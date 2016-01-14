@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="@drawable/bf_play_bg"
+    android:id="@+id/bottom_actionbar_container">
+    <!-- 底部自定义actionbar -->
+    <remix.myplayer.ui.BottomActionBar
+        android:id="@+id/bottom_action_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+        <!-- 播放界面按钮 -->
+        <ImageView
+            android:layout_marginLeft="19dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/home_btn_back"
+            android:id="@+id/bottom_action_bar_cover"
+            android:layout_centerVertical="true"/>
+        <!-- 歌曲名与歌手 -->
+        <LinearLayout
+            android:layout_marginLeft="72dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="200dp"
+                android:textColor="#1b1c19"
+                android:textSize="16dp"
+                android:id="@+id/bottom_title"
+                android:text="歌曲名"/>
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="200dp"
+                android:id="@+id/bottom_artist"
+                android:textSize="14dp"
+                android:textColor="#6d6c69"
+                android:text="歌手"/>
+
+        </LinearLayout>
+
+        <!-- 前进播放后退三个按钮 -->
+        <ImageButton
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginRight="19dp"
+            android:layout_alignParentRight="true"
+            android:id="@+id/playbar_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/holo_selector"
+            android:src="@drawable/bf_but_play"/>
+
+    </remix.myplayer.ui.BottomActionBar>
+</RelativeLayout>

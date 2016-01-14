@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">MyPlayer</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Tabs -->
+    <string name="tab_song">歌曲</string>
+    <string name="tab_album">专辑</string>
+    <string name="tab_artist">艺术家</string>
+    <string name="tab_playlist">播放列表</string>
+    <string name="tab_dir">文件夹</string>
+
+</resources>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!-- 标题栏 -->
+    <RelativeLayout
+        android:id="@+id/main_top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:background="#fff">
+        <ImageButton
+            android:id="@+id/btn_slide_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="19dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/btn_actionbar_menu"/>
+        <ImageButton
+            android:id="@+id/btn_top_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="19dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/actinobar_search" />
+        <ImageButton
+            android:id="@+id/btn_top_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:layout_toLeftOf="@id/btn_top_search"
+            android:layout_centerVertical="true"
+            android:background="@drawable/actionbar_timer" />
+    </RelativeLayout>
+    <!-- CustonTab -->
+    <!--<com.viewpagerindicator.TabPageIndicator-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="@dimen/tab_height"-->
+        <!--android:id="@+id/tab_indicator"/>-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tab_height"
+        android:orientation="horizontal"
+        android:background="#fff"
+        android:gravity="center_vertical|center_horizontal">
+        <TextView
+            android:id="@+id/tab_song"
+            style="@style/CustomTab"
+            android:text="@string/tab_song"/>
+        <TextView
+            android:id="@+id/tab_album"
+            style="@style/CustomTab"
+            android:text="@string/tab_album"/>
+        <TextView
+            android:id="@+id/tab_artist"
+            style="@style/CustomTab"
+            android:text="@string/tab_artist"/>
+        <TextView
+            android:id="@+id/tab_playlist"
+            style="@style/CustomTab"
+            android:text="@string/tab_dir"/>
+    </LinearLayout>
+    <!-- Tab分割线-->
+    <ImageView
+        android:id="@+id/tab_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/indicator"/>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/line"/>
+    <!--中间四个fragment-->
+    <remix.myplayer.ui.MyPager
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        android:background="#fff"
+        android:id="@+id/ViewPager" />
+
+    <!--
+    <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
+        android:id="@+id/ViewPager" />
+        -->
+</LinearLayout>

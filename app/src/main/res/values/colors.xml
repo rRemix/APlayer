@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <!-- A semi-transparent dark Holo shade of blue -->
+    <color name="holo_blue_dark">#ff0099cc</color>
+    <color name="holo_dark">#ffffffff</color>
+
+    <!-- Transparent -->
+    <color name="transparent">#00000000</color>
+    <color name="translucence">#30000000</color>
+    <!--分割线-->
+    <color name="divider">#c0c0c0</color>
+    <!-- 轨道背景-->
+    <color name="progress_bg">#d1d0ce</color>
+    <!-- 已完成轨道背景-->
+    <color name="progress_complete">#8e24aa</color>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="About">0</integer>
+    <integer name="Search">1</integer>
+    <integer name="Play">2</integer>
+    <integer name="Refush">3</integer>
+    <integer name="Exit">4</integer>
+    <integer-array name="Slide_Menu">
+        <item>@integer/About</item>
+        <item>@integer/Search</item>
+        <item>@integer/Play</item>
+        <item>@integer/Refush</item>
+        <item>@integer/Exit</item>
+    </integer-array>
+</resources>

@@ -1,0 +1,3 @@
+include ':app'
+include ':slidingmenu_library'
+include ':viewpageindicator'

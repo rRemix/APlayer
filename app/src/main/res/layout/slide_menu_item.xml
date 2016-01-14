@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:gravity="center_vertical"
+    android:divider="@color/divider">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:id="@+id/slide_menu_image"
+        android:src="@drawable/drawer_icon_allsong"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/slide_menu_text"
+        android:layout_margin="8dp"
+        android:text="全部歌曲"
+        android:textSize="16dp"
+        android:textColor="#fff"/>
+</LinearLayout>
