@@ -1,5 +1,6 @@
 package remix.myplayer.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,7 @@ import remix.myplayer.listeners.SlideMenuListener;
 import remix.myplayer.listeners.TabTextListener;
 import remix.myplayer.listeners.ViewPagerListener;
 import remix.myplayer.ui.MyPager;
+import remix.myplayer.ui.TimerPopupWindow;
 
 /**
  * Created by Remix on 2015/12/5.
@@ -30,6 +32,7 @@ public class MainFragment extends Fragment {
     public static MainFragment mInstance;
     private ImageView mTabImage = null;
     private ImageButton mSlideMenuBtn;
+    private ImageButton mTimer;
     private ListView mSlideMenuList;
     private SlidingMenu mSlideMenu;
     private MyPager mViewPager;
@@ -51,9 +54,21 @@ public class MainFragment extends Fragment {
         mInflater = inflater;
         View rootView = inflater.inflate(R.layout.homepage,null);
         initTab(rootView);
+        initTimer(rootView);
         initPager();
         initSlideMenu(rootView);
         return rootView;
+    }
+
+    private void initTimer(View v)
+    {
+        mTimer = (ImageButton)v.findViewById(R.id.btn_top_timer);
+        mTimer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), TimerPopupWindow.class));
+            }
+        });
     }
 
     private void initSlideMenu(View v)

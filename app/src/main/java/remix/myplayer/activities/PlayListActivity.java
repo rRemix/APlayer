@@ -22,8 +22,8 @@ public class PlayListActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.playlist);
-        mRecycleView = (RecyclerView)findViewById(R.id.playlist_recycleview);
-        mRecycleView.setLayoutManager(new GridLayoutManager(this, 3));
+//        mRecycleView = (RecyclerView)findViewById(R.id.playlist_recycleview);
+//        mRecycleView.setLayoutManager(new GridLayoutManager(this, 3));
 //        mRecycleView.setAdapter();
     }
 }

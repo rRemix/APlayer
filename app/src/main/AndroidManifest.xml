@@ -36,18 +36,22 @@
 
         <activity android:name=".activities.ChildHolderActivity"/>
 
-        <service android:name=".services.MusicService">
-        </service>
+        <service android:name=".services.MusicService"/>
+        <service android:name=".services.TimerService"/>
+
+
 
         <activity android:name=".ui.PlayListPopupWindow"
-            android:theme="@style/PlayListDialog"/>
+            android:theme="@style/PopupDialog"/>
 
         <activity android:name=".ui.SelectedPopupWindow"
-            android:theme="@style/PlayListDialog"/>
+            android:theme="@style/PopupDialog"/>
 
+        <activity android:name=".ui.TimerPopupWindow"
+            android:theme="@style/PopupDialog"/>
 
         <activity android:name=".ui.SharePopupWindow"
-            android:theme="@style/PlayListDialog"
+            android:theme="@style/PopupDialog"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="portrait" >
             <!-- 微博分享-->
@@ -88,6 +92,7 @@
                 <action android:name="remix.music.UPDATE_ACTION"/>
             </intent-filter>
         </receiver>
+
     </application>
 
 </manifest>
