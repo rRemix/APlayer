@@ -86,25 +86,26 @@ public class Utility {
         }
     }
 
-    public static Bitmap getBitmapByArtistId(int id)
+    public static String CheckUrlByArtistId(int artistid)
     {
         Cursor cursor = null;
         ContentResolver resolver = mContext.getContentResolver();
-        if(id < 0 ) return null;
-        Bitmap bitmap = null;
+        if(artistid < 0 ) return null;
+        String url = null;
         cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                MediaStore.Audio.Media.ARTIST_ID + "=" + id, null, null);
+                MediaStore.Audio.Media.ARTIST_ID + "=" + artistid, null, null);
         if(cursor != null && cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
-                int songid = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-                bitmap = CheckBitmapBySongId(songid,true);
-                if(bitmap != null)
+                int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                url = CheckUrlByAlbumId(id);
+                if(url != null)
                     break;
             }
         }
         cursor.close();
-        return bitmap;
+        return url;
     }
+
 
     /*
     type 0:专辑 1:歌手
@@ -149,7 +150,7 @@ public class Utility {
     {
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{"album_art"},
-                MediaStore.Audio.Albums._ID + "=" + songId, null, null);
+                MediaStore.Audio.Media._ID + "=" + songId, null, null);
         if(cursor != null && cursor.getCount() > 0)
         {
             cursor.moveToNext();

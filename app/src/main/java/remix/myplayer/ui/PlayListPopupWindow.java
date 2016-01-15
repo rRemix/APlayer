@@ -1,23 +1,19 @@
 package remix.myplayer.ui;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import remix.myplayer.R;
-import remix.myplayer.adapters.PlayListAdapter;
+import remix.myplayer.adapters.PlayingAdapter;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.Utility;
 
@@ -31,7 +27,7 @@ public class PlayListPopupWindow extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.popup_playlist);
         mListView = (ListView)findViewById(R.id.bottom_actionbar_play_list);
-        mListView.setAdapter(new PlayListAdapter(getLayoutInflater(), getApplicationContext()));
+        mListView.setAdapter(new PlayingAdapter(getLayoutInflater(), getApplicationContext()));
         mListView.setOnItemClickListener(new ListViewListener());
 
         //改变播放列表高度，并置于底部

@@ -1,80 +1,50 @@
 package remix.myplayer.adapters;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.security.PrivateKey;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.MainActivity;
-import remix.myplayer.services.MusicService;
-import remix.myplayer.utils.MP3Info;
-import remix.myplayer.utils.Utility;
 
 /**
- * Created by Remix on 2015/12/2.
+ * Created by taeja on 16-1-15.
  */
-public class PlayListAdapter extends BaseAdapter {
-    private LayoutInflater mInflater;
+public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHolder> {
     private Context mContext;
-    public PlayListAdapter(LayoutInflater inflater,Context context)
+
+    public PlayListAdapter(Context context)
     {
-        mContext = context;
-        mInflater = inflater;
-    }
-    @Override
-    public int getCount() {
-        if(Utility.mPlayList == null)
-            return 0;
-        return Utility.mPlayList.size();
+        this.mContext = context;
     }
 
     @Override
-    public Object getItem(int position)
-    {
-        if(Utility.mPlayList == null || Utility.mPlayList.size() == 0)
-            return null;
-        return Utility.mPlayList.get(position);
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        ViewHolder holder = new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.album_recycle_item, null, false));
+        return holder;
     }
 
     @Override
-    public long getItemId(int position) {
-        return position;
+    public void onBindViewHolder(ViewHolder holder, int position) {
+
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        View ItemView = mInflater.inflate(R.layout.playlist_item,null);
-        if(Utility.mPlayList == null || Utility.mPlayList.size() == 0)
-            return ItemView;
-        TextView title = (TextView)ItemView.findViewById(R.id.playlist_item_name);
-        TextView artist = (TextView)ItemView.findViewById(R.id.playlist_item_artist);
+    public int getItemCount() {
+        return 0;
+    }
 
-        MP3Info temp = new MP3Info(Utility.getMP3InfoById(Utility.mPlayList.get(position)));
-        title.setText(temp.getDisplayname());
-        artist.setText(temp.getArtist());
-
-        ImageView button = (ImageView)ItemView.findViewById(R.id.playlist_button_delete);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MP3Info temp = Utility.getMP3InfoById(Utility.mPlayList.get(position));
-                if (temp != null) {
-                    Utility.mPlayList.remove(position);
-                }
-                Toast.makeText(v.getContext(), "删除了第" + position + "项", Toast.LENGTH_SHORT).show();
-                notifyDataSetChanged();
-            }
-        });
-        return ItemView;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public final TextView mName;
+        public final TextView mCount;
+        public ViewHolder(View itemView) {
+            super(itemView);
+            mName = (TextView) itemView.findViewById(R.id.playlist_name);
+            mCount = (TextView)itemView.findViewById(R.id.playlist_count);
+        }
     }
 }

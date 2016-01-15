@@ -71,7 +71,7 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
                     mInfoList = Utility.getMP3InfoByArtistIdOrAlbumId(mId, 0);
                     break;
                 case Utility.ARTIST_HOLDER:
-                    mInfoList = Utility.mInstace.getMP3InfoByArtistIdOrAlbumId(mId, 1);
+                    mInfoList = Utility.getMP3InfoByArtistIdOrAlbumId(mId, 1);
                     break;
                 case Utility.FOLDER_HOLDER:
                     Iterator it = Utility.mFolderMap.keySet().iterator();

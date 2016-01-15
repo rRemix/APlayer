@@ -1,9 +1,5 @@
 package remix.myplayer.fragments;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,14 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 
 import remix.myplayer.R;
-import remix.myplayer.adapters.PlayListAdapter;
 import remix.myplayer.utils.MP3Info;
-import remix.myplayer.utils.Utility;
 
 /**
  * Created by Remix on 2015/12/2.

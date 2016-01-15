@@ -2,37 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!-- 标题栏 -->
-    <RelativeLayout
-        android:id="@+id/main_top_bar"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:background="#fff">
-        <ImageButton
-            android:id="@+id/btn_slide_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="19dp"
-            android:layout_centerVertical="true"
-            android:background="@drawable/btn_actionbar_menu"/>
-        <ImageButton
-            android:id="@+id/btn_top_search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="19dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/actinobar_search" />
-        <ImageButton
-            android:id="@+id/btn_top_timer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="16dp"
-            android:layout_toLeftOf="@id/btn_top_search"
-            android:layout_centerVertical="true"
-            android:background="@drawable/actionbar_timer" />
-    </RelativeLayout>
+
+    <include layout="@layout/top_actionbar"/>
+
     <!-- CustonTab -->
     <!--<com.viewpagerindicator.TabPageIndicator-->
         <!--android:layout_width="match_parent"-->

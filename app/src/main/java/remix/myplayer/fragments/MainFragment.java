@@ -58,6 +58,7 @@ public class MainFragment extends Fragment {
 
     private void initSlideMenu(View v)
     {
+        //初始化菜单
         mSlideMenu = new SlidingMenu(getContext());
         mSlideMenu.setMode(SlidingMenu.LEFT);
         mSlideMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);

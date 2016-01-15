@@ -37,7 +37,7 @@ public class ArtistAdapter extends SimpleCursorAdapter {
         }
         @Override
         protected Bitmap doInBackground(Integer... params) {
-            return Utility.getBitmapByArtistId(params[0]);
+            return null;
         }
 
         @Override

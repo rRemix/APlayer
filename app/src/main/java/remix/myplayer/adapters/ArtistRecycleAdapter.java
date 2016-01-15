@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.lang.ref.WeakReference;
 
@@ -56,23 +59,24 @@ public class ArtistRecycleAdapter extends RecyclerView.Adapter<ArtistRecycleAdap
 
 
     //<Params, Progress, Result>
-    class AsynLoadImage extends AsyncTask<Integer,Integer,Bitmap>
+    class AsynLoadImage extends AsyncTask<Integer,Integer,String>
     {
 //        private final WeakReference mImageView;
-        private final ImageView mImage;
-        public AsynLoadImage(ImageView imageView)
+        private final SimpleDraweeView mImage;
+        public AsynLoadImage(SimpleDraweeView imageView)
         {
 //            mImageView = new WeakReference(imageView);
             mImage = imageView;
         }
         @Override
-        protected Bitmap doInBackground(Integer... params) {
-            return Utility.getBitmapByArtistId(params[0]);
+        protected String doInBackground(Integer... params) {
+            return Utility.CheckUrlByArtistId(params[0]);
         }
         @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            if(bitmap != null && mImage != null)
-                mImage.setImageBitmap(bitmap);
+        protected void onPostExecute(String url) {
+            Uri uri = Uri.parse("file:///" + url);
+            if(url != null && mImage != null)
+                mImage.setImageURI(uri);
         }
     }
 
@@ -136,12 +140,13 @@ public class ArtistRecycleAdapter extends RecyclerView.Adapter<ArtistRecycleAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView mText1;
-        public final ImageView mImage;
+//        public final ImageView mImage;
+        public final SimpleDraweeView mImage;
         public final ImageButton mButton;
         public ViewHolder(View v) {
             super(v);
             mText1 = (TextView)v.findViewById(R.id.recycleview_text1);
-            mImage = (ImageView)v.findViewById(R.id.recycleview_image);
+            mImage = (SimpleDraweeView)v.findViewById(R.id.recycleview_simpleiview);
             mButton = (ImageButton)v.findViewById(R.id.recycleview_button);
         }
     }
