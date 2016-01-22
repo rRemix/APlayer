@@ -15,13 +15,15 @@
             android:src="@drawable/acbar_btn_back"
             android:background="@color/transparent"
             android:id="@+id/btn_search_back" />
-        <EditText
+        <SearchView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="11"
-            android:hint="搜索歌曲"
-            android:id="@+id/search_edit"
-            android:drawableEnd="@drawable/actinobar_search"/>
-
+            android:queryHint="搜索歌曲"
+            android:id="@+id/search_"/>
     </LinearLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/text"/>
 </LinearLayout>
