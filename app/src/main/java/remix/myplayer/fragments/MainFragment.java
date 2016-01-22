@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import remix.myplayer.R;
+import remix.myplayer.activities.SearchActivity;
 import remix.myplayer.adapters.PagerAdapter;
 import remix.myplayer.adapters.SlideMenuAdapter;
 import remix.myplayer.adapters.SlideMenuRecycleAdpater;
@@ -33,6 +34,7 @@ public class MainFragment extends Fragment {
     private ImageView mTabImage = null;
     private ImageButton mSlideMenuBtn;
     private ImageButton mTimer;
+    private ImageButton mSearch;
     private ListView mSlideMenuList;
     private SlidingMenu mSlideMenu;
     private MyPager mViewPager;
@@ -54,19 +56,26 @@ public class MainFragment extends Fragment {
         mInflater = inflater;
         View rootView = inflater.inflate(R.layout.homepage,null);
         initTab(rootView);
-        initTimer(rootView);
+        initTimerandSearch(rootView);
         initPager();
         initSlideMenu(rootView);
         return rootView;
     }
 
-    private void initTimer(View v)
+    private void initTimerandSearch(View v)
     {
         mTimer = (ImageButton)v.findViewById(R.id.btn_top_timer);
         mTimer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getActivity(), TimerPopupWindow.class));
+            }
+        });
+        mSearch = (ImageButton)v.findViewById(R.id.btn_top_search);
+        mSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), SearchActivity.class));
             }
         });
     }

@@ -31,8 +31,10 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".activities.SearchActivity"/>
+
         <activity android:name=".activities.AudioHolderActivity"
-            android:theme="@style/AppTheme.NoActionBar.Translucent"/>
+            android:theme="@style/AppTheme.NoActionBar.Translucent" />
 
         <activity android:name=".activities.ChildHolderActivity"/>
 

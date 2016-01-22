@@ -18,6 +18,7 @@ import java.util.Timer;
 
 import remix.myplayer.R;
 import remix.myplayer.services.TimerService;
+import remix.myplayer.utils.Utility;
 
 /**
  * Created by taeja on 16-1-15.
@@ -28,7 +29,7 @@ public class TimerPopupWindow extends Activity {
     private SeekBar mSeekbar;
     private Button mToggle;
     private Button mCancel;
-    private int mTime;
+    private static int mTime;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +39,7 @@ public class TimerPopupWindow extends Activity {
         Window w = getWindow();
         WindowManager wm = getWindowManager();
         Display display = wm.getDefaultDisplay();
-        DisplayMetrics metrics = new DisplayMetrics();
+        final DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
         lp.height = (int) (200 * metrics.densityDpi / 160);
@@ -47,7 +48,14 @@ public class TimerPopupWindow extends Activity {
         w.setGravity(Gravity.BOTTOM);
 
         mText = (TextView)findViewById(R.id.close_time);
+        if(misRun)
+        {
+            long stoptime = System.currentTimeMillis();
+            int runtime = (int)(System.currentTimeMillis() - TimerService.mStartTime) / 1000 / 60;
+            mText.setText(String.valueOf(mTime - runtime));
+        }
         mSeekbar = (SeekBar)findViewById(R.id.close_seekbar);
+        mTime = mSeekbar.getProgress();
         mSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -66,16 +74,22 @@ public class TimerPopupWindow extends Activity {
             }
         });
 
+        Intent startIntent = new Intent(TimerPopupWindow.this, TimerService.class);
+        startService(startIntent);
+
         mToggle = (Button)findViewById(R.id.close_toggle);
         mToggle.setText(misRun == true ? "取消计时" : "开始计时");
         mToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent startIntent = new Intent(TimerPopupWindow.this, TimerService.class);
-                startService(startIntent);
 
-                String msg = misRun == true ? "取消定时关闭" : "将在" + mTime + "后关闭";
+                String msg = misRun == true ? "取消定时关闭" : "将在" + mTime + "分钟后关闭";
                 Toast.makeText(TimerPopupWindow.this,msg,Toast.LENGTH_SHORT).show();
+                misRun = !misRun;
+                Intent intent = new Intent(Utility.CONTROL_TIMER);
+                intent.putExtra("Time",mTime);
+                intent.putExtra("Run",misRun);
+                sendBroadcast(intent);
                 finish();
             }
         });

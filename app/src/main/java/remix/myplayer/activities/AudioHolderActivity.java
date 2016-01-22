@@ -147,6 +147,12 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         }
     };
 
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -252,6 +258,13 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     protected void onStop() {
         super.onStop();
         mIsRun = false;
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        unbindService(mConnecting);
     }
 
     class ProgeressThread extends Thread {
@@ -382,12 +395,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             }
         });
     }
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-        unbindService(mConnecting);
-    }
+
     //更新顶部信息
     public void UpdateTopStatus(MP3Info mp3Info)
     {
