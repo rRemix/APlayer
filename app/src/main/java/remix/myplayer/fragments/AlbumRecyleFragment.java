@@ -60,19 +60,6 @@ public class AlbumRecyleFragment extends Fragment implements LoaderManager.Loade
             }
         });
         mRecycleView.setAdapter(mAdapter);
-//        mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//
-//                if(newState == RecyclerView.SCROLL_STATE_IDLE)
-//                {
-//                    mAdapter.setScrollState(false);
-//                }
-//                else
-//                    mAdapter.setScrollState(true);
-//            }
-//        });
     }
     @Nullable
     @Override

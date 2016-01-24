@@ -29,6 +29,7 @@ import java.lang.ref.WeakReference;
 import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;
 import remix.myplayer.adapters.SongListAdapter;
+import remix.myplayer.listeners.ListViewListener;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Utility;
 
@@ -53,33 +54,6 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         mManager = getLoaderManager();
         mManager.initLoader(1000, null, this);
         mAdapter = new SongListAdapter(getContext(),R.layout.allsong_item,null,new String[]{},new int[]{},0);
-//        mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(AbsListView view, int scrollState) {
-//                if(scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_FLING) {
-//                    mAdapter.setScrollState(false);
-//                    int count = view.getChildCount();
-//                    for(int i = 0 ; i < count ;i++)
-//                    {
-//                        ImageView imageView = (ImageView)view.getChildAt(i).findViewById(R.id.homepage_head_image);
-//                        if(imageView.getTag() == null) continue;
-//                        if(!imageView.getTag().equals(""))
-//                        {
-//                            AsynLoadImage task = new AsynLoadImage(imageView);
-//                            int albumid = Integer.valueOf(imageView.getTag().toString());
-//                            task.execute(albumid);
-//                        }
-//                    }
-//                }
-//                else
-//                    mAdapter.setScrollState(true);
-//            }
-//
-//            @Override
-//            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-//
-//            }
-//        });
         mListView.setAdapter(mAdapter);
     }
 
@@ -132,7 +106,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         super.onCreateView(inflater,container,savedInstanceState);
         final View rootView = inflater.inflate(R.layout.allsong_list,null);
         mListView = (ListView)rootView.findViewById(R.id.list);
-        mListView.setOnItemClickListener(new ListViewListener());
+        mListView.setOnItemClickListener(new ListViewListener(getContext()));
         return rootView;
     }
 
@@ -166,34 +140,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
             mAdapter.changeCursor(null);
     }
 
-    private class ListViewListener implements AdapterView.OnItemClickListener
-    {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Intent intent = new Intent(Utility.CTL_ACTION);
-            Bundle arg = new Bundle();
-            arg.putInt("Control", Utility.PLAYSELECTEDSONG);
-            arg.putInt("Position", position);
-            intent.putExtras(arg);
-            getContext().sendBroadcast(intent);
-            Utility.mPlayList = Utility.mAllSongList;
-            MainActivity.mInstance.getService().UpdateNextSong(position);
 
-            //将当前选中的歌曲的歌曲名设置为红色
-//            TextView title = (TextView)view.findViewById(R.id.displayname);
-//            title.setTextColor(Color.RED);
-//            //取消上次选中的红色
-//            if(mPrev != -1)
-//            {
-//                adapter = (SongListAdapter)parent.getAdapter();
-//                TextView prevtitle = (TextView)parent.getAdapter().getView(mPrev,view,null).findViewById(R.id.displayname);
-//                prevtitle.setBackgroundColor(Color.BLACK);
-//                adapter.notifyDataSetChanged();
-//                System.out.println(prevtitle.getText().toString());
-//            }
-//            mPrev = position;
-        }
-    }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {

@@ -78,16 +78,6 @@ public class SongListAdapter extends SimpleCursorAdapter {
         holder.mOther.setText(artist + "-" + album);
         AsynLoadImage task = new AsynLoadImage(holder.mImage);
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,((Cursor) getItem(position)).getInt(AllSongFragment.mSongId));
-//        task.execute(((Cursor) getItem(position)).getInt(AllSongFragment.mSongId));
-//        if(!mScrollState) {
-//            AsynLoadImage task = new AsynLoadImage(holder.mImage);
-//            task.execute(((Cursor) getItem(position)).getInt(AllSongFragment.mSongId));
-//        }
-//        else
-//        {
-//            holder.mImage.setTag((((Cursor) getItem(position)).getInt(AllSongFragment.mAlbumIdIndex)));
-//            holder.mImage.setImageResource(R.drawable.default_recommend);
-//        }
 
         final ImageView mItemButton = (ImageView)convertView.findViewById(R.id.allsong_item_button);
         mItemButton.setOnClickListener(new View.OnClickListener() {
@@ -105,7 +95,6 @@ public class SongListAdapter extends SimpleCursorAdapter {
     class AsynLoadImage extends AsyncTask<Integer,Integer,Bitmap>
     {
         private final WeakReference mImageView;
-        //        private ImageView mImageView;
         public AsynLoadImage(ImageView imageView)
         {
             mImageView = new WeakReference(imageView);

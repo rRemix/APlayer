@@ -22,8 +22,9 @@
             android:queryHint="搜索歌曲"
             android:id="@+id/search_"/>
     </LinearLayout>
-    <TextView
+    <ListView
+        android:id="@+id/search_result"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/text"/>
+        android:layout_height="match_parent">
+    </ListView>
 </LinearLayout>

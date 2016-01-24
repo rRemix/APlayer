@@ -232,7 +232,6 @@ public class Utility {
                     thumb = Bitmap.createScaledBitmap(bm, 350, 350, true);
                 if(bm != null && !bm.isRecycled())
                 {
-                    bm.recycle();
                     bm = null;
                 }
                 return thumb;

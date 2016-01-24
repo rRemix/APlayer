@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import remix.myplayer.R;
+import remix.myplayer.activities.SearchActivity;
 import remix.myplayer.adapters.FolderAdapter;
 import remix.myplayer.adapters.SongListAdapter;
 import remix.myplayer.utils.MP3Info;
@@ -128,6 +129,7 @@ public class SelectedPopupWindow extends Activity {
         ContentResolver resolver = getContentResolver();
         if(resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,MediaStore.MediaColumns.DATA + "=?",new String[]{mInfo.getUrl()}) > 0)
         {
+            SearchActivity.mUpdate = true;
             //删除播放列表与全部歌曲列表中该歌曲
             for(Long id : Utility.mPlayList)
             {
@@ -151,12 +153,7 @@ public class SelectedPopupWindow extends Activity {
                 {
                     if(mp3Info.getDisplayname().equals(mInfo.getDisplayname()))
                     {
-                        ArrayList allsonglist = Utility.mAllSongList;
-                        ArrayList playlist = Utility.mPlayList;
                         list.remove(mp3Info);
-                        allsonglist = Utility.mAllSongList;
-                        playlist = Utility.mPlayList;
-                        System.out.println(list);
                         break;
                     }
                 }

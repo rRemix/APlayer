@@ -3,44 +3,34 @@
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="72dp"
     android:id="@+id/songlist_item">
-    <remix.myplayer.ui.CircleImageView
+    <ImageView
         android:layout_alignParentLeft="true"
-        android:id="@+id/homepage_head_image"
+        android:id="@+id/search_image"
         android:src="@drawable/default_recommend"
         android:layout_centerVertical="true"
         android:layout_marginLeft="19dp"
-        android:layout_width="40dp"
-        android:layout_height="40dp"/>
+        android:layout_width="45dp"
+        android:layout_height="45dp"/>
     <!--歌曲名、歌手、专辑-->
     <LinearLayout
         android:layout_width="150dp"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="73dp"
+        android:layout_marginLeft="85dp"
         android:layout_centerVertical="true"
         android:orientation="vertical">
         <TextView
             style="@style/songlist_item_title"
-            android:id="@+id/displayname"
+            android:id="@+id/search_name"
             android:layout_marginTop="5dp"
             android:text="歌曲名"/>
         <TextView
-            android:id="@+id/detail"
+            android:id="@+id/search_detail"
             style="@style/songlist_item_title"
             android:textColor="#6d6d69"
             android:textSize="14dp"
             android:text="歌手与专辑"
             android:layout_marginBottom="5dp"/>
     </LinearLayout>
-    <!--结尾处按钮-->
-    <ImageView
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="18dp"
-        android:id="@+id/allsong_item_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_centerVertical="true"
-        android:scaleType="center"
-        android:src="@drawable/list_icn_more"
-        android:background="@drawable/bg_btn_gray_selector"/>
+
 </RelativeLayout>

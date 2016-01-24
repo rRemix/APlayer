@@ -102,7 +102,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
                 //对专辑图片进行高斯模糊，并将其设置为背景
                 float radius = 25;
                 float scaleFactor = 12;
-                if (mWidth > 0 && mHeight > 0) {
+                if (mWidth > 0 && mHeight > 0 ) {
                     Bitmap bkg = Utility.CheckBitmapBySongId((int) mInfo.getId(),false);
                     if (bkg == null)
                         bkg = BitmapFactory.decodeResource(getResources(), R.drawable.bg_lockscreen_default);
