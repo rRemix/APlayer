@@ -16,9 +16,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
-
-import javax.net.ssl.SSLContext;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.AlbumHolderAdapter;
@@ -68,10 +65,10 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
             switch (type)
             {
                 case Utility.ALBUM_HOLDER:
-                    mInfoList = Utility.getMP3InfoByArtistIdOrAlbumId(mId, 0);
+                    mInfoList = Utility.getMP3InfoByArtistIdOrAlbumId(mId, Utility.ALBUM_HOLDER);
                     break;
                 case Utility.ARTIST_HOLDER:
-                    mInfoList = Utility.getMP3InfoByArtistIdOrAlbumId(mId, 1);
+                    mInfoList = Utility.getMP3InfoByArtistIdOrAlbumId(mId, Utility.ARTIST_HOLDER);
                     break;
                 case Utility.FOLDER_HOLDER:
                     Iterator it = Utility.mFolderMap.keySet().iterator();
@@ -82,7 +79,6 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
                         i++;
                     }
                     String key = (String)it.next();
-//                    mInfoList = Utility.mFolderMap.get(key);
                     mInfoList = Utility.getMP3ListByIds(Utility.mFolderMap.get(key));
                     Title = key.substring(key.lastIndexOf("/") + 1,key.length());
                     break;

@@ -16,8 +16,10 @@ import android.os.Message;
 import android.support.v4.view.ViewPager;
 
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -39,6 +41,7 @@ import remix.myplayer.fragments.LrcFragment;
 import remix.myplayer.fragments.RecordFragment;
 import remix.myplayer.services.MusicService;
 
+import remix.myplayer.ui.AudioPager;
 import remix.myplayer.ui.PlayListPopupWindow;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.Utility;
@@ -66,7 +69,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     private TextView mTopTitle;
     private TextView mTopDetail;
     private ImageButton mHide;
-    private ViewPager mPager;
+    private AudioPager mPager;
     private TextView mHasPlay;
     private TextView mRemainPlay;
     private SeekBar mSeekBar;
@@ -454,7 +457,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     private void initPager()
     {
         //初始化Viewpager
-        mPager = (ViewPager)findViewById(R.id.holder_pager);
+        mPager = (AudioPager)findViewById(R.id.holder_pager);
         mAdapter = new PagerAdapter(getSupportFragmentManager());
         mBundle = new Bundle();
         mBundle.putSerializable("MP3Info", mInfo);
@@ -472,6 +475,10 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
                 mGuideList.get(mPrevPosition).setImageResource(R.drawable.play_icon_unselected_dot);
                 mGuideList.get(position).setImageResource(R.drawable.play_icon_selected_dot);
                 mPrevPosition = position;
+                if(position == 0)
+                    mPager.setIntercept(true);
+                else
+                    mPager.setIntercept(false);
             }
 
             @Override

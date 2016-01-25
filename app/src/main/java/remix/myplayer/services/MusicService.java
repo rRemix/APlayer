@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.UTFDataFormatException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -33,6 +34,8 @@ import remix.myplayer.utils.Utility;
  * Created by Remix on 2015/12/1.
  */
 public class MusicService extends Service {
+    //实例
+    public static MusicService mInstance;
     //播放列表
 //    private static ArrayList<MP3Info> mInfoList = Utility.mInfoList;
     //是否第一次启动
@@ -102,6 +105,8 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        mInstance = this;
+
         if(Utility.mPlayList != null && Utility.mPlayList.size() > 0)
             mId = Utility.mPlayList.get(0);
         mInfo = Utility.getMP3InfoById(mId);
@@ -211,24 +216,6 @@ public class MusicService extends Service {
     public void addCallback(Callback callback,int positon)
     {
         mCallBacklist.add(callback);
-//        if(positon == 0)
-//        {
-//            if(mCallBacklist.size() == positon)
-//                mCallBacklist.add(callback);
-//            else
-//                mCallBacklist.set(0,callback);
-//        }
-//        else
-//        {
-//            String Flag;
-//        }
-
-
-//        if (mCallBacklist.size() == positon)
-//            mCallBacklist.add(callback);
-//        else
-//            mCallBacklist.set(positon,callback);
-
     }
     //返回回调接口链表的长度
     public int getCallBackListSize()
@@ -282,7 +269,7 @@ public class MusicService extends Service {
                     break;
                 default:break;
             }
-            if(Control != Utility.PLAY_LOOP && Control != Utility.PLAY_SHUFFLE)
+//            if(Control != Utility.PLAY_LOOP && Control != Utility.PLAY_SHUFFLE)
             {
                 handler.sendEmptyMessage(Utility.UPDATE_INFORMATION);
             }
@@ -315,6 +302,8 @@ public class MusicService extends Service {
     //根据当前播放列表的长度，得到一个随机数
     private int getShuffle()
     {
+        if(Utility.mPlayList.size() == 1)
+            return 0;
         return new Random().nextInt(Utility.mPlayList.size() - 1);
     }
     //根据当前播放模式，播放上一首或者下一首

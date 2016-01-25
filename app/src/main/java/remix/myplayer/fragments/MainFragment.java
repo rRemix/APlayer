@@ -126,7 +126,6 @@ public class MainFragment extends Fragment {
         mAdapter.AddFragment(new AllSongFragment());
         mAdapter.AddFragment(new AlbumRecyleFragment());
         mAdapter.AddFragment(new ArtistRecycleFragment());
-//        mAdapter.AddFragment(new ArtistFragment());
         mAdapter.AddFragment(new FolderFragment());
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(0);

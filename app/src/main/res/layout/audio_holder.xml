@@ -57,7 +57,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
             <!-- 中间三个页面 -->
-            <android.support.v4.view.ViewPager
+            <remix.myplayer.ui.AudioPager
                 android:layout_below="@id/top_actionbar"
                 android:id="@+id/holder_pager"
                 android:layout_width="match_parent"

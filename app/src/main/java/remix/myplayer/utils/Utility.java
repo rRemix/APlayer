@@ -17,6 +17,7 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,6 +26,7 @@ import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +34,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
+
+import remix.myplayer.adapters.FolderAdapter;
+import remix.myplayer.adapters.SongListAdapter;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -59,6 +64,7 @@ public class Utility {
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA},
                 MediaStore.Audio.Media.SIZE + ">80000", null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
             if (id > 0)
@@ -115,15 +121,16 @@ public class Utility {
         Cursor cursor = null;
         ContentResolver resolver = mContext.getContentResolver();
         ArrayList<MP3Info> mp3Info = new ArrayList<>();
-        if (type == 0) {
+        if (type == ALBUM_HOLDER) {
             cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
                     MediaStore.Audio.Media.ALBUM_ID + "=" + _id, null, null);
             }
 
-        if (type == 1) {
+        if (type == ARTIST_HOLDER) {
             cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
                     MediaStore.Audio.Media.ARTIST_ID + "=" + _id, null, null);
             }
+
         if(cursor != null && cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
@@ -291,6 +298,52 @@ public class Utility {
         if(count > 0)
             return count;
         return -1;
+    }
+
+    //0:删除某专辑的所有歌曲 1:删除某歌手的所有歌曲 2:删除单首歌曲
+    public static boolean deleteSong(MP3Info info,int type)
+    {
+        ContentResolver resolver = mContext.getContentResolver();
+        if(resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,MediaStore.MediaColumns.DATA + "=?",new String[]{info.getUrl()}) > 0)
+        {
+            //删除播放列表与全部歌曲列表中该歌曲
+            for(Long id : Utility.mPlayList)
+            {
+                if(info.getId() == id)
+                {
+                    Utility.mPlayList.remove(id);
+                    break;
+                }
+            }
+            //删除文件夹列表中该歌曲
+            //获得歌曲所在文件夹
+            Iterator it = Utility.mFolderList.keySet().iterator();
+            while(it.hasNext())
+            {
+                String Key = (String)it.next();
+                String Name = info.getUrl().substring(0,info.getUrl().lastIndexOf('/'));
+                if(!Key.equals(Name))
+                    continue;
+                ArrayList<MP3Info> list = Utility.mFolderList.get(Key);
+                for(MP3Info mp3Info : list)
+                {
+                    if(mp3Info.getDisplayname().equals(info.getDisplayname()))
+                    {
+                        list.remove(mp3Info);
+                        break;
+                    }
+                }
+                break;
+            }
+            //通知适配器刷新
+            SongListAdapter.mInstance.notifyDataSetChanged();
+            if(FolderAdapter.mInstance != null)
+                FolderAdapter.mInstance.notifyDataSetChanged();
+
+            return true;
+        }
+        else
+            return false;
     }
 
     //压缩图片用于分享
@@ -576,9 +629,9 @@ public class Utility {
     //更新背景
     public final static int UPDATE_BG = 0x102;
     //启动哪一个子fragment
-    public final static int ALBUM_HOLDER = 1;
-    public final static int ARTIST_HOLDER = 2;
-    public final static int FOLDER_HOLDER = 3;
+    public final static int ALBUM_HOLDER = 0;
+    public final static int ARTIST_HOLDER = 1;
+    public final static int FOLDER_HOLDER = 2;
 
     //腾讯Api Id
     public final static String TECENT_APIID = "1105030910";

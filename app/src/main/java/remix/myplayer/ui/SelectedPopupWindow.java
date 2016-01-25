@@ -112,7 +112,8 @@ public class SelectedPopupWindow extends Activity {
         mDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                delete();
+                String result = Utility.deleteSong(mInfo,2) == true ? "删除成功" : "删除失败";
+                Toast.makeText(SelectedPopupWindow.this,result,Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
@@ -124,12 +125,11 @@ public class SelectedPopupWindow extends Activity {
         });
     }
 
-    private void delete()
+    public void delete()
     {
         ContentResolver resolver = getContentResolver();
         if(resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,MediaStore.MediaColumns.DATA + "=?",new String[]{mInfo.getUrl()}) > 0)
         {
-            SearchActivity.mUpdate = true;
             //删除播放列表与全部歌曲列表中该歌曲
             for(Long id : Utility.mPlayList)
             {
@@ -163,10 +163,7 @@ public class SelectedPopupWindow extends Activity {
             SongListAdapter.mInstance.notifyDataSetChanged();
             if(FolderAdapter.mInstance != null)
                 FolderAdapter.mInstance.notifyDataSetChanged();
-            //当前播放歌曲切换到下一首
-//            Intent intent = new Intent(Utility.CTL_ACTION);
-//            intent.putExtra("Control", Utility.NEXT);
-//            sendBroadcast(intent);
+
             Toast.makeText(getApplicationContext(), "删除成功！", Toast.LENGTH_SHORT).show();
         }
         else

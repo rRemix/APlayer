@@ -27,6 +27,7 @@ import java.util.Objects;
 import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;
 import remix.myplayer.fragments.AlbumRecyleFragment;
+import remix.myplayer.listeners.PopupListener;
 import remix.myplayer.utils.Utility;
 
 /**
@@ -98,7 +99,7 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         if(mCursor.moveToPosition(position))
         {
             holder.mText1.setText(mCursor.getString(AlbumRecyleFragment.mAlbumIndex));
@@ -124,20 +125,12 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
                     public void onClick(View v) {
                         final PopupMenu popupMenu = new PopupMenu(mContext,holder.mButton);
                         MainActivity.mInstance.getMenuInflater().inflate(R.menu.pop_menu, popupMenu.getMenu());
-                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                            @Override
-                            public boolean onMenuItemClick(MenuItem item) {
-                                switch (item.getItemId()) {
-                                    case R.id.exit:
-                                        popupMenu.dismiss();
-                                        break;
-                                    default:
-                                        Toast.makeText(mContext, "Click " + item.getTitle(), Toast.LENGTH_SHORT).show();
-                                }
-                                return true;
-                            }
-                        });
-                        popupMenu.setGravity(Gravity.END );
+
+                        mCursor.moveToPosition(position);
+                        popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
+                                mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex),
+                                Utility.ALBUM_HOLDER));
+                        popupMenu.setGravity(Gravity.END);
                         popupMenu.show();
                     }
                 });

@@ -50,23 +50,6 @@ public class FolderFragment extends Fragment {
             intent.putExtra("Title","文件夹");
             startActivity(intent);
 
-//            AlbumHolderFragment fragment = new AlbumHolderFragment();
-//            Bundle bundle = new Bundle();
-//            bundle.putInt("Id", Utility.mAlbumList.get(position).getAlbumId());
-//            fragment.setArguments(bundle);
-//
-//            FragmentManager fm = MainActivity.mInstance.getSupportFragmentManager();
-//
-//            List<Fragment> fragList = fm.getFragments();
-//            for(Fragment fragment1 : fragList)
-//            {
-//                fm.beginTransaction().hide(fragment1);
-//            }
-//            fm.beginTransaction().replace(R.id.main_fragment_container, fragment)
-//                    .addToBackStack(null).commit();
-//
-//            int count = MainActivity.mInstance.getSupportFragmentManager().getBackStackEntryCount();
-//            System.out.println(count);
         }
     }
 }

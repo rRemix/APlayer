@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
+
 import java.util.ArrayList;
 import remix.myplayer.R;
 import remix.myplayer.adapters.SearchAdapter;
@@ -24,10 +26,10 @@ public class SearchActivity extends AppCompatActivity {
     public static int mArtistIndex;
     public static int mAlbumIndex;
     private Cursor mCursor;
-    public static boolean mUpdate = true;
     private ListView mListView;
     private SearchView mSearchView;
     private SearchAdapter mAdapter;
+    private TextView mSearchText;
     private String mkey;
     private static final String SDROOT = "/sdcard/";
 
@@ -48,6 +50,15 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
+            }
+        });
+
+        mSearchText = (TextView)findViewById(R.id.search_text) ;
+        mSearchText.setVisibility(View.INVISIBLE);
+        mSearchText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
 
@@ -109,9 +120,6 @@ public class SearchActivity extends AppCompatActivity {
                         mCursor.moveToPosition(i);
                         list.add(mCursor.getLong(mIdIndex));
                     }
-//                    while (mCursor.moveToNext()) {
-//                        list.add(mCursor.getLong(mIdIndex));
-//                    }
                     Utility.mPlayList = list;
                     MainActivity.mInstance.getService().UpdateNextSong(position);
                 }
