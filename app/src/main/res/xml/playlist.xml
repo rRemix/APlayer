@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<playlist >
+    <mylove>
+        <song name="我最亲爱的"/>
+        <song name="易燃易爆炸"/>
+        <song name="李白"/>
+    </mylove>
+
+    <歌单>
+        <song name="歌曲1"/>
+        <song name="歌曲2"/>
+        <song name="歌曲3"/>
+    </歌单>
+</playlist>
+

@@ -235,8 +235,11 @@ public class MusicService extends Service {
                     if(mCurrent == -1)
                         System.out.println("参数错误");
                     mId = Utility.mPlayList.get(mCurrent);
+
                     mInfo = Utility.getMP3InfoById(mId);
 //                    mInfo = Utility.mPlayList.get(mCurrent);
+                    if(mInfo == null)
+                        break;
                     mBinder.Play(mInfo.getUrl());
                     break;
                 //播放上一首

@@ -115,7 +115,8 @@ public class ArtistRecycleAdapter extends RecyclerView.Adapter<ArtistRecycleAdap
                         mCursor.moveToPosition(position);
                         popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
                                 mCursor.getInt(ArtistRecycleFragment.mArtistIdIndex),
-                                Utility.ARTIST_HOLDER));
+                                Utility.ARTIST_HOLDER,
+                                mCursor.getString(ArtistRecycleFragment.mArtistIdIndex)));
                         popupMenu.setGravity(Gravity.END);
                         popupMenu.show();
                     }

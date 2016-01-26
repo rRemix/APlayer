@@ -1,28 +1,19 @@
 package remix.myplayer.adapters;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-
-import java.lang.ref.WeakReference;
-import java.util.Objects;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;
@@ -36,8 +27,6 @@ import remix.myplayer.utils.Utility;
 public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.ViewHolder>  {
     private Cursor mCursor;
     private Context mContext;
-    private boolean mScrollState = false;
-    private static Bitmap mBmp;
     public interface OnItemClickLitener
     {
         void onItemClick(View view, int position);
@@ -46,10 +35,6 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
     public void setOnItemClickLitener(OnItemClickLitener mOnItemClickLitener)
     {
         this.mOnItemClickLitener = mOnItemClickLitener;
-    }
-    public void setScrollState(boolean isScroll)
-    {
-        mScrollState = isScroll;
     }
     private OnItemClickLitener mOnItemClickLitener;
 
@@ -129,7 +114,8 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
                         mCursor.moveToPosition(position);
                         popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
                                 mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex),
-                                Utility.ALBUM_HOLDER));
+                                Utility.ALBUM_HOLDER,
+                                mCursor.getString(AlbumRecyleFragment.mAlbumIdIndex)));
                         popupMenu.setGravity(Gravity.END);
                         popupMenu.show();
                     }

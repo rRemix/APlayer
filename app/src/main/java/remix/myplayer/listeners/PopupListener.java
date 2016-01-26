@@ -23,10 +23,12 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
     private int mId;
     //0:专辑 1:歌手 2:文件夹
     private int mType;
-    public PopupListener(Context Context,int id,int type) {
+    private String mKey;
+    public PopupListener(Context Context,int id,int type,String key) {
         this.mContext = Context;
         this.mId = id;
         this.mType = type;
+        this.mKey = key;
     }
 
     @Override
@@ -37,15 +39,7 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
             list = Utility.getMP3InfoByArtistIdOrAlbumId(mId, mType);
         else
         {
-            Iterator it = Utility.mFolderMap.keySet().iterator();
-            int i  = 0;
-            while(i != mId)
-            {
-                it.next();
-                i++;
-            }
-            String key = (String)it.next();
-            list = Utility.getMP3ListByIds(Utility.mFolderMap.get(key));
+            list = Utility.getMP3ListByFolder(Utility.mFolderList.get(mId));
         }
         switch (item.getItemId()) {
             //播放
@@ -74,6 +68,7 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
                 break;
             //删除
             case R.id.menu_delete:
+                Utility.deleteSong(mKey,mType);
                 break;
             default:
                 Toast.makeText(mContext, "Click " + item.getTitle(), Toast.LENGTH_SHORT).show();

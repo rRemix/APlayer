@@ -37,8 +37,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textColor="#1b1c19"
-                android:textSize="16dp"
+                android:textColor="#6d6c69"
+                android:textSize="15dp"
                 android:text="添加"/>
         </LinearLayout>
 
@@ -59,8 +59,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textColor="#1b1c19"
-                android:textSize="16dp"
+                android:textColor="#6d6c69"
+                android:textSize="15dp"
                 android:text="铃声"/>
         </LinearLayout>
 
@@ -81,8 +81,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textSize="16dp"
-                android:textColor="#1b1c19"
+                android:textSize="15dp"
+                android:textColor="#6d6c69"
                 android:text="分享"/>
         </LinearLayout>
 
@@ -103,8 +103,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textSize="16dp"
-                android:textColor="#1b1c19"
+                android:textSize="15dp"
+                android:textColor="#6d6c69"
                 android:text="删除"/>
         </LinearLayout>
 

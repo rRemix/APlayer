@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +16,8 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.util.Xml;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -27,6 +30,12 @@ import android.widget.Toast;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.tencent.open.t.Weibo;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
@@ -38,6 +47,7 @@ import remix.myplayer.R;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.XmlUtil;
 
 public class MainActivity extends AppCompatActivity implements MusicService.Callback, LoaderManager.LoaderCallbacks<Cursor>{
     public static MainActivity mInstance;
@@ -60,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        XmlUtil.getPlayList("playlist");
+
 
         Fresco.initialize(this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);

@@ -5,29 +5,18 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.provider.MediaStore;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
-import android.widget.SimpleAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
-import java.util.Map;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.MainActivity;
 import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.ui.CircleImageView;
 import remix.myplayer.ui.SelectedPopupWindow;
-import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.Utility;
 
 /**

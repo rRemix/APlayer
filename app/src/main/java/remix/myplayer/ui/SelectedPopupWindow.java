@@ -112,7 +112,7 @@ public class SelectedPopupWindow extends Activity {
         mDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String result = Utility.deleteSong(mInfo,2) == true ? "删除成功" : "删除失败";
+                String result = Utility.deleteSong(mInfo.getUrl(),Utility.DELETE_SINGLE) == true ? "删除成功" : "删除失败";
                 Toast.makeText(SelectedPopupWindow.this,result,Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -141,24 +141,24 @@ public class SelectedPopupWindow extends Activity {
             }
             //删除文件夹列表中该歌曲
             //获得歌曲所在文件夹
-            Iterator it = Utility.mFolderList.keySet().iterator();
-            while(it.hasNext())
-            {
-                String Key = (String)it.next();
-                String Name = mInfo.getUrl().substring(0,mInfo.getUrl().lastIndexOf('/'));
-                if(!Key.equals(Name))
-                    continue;
-                ArrayList<MP3Info> list = Utility.mFolderList.get(Key);
-                for(MP3Info mp3Info : list)
-                {
-                    if(mp3Info.getDisplayname().equals(mInfo.getDisplayname()))
-                    {
-                        list.remove(mp3Info);
-                        break;
-                    }
-                }
-                break;
-            }
+//            Iterator it = Utility.mFolderList.keySet().iterator();
+//            while(it.hasNext())
+//            {
+//                String Key = (String)it.next();
+//                String Name = mInfo.getUrl().substring(0,mInfo.getUrl().lastIndexOf('/'));
+//                if(!Key.equals(Name))
+//                    continue;
+//                ArrayList<MP3Info> list = Utility.mFolderList.get(Key);
+//                for(MP3Info mp3Info : list)
+//                {
+//                    if(mp3Info.getDisplayname().equals(mInfo.getDisplayname()))
+//                    {
+//                        list.remove(mp3Info);
+//                        break;
+//                    }
+//                }
+//                break;
+//            }
             //通知适配器刷新
             SongListAdapter.mInstance.notifyDataSetChanged();
             if(FolderAdapter.mInstance != null)

@@ -1,7 +1,11 @@
 package remix.myplayer;
 
 import android.test.InstrumentationTestCase;
+import android.util.Xml;
 
+import org.xmlpull.v1.XmlPullParser;
+
+import java.io.FileInputStream;
 import java.util.ArrayList;
 
 import remix.myplayer.utils.SearchLRC;
@@ -16,9 +20,8 @@ public class TestClass extends InstrumentationTestCase {
 //        ArrayList<String> list = lrc.fetchLyric();
 //        System.out.println(list);
 //    }
-    public void testPase()
+    public void testXmlParser()
     {
-        SearchLRC lrc = new SearchLRC();
-        lrc.ParseLrc();
+
     }
 }

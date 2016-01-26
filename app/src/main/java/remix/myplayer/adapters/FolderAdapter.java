@@ -1,27 +1,20 @@
 package remix.myplayer.adapters;
 
 import android.content.Context;
-import android.os.Environment;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.widget.PopupMenu;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
-
-
-import java.io.IOException;
-import java.security.Key;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.namespace.NamespaceContext;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;
@@ -36,17 +29,18 @@ public class FolderAdapter extends BaseAdapter {
     public static FolderAdapter mInstance;
     private Context mContext;
     private static int mIndex = 0;
-    public FolderAdapter(LayoutInflater Inflater,Context context) {
-        this.mInflater = Inflater;
+
+    public FolderAdapter(Context Context, LayoutInflater Inflater) {
         mInstance = this;
-        mContext = context;
+        this.mContext = Context;
+        this.mInflater = Inflater;
     }
 
     @Override
     public int getCount() {
-        if(Utility.mFolderMap == null)
+        if(Utility.mFolderList == null)
             return 0;
-        return Utility.mFolderMap.size();
+        return Utility.mFolderList.size();
     }
 
     @Override
@@ -66,7 +60,7 @@ public class FolderAdapter extends BaseAdapter {
         TextView num = (TextView)ItemView.findViewById(R.id.folder_num);
         TextView path = (TextView)ItemView.findViewById(R.id.folder_path);
         final ImageView button = (ImageView)ItemView.findViewById(R.id.folder_button);
-        if(Utility.mFolderMap == null || Utility.mFolderMap.size() < 0)
+        if(Utility.mFolderList == null || Utility.mFolderList.size() < 0)
             return ItemView;
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,28 +69,50 @@ public class FolderAdapter extends BaseAdapter {
                 MainActivity.mInstance.getMenuInflater().inflate(R.menu.pop_menu, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
                         position,
-                        Utility.FOLDER_HOLDER));
+                        Utility.FOLDER_HOLDER,
+                        Utility.mFolderList.get(position)));
                 popupMenu.setGravity(Gravity.END );
                 popupMenu.show();
             }
         });
-        Set set = Utility.mFolderMap.keySet();
-        Iterator it = set.iterator();
-        int i = 0;
-        while(it.hasNext())
+        Cursor cursor = null;
+        try
         {
-            if(i++ == position)
-            {
-                String RootPath = (String)it.next();
-                int Count = Utility.mFolderMap.get(RootPath).size();
-                String Name = RootPath.substring(RootPath.lastIndexOf('/') + 1,RootPath.length());
-                name.setText(Name);
-                num.setText(Count + "首歌曲");
-                path.setText(RootPath);
-                break;
-            }
-            it.next();
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    new String[]{MediaStore.Video.Media.BUCKET_DISPLAY_NAME,MediaStore.Audio.Media.DATA},
+                    MediaStore.Video.Media.BUCKET_DISPLAY_NAME + "=?",
+                    new String[]{Utility.mFolderList.get(position)},null);
         }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        cursor.moveToFirst();
+        if(cursor != null && cursor.getCount() > 0)
+        {
+            name.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)));
+            String displayname  = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+            path.setText(displayname.substring(0,displayname.lastIndexOf("/")));
+            num.setText(String.valueOf(cursor.getCount()) + "首");
+        }
+        cursor.close();
         return ItemView;
+    }
+
+
+
+    class ViewHolder
+    {
+        public TextView mName;
+        public TextView mPath;
+        public TextView mCount;
+        public ImageView mButton;
+
+        public ViewHolder(TextView name, TextView path, TextView count, ImageView button) {
+            this.mName = name;
+            this.mPath = path;
+            this.mCount = count;
+            this.mButton = button;
+        }
     }
 }

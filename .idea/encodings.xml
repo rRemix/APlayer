@@ -2,6 +2,7 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/slidingmenu_library/src/main/java/com/jeremyfeinstein/slidingmenu/lib/CustomViewBehind.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/slidingmenu_library/src/main/java/com/jeremyfeinstein/slidingmenu/lib/SlidingMenu.java" charset="GBK" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>
