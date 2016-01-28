@@ -3,29 +3,23 @@ package remix.myplayer.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
-import java.lang.ref.WeakReference;
-
 import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;
-import remix.myplayer.fragments.AlbumRecyleFragment;
 import remix.myplayer.fragments.ArtistRecycleFragment;
+import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.listeners.PopupListener;
 import remix.myplayer.utils.Utility;
 
@@ -36,17 +30,13 @@ public class ArtistRecycleAdapter extends RecyclerView.Adapter<ArtistRecycleAdap
     private Cursor mCursor;
     private Context mContext;
     private Bitmap mDefaultBmp;
-    public interface OnItemClickLitener
-    {
-        void onItemClick(View view, int position);
-        void onItemLongClick(View view , int position);
-    }
-    public void setOnItemClickLitener(OnItemClickLitener mOnItemClickLitener)
+
+    public void setOnItemClickLitener(OnItemClickListener mOnItemClickLitener)
     {
         this.mOnItemClickLitener = mOnItemClickLitener;
     }
 
-    private OnItemClickLitener mOnItemClickLitener;
+    private OnItemClickListener mOnItemClickLitener;
 
     public ArtistRecycleAdapter(Cursor cursor, Context context) {
         this.mCursor = cursor;

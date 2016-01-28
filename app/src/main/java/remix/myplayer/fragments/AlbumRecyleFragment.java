@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import remix.myplayer.R;
 import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.adapters.AlbumRecycleAdater;
+import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.utils.Utility;
 
 /**
@@ -41,7 +42,7 @@ public class AlbumRecyleFragment extends Fragment implements LoaderManager.Loade
         mManager = getLoaderManager();
         mManager.initLoader(1001, null, this);
         mAdapter = new AlbumRecycleAdater(mCursor,getContext());
-        mAdapter.setOnItemClickLitener(new AlbumRecycleAdater.OnItemClickLitener() {
+        mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 if(mCursor != null && mCursor.moveToPosition(position))

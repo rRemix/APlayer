@@ -18,6 +18,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;
 import remix.myplayer.fragments.AlbumRecyleFragment;
+import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.listeners.PopupListener;
 import remix.myplayer.utils.Utility;
 
@@ -27,22 +28,17 @@ import remix.myplayer.utils.Utility;
 public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.ViewHolder>  {
     private Cursor mCursor;
     private Context mContext;
-    public interface OnItemClickLitener
-    {
-        void onItemClick(View view, int position);
-        void onItemLongClick(View view , int position);
-    }
-    public void setOnItemClickLitener(OnItemClickLitener mOnItemClickLitener)
-    {
-        this.mOnItemClickLitener = mOnItemClickLitener;
-    }
-    private OnItemClickLitener mOnItemClickLitener;
+
+    private OnItemClickListener mOnItemClickLitener;
 
     public AlbumRecycleAdater(Cursor cursor, Context context) {
         this.mCursor = cursor;
         this.mContext = context;
     }
-
+    public void setOnItemClickLitener(OnItemClickListener l)
+    {
+        this.mOnItemClickLitener = l;
+    }
     public void setCursor(Cursor mCursor) {
         this.mCursor = mCursor;
         notifyDataSetChanged();

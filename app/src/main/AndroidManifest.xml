@@ -33,6 +33,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".activities.PlayListActivity"/>
+
         <activity android:name=".activities.SearchActivity"/>
 
         <activity android:name=".activities.AudioHolderActivity"

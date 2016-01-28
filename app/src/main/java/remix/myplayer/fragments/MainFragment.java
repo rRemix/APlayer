@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import remix.myplayer.R;
+import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.activities.SearchActivity;
 import remix.myplayer.adapters.PagerAdapter;
 import remix.myplayer.adapters.SlideMenuAdapter;
@@ -165,7 +166,7 @@ public class MainFragment extends Fragment {
                     mViewPager.setCurrentItem(0);
                     break;
                 case 1:
-                    Toast.makeText(mContext, "播放列表", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getActivity(), PlayListActivity.class));
                     break;
                 case 2:
                     Intent intent = new Intent(Utility.CTL_ACTION);

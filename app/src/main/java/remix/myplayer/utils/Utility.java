@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -276,6 +277,43 @@ public class Utility {
         }
         cursor.close();
         return list;
+    }
+
+    //根据多个歌曲名字返回多个歌曲详细信息
+    public static ArrayList<MP3Info> getMP3ListByNames(ArrayList<String> list)
+    {
+        String[] array = (String[])list.toArray(new String[list.size()]);
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0 ; i < list.size() ; i++)
+        {
+            sb.append(MediaStore.Audio.Media.TITLE + "=" + list.get(i));
+            if(i != list.size() - 1)
+                sb.append(" and ");
+        }
+        ArrayList<MP3Info> mlist = new ArrayList<>();
+        Cursor cursor = null;
+        try {
+            for(int i = 0 ; i < list.size(); i++)
+            {
+                cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        null,
+                        MediaStore.Audio.Media.TITLE + "=?",
+                        new String[]{list.get(i)}, null);
+                cursor.moveToFirst();
+                if (cursor != null && cursor.getCount() > 0)
+                {
+                    mlist.add(getMP3Info(cursor));
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            if(cursor != null)
+                cursor.close();
+        }
+        return  mlist;
     }
 
     //根据记录集获得歌曲详细
@@ -672,7 +710,7 @@ public class Utility {
     public final static int ALBUM_HOLDER = 0;
     public final static int ARTIST_HOLDER = 1;
     public final static int FOLDER_HOLDER = 2;
-
+    public final static int PLAYLIST_HOLDER = 3;
     //腾讯Api Id
     public final static String TECENT_APIID = "1105030910";
     //微博Api Id

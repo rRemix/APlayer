@@ -75,6 +75,10 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
                     mInfoList = Utility.getMP3ListByFolder(bucket_display_name);
                     Title = bucket_display_name;
                     break;
+                case Utility.PLAYLIST_HOLDER:
+                    ArrayList<String> list = PlayListActivity.mPlaylist.get(Title);
+                    mInfoList = Utility.getMP3ListByNames(list);
+                    break;
             }
         }
         if(mInfoList == null)
@@ -86,6 +90,8 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //                MP3Info temp = (MP3Info) parent.getAdapter().getItem(position);
+                if(mInfoList.size() == 0)
+                    return;
                 ArrayList<Long> ids = new ArrayList<Long>();
                 for(MP3Info info : mInfoList)
                     ids.add(info.getId());

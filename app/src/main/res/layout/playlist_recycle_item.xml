@@ -1,33 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="150dp"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto">
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:layout_width="164dp"
+    android:layout_height="196dp"
+    android:paddingTop="8dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:background="@color/transparent">
     <com.facebook.drawee.view.SimpleDraweeView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="164dp"
+        android:layout_height="164dp"
         android:id="@+id/recycleview_simpleiview"
         fresco:fadeDuration="300"
         fresco:actualImageScaleType="focusCrop"
-        fresco:placeholderImage="@drawable/no_art_small"
-        fresco:placeholderImageScaleType="fitCenter"/>
-    <LinearLayout
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        fresco:placeholderImage="@drawable/default_album_list"
+        fresco:placeholderImageScaleType="fitCenter"
+        android:layout_alignParentTop="true" />
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="32dp"
+        android:background="#f7f7f6"
+        android:layout_below="@id/recycleview_simpleiview">
         <TextView
-            android:id="@+id/playlist_name"
-            android:gravity="left"
-            android:layout_width="match_parent"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_centerVertical="true"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="播放列表"/>
-        <TextView
-            android:id="@+id/playlist_count"
-            android:gravity="left"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=" 首"/>
-    </LinearLayout>
+            android:text="播放列表名"
+            android:id="@+id/playlist_item_name"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textColor="#1c1b19"
+            android:textSize="12dp"/>
+        <ImageButton
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:id="@+id/recycleview_button"
+            android:src="@drawable/list_icn_more"
+            android:background="@drawable/bg_btn_gray_selector"/>
+        <!--android:background="@drawable/list_icn_more" />-->
+    </RelativeLayout>
 </RelativeLayout>

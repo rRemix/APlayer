@@ -17,7 +17,7 @@ import java.util.Map;
  * Created by taeja on 16-1-26.
  */
 public class XmlUtil {
-    public static Map<String,ArrayList<String>> getPlayList(String playlist_name)
+    public static Map<String,ArrayList<String>> getPlayList()
     {
         Map<String,ArrayList<String>> map = new HashMap<String,ArrayList<String>>();
         XmlPullParser parser = Xml.newPullParser();
@@ -36,16 +36,18 @@ public class XmlUtil {
                         list = new ArrayList<>();
                         break;
                     case XmlPullParser.START_TAG:
-                        if(parser.getName().equals("song"))
-                        {
-                            list.add(parser.getAttributeValue(0));
-                        }
-                        else
+
+                        if(!parser.getName().equals("playlist") && !parser.getName().equals("song"))
                             tag = parser.getName();
+                        if(tag != null && parser.getName().equals("song"))
+                            list.add(parser.getAttributeValue(0));
                         break;
                     case XmlPullParser.END_TAG:
-                        if(parser.getName().equals(tag))
-                            map.put(tag,list);
+                        if(tag != null && parser.getName().equals(tag)) {
+                            map.put(tag,(ArrayList<String>) list.clone());
+                            list.clear();
+                            tag = null;
+                        }
                         break;
                 }
                 eventType = parser.next();

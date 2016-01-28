@@ -28,6 +28,7 @@
             android:id="@+id/btn_top_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="onSearch"
             android:layout_marginRight="19dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
@@ -36,6 +37,7 @@
             android:id="@+id/btn_top_timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="onTimer"
             android:layout_marginRight="16dp"
             android:layout_toLeftOf="@id/btn_top_search"
             android:layout_centerVertical="true"
@@ -47,10 +49,22 @@
         android:layout_height="8dp"
         android:background="#edeceb"/>
 
-    <android.support.v7.widget.RecyclerView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/playlist_recycleview">
+        android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/playlist_recycleview">
+        </android.support.v7.widget.RecyclerView>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="40dp"
+            android:src="@drawable/playlist_fab_btn_add"
+            android:background="@drawable/playlist_fab_btn_bg"
+            android:layout_gravity="bottom|right"/>
+    </FrameLayout>
 
-    </android.support.v7.widget.RecyclerView>
+
 </LinearLayout>
