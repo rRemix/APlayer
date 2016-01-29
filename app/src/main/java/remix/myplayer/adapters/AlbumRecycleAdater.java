@@ -2,6 +2,7 @@ package remix.myplayer.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.widget.PopupMenu;
@@ -58,7 +59,7 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
         }
         @Override
         protected Object doInBackground(Integer... params) {
-//            return Utility.CheckBitmapByAlbumId(params[0],false);
+//            return Utility.CheckBitmapByAlbumId(params[0],true);
             return Utility.CheckUrlByAlbumId(params[0]);
 //                return params[0];
         }
@@ -66,8 +67,7 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
         protected void onPostExecute(Object url) {
             Uri uri = Uri.parse("file:///" + (String)url);
             if(url != null && mImage != null);
-                mImage.setImageURI(uri);
-//                mImage.setImageBitmap((Bitmap)url);
+//                mImage.setImageURI(uri);
 //                mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), (int)url));
 
         }
@@ -86,7 +86,6 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
             holder.mText1.setText(mCursor.getString(AlbumRecyleFragment.mAlbumIndex));
             holder.mText2.setText(mCursor.getString(AlbumRecyleFragment.mArtistIndex));
             AsynLoadImage task = new AsynLoadImage(holder.mImage);
-//            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex));
             task.execute(mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex));
 //            holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex)));
             if(mOnItemClickLitener != null)

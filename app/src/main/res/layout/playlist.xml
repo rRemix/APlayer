@@ -60,6 +60,7 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="onAdd"
             android:layout_margin="40dp"
             android:src="@drawable/playlist_fab_btn_add"
             android:background="@drawable/playlist_fab_btn_bg"

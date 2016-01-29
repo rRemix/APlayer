@@ -125,6 +125,8 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
         layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(mInfoList.size() == 0)
+                    return;
                 MusicService.setPlayModel(Utility.PLAY_SHUFFLE);
                 Intent intent = new Intent(Utility.CTL_ACTION);
                 intent.putExtra("Control", Utility.NEXT);

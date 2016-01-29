@@ -2,6 +2,8 @@ package remix.myplayer.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,6 +60,13 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         }
         holder.mName.setText(name);
 
+        ArrayList<String> list = PlayListActivity.mPlaylist.get(name);
+        if(list != null && list.size() > 0)
+        {
+            AsynLoadImage task = new AsynLoadImage(holder.mImage);
+            task.execute(list.get(0));
+        }
+
         if(mOnItemClickLitener != null)
         {
             holder.mImage.setOnClickListener(new View.OnClickListener() {
@@ -81,6 +90,25 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             super(itemView);
             mName = (TextView) itemView.findViewById(R.id.playlist_item_name);
             mImage = (SimpleDraweeView)itemView.findViewById(R.id.recycleview_simpleiview);
+        }
+    }
+
+    class AsynLoadImage extends AsyncTask<String,Integer,String>
+    {
+        private final SimpleDraweeView mImage;
+        public AsynLoadImage(SimpleDraweeView imageView)
+        {
+            mImage = imageView;
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            return Utility.getImageUrl(params[0],Utility.URL_NAME);
+        }
+        @Override
+        protected void onPostExecute(String url) {
+            Uri uri = Uri.parse("file:///" + url);
+            if(url != null && mImage != null)
+                mImage.setImageURI(uri);
         }
     }
 }

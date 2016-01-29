@@ -19,6 +19,8 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.facebook.common.logging.LoggingDelegate;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -101,29 +103,9 @@ public class Utility {
             mFolderList.add(path);
     }
 
-    public static String CheckUrlByArtistId(int artistid)
-    {
-        Cursor cursor = null;
-        ContentResolver resolver = mContext.getContentResolver();
-        if(artistid < 0 ) return null;
-        String url = null;
-        cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                MediaStore.Audio.Media.ARTIST_ID + "=" + artistid, null, null);
-        if(cursor != null && cursor.getCount() > 0) {
-            while (cursor.moveToNext()) {
-                int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                url = CheckUrlByAlbumId(id);
-                if(url != null)
-                    break;
-            }
-        }
-        cursor.close();
-        return url;
-    }
-
-
     /*
     type 0:专辑 1:歌手
+    flag 是否需要完整信息
      */
     //根据歌手或者专辑id获取所有歌曲
     public static ArrayList<MP3Info> getMP3InfoByArtistIdOrAlbumId(int _id, int type) {
@@ -162,40 +144,93 @@ public class Utility {
         return null;
     }
     //根据歌曲id查询图片url
-    public static String CheckUrlBySongId(long songId)
+//    public static String CheckUrlBySongId(long songId)
+//    {
+//        ContentResolver resolver = mContext.getContentResolver();
+//        Cursor cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{"album_art"},
+//                MediaStore.Audio.Media._ID + "=" + songId, null, null);
+//        if(cursor != null && cursor.getCount() > 0)
+//        {
+//            cursor.moveToNext();
+//            String album_url = "";
+//            album_url = cursor.getString(0);
+//            cursor.close();
+//            if (!album_url.equals(""))
+//                return album_url;
+//        }
+//        return null;
+//    }
+
+
+    //根据参数获得图片url
+    // 0:专辑id 1:歌手id 2:歌曲id 3:歌曲名
+
+    public static String getImageUrl(String arg,int type)
     {
+        if(arg == null || arg.equals(""))
+            return null;
+
         ContentResolver resolver = mContext.getContentResolver();
-        Cursor cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{"album_art"},
-                MediaStore.Audio.Media._ID + "=" + songId, null, null);
-        if(cursor != null && cursor.getCount() > 0)
+        String url = null;
+        String album = null;
+        Cursor cursor = null;
+        String selection = null;
+        String[] selectionArg = null;
+        switch (type)
         {
-            cursor.moveToNext();
-            String album_url = "";
-            album_url = cursor.getString(0);
-            cursor.close();
-            if (!album_url.equals(""))
-                return album_url;
+            case URL_ALBUM:
+                selection = MediaStore.Audio.Albums._ID + "=" + arg;
+                break;
+            case URL_ARTIST:
+                selection = MediaStore.Audio.Albums.ARTIST + "=?";
+                selectionArg = new String[]{arg};
+                break;
+            case URL_SONGID:
+                selection = MediaStore.Audio.Media._ID + "=" + arg;
+                break;
+            case URL_NAME:
+                selection = MediaStore.Audio.Media.TITLE + "=" + arg;
+//                selectionArg = new String[]{arg};
+                break;
         }
-        return null;
+        try {
+            cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.AlbumColumns.ALBUM_ART,MediaStore.Audio.AlbumColumns.ALBUM},
+                    selection,selectionArg
+                    , null);
+            if(cursor != null && cursor.getCount() > 0)
+            {
+                int index = cursor.getColumnIndex("album_art");
+                cursor.moveToNext();
+                url = cursor.getString(0);
+                album = cursor.getString(1);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            if(cursor != null)
+                cursor.close();
+        }
+        return url;
     }
 
     //根据专辑id查询图片url
     public static String CheckUrlByAlbumId(long Id)
     {
         ContentResolver resolver = mContext.getContentResolver();
+        String url = null;
         Cursor cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{"album_art"},
                 MediaStore.Audio.Albums._ID + "=" + Id,
                 null, null);
         if(cursor != null && cursor.getCount() > 0)
         {
             cursor.moveToNext();
-            String album_url = "";
-            album_url = cursor.getString(0);
+            url = cursor.getString(0);
             cursor.close();
-            if (album_url != null && !album_url.equals(""))
-                return album_url;
         }
-        return null;
+
+        return url;
     }
     //根据专辑id查询图片
     public static Bitmap CheckBitmapByAlbumId(int albumId,boolean isthumb)
@@ -208,21 +243,15 @@ public class Utility {
                 Bitmap bm = BitmapFactory.decodeFileDescriptor(fd);
                 if(bm == null)
                     return null;
-                Bitmap thumb = null;
+                Bitmap thumb;
                 if(isthumb)
                     thumb = Bitmap.createScaledBitmap(bm, 150, 150, true);
                 else
                     thumb = Bitmap.createScaledBitmap(bm, 350, 350, true);
-                if(bm != null && !bm.isRecycled())
-                {
-                    Log.i(TAG,bm.toString());
-//                    bm.recycle();
-//                    bm = null;
-                }
                 return thumb;
             }
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -238,7 +267,6 @@ public class Utility {
             if (pfd != null) {
                 FileDescriptor fd = pfd.getFileDescriptor();
                 Bitmap bm = BitmapFactory.decodeFileDescriptor(fd);
-
                 if(bm == null)
                     return null;
                 Bitmap thumb = null;
@@ -282,14 +310,6 @@ public class Utility {
     //根据多个歌曲名字返回多个歌曲详细信息
     public static ArrayList<MP3Info> getMP3ListByNames(ArrayList<String> list)
     {
-        String[] array = (String[])list.toArray(new String[list.size()]);
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0 ; i < list.size() ; i++)
-        {
-            sb.append(MediaStore.Audio.Media.TITLE + "=" + list.get(i));
-            if(i != list.size() - 1)
-                sb.append(" and ");
-        }
         ArrayList<MP3Info> mlist = new ArrayList<>();
         Cursor cursor = null;
         try {
@@ -325,6 +345,10 @@ public class Utility {
         String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
         String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
         long albumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+        if(albumId == 357)
+        {
+            Log.d("Cursor",String.valueOf(albumId));
+        }
         long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
         String realtime = getTime(duration);
         String url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
@@ -686,7 +710,6 @@ public class Utility {
 
     public final static String CTL_ACTION = "remix.music.CTL_ACTION";
     public final static String UPDATE_ACTION = "remix.music.UPDATE_ACTION";
-    public final static String UPDATE_SEEKBAR = "remix.music.UPDATE_SEEKBAR";
     public final static String CONTROL_TIMER = "remix.music.CONTROL_TIMER";
     //控制命令
     public final static int PLAYSELECTEDSONG = 0;
@@ -717,5 +740,10 @@ public class Utility {
     public final static String WEIBO_APIID = "949172486";
     //微信APi Id
     public final static String WECHAT_APIID = "wx10775467a6664fbb";
+    //获得专辑封面类型
+    public final static int URL_ALBUM = 0;
+    public final static int URL_ARTIST = 1;
+    public final static int URL_SONGID = 2;
+    public final static int URL_NAME = 3;
 
 }

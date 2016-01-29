@@ -50,18 +50,16 @@ public class ArtistRecycleAdapter extends RecyclerView.Adapter<ArtistRecycleAdap
 
 
     //<Params, Progress, Result>
-    class AsynLoadImage extends AsyncTask<Integer,Integer,String>
+    class AsynLoadImage extends AsyncTask<String,Integer,String>
     {
-//        private final WeakReference mImageView;
         private final SimpleDraweeView mImage;
         public AsynLoadImage(SimpleDraweeView imageView)
         {
-//            mImageView = new WeakReference(imageView);
             mImage = imageView;
         }
         @Override
-        protected String doInBackground(Integer... params) {
-            return Utility.CheckUrlByArtistId(params[0]);
+        protected String doInBackground(String... params) {
+            return Utility.getImageUrl(params[0],Utility.URL_ARTIST);
         }
         @Override
         protected void onPostExecute(String url) {
@@ -84,7 +82,7 @@ public class ArtistRecycleAdapter extends RecyclerView.Adapter<ArtistRecycleAdap
             holder.mText1.setText(mCursor.getString(ArtistRecycleFragment.mArtistIndex));
             AsynLoadImage task = new AsynLoadImage(holder.mImage);
 //            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex));
-            task.execute(mCursor.getInt(ArtistRecycleFragment.mArtistIdIndex));
+            task.execute(mCursor.getString(ArtistRecycleFragment.mArtistIndex));
             if(mOnItemClickLitener != null)
             {
                 holder.mImage.setOnClickListener(new View.OnClickListener() {

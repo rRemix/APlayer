@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        XmlUtil.setContext(getApplicationContext());
 
         Fresco.initialize(this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
