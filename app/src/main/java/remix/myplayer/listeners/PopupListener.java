@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import remix.myplayer.R;
+import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.MP3Info;
+import remix.myplayer.utils.PlayListItem;
 import remix.myplayer.utils.Utility;
 
 /**
@@ -35,19 +37,32 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
     public boolean onMenuItemClick(MenuItem item) {
         ArrayList<MP3Info> list = new ArrayList<>();
         ArrayList<Long> ids = new ArrayList<Long>();
-        if(mType <= Utility.ARTIST_HOLDER)
+        if(mType <= Utility.ARTIST_HOLDER) {
             list = Utility.getMP3InfoByArtistIdOrAlbumId(mId, mType);
-        else
+            for(MP3Info info : list)
+                ids.add(info.getId());
+        }
+        else if(mType == Utility.FOLDER_HOLDER)
         {
             list = Utility.getMP3ListByFolder(Utility.mFolderList.get(mId));
+            for(MP3Info info : list)
+                ids.add(info.getId());
+        }
+        else
+        {
+            String name = null;
+            Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
+            for(int i = 0 ; i <= mId ; i++) {
+                it.hasNext();
+                name = it.next().toString();
+            }
+            for(PlayListItem tmp : PlayListActivity.mPlaylist.get(name))
+                ids.add((long)tmp.getId());
         }
         switch (item.getItemId()) {
             //播放
             case R.id.menu_play:
-                for(MP3Info info : list)
-                {
-                    ids.add(info.getId());
-                }
+
                 Utility.mPlayList = (ArrayList) ids.clone();
                 MusicService.mInstance.UpdateNextSong(0);
                 Intent intent = new Intent(Utility.CTL_ACTION);
@@ -59,11 +74,6 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
                 break;
             //添加到播放列表
             case R.id.menu_add:
-
-                for(MP3Info info : list)
-                {
-                    ids.add(info.getId());
-                }
                 Utility.mPlayList.addAll(ids);
                 break;
             //删除

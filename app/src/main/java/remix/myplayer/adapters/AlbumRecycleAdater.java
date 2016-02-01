@@ -2,11 +2,12 @@ package remix.myplayer.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import remix.myplayer.R;
@@ -29,7 +31,7 @@ import remix.myplayer.utils.Utility;
 public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.ViewHolder>  {
     private Cursor mCursor;
     private Context mContext;
-
+    private static int mCount = 0;
     private OnItemClickListener mOnItemClickLitener;
 
     public AlbumRecycleAdater(Cursor cursor, Context context) {
@@ -61,14 +63,27 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
         protected Object doInBackground(Integer... params) {
 //            return Utility.CheckBitmapByAlbumId(params[0],true);
             return Utility.CheckUrlByAlbumId(params[0]);
-//                return params[0];
         }
         @Override
         protected void onPostExecute(Object url) {
             Uri uri = Uri.parse("file:///" + (String)url);
             if(url != null && mImage != null);
-//                mImage.setImageURI(uri);
-//                mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), (int)url));
+            {
+                mImage.setImageURI(uri);
+                //创建DraweeController
+//                DraweeController controller = Fresco.newDraweeControllerBuilder()
+//                        //加载的图片URI地址
+//                        .setUri(uri)
+//                        //设置点击重试是否开启
+//                        .setTapToRetryEnabled(true)
+//                        //设置旧的Controller
+//                        .setOldController(mImage.getController())
+//                        .setControllerListener(new DraweeListener())
+//                        //构建
+//                        .build();
+//
+//                mImage.setController(controller);
+            }
 
         }
     }
@@ -85,7 +100,9 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
         {
             holder.mText1.setText(mCursor.getString(AlbumRecyleFragment.mAlbumIndex));
             holder.mText2.setText(mCursor.getString(AlbumRecyleFragment.mArtistIndex));
+
             AsynLoadImage task = new AsynLoadImage(holder.mImage);
+//            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex));
             task.execute(mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex));
 //            holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex)));
             if(mOnItemClickLitener != null)
@@ -104,7 +121,7 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
                     @Override
                     public void onClick(View v) {
                         final PopupMenu popupMenu = new PopupMenu(mContext,holder.mButton);
-                        MainActivity.mInstance.getMenuInflater().inflate(R.menu.pop_menu, popupMenu.getMenu());
+                        MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
 
                         mCursor.moveToPosition(position);
                         popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
@@ -137,8 +154,43 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
             mText2 = (TextView)v.findViewById(R.id.recycleview_text2);
 //            mImage = (ImageView)v.findViewById(R.id.recycleview_simpleiview);
             mImage = (SimpleDraweeView)v.findViewById(R.id.recycleview_simpleiview);
+
             mButton = (ImageButton)v.findViewById(R.id.recycleview_button);
         }
 
+    }
+
+    class DraweeListener implements ControllerListener
+    {
+
+        @Override
+        public void onSubmit(String id, Object callerContext) {
+
+        }
+
+        @Override
+        public void onFinalImageSet(String id, Object imageInfo, Animatable animatable) {
+
+        }
+
+        @Override
+        public void onIntermediateImageSet(String id, Object imageInfo) {
+
+        }
+
+        @Override
+        public void onIntermediateImageFailed(String id, Throwable throwable) {
+
+        }
+
+        @Override
+        public void onFailure(String id, Throwable throwable) {
+//            File f = new File(throwable.getMessage());
+        }
+
+        @Override
+        public void onRelease(String id) {
+
+        }
     }
 }

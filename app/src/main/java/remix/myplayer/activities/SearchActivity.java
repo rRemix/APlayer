@@ -90,11 +90,18 @@ public class SearchActivity extends AppCompatActivity {
             mCursor = cursor;
             mAdapter.changeCursor(mCursor);
         }
+        else
+        {
+            mCursor = null;
+            mAdapter.changeCursor(mCursor);
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(mCursor != null)
+            mCursor.close();
         mAdapter.changeCursor(null);
     }
 

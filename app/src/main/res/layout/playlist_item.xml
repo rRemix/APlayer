@@ -32,7 +32,7 @@
         <ImageView
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:id="@+id/playlist_button_delete"
+            android:id="@+id/playlist_item_button"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:src="@drawable/bg_btn_playlist_delete"

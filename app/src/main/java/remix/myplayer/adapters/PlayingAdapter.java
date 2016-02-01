@@ -56,18 +56,18 @@ public class PlayingAdapter extends BaseAdapter {
         title.setText(temp.getDisplayname());
         artist.setText(temp.getArtist());
 
-        ImageView button = (ImageView)ItemView.findViewById(R.id.playlist_button_delete);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MP3Info temp = Utility.getMP3InfoById(Utility.mPlayList.get(position));
-                if (temp != null) {
-                    Utility.mPlayList.remove(position);
-                }
-                Toast.makeText(v.getContext(), "删除了第" + position + "项", Toast.LENGTH_SHORT).show();
-                notifyDataSetChanged();
-            }
-        });
+//        ImageView button = (ImageView)ItemView.findViewById(R.id.playlist_button_delete);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                MP3Info temp = Utility.getMP3InfoById(Utility.mPlayList.get(position));
+//                if (temp != null) {
+//                    Utility.mPlayList.remove(position);
+//                }
+//                Toast.makeText(v.getContext(), "删除了第" + position + "项", Toast.LENGTH_SHORT).show();
+//                notifyDataSetChanged();
+//            }
+//        });
         return ItemView;
     }
 }

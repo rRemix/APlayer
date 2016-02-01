@@ -99,7 +99,7 @@ public class ArtistRecycleAdapter extends RecyclerView.Adapter<ArtistRecycleAdap
                     @Override
                     public void onClick(View v) {
                         final PopupMenu popupMenu = new PopupMenu(mContext,holder.mButton);
-                        MainActivity.mInstance.getMenuInflater().inflate(R.menu.pop_menu, popupMenu.getMenu());
+                        MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
                         mCursor.moveToPosition(position);
                         popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
                                 mCursor.getInt(ArtistRecycleFragment.mArtistIdIndex),

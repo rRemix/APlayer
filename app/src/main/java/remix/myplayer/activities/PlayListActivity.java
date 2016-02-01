@@ -30,6 +30,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapters.PlayListAdapter;
 import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.DensityUtil;
+import remix.myplayer.utils.PlayListItem;
 import remix.myplayer.utils.Utility;
 import remix.myplayer.utils.XmlUtil;
 
@@ -39,14 +40,16 @@ import remix.myplayer.utils.XmlUtil;
 public class PlayListActivity extends AppCompatActivity{
     private RecyclerView mRecycleView;
     private PlayListAdapter mAdapter;
-    public static Map<String,ArrayList<String>> mPlaylist = new HashMap<>();
+    public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
     private ImageButton mButton;
+    static {
+        mPlaylist = XmlUtil.getPlayList();
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.playlist);
-        mPlaylist = XmlUtil.getPlayList();
         mRecycleView = (RecyclerView)findViewById(R.id.playlist_recycleview);
         mRecycleView.setLayoutManager(new GridLayoutManager(this, 2));
         mAdapter = new PlayListAdapter(getApplicationContext());
@@ -65,7 +68,6 @@ public class PlayListActivity extends AppCompatActivity{
                 intent.putExtra("Title", name);
                 intent.putExtra("Type", Utility.PLAYLIST_HOLDER);
                 startActivity(intent);
-
             }
 
             @Override

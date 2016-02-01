@@ -22,6 +22,7 @@ import remix.myplayer.adapters.AlbumHolderAdapter;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.MP3Info;
+import remix.myplayer.utils.PlayListItem;
 import remix.myplayer.utils.Utility;
 
 /**
@@ -76,8 +77,11 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
                     Title = bucket_display_name;
                     break;
                 case Utility.PLAYLIST_HOLDER:
-                    ArrayList<String> list = PlayListActivity.mPlaylist.get(Title);
-                    mInfoList = Utility.getMP3ListByNames(list);
+                    ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(Title);
+                    ArrayList<String> names = new ArrayList<>();
+                    for(PlayListItem item : list)
+                        names.add(item.getmSongame());
+                    mInfoList = Utility.getMP3ListByNames(names);
                     break;
             }
         }

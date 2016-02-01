@@ -3,14 +3,11 @@ package remix.myplayer.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.SimpleAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -18,8 +15,6 @@ import java.lang.ref.WeakReference;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.SearchActivity;
-import remix.myplayer.fragments.AllSongFragment;
-import remix.myplayer.ui.CircleImageView;
 import remix.myplayer.utils.Utility;
 
 /**
@@ -28,9 +23,10 @@ import remix.myplayer.utils.Utility;
 public class SearchAdapter extends SimpleCursorAdapter
 {
     private Cursor mCurosr;
-
+    private Context mContext;
     public SearchAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
         super(context, layout, c, from, to, flags);
+        mContext = context;
     }
 
 
@@ -56,7 +52,8 @@ public class SearchAdapter extends SimpleCursorAdapter
                 holder.mName.setText(name.substring(0,name.lastIndexOf(".")));
                 holder.mOther.setText(getCursor().getString(SearchActivity.mArtistIndex) + "-" + getCursor().getString(SearchActivity.mAlbumIndex));
                 AsynLoadImage task = new AsynLoadImage(holder.mImage);
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, getCursor().getInt(SearchActivity.mIdIndex));
+                task.execute(getCursor().getInt(SearchActivity.mIdIndex));
+//                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, );
             }
             catch (Exception e)
             {
@@ -68,10 +65,10 @@ public class SearchAdapter extends SimpleCursorAdapter
     }
     class AsynLoadImage extends AsyncTask<Integer,Integer,Bitmap>
     {
-        private final WeakReference mImageView;
+        private final ImageView mImageView;
         public AsynLoadImage(ImageView imageView)
         {
-            mImageView = new WeakReference(imageView);
+            mImageView = imageView;
         }
         @Override
         protected Bitmap doInBackground(Integer... params) {
@@ -80,7 +77,9 @@ public class SearchAdapter extends SimpleCursorAdapter
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             if(bitmap != null)
-                ((ImageView)mImageView.get()).setImageBitmap(bitmap);
+                mImageView.setImageBitmap(bitmap);
+            else
+                mImageView.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(),R.drawable.default_recommend));
         }
     }
     class ViewHolder

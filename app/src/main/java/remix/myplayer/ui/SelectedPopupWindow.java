@@ -21,11 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import remix.myplayer.R;
-import remix.myplayer.activities.SearchActivity;
 import remix.myplayer.adapters.FolderAdapter;
 import remix.myplayer.adapters.SongListAdapter;
 import remix.myplayer.utils.MP3Info;
@@ -75,16 +71,20 @@ public class SelectedPopupWindow extends Activity {
         mAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(Long id : Utility.mPlayList)
-                {
-                    if(id == mInfo.getId()) {
-                        Toast.makeText(SelectedPopupWindow.this, "该歌曲已在播放列表中", Toast.LENGTH_SHORT).show();
-                        finish();
-                        return;
-                    }
-                }
-                Utility.mPlayList.add(mInfo.getId());
-                Toast.makeText(SelectedPopupWindow.this,"添加播放列表成功",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(SelectedPopupWindow.this,AddPopupWindow.class);
+                intent.putExtra("SongName",mInfo.getDisplayname());
+                intent.putExtra("Id",mInfo.getId());
+                startActivity(intent);
+//                for(Long id : Utility.mPlayList)
+//                {
+//                    if(id == mInfo.getId()) {
+//                        Toast.makeText(SelectedPopupWindow.this, "该歌曲已在播放列表中", Toast.LENGTH_SHORT).show();
+//                        finish();
+//                        return;
+//                    }
+//                }
+//                Utility.mPlayList.add(mInfo.getId());
+//                Toast.makeText(SelectedPopupWindow.this,"添加播放列表成功",Toast.LENGTH_SHORT).show();
                 finish();
             }
         });

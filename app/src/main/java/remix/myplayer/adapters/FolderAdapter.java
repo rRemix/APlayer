@@ -2,18 +2,14 @@ package remix.myplayer.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.widget.PopupMenu;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import remix.myplayer.R;
@@ -66,7 +62,7 @@ public class FolderAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 final PopupMenu popupMenu = new PopupMenu(mContext,button);
-                MainActivity.mInstance.getMenuInflater().inflate(R.menu.pop_menu, popupMenu.getMenu());
+                MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
                         position,
                         Utility.FOLDER_HOLDER,

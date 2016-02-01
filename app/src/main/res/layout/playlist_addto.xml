@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:background="#fff">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:lines="1"
+        android:gravity="center"
+        android:ellipsize="end"
+        android:textColor="#001"
+        android:text="添加到本地歌单"
+        android:textSize="17dp"
+        android:id="@+id/playlist_addto_text"/>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E6E6E6"
+        android:layout_below="@id/playlist_addto_text"/>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:layout_below="@id/playlist_addto_text"
+        android:id="@+id/playlist_addto_list"
+
+        android:dividerHeight="1dp"
+        android:divider="#E6E6E6"/>
+    <Button
+        android:layout_margin="20dp"
+        android:layout_width="130dp"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:onClick="onCancel"
+        android:layout_gravity="center_horizontal"
+        android:text="取消"
+        android:textSize="18dp"
+        android:textColor="@color/translucence"
+        android:background="@drawable/bg_boder"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>

@@ -171,39 +171,35 @@ public class Utility {
             return null;
 
         ContentResolver resolver = mContext.getContentResolver();
-        String url = null;
-        String album = null;
+        boolean mFlag = false;
         Cursor cursor = null;
         String selection = null;
         String[] selectionArg = null;
+        Long id = 0L;
         switch (type)
         {
-            case URL_ALBUM:
-                selection = MediaStore.Audio.Albums._ID + "=" + arg;
-                break;
             case URL_ARTIST:
-                selection = MediaStore.Audio.Albums.ARTIST + "=?";
-                selectionArg = new String[]{arg};
+                selection = MediaStore.Audio.Media.ARTIST + "=?";
                 break;
             case URL_SONGID:
-                selection = MediaStore.Audio.Media._ID + "=" + arg;
+                selection = MediaStore.Audio.Media._ID + "=?";
                 break;
             case URL_NAME:
-                selection = MediaStore.Audio.Media.TITLE + "=" + arg;
-//                selectionArg = new String[]{arg};
+                selection = MediaStore.Audio.Media.TITLE + "=?";
                 break;
+            default:
+                mFlag = true;
         }
         try {
-            cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.AlbumColumns.ALBUM_ART,MediaStore.Audio.AlbumColumns.ALBUM},
-                    selection,selectionArg
-                    , null);
-            if(cursor != null && cursor.getCount() > 0)
-            {
-                int index = cursor.getColumnIndex("album_art");
-                cursor.moveToNext();
-                url = cursor.getString(0);
-                album = cursor.getString(1);
+            if(mFlag)
+                return CheckUrlByAlbumId(Long.valueOf(arg));
+            cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,new String[]{MediaStore.Audio.Media.ALBUM_ID},
+                    selection,new String[]{arg},null);
+            if(cursor != null && cursor.moveToFirst()) {
+                id = Long.valueOf(cursor.getString(0));
+                cursor.close();
             }
+            return CheckUrlByAlbumId(id);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -212,7 +208,28 @@ public class Utility {
             if(cursor != null)
                 cursor.close();
         }
-        return url;
+        return null;
+//        try {
+//            return CheckUrlByAlbumId(1);
+//            cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.AlbumColumns.ALBUM_ART,MediaStore.Audio.AlbumColumns.ALBUM},
+//                    selection,selectionArg
+//                    , null);
+//            if(cursor != null && cursor.getCount() > 0)
+//            {
+//                int index = cursor.getColumnIndex("album_art");
+//                cursor.moveToNext();
+//                url = cursor.getString(0);
+//                album = cursor.getString(1);
+//            }
+//        }
+//        catch (Exception e){
+//            e.printStackTrace();
+//        }
+//        finally {
+//            if(cursor != null)
+//                cursor.close();
+//        }
+//        return url;
     }
 
     //根据专辑id查询图片url
@@ -703,7 +720,7 @@ public class Utility {
     }
 
     //删除选项
-    public final static int DELETE_SINGLE = 3;
+    public final static int DELETE_SINGLE = 4;
     public final static int DELETE_ALBUM = 0;
     public final static int DELETE_ARTIST = 1;
     public final static int DELETE_FOLDER = 2;

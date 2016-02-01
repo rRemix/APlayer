@@ -1,26 +1,28 @@
 package remix.myplayer.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
-import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.ChildHolderActivity;
+import remix.myplayer.activities.MainActivity;
 import remix.myplayer.activities.PlayListActivity;
+import remix.myplayer.fragments.AlbumRecyleFragment;
+import remix.myplayer.listeners.PopupListener;
+import remix.myplayer.utils.PlayListItem;
 import remix.myplayer.utils.Utility;
 
 /**
@@ -28,7 +30,6 @@ import remix.myplayer.utils.Utility;
  */
 public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHolder> {
     private Context mContext;
-
     public PlayListAdapter(Context context)
     {
         this.mContext = context;
@@ -53,6 +54,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
+        PlayListItem item = null;
         String name = null;
         for(int i = 0 ; i<= position ;i++) {
             it.hasNext();
@@ -60,11 +62,11 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         }
         holder.mName.setText(name);
 
-        ArrayList<String> list = PlayListActivity.mPlaylist.get(name);
+        ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
         if(list != null && list.size() > 0)
         {
             AsynLoadImage task = new AsynLoadImage(holder.mImage);
-            task.execute(list.get(0));
+            task.execute(list.get(0).getmSongame());
         }
 
         if(mOnItemClickLitener != null)
@@ -76,6 +78,24 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                 }
             });
         }
+        holder.mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.mButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final PopupMenu popupMenu = new PopupMenu(mContext,holder.mButton);
+                        MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
+                        popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
+                                position,
+                                Utility.PLAYLIST_HOLDER,
+                                null));
+                        popupMenu.setGravity(Gravity.END);
+                        popupMenu.show();
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -86,10 +106,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView mName;
         public final SimpleDraweeView mImage;
+        public final ImageView mButton;
         public ViewHolder(View itemView) {
             super(itemView);
             mName = (TextView) itemView.findViewById(R.id.playlist_item_name);
             mImage = (SimpleDraweeView)itemView.findViewById(R.id.recycleview_simpleiview);
+            mButton = (ImageView)itemView.findViewById(R.id.recycleview_button);
         }
     }
 
