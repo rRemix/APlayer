@@ -1,5 +1,6 @@
 package remix.myplayer.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import remix.myplayer.utils.XmlUtil;
  * Created by taeja on 16-1-15.
  */
 public class PlayListActivity extends AppCompatActivity{
+    public static PlayListActivity mInstance;
     private RecyclerView mRecycleView;
     private PlayListAdapter mAdapter;
     public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
@@ -48,8 +50,8 @@ public class PlayListActivity extends AppCompatActivity{
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.playlist);
+        mInstance = this;
         mRecycleView = (RecyclerView)findViewById(R.id.playlist_recycleview);
         mRecycleView.setLayoutManager(new GridLayoutManager(this, 2));
         mAdapter = new PlayListAdapter(getApplicationContext());
@@ -102,11 +104,13 @@ public class PlayListActivity extends AppCompatActivity{
                 return false;
             }
         });
+        window.setAnimationStyle(R.style.popwin_anim_style);
         window.showAtLocation(v, Gravity.CENTER,0,0);
 
         //修改获得焦点时下划线的颜色
         EditText editText = (EditText)contentView.findViewById(R.id.playlist_add_edit);
         editText.getBackground().setColorFilter(getResources().getColor(R.color.progress_complete), PorterDuff.Mode.SRC_ATOP);
+        editText.setText("本地歌单" + mPlaylist.size());
         contentView.findViewById(R.id.playlist_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -117,12 +121,17 @@ public class PlayListActivity extends AppCompatActivity{
         contentView.findViewById(R.id.playlist_continue).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 String name = ((EditText)contentView.findViewById(R.id.playlist_add_edit)).getText().toString();
                 if(name != null && !name.equals(""))
                     XmlUtil.addPlaylist(name);
                 window.dismiss();
             }
         });
+    }
 
+    public PlayListAdapter getAdapter()
+    {
+        return mAdapter;
     }
 }

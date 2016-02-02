@@ -33,7 +33,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.PlayListActivity"/>
+        <activity android:name=".activities.PlayListActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity android:name=".activities.SearchActivity"/>
 
@@ -48,7 +49,7 @@
         <activity android:name=".ui.AddPopupWindow"
             android:theme="@style/PopupDialog"/>
 
-        <activity android:name=".ui.PlayListPopupWindow"
+        <activity android:name=".ui.PlayingListPopupWindow"
             android:theme="@style/PopupDialog"/>
 
         <activity android:name=".ui.SelectedPopupWindow"

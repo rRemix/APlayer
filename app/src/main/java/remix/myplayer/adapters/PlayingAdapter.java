@@ -5,9 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import remix.myplayer.R;
 import remix.myplayer.utils.MP3Info;
@@ -26,17 +24,17 @@ public class PlayingAdapter extends BaseAdapter {
     }
     @Override
     public int getCount() {
-        if(Utility.mPlayList == null)
+        if(Utility.mPlayingList == null)
             return 0;
-        return Utility.mPlayList.size();
+        return Utility.mPlayingList.size();
     }
 
     @Override
     public Object getItem(int position)
     {
-        if(Utility.mPlayList == null || Utility.mPlayList.size() == 0)
+        if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
             return null;
-        return Utility.mPlayList.get(position);
+        return Utility.mPlayingList.get(position);
     }
 
     @Override
@@ -47,27 +45,16 @@ public class PlayingAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View ItemView = mInflater.inflate(R.layout.playlist_item,null);
-        if(Utility.mPlayList == null || Utility.mPlayList.size() == 0)
+        if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
             return ItemView;
         TextView title = (TextView)ItemView.findViewById(R.id.playlist_item_name);
         TextView artist = (TextView)ItemView.findViewById(R.id.playlist_item_artist);
 
-        MP3Info temp = new MP3Info(Utility.getMP3InfoById(Utility.mPlayList.get(position)));
+        MP3Info temp = new MP3Info(Utility.getMP3InfoById(Utility.mPlayingList.get(position)));
         title.setText(temp.getDisplayname());
         artist.setText(temp.getArtist());
 
-//        ImageView button = (ImageView)ItemView.findViewById(R.id.playlist_button_delete);
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                MP3Info temp = Utility.getMP3InfoById(Utility.mPlayList.get(position));
-//                if (temp != null) {
-//                    Utility.mPlayList.remove(position);
-//                }
-//                Toast.makeText(v.getContext(), "删除了第" + position + "项", Toast.LENGTH_SHORT).show();
-//                notifyDataSetChanged();
-//            }
-//        });
+//
         return ItemView;
     }
 }

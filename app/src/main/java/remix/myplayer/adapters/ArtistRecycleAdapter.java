@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -98,7 +99,8 @@ public class ArtistRecycleAdapter extends RecyclerView.Adapter<ArtistRecycleAdap
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final PopupMenu popupMenu = new PopupMenu(mContext,holder.mButton);
+                        Context wrapper = new ContextThemeWrapper(mContext,R.style.MyPopupMenu);
+                        final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                         MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
                         mCursor.moveToPosition(position);
                         popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
@@ -121,7 +123,6 @@ public class ArtistRecycleAdapter extends RecyclerView.Adapter<ArtistRecycleAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView mText1;
-//        public final ImageView mImage;
         public final SimpleDraweeView mImage;
         public final ImageButton mButton;
         public ViewHolder(View v) {

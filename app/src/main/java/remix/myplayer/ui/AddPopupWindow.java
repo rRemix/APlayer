@@ -31,8 +31,8 @@ public class AddPopupWindow extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playlist_addto);
 
-        mSongName = getIntent().getStringExtra("SongName");
-        mId = getIntent().getIntExtra("Id",-1);
+        mSongName = getIntent().getExtras().getString("SongName");
+        mId = (int)getIntent().getExtras().getLong("Id");
         //改变高度，并置于底部
         Window w = getWindow();
         WindowManager wm = getWindowManager();

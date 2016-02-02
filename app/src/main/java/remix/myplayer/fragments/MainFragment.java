@@ -95,7 +95,6 @@ public class MainFragment extends Fragment {
         mSlideMenu.setFadeDegree(0.35f);
         mSlideMenu.attachToActivity(getActivity(), SlidingMenu.SLIDING_CONTENT);
         mSlideMenu.setMenu(R.layout.slide_menu);
-
         mSlideMenuList = (ListView)mSlideMenu.findViewById(R.id.slide_menu_list);
         mSlideMenuList.setAdapter(new SlideMenuAdapter(getActivity().getLayoutInflater()));
         mSlideMenuList.setOnItemClickListener(new SlideMenuListener(getContext()));
@@ -151,6 +150,15 @@ public class MainFragment extends Fragment {
         view4.setOnClickListener(new TabTextListener(mViewPager, 3));
     }
 
+    public boolean isMenuShow()
+    {
+        return mSlideMenu.isMenuShowing();
+    }
+    public void toggleMenu()
+    {
+        mSlideMenu.toggle();
+    }
+
     class SlideMenuListener implements AdapterView.OnItemClickListener {
         private Context mContext;
 
@@ -177,4 +185,6 @@ public class MainFragment extends Fragment {
             }
         }
     }
+
+
 }

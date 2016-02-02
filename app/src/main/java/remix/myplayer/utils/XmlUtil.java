@@ -30,7 +30,7 @@ import remix.myplayer.activities.PlayListActivity;
 public class XmlUtil {
     static {
         try {
-            File file = new File("playlist.xml");
+            File file = new File("/data/data/remix.myplayer/files/playlist.xml");
             if(!file.exists())
                 file.createNewFile();
         }
@@ -44,14 +44,15 @@ public class XmlUtil {
     {
         mContext = context;
     }
-    public static Map<String,ArrayList<PlayListItem>> getPlayList()
-    {
+    public static Map<String,ArrayList<PlayListItem>> getPlayList()  {
         Map<String,ArrayList<PlayListItem>> map = new HashMap<String,ArrayList<PlayListItem>>();
         XmlPullParser parser = Xml.newPullParser();
         ArrayList<PlayListItem> list = null;
         String key = null;
+        FileInputStream in = null;
         try {
-            FileInputStream in = mContext.openFileInput("playlist.xml");
+            in = mContext.openFileInput("playlist.xml");
+
             parser.setInput(in,"UTF-8");
             int eventType = parser.getEventType();
             String tag = null;
@@ -92,6 +93,14 @@ public class XmlUtil {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        finally {
+                try {
+                    if(in != null)
+                        in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
         return map;
     }
@@ -141,8 +150,9 @@ public class XmlUtil {
     }
     public static void updateXml()
     {
+        FileOutputStream fos = null;
         try {
-            FileOutputStream fos = mContext.openFileOutput("playlist.xml",Context.MODE_PRIVATE);
+            fos = mContext.openFileOutput("playlist.xml",Context.MODE_PRIVATE);
             XmlSerializer parser =  XmlPullParserFactory.newInstance().newSerializer();
             parser.setOutput(fos,"utf-8");
             parser.startDocument("utf-8",true);
@@ -171,7 +181,15 @@ public class XmlUtil {
         catch (IOException e){
             e.printStackTrace();
         }
+        finally {
+            try {
+                if(fos != null)
+                    fos.close();
+            }
+            catch (IOException e){
+                e.printStackTrace();
+            }
+        }
     }
-
 
 }

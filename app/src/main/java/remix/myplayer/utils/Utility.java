@@ -6,41 +6,23 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Message;
 import android.os.ParcelFileDescriptor;
-import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.WindowManager;
-import android.widget.Toast;
 
-import com.facebook.common.logging.LoggingDelegate;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
 
 import remix.myplayer.adapters.FolderAdapter;
-import remix.myplayer.adapters.SongListAdapter;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -49,7 +31,7 @@ public class Utility {
     private final static String TAG = "Utility";
     public static Utility mInstace = null;
     public static ArrayList<Long> mAllSongList = new ArrayList<>();
-    public static ArrayList<Long> mPlayList = new ArrayList<>();
+    public static ArrayList<Long> mPlayingList = new ArrayList<>();
 //    public static Map<String, ArrayList<MP3Info>> mFolderList = new HashMap<>();
     public static Map<String,LinkedList<Long>> mFolderMap = new HashMap<>();
     public static ArrayList<String> mFolderList = new ArrayList<>();
@@ -443,7 +425,7 @@ public class Utility {
             int ret = resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,where,arg);
             if(ret > 0) {
                 //删除播放列表与全部歌曲列表中该歌曲
-                Utility.mAllSongList = Utility.mPlayList = getAllSongsId();
+                Utility.mAllSongList = Utility.mPlayingList = getAllSongsId();
                 //通知适配器刷新
 //                SongListAdapter.mInstance.notifyDataSetChanged();
                 mFolderList.remove(data);
@@ -735,13 +717,17 @@ public class Utility {
     public final static int NEXT = 3;
     public final static int PAUSE = 4;
     public final static int CONTINUE = 5;
+    //播放模式
     public final static int PLAY_LOOP = 6;
     public final static int PLAY_SHUFFLE = 7;
+    public final static int PLAY_REPEATONE = 8;
     //当前状态
     public final static int STATUS_PLAY = 0x010;
     public final static int STATUS_PAUSE = 0x011;
-    //更新seekbar、已播放时间、未播放时间的消息
-    public final static int UPDATE_TIME = 0x100;
+    //更新seekbar、已播放时间、未播放时间
+    public final static int UPDATE_TIME_ALL = 0x010;
+    //更新已播放时间、未播放时间
+    public final static int UPDATE_TIME_ONLY = 0x011;
     //更新播放信息
     public final static int UPDATE_INFORMATION = 0x101;
     //更新背景

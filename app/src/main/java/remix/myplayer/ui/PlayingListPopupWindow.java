@@ -20,7 +20,7 @@ import remix.myplayer.utils.Utility;
 /**
  * Created by Remix on 2015/12/6.
  */
-public class PlayListPopupWindow extends Activity {
+public class PlayingListPopupWindow extends Activity {
     private ListView mListView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,7 @@ public class PlayListPopupWindow extends Activity {
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.height = (int) (metrics.heightPixels * 0.85);
+        lp.height = (int) (metrics.heightPixels * 0.55);
         lp.width = (int) (metrics.widthPixels);
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
@@ -54,7 +54,6 @@ public class PlayListPopupWindow extends Activity {
     {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            MP3Info temp = (MP3Info) parent.getAdapter().getItem(position);
             Intent intent = new Intent(Utility.CTL_ACTION);
             Bundle arg = new Bundle();
             arg.putInt("Control", Utility.PLAYSELECTEDSONG);

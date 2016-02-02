@@ -16,6 +16,7 @@ import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.PlayListItem;
 import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.XmlUtil;
 
 /**
  * Created by taeja on 16-1-25.
@@ -23,7 +24,7 @@ import remix.myplayer.utils.Utility;
 public class PopupListener implements PopupMenu.OnMenuItemClickListener {
     private Context mContext;
     private int mId;
-    //0:专辑 1:歌手 2:文件夹
+    //0:专辑 1:歌手 2:文件夹 3:播放列表
     private int mType;
     private String mKey;
     public PopupListener(Context Context,int id,int type,String key) {
@@ -37,6 +38,7 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
     public boolean onMenuItemClick(MenuItem item) {
         ArrayList<MP3Info> list = new ArrayList<>();
         ArrayList<Long> ids = new ArrayList<Long>();
+        String name = null;
         if(mType <= Utility.ARTIST_HOLDER) {
             list = Utility.getMP3InfoByArtistIdOrAlbumId(mId, mType);
             for(MP3Info info : list)
@@ -50,7 +52,6 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
         }
         else
         {
-            String name = null;
             Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
             for(int i = 0 ; i <= mId ; i++) {
                 it.hasNext();
@@ -62,9 +63,8 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
         switch (item.getItemId()) {
             //播放
             case R.id.menu_play:
-
-                Utility.mPlayList = (ArrayList) ids.clone();
-                MusicService.mInstance.UpdateNextSong(0);
+                Utility.mPlayingList = (ArrayList) ids.clone();
+//                MusicService.mInstance.UpdateNextSong(0);
                 Intent intent = new Intent(Utility.CTL_ACTION);
                 Bundle arg = new Bundle();
                 arg.putInt("Control", Utility.PLAYSELECTEDSONG);
@@ -74,11 +74,19 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
                 break;
             //添加到播放列表
             case R.id.menu_add:
-                Utility.mPlayList.addAll(ids);
+                Utility.mPlayingList.addAll(ids);
                 break;
             //删除
             case R.id.menu_delete:
-                Utility.deleteSong(mKey,mType);
+                if(mType != Utility.PLAYLIST_HOLDER)
+                    Utility.deleteSong(mKey,mType);
+                else {
+                    if(name != null && !name.equals("")) {
+                        PlayListActivity.mPlaylist.remove(name);
+                        PlayListActivity.mInstance.getAdapter().notifyDataSetChanged();
+                        XmlUtil.updateXml();
+                    }
+                }
                 break;
             default:
                 Toast.makeText(mContext, "Click " + item.getTitle(), Toast.LENGTH_SHORT).show();

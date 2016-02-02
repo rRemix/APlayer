@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.nfc.Tag;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,15 +15,11 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.IOException;
-import java.io.UTFDataFormatException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
-import java.util.TimerTask;
 
-import remix.myplayer.activities.AudioHolderActivity;
-import remix.myplayer.activities.MainActivity;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.Utility;
@@ -77,7 +72,7 @@ public class MusicService extends Service {
                     if(mCallBacklist.get(i) != null)
                         try
                         {
-                            mCallBacklist.get(i).getCurrentInfo(mInfo,mIsplay);
+                            mCallBacklist.get(i).UpdateUI(mInfo,mIsplay);
                         }
                         catch (Exception e)
                         {
@@ -107,11 +102,11 @@ public class MusicService extends Service {
         super.onCreate();
         mInstance = this;
 
-        if(Utility.mPlayList != null && Utility.mPlayList.size() > 0)
-            mId = Utility.mPlayList.get(0);
+        if(Utility.mPlayingList != null && Utility.mPlayingList.size() > 0)
+            mId = Utility.mPlayingList.get(0);
         mInfo = Utility.getMP3InfoById(mId);
-        if(Utility.mPlayList.size() > 1)
-            mNextInfo = Utility.getMP3InfoById(Utility.mPlayList.get(1));
+//        if(Utility.mPlayingList.size() > 1)
+//            mNextInfo = Utility.getMP3InfoById(Utility.mPlayingList.get(1));
 
         mCallBacklist = new ArrayList<Callback>(){};
         mPlayer = new MediaPlayer();
@@ -141,7 +136,7 @@ public class MusicService extends Service {
         mPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                Log.i("Error","what = " + what + " extar = " + extra);
+                Log.d("Error","what = " + what + " extar = " + extra);
                 return true;
             }
         });
@@ -210,7 +205,7 @@ public class MusicService extends Service {
 
     //回调接口，当发生更新时，通知所有activity接受更新
     public interface Callback {
-        public void getCurrentInfo(MP3Info MP3info,boolean isplay);
+        public void UpdateUI(MP3Info MP3info, boolean isplay);
     }
     //添加回调接口的一个实现类
     public void addCallback(Callback callback,int positon)
@@ -234,10 +229,8 @@ public class MusicService extends Service {
                     mCurrent = intent.getIntExtra("Position", -1);
                     if(mCurrent == -1)
                         System.out.println("参数错误");
-                    mId = Utility.mPlayList.get(mCurrent);
-
+                    mId = Utility.mPlayingList.get(mCurrent);
                     mInfo = Utility.getMP3InfoById(mId);
-//                    mInfo = Utility.mPlayList.get(mCurrent);
                     if(mInfo == null)
                         break;
                     mBinder.Play(mInfo.getUrl());
@@ -270,6 +263,9 @@ public class MusicService extends Service {
                 case Utility.PLAY_SHUFFLE:
                     mPlayModel = Utility.PLAY_SHUFFLE;
                     break;
+                //单曲循环
+                case Utility.PLAY_REPEATONE:
+                    mPlayModel = Utility.PLAY_REPEATONE;
                 default:break;
             }
 //            if(Control != Utility.PLAY_LOOP && Control != Utility.PLAY_SHUFFLE)
@@ -277,15 +273,6 @@ public class MusicService extends Service {
                 handler.sendEmptyMessage(Utility.UPDATE_INFORMATION);
             }
         }
-    }
-    private void SendUpdate()
-    {
-        Intent intentBottom = new Intent(Utility.UPDATE_ACTION);
-        Bundle arg = new Bundle();
-        arg.putSerializable("Info",mInfo);
-        arg.putBoolean("Status",mPlayer.isPlaying());
-        intentBottom.putExtras(arg);
-//        context.sendBroadcast(intentBottom);
     }
     //准备播放
     private void PrepareAndPlay(String path)
@@ -305,49 +292,48 @@ public class MusicService extends Service {
     //根据当前播放列表的长度，得到一个随机数
     private int getShuffle()
     {
-        if(Utility.mPlayList.size() == 1)
+        if(Utility.mPlayingList.size() == 1)
             return 0;
-        return new Random().nextInt(Utility.mPlayList.size() - 1);
+        return new Random().nextInt(Utility.mPlayingList.size() - 1);
     }
     //根据当前播放模式，播放上一首或者下一首
     public void PlayNextOrPrev(boolean IsNext,boolean NeedPlay)
     {
-        if(Utility.mPlayList == null || Utility.mPlayList.size() == 0)
+        if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
             return;
-        if(NeedPlay)
-            mInfo = mNextInfo;
 
-        if(mPlayModel == Utility.PLAY_SHUFFLE)
-        {
+        if(mPlayModel == Utility.PLAY_SHUFFLE) {
             mCurrent = getShuffle();
-            mId = Utility.mPlayList.get(mCurrent);
-//            mInfo = Utility.getMP3InfoById(mId);
-            mNextInfo = Utility.getMP3InfoById(mId);
+            mId = Utility.mPlayingList.get(mCurrent);
+            mInfo = Utility.getMP3InfoById(mId);
+//            mNextInfo = Utility.getMP3InfoById(mId);
         }
-        else if(mPlayModel == Utility.PLAY_LOOP)
-        {
-            if(IsNext)
-            {
-                if ((++mCurrent) > Utility.mPlayList.size() - 1)
+        else if(mPlayModel == Utility.PLAY_LOOP) {
+            if(IsNext) {
+                if ((++mCurrent) > Utility.mPlayingList.size() - 1)
                     mCurrent = 0;
-                mNext = mCurrent + 1;
-                if(mNext > Utility.mPlayList.size() - 1)
-                    mNext = 0;
-                mId = Utility.mPlayList.get(mNext);
-//                mInfo = Utility.getMP3InfoById(mId);
-                mNextInfo = Utility.getMP3InfoById(mId);
+                mId = Utility.mPlayingList.get(mCurrent);
+                mInfo = Utility.getMP3InfoById(mId);
+//                mNext = mCurrent + 1;
+//                if(mNext > Utility.mPlayingList.size() - 1)
+//                    mNext = 0;
+
+//                mNextInfo = Utility.getMP3InfoById(mId);
             }
-            else
-            {
+            else {
                 if ((--mCurrent) < 0)
-                    mCurrent = Utility.mPlayList.size() - 1;
-                mNext = mCurrent - 1;
-                if(mNext < 0)
-                    mNext = Utility.mPlayList.size() - 1;
-                mId = Utility.mPlayList.get(mNext);
-//                mInfo = Utility.getMP3InfoById(mId);
-                mNextInfo = Utility.getMP3InfoById(mId);
+                    mCurrent = Utility.mPlayingList.size() - 1;
+                mId = Utility.mPlayingList.get(mCurrent);
+                mInfo = Utility.getMP3InfoById(mId);
+//                mNext = mCurrent - 1;
+//                if(mNext < 0)
+//                    mNext = Utility.mPlayingList.size() - 1;
+//                mId = Utility.mPlayingList.get(mNext);
+//                mNextInfo = Utility.getMP3InfoById(mId);
             }
+        }
+        else {
+
         }
         if(NeedPlay)
             mBinder.Play(mInfo.getUrl());
@@ -373,21 +359,21 @@ public class MusicService extends Service {
     }
 
     //设置当前播放的角标
-    public void UpdateNextSong(int current)
-    {
-        mCurrent = current;
-        mNext = mCurrent + 1 == Utility.mPlayList.size() ? 0 : mCurrent + 1;
-        mNextInfo = Utility.getMP3InfoById(Utility.mPlayList.get(mNext));
-    }
+//    public void UpdateNextSong(int current)
+//    {
+//        mCurrent = current;
+//        mNext = mCurrent + 1 == Utility.mPlayingList.size() ? 0 : mCurrent + 1;
+//        mNextInfo = Utility.getMP3InfoById(Utility.mPlayingList.get(mNext));
+//    }
     //设置当前播放列表
     public static void setCurrentList(ArrayList<Long> list)
     {
-        Utility.mPlayList = list;
+        Utility.mPlayingList = list;
     }
     //返回当前播放列表
     public static ArrayList<Long> getCurrentList()
     {
-        return Utility.mPlayList;
+        return Utility.mPlayingList;
     }
     //返回当前播放歌曲
     public static MP3Info getCurrentMP3()

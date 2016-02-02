@@ -72,19 +72,13 @@ public class SelectedPopupWindow extends Activity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(SelectedPopupWindow.this,AddPopupWindow.class);
-                intent.putExtra("SongName",mInfo.getDisplayname());
-                intent.putExtra("Id",mInfo.getId());
+                Bundle arg = new Bundle();
+                arg.putString("SongName",mInfo.getDisplayname());
+                arg.putLong("Id",mInfo.getId());
+
+                intent.putExtras(arg);
                 startActivity(intent);
-//                for(Long id : Utility.mPlayList)
-//                {
-//                    if(id == mInfo.getId()) {
-//                        Toast.makeText(SelectedPopupWindow.this, "该歌曲已在播放列表中", Toast.LENGTH_SHORT).show();
-//                        finish();
-//                        return;
-//                    }
-//                }
-//                Utility.mPlayList.add(mInfo.getId());
-//                Toast.makeText(SelectedPopupWindow.this,"添加播放列表成功",Toast.LENGTH_SHORT).show();
+
                 finish();
             }
         });
@@ -131,11 +125,11 @@ public class SelectedPopupWindow extends Activity {
         if(resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,MediaStore.MediaColumns.DATA + "=?",new String[]{mInfo.getUrl()}) > 0)
         {
             //删除播放列表与全部歌曲列表中该歌曲
-            for(Long id : Utility.mPlayList)
+            for(Long id : Utility.mPlayingList)
             {
                 if(mInfo.getId() == id)
                 {
-                    Utility.mPlayList.remove(id);
+                    Utility.mPlayingList.remove(id);
                     break;
                 }
             }

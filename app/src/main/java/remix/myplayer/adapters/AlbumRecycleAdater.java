@@ -1,10 +1,12 @@
 package remix.myplayer.adapters;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -120,7 +122,8 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final PopupMenu popupMenu = new PopupMenu(mContext,holder.mButton);
+                        Context wrapper = new ContextThemeWrapper(mContext,R.style.MyPopupMenu);
+                        final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                         MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
 
                         mCursor.moveToPosition(position);
@@ -185,7 +188,6 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
 
         @Override
         public void onFailure(String id, Throwable throwable) {
-//            File f = new File(throwable.getMessage());
         }
 
         @Override

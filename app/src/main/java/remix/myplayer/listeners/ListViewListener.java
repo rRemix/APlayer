@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import remix.myplayer.activities.MainActivity;
-import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.Utility;
 
 /**
@@ -28,8 +27,8 @@ public class ListViewListener implements AdapterView.OnItemClickListener
         arg.putInt("Position", position);
         intent.putExtras(arg);
         mContext.sendBroadcast(intent);
-        Utility.mPlayList = Utility.mAllSongList;
-        MainActivity.mInstance.getService().UpdateNextSong(position);
+        Utility.mPlayingList = Utility.mAllSongList;
+//        MainActivity.mInstance.getService().UpdateNextSong(position);
 
     }
 }

@@ -15,7 +15,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.AlbumHolderAdapter;
@@ -99,8 +98,8 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
                 ArrayList<Long> ids = new ArrayList<Long>();
                 for(MP3Info info : mInfoList)
                     ids.add(info.getId());
-                Utility.mPlayList = (ArrayList) ids.clone();
-                mService.UpdateNextSong(position);
+                Utility.mPlayingList = (ArrayList) ids.clone();
+//                mService.UpdateNextSong(position);
 
                 Intent intent = new Intent(Utility.CTL_ACTION);
                 Bundle arg = new Bundle();
@@ -145,9 +144,9 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
 
         //初始化底部状态栏
         mActionbar = (BottomActionBarFragment)getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        if(Utility.mPlayList.size() == 0)
+        if(Utility.mPlayingList.size() == 0)
             return;
-        mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayList.get(0)), false);
+        mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(0)), false);
 
     }
     @Override
@@ -156,7 +155,7 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
         unbindService(mConnecting);
     }
     @Override
-    public void getCurrentInfo(MP3Info MP3info, boolean isplay) {
+    public void UpdateUI(MP3Info MP3info, boolean isplay) {
         MP3Info temp = MP3info;
         mActionbar.UpdateBottomStatus(MP3info, isplay);
     }

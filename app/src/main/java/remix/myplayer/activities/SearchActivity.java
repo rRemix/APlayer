@@ -127,8 +127,8 @@ public class SearchActivity extends AppCompatActivity {
                         mCursor.moveToPosition(i);
                         list.add(mCursor.getLong(mIdIndex));
                     }
-                    Utility.mPlayList = list;
-                    MainActivity.mInstance.getService().UpdateNextSong(position);
+                    Utility.mPlayingList = list;
+//                    MainActivity.mInstance.getService().UpdateNextSong(position);
                 }
             }
         }

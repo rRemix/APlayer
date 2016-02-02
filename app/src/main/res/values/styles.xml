@@ -73,15 +73,14 @@
 
     <!-- 顶部两个按钮 -->
     <style name="TopImageButton">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">32dp</item>
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
         <item name="android:layout_marginLeft">19dp</item>
     </style>
 
     <!-- 播放时间 -->
     <style name="Playtimetext">
-        <item name="android:layout_marginTop">10dp</item>
+
         <item name="android:layout_weight">1</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
@@ -149,4 +148,15 @@
         <item name="android:textColor">@drawable/bg_tab_textcolor</item>
     </style>
 
+    <!--菜单风格-->
+    <style name="MyPopupMenu" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:popupBackground">@drawable/pop_bg</item>
+        <item name="android:disabledAlpha">0.5</item>
+    </style>
+
+    <!--popup_style-->
+    <style name="popwin_anim_style">
+        <item name="android:windowEnterAnimation">@anim/popup_in</item>
+        <item name="android:windowExitAnimation">@anim/popup_out</item>
+    </style>
 </resources>

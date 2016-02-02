@@ -3,10 +3,12 @@ package remix.myplayer.adapters;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -78,24 +80,20 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                 }
             });
         }
-        holder.mButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                holder.mButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        final PopupMenu popupMenu = new PopupMenu(mContext,holder.mButton);
-                        MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
-                        popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
-                                position,
-                                Utility.PLAYLIST_HOLDER,
-                                null));
-                        popupMenu.setGravity(Gravity.END);
-                        popupMenu.show();
-                    }
-                });
-            }
-        });
+        if(holder.mButton != null)
+        {
+            holder.mButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Context wrapper = new ContextThemeWrapper(mContext, R.style.MyPopupMenu);
+                    final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
+                    PlayListActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
+                    popupMenu.setOnMenuItemClickListener(new PopupListener(mContext, position, Utility.PLAYLIST_HOLDER, ""));
+                    popupMenu.setGravity(Gravity.END);
+                    popupMenu.show();
+                }
+            });
+        }
     }
 
     @Override

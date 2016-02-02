@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
@@ -16,8 +15,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.util.Xml;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -28,14 +25,7 @@ import android.widget.Toast;
 
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.tencent.open.t.Weibo;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
@@ -93,9 +83,9 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         initSlideMenu();
         //初始化底部状态栏
         mActionbar = (BottomActionBarFragment)getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        if(Utility.mPlayList == null || Utility.mPlayList.size() == 0)
+        if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
             return;
-        mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayList.get(0)), false);
+        mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(0)), false);
 
     }
 
@@ -199,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         new Thread(task, "getInfo").start();
         try {
             Utility.mAllSongList = task.get();
-            Utility.mPlayList = task.get();
+            Utility.mPlayingList = task.get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -210,16 +200,32 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode == KeyEvent.KEYCODE_BACK)
         {
+//            List<Fragment> list = getSupportFragmentManager().getFragments();
+//            MainFragment fragment = null;
+//            for(int i = 0; i < list.size(); i++)
+//            {
+//                if(list.get(i) instanceof MainFragment)
+//                    fragment = (MainFragment) list.get(i);
+//            }
+//            if(fragment.isMenuShow())
+//                fragment.toggleMenu();
+//            else {
+//                Intent home = new Intent(Intent.ACTION_MAIN);
+//                home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                home.addCategory(Intent.CATEGORY_HOME);
+//                startActivity(home);
+//            }
             Intent home = new Intent(Intent.ACTION_MAIN);
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             home.addCategory(Intent.CATEGORY_HOME);
             startActivity(home);
+
         }
         return super.onKeyDown(keyCode, event);
     }
 
     @Override
-    public void getCurrentInfo(MP3Info MP3info,boolean isplay){
+    public void UpdateUI(MP3Info MP3info, boolean isplay){
         MP3Info temp = MP3info;
         mActionbar.UpdateBottomStatus(MP3info, isplay);
     }
