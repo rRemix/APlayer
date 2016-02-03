@@ -1,9 +1,15 @@
 package remix.myplayer.activities;
 
 
+import android.app.ActivityManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -11,6 +17,8 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +35,7 @@ import android.widget.Toast;
 import com.facebook.drawee.backends.pipeline.Fresco;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
@@ -47,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     private Utility mUtlity;
     private RecyclerView mMenuRecycle;
     private SlideMenuRecycleAdpater mMenuAdapter;
+    private NotifyBroadReceiver mReceiver;
+    private MusicService.PlayerReceiver mMusicReceiver;
     private ServiceConnection mConnecting = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -58,6 +69,27 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
             mService = null;
         }
     };
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        unbindService(mConnecting);
+        unregisterReceiver(mReceiver);
+        unregisterReceiver(mMusicReceiver);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         XmlUtil.setContext(getApplicationContext());
@@ -68,15 +100,21 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         super.onCreate(savedInstanceState);
         mInstance = this;
         setContentView(R.layout.content_main);
-        mUtlity = new Utility(this);
+        mUtlity = new Utility(getApplicationContext());
         loadsongs();
         mManager = getSupportLoaderManager();
         mManager.initLoader(1003,null,this);
 
 
+        //注册控制栏监听
+        mReceiver = new NotifyBroadReceiver();
+        IntentFilter filter = new IntentFilter(Utility.NOTIFY);
+        registerReceiver(mReceiver,filter);
         //绑定控制播放的service
-        Intent intent = new Intent(MainActivity.this,MusicService.class);
-        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);
+        MusicService.addCallback(MainActivity.this,0);
+//        Intent intent = new Intent(MainActivity.this,MusicService.class);
+//        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);
+        startService(new Intent(this,MusicService.class));
         //加载主页fragment
         initMainFragment();
         //初始化侧滑菜单
@@ -85,7 +123,17 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         mActionbar = (BottomActionBarFragment)getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
             return;
-        mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(0)), false);
+        mActionbar.UpdateBottomStatus(MusicService.getCurrentMP3() == null ?
+                Utility.getMP3InfoById(Utility.mPlayingList.get(0)) :
+                MusicService.getCurrentMP3(),
+                false);
+
+        //注册Musicreceiver
+        MusicService service = new MusicService(getApplicationContext());
+        mMusicReceiver = service.new PlayerReceiver();
+        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
+        registerReceiver(mMusicReceiver, musicfilter);
+
 
     }
 
@@ -109,11 +157,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     {
         return getSupportFragmentManager();
     }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unbindService(mConnecting);
-    }
+
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -255,6 +299,44 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public class NotifyBroadReceiver extends BroadcastReceiver
+    {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.drawable.ic_dialog)
+                    .setContentTitle("Notify")
+                    .setContentText("Hello World");
+
+            Intent resultIntent = new Intent(context, AudioHolderActivity.class);
+//            resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addParentStack(AudioHolderActivity.class);
+//            stackBuilder.addNextIntent(resultIntent);
+            stackBuilder.addNextIntent(new Intent(context,MainActivity.class));
+            stackBuilder.addNextIntent(new Intent(context,AudioHolderActivity.class));
+
+//            stackBuilder.addNextIntentWithParentStack(resultIntent);
+
+//            ActivityManager mActivityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+//            List<ActivityManager.RunningTaskInfo> rti = mActivityManager.getRunningTasks(1);
+//            String name = rti.get(0).baseActivity.getClassName();
+
+
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            0,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent);
+
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(0, mBuilder.build());
+        }
     }
 }
 

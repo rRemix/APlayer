@@ -344,10 +344,6 @@ public class Utility {
         String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
         String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
         long albumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-        if(albumId == 357)
-        {
-            Log.d("Cursor",String.valueOf(albumId));
-        }
         long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
         String realtime = getTime(duration);
         String url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
@@ -710,6 +706,7 @@ public class Utility {
     public final static String CTL_ACTION = "remix.music.CTL_ACTION";
     public final static String UPDATE_ACTION = "remix.music.UPDATE_ACTION";
     public final static String CONTROL_TIMER = "remix.music.CONTROL_TIMER";
+    public final static String NOTIFY = "remix.music.NOTIFY";
     //控制命令
     public final static int PLAYSELECTEDSONG = 0;
     public final static int PREV = 1;

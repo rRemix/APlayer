@@ -3,6 +3,7 @@ package remix.myplayer.activities;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -37,6 +38,7 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     private TextView mNum;
     private TextView mTitle;
     private BottomActionBarFragment mActionbar;
+    private MusicService.PlayerReceiver mMusicReceiver;
     private ServiceConnection mConnecting = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -53,8 +55,15 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //绑定控制播放的service
-        Intent intent = new Intent(ChildHolderActivity.this,MusicService.class);
-        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);
+//        Intent intent = new Intent(ChildHolderActivity.this,MusicService.class);
+//        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);
+        MusicService.addCallback(ChildHolderActivity.this,2);
+
+        //注册Musicreceiver
+        MusicService service = new MusicService(getApplicationContext());
+        mMusicReceiver = service.new PlayerReceiver();
+        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
+        registerReceiver(mMusicReceiver, musicfilter);
 
         mId = getIntent().getIntExtra("Id",-1);
         int type = getIntent().getIntExtra("Type",-1);
@@ -152,7 +161,8 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(mConnecting);
+//        unbindService(mConnecting);
+        unregisterReceiver(mMusicReceiver);
     }
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay) {

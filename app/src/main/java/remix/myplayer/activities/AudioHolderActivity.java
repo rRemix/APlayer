@@ -1,8 +1,11 @@
 package remix.myplayer.activities;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +16,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
 
 import android.support.v7.app.AppCompatActivity;
@@ -93,6 +98,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     private AlphaAnimation mAnimIn;
     private AlphaAnimation mAnimOut;
     private Bitmap mNewBitMap;
+    private MusicService.PlayerReceiver mMusicReceiver;
     private Handler mBlurHandler = new Handler()
     {
         @Override
@@ -151,9 +157,16 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
 //        mInfo = (MP3Info)getIntent().getExtras().getSerializable("MP3Info");
         mInfo = MusicService.getCurrentMP3();
         mIsPlay = getIntent().getBooleanExtra("Isplay",false);
-        Intent intent = new Intent(AudioHolderActivity.this,MusicService.class);
-        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);
+        MusicService.addCallback(this,1);
+//        Intent intent = new Intent(AudioHolderActivity.this,MusicService.class);
+//        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);
 
+
+        //注册Musicreceiver
+        MusicService service = new MusicService(getApplicationContext());
+        mMusicReceiver = service.new PlayerReceiver();
+        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
+        registerReceiver(mMusicReceiver, musicfilter);
         //初始化动画相关
         initAnim();
         //初始化顶部信息
@@ -196,9 +209,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
                     mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
                     mContainer.startAnimation(mAnimIn);
                 }
-
             }
-
             @Override
             public void onAnimationRepeat(Animation animation) {
             }
@@ -293,7 +304,8 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     public void onDestroy()
     {
         super.onDestroy();
-        unbindService(mConnecting);
+//        unbindService(mConnecting);
+        unregisterReceiver(mMusicReceiver);
     }
 
     class ProgeressThread extends Thread {
@@ -301,6 +313,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         public void run() {
             while (mIsRun && mInfo != null) {
                 if (MusicService.getIsplay()) {
+//                    mCurrent = MusicService.mInstance.getCurrentTime();
                     mCurrent = MusicService.getCurrentTime();
                     mHandler.sendEmptyMessage(Utility.UPDATE_TIME_ALL);
                 }
@@ -508,12 +521,12 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     @Override
     protected void onStart() {
         super.onStart();
-        overridePendingTransition(R.anim.slide_bottom_in, 0);
+//        overridePendingTransition(R.anim.slide_bottom_in, 0);
     }
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(0, R.anim.slide_bottom_out);
+//        overridePendingTransition(0, R.anim.slide_bottom_out);
     }
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay){
@@ -536,8 +549,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             mDuration = (int) mInfo.getDuration();
             mSeekBar.setMax(mDuration);
             mBlurHandler.sendEmptyMessage(Utility.UPDATE_BG);
-            //更新下一首歌曲
-            initNextSong();
+
         }
         else if(mIsRun)
             //更新按钮状态

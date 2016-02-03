@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_APN_SETTINGS"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
         android:allowBackup="true"
@@ -33,13 +34,21 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.PlayListActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
         <activity android:name=".activities.SearchActivity"/>
 
+        <activity android:name=".activities.PlayListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+
+
         <activity android:name=".activities.AudioHolderActivity"
-            android:theme="@style/AppTheme.NoActionBar.Translucent" />
+            android:theme="@style/AudioHolderStyle"
+            android:parentActivityName=".activities.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.MainActivity"/>
+        </activity>
 
         <activity android:name=".activities.ChildHolderActivity"/>
 
@@ -92,7 +101,6 @@
             android:name="com.tencent.connect.common.AssistActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:configChanges="orientation|keyboardHidden|screenSize" />
-
 
 
         <receiver android:name=".test.receiver">

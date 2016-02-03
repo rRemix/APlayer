@@ -39,7 +39,7 @@ import remix.myplayer.utils.Utility;
 public class AllSongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private LoaderManager mManager;
     private SongListAdapter mAdapter;
-    private MusicService.PlayerReceiver receiver;
+    private MusicService.PlayerReceiver mMusicReceiver;
     private int mPrev = -1;
     private Cursor mCursor = null;
     private ListView mListView = null;
@@ -83,21 +83,21 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        //注册broadcastreceiver
-        MusicService service = new MusicService(getContext());
-        receiver = service.new PlayerReceiver();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Utility.CTL_ACTION);
-        getContext().registerReceiver(receiver, filter);
+
+//        MusicService service = new MusicService(getContext());
+//        mMusicReceiver = service.new PlayerReceiver();
+//        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
+//        getContext().registerReceiver(mMusicReceiver, musicfilter);
+
     }
 
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getContext().unregisterReceiver(receiver);
         if(mAdapter != null)
             mAdapter.changeCursor(null);
+//        getContext().unregisterReceiver(mMusicReceiver);
     }
 
     @Nullable

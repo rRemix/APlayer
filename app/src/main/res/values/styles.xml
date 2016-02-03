@@ -23,12 +23,19 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
-    
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-
+    <!--Audio_style-->
+    <style name="Audio_style">
+        <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
+        <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
+    </style>
+    <style name="AudioHolderStyle" parent="AppTheme.NoActionBar.Translucent">
+        <!--<item name="android:windowAnimationStyle">@style/Audio_style</item>-->
+    </style>
 
     <!--Custom Tab-->
     <style name="CustomTab">
@@ -159,4 +166,6 @@
         <item name="android:windowEnterAnimation">@anim/popup_in</item>
         <item name="android:windowExitAnimation">@anim/popup_out</item>
     </style>
+
+
 </resources>

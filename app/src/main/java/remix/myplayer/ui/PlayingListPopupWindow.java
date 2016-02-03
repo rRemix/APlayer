@@ -14,7 +14,6 @@ import android.widget.ListView;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.PlayingAdapter;
-import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.Utility;
 
 /**
@@ -25,7 +24,7 @@ public class PlayingListPopupWindow extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.popup_playlist);
+        setContentView(R.layout.popup_playinglist);
         mListView = (ListView)findViewById(R.id.bottom_actionbar_play_list);
         mListView.setAdapter(new PlayingAdapter(getLayoutInflater(), getApplicationContext()));
         mListView.setOnItemClickListener(new ListViewListener());
