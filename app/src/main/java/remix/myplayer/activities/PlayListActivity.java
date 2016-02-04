@@ -45,7 +45,7 @@ public class PlayListActivity extends AppCompatActivity{
     public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
     private ImageButton mButton;
     static {
-        mPlaylist = XmlUtil.getPlayList();
+        mPlaylist = XmlUtil.getPlayList("playlist.xml");
     }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -123,8 +123,10 @@ public class PlayListActivity extends AppCompatActivity{
             public void onClick(View v) {
 
                 String name = ((EditText)contentView.findViewById(R.id.playlist_add_edit)).getText().toString();
-                if(name != null && !name.equals(""))
+                if(name != null && !name.equals("")) {
                     XmlUtil.addPlaylist(name);
+                    mAdapter.notifyDataSetChanged();
+                }
                 window.dismiss();
             }
         });

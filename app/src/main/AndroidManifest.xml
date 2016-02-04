@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_APN_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
     <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
@@ -26,7 +27,8 @@
     <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,6 +46,7 @@
 
         <activity android:name=".activities.AudioHolderActivity"
             android:theme="@style/AudioHolderStyle"
+
             android:parentActivityName=".activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -106,6 +109,17 @@
         <receiver android:name=".test.receiver">
             <intent-filter>
                 <action android:name="remix.music.UPDATE_ACTION"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".services.MusicService$PlayerReceiver">
+            <intent-filter>
+                <action android:name="remix.music.CTL_ACTION"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".broadcastreceivers.NotifyReceiver">
+            <intent-filter>
+                <action android:name="remix.music.CTL_ACTION"/>
             </intent-filter>
         </receiver>
 

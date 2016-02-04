@@ -1,11 +1,7 @@
 package remix.myplayer.activities;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,8 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
 
 import android.support.v7.app.AppCompatActivity;
@@ -45,7 +39,7 @@ import remix.myplayer.fragments.LrcFragment;
 import remix.myplayer.fragments.RecordFragment;
 import remix.myplayer.services.MusicService;
 
-import remix.myplayer.ui.AudioPager;
+import remix.myplayer.ui.AudioViewPager;
 import remix.myplayer.ui.PlayingListPopupWindow;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.Utility;
@@ -75,7 +69,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     private TextView mTopTitle;
     private TextView mTopDetail;
     private ImageButton mHide;
-    private AudioPager mPager;
+    private AudioViewPager mPager;
     private TextView mHasPlay;
     private TextView mRemainPlay;
     private SeekBar mSeekBar;
@@ -109,6 +103,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
                 float radius = 25;
                 float scaleFactor = 12;
                 if (mWidth > 0 && mHeight > 0 ) {
+                    if(mInfo == null) return;
                     Bitmap bkg = Utility.CheckBitmapBySongId((int) mInfo.getId(),false);
                     if (bkg == null)
                         bkg = BitmapFactory.decodeResource(getResources(), R.drawable.bg_lockscreen_default);
@@ -133,7 +128,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = ((MusicService.PlayerBinder)service).getService();
-            mService.addCallback(AudioHolderActivity.this,1);
+            mService.addCallback(AudioHolderActivity.this);
         }
         @Override
         public void onServiceDisconnected(ComponentName name) {
@@ -156,17 +151,18 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         setContentView(R.layout.audio_holder);
 //        mInfo = (MP3Info)getIntent().getExtras().getSerializable("MP3Info");
         mInfo = MusicService.getCurrentMP3();
-        mIsPlay = getIntent().getBooleanExtra("Isplay",false);
-        MusicService.addCallback(this,1);
+//        mIsPlay = getIntent().getBooleanExtra("Isplay",false);
+        mIsPlay = MusicService.getIsplay();
+        MusicService.addCallback(this);
 //        Intent intent = new Intent(AudioHolderActivity.this,MusicService.class);
 //        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);
 
 
         //注册Musicreceiver
-        MusicService service = new MusicService(getApplicationContext());
-        mMusicReceiver = service.new PlayerReceiver();
-        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
-        registerReceiver(mMusicReceiver, musicfilter);
+//        MusicService service = new MusicService(getApplicationContext());
+//        mMusicReceiver = service.new PlayerReceiver();
+//        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
+//        registerReceiver(mMusicReceiver, musicfilter);
         //初始化动画相关
         initAnim();
         //初始化顶部信息
@@ -305,7 +301,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     {
         super.onDestroy();
 //        unbindService(mConnecting);
-        unregisterReceiver(mMusicReceiver);
+//        unregisterReceiver(mMusicReceiver);
     }
 
     class ProgeressThread extends Thread {
@@ -357,6 +353,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mGuideList.add((ImageView) findViewById(R.id.guide_02));
         mGuideList.add((ImageView) findViewById(R.id.guide_03));
     }
+
     private void initButton()
     {
         mPlayBarPrev = (ImageButton)findViewById(R.id.playbar_prev);
@@ -487,7 +484,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     private void initPager()
     {
         //初始化Viewpager
-        mPager = (AudioPager)findViewById(R.id.holder_pager);
+        mPager = (AudioViewPager)findViewById(R.id.holder_pager);
         mAdapter = new PagerAdapter(getSupportFragmentManager());
         mBundle = new Bundle();
         mBundle.putSerializable("MP3Info", mInfo);
@@ -557,5 +554,9 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
 
     }
 
+    @Override
+    public int getType() {
+        return 1;
+    }
 
 }

@@ -41,7 +41,11 @@ public class Utility {
         mInstace = this;
         this.mContext = ctx;
     }
-
+    public static void setPlayingList(ArrayList<Long> list)
+    {
+        mPlayingList = list;
+        XmlUtil.updatePlayingListXml();
+    }
     //返回所有歌曲id，作为打开时默认的播放列表
     public static ArrayList<Long> getAllSongsId() {
         ArrayList<Long> mAllSongList = new ArrayList<>();

@@ -34,7 +34,7 @@
         <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
     </style>
     <style name="AudioHolderStyle" parent="AppTheme.NoActionBar.Translucent">
-        <!--<item name="android:windowAnimationStyle">@style/Audio_style</item>-->
+        <item name="android:windowAnimationStyle">@style/Audio_style</item>
     </style>
 
     <!--Custom Tab-->

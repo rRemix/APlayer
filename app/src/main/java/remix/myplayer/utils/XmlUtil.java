@@ -33,6 +33,9 @@ public class XmlUtil {
             File file = new File("/data/data/remix.myplayer/files/playlist.xml");
             if(!file.exists())
                 file.createNewFile();
+            File file1 = new File("/data/data/remix.myplayer/files/playinglist.xml");
+            if(!file1.exists())
+                file1.createNewFile();
         }
         catch (IOException e){
             e.printStackTrace();
@@ -44,14 +47,14 @@ public class XmlUtil {
     {
         mContext = context;
     }
-    public static Map<String,ArrayList<PlayListItem>> getPlayList()  {
+    public static Map<String,ArrayList<PlayListItem>> getPlayList(String name)  {
         Map<String,ArrayList<PlayListItem>> map = new HashMap<String,ArrayList<PlayListItem>>();
         XmlPullParser parser = Xml.newPullParser();
         ArrayList<PlayListItem> list = null;
         String key = null;
         FileInputStream in = null;
         try {
-            in = mContext.openFileInput("playlist.xml");
+            in = mContext.openFileInput(name);
 
             parser.setInput(in,"UTF-8");
             int eventType = parser.getEventType();
@@ -104,17 +107,70 @@ public class XmlUtil {
         }
         return map;
     }
+
+
+    public static ArrayList<Long> getPlayingList()  {
+        XmlPullParser parser = Xml.newPullParser();
+        ArrayList<Long> list = null;
+        FileInputStream in = null;
+        try {
+//            in = new FileInputStream(Environment.getExternalStorageDirectory().getCanonicalPath() + "/playinglist.xml");
+            in = mContext.openFileInput("playinglist.xml");
+            parser.setInput(in,"UTF-8");
+            int eventType = parser.getEventType();
+            String tag = null;
+            while(eventType != XmlPullParser.END_DOCUMENT)
+            {
+                switch (eventType)
+                {
+                    case XmlPullParser.START_DOCUMENT:
+                        list = new ArrayList<>();
+                        break;
+                    case XmlPullParser.START_TAG:
+                        if(parser.getName().equals("playinglist") )
+                            tag = parser.getName();
+                        if(tag != null && parser.getName().equals("song")) {
+                            list.add(Long.parseLong(parser.getAttributeValue(0)));
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        if(tag != null && parser.getName().equals(tag)) {
+                            tag = null;
+                        }
+                        break;
+                }
+                eventType = parser.next();
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if(in != null)
+                    in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
+
     public static void deletePlaylist(String name)  {
         if(name != null && !name.equals("")) {
             PlayListActivity.mPlaylist.remove(name);
-            updateXml();
+            updatePlaylistXml();
         }
     }
     public static void addPlaylist(String name)
     {
         if(name != null && !name.equals("")) {
             PlayListActivity.mPlaylist.put(name, new ArrayList<PlayListItem>());
-            updateXml();
+            updatePlaylistXml();
         }
     }
     public static void deleteSong(String name,String song)
@@ -122,7 +178,7 @@ public class XmlUtil {
         if(!name.equals("") && !song.equals("")) {
             ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
             list.remove(song);
-            updateXml();
+            updatePlaylistXml();
         }
     }
 
@@ -131,7 +187,7 @@ public class XmlUtil {
         if(!name.equals("") && !song.equals("")) {
             ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
             list.add(new PlayListItem(song,id));
-            updateXml();
+            updatePlaylistXml();
         }
     }
     public static void updateSong(String name,String _new,String _old,int id)
@@ -145,10 +201,10 @@ public class XmlUtil {
                     tmp.setId(id);
                 }
             }
-            updateXml();
+            updatePlaylistXml();
         }
     }
-    public static void updateXml()
+    public static void updatePlaylistXml()
     {
         FileOutputStream fos = null;
         try {
@@ -192,4 +248,55 @@ public class XmlUtil {
         }
     }
 
+
+    public static void deleteSong(long id)
+    {
+        if(id > 0 && Utility.mPlayingList.contains(id)) {
+            Utility.mPlayingList.remove(id);
+            updatePlayingListXml();
+        }
+    }
+
+    public static void addSong(long id)
+    {
+        if(id > 0) {
+           Utility.mPlayingList.add(id);
+            updatePlayingListXml();
+        }
+    }
+
+    public static void updatePlayingListXml()
+    {
+        FileOutputStream fos = null;
+        try {
+            fos = mContext.openFileOutput("playinglist.xml",Context.MODE_PRIVATE);
+            XmlSerializer parser =  XmlPullParserFactory.newInstance().newSerializer();
+            parser.setOutput(fos,"utf-8");
+            parser.startDocument("utf-8",true);
+            parser.startTag(null,"playinglist");
+            for(int i = 0 ; i < Utility.mPlayingList.size(); i++)
+            {
+                parser.startTag(null,"song");
+                parser.attribute(null,"id",Utility.mPlayingList.get(i).toString());
+                parser.endTag(null,"song");
+            }
+            parser.endTag(null,"playinglist");
+            parser.endDocument();
+        }
+        catch (XmlPullParserException e){
+            e.printStackTrace();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if(fos != null)
+                    fos.close();
+            }
+            catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
 }

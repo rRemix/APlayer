@@ -43,7 +43,7 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = ((MusicService.PlayerBinder)service).getService();
-            mService.addCallback(ChildHolderActivity.this,2);
+            mService.addCallback(ChildHolderActivity.this);
         }
         @Override
         public void onServiceDisconnected(ComponentName name) {
@@ -57,13 +57,13 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
         //绑定控制播放的service
 //        Intent intent = new Intent(ChildHolderActivity.this,MusicService.class);
 //        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);
-        MusicService.addCallback(ChildHolderActivity.this,2);
+        MusicService.addCallback(ChildHolderActivity.this);
 
         //注册Musicreceiver
-        MusicService service = new MusicService(getApplicationContext());
-        mMusicReceiver = service.new PlayerReceiver();
-        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
-        registerReceiver(mMusicReceiver, musicfilter);
+//        MusicService service = new MusicService(getApplicationContext());
+//        mMusicReceiver = service.new PlayerReceiver();
+//        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
+//        registerReceiver(mMusicReceiver, musicfilter);
 
         mId = getIntent().getIntExtra("Id",-1);
         int type = getIntent().getIntExtra("Type",-1);
@@ -146,7 +146,7 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
                 for (MP3Info info : mInfoList) {
                     ids.add(info.getId());
                 }
-                MusicService.setCurrentList(ids);
+                Utility.setPlayingList(ids);
                 sendBroadcast(intent);
             }
         });
@@ -162,11 +162,16 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     protected void onDestroy() {
         super.onDestroy();
 //        unbindService(mConnecting);
-        unregisterReceiver(mMusicReceiver);
+//        unregisterReceiver(mMusicReceiver);
     }
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay) {
         MP3Info temp = MP3info;
         mActionbar.UpdateBottomStatus(MP3info, isplay);
+    }
+
+    @Override
+    public int getType() {
+        return 3;
     }
 }

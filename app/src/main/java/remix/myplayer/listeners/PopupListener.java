@@ -63,7 +63,7 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
         switch (item.getItemId()) {
             //播放
             case R.id.menu_play:
-                Utility.mPlayingList = (ArrayList) ids.clone();
+                Utility.setPlayingList((ArrayList) ids.clone());
 //                MusicService.mInstance.UpdateNextSong(0);
                 Intent intent = new Intent(Utility.CTL_ACTION);
                 Bundle arg = new Bundle();
@@ -75,6 +75,7 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
             //添加到播放列表
             case R.id.menu_add:
                 Utility.mPlayingList.addAll(ids);
+                Utility.setPlayingList(Utility.mPlayingList);
                 break;
             //删除
             case R.id.menu_delete:
@@ -84,7 +85,7 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
                     if(name != null && !name.equals("")) {
                         PlayListActivity.mPlaylist.remove(name);
                         PlayListActivity.mInstance.getAdapter().notifyDataSetChanged();
-                        XmlUtil.updateXml();
+                        XmlUtil.updatePlaylistXml();
                     }
                 }
                 break;

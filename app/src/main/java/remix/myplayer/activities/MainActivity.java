@@ -40,15 +40,18 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import remix.myplayer.adapters.SlideMenuRecycleAdpater;
+import remix.myplayer.broadcastreceivers.NotifyReceiver;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.fragments.MainFragment;
 import remix.myplayer.R;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.MP3Info;
+import remix.myplayer.utils.PlayListItem;
+import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.Utility;
 import remix.myplayer.utils.XmlUtil;
 
-public class MainActivity extends AppCompatActivity implements MusicService.Callback, LoaderManager.LoaderCallbacks<Cursor>{
+public class MainActivity extends AppCompatActivity implements MusicService.Callback{
     public static MainActivity mInstance;
     private MusicService mService;
     private BottomActionBarFragment mActionbar;
@@ -56,13 +59,13 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     private Utility mUtlity;
     private RecyclerView mMenuRecycle;
     private SlideMenuRecycleAdpater mMenuAdapter;
-    private NotifyBroadReceiver mReceiver;
+    private NotifyReceiver mReceiver;
     private MusicService.PlayerReceiver mMusicReceiver;
     private ServiceConnection mConnecting = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = ((MusicService.PlayerBinder)service).getService();
-            mService.addCallback(MainActivity.this,0);
+            mService.addCallback(MainActivity.this);
         }
         @Override
         public void onServiceDisconnected(ComponentName name) {
@@ -76,6 +79,10 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         super.onResume();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -87,7 +94,8 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         super.onDestroy();
 //        unbindService(mConnecting);
         unregisterReceiver(mReceiver);
-        unregisterReceiver(mMusicReceiver);
+
+//        unregisterReceiver(mMusicReceiver);
     }
 
     @Override
@@ -102,16 +110,14 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         setContentView(R.layout.content_main);
         mUtlity = new Utility(getApplicationContext());
         loadsongs();
-        mManager = getSupportLoaderManager();
-        mManager.initLoader(1003,null,this);
 
 
         //注册控制栏监听
-        mReceiver = new NotifyBroadReceiver();
+        mReceiver = new NotifyReceiver();
         IntentFilter filter = new IntentFilter(Utility.NOTIFY);
         registerReceiver(mReceiver,filter);
         //绑定控制播放的service
-        MusicService.addCallback(MainActivity.this,0);
+        MusicService.addCallback(MainActivity.this);
 //        Intent intent = new Intent(MainActivity.this,MusicService.class);
 //        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);
         startService(new Intent(this,MusicService.class));
@@ -123,16 +129,26 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         mActionbar = (BottomActionBarFragment)getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
             return;
-        mActionbar.UpdateBottomStatus(MusicService.getCurrentMP3() == null ?
-                Utility.getMP3InfoById(Utility.mPlayingList.get(0)) :
-                MusicService.getCurrentMP3(),
-                false);
+        //如果是第一次启动软件
+        int mFir = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mFirst",-1);
+        int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mPos",-1);
+        SharedPrefsUtil.putValue(getApplicationContext(),"setting","mFrist",1);
+
+        if(mFir == 0 || mPos < 0)
+            mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(0)),false);
+        else
+            mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(mPos)), false);
+
+//        mActionbar.UpdateBottomStatus(MusicService.getCurrentMP3() == null ?
+//                Utility.getMP3InfoById(Utility.mPlayingList.get(0)) :
+//                MusicService.getCurrentMP3(),
+//                false);
 
         //注册Musicreceiver
-        MusicService service = new MusicService(getApplicationContext());
-        mMusicReceiver = service.new PlayerReceiver();
-        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
-        registerReceiver(mMusicReceiver, musicfilter);
+//        MusicService service = new MusicService(getApplicationContext());
+//        mMusicReceiver = service.new PlayerReceiver();
+//        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
+//        registerReceiver(mMusicReceiver, musicfilter);
 
 
     }
@@ -159,65 +175,10 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     }
 
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, 1, 0, "测试1");
-        menu.add(0, 2, 0, "测试2");
-        menu.add(0, 3, 0, "测试3");
-        menu.setHeaderTitle("菜单测试");
-        super.onCreateContextMenu(menu, v, menuInfo);
-    }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        switch (item.getItemId())
-        {
-            case 1:
-                Toast.makeText(this, "单击了测试1", Toast.LENGTH_SHORT).show();
-                break;
-            case 2:
-                Toast.makeText(this,"单击了测试1",Toast.LENGTH_SHORT).show();
-                break;
-            case 3:
-                Toast.makeText(this,"单击了测试1",Toast.LENGTH_SHORT).show();
-                break;
-        }
-        return super.onContextItemSelected(item);
-    }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        CursorLoader loader = new CursorLoader(this,  MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA},
-                MediaStore.Audio.Media.SIZE + ">80000", null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-        return loader;
-    }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-//        while (cursor.moveToNext()) {
-//            long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-//            if (id > 0)
-//                Utility.mAllSongList.add(Long.valueOf(id));
-//            String fullpath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-//            Utility.SortWithFolder(id,fullpath);
-//        }
-//        System.out.println(Utility.mFolderMap);
-//        long start = System.currentTimeMillis();
-//        for(int i = 0 ; i < Utility.mAllSongList.size() ; i++)
-//        {
-//            Utility.SortWithFolder(Utility.mAllSongList.get(i));
-//        }
-//        long end = System.currentTimeMillis();
-//        System.out.println("耗时: " + (end - start));
-//        cursor.close();
-    }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
 
     //读取sd卡歌曲信息
     public static void loadsongs()
@@ -233,7 +194,21 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         new Thread(task, "getInfo").start();
         try {
             Utility.mAllSongList = task.get();
-            Utility.mPlayingList = task.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //读取正在播放列表信息
+        FutureTask<ArrayList<Long>> task1 = new FutureTask<ArrayList<Long>>(new Callable<ArrayList<Long>>() {
+            @Override
+            public ArrayList<Long> call() throws Exception {
+                return XmlUtil.getPlayingList();
+            }
+        });
+        //开启一条线程来读取歌曲信息
+        new Thread(task1, "getPlayingList").start();
+        try {
+            Utility.mPlayingList = task1.get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -274,6 +249,11 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         mActionbar.UpdateBottomStatus(MP3info, isplay);
     }
 
+    @Override
+    public int getType() {
+        return 0;
+    }
+
     public  MusicService getService()
     {
         return mService;
@@ -310,27 +290,22 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
                     .setSmallIcon(R.drawable.ic_dialog)
                     .setContentTitle("Notify")
                     .setContentText("Hello World");
+            Intent result = new Intent(context,AudioHolderActivity.class);
+            result.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-            Intent resultIntent = new Intent(context, AudioHolderActivity.class);
-//            resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
             stackBuilder.addParentStack(AudioHolderActivity.class);
-//            stackBuilder.addNextIntent(resultIntent);
-            stackBuilder.addNextIntent(new Intent(context,MainActivity.class));
-            stackBuilder.addNextIntent(new Intent(context,AudioHolderActivity.class));
+//            stackBuilder.addNextIntent(new Intent(context,MainActivity.class));
+            stackBuilder.addNextIntent(result);
 
-//            stackBuilder.addNextIntentWithParentStack(resultIntent);
-
-//            ActivityManager mActivityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
-//            List<ActivityManager.RunningTaskInfo> rti = mActivityManager.getRunningTasks(1);
-//            String name = rti.get(0).baseActivity.getClassName();
 
 
             PendingIntent resultPendingIntent =
                     stackBuilder.getPendingIntent(
                             0,
-                            PendingIntent.FLAG_UPDATE_CURRENT
+                            PendingIntent.FLAG_CANCEL_CURRENT
                     );
+
             mBuilder.setContentIntent(resultPendingIntent);
 
             NotificationManager mNotificationManager =
