@@ -241,12 +241,6 @@ public class MusicService extends Service {
     }
 
 
-
-
-
-
-
-
     public class PlayerBinder extends Binder
     {
         public MusicService getService() {

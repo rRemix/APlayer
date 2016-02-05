@@ -92,6 +92,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     private AlphaAnimation mAnimIn;
     private AlphaAnimation mAnimOut;
     private Bitmap mNewBitMap;
+    private boolean mFromNotify = false;
     private MusicService.PlayerReceiver mMusicReceiver;
     private Handler mBlurHandler = new Handler()
     {
@@ -146,6 +147,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mFromNotify = getIntent().getBooleanExtra("Notify",false);
 
         mInstance = this;
         setContentView(R.layout.audio_holder);
@@ -156,6 +158,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         MusicService.addCallback(this);
 //        Intent intent = new Intent(AudioHolderActivity.this,MusicService.class);
 //        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);
+
 
 
         //注册Musicreceiver
@@ -518,12 +521,14 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     @Override
     protected void onStart() {
         super.onStart();
-//        overridePendingTransition(R.anim.slide_bottom_in, 0);
+        if(!mFromNotify)
+            overridePendingTransition(R.anim.slide_bottom_in, 0);
     }
     @Override
     public void finish() {
         super.finish();
-//        overridePendingTransition(0, R.anim.slide_bottom_out);
+//        if(!mFromNotify)
+        overridePendingTransition(0, R.anim.slide_bottom_out);
     }
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay){

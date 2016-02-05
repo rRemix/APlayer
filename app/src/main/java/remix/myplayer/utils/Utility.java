@@ -750,4 +750,9 @@ public class Utility {
     public final static int URL_SONGID = 2;
     public final static int URL_NAME = 3;
 
+
+    public final static String ACTION_BUTTON = "ACTION_BUTTON";
+    public final static int NOTIFY_PREV = 0;
+    public final static int NOTIFY_PLAY = 1;
+    public final static int NOTIFY_NEXT = 2;
 }

@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.media.AudioManager;
+import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
@@ -21,6 +23,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
@@ -40,6 +43,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import remix.myplayer.adapters.SlideMenuRecycleAdpater;
+import remix.myplayer.broadcastreceivers.LineCtlReceiver;
 import remix.myplayer.broadcastreceivers.NotifyReceiver;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.fragments.MainFragment;
@@ -51,7 +55,7 @@ import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.Utility;
 import remix.myplayer.utils.XmlUtil;
 
-public class MainActivity extends AppCompatActivity implements MusicService.Callback{
+public class MainActivity extends AppCompatActivity implements MusicService.Callback,AudioManager.OnAudioFocusChangeListener{
     public static MainActivity mInstance;
     private MusicService mService;
     private BottomActionBarFragment mActionbar;
@@ -60,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     private RecyclerView mMenuRecycle;
     private SlideMenuRecycleAdpater mMenuAdapter;
     private NotifyReceiver mReceiver;
+    private LineCtlReceiver mLineCtlReceiver;
     private MusicService.PlayerReceiver mMusicReceiver;
     private ServiceConnection mConnecting = new ServiceConnection() {
         @Override
@@ -92,9 +97,9 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     @Override
     protected void onDestroy() {
         super.onDestroy();
+//        unregisterReceiver(mLineCtlReceiver);
 //        unbindService(mConnecting);
-        unregisterReceiver(mReceiver);
-
+//        unregisterReceiver(mReceiver);
 //        unregisterReceiver(mMusicReceiver);
     }
 
@@ -111,11 +116,18 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         mUtlity = new Utility(getApplicationContext());
         loadsongs();
 
+//        //获取音频服务
+//        AudioManager audioManager = (AudioManager) this.getSystemService(AUDIO_SERVICE);
+//        //注册接收的Receiver
+//        ComponentName  mbCN = new ComponentName(this,LineCtlReceiver.class);
+//        //注册MediaButton
+//        audioManager.registerMediaButtonEventReceiver(mbCN);
+//        int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
+//                AudioManager.AUDIOFOCUS_GAIN);
+//        if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+//            Toast.makeText(this,"could not get audio focus",Toast.LENGTH_SHORT).show();
 
-        //注册控制栏监听
-        mReceiver = new NotifyReceiver();
-        IntentFilter filter = new IntentFilter(Utility.NOTIFY);
-        registerReceiver(mReceiver,filter);
+
         //绑定控制播放的service
         MusicService.addCallback(MainActivity.this);
 //        Intent intent = new Intent(MainActivity.this,MusicService.class);
@@ -175,11 +187,6 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     }
 
 
-
-
-
-
-
     //读取sd卡歌曲信息
     public static void loadsongs()
     {
@@ -215,33 +222,18 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     }
 
     //后退返回桌面
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK)
-        {
-//            List<Fragment> list = getSupportFragmentManager().getFragments();
-//            MainFragment fragment = null;
-//            for(int i = 0; i < list.size(); i++)
-//            {
-//                if(list.get(i) instanceof MainFragment)
-//                    fragment = (MainFragment) list.get(i);
-//            }
-//            if(fragment.isMenuShow())
-//                fragment.toggleMenu();
-//            else {
-//                Intent home = new Intent(Intent.ACTION_MAIN);
-//                home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                home.addCategory(Intent.CATEGORY_HOME);
-//                startActivity(home);
-//            }
-            Intent home = new Intent(Intent.ACTION_MAIN);
-            home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            home.addCategory(Intent.CATEGORY_HOME);
-            startActivity(home);
-
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if(keyCode == KeyEvent.KEYCODE_BACK)
+//        {
+//            Intent home = new Intent(Intent.ACTION_MAIN);
+//            home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            home.addCategory(Intent.CATEGORY_HOME);
+//            startActivity(home);
+//
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay){
@@ -281,37 +273,9 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         return super.onOptionsItemSelected(item);
     }
 
-    public class NotifyBroadReceiver extends BroadcastReceiver
-    {
-        @Override
-        public void onReceive(Context context, Intent intent) {
+    @Override
+    public void onAudioFocusChange(int focusChange) {
 
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.ic_dialog)
-                    .setContentTitle("Notify")
-                    .setContentText("Hello World");
-            Intent result = new Intent(context,AudioHolderActivity.class);
-            result.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-            stackBuilder.addParentStack(AudioHolderActivity.class);
-//            stackBuilder.addNextIntent(new Intent(context,MainActivity.class));
-            stackBuilder.addNextIntent(result);
-
-
-
-            PendingIntent resultPendingIntent =
-                    stackBuilder.getPendingIntent(
-                            0,
-                            PendingIntent.FLAG_CANCEL_CURRENT
-                    );
-
-            mBuilder.setContentIntent(resultPendingIntent);
-
-            NotificationManager mNotificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(0, mBuilder.build());
-        }
     }
 }
 

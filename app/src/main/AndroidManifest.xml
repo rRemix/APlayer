@@ -24,17 +24,26 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-    <activity
+        <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+        <activity android:name=".activities.AudioHolderActivity"
+            android:theme="@style/AudioHolderStyle"
+            android:parentActivityName=".activities.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.MainActivity"/>
+        </activity>
+
 
         <activity android:name=".activities.SearchActivity"/>
 
@@ -43,20 +52,8 @@
         </activity>
 
 
-
-        <activity android:name=".activities.AudioHolderActivity"
-            android:theme="@style/AudioHolderStyle"
-
-            android:parentActivityName=".activities.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity"/>
-        </activity>
-
         <activity android:name=".activities.ChildHolderActivity"/>
 
-        <service android:name=".services.MusicService"/>
-        <service android:name=".services.TimerService"/>
 
         <activity android:name=".ui.AddPopupWindow"
             android:theme="@style/PopupDialog"/>
@@ -117,11 +114,22 @@
                 <action android:name="remix.music.CTL_ACTION"/>
             </intent-filter>
         </receiver>
+
         <receiver android:name=".broadcastreceivers.NotifyReceiver">
             <intent-filter>
                 <action android:name="remix.music.CTL_ACTION"/>
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".broadcastreceivers.LineCtlReceiver">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.MEDIA_BUTTON"/>
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".services.MusicService"/>
+        <service android:name=".services.TimerService"/>
+
 
     </application>
 

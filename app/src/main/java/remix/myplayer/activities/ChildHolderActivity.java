@@ -1,5 +1,6 @@
 package remix.myplayer.activities;
 
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -156,6 +157,8 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
         if(Utility.mPlayingList.size() == 0)
             return;
         mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(0)), false);
+
+
 
     }
     @Override
