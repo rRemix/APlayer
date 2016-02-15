@@ -19,7 +19,7 @@ import remix.myplayer.utils.Utility;
  */
 public class TimerService extends Service {
     public static boolean mRun = false;
-    private int mTime;
+    private long mTime;
     private Timer mTimer = null;
     private TimerReceiver mReceiver;
     public static long mStartTime;
@@ -52,17 +52,15 @@ public class TimerService extends Service {
     {
         @Override
         public void onReceive(Context context, Intent intent) {
-            mTime = intent.getIntExtra("Time",-1);
+            mTime = intent.getLongExtra("Time",-1);
             mRun = intent.getBooleanExtra("Run",false);
             //关闭定时
-            if(!mRun)
-            {
+            if(!mRun) {
                 mTimer.cancel();
                 mTimer = null;
                 mStartTime = -1;
             }
-            else
-            {
+            else {
                 if(mTime < 0)
                     return;
                 mTimer = new Timer();

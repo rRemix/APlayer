@@ -14,8 +14,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Timer;
-
 import remix.myplayer.R;
 import remix.myplayer.services.TimerService;
 import remix.myplayer.utils.Utility;
@@ -26,51 +24,49 @@ import remix.myplayer.utils.Utility;
 public class TimerPopupWindow extends Activity {
     public static boolean misRun = false;
     private TextView mText;
-    private SeekBar mSeekbar;
+    private CircleSeekBar mSeekbar;
     private Button mToggle;
     private Button mCancel;
-    private static int mTime;
+    private static long mTime;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.popup_timer);
-        //改变高度，并置于底部
+        //居中显示
         Window w = getWindow();
         WindowManager wm = getWindowManager();
         Display display = wm.getDefaultDisplay();
         final DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.height = (int) (200 * metrics.densityDpi / 160);
-        lp.width = (int) (metrics.widthPixels);
+        lp.height = (int) (metrics.heightPixels * 0.6);
+        lp.width = (int) (metrics.widthPixels * 0.7);
         w.setAttributes(lp);
-        w.setGravity(Gravity.BOTTOM);
+        w.setGravity(Gravity.CENTER);
 
-        mText = (TextView)findViewById(R.id.close_time);
+//        mText = (TextView)findViewById(R.id.close_time);
         if(misRun)
         {
             long stoptime = System.currentTimeMillis();
             int runtime = (int)(System.currentTimeMillis() - TimerService.mStartTime) / 1000 / 60;
-            mText.setText(String.valueOf(mTime - runtime));
+//            mText.setText(String.valueOf(mTime - runtime));
         }
-        mSeekbar = (SeekBar)findViewById(R.id.close_seekbar);
+        mSeekbar = (CircleSeekBar) findViewById(R.id.close_seekbar);
         mTime = mSeekbar.getProgress();
-        mSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        mSeekbar.setOnSeekBarChangeListener(new CircleSeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(progress > 0)
-                {
-                    mText.setText(String.valueOf(progress));
+            public void onProgressChanged(CircleSeekBar seekBar, long progress, boolean fromUser) {
+                if(progress > 0) {
+//                    mText.setText(String.valueOf(progress));
                     mTime = progress;
                 }
             }
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            public void onStartTrackingTouch(CircleSeekBar seekBar) {
             }
-
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onStopTrackingTouch(CircleSeekBar seekBar) {
             }
         });
 
@@ -82,7 +78,6 @@ public class TimerPopupWindow extends Activity {
         mToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 String msg = misRun == true ? "取消定时关闭" : "将在" + mTime + "分钟后关闭";
                 Toast.makeText(TimerPopupWindow.this,msg,Toast.LENGTH_SHORT).show();
                 misRun = !misRun;

@@ -21,8 +21,5 @@ public class TestClass extends InstrumentationTestCase {
 //        ArrayList<String> list = lrc.fetchLyric();
 //        System.out.println(list);
 //    }
-    public void testXmlParser()
-    {
-        XmlUtil.getPlayList();
-    }
+
 }
