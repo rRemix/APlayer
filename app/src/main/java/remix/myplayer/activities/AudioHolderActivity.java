@@ -1,6 +1,8 @@
 package remix.myplayer.activities;
 
+import android.app.NotificationManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
@@ -34,6 +36,7 @@ import java.util.Timer;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.PagerAdapter;
+import remix.myplayer.broadcastreceivers.NotifyReceiver;
 import remix.myplayer.fragments.CoverFragment;
 import remix.myplayer.fragments.LrcFragment;
 import remix.myplayer.fragments.RecordFragment;
@@ -48,7 +51,7 @@ import remix.myplayer.utils.Utility;
  * Created by Remix on 2015/12/1.
  */
 public class AudioHolderActivity extends AppCompatActivity implements MusicService.Callback{
-    public static AudioHolderActivity mInstance;
+    public static AudioHolderActivity mInstance = null;
     public static String mFLAG = "CHILD";
     //记录操作是下一首还是上一首
     public static int mOperation = -1;
@@ -146,11 +149,18 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mFromNotify = getIntent().getBooleanExtra("Notify",false);
-
         mInstance = this;
         setContentView(R.layout.audio_holder);
+
+        mFromNotify = getIntent().getBooleanExtra("Notify",false);
+        //如果是从通知栏启动,关闭通知栏
+        if(mFromNotify){
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancel(0);
+        }
+
+
 //        mInfo = (MP3Info)getIntent().getExtras().getSerializable("MP3Info");
         mInfo = MusicService.getCurrentMP3();
 //        mIsPlay = getIntent().getBooleanExtra("Isplay",false);

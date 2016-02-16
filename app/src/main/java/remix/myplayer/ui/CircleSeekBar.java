@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -14,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import remix.myplayer.R;
+import remix.myplayer.utils.DensityUtil;
 
 /**
  * Created by taeja on 16-2-15.
@@ -21,9 +23,11 @@ import remix.myplayer.R;
 public class CircleSeekBar extends View {
     private Paint mCirclePaint;
     private Paint mArcPaint;
+    private Paint mTextPaint;
     private int mCenterX = 0;
     private int mCenterY = 0;
     private int mRadius = 0;
+    private boolean mRadiusFlag = true;
     private int mThumbWidth = 0;
     private int mThumbHeight = 0;
     private double mThumbSize = 0;
@@ -35,13 +39,17 @@ public class CircleSeekBar extends View {
     private long mProgressMax = 100;
     private long mProgress = 0;
     private RectF mRectF = new RectF();
+    private Rect mTextRect = new Rect();
     private int mProgressWidth = 0;
     private int mProgressCorlor;
     private int[] mThumbNormal = null;
     private int[] mThumbPressed = null;
     private Context mContext;
     private AttributeSet mAttrs = null;
+    private float mBaseLine = 0;
     private OnSeekBarChangeListener mOnSeekBarChangeListener;
+    //是否开始计时
+    private boolean mStart = false;
     public CircleSeekBar(Context context) {
         super(context);
         mContext = context;
@@ -69,17 +77,19 @@ public class CircleSeekBar extends View {
         canvas.drawBitmap(mThumbBitmap,
                 mCenterX + mOffsetX - mThumbWidth / 2,
                 mCenterY + mOffsetY - mThumbHeight / 2 ,null);
+//        canvas.drawText("60:00min",mCenterX,mBaseLine,mTextPaint);
         super.onDraw(canvas);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(isPointOnThumb(event.getX(),event.getY()) && event.getAction() != MotionEvent.ACTION_UP) {
+        if(isPointOnThumb(event.getX(),event.getY())
+                && event.getAction() != MotionEvent.ACTION_UP
+                && !mStart) {
             seekTo(event.getX(),event.getY());
         }
         return true;
     }
-
 
     private void seekTo(float eventX,float eventY) {
         mRad = Math.atan2(eventY - mCenterY, eventX - mCenterX);
@@ -95,6 +105,7 @@ public class CircleSeekBar extends View {
         mOnSeekBarChangeListener.onProgressChanged(this,mProgress,true);
 
     }
+
 
     //设置thumb坐标
     private void setThumbPostion(double radian) {
@@ -137,6 +148,15 @@ public class CircleSeekBar extends View {
         mArcPaint.setStyle(Paint.Style.STROKE);
         mArcPaint.setStrokeWidth(mProgressWidth);
 
+//        mTextPaint = new Paint();
+//        mTextPaint.setAntiAlias(true);
+//        mTextPaint.setColor(Color.parseColor("#1b1c19"));
+//        mTextPaint.setTextSize(DensityUtil.dip2px(getContext(),22));
+//        mTextPaint.setTextAlign(Paint.Align.CENTER);
+//        Paint.FontMetricsInt fontMetrics = mTextPaint.getFontMetricsInt();
+//        mBaseLine = (mRectF.bottom + mRectF.top - fontMetrics.bottom - fontMetrics.top) / 2;
+
+
         mThumbBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.progress_indicator);
         mThumbWidth = mThumbBitmap.getWidth();
         mThumbHeight = mThumbBitmap.getHeight();
@@ -156,13 +176,15 @@ public class CircleSeekBar extends View {
                                 mCenterY - mRadius,
                                 mCenterX + mRadius,
                                 mCenterY + mRadius);
-//            mRectF = new RectF(mThumbHeight / 2, size - mRadius, getWidth() - mThumbHeight / 2, size - mThumbHeight / 2);
+            mOffsetX = (float) Math.sin(mRad) * mRadius;
+            mOffsetY = -(float) Math.cos(mRad) * mRadius;
+            invalidate();
         }
-        if(mOffsetX == 0 && mOffsetY == 0 && mRadius > 0) {
-            //初始0度
-            mOffsetX = (float) Math.sin(0) * mRadius;
-            mOffsetY = -(float) Math.cos(0) * mRadius;
-        }
+//        if(mOffsetX == 0 && mOffsetY == 0 && mRadius > 0) {
+//            //初始0度
+//            mOffsetX = (float) Math.sin(0) * mRadius;
+//            mOffsetY = -(float) Math.cos(0) * mRadius;
+//        }
     }
 
     public void setMax(long max)
@@ -173,6 +195,10 @@ public class CircleSeekBar extends View {
     {
         return mProgress;
     }
+    public void setStart(boolean start)
+    {
+        mStart = start;
+    }
     public void setProgress(long progress)
     {
         if(progress >= mProgressMax)
@@ -180,7 +206,7 @@ public class CircleSeekBar extends View {
         if(progress <= 0)
             progress = 0;
         mProgress = progress;
-        mRad = Math.toRadians((double)progress / mProgressMax * 360);
+        mRad = Math.toRadians(progress * 360.0 / mProgressMax );
         setThumbPostion(mRad);
         invalidate();
     }

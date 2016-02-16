@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="2px"
         android:background="#c0c0c0"/>
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
@@ -28,7 +28,15 @@
             android:layout_height="match_parent"
             android:layout_margin="36dp"
             CircleSeekBar:progress_max="60"/>
-    </LinearLayout>
+        <TextView
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/close_time"
+            android:textSize="22dp"
+            android:textColor="#1b1c19"
+            android:text="00:00min"/>
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

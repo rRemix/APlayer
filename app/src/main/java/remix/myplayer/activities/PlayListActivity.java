@@ -39,7 +39,7 @@ import remix.myplayer.utils.XmlUtil;
  * Created by taeja on 16-1-15.
  */
 public class PlayListActivity extends AppCompatActivity{
-    public static PlayListActivity mInstance;
+    public static PlayListActivity mInstance = null;
     private RecyclerView mRecycleView;
     private PlayListAdapter mAdapter;
     public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();

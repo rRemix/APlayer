@@ -72,7 +72,6 @@ public class LrcView extends TextView {
         mCurrent = SelectIndex(MusicService.getCurrentTime());
         if(mCurrent == -1)
             return;
-
         try
         {
             int i = 0;

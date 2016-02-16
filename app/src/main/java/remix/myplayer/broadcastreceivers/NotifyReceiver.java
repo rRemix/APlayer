@@ -1,6 +1,5 @@
 package remix.myplayer.broadcastreceivers;
 
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,16 +7,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
-import java.util.List;
-
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
-import remix.myplayer.activities.SearchActivity;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Utility;
 
@@ -26,11 +21,15 @@ import remix.myplayer.utils.Utility;
  */
 public class NotifyReceiver extends BroadcastReceiver
 {
+
+    public static boolean misFromActivity = false;
     private RemoteViews mRemoteView;
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(MusicService.getCurrentMP3() == null && !MusicService.getIsplay())
+        if(MusicService.getCurrentMP3() == null || !MusicService.getIsplay()) {
             return;
+        }
+
         mRemoteView = new RemoteViews(context.getPackageName(),R.layout.notify_playbar);
         //设置歌手，歌曲名
         mRemoteView.setTextViewText(R.id.notify_song, MusicService.getCurrentMP3().getDisplayname());
@@ -74,8 +73,7 @@ public class NotifyReceiver extends BroadcastReceiver
 //        result.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-//        stackBuilder.addParentStack(AudioHolderActivity.class);
-        stackBuilder.addNextIntent(new Intent(context,SearchActivity.class));
+        stackBuilder.addParentStack(AudioHolderActivity.class);
         stackBuilder.addNextIntent(result);
         stackBuilder.editIntentAt(1).putExtra("Notify",true);
 

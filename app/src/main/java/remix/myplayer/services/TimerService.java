@@ -71,6 +71,7 @@ public class TimerService extends Service {
                             mStartTime= System.currentTimeMillis();
                             Thread.sleep(mTime * 60 * 1000);
                             System.exit(0);
+//                            sendBroadcast(new Intent(Utility.EXIT));
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

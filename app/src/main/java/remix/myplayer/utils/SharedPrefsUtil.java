@@ -29,6 +29,16 @@ public class SharedPrefsUtil {
         SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
         editor.putString(key,value).commit();
     }
+    public static void putValue(Context context,String name,String key,boolean value)
+    {
+        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
+        editor.putBoolean(key,value).commit();
+    }
+    public static boolean getValue(Context context,String name,String key,boolean dft)
+    {
+        return context.getSharedPreferences(name,Context.MODE_PRIVATE).getBoolean(key,dft);
+    }
+
     public static int getValue(Context context,String name,String key,int dft)
     {
         return context.getSharedPreferences(name,Context.MODE_PRIVATE).getInt(key,dft);

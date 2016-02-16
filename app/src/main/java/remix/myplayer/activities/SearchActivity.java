@@ -31,13 +31,14 @@ public class SearchActivity extends AppCompatActivity {
     private SearchAdapter mAdapter;
     private TextView mSearchText;
     private String mkey;
+    public static SearchActivity mInstance = null;
     private static final String SDROOT = "/sdcard/";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-
+        mInstance = this;
         mSearchView = (SearchView) findViewById(R.id.search_);
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

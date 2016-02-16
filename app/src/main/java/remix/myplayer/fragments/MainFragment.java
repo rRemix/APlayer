@@ -2,6 +2,7 @@ package remix.myplayer.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -38,6 +39,8 @@ public class MainFragment extends Fragment {
     public static MainFragment mInstance;
     private ImageView mTabImage = null;
     private ImageButton mSlideMenuBtn;
+    private ImageButton mSlideMenuAbout;
+    private ImageButton mSlideMenuExit;
     private ImageButton mTimer;
     private ImageButton mSearch;
     private ListView mSlideMenuList;
@@ -106,19 +109,15 @@ public class MainFragment extends Fragment {
                 mSlideMenu.toggle();
             }
         });
-//        mSlideMenuBtn = (Button)v.findViewById(R.id.btn_slide_menu);
-//        mSlideMenuBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mMenuRecycle = ((MainActivity)getActivity()).getRecycleMenu();
-//                if(mMenuRecycle == null)
-//                    return;
-//                if(mMenuRecycle.isShown())
-//                    mMenuRecycle.setVisibility(View.INVISIBLE);
-//                else
-//                    mMenuRecycle.setVisibility(View.VISIBLE);
-//            }
-//        });
+        mSlideMenuAbout = (ImageButton)mSlideMenu.findViewById(R.id.drawer_about);
+        mSlideMenuExit = (ImageButton)mSlideMenu.findViewById(R.id.drawer_exit);
+        mSlideMenuExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getContext().sendBroadcast(new Intent(Utility.EXIT));
+            }
+        });
+
     }
     public PagerAdapter getAdapter()
     {

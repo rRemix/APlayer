@@ -40,6 +40,7 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     private TextView mTitle;
     private BottomActionBarFragment mActionbar;
     private MusicService.PlayerReceiver mMusicReceiver;
+    public static ChildHolderActivity mInstance = null;
     private ServiceConnection mConnecting = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -55,6 +56,7 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mInstance = this;
         //绑定控制播放的service
 //        Intent intent = new Intent(ChildHolderActivity.this,MusicService.class);
 //        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);

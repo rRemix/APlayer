@@ -711,6 +711,7 @@ public class Utility {
     public final static String UPDATE_ACTION = "remix.music.UPDATE_ACTION";
     public final static String CONTROL_TIMER = "remix.music.CONTROL_TIMER";
     public final static String NOTIFY = "remix.music.NOTIFY";
+    public final static String EXIT = "remix.music.EXIT";
     //控制命令
     public final static int PLAYSELECTEDSONG = 0;
     public final static int PREV = 1;

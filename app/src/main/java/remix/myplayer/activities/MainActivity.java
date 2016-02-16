@@ -1,48 +1,30 @@
 package remix.myplayer.activities;
 
 
-import android.app.ActivityManager;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.media.AudioManager;
-import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
-import android.widget.Toast;
 
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import remix.myplayer.adapters.SlideMenuRecycleAdpater;
+import remix.myplayer.broadcastreceivers.ExitReceiver;
 import remix.myplayer.broadcastreceivers.LineCtlReceiver;
 import remix.myplayer.broadcastreceivers.NotifyReceiver;
 import remix.myplayer.fragments.BottomActionBarFragment;
@@ -50,22 +32,24 @@ import remix.myplayer.fragments.MainFragment;
 import remix.myplayer.R;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.MP3Info;
-import remix.myplayer.utils.PlayListItem;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.Utility;
 import remix.myplayer.utils.XmlUtil;
 
-public class MainActivity extends AppCompatActivity implements MusicService.Callback,AudioManager.OnAudioFocusChangeListener{
-    public static MainActivity mInstance;
+public class MainActivity extends AppCompatActivity implements MusicService.Callback{
+    public static MainActivity mInstance = null;
     private MusicService mService;
     private BottomActionBarFragment mActionbar;
     private LoaderManager mManager;
     private Utility mUtlity;
     private RecyclerView mMenuRecycle;
     private SlideMenuRecycleAdpater mMenuAdapter;
-    private NotifyReceiver mReceiver;
+    public NotifyReceiver mNotifyReceiver;
     private LineCtlReceiver mLineCtlReceiver;
     private MusicService.PlayerReceiver mMusicReceiver;
+    private ExitReceiver mExitReceiver;
+    //判断NotifyReceiver是否注册过
+    private static boolean mNotifyFlag = false;
     private ServiceConnection mConnecting = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -82,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     @Override
     protected void onResume() {
         super.onResume();
+
     }
 
     @Override
@@ -97,9 +82,10 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
 //        unregisterReceiver(mLineCtlReceiver);
 //        unbindService(mConnecting);
-//        unregisterReceiver(mReceiver);
+//        unregisterReceiver(mNotifyReceiver);
 //        unregisterReceiver(mMusicReceiver);
     }
 
@@ -128,11 +114,19 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 //            Toast.makeText(this,"could not get audio focus",Toast.LENGTH_SHORT).show();
 
 
-        //绑定控制播放的service
+        //播放的service
         MusicService.addCallback(MainActivity.this);
-//        Intent intent = new Intent(MainActivity.this,MusicService.class);
-//        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);
         startService(new Intent(this,MusicService.class));
+        try {
+            mNotifyFlag = true;
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            filter.addAction(Utility.NOTIFY);
+            mNotifyReceiver = new NotifyReceiver();
+            registerReceiver(mNotifyReceiver, filter);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         //加载主页fragment
         initMainFragment();
         //初始化侧滑菜单
@@ -142,11 +136,11 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
             return;
         //如果是第一次启动软件
-        int mFir = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mFirst",-1);
+        boolean mFir = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mFirst",true);
         int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mPos",-1);
-        SharedPrefsUtil.putValue(getApplicationContext(),"setting","mFrist",1);
+        SharedPrefsUtil.putValue(getApplicationContext(),"setting","mFirst",false);
 
-        if(mFir == 0 || mPos < 0)
+        if(mFir || mPos < 0)
             mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(0)),false);
         else
             mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(mPos)), false);
@@ -222,18 +216,18 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     }
 
     //后退返回桌面
-//    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        if(keyCode == KeyEvent.KEYCODE_BACK)
-//        {
-//            Intent home = new Intent(Intent.ACTION_MAIN);
-//            home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            home.addCategory(Intent.CATEGORY_HOME);
-//            startActivity(home);
-//
-//        }
-//        return super.onKeyDown(keyCode, event);
-//    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+            NotifyReceiver.misFromActivity = true;
+            Intent home = new Intent(Intent.ACTION_MAIN);
+            home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            home.addCategory(Intent.CATEGORY_HOME);
+            startActivity(home);
+            sendBroadcast(new Intent(Utility.NOTIFY));
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay){
@@ -273,9 +267,5 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onAudioFocusChange(int focusChange) {
-
-    }
 }
 

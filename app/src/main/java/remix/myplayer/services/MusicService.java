@@ -29,6 +29,7 @@ import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.activities.MainActivity;
+import remix.myplayer.broadcastreceivers.NotifyReceiver;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.SharedPrefsUtil;
@@ -41,8 +42,6 @@ import remix.myplayer.utils.Utility;
 public class MusicService extends Service {
     //实例
     public static MusicService mInstance;
-    //播放列表
-//    private static ArrayList<MP3Info> mInfoList = Utility.mInfoList;
     //是否第一次启动
     private static boolean mFlag = true;
     //播放模式
@@ -57,17 +56,12 @@ public class MusicService extends Service {
     private static long mId = -1;
     //当前正在播放的mp3
     private static MP3Info mInfo = null;
-    //下一首播放的mp3
-    private static MP3Info mNextInfo;
-    private Handler mHandler;
     private static MediaPlayer mPlayer;
     private static PlayerBinder mBinder;
     //回调接口的集合
     private static List<Callback> mCallBacklist  = new ArrayList<Callback>(){};;
-    //当前播放歌曲的路径
-    private String mPath = null;
     private static Context context;
-    private Timer mTimer;
+    private NotifyReceiver mNotifyReceiver;
     private static Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg)
@@ -107,26 +101,14 @@ public class MusicService extends Service {
         return mBinder;
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         mPlayer.release();
+        mPlayer = null;
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        return super.onUnbind(intent);
-    }
-
-    @Override
-    public void onRebind(Intent intent) {
-        super.onRebind(intent);
-    }
 
     @Override
     public void onCreate() {
@@ -134,16 +116,9 @@ public class MusicService extends Service {
         mInstance = this;
         int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mPos",-1);
         if(Utility.mPlayingList != null && Utility.mPlayingList.size() > 0) {
-            if(mPos != -1) {
-                mId = Utility.mPlayingList.get(mPos);
-                mInfo = Utility.getMP3InfoById(mId);
-                mCurrent = mPos;
-            }
-            else {
-                mId = Utility.mPlayingList.get(0);
-                mInfo = Utility.getMP3InfoById(mId);
-                mCurrent = 0;
-            }
+            mId = mPos == -1 ? Utility.mPlayingList.get(0) : Utility.mPlayingList.get(mPos);
+            mInfo = Utility.getMP3InfoById(mId);
+            mCurrent = mPos == -1 ? 0 : mPos;
         }
         else
             mInfo = null;
@@ -383,10 +358,10 @@ public class MusicService extends Service {
     {
         try
         {
-            if(mFlag) {
-                Intent intent = new Intent(Utility.NOTIFY);
-                MainActivity.mInstance.sendBroadcast(intent);
-            }
+//            if(mFlag) {
+//                Intent intent = new Intent(Utility.NOTIFY);
+//                MainActivity.mInstance.sendBroadcast(intent);
+//            }
             mPlayer.reset();
             mPlayer.setDataSource(path);
             mPlayer.prepareAsync();
@@ -477,11 +452,6 @@ public class MusicService extends Service {
     public static MP3Info getCurrentMP3()
     {
         return mInfo;
-    }
-    //返回下一首播放的歌曲
-    public static MP3Info getNextMP3()
-    {
-        return mNextInfo;
     }
     //获得当前播放进度
     public static int getCurrentTime()

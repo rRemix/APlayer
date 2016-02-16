@@ -65,7 +65,7 @@
             android:theme="@style/PopupDialog"/>
 
         <activity android:name=".ui.TimerPopupWindow"
-            android:theme="@style/PopupDialog"/>
+            android:theme="@style/PopupTimer"/>
 
         <activity android:name=".ui.SharePopupWindow"
             android:theme="@style/PopupDialog"
@@ -115,15 +115,21 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".broadcastreceivers.NotifyReceiver">
-            <intent-filter>
-                <action android:name="remix.music.CTL_ACTION"/>
-            </intent-filter>
-        </receiver>
+        <!--<receiver android:name=".broadcastreceivers.NotifyReceiver">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.CLOSE_SYSTEM_DIALOGS"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
 
         <receiver android:name=".broadcastreceivers.LineCtlReceiver">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".broadcastreceivers.ExitReceiver">
+            <intent-filter>
+                <action android:name="remix.music.EXIT"/>
             </intent-filter>
         </receiver>
 
