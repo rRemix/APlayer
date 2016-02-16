@@ -31,6 +31,7 @@ import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.fragments.MainFragment;
 import remix.myplayer.R;
 import remix.myplayer.services.MusicService;
+import remix.myplayer.services.NotifyService;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.Utility;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     private ExitReceiver mExitReceiver;
     //判断NotifyReceiver是否注册过
     private static boolean mNotifyFlag = false;
+    private boolean mFromNotify = false;
     private ServiceConnection mConnecting = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -61,14 +63,10 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
             mService = null;
         }
     };
-
-
     @Override
     protected void onResume() {
         super.onResume();
-
     }
-
     @Override
     protected void onStop() {
         super.onStop();
@@ -92,45 +90,27 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         XmlUtil.setContext(getApplicationContext());
-
         Fresco.initialize(this);
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
-        mInstance = this;
         setContentView(R.layout.content_main);
+        mInstance = this;
         mUtlity = new Utility(getApplicationContext());
-        loadsongs();
 
-//        //获取音频服务
-//        AudioManager audioManager = (AudioManager) this.getSystemService(AUDIO_SERVICE);
-//        //注册接收的Receiver
-//        ComponentName  mbCN = new ComponentName(this,LineCtlReceiver.class);
-//        //注册MediaButton
-//        audioManager.registerMediaButtonEventReceiver(mbCN);
-//        int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
-//                AudioManager.AUDIOFOCUS_GAIN);
-//        if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
-//            Toast.makeText(this,"could not get audio focus",Toast.LENGTH_SHORT).show();
-
-
-        //播放的service
-        MusicService.addCallback(MainActivity.this);
-        startService(new Intent(this,MusicService.class));
-        try {
-            mNotifyFlag = true;
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-            filter.addAction(Utility.NOTIFY);
-            mNotifyReceiver = new NotifyReceiver();
-            registerReceiver(mNotifyReceiver, filter);
-        }catch (Exception e){
-            e.printStackTrace();
+        mFromNotify = getIntent().getBooleanExtra("Notify",false);
+        if(!mFromNotify) {
+            loadsongs();
+            //播放的service
+            MusicService.addCallback(MainActivity.this);
+            startService(new Intent(this,MusicService.class));
+            //NofityService
+            startService(new Intent(this, NotifyService.class));
         }
+
         //加载主页fragment
         initMainFragment();
-        //初始化侧滑菜单
-        initSlideMenu();
         //初始化底部状态栏
         mActionbar = (BottomActionBarFragment)getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
@@ -141,32 +121,11 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         SharedPrefsUtil.putValue(getApplicationContext(),"setting","mFirst",false);
 
         if(mFir || mPos < 0)
-            mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(0)),false);
+            mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(0)),mFromNotify);
         else
-            mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(mPos)), false);
-
-//        mActionbar.UpdateBottomStatus(MusicService.getCurrentMP3() == null ?
-//                Utility.getMP3InfoById(Utility.mPlayingList.get(0)) :
-//                MusicService.getCurrentMP3(),
-//                false);
-
-        //注册Musicreceiver
-//        MusicService service = new MusicService(getApplicationContext());
-//        mMusicReceiver = service.new PlayerReceiver();
-//        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
-//        registerReceiver(mMusicReceiver, musicfilter);
-
-
+            mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(mPos)), mFromNotify);
     }
 
-    private void initSlideMenu()
-    {
-//        mMenuRecycle = (RecyclerView)findViewById(R.id.slide_menu_recyclelist);
-//        mMenuRecycle.setLayoutManager(new LinearLayoutManager(this));
-//        mMenuAdapter = new SlideMenuRecycleAdpater(getLayoutInflater());
-//        mMenuRecycle.setAdapter(mMenuAdapter);
-//        mMenuRecycle.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
-    }
     public RecyclerView getRecycleMenu()
     {
         return mMenuRecycle;
@@ -179,7 +138,6 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     {
         return getSupportFragmentManager();
     }
-
 
     //读取sd卡歌曲信息
     public static void loadsongs()
@@ -210,6 +168,8 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         new Thread(task1, "getPlayingList").start();
         try {
             Utility.mPlayingList = task1.get();
+            if(Utility.mPlayingList == null || Utility.mPlayingList.size()  == 0)
+                Utility.mPlayingList = (ArrayList<Long>)task1.get().clone();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -258,12 +218,10 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

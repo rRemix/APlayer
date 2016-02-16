@@ -75,7 +75,6 @@ public class SongListAdapter extends SimpleCursorAdapter {
                 Intent intent = new Intent(mContext, SelectedPopupWindow.class);
                 intent.putExtra("Position",position);
                 mContext.startActivity(intent);
-//
             }
         });
         return convertView;

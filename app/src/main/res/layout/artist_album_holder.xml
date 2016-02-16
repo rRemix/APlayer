@@ -30,8 +30,8 @@
         android:background="#edeceb"
         android:id="@+id/child_holder_shuffle">
         <ImageButton
-            android:layout_width="17dp"
-            android:layout_height="17dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:id="@+id/album_holder_button"
             android:background="@drawable/home_btn_shuffle"

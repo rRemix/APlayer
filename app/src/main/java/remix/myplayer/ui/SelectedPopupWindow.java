@@ -37,14 +37,14 @@ public class SelectedPopupWindow extends Activity {
     private ImageView mDelete;
     private Button mCancel;
     private TextView mTitle;
-    private MP3Info mInfo;
+    private MP3Info mInfo = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.popup_option);
         int pos = getIntent().getIntExtra("Position",-1);
-        mInfo = new MP3Info(Utility.getMP3InfoById(Utility.mAllSongList.get(pos)));
-//        mInfo = new MP3Info(Utility.mAllSongList.get(getIntent().getIntExtra("Position",-1)));
+        if(pos > 0 && pos < Utility.mAllSongList.size() - 1)
+            mInfo = new MP3Info(Utility.getMP3InfoById(Utility.mAllSongList.get(pos)));
         if(mInfo == null)
             return;
         mTitle = (TextView)findViewById(R.id.popup_title);
@@ -75,10 +75,8 @@ public class SelectedPopupWindow extends Activity {
                 Bundle arg = new Bundle();
                 arg.putString("SongName",mInfo.getDisplayname());
                 arg.putLong("Id",mInfo.getId());
-
                 intent.putExtras(arg);
                 startActivity(intent);
-
                 finish();
             }
         });

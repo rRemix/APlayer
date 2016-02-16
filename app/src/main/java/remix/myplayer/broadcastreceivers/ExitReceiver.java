@@ -11,6 +11,7 @@ import remix.myplayer.activities.MainActivity;
 import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.activities.SearchActivity;
 import remix.myplayer.services.MusicService;
+import remix.myplayer.services.NotifyService;
 
 /**
  * Created by taeja on 16-2-16.
@@ -20,10 +21,9 @@ public class ExitReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
-            try{
-                context.unregisterReceiver(MainActivity.mInstance.mNotifyReceiver);
-                MusicService.mInstance.stopSelf();
-                System.exit(0);
+            System.exit(0);
+            MusicService.mInstance.stopSelf();
+            NotifyService.mInstance.stopSelf();
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -45,9 +45,7 @@ public class ExitReceiver extends BroadcastReceiver {
 //            MainActivity.mInstance.finish();
 //            PlayListActivity.mInstance.finish();
 //            SearchActivity.mInstance.finish();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+
 
     }
 }

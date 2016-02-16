@@ -140,8 +140,6 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
             mAdapter.changeCursor(null);
     }
 
-
-
     @Override
     public boolean onContextItemSelected(MenuItem item) {
 
