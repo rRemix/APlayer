@@ -145,26 +145,6 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
-    <!-- 顶部viewpageindicator-->
-    <style name="StyledIndicators" parent="AppTheme.NoActionBar">
-        <item name="vpiTabPageIndicatorStyle">@style/CustomTabPageIndicator</item>
-    </style>
-    <style name="CustomTabPageIndicator" parent="Widget.TabPageIndicator">
-        <item name="android:background">@drawable/bg_tab_indicator</item>
-        <item name="android:textAppearance">@style/CustomTabPageIndicator.Text</item>
-        <item name="android:textSize">14dp</item>
-        <item name="android:dividerPadding">2dp</item>
-        <item name="android:showDividers">middle</item>
-
-        <item name="android:paddingLeft">10dp</item>
-        <item name="android:paddingRight">10dp</item>
-        <item name="android:fadingEdge">horizontal</item>
-        <item name="android:fadingEdgeLength">8dp</item>
-    </style>
-    <style name="CustomTabPageIndicator.Text" parent="android:TextAppearance.Medium">
-        <item name="android:typeface">monospace</item>
-        <item name="android:textColor">@drawable/bg_tab_textcolor</item>
-    </style>
 
     <!--菜单风格-->
     <style name="MyPopupMenu" parent="Theme.AppCompat.Light.NoActionBar">

@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ import remix.myplayer.broadcastreceivers.NotifyReceiver;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.MP3Info;
+import remix.myplayer.infos.MP3Info;
 import remix.myplayer.utils.SharedPrefsUtil;
 
 
@@ -298,7 +299,11 @@ public class MusicService extends Service {
                 case Constants.PLAYSELECTEDSONG:
                     mCurrent = intent.getIntExtra("Position", -1);
                     if(mCurrent == -1)
-                        System.out.println("参数错误");
+                        return;
+                    if(mCurrent > DBUtil.mPlayingList.size() - 1){
+                        Toast.makeText(context,"请先添加歌曲到该播放列表",Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     mId = DBUtil.mPlayingList.get(mCurrent);
                     mInfo = DBUtil.getMP3InfoById(mId);
                     if(mInfo == null)
@@ -424,13 +429,6 @@ public class MusicService extends Service {
         mPlayer.seekTo(current);
     }
 
-    //设置当前播放的角标
-//    public void UpdateNextSong(int current)
-//    {
-//        mCurrent = current;
-//        mNext = mCurrent + 1 == CommonUtil.mPlayingList.size() ? 0 : mCurrent + 1;
-//        mNextInfo = CommonUtil.getMP3InfoById(CommonUtil.mPlayingList.get(mNext));
-//    }
     //设置当前播放列表
     public static void setCurrentList(ArrayList<Long> list)
     {

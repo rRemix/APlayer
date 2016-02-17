@@ -15,8 +15,8 @@ import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.ui.LrcView;
 import remix.myplayer.utils.CommonUtil;
-import remix.myplayer.utils.LrcInfo;
-import remix.myplayer.utils.MP3Info;
+import remix.myplayer.infos.LrcInfo;
+import remix.myplayer.infos.MP3Info;
 import remix.myplayer.utils.SearchLRC;
 
 /**
@@ -100,25 +100,6 @@ public class LrcFragment extends Fragment {
         }
 
     }
-
-//    class DownloadTask extends AsyncTask<String[],Integer,TreeMap<Integer,String>>
-//    {
-//        @Override
-//        protected TreeMap<Integer,String> doInBackground(String[]... params) {
-//            if(mInfo == null)
-//                return null;
-//            String name = params[0][0];
-//            String artist = params[0][1];
-//            SearchLRC searchLRC = new SearchLRC(name,artist);
-//            return searchLRC.fetchLyric();
-//        }
-//        @Override
-//        protected void onPostExecute(TreeMap<Integer,String> strings) {
-//            mTextMap = strings;
-//            if(mTextMap != null && mTextMap.size() > 0)
-//                mHandler.sendEmptyMessage(UPDATE_LRC);
-//        }
-//    }
 
 
 }

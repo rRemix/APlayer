@@ -8,18 +8,13 @@ import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeMap;
 
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.utils.LrcInfo;
-import remix.myplayer.utils.SearchLRC;
+import remix.myplayer.infos.LrcInfo;
 
 /**
  * Created by Remix on 2015/12/8.

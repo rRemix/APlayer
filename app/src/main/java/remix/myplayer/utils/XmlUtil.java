@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import remix.myplayer.activities.PlayListActivity;
+import remix.myplayer.infos.PlayListItem;
 
 /**
  * Created by taeja on 16-1-26.

@@ -23,10 +23,9 @@ import android.widget.Toast;
 import java.lang.ref.WeakReference;
 
 import remix.myplayer.R;
-import remix.myplayer.adapters.SongListAdapter;
+import remix.myplayer.adapters.AllSongAdapter;
 import remix.myplayer.listeners.ListViewListener;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.DBUtil;
 
 /**
@@ -34,7 +33,7 @@ import remix.myplayer.utils.DBUtil;
  */
 public class AllSongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private LoaderManager mManager;
-    private SongListAdapter mAdapter;
+    private AllSongAdapter mAdapter;
     private MusicService.PlayerReceiver mMusicReceiver;
     private int mPrev = -1;
     private Cursor mCursor = null;
@@ -49,41 +48,15 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         super.onActivityCreated(savedInstanceState);
         mManager = getLoaderManager();
         mManager.initLoader(1000, null, this);
-        mAdapter = new SongListAdapter(getContext(),R.layout.allsong_item,null,new String[]{},new int[]{},0);
+        mAdapter = new AllSongAdapter(getContext(),R.layout.allsong_item,null,new String[]{},new int[]{},0);
         mListView.setAdapter(mAdapter);
     }
 
-    class AsynLoadImage extends AsyncTask<Integer,Integer,Bitmap>
-    {
-        private final WeakReference mImageView;
-        //        private ImageView mImageView;
-        public AsynLoadImage(ImageView imageView)
-        {
-            mImageView = new WeakReference(imageView);
-        }
-        @Override
-        protected Bitmap doInBackground(Integer... params) {
-            return DBUtil.CheckBitmapByAlbumId(params[0],true);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            if(bitmap != null)
-                ((ImageView)mImageView.get()).setImageBitmap(bitmap);
-            else
-                ((ImageView)mImageView.get()).setImageResource(R.drawable.default_recommend);
-        }
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-//        MusicService service = new MusicService(getContext());
-//        mMusicReceiver = service.new PlayerReceiver();
-//        IntentFilter musicfilter = new IntentFilter(CommonUtil.CTL_ACTION);
-//        getContext().registerReceiver(mMusicReceiver, musicfilter);
 
     }
 
@@ -93,7 +66,6 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         super.onDestroy();
         if(mAdapter != null)
             mAdapter.changeCursor(null);
-//        getContext().unregisterReceiver(mMusicReceiver);
     }
 
     @Nullable

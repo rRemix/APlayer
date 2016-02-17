@@ -32,9 +32,9 @@ public class CommonUtil {
 
     private static Context mContext;
 
-    public CommonUtil(Context ctx) {
-        mInstace = this;
-        this.mContext = ctx;
+    public static void setContext(Context context)
+    {
+        mContext = context;
     }
 
     //压缩图片用于分享

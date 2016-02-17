@@ -5,12 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.utils.MP3Info;
+import remix.myplayer.infos.MP3Info;
 
 /**
  * Created by Remix on 2015/12/1.

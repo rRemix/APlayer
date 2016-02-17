@@ -46,7 +46,7 @@ import remix.myplayer.ui.PlayingListPopupWindow;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.MP3Info;
+import remix.myplayer.infos.MP3Info;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -129,17 +129,6 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             }
         }
     };
-    private ServiceConnection mConnecting = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mService = ((MusicService.PlayerBinder)service).getService();
-            mService.addCallback(AudioHolderActivity.this);
-        }
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mService = null;
-        }
-    };
 
 
     @Override
@@ -161,22 +150,10 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             mNotificationManager.cancel(0);
         }
 
-
-//        mInfo = (MP3Info)getIntent().getExtras().getSerializable("MP3Info");
         mInfo = MusicService.getCurrentMP3();
-//        mIsPlay = getIntent().getBooleanExtra("Isplay",false);
         mIsPlay = MusicService.getIsplay();
         MusicService.addCallback(this);
-//        Intent intent = new Intent(AudioHolderActivity.this,MusicService.class);
-//        bindService(intent, mConnecting, Context.BIND_AUTO_CREATE);
 
-
-
-        //注册Musicreceiver
-//        MusicService service = new MusicService(getApplicationContext());
-//        mMusicReceiver = service.new PlayerReceiver();
-//        IntentFilter musicfilter = new IntentFilter(CommonUtil.CTL_ACTION);
-//        registerReceiver(mMusicReceiver, musicfilter);
         //初始化动画相关
         initAnim();
         //初始化顶部信息
@@ -189,8 +166,6 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         initPager();
         //初始化seekbar以及播放时间
         initSeekBar();
-        //初始化下一首歌曲
-        initNextSong();
         //初始化三个控制按钮
         initButton();
         //初始化底部四个按钮
@@ -228,13 +203,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
     }
 
-    public void initNextSong() {
-//        if(mNextText == null)
-//            mNextText = (TextView)findViewById(R.id.next_text);
-//        MP3Info next = MusicService.getNextMP3();
-//        if(next != null)
-//            mNextText.setText("下一首：" + next.getDisplayname());
-    }
+
 
 
     private void initBottomButton()
@@ -260,40 +229,6 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
                 startActivity(new Intent(AudioHolderActivity.this,PlayingListPopupWindow.class));
             }
         });
-//        mModelLoop = (ImageButton)findViewById(R.id.play_model_loop);
-//        mModelShuffle = (ImageButton)findViewById(R.id.play_model_shuffle);
-//        mModelLoop.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(MusicService.getPlayModel() == CommonUtil.PLAY_LOOP)
-//                    return;
-//                MusicService.setPlayModel(CommonUtil.PLAY_LOOP);
-//                mModelLoop.setImageResource(R.drawable.play_btn_loop_prs);
-//                mModelShuffle.setImageResource(R.drawable.play_btn_shuffle);
-//                Toast.makeText(AudioHolderActivity.this,"顺序播放", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//        mModelShuffle.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(MusicService.getPlayModel() == CommonUtil.PLAY_SHUFFLE)
-//                    return;
-//                MusicService.setPlayModel(CommonUtil.PLAY_SHUFFLE);
-//                mModelShuffle.setImageResource(R.drawable.play_btn_shuffle_prs);
-//                mModelLoop.setImageResource(R.drawable.play_btn_loop);
-//                Toast.makeText(AudioHolderActivity.this,"随机播放", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
-//        mModel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                int PlayModel = MusicService.getPlayModel();
-//                mModel.setImageResource(PlayModel == CommonUtil.PLAY_NORMAL ? R.drawable.bg_btn_holder_playmodel_shuffle : R.drawable.bg_btn_holder_playmodel_normal);
-//                MusicService.setPlayModel(PlayModel == CommonUtil.PLAY_NORMAL ? CommonUtil.PLAY_SHUFFLE : CommonUtil.PLAY_NORMAL);
-//                Toast.makeText(AudioHolderActivity.this,PlayModel == CommonUtil.PLAY_NORMAL ? "随机播放" : "顺序播放",Toast.LENGTH_SHORT).show();
-//            }
-//        });
     }
 
     @Override
@@ -314,8 +249,6 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     public void onDestroy()
     {
         super.onDestroy();
-//        unbindService(mConnecting);
-//        unregisterReceiver(mMusicReceiver);
     }
 
     class ProgeressThread extends Thread {
@@ -323,7 +256,6 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         public void run() {
             while (mIsRun && mInfo != null) {
                 if (MusicService.getIsplay()) {
-//                    mCurrent = MusicService.mInstance.getCurrentTime();
                     mCurrent = MusicService.getCurrentTime();
                     mHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
                 }
@@ -351,7 +283,6 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     private void initTopButton()
     {
         mHide = (ImageButton)findViewById(R.id.top_hide);
-//        mTopSetting = (ImageButton)findViewById(R.id.top_setting);
         mHide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -374,7 +305,6 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mPlayBarPlay = (ImageButton)findViewById(R.id.playbar_play);
         mPlayBarNext = (ImageButton)findViewById(R.id.playbar_next);
         UpdatePlayButton(mIsPlay);
-//        CtrlButtonListener listener = new CtrlButtonListener(getApplicationContext());
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -422,10 +352,6 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser)
                     mHandler.sendEmptyMessage(Constants.UPDATE_TIME_ONLY);
-//                if (fromUser && (Math.abs(mCurrent - progress) > 300) && !misChanging) {
-//                    mSeekBar.setProgress(progress);
-//                    MusicService.setProgress(progress);
-//                }
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -474,11 +400,8 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mTopDetail = (TextView)findViewById(R.id.top_detail);
         UpdateTopStatus(mInfo);
     }
-    private void initInformationFragment()
+    private void initRecordFragment()
     {
-//        InformantionFragment fragment = new InformantionFragment();
-//        fragment.setArguments(mBundle);
-//        mAdapter.AddFragment(fragment);
         RecordFragment fragment = new RecordFragment();
         mAdapter.AddFragment(fragment);
     }
@@ -502,7 +425,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mAdapter = new PagerAdapter(getSupportFragmentManager());
         mBundle = new Bundle();
         mBundle.putSerializable("MP3Info", mInfo);
-        initInformationFragment();
+        initRecordFragment();
         initCoverFragment();
         initLrcFragment();
         mPager.setAdapter(mAdapter);
@@ -538,15 +461,12 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     @Override
     public void finish() {
         super.finish();
-//        if(!mFromNotify)
         overridePendingTransition(0, R.anim.slide_bottom_out);
     }
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay){
         mInfo= MP3info;
         mIsPlay = isplay;
-//        if(mInfo.getId() != MP3info.getId())
-//            mBlurHandler.sendEmptyMessage(CommonUtil.UPDATE_BG);
 
         if(mOperation != Constants.PLAY && mIsRun) {
             //更新顶部信息

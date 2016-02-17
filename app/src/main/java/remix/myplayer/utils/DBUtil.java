@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import remix.myplayer.adapters.FolderAdapter;
+import remix.myplayer.infos.MP3Info;
 
 /**
  * Created by taeja on 16-2-17.
@@ -420,7 +421,6 @@ public class DBUtil {
                 //删除播放列表与全部歌曲列表中该歌曲
                 mAllSongList = mPlayingList = getAllSongsId();
                 //通知适配器刷新
-//                SongListAdapter.mInstance.notifyDataSetChanged();
                 mFolderList.remove(data);
                 if(FolderAdapter.mInstance != null)
                     FolderAdapter.mInstance.notifyDataSetChanged();

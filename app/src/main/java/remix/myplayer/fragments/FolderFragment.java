@@ -23,25 +23,8 @@ import remix.myplayer.utils.DBUtil;
  * Created by Remix on 2015/12/5.
  */
 public class FolderFragment extends Fragment {
-    private Cursor mCursor = null;
-    public static int mBucketNameIndex;
-    public static int mSongIdIndex;
-    public static int mDisPlayNameIndex;
-    private FolderAdapter mAdapter;
     private ListView mListView;
-    private LoaderManager mManager;
-//    @Override
-//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//        mManager = getLoaderManager();
-//        mManager.initLoader(1003, null, this);
-//
-//        mAdapter = new FolderAdapter(getContext(),R.layout.folder_item,null,new String[]{},new int[]{},0);
-//
-//
-//        mListView.setAdapter(mAdapter);
-//        mListView.setOnItemClickListener(new ListViewListener());
-//    }
+
 
     @Nullable
     @Override
@@ -57,39 +40,6 @@ public class FolderFragment extends Fragment {
         return rootView;
     }
 
-//    @Override
-//    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-////        bucket_display_name
-//        CursorLoader loader = new CursorLoader(getContext(), MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-//               new String[]{MediaStore.Audio.Media._COUNT},
-//                MediaStore.Audio.Media.SIZE + ">80000" /* and "+  MediaStore.Video.Media.BUCKET_DISPLAY_NAME + " != 0"*/,
-//                null,null);
-//        return loader;
-//    }
-
-//    @Override
-//    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-//        if(data == null)
-//            return ;
-//        mCursor = data;
-//        mBucketNameIndex = data.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
-//        mDisPlayNameIndex = data.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
-//        while (mCursor.moveToNext())
-//        {
-//            for(int i = 0 ; i < mCursor.getColumnCount() ;i++)
-//            {
-//                Log.d("Cursor","name: " + mCursor.getColumnName(i) + " val: " + mCursor.getString(i));
-//            }
-//        }
-//        mCursor = data;
-//
-//    }
-
-//    @Override
-//    public void onLoaderReset(Loader<Cursor> loader) {
-//        if (mAdapter != null)
-//            mAdapter.changeCursor(null);
-//    }
 
     private class ListViewListener implements AdapterView.OnItemClickListener
     {

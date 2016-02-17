@@ -26,11 +26,6 @@ public class PagerAdapter extends FragmentPagerAdapter implements ImpAdapter {
         mFragmentList.add(fragment);
     }
 
-//    @Override
-//    public int getItemPosition(Object object) {
-//        //notifyDataSetChanged();
-//        return POSITION_NONE;
-//    }
 
     @Override
     public CharSequence getPageTitle(int position) {

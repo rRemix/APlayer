@@ -68,22 +68,8 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
         @Override
         protected void onPostExecute(Object url) {
             Uri uri = Uri.parse("file:///" + (String)url);
-            if(url != null && mImage != null);
-            {
+            if(url != null && mImage != null);{
                 mImage.setImageURI(uri);
-                //创建DraweeController
-//                DraweeController controller = Fresco.newDraweeControllerBuilder()
-//                        //加载的图片URI地址
-//                        .setUri(uri)
-//                        //设置点击重试是否开启
-//                        .setTapToRetryEnabled(true)
-//                        //设置旧的Controller
-//                        .setOldController(mImage.getController())
-//                        .setControllerListener(new DraweeListener())
-//                        //构建
-//                        .build();
-//
-//                mImage.setController(controller);
             }
 
         }

@@ -24,7 +24,6 @@ public class RecordFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.record,null);
-//        mEdit = (EditText)rootView.findViewById(R.id.edit_record);
         return rootView;
     }
 

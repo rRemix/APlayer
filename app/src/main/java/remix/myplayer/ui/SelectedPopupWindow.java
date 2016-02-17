@@ -23,10 +23,10 @@ import android.widget.Toast;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.FolderAdapter;
-import remix.myplayer.adapters.SongListAdapter;
+import remix.myplayer.adapters.AllSongAdapter;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.MP3Info;
+import remix.myplayer.infos.MP3Info;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -153,7 +153,7 @@ public class SelectedPopupWindow extends Activity {
 //                break;
 //            }
             //通知适配器刷新
-            SongListAdapter.mInstance.notifyDataSetChanged();
+            AllSongAdapter.mInstance.notifyDataSetChanged();
             if(FolderAdapter.mInstance != null)
                 FolderAdapter.mInstance.notifyDataSetChanged();
 

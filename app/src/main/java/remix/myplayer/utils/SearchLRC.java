@@ -5,24 +5,19 @@ package remix.myplayer.utils;
  */
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Set;
 import java.util.TreeMap;
 
-import android.support.v4.app.INotificationSideChannel;
 import android.util.Log;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import remix.myplayer.infos.LrcInfo;
 
 public class SearchLRC {
     public static TreeMap<Integer,String> lrcMap = new TreeMap<>();

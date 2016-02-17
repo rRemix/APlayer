@@ -7,9 +7,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.LoaderManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,9 +20,6 @@ import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
-import remix.myplayer.adapters.SlideMenuRecycleAdpater;
-import remix.myplayer.broadcastreceivers.ExitReceiver;
-import remix.myplayer.broadcastreceivers.LineCtlReceiver;
 import remix.myplayer.broadcastreceivers.NotifyReceiver;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.fragments.MainFragment;
@@ -34,7 +29,7 @@ import remix.myplayer.services.NotifyService;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.MP3Info;
+import remix.myplayer.infos.MP3Info;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.XmlUtil;
 
@@ -42,16 +37,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     public static MainActivity mInstance = null;
     private MusicService mService;
     private BottomActionBarFragment mActionbar;
-    private LoaderManager mManager;
-    private CommonUtil mUtlity;
-    private RecyclerView mMenuRecycle;
-    private SlideMenuRecycleAdpater mMenuAdapter;
-    public NotifyReceiver mNotifyReceiver;
-    private LineCtlReceiver mLineCtlReceiver;
-    private MusicService.PlayerReceiver mMusicReceiver;
-    private ExitReceiver mExitReceiver;
-    //判断NotifyReceiver是否注册过
-    private static boolean mNotifyFlag = false;
+
     private boolean mFromNotify = false;
     private ServiceConnection mConnecting = new ServiceConnection() {
         @Override
@@ -81,17 +67,14 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-//        unregisterReceiver(mLineCtlReceiver);
-//        unbindService(mConnecting);
-//        unregisterReceiver(mNotifyReceiver);
-//        unregisterReceiver(mMusicReceiver);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         XmlUtil.setContext(getApplicationContext());
         DBUtil.setContext(getApplicationContext());
+        CommonUtil.setContext(getApplicationContext());
+
         Fresco.initialize(this);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -99,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_main);
         mInstance = this;
-        mUtlity = new CommonUtil(getApplicationContext());
+
 
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         if(!mFromNotify) {
@@ -128,10 +111,6 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
             mActionbar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(mPos)), mFromNotify);
     }
 
-    public RecyclerView getRecycleMenu()
-    {
-        return mMenuRecycle;
-    }
     private void initMainFragment() {
         getSupportFragmentManager().beginTransaction().add(R.id.main_fragment_container, new MainFragment(), "MainFragment").addToBackStack(null).commit();
     }

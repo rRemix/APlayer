@@ -19,7 +19,7 @@ import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.MP3Info;
+import remix.myplayer.infos.MP3Info;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -39,9 +39,6 @@ public class CoverFragment extends Fragment {
         mInfo = (MP3Info)getArguments().getSerializable("MP3Info");
         View rootView = inflater.inflate(R.layout.cover,container,false);
         mImage = (ImageView)rootView.findViewById(R.id.cover_image);
-//        mImage.setBackgroundResource(R.drawable.bg_cover_corners);
-//        mImage.setMinimumHeight(AudioHolderActivity.mWidth - 10);
-//        mImage.setMinimumWidth(AudioHolderActivity.mWidth - 10);
         if(mInfo != null && (mBitmap = DBUtil.CheckBitmapBySongId((int)mInfo.getId(),false)) != null)
             mImage.setImageBitmap(mBitmap);
         if(mLeftAnimation == null || mScaleAnimation == null || mRightAnimation == null)
@@ -72,17 +69,7 @@ public class CoverFragment extends Fragment {
 
         }
         return rootView;
-//        LinearLayout layout = new LinearLayout(getContext());
-//        layout.setLayoutParams(new  ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-//        mImage = new ImageView(getContext());
-//        mBitmap = BitmapFactory.decodeFile(mInfo.getAlbumArt());
-//        if(mBitmap != null)
-//            mImage.setImageBitmap(mBitmap);
-//        else
-//            mImage.setImageResource(R.drawable.no_art_normal);
-//        mImage.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-//        layout.addView(mImage);
-//        return layout;
+
     }
     public void UpdateCover(Bitmap bitmap)
     {

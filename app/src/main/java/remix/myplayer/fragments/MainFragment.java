@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +21,6 @@ import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.activities.SearchActivity;
 import remix.myplayer.adapters.PagerAdapter;
 import remix.myplayer.adapters.SlideMenuAdapter;
-import remix.myplayer.adapters.SlideMenuRecycleAdpater;
 import remix.myplayer.listeners.TabTextListener;
 import remix.myplayer.listeners.ViewPagerListener;
 import remix.myplayer.ui.MyPager;
@@ -46,8 +44,6 @@ public class MainFragment extends Fragment {
     private LayoutInflater mInflater;
     private PagerAdapter mAdapter;
 
-    private RecyclerView mMenuRecycle;
-    private SlideMenuRecycleAdpater mMenuAdapter;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

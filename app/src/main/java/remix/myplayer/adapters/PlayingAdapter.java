@@ -15,7 +15,7 @@ import remix.myplayer.R;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.MP3Info;
+import remix.myplayer.infos.MP3Info;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -92,15 +92,6 @@ public class PlayingAdapter extends BaseAdapter {
             });
         }
         return convertView;
-//        View ItemView = mInflater.inflate(R.layout.playinglist_item,null);
-//        if(CommonUtil.mPlayingList == null || CommonUtil.mPlayingList.size() == 0)
-//            return ItemView;
-//        TextView title = (TextView)ItemView.findViewById(R.id.playlist_item_name);
-//        TextView artist = (TextView)ItemView.findViewById(R.id.playlist_item_artist);
-//
-//        MP3Info temp = new MP3Info(CommonUtil.getMP3InfoById(CommonUtil.mPlayingList.get(position)));
-//        title.setText(temp.getDisplayname());
-//        artist.setText(temp.getArtist());
 
     }
     public static class ViewHolder{

@@ -25,7 +25,7 @@ import remix.myplayer.adapters.PlayListAdapter;
 import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DensityUtil;
-import remix.myplayer.utils.PlayListItem;
+import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.utils.XmlUtil;
 
 /**

@@ -37,7 +37,7 @@ import java.net.URLEncoder;
 import remix.myplayer.R;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.MP3Info;
+import remix.myplayer.infos.MP3Info;
 
 /**
  * Created by Remix on 2015/12/9.

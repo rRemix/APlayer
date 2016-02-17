@@ -52,7 +52,6 @@ public class SearchAdapter extends SimpleCursorAdapter
                 holder.mOther.setText(getCursor().getString(SearchActivity.mArtistIndex) + "-" + getCursor().getString(SearchActivity.mAlbumIndex));
                 AsynLoadImage task = new AsynLoadImage(holder.mImage);
                 task.execute(getCursor().getInt(SearchActivity.mIdIndex));
-//                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, );
             }
             catch (Exception e)
             {

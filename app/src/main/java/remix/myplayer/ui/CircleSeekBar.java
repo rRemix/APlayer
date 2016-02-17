@@ -102,7 +102,8 @@ public class CircleSeekBar extends View {
         invalidate();
         //设置当前进度
         mProgress = (int)(Math.toDegrees(mRad) / 360.0 * mProgressMax);
-        mOnSeekBarChangeListener.onProgressChanged(this,mProgress,true);
+        if(mOnSeekBarChangeListener != null)
+            mOnSeekBarChangeListener.onProgressChanged(this,mProgress,true);
 
     }
 
