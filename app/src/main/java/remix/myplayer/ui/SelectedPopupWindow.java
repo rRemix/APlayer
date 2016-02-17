@@ -24,8 +24,9 @@ import android.widget.Toast;
 import remix.myplayer.R;
 import remix.myplayer.adapters.FolderAdapter;
 import remix.myplayer.adapters.SongListAdapter;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.MP3Info;
-import remix.myplayer.utils.Utility;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -43,8 +44,8 @@ public class SelectedPopupWindow extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.popup_option);
         int pos = getIntent().getIntExtra("Position",-1);
-        if(pos > 0 && pos < Utility.mAllSongList.size() - 1)
-            mInfo = new MP3Info(Utility.getMP3InfoById(Utility.mAllSongList.get(pos)));
+        if(pos > 0 && pos < DBUtil.mAllSongList.size() - 1)
+            mInfo = new MP3Info(DBUtil.getMP3InfoById(DBUtil.mAllSongList.get(pos)));
         if(mInfo == null)
             return;
         mTitle = (TextView)findViewById(R.id.popup_title);
@@ -104,7 +105,7 @@ public class SelectedPopupWindow extends Activity {
         mDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String result = Utility.deleteSong(mInfo.getUrl(),Utility.DELETE_SINGLE) == true ? "删除成功" : "删除失败";
+                String result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE) == true ? "删除成功" : "删除失败";
                 Toast.makeText(SelectedPopupWindow.this,result,Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -123,24 +124,24 @@ public class SelectedPopupWindow extends Activity {
         if(resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,MediaStore.MediaColumns.DATA + "=?",new String[]{mInfo.getUrl()}) > 0)
         {
             //删除播放列表与全部歌曲列表中该歌曲
-            for(Long id : Utility.mPlayingList)
+            for(Long id : DBUtil.mPlayingList)
             {
                 if(mInfo.getId() == id)
                 {
-                    Utility.mPlayingList.remove(id);
+                    DBUtil.mPlayingList.remove(id);
                     break;
                 }
             }
             //删除文件夹列表中该歌曲
             //获得歌曲所在文件夹
-//            Iterator it = Utility.mFolderList.keySet().iterator();
+//            Iterator it = CommonUtil.mFolderList.keySet().iterator();
 //            while(it.hasNext())
 //            {
 //                String Key = (String)it.next();
 //                String Name = mInfo.getUrl().substring(0,mInfo.getUrl().lastIndexOf('/'));
 //                if(!Key.equals(Name))
 //                    continue;
-//                ArrayList<MP3Info> list = Utility.mFolderList.get(Key);
+//                ArrayList<MP3Info> list = CommonUtil.mFolderList.get(Key);
 //                for(MP3Info mp3Info : list)
 //                {
 //                    if(mp3Info.getDisplayname().equals(mInfo.getDisplayname()))

@@ -1,39 +1,30 @@
 package remix.myplayer.services;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Timer;
 
-import remix.myplayer.R;
-import remix.myplayer.activities.AudioHolderActivity;
-import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.activities.MainActivity;
 import remix.myplayer.broadcastreceivers.NotifyReceiver;
 import remix.myplayer.fragments.BottomActionBarFragment;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.SharedPrefsUtil;
-import remix.myplayer.utils.Utility;
 
 
 /**
@@ -45,7 +36,7 @@ public class MusicService extends Service {
     //是否第一次启动
     private static boolean mFlag = true;
     //播放模式
-    private static int mPlayModel = Utility.PLAY_LOOP;
+    private static int mPlayModel = Constants.PLAY_LOOP;
     //当前是否在播放
     private static Boolean mIsplay = false;
     //记录当前播放的角标
@@ -66,7 +57,7 @@ public class MusicService extends Service {
         @Override
         public void handleMessage(Message msg)
         {
-            if(msg.what == Utility.UPDATE_INFORMATION)
+            if(msg.what == Constants.UPDATE_INFORMATION)
             {
                 if(mCallBacklist != null)
                     System.out.println(mCallBacklist);
@@ -115,16 +106,16 @@ public class MusicService extends Service {
         super.onCreate();
         mInstance = this;
         int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mPos",-1);
-        if(Utility.mPlayingList != null && Utility.mPlayingList.size() > 0) {
-            mId = mPos == -1 ? Utility.mPlayingList.get(0) : Utility.mPlayingList.get(mPos);
-            mInfo = Utility.getMP3InfoById(mId);
+        if(DBUtil.mPlayingList != null && DBUtil.mPlayingList.size() > 0) {
+            mId = mPos == -1 ? DBUtil.mPlayingList.get(0) : DBUtil.mPlayingList.get(mPos);
+            mInfo = DBUtil.getMP3InfoById(mId);
             mCurrent = mPos == -1 ? 0 : mPos;
         }
         else
             mInfo = null;
 
-//        if(Utility.mPlayingList.size() > 1)
-//            mNextInfo = Utility.getMP3InfoById(Utility.mPlayingList.get(1));
+//        if(CommonUtil.mPlayingList.size() > 1)
+//            mNextInfo = CommonUtil.getMP3InfoById(CommonUtil.mPlayingList.get(1));
 
 
         mPlayer = new MediaPlayer();
@@ -141,7 +132,7 @@ public class MusicService extends Service {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 PlayNextOrPrev(true,true);
-                handler.sendEmptyMessage(Utility.UPDATE_INFORMATION);
+                handler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
                 //SendUpdate();
             }
         });
@@ -301,56 +292,58 @@ public class MusicService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             int Control = intent.getIntExtra("Control",-1);
-
             switch (Control)
             {
                 //播放listview选中的歌曲
-                case Utility.PLAYSELECTEDSONG:
+                case Constants.PLAYSELECTEDSONG:
                     mCurrent = intent.getIntExtra("Position", -1);
                     if(mCurrent == -1)
                         System.out.println("参数错误");
-                    mId = Utility.mPlayingList.get(mCurrent);
-                    mInfo = Utility.getMP3InfoById(mId);
+                    mId = DBUtil.mPlayingList.get(mCurrent);
+                    mInfo = DBUtil.getMP3InfoById(mId);
                     if(mInfo == null)
                         break;
                     Play(mInfo.getUrl());
 //                    mBinder.Play(mInfo.getUrl());
                     break;
                 //播放上一首
-                case Utility.PREV:
+                case Constants.PREV:
                     PlayPrevious();
                     break;
                 //播放下一首
-                case Utility.NEXT:
+                case Constants.NEXT:
                     PlayNext();
                     break;
                 //暂停或者继续播放
-                case Utility.PLAY:
+                case Constants.PLAY:
                     PlayOrPause();
                     break;
                 //暂停
-                case Utility.PAUSE:
+                case Constants.PAUSE:
                     Pause();
                     break;
                 //继续播放
-                case Utility.CONTINUE:
+                case Constants.CONTINUE:
                     PlayContinue();
                     break;
                 //顺序播放
-                case Utility.PLAY_LOOP:
-                    mPlayModel = Utility.PLAY_LOOP;
+                case Constants.PLAY_LOOP:
+                    mPlayModel = Constants.PLAY_LOOP;
                     break;
                 //随机播放
-                case Utility.PLAY_SHUFFLE:
-                    mPlayModel = Utility.PLAY_SHUFFLE;
+                case Constants.PLAY_SHUFFLE:
+                    mPlayModel = Constants.PLAY_SHUFFLE;
                     break;
                 //单曲循环
-                case Utility.PLAY_REPEATONE:
-                    mPlayModel = Utility.PLAY_REPEATONE;
+                case Constants.PLAY_REPEATONE:
+                    mPlayModel = Constants.PLAY_REPEATONE;
                 default:break;
             }
-            handler.sendEmptyMessage(Utility.UPDATE_INFORMATION);
-
+            handler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
+            boolean FromNotify = intent.getBooleanExtra("FromNotify",false);
+            if(FromNotify){
+                NotifyService.mInstance.UpdateNotify();
+            }
         }
     }
     //准备播放
@@ -359,7 +352,7 @@ public class MusicService extends Service {
         try
         {
 //            if(mFlag) {
-//                Intent intent = new Intent(Utility.NOTIFY);
+//                Intent intent = new Intent(CommonUtil.NOTIFY);
 //                MainActivity.mInstance.sendBroadcast(intent);
 //            }
             mPlayer.reset();
@@ -376,33 +369,33 @@ public class MusicService extends Service {
     //根据当前播放列表的长度，得到一个随机数
     private static int getShuffle()
     {
-        if(Utility.mPlayingList.size() == 1)
+        if(DBUtil.mPlayingList.size() == 1)
             return 0;
-        return new Random().nextInt(Utility.mPlayingList.size() - 1);
+        return new Random().nextInt(DBUtil.mPlayingList.size() - 1);
     }
     //根据当前播放模式，播放上一首或者下一首
     public static void PlayNextOrPrev(boolean IsNext,boolean NeedPlay)
     {
-        if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
+        if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return;
 
-        if(mPlayModel == Utility.PLAY_SHUFFLE) {
+        if(mPlayModel == Constants.PLAY_SHUFFLE) {
             mCurrent = getShuffle();
-            mId = Utility.mPlayingList.get(mCurrent);
-            mInfo = Utility.getMP3InfoById(mId);
+            mId = DBUtil.mPlayingList.get(mCurrent);
+            mInfo = DBUtil.getMP3InfoById(mId);
         }
-        else if(mPlayModel == Utility.PLAY_LOOP) {
+        else if(mPlayModel == Constants.PLAY_LOOP) {
             if(IsNext) {
-                if ((++mCurrent) > Utility.mPlayingList.size() - 1)
+                if ((++mCurrent) > DBUtil.mPlayingList.size() - 1)
                     mCurrent = 0;
-                mId = Utility.mPlayingList.get(mCurrent);
-                mInfo = Utility.getMP3InfoById(mId);
+                mId = DBUtil.mPlayingList.get(mCurrent);
+                mInfo = DBUtil.getMP3InfoById(mId);
             }
             else {
                 if ((--mCurrent) < 0)
-                    mCurrent = Utility.mPlayingList.size() - 1;
-                mId = Utility.mPlayingList.get(mCurrent);
-                mInfo = Utility.getMP3InfoById(mId);
+                    mCurrent = DBUtil.mPlayingList.size() - 1;
+                mId = DBUtil.mPlayingList.get(mCurrent);
+                mInfo = DBUtil.getMP3InfoById(mId);
             }
         }
         else {
@@ -435,18 +428,18 @@ public class MusicService extends Service {
 //    public void UpdateNextSong(int current)
 //    {
 //        mCurrent = current;
-//        mNext = mCurrent + 1 == Utility.mPlayingList.size() ? 0 : mCurrent + 1;
-//        mNextInfo = Utility.getMP3InfoById(Utility.mPlayingList.get(mNext));
+//        mNext = mCurrent + 1 == CommonUtil.mPlayingList.size() ? 0 : mCurrent + 1;
+//        mNextInfo = CommonUtil.getMP3InfoById(CommonUtil.mPlayingList.get(mNext));
 //    }
     //设置当前播放列表
     public static void setCurrentList(ArrayList<Long> list)
     {
-        Utility.mPlayingList = list;
+        DBUtil.mPlayingList = list;
     }
     //返回当前播放列表
     public static ArrayList<Long> getCurrentList()
     {
-        return Utility.mPlayingList;
+        return DBUtil.mPlayingList;
     }
     //返回当前播放歌曲
     public static MP3Info getCurrentMP3()

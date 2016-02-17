@@ -1,37 +1,25 @@
 package remix.myplayer.fragments;
 
-import android.app.ActionBar;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
-
-import java.io.File;
-import java.io.InterruptedIOException;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.MP3Info;
-import remix.myplayer.utils.Utility;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -54,7 +42,7 @@ public class CoverFragment extends Fragment {
 //        mImage.setBackgroundResource(R.drawable.bg_cover_corners);
 //        mImage.setMinimumHeight(AudioHolderActivity.mWidth - 10);
 //        mImage.setMinimumWidth(AudioHolderActivity.mWidth - 10);
-        if(mInfo != null && (mBitmap = Utility.CheckBitmapBySongId((int)mInfo.getId(),false)) != null)
+        if(mInfo != null && (mBitmap = DBUtil.CheckBitmapBySongId((int)mInfo.getId(),false)) != null)
             mImage.setImageBitmap(mBitmap);
         if(mLeftAnimation == null || mScaleAnimation == null || mRightAnimation == null)
         {
@@ -103,7 +91,7 @@ public class CoverFragment extends Fragment {
         if (mImage == null)
             return;
         mNewBitmap = bitmap;
-        if(AudioHolderActivity.mOperation == Utility.PREV)
+        if(AudioHolderActivity.mOperation == Constants.PREV)
             mImage.startAnimation(mRightAnimation);
         else
             mImage.startAnimation(mLeftAnimation);

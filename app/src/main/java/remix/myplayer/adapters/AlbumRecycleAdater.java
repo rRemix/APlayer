@@ -1,7 +1,6 @@
 package remix.myplayer.adapters;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
@@ -9,7 +8,6 @@ import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +23,8 @@ import remix.myplayer.activities.MainActivity;
 import remix.myplayer.fragments.AlbumRecyleFragment;
 import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.listeners.PopupListener;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2015/12/20.
@@ -63,8 +62,8 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
         }
         @Override
         protected Object doInBackground(Integer... params) {
-//            return Utility.CheckBitmapByAlbumId(params[0],true);
-            return Utility.CheckUrlByAlbumId(params[0]);
+//            return CommonUtil.CheckBitmapByAlbumId(params[0],true);
+            return DBUtil.CheckUrlByAlbumId(params[0]);
         }
         @Override
         protected void onPostExecute(Object url) {
@@ -129,7 +128,7 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
                         mCursor.moveToPosition(position);
                         popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
                                 mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex),
-                                Utility.ALBUM_HOLDER,
+                                Constants.ALBUM_HOLDER,
                                 mCursor.getString(AlbumRecyleFragment.mAlbumIdIndex)));
                         popupMenu.setGravity(Gravity.END);
                         popupMenu.show();

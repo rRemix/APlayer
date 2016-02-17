@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.view.View;
 
 import remix.myplayer.R;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
 
 /**
  * Created by Remix on 2015/12/3.
@@ -18,17 +18,17 @@ public class CtrlButtonListener implements View.OnClickListener {
     }
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(Utility.CTL_ACTION);
+        Intent intent = new Intent(Constants.CTL_ACTION);
         switch (v.getId())
         {
             case R.id.playbar_prev:
-                intent.putExtra("Control", Utility.PREV);
+                intent.putExtra("Control", Constants.PREV);
                 break;
             case R.id.playbar_next:
-                intent.putExtra("Control", Utility.NEXT);
+                intent.putExtra("Control", Constants.NEXT);
                 break;
             case R.id.playbar_play:
-                intent.putExtra("Control", Utility.PLAY);
+                intent.putExtra("Control", Constants.PLAY);
                 break;
         }
         context.sendBroadcast(intent);

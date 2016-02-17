@@ -1,19 +1,11 @@
 package remix.myplayer.fragments;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.BaseColumns;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,14 +13,11 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
-import java.io.IOException;
-
-import remix.myplayer.R;
 import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.adapters.FolderAdapter;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2015/12/5.
@@ -108,8 +97,8 @@ public class FolderFragment extends Fragment {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
             intent.putExtra("Id", position);
-            intent.putExtra("Type",Utility.FOLDER_HOLDER);
-            intent.putExtra("Title",Utility.mFolderList.get(position));
+            intent.putExtra("Type", Constants.FOLDER_HOLDER);
+            intent.putExtra("Title", DBUtil.mFolderList.get(position));
             startActivity(intent);
 
         }

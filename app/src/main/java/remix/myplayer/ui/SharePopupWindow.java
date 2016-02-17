@@ -1,11 +1,7 @@
 package remix.myplayer.ui;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -27,15 +23,10 @@ import com.sina.weibo.sdk.api.share.SendMultiMessageToWeiboRequest;
 import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.sina.weibo.sdk.constant.WBConstants;
 import com.tencent.connect.share.QQShare;
-import com.tencent.mm.sdk.constants.ConstantsAPI;
-import com.tencent.mm.sdk.modelbase.BaseReq;
-import com.tencent.mm.sdk.modelbase.BaseResp;
 import com.tencent.mm.sdk.modelmsg.SendMessageToWX;
-import com.tencent.mm.sdk.modelmsg.WXImageObject;
 import com.tencent.mm.sdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.sdk.modelmsg.WXTextObject;
 import com.tencent.mm.sdk.openapi.IWXAPI;
-import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
@@ -44,8 +35,9 @@ import com.tencent.tauth.UiError;
 import java.net.URLEncoder;
 
 import remix.myplayer.R;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.MP3Info;
-import remix.myplayer.utils.Utility;
 
 /**
  * Created by Remix on 2015/12/9.
@@ -70,14 +62,14 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
         if(mInfo == null)
             return;
         //初始化tencent API
-        mTencentApi = Tencent.createInstance(Utility.TECENT_APIID, getApplicationContext());
+        mTencentApi = Tencent.createInstance(Constants.TECENT_APIID, getApplicationContext());
         mListener = new BaseUiListener();
         //初始化微博API
-        mWeiboApi = WeiboShareSDK.createWeiboAPI(this,Utility.WEIBO_APIID);
+        mWeiboApi = WeiboShareSDK.createWeiboAPI(this, Constants.WEIBO_APIID);
         mWeiboApi.registerApp();
         //初始化微信api
-        mWechatApi = WXAPIFactory.createWXAPI(this,Utility.WECHAT_APIID,true);
-        mWechatApi.registerApp(Utility.WECHAT_APIID);
+        mWechatApi = WXAPIFactory.createWXAPI(this, Constants.WECHAT_APIID,true);
+        mWechatApi.registerApp(Constants.WECHAT_APIID);
 
         if (savedInstanceState != null) {
             mWeiboApi.handleWeiboResponse(getIntent(), this);
@@ -99,7 +91,7 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                String album_url = Utility.CheckUrlByAlbumId(mInfo.getAlbumId());
+                String album_url = DBUtil.CheckUrlByAlbumId(mInfo.getAlbumId());
                 bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
                 bundle.putString(QQShare.SHARE_TO_QQ_TITLE, mInfo.getDisplayname());
                 bundle.putString(QQShare.SHARE_TO_QQ_SUMMARY, mInfo.getArtist());
@@ -160,7 +152,7 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
                         Toast.LENGTH_SHORT).show();
                 return;
             }
-//            Bitmap bmp = Utility.CheckBitmapBySongId((int)mInfo.getId());
+//            Bitmap bmp = CommonUtil.CheckBitmapBySongId((int)mInfo.getId());
 //            Bitmap thumbBmp = Bitmap.createScaledBitmap(bmp, 150, 150, true);
 //            bmp.recycle();
             WXTextObject textObject = new WXTextObject();
@@ -174,7 +166,7 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
             msg.title = "title";
             msg.mediaTagName = "mediaTagName";
             msg.messageExt = "messageExt";
-//            msg.thumbData = Utility.bmpToByteArray(thumbBmp,true);
+//            msg.thumbData = CommonUtil.bmpToByteArray(thumbBmp,true);
 
             SendMessageToWX.Req req = new SendMessageToWX.Req();
             req.scene = v.getId() == R.id.share_wechat ? SendMessageToWX.Req.WXSceneSession : SendMessageToWX.Req.WXSceneTimeline;

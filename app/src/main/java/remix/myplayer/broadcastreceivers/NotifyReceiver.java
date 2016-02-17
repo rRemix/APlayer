@@ -14,7 +14,8 @@ import android.widget.RemoteViews;
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by taeja on 16-2-4.
@@ -35,7 +36,7 @@ public class NotifyReceiver extends BroadcastReceiver
         mRemoteView.setTextViewText(R.id.notify_song, MusicService.getCurrentMP3().getDisplayname());
         mRemoteView.setTextViewText(R.id.notify_artist, MusicService.getCurrentMP3().getArtist());
         //设置封面
-        Bitmap bitmap = Utility.CheckBitmapBySongId((int)MusicService.getCurrentMP3().getId(),true);
+        Bitmap bitmap = DBUtil.CheckBitmapBySongId((int)MusicService.getCurrentMP3().getId(),true);
         if(bitmap != null)
             mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
         else
@@ -47,12 +48,12 @@ public class NotifyReceiver extends BroadcastReceiver
             mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_pause_nor);
         }
 
-        Intent mButtonIntent = new Intent(Utility.CTL_ACTION);
-        mButtonIntent.putExtra("Control",Utility.PLAY);
+        Intent mButtonIntent = new Intent(Constants.CTL_ACTION);
+        mButtonIntent.putExtra("Control", Constants.PLAY);
         PendingIntent mIntent_Play = PendingIntent.getBroadcast(context,1,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteView.setOnClickPendingIntent(R.id.notify_play,mIntent_Play);
 
-        mButtonIntent.putExtra("Control",Utility.NEXT);
+        mButtonIntent.putExtra("Control", Constants.NEXT);
         PendingIntent mIntent_Next = PendingIntent.getBroadcast(context,2,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteView.setOnClickPendingIntent(R.id.notify_next,mIntent_Next);
 

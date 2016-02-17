@@ -6,14 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 
-import com.tencent.connect.common.Constants;
 import com.tencent.connect.share.QQShare;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 
 import remix.myplayer.R;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
 
 /**
  * Created by Remix on 2015/12/20.
@@ -27,7 +26,7 @@ public class ShareTestActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.testactivity);
 
-        mTencent = Tencent.createInstance(Utility.TECENT_APIID,getApplicationContext());
+        mTencent = Tencent.createInstance(Constants.TECENT_APIID,getApplicationContext());
 //        mEditText = (EditText)findViewById(R.id.test_edit);
         mListener = new BaseUiListener();
     }

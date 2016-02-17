@@ -11,11 +11,10 @@ import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import java.lang.ref.WeakReference;
-
 import remix.myplayer.R;
 import remix.myplayer.activities.SearchActivity;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.CommonUtil;
+import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2016/1/23.
@@ -72,7 +71,7 @@ public class SearchAdapter extends SimpleCursorAdapter
         }
         @Override
         protected Bitmap doInBackground(Integer... params) {
-            return Utility.CheckBitmapBySongId(params[0], true);
+            return DBUtil.CheckBitmapBySongId(params[0], true);
         }
         @Override
         protected void onPostExecute(Bitmap bitmap) {

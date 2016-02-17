@@ -22,7 +22,8 @@ import remix.myplayer.activities.MainActivity;
 import remix.myplayer.fragments.ArtistRecycleFragment;
 import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.listeners.PopupListener;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2015/12/22.
@@ -60,7 +61,7 @@ public class ArtistRecycleAdapter extends RecyclerView.Adapter<ArtistRecycleAdap
         }
         @Override
         protected String doInBackground(String... params) {
-            return Utility.getImageUrl(params[0],Utility.URL_ARTIST);
+            return DBUtil.getImageUrl(params[0], Constants.URL_ARTIST);
         }
         @Override
         protected void onPostExecute(String url) {
@@ -105,7 +106,7 @@ public class ArtistRecycleAdapter extends RecyclerView.Adapter<ArtistRecycleAdap
                         mCursor.moveToPosition(position);
                         popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
                                 mCursor.getInt(ArtistRecycleFragment.mArtistIdIndex),
-                                Utility.ARTIST_HOLDER,
+                                Constants.ARTIST_HOLDER,
                                 mCursor.getString(ArtistRecycleFragment.mArtistIdIndex)));
                         popupMenu.setGravity(Gravity.END);
                         popupMenu.show();

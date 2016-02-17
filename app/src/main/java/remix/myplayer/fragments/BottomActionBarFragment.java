@@ -1,11 +1,5 @@
 package remix.myplayer.fragments;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,15 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import remix.myplayer.R;
 import remix.myplayer.listeners.CtrlButtonListener;
-import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.BottomActionBar;
 import remix.myplayer.utils.MP3Info;
-import remix.myplayer.utils.Utility;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -41,7 +32,7 @@ public class BottomActionBarFragment extends Fragment{
         //注册recevier
 //        bottomReceiver = new BottomReceiver();
 //        IntentFilter filter = new IntentFilter();
-//        filter.addAction(Utility.UPDATE_ACTION);
+//        filter.addAction(CommonUtil.UPDATE_ACTION);
 //        getContext().registerReceiver(bottomReceiver,filter);
     }
 
@@ -70,17 +61,17 @@ public class BottomActionBarFragment extends Fragment{
 
 //    @Override
 //    public void onClick(View v) {
-//        Intent intent = new Intent(Utility.CTL_ACTION);
+//        Intent intent = new Intent(CommonUtil.CTL_ACTION);
 //        switch (v.getId())
 //        {
 //            case R.id.bottom_actionbar_previous:
-//                intent.putExtra("Control", Utility.PREV);
+//                intent.putExtra("Control", CommonUtil.PREV);
 //                break;
 //            case R.id.bottom_actionbar_next:
-//                intent.putExtra("Control", Utility.NEXT);
+//                intent.putExtra("Control", CommonUtil.NEXT);
 //                break;
 //            case R.id.bottom_actionbar_play:
-//                intent.putExtra("Control", Utility.PLAY);
+//                intent.putExtra("Control", CommonUtil.PLAY);
 //                break;
 //        }
 //        getContext().sendBroadcast(intent);

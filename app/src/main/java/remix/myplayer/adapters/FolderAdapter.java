@@ -15,7 +15,8 @@ import android.widget.TextView;
 import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;
 import remix.myplayer.listeners.PopupListener;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2015/12/5.
@@ -34,9 +35,9 @@ public class FolderAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if(Utility.mFolderList == null)
+        if(DBUtil.mFolderList == null)
             return 0;
-        return Utility.mFolderList.size();
+        return DBUtil.mFolderList.size();
     }
 
     @Override
@@ -56,7 +57,7 @@ public class FolderAdapter extends BaseAdapter {
         TextView num = (TextView)ItemView.findViewById(R.id.folder_num);
         TextView path = (TextView)ItemView.findViewById(R.id.folder_path);
         final ImageView button = (ImageView)ItemView.findViewById(R.id.folder_button);
-        if(Utility.mFolderList == null || Utility.mFolderList.size() < 0)
+        if(DBUtil.mFolderList == null || DBUtil.mFolderList.size() < 0)
             return ItemView;
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,8 +66,8 @@ public class FolderAdapter extends BaseAdapter {
                 MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
                         position,
-                        Utility.FOLDER_HOLDER,
-                        Utility.mFolderList.get(position)));
+                        Constants.FOLDER_HOLDER,
+                        DBUtil.mFolderList.get(position)));
                 popupMenu.setGravity(Gravity.END );
                 popupMenu.show();
             }
@@ -77,7 +78,7 @@ public class FolderAdapter extends BaseAdapter {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{MediaStore.Video.Media.BUCKET_DISPLAY_NAME,MediaStore.Audio.Media.DATA},
                     MediaStore.Video.Media.BUCKET_DISPLAY_NAME + "=?",
-                    new String[]{Utility.mFolderList.get(position)},null);
+                    new String[]{DBUtil.mFolderList.get(position)},null);
         }
         catch (Exception e)
         {

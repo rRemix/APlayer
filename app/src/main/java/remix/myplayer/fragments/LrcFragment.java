@@ -1,31 +1,23 @@
 package remix.myplayer.fragments;
 
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.renderscript.RenderScript;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.TreeMap;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.ui.LrcView;
+import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.LrcInfo;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.SearchLRC;
-import remix.myplayer.utils.Utility;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -93,7 +85,7 @@ public class LrcFragment extends Fragment {
         }
         @Override
         public void run() {
-            if(!Utility.isNetWorkConnected()) {
+            if(!CommonUtil.isNetWorkConnected()) {
                 mHandler.sendEmptyMessage(NO_NETWORK);
                 return;
             }

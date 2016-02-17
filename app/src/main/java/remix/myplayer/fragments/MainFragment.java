@@ -2,7 +2,6 @@ package remix.myplayer.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,7 +14,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
@@ -25,12 +23,11 @@ import remix.myplayer.activities.SearchActivity;
 import remix.myplayer.adapters.PagerAdapter;
 import remix.myplayer.adapters.SlideMenuAdapter;
 import remix.myplayer.adapters.SlideMenuRecycleAdpater;
-import remix.myplayer.listeners.SlideMenuListener;
 import remix.myplayer.listeners.TabTextListener;
 import remix.myplayer.listeners.ViewPagerListener;
 import remix.myplayer.ui.MyPager;
 import remix.myplayer.ui.TimerPopupWindow;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
 
 /**
  * Created by Remix on 2015/12/5.
@@ -114,7 +111,7 @@ public class MainFragment extends Fragment {
         mSlideMenuExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getContext().sendBroadcast(new Intent(Utility.EXIT));
+                getContext().sendBroadcast(new Intent(Constants.EXIT));
             }
         });
 
@@ -176,8 +173,8 @@ public class MainFragment extends Fragment {
                     startActivity(new Intent(getActivity(), PlayListActivity.class));
                     break;
                 case 2:
-                    Intent intent = new Intent(Utility.CTL_ACTION);
-                    intent.putExtra("Control", Utility.PREV);
+                    Intent intent = new Intent(Constants.CTL_ACTION);
+                    intent.putExtra("Control", Constants.PREV);
                     mContext.sendBroadcast(intent);
                     break;
                 default:break;

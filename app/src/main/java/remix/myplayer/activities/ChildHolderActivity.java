@@ -1,10 +1,7 @@
 package remix.myplayer.activities;
 
-import android.app.NotificationManager;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -22,9 +19,10 @@ import remix.myplayer.R;
 import remix.myplayer.adapters.AlbumHolderAdapter;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.services.MusicService;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.PlayListItem;
-import remix.myplayer.utils.Utility;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -65,7 +63,7 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
         //注册Musicreceiver
 //        MusicService service = new MusicService(getApplicationContext());
 //        mMusicReceiver = service.new PlayerReceiver();
-//        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
+//        IntentFilter musicfilter = new IntentFilter(CommonUtil.CTL_ACTION);
 //        registerReceiver(mMusicReceiver, musicfilter);
 
         mId = getIntent().getIntExtra("Id",-1);
@@ -76,23 +74,23 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
             mInfoList = new ArrayList<>();
             switch (type)
             {
-                case Utility.ALBUM_HOLDER:
-                    mInfoList = Utility.getMP3InfoByArtistIdOrAlbumId(mId, Utility.ALBUM_HOLDER);
+                case Constants.ALBUM_HOLDER:
+                    mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ALBUM_HOLDER);
                     break;
-                case Utility.ARTIST_HOLDER:
-                    mInfoList = Utility.getMP3InfoByArtistIdOrAlbumId(mId, Utility.ARTIST_HOLDER);
+                case Constants.ARTIST_HOLDER:
+                    mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST_HOLDER);
                     break;
-                case Utility.FOLDER_HOLDER:
-                    String bucket_display_name = Utility.mFolderList.get(mId);
-                    mInfoList = Utility.getMP3ListByFolder(bucket_display_name);
+                case Constants.FOLDER_HOLDER:
+                    String bucket_display_name = DBUtil.mFolderList.get(mId);
+                    mInfoList = DBUtil.getMP3ListByFolder(bucket_display_name);
                     Title = bucket_display_name;
                     break;
-                case Utility.PLAYLIST_HOLDER:
+                case Constants.PLAYLIST_HOLDER:
                     ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(Title);
                     ArrayList<String> names = new ArrayList<>();
                     for(PlayListItem item : list)
                         names.add(item.getmSongame());
-                    mInfoList = Utility.getMP3ListByNames(names);
+                    mInfoList = DBUtil.getMP3ListByNames(names);
                     break;
             }
         }
@@ -104,18 +102,16 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                MP3Info temp = (MP3Info) parent.getAdapter().getItem(position);
                 if(mInfoList.size() == 0)
                     return;
                 ArrayList<Long> ids = new ArrayList<Long>();
                 for(MP3Info info : mInfoList)
                     ids.add(info.getId());
-                Utility.mPlayingList = (ArrayList) ids.clone();
-//                mService.UpdateNextSong(position);
+                DBUtil.setPlayingList((ArrayList) ids.clone());
 
-                Intent intent = new Intent(Utility.CTL_ACTION);
+                Intent intent = new Intent(Constants.CTL_ACTION);
                 Bundle arg = new Bundle();
-                arg.putInt("Control", Utility.PLAYSELECTEDSONG);
+                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                 arg.putInt("Position", position);
                 intent.putExtras(arg);
                 sendBroadcast(intent);
@@ -142,23 +138,23 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
             public void onClick(View v) {
                 if(mInfoList.size() == 0)
                     return;
-                MusicService.setPlayModel(Utility.PLAY_SHUFFLE);
-                Intent intent = new Intent(Utility.CTL_ACTION);
-                intent.putExtra("Control", Utility.NEXT);
+                MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
+                Intent intent = new Intent(Constants.CTL_ACTION);
+                intent.putExtra("Control", Constants.NEXT);
                 ArrayList<Long> ids = new ArrayList<Long>();
                 for (MP3Info info : mInfoList) {
                     ids.add(info.getId());
                 }
-                Utility.setPlayingList(ids);
+                DBUtil.setPlayingList(ids);
                 sendBroadcast(intent);
             }
         });
 
         //初始化底部状态栏
         mActionbar = (BottomActionBarFragment)getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        if(Utility.mPlayingList.size() == 0)
+        if(DBUtil.mPlayingList.size() == 0)
             return;
-        mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(0)), false);
+        mActionbar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)), false);
 
 
 

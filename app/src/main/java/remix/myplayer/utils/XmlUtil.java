@@ -1,7 +1,6 @@
 package remix.myplayer.utils;
 
 import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
 import android.util.Xml;
 
@@ -15,13 +14,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import remix.myplayer.activities.MainActivity;
 import remix.myplayer.activities.PlayListActivity;
 
 /**
@@ -251,8 +248,8 @@ public class XmlUtil {
 
     public static void deleteSong(long id)
     {
-        if(id > 0 && Utility.mPlayingList.contains(id)) {
-            Utility.mPlayingList.remove(id);
+        if(id > 0 && DBUtil.mPlayingList.contains(id)) {
+            DBUtil.mPlayingList.remove(id);
             updatePlayingListXml();
         }
     }
@@ -260,7 +257,7 @@ public class XmlUtil {
     public static void addSong(long id)
     {
         if(id > 0) {
-           Utility.mPlayingList.add(id);
+            DBUtil.mPlayingList.add(id);
             updatePlayingListXml();
         }
     }
@@ -274,10 +271,10 @@ public class XmlUtil {
             parser.setOutput(fos,"utf-8");
             parser.startDocument("utf-8",true);
             parser.startTag(null,"playinglist");
-            for(int i = 0 ; i < Utility.mPlayingList.size(); i++)
+            for(int i = 0; i < DBUtil.mPlayingList.size(); i++)
             {
                 parser.startTag(null,"song");
-                parser.attribute(null,"id",Utility.mPlayingList.get(i).toString());
+                parser.attribute(null,"id", DBUtil.mPlayingList.get(i).toString());
                 parser.endTag(null,"song");
             }
             parser.endTag(null,"playinglist");

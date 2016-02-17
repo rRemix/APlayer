@@ -13,8 +13,9 @@ import android.widget.TextView;
 
 import remix.myplayer.R;
 import remix.myplayer.services.MusicService;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.MP3Info;
-import remix.myplayer.utils.Utility;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -37,17 +38,17 @@ public class PlayingAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if(Utility.mPlayingList == null)
+        if(DBUtil.mPlayingList == null)
             return 0;
-        return Utility.mPlayingList.size();
+        return DBUtil.mPlayingList.size();
     }
 
     @Override
     public Object getItem(int position)
     {
-        if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
+        if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return null;
-        return Utility.mPlayingList.get(position);
+        return DBUtil.mPlayingList.get(position);
     }
 
     @Override
@@ -68,21 +69,21 @@ public class PlayingAdapter extends BaseAdapter {
             holder = (ViewHolder)convertView.getTag();
 
 
-        if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
+        if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return convertView;
 
-        final MP3Info temp = new MP3Info(Utility.getMP3InfoById(Utility.mPlayingList.get(position)));
+        final MP3Info temp = new MP3Info(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(position)));
         if(temp != null) {
             holder.mSong.setText(temp.getDisplayname());
             holder.mArtist.setText(temp.getArtist());
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Utility.mPlayingList.remove(temp.getId());
+                    DBUtil.mPlayingList.remove(temp.getId());
                     if(temp.getId() == MusicService.getCurrentMP3().getId())
                     {
-                        Intent intent = new Intent(Utility.CTL_ACTION);
-                        intent.putExtra("Control", Utility.NEXT);
+                        Intent intent = new Intent(Constants.CTL_ACTION);
+                        intent.putExtra("Control", Constants.NEXT);
                         mContext.sendBroadcast(intent);
                     }
                     mHandler.sendEmptyMessage(0x132);
@@ -92,12 +93,12 @@ public class PlayingAdapter extends BaseAdapter {
         }
         return convertView;
 //        View ItemView = mInflater.inflate(R.layout.playinglist_item,null);
-//        if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
+//        if(CommonUtil.mPlayingList == null || CommonUtil.mPlayingList.size() == 0)
 //            return ItemView;
 //        TextView title = (TextView)ItemView.findViewById(R.id.playlist_item_name);
 //        TextView artist = (TextView)ItemView.findViewById(R.id.playlist_item_artist);
 //
-//        MP3Info temp = new MP3Info(Utility.getMP3InfoById(Utility.mPlayingList.get(position)));
+//        MP3Info temp = new MP3Info(CommonUtil.getMP3InfoById(CommonUtil.mPlayingList.get(position)));
 //        title.setText(temp.getDisplayname());
 //        artist.setText(temp.getArtist());
 

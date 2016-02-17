@@ -12,10 +12,10 @@ import java.util.Iterator;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.PlayListActivity;
-import remix.myplayer.services.MusicService;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.PlayListItem;
-import remix.myplayer.utils.Utility;
 import remix.myplayer.utils.XmlUtil;
 
 /**
@@ -39,14 +39,14 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
         ArrayList<MP3Info> list = new ArrayList<>();
         ArrayList<Long> ids = new ArrayList<Long>();
         String name = null;
-        if(mType <= Utility.ARTIST_HOLDER) {
-            list = Utility.getMP3InfoByArtistIdOrAlbumId(mId, mType);
+        if(mType <= Constants.ARTIST_HOLDER) {
+            list = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, mType);
             for(MP3Info info : list)
                 ids.add(info.getId());
         }
-        else if(mType == Utility.FOLDER_HOLDER)
+        else if(mType == Constants.FOLDER_HOLDER)
         {
-            list = Utility.getMP3ListByFolder(Utility.mFolderList.get(mId));
+            list = DBUtil.getMP3ListByFolder(DBUtil.mFolderList.get(mId));
             for(MP3Info info : list)
                 ids.add(info.getId());
         }
@@ -63,24 +63,24 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
         switch (item.getItemId()) {
             //播放
             case R.id.menu_play:
-                Utility.setPlayingList((ArrayList) ids.clone());
+                DBUtil.setPlayingList((ArrayList) ids.clone());
 //                MusicService.mInstance.UpdateNextSong(0);
-                Intent intent = new Intent(Utility.CTL_ACTION);
+                Intent intent = new Intent(Constants.CTL_ACTION);
                 Bundle arg = new Bundle();
-                arg.putInt("Control", Utility.PLAYSELECTEDSONG);
+                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                 arg.putInt("Position", 0);
                 intent.putExtras(arg);
                 mContext.sendBroadcast(intent);
                 break;
             //添加到播放列表
             case R.id.menu_add:
-                Utility.mPlayingList.addAll(ids);
-                Utility.setPlayingList(Utility.mPlayingList);
+                DBUtil.mPlayingList.addAll(ids);
+                DBUtil.setPlayingList(DBUtil.mPlayingList);
                 break;
             //删除
             case R.id.menu_delete:
-                if(mType != Utility.PLAYLIST_HOLDER)
-                    Utility.deleteSong(mKey,mType);
+                if(mType != Constants.PLAYLIST_HOLDER)
+                    DBUtil.deleteSong(mKey,mType);
                 else {
                     if(name != null && !name.equals("")) {
                         PlayListActivity.mPlaylist.remove(name);

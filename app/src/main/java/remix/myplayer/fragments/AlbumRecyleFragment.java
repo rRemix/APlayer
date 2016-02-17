@@ -20,7 +20,7 @@ import remix.myplayer.R;
 import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.adapters.AlbumRecycleAdater;
 import remix.myplayer.listeners.OnItemClickListener;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
 
 /**
  * Created by Remix on 2015/12/20.
@@ -52,7 +52,7 @@ public class AlbumRecyleFragment extends Fragment implements LoaderManager.Loade
                     Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
                     intent.putExtra("Id", albumid);
                     intent.putExtra("Title", title);
-                    intent.putExtra("Type", Utility.ALBUM_HOLDER);
+                    intent.putExtra("Type", Constants.ALBUM_HOLDER);
                     startActivity(intent);
                 }
             }

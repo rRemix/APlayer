@@ -8,7 +8,6 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -20,12 +19,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.MainActivity;
 import remix.myplayer.activities.PlayListActivity;
-import remix.myplayer.fragments.AlbumRecyleFragment;
 import remix.myplayer.listeners.PopupListener;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.PlayListItem;
-import remix.myplayer.utils.Utility;
 
 /**
  * Created by taeja on 16-1-15.
@@ -88,7 +86,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                     Context wrapper = new ContextThemeWrapper(mContext, R.style.MyPopupMenu);
                     final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                     PlayListActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
-                    popupMenu.setOnMenuItemClickListener(new PopupListener(mContext, position, Utility.PLAYLIST_HOLDER, ""));
+                    popupMenu.setOnMenuItemClickListener(new PopupListener(mContext, position, Constants.PLAYLIST_HOLDER, ""));
                     popupMenu.setGravity(Gravity.END);
                     popupMenu.show();
                 }
@@ -122,7 +120,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         }
         @Override
         protected String doInBackground(String... params) {
-            return Utility.getImageUrl(params[0],Utility.URL_NAME);
+            return DBUtil.getImageUrl(params[0], Constants.URL_NAME);
         }
         @Override
         protected void onPostExecute(String url) {

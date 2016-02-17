@@ -3,15 +3,10 @@ package remix.myplayer.listeners;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.CursorAdapter;
 import android.widget.Toast;
-import org.xmlpull.v1.*;
-import remix.myplayer.R;
-import remix.myplayer.activities.MainActivity;
-import remix.myplayer.fragments.MainFragment;
-import remix.myplayer.utils.Utility;
+
+import remix.myplayer.utils.Constants;
 
 /**
  * Created by Remix on 2015/12/10.
@@ -33,8 +28,8 @@ public class SlideMenuListener implements AdapterView.OnItemClickListener {
                 Toast.makeText(mContext, "播放列表", Toast.LENGTH_SHORT).show();
                 break;
             case 2:
-                Intent intent = new Intent(Utility.CTL_ACTION);
-                intent.putExtra("Control", Utility.PREV);
+                Intent intent = new Intent(Constants.CTL_ACTION);
+                intent.putExtra("Control", Constants.PREV);
                 mContext.sendBroadcast(intent);
                 break;
             default:break;

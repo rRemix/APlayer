@@ -6,13 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
 
 /**
  * Created by taeja on 16-1-15.
@@ -33,7 +32,7 @@ public class TimerService extends Service {
     public void onCreate() {
         super.onCreate();
         mReceiver = new TimerReceiver();
-        IntentFilter filter = new IntentFilter(Utility.CONTROL_TIMER);
+        IntentFilter filter = new IntentFilter(Constants.CONTROL_TIMER);
         registerReceiver(mReceiver,filter);
     }
 
@@ -71,7 +70,7 @@ public class TimerService extends Service {
                             mStartTime= System.currentTimeMillis();
                             Thread.sleep(mTime * 60 * 1000);
                             System.exit(0);
-//                            sendBroadcast(new Intent(Utility.EXIT));
+//                            sendBroadcast(new Intent(CommonUtil.EXIT));
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

@@ -8,8 +8,8 @@ import android.widget.AdapterView;
 
 import java.util.ArrayList;
 
-import remix.myplayer.activities.MainActivity;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -23,13 +23,13 @@ public class ListViewListener implements AdapterView.OnItemClickListener
     }
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intent = new Intent(Utility.CTL_ACTION);
+        Intent intent = new Intent(Constants.CTL_ACTION);
         Bundle arg = new Bundle();
-        arg.putInt("Control", Utility.PLAYSELECTEDSONG);
+        arg.putInt("Control", Constants.PLAYSELECTEDSONG);
         arg.putInt("Position", position);
         intent.putExtras(arg);
         mContext.sendBroadcast(intent);
-        Utility.setPlayingList((ArrayList<Long>) Utility.mAllSongList.clone());
+        DBUtil.setPlayingList((ArrayList<Long>) DBUtil.mAllSongList.clone());
 //        MainActivity.mInstance.getService().UpdateNextSong(position);
 
     }

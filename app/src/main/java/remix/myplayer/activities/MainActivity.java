@@ -3,7 +3,6 @@ package remix.myplayer.activities;
 
 import android.content.ComponentName;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -32,9 +31,11 @@ import remix.myplayer.fragments.MainFragment;
 import remix.myplayer.R;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.services.NotifyService;
+import remix.myplayer.utils.CommonUtil;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.MP3Info;
 import remix.myplayer.utils.SharedPrefsUtil;
-import remix.myplayer.utils.Utility;
 import remix.myplayer.utils.XmlUtil;
 
 public class MainActivity extends AppCompatActivity implements MusicService.Callback{
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     private MusicService mService;
     private BottomActionBarFragment mActionbar;
     private LoaderManager mManager;
-    private Utility mUtlity;
+    private CommonUtil mUtlity;
     private RecyclerView mMenuRecycle;
     private SlideMenuRecycleAdpater mMenuAdapter;
     public NotifyReceiver mNotifyReceiver;
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         XmlUtil.setContext(getApplicationContext());
+        DBUtil.setContext(getApplicationContext());
         Fresco.initialize(this);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -97,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_main);
         mInstance = this;
-        mUtlity = new Utility(getApplicationContext());
+        mUtlity = new CommonUtil(getApplicationContext());
 
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         if(!mFromNotify) {
@@ -113,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         initMainFragment();
         //初始化底部状态栏
         mActionbar = (BottomActionBarFragment)getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        if(Utility.mPlayingList == null || Utility.mPlayingList.size() == 0)
+        if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return;
         //如果是第一次启动软件
         boolean mFir = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mFirst",true);
@@ -121,9 +123,9 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         SharedPrefsUtil.putValue(getApplicationContext(),"setting","mFirst",false);
 
         if(mFir || mPos < 0)
-            mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(0)),mFromNotify);
+            mActionbar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)),mFromNotify);
         else
-            mActionbar.UpdateBottomStatus(Utility.getMP3InfoById(Utility.mPlayingList.get(mPos)), mFromNotify);
+            mActionbar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(mPos)), mFromNotify);
     }
 
     public RecyclerView getRecycleMenu()
@@ -146,13 +148,13 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         FutureTask<ArrayList<Long>> task = new FutureTask<ArrayList<Long>>(new Callable<ArrayList<Long>>() {
             @Override
             public ArrayList<Long> call() throws Exception {
-                return Utility.getAllSongsId();
+                return DBUtil.getAllSongsId();
             }
         });
         //开启一条线程来读取歌曲信息
         new Thread(task, "getInfo").start();
         try {
-            Utility.mAllSongList = task.get();
+            DBUtil.mAllSongList = task.get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -167,9 +169,9 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         //开启一条线程来读取歌曲信息
         new Thread(task1, "getPlayingList").start();
         try {
-            Utility.mPlayingList = task1.get();
-            if(Utility.mPlayingList == null || Utility.mPlayingList.size()  == 0)
-                Utility.mPlayingList = (ArrayList<Long>)task1.get().clone();
+            DBUtil.mPlayingList = task1.get();
+            if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size()  == 0)
+                DBUtil.mPlayingList = (ArrayList<Long>)task1.get().clone();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -184,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             home.addCategory(Intent.CATEGORY_HOME);
             startActivity(home);
-            sendBroadcast(new Intent(Utility.NOTIFY));
+            sendBroadcast(new Intent(Constants.NOTIFY));
         }
         return super.onKeyDown(keyCode, event);
     }

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -17,12 +16,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import remix.myplayer.R;
 import remix.myplayer.services.TimerService;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
 
 /**
  * Created by taeja on 16-1-15.
@@ -97,7 +93,7 @@ public class TimerPopupWindow extends Activity {
                 Toast.makeText(TimerPopupWindow.this,msg,Toast.LENGTH_SHORT).show();
                 misTime = !misTime;
                 mSeekbar.setStart(misTime);
-                Intent intent = new Intent(Utility.CONTROL_TIMER);
+                Intent intent = new Intent(Constants.CONTROL_TIMER);
                 intent.putExtra("Time",mTime);
                 intent.putExtra("Run", misTime);
                 sendBroadcast(intent);

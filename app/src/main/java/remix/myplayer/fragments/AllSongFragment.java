@@ -1,8 +1,6 @@
 package remix.myplayer.fragments;
 
 
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -17,8 +15,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -27,11 +23,11 @@ import android.widget.Toast;
 import java.lang.ref.WeakReference;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.MainActivity;
 import remix.myplayer.adapters.SongListAdapter;
 import remix.myplayer.listeners.ListViewListener;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.CommonUtil;
+import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -67,7 +63,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         }
         @Override
         protected Bitmap doInBackground(Integer... params) {
-            return Utility.CheckBitmapByAlbumId(params[0],true);
+            return DBUtil.CheckBitmapByAlbumId(params[0],true);
         }
 
         @Override
@@ -86,7 +82,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
 
 //        MusicService service = new MusicService(getContext());
 //        mMusicReceiver = service.new PlayerReceiver();
-//        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
+//        IntentFilter musicfilter = new IntentFilter(CommonUtil.CTL_ACTION);
 //        getContext().registerReceiver(mMusicReceiver, musicfilter);
 
     }

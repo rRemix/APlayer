@@ -36,7 +36,6 @@ import java.util.Timer;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.PagerAdapter;
-import remix.myplayer.broadcastreceivers.NotifyReceiver;
 import remix.myplayer.fragments.CoverFragment;
 import remix.myplayer.fragments.LrcFragment;
 import remix.myplayer.fragments.RecordFragment;
@@ -44,8 +43,10 @@ import remix.myplayer.services.MusicService;
 
 import remix.myplayer.ui.AudioViewPager;
 import remix.myplayer.ui.PlayingListPopupWindow;
+import remix.myplayer.utils.CommonUtil;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.MP3Info;
-import remix.myplayer.utils.Utility;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -102,13 +103,13 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         @Override
         public void handleMessage(Message msg)
         {
-            if(msg.what == Utility.UPDATE_BG) {
+            if(msg.what == Constants.UPDATE_BG) {
                 //对专辑图片进行高斯模糊，并将其设置为背景
                 float radius = 25;
                 float scaleFactor = 12;
                 if (mWidth > 0 && mHeight > 0 ) {
                     if(mInfo == null) return;
-                    Bitmap bkg = Utility.CheckBitmapBySongId((int) mInfo.getId(),false);
+                    Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
                     if (bkg == null)
                         bkg = BitmapFactory.decodeResource(getResources(), R.drawable.bg_lockscreen_default);
                     mNewBitMap = Bitmap.createBitmap((int) (mWidth / scaleFactor), (int) (mHeight / scaleFactor), Bitmap.Config.ARGB_8888);
@@ -119,7 +120,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
                     paint.setFlags(Paint.FILTER_BITMAP_FLAG);
                     paint.setAlpha((int)(255 * 0.3));
                     canvas.drawBitmap(bkg, 0, 0, paint);
-                    mNewBitMap = Utility.doBlur(mNewBitMap, (int) radius, true);
+                    mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
                     //获得当前背景
 //                    mContainer.startAnimation(mAnimOut);
                     mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
@@ -174,7 +175,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         //注册Musicreceiver
 //        MusicService service = new MusicService(getApplicationContext());
 //        mMusicReceiver = service.new PlayerReceiver();
-//        IntentFilter musicfilter = new IntentFilter(Utility.CTL_ACTION);
+//        IntentFilter musicfilter = new IntentFilter(CommonUtil.CTL_ACTION);
 //        registerReceiver(mMusicReceiver, musicfilter);
         //初始化动画相关
         initAnim();
@@ -224,7 +225,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             }
         });
         mContainer = (LinearLayout)findViewById(R.id.audio_holder_container);
-        mBlurHandler.sendEmptyMessage(Utility.UPDATE_BG);
+        mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
     }
 
     public void initNextSong() {
@@ -243,12 +244,12 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             @Override
             public void onClick(View v) {
                 int currentmodel = MusicService.getPlayModel();
-                currentmodel = (currentmodel == Utility.PLAY_REPEATONE ? Utility.PLAY_LOOP : ++currentmodel);
+                currentmodel = (currentmodel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentmodel);
                 MusicService.setPlayModel(currentmodel);
-                mPlayModel.setBackground(getResources().getDrawable(currentmodel == Utility.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
-                                        currentmodel == Utility.PLAY_SHUFFLE ? R.drawable.bg_btn_holder_playmodel_shuffle :
+                mPlayModel.setBackground(getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
+                                        currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.bg_btn_holder_playmodel_shuffle :
                                         R.drawable.bg_btn_holder_playmodel_repeat,getTheme()));
-                String msg = currentmodel == Utility.PLAY_LOOP ? "顺序播放" : currentmodel == Utility.PLAY_SHUFFLE ? "随机播放" : "单曲播放";
+                String msg = currentmodel == Constants.PLAY_LOOP ? "顺序播放" : currentmodel == Constants.PLAY_SHUFFLE ? "随机播放" : "单曲播放";
                 Toast.makeText(AudioHolderActivity.this,msg,Toast.LENGTH_SHORT).show();
             }
         });
@@ -264,9 +265,9 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
 //        mModelLoop.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                if(MusicService.getPlayModel() == Utility.PLAY_LOOP)
+//                if(MusicService.getPlayModel() == CommonUtil.PLAY_LOOP)
 //                    return;
-//                MusicService.setPlayModel(Utility.PLAY_LOOP);
+//                MusicService.setPlayModel(CommonUtil.PLAY_LOOP);
 //                mModelLoop.setImageResource(R.drawable.play_btn_loop_prs);
 //                mModelShuffle.setImageResource(R.drawable.play_btn_shuffle);
 //                Toast.makeText(AudioHolderActivity.this,"顺序播放", Toast.LENGTH_SHORT).show();
@@ -275,9 +276,9 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
 //        mModelShuffle.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                if(MusicService.getPlayModel() == Utility.PLAY_SHUFFLE)
+//                if(MusicService.getPlayModel() == CommonUtil.PLAY_SHUFFLE)
 //                    return;
-//                MusicService.setPlayModel(Utility.PLAY_SHUFFLE);
+//                MusicService.setPlayModel(CommonUtil.PLAY_SHUFFLE);
 //                mModelShuffle.setImageResource(R.drawable.play_btn_shuffle_prs);
 //                mModelLoop.setImageResource(R.drawable.play_btn_loop);
 //                Toast.makeText(AudioHolderActivity.this,"随机播放", Toast.LENGTH_SHORT).show();
@@ -288,9 +289,9 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
 //            @Override
 //            public void onClick(View v) {
 //                int PlayModel = MusicService.getPlayModel();
-//                mModel.setImageResource(PlayModel == Utility.PLAY_NORMAL ? R.drawable.bg_btn_holder_playmodel_shuffle : R.drawable.bg_btn_holder_playmodel_normal);
-//                MusicService.setPlayModel(PlayModel == Utility.PLAY_NORMAL ? Utility.PLAY_SHUFFLE : Utility.PLAY_NORMAL);
-//                Toast.makeText(AudioHolderActivity.this,PlayModel == Utility.PLAY_NORMAL ? "随机播放" : "顺序播放",Toast.LENGTH_SHORT).show();
+//                mModel.setImageResource(PlayModel == CommonUtil.PLAY_NORMAL ? R.drawable.bg_btn_holder_playmodel_shuffle : R.drawable.bg_btn_holder_playmodel_normal);
+//                MusicService.setPlayModel(PlayModel == CommonUtil.PLAY_NORMAL ? CommonUtil.PLAY_SHUFFLE : CommonUtil.PLAY_NORMAL);
+//                Toast.makeText(AudioHolderActivity.this,PlayModel == CommonUtil.PLAY_NORMAL ? "随机播放" : "顺序播放",Toast.LENGTH_SHORT).show();
 //            }
 //        });
     }
@@ -324,7 +325,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
                 if (MusicService.getIsplay()) {
 //                    mCurrent = MusicService.mInstance.getCurrentTime();
                     mCurrent = MusicService.getCurrentTime();
-                    mHandler.sendEmptyMessage(Utility.UPDATE_TIME_ALL);
+                    mHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
                 }
                 try {
                     Thread.sleep(1000);
@@ -340,9 +341,9 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         @Override
         public void handleMessage(Message msg)
         {
-            mHasPlay.setText(Utility.getTime(mCurrent));
-            mRemainPlay.setText(Utility.getTime(mDuration - mCurrent));
-            if(msg.what == Utility.UPDATE_TIME_ALL)
+            mHasPlay.setText(CommonUtil.getTime(mCurrent));
+            mRemainPlay.setText(CommonUtil.getTime(mDuration - mCurrent));
+            if(msg.what == Constants.UPDATE_TIME_ALL)
                 mSeekBar.setProgress(mCurrent);
         }
     };
@@ -377,20 +378,20 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Utility.CTL_ACTION);
+                Intent intent = new Intent(Constants.CTL_ACTION);
                 switch (v.getId())
                 {
                     case R.id.playbar_prev:
-                        intent.putExtra("Control", Utility.PREV);
-                        mOperation = Utility.PREV;
+                        intent.putExtra("Control", Constants.PREV);
+                        mOperation = Constants.PREV;
                         break;
                     case R.id.playbar_next:
-                        mOperation = Utility.NEXT;
-                        intent.putExtra("Control", Utility.NEXT);
+                        mOperation = Constants.NEXT;
+                        intent.putExtra("Control", Constants.NEXT);
                         break;
                     case R.id.playbar_play:
-                        mOperation = Utility.PLAY;
-                        intent.putExtra("Control", Utility.PLAY);
+                        mOperation = Constants.PLAY;
+                        intent.putExtra("Control", Constants.PLAY);
                         break;
                 }
                 sendBroadcast(intent);
@@ -410,8 +411,8 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         //初始化已播放时间与剩余时间
         mHasPlay = (TextView)findViewById(R.id.text_hasplay);
         mRemainPlay = (TextView)findViewById(R.id.text_remain);
-        mHasPlay.setText(Utility.getTime(mCurrent));
-        mRemainPlay.setText(Utility.getTime(mDuration - mCurrent));
+        mHasPlay.setText(CommonUtil.getTime(mCurrent));
+        mRemainPlay.setText(CommonUtil.getTime(mDuration - mCurrent));
 
         mSeekBar = (SeekBar)findViewById(R.id.seekbar);
         mSeekBar.setMax((int) mInfo.getDuration());
@@ -420,7 +421,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser)
-                    mHandler.sendEmptyMessage(Utility.UPDATE_TIME_ONLY);
+                    mHandler.sendEmptyMessage(Constants.UPDATE_TIME_ONLY);
 //                if (fromUser && (Math.abs(mCurrent - progress) > 300) && !misChanging) {
 //                    mSeekBar.setProgress(progress);
 //                    MusicService.setProgress(progress);
@@ -545,9 +546,9 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mInfo= MP3info;
         mIsPlay = isplay;
 //        if(mInfo.getId() != MP3info.getId())
-//            mBlurHandler.sendEmptyMessage(Utility.UPDATE_BG);
+//            mBlurHandler.sendEmptyMessage(CommonUtil.UPDATE_BG);
 
-        if(mOperation != Utility.PLAY && mIsRun) {
+        if(mOperation != Constants.PLAY && mIsRun) {
             //更新顶部信息
             UpdateTopStatus(mInfo);
             //更新按钮状态
@@ -555,12 +556,12 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             //更新歌词
             ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
             //更新专辑封面
-            ((CoverFragment) mAdapter.getItem(1)).UpdateCover(Utility.CheckBitmapBySongId((int)MP3info.getId(),false));
+            ((CoverFragment) mAdapter.getItem(1)).UpdateCover(DBUtil.CheckBitmapBySongId((int)MP3info.getId(),false));
             //更新进度条
             mCurrent = MusicService.getCurrentTime();
             mDuration = (int) mInfo.getDuration();
             mSeekBar.setMax(mDuration);
-            mBlurHandler.sendEmptyMessage(Utility.UPDATE_BG);
+            mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
 
         }
         else if(mIsRun)

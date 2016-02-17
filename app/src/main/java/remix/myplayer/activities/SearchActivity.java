@@ -15,7 +15,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import remix.myplayer.R;
 import remix.myplayer.adapters.SearchAdapter;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by taeja on 16-1-22.
@@ -113,9 +114,9 @@ public class SearchActivity extends AppCompatActivity {
     class ListViewListener implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Intent intent = new Intent(Utility.CTL_ACTION);
+            Intent intent = new Intent(Constants.CTL_ACTION);
             Bundle arg = new Bundle();
-            arg.putInt("Control", Utility.PLAYSELECTEDSONG);
+            arg.putInt("Control", Constants.PLAYSELECTEDSONG);
             arg.putInt("Position", position);
             intent.putExtras(arg);
             getApplicationContext().sendBroadcast(intent);
@@ -128,7 +129,7 @@ public class SearchActivity extends AppCompatActivity {
                         mCursor.moveToPosition(i);
                         list.add(mCursor.getLong(mIdIndex));
                     }
-                    Utility.mPlayingList = list;
+                    DBUtil.mPlayingList = list;
 //                    MainActivity.mInstance.getService().UpdateNextSong(position);
                 }
             }

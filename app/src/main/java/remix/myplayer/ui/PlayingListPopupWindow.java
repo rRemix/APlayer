@@ -14,7 +14,7 @@ import android.widget.ListView;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.PlayingAdapter;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -53,9 +53,9 @@ public class PlayingListPopupWindow extends Activity {
     {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Intent intent = new Intent(Utility.CTL_ACTION);
+            Intent intent = new Intent(Constants.CTL_ACTION);
             Bundle arg = new Bundle();
-            arg.putInt("Control", Utility.PLAYSELECTEDSONG);
+            arg.putInt("Control", Constants.PLAYSELECTEDSONG);
             arg.putInt("Position", position);
             intent.putExtras(arg);
             sendBroadcast(intent);

@@ -2,7 +2,6 @@ package remix.myplayer.fragments;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
@@ -21,7 +20,7 @@ import remix.myplayer.R;
 import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.adapters.ArtistRecycleAdapter;
 import remix.myplayer.listeners.OnItemClickListener;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
 
 /**
  * Created by Remix on 2015/12/22.
@@ -49,7 +48,7 @@ public class ArtistRecycleFragment extends Fragment implements LoaderManager.Loa
                     Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
                     intent.putExtra("Id", artistid);
                     intent.putExtra("Title", title);
-                    intent.putExtra("Type", Utility.ARTIST_HOLDER);
+                    intent.putExtra("Type", Constants.ARTIST_HOLDER);
                     startActivity(intent);
                 }
             }

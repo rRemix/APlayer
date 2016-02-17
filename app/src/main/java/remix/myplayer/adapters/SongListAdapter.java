@@ -17,7 +17,8 @@ import remix.myplayer.R;
 import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.ui.CircleImageView;
 import remix.myplayer.ui.SelectedPopupWindow;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.CommonUtil;
+import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -89,7 +90,7 @@ public class SongListAdapter extends SimpleCursorAdapter {
         }
         @Override
         protected Bitmap doInBackground(Integer... params) {
-            return Utility.CheckBitmapBySongId(params[0],true);
+            return DBUtil.CheckBitmapBySongId(params[0],true);
         }
 
         @Override

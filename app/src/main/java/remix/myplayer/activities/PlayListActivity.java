@@ -1,10 +1,8 @@
 package remix.myplayer.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,24 +13,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.PlayListAdapter;
 import remix.myplayer.ui.TimerPopupWindow;
+import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DensityUtil;
 import remix.myplayer.utils.PlayListItem;
-import remix.myplayer.utils.Utility;
 import remix.myplayer.utils.XmlUtil;
 
 /**
@@ -68,7 +61,7 @@ public class PlayListActivity extends AppCompatActivity{
                 Intent intent = new Intent(PlayListActivity.this, ChildHolderActivity.class);
                 intent.putExtra("Id", position);
                 intent.putExtra("Title", name);
-                intent.putExtra("Type", Utility.PLAYLIST_HOLDER);
+                intent.putExtra("Type", Constants.PLAYLIST_HOLDER);
                 startActivity(intent);
             }
 

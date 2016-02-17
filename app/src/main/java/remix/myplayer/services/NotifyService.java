@@ -12,7 +12,6 @@ import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.service.notification.StatusBarNotification;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -20,7 +19,9 @@ import android.widget.RemoteViews;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
-import remix.myplayer.utils.Utility;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.MP3Info;
 
 /**
  * Created by Remix on 2016/2/16.
@@ -28,7 +29,7 @@ import remix.myplayer.utils.Utility;
 public class NotifyService extends Service {
     private NotifyReceiver mNotifyReceiver;
     public static NotifyService mInstance;
-
+    private Context mContext;
 //    @Override
 //    public int onStartCommand(Intent intent, int flags, int startId) {
 //        return super.onStartCommand(intent, flags, startId);
@@ -37,11 +38,12 @@ public class NotifyService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext = getApplicationContext();
         mInstance = this;
         mNotifyReceiver = new NotifyReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-        filter.addAction(Utility.NOTIFY);
+        filter.addAction(Constants.NOTIFY);
         registerReceiver(mNotifyReceiver,filter);
     }
     @Override
@@ -55,42 +57,65 @@ public class NotifyService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+    public void UpdateNotify(){
+        mNotifyReceiver.UpdateNotify();
+    }
+
 
     class NotifyReceiver extends BroadcastReceiver {
         private Handler mHandler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
-                super.handleMessage(msg);
+                UpdateNotify();
             }
         };
         private RemoteViews mRemoteView;
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(MusicService.getCurrentMP3() == null || !MusicService.getIsplay()) {
-                return;
-            }
-            mRemoteView = new RemoteViews(context.getPackageName(), R.layout.notify_playbar);
-            UpdateUI();
+            UpdateNotify();
+        }
 
-            Intent mButtonIntent = new Intent(Utility.CTL_ACTION);
-            mButtonIntent.putExtra("Control", Utility.PLAY);
-            PendingIntent mIntent_Play = PendingIntent.getBroadcast(context,1,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        private void UpdateNotify() {
+            mRemoteView = new RemoteViews(mContext.getPackageName(), R.layout.notify_playbar);
+            MP3Info temp = MusicService.getCurrentMP3();
+            if(temp == null)
+                return;
+            //设置歌手，歌曲名
+            mRemoteView.setTextViewText(R.id.notify_song, temp.getDisplayname());
+            mRemoteView.setTextViewText(R.id.notify_artist, temp.getArtist());
+            //设置封面
+            Bitmap bitmap = DBUtil.CheckBitmapBySongId((int) temp.getId(), true);
+            if(bitmap != null)
+                mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
+            else
+                mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.default_recommend);
+            //设置播放按钮
+            if(!MusicService.getIsplay()){
+                mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_play_nor);
+            }else{
+                mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_pause_nor);
+            }
+
+            Intent mButtonIntent = new Intent(Constants.CTL_ACTION);
+            mButtonIntent.putExtra("FromNotify", true);
+            mButtonIntent.putExtra("Control", Constants.PLAY);
+            PendingIntent mIntent_Play = PendingIntent.getBroadcast(mContext,1,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
             mRemoteView.setOnClickPendingIntent(R.id.notify_play,mIntent_Play);
 
-            mButtonIntent.putExtra("Control",Utility.NEXT);
-            PendingIntent mIntent_Next = PendingIntent.getBroadcast(context,2,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+            mButtonIntent.putExtra("Control", Constants.NEXT);
+            PendingIntent mIntent_Next = PendingIntent.getBroadcast(mContext,2,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
             mRemoteView.setOnClickPendingIntent(R.id.notify_next,mIntent_Next);
 
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext)
                     .setContent(mRemoteView)
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
                     .setOngoing(true)
                     .setSmallIcon(R.drawable.app_icon);
 
-            Intent result = new Intent(context,AudioHolderActivity.class);
+            Intent result = new Intent(mContext,AudioHolderActivity.class);
 
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
             stackBuilder.addParentStack(AudioHolderActivity.class);
             stackBuilder.addNextIntent(result);
             stackBuilder.editIntentAt(1).putExtra("Notify", true);
@@ -103,29 +128,9 @@ public class NotifyService extends Service {
                     );
 
             mBuilder.setContentIntent(resultPendingIntent);
-
             NotificationManager mNotificationManager =
-                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(0, mBuilder.build());
-
-        }
-
-        private void UpdateUI() {
-            //设置歌手，歌曲名
-            mRemoteView.setTextViewText(R.id.notify_song, MusicService.getCurrentMP3().getDisplayname());
-            mRemoteView.setTextViewText(R.id.notify_artist, MusicService.getCurrentMP3().getArtist());
-            //设置封面
-            Bitmap bitmap = Utility.CheckBitmapBySongId((int) MusicService.getCurrentMP3().getId(), true);
-            if(bitmap != null)
-                mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
-            else
-                mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.default_recommend);
-            //设置播放按钮
-            if(!MusicService.getIsplay()){
-                mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_play_nor);
-            }else{
-                mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_pause_nor);
-            }
         }
     }
 
