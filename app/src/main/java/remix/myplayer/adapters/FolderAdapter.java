@@ -12,6 +12,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+
 import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;
 import remix.myplayer.listeners.PopupListener;
@@ -35,9 +38,9 @@ public class FolderAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if(DBUtil.mFolderList == null)
+        if(DBUtil.mFolderMap == null)
             return 0;
-        return DBUtil.mFolderList.size();
+        return DBUtil.mFolderMap.size();
     }
 
     @Override
@@ -53,46 +56,39 @@ public class FolderAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View ItemView = mInflater.inflate(R.layout.folder_item,null);
-        TextView name = (TextView)ItemView.findViewById(R.id.folder_name);
-        TextView num = (TextView)ItemView.findViewById(R.id.folder_num);
-        TextView path = (TextView)ItemView.findViewById(R.id.folder_path);
+        TextView mNameView = (TextView)ItemView.findViewById(R.id.folder_name);
+        TextView mNumView = (TextView)ItemView.findViewById(R.id.folder_num);
+        TextView mPathView = (TextView)ItemView.findViewById(R.id.folder_path);
         final ImageView button = (ImageView)ItemView.findViewById(R.id.folder_button);
-        if(DBUtil.mFolderList == null || DBUtil.mFolderList.size() < 0)
+
+        if(DBUtil.mFolderMap == null || DBUtil.mFolderMap.size() < 0)
             return ItemView;
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final PopupMenu popupMenu = new PopupMenu(mContext,button);
-                MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
-                        position,
-                        Constants.FOLDER_HOLDER,
-                        DBUtil.mFolderList.get(position)));
-                popupMenu.setGravity(Gravity.END );
-                popupMenu.show();
-            }
-        });
-        Cursor cursor = null;
-        try
-        {
-            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{MediaStore.Video.Media.BUCKET_DISPLAY_NAME,MediaStore.Audio.Media.DATA},
-                    MediaStore.Video.Media.BUCKET_DISPLAY_NAME + "=?",
-                    new String[]{DBUtil.mFolderList.get(position)},null);
+        Iterator it = DBUtil.mFolderMap.keySet().iterator();
+        String full_path = null;
+        for(int i = 0 ; i <= position ; i++)
+            full_path = it.next().toString();
+
+
+        if(full_path != null){
+            mNameView.setText(full_path.substring(full_path.lastIndexOf("/")+ 1,full_path.length()));
+            mPathView.setText(full_path);
+            mNumView.setText(DBUtil.mFolderMap.get(full_path).size()+ "首");
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        cursor.moveToFirst();
-        if(cursor != null && cursor.getCount() > 0)
-        {
-            name.setText(cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)));
-            String displayname  = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-            path.setText(displayname.substring(0,displayname.lastIndexOf("/")));
-            num.setText(String.valueOf(cursor.getCount()) + "首");
-        }
-        cursor.close();
+
+//        button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                final PopupMenu popupMenu = new PopupMenu(mContext,button);
+//                MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
+//                popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
+//                        position,
+//                        Constants.FOLDER_HOLDER,
+//                        DBUtil.mFolderList.get(position)));
+//                popupMenu.setGravity(Gravity.END );
+//                popupMenu.show();
+//            }
+//        });
+
         return ItemView;
     }
 

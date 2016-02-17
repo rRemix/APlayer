@@ -300,10 +300,10 @@ public class MusicService extends Service {
                     mCurrent = intent.getIntExtra("Position", -1);
                     if(mCurrent == -1)
                         return;
-                    if(mCurrent > DBUtil.mPlayingList.size() - 1){
-                        Toast.makeText(context,"请先添加歌曲到该播放列表",Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+//                    if(mCurrent > DBUtil.mPlayingList.size() - 1){
+//                        Toast.makeText(context,"请先添加歌曲到该播放列表",Toast.LENGTH_SHORT).show();
+//                        return;
+//                    }
                     mId = DBUtil.mPlayingList.get(mCurrent);
                     mInfo = DBUtil.getMP3InfoById(mId);
                     if(mInfo == null)

@@ -47,7 +47,6 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
         //绑定控制播放的service;
         MusicService.addCallback(ChildHolderActivity.this);
 
-
         mId = getIntent().getIntExtra("Id",-1);
         int type = getIntent().getIntExtra("Type",-1);
         String Title = getIntent().getStringExtra("Title");
@@ -63,9 +62,11 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
                     mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST_HOLDER);
                     break;
                 case Constants.FOLDER_HOLDER:
-                    String bucket_display_name = DBUtil.mFolderList.get(mId);
-                    mInfoList = DBUtil.getMP3ListByFolder(bucket_display_name);
-                    Title = bucket_display_name;
+                    mInfoList = DBUtil.getMP3ListByIds(DBUtil.mFolderMap.get(Title));
+                    Title = Title.substring(Title.lastIndexOf("/")+ 1,Title.length());
+//                    String bucket_display_name = DBUtil.mFolderList.get(mId);
+//                    mInfoList = DBUtil.getMP3ListByFolder(bucket_display_name);
+//                    Title = bucket_display_name;
                     break;
                 case Constants.PLAYLIST_HOLDER:
                     ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(Title);
@@ -76,7 +77,7 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
                     break;
             }
         }
-        if(mInfoList == null)
+        if(mInfoList == null || mInfoList.size() == 0)
             return;
         setContentView(R.layout.child_holder);
         mListView = (ListView)findViewById(R.id.artist_album_holder_list);

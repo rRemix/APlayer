@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
@@ -26,10 +27,12 @@ import remix.myplayer.infos.MP3Info;
  * Created by taeja on 16-2-17.
  */
 public class DBUtil {
+    private static final String TAG = "DBUtil";
     public static ArrayList<Long> mAllSongList = new ArrayList<>();
     public static ArrayList<Long> mPlayingList = new ArrayList<>();
     public static Map<String,LinkedList<Long>> mFolderMap = new HashMap<>();
     public static ArrayList<String> mFolderList = new ArrayList<>();
+
     private static Context mContext;
     public static void setContext(Context context){
         mContext = context;
@@ -45,23 +48,47 @@ public class DBUtil {
         ArrayList<Long> mAllSongList = new ArrayList<>();
         //查询sd卡上所有音乐文件信息，过滤小于800k的
         ContentResolver resolver = mContext.getContentResolver();
-        Cursor cursor = resolver.query(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA,MediaStore.Video.Media.BUCKET_DISPLAY_NAME},
-                MediaStore.Audio.Media.SIZE + ">80000", null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-
-        while (cursor.moveToNext()) {
-            long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-            if (id > 0)
-                mAllSongList.add(Long.valueOf(id));
-            String buckey_display_name = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME));
-            SortWithFolder(buckey_display_name);
+        Cursor cursor = null;
+        try{
+            cursor = resolver.query(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA},
+                    MediaStore.Audio.Media.SIZE + ">80000", null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        Collections.sort(mFolderList);
+
+        try {
+            Cursor cursor1 = resolver.query(
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                    null,
+                    null, null, null);
+            if(cursor1 != null){
+                cursor1.moveToFirst();
+                for(int i = 0 ; i < cursor1.getColumnCount() ;i++){
+                    Log.d(TAG,cursor1.getColumnName(i));
+                    Log.d(TAG,cursor1.getString(i));
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+        if(cursor != null) {
+            while (cursor.moveToNext()) {
+                long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+                if (id > 0)
+                    mAllSongList.add(id);
+                String full_path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                SortWithFolder(id,full_path);
+//                String buckey_display_name = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME));
+//                SortWithFolder(buckey_display_name);
+            }
+        }
         cursor.close();
-        if (mAllSongList.size() > 0)
-            return mAllSongList;
-        return null;
+        return mAllSongList.size() > 0 ? mAllSongList : null;
+
     }
 
     //将歌曲按文件夹分类
@@ -77,12 +104,10 @@ public class DBUtil {
         }
     }
     //获得所有文件夹
-    public static void SortWithFolder(String path)
-    {
+    public static void SortWithFolder(String path) {
         if(!mFolderList.contains(path))
             mFolderList.add(path);
     }
-
     /*
     type 0:专辑 1:歌手
     flag 是否需要完整信息
