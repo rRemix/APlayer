@@ -26,6 +26,7 @@ public class AddPopupWindow extends Activity {
     private PlayListAddtoAdapter mAdapter;
     private String mSongName;
     private int mId;
+    private int mAlbumId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +34,7 @@ public class AddPopupWindow extends Activity {
 
         mSongName = getIntent().getExtras().getString("SongName");
         mId = (int)getIntent().getExtras().getLong("Id");
+        mAlbumId = (int)getIntent().getExtras().getLong("AlbumId");
         //改变高度，并置于底部
         Window w = getWindow();
         WindowManager wm = getWindowManager();
@@ -54,7 +56,7 @@ public class AddPopupWindow extends Activity {
                 TextView textView = (TextView)view.findViewById(R.id.playlist_addto_text);
                 String playlist = textView.getText().toString();
                 if(playlist != null && mSongName != null && mId > 0) {
-                    XmlUtil.addSong(playlist, mSongName,mId);
+                    XmlUtil.addSong(playlist, mSongName,mId,mAlbumId);
                     Toast.makeText(AddPopupWindow.this,"添加成功", Toast.LENGTH_SHORT).show();
                 }
                 else

@@ -1,5 +1,6 @@
 package remix.myplayer.adapters;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.Animatable;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.controller.ControllerListener;
@@ -63,7 +65,8 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
         @Override
         protected Object doInBackground(Integer... params) {
 //            return CommonUtil.CheckBitmapByAlbumId(params[0],true);
-            return DBUtil.CheckUrlByAlbumId(params[0]);
+            return DBUtil.getImageUrl(String.valueOf(params[0]),Constants.URL_ALBUM);
+//            return DBUtil.CheckUrlByAlbumId(params[0]);
         }
         @Override
         protected void onPostExecute(Object url) {
@@ -71,7 +74,6 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
             if(url != null && mImage != null);{
                 mImage.setImageURI(uri);
             }
-
         }
     }
 
@@ -87,11 +89,10 @@ public class AlbumRecycleAdater extends RecyclerView.Adapter<AlbumRecycleAdater.
         {
             holder.mText1.setText(mCursor.getString(AlbumRecyleFragment.mAlbumIndex));
             holder.mText2.setText(mCursor.getString(AlbumRecyleFragment.mArtistIndex));
-
-            AsynLoadImage task = new AsynLoadImage(holder.mImage);
+//            AsynLoadImage task = new AsynLoadImage(holder.mImage);
 //            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex));
-            task.execute(mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex));
-//            holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex)));
+//            task.execute(mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex));
+            holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex)));
             if(mOnItemClickLitener != null)
             {
                 holder.mImage.setOnClickListener(new View.OnClickListener() {

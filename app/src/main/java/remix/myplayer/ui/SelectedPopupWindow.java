@@ -76,6 +76,7 @@ public class SelectedPopupWindow extends Activity {
                 Bundle arg = new Bundle();
                 arg.putString("SongName",mInfo.getDisplayname());
                 arg.putLong("Id",mInfo.getId());
+                arg.putLong("AlbumId",mInfo.getAlbumId());
                 intent.putExtras(arg);
                 startActivity(intent);
                 finish();

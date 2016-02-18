@@ -39,19 +39,18 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
         ArrayList<MP3Info> list = new ArrayList<>();
         ArrayList<Long> ids = new ArrayList<Long>();
         String name = null;
-        if(mType <= Constants.ARTIST_HOLDER) {
+        if(mType == Constants.ARTIST_HOLDER || mType == Constants.ALBUM_HOLDER) {
             list = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, mType);
             for(MP3Info info : list)
                 ids.add(info.getId());
         }
-        else if(mType == Constants.FOLDER_HOLDER)
-        {
-            list = DBUtil.getMP3ListByFolder(DBUtil.mFolderList.get(mId));
+        else if(mType == Constants.FOLDER_HOLDER) {
+//            list = DBUtil.getMP3ListByFolder(DBUtil.mFolderList.get(mId));
+            list = DBUtil.getMP3ListByIds(DBUtil.getIdsByFolderName(mKey,mId));
             for(MP3Info info : list)
                 ids.add(info.getId());
         }
-        else
-        {
+        else {
             Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
             for(int i = 0 ; i <= mId ; i++) {
                 it.hasNext();

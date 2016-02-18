@@ -27,7 +27,7 @@
             android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:lines="1"
-            android:ellipsize="start"
+            android:ellipsize="end"
             android:id="@+id/folder_path"
             android:textSize="10dp"
             android:text="路径"

@@ -5,10 +5,16 @@ package remix.myplayer.utils;
  */
 public class Constants {
     //删除选项
-    public final static int DELETE_SINGLE = 4;
-    public final static int DELETE_ALBUM = 0;
-    public final static int DELETE_ARTIST = 1;
-    public final static int DELETE_FOLDER = 2;
+    public final static int DELETE_SINGLE = 0;
+    public final static int DELETE_ALBUM = 1;
+    public final static int DELETE_ARTIST = 2;
+    public final static int DELETE_FOLDER = 3;
+    //启动哪一个fragment
+    public final static int PLAYLIST_HOLDER = 0;
+    public final static int ALBUM_HOLDER = 1;
+    public final static int ARTIST_HOLDER = 2;
+    public final static int FOLDER_HOLDER = 3;
+
     public final static String CTL_ACTION = "remix.music.CTL_ACTION";
     public final static String UPDATE_ACTION = "remix.music.UPDATE_ACTION";
     public final static String CONTROL_TIMER = "remix.music.CONTROL_TIMER";
@@ -36,11 +42,7 @@ public class Constants {
     public final static int UPDATE_INFORMATION = 0x101;
     //更新背景
     public final static int UPDATE_BG = 0x102;
-    //启动哪一个子fragment
-    public final static int ALBUM_HOLDER = 0;
-    public final static int ARTIST_HOLDER = 1;
-    public final static int FOLDER_HOLDER = 2;
-    public final static int PLAYLIST_HOLDER = 3;
+
     //腾讯Api Id
     public final static String TECENT_APIID = "1105030910";
     //微博Api Id

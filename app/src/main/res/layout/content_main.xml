@@ -1,29 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
     <!-- 主内容-->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/container"
-        android:orientation="vertical"
-        android:background="@drawable/menu_bg">
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#fef2f3f9"
-            android:id="@+id/main_fragment_container">
-        </FrameLayout>
-        <!-- 底部自定义ationbar -->
-        <fragment android:name="remix.myplayer.fragments.BottomActionBarFragment"
-            android:layout_gravity="bottom"
-            android:layout_below="@id/main_fragment_container"
-            android:id="@+id/bottom_actionbar_new"
-            android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:layout_alignParentBottom="true"/>
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:background="#fef2f3f9"
+        android:id="@+id/main_fragment_container">
     </FrameLayout>
+    <!-- 底部自定义ationbar -->
+    <fragment android:name="remix.myplayer.fragments.BottomActionBarFragment"
+        android:id="@+id/bottom_actionbar_new"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
 
-</RelativeLayout>
+</LinearLayout>

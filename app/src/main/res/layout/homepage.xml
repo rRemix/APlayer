@@ -46,8 +46,8 @@
     <!--中间四个fragment-->
     <remix.myplayer.ui.MyPager
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="10"
+        android:layout_height="match_parent"
+
         android:background="#fff"
         android:id="@+id/ViewPager" />
 

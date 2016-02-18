@@ -13,6 +13,7 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -297,5 +298,11 @@ public class CommonUtil {
         return false;
     }
 
+    public static boolean deleteFile(String path){
+        File file = new File(path);
+        if(file.exists())
+            return file.delete();
+        return false;
+    }
 
 }

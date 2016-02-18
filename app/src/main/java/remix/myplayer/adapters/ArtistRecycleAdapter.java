@@ -1,10 +1,12 @@
 package remix.myplayer.adapters;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -83,8 +85,13 @@ public class ArtistRecycleAdapter extends RecyclerView.Adapter<ArtistRecycleAdap
         {
             holder.mText1.setText(mCursor.getString(ArtistRecycleFragment.mArtistIndex));
             AsynLoadImage task = new AsynLoadImage(holder.mImage);
-//            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,mCursor.getInt(AlbumRecyleFragment.mAlbumIdIndex));
-            task.execute(mCursor.getString(ArtistRecycleFragment.mArtistIndex));
+//            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,mCursor.getString(ArtistRecycleFragment.mArtistIdIndex));
+            task.execute(mCursor.getString(ArtistRecycleFragment.mArtistIdIndex));
+//
+
+//            String path = DBUtil.getImageUrl(mCursor.getString(ArtistRecycleFragment.mArtistIdIndex), Constants.URL_ARTIST);
+//            Uri uri = Uri.parse("file:///" + path);
+//            holder.mImage.setImageURI(uri);
             if(mOnItemClickLitener != null)
             {
                 holder.mImage.setOnClickListener(new View.OnClickListener() {

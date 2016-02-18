@@ -66,7 +66,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         if(list != null && list.size() > 0)
         {
             AsynLoadImage task = new AsynLoadImage(holder.mImage);
-            task.execute(list.get(0).getmSongame());
+            task.execute(list.get(0).getAlbumId());
         }
 
         if(mOnItemClickLitener != null)
@@ -111,7 +111,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         }
     }
 
-    class AsynLoadImage extends AsyncTask<String,Integer,String>
+    class AsynLoadImage extends AsyncTask<Integer,Integer,String>
     {
         private final SimpleDraweeView mImage;
         public AsynLoadImage(SimpleDraweeView imageView)
@@ -119,8 +119,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             mImage = imageView;
         }
         @Override
-        protected String doInBackground(String... params) {
-            return DBUtil.getImageUrl(params[0], Constants.URL_NAME);
+        protected String doInBackground(Integer... params) {
+            return DBUtil.getImageUrl(params[0] + "", Constants.URL_ALBUM);
         }
         @Override
         protected void onPostExecute(String url) {

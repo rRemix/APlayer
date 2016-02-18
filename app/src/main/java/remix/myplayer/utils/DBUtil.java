@@ -1,7 +1,9 @@
 package remix.myplayer.utils;
 
+import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -9,18 +11,22 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
 import remix.myplayer.adapters.FolderAdapter;
+import remix.myplayer.fragments.ArtistRecycleFragment;
 import remix.myplayer.infos.MP3Info;
 
 /**
@@ -49,7 +55,21 @@ public class DBUtil {
         //查询sd卡上所有音乐文件信息，过滤小于800k的
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
+
         try{
+//            cursor = resolver.query(
+//                    MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+//                    null,
+//                    null, null, null);
+//            if(cursor != null){
+//                cursor.moveToFirst();
+//                cursor.moveToPosition(3);
+//                for (int i = 0 ; i < cursor.getColumnCount() ; i++){
+//                    Log.d("DBUtil","name=" + cursor.getColumnName(i));
+//                    Log.d("DBUtil","value=" + cursor.getString(i));
+//                }
+//            }
+
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA},
@@ -59,36 +79,37 @@ public class DBUtil {
         }
 
         try {
-            Cursor cursor1 = resolver.query(
-                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                    null,
-                    null, null, null);
-            if(cursor1 != null){
-                cursor1.moveToFirst();
-                for(int i = 0 ; i < cursor1.getColumnCount() ;i++){
-                    Log.d(TAG,cursor1.getColumnName(i));
-                    Log.d(TAG,cursor1.getString(i));
+            if(cursor != null) {
+                DBUtil.mFolderMap.clear();
+                while (cursor.moveToNext()) {
+                    long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+                    if (id > 0)
+                        mAllSongList.add(id);
+                    String full_path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                    SortWithFolder(id,full_path);
                 }
+                cursor.close();
             }
         }catch (Exception e){
             e.printStackTrace();
         }
 
 
-        if(cursor != null) {
-            while (cursor.moveToNext()) {
-                long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-                if (id > 0)
-                    mAllSongList.add(id);
-                String full_path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                SortWithFolder(id,full_path);
-//                String buckey_display_name = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.BUCKET_DISPLAY_NAME));
-//                SortWithFolder(buckey_display_name);
-            }
-        }
-        cursor.close();
+
+
+
+
         return mAllSongList.size() > 0 ? mAllSongList : null;
 
+    }
+
+    //根据文件夹名字获得所有歌曲id
+    public static LinkedList<Long> getIdsByFolderName(String foldername,int position){
+        Iterator it = DBUtil.mFolderMap.keySet().iterator();
+        String full_path = null;
+        for(int i = 0 ; i <= position ; i++)
+            full_path = it.next().toString();
+        return (LinkedList)DBUtil.mFolderMap.get(full_path);
     }
 
     //将歌曲按文件夹分类
@@ -167,6 +188,7 @@ public class DBUtil {
 //    }
 
 
+
     //根据参数获得图片url
     // 0:专辑id 1:歌手id 2:歌曲id 3:歌曲名
 
@@ -176,35 +198,38 @@ public class DBUtil {
             return null;
 
         ContentResolver resolver = mContext.getContentResolver();
-        boolean mFlag = false;
         Cursor cursor = null;
         String selection = null;
         String[] selectionArg = null;
-        Long id = 0L;
+
         switch (type)
         {
             case Constants.URL_ARTIST:
-                selection = MediaStore.Audio.Media.ARTIST + "=?";
+                selection = MediaStore.Audio.Media.ARTIST_ID + "=" + arg;
+                selectionArg = null;
                 break;
             case Constants.URL_SONGID:
-                selection = MediaStore.Audio.Media._ID + "=?";
+                selection = MediaStore.Audio.Media._ID + "=" + arg;
+                selectionArg = null;
                 break;
             case Constants.URL_NAME:
                 selection = MediaStore.Audio.Media.TITLE + "=?";
+                selectionArg = new String[]{arg};
                 break;
-            default:
-                mFlag = true;
+            case Constants.URL_ALBUM:
+                selection = MediaStore.Audio.Albums._ID + "=" + arg;
+                selectionArg = null;
         }
         try {
-            if(mFlag)
-                return CheckUrlByAlbumId(Long.valueOf(arg));
-            cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,new String[]{MediaStore.Audio.Media.ALBUM_ID},
-                    selection,new String[]{arg},null);
+            String album_art = null;
+
+            cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,new String[]{MediaStore.Audio.Albums.ALBUM_ART},
+                    selection,selectionArg,null);
             if(cursor != null && cursor.moveToFirst()) {
-                id = Long.valueOf(cursor.getString(0));
+                album_art = cursor.getString(0);
                 cursor.close();
             }
-            return CheckUrlByAlbumId(id);
+            return album_art;
         }
         catch (Exception e){
             e.printStackTrace();
@@ -214,27 +239,7 @@ public class DBUtil {
                 cursor.close();
         }
         return null;
-//        try {
-//            return CheckUrlByAlbumId(1);
-//            cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.AlbumColumns.ALBUM_ART,MediaStore.Audio.AlbumColumns.ALBUM},
-//                    selection,selectionArg
-//                    , null);
-//            if(cursor != null && cursor.getCount() > 0)
-//            {
-//                int index = cursor.getColumnIndex("album_art");
-//                cursor.moveToNext();
-//                url = cursor.getString(0);
-//                album = cursor.getString(1);
-//            }
-//        }
-//        catch (Exception e){
-//            e.printStackTrace();
-//        }
-//        finally {
-//            if(cursor != null)
-//                cursor.close();
-//        }
-//        return url;
+
     }
 
     //根据专辑id查询图片url
@@ -416,11 +421,17 @@ public class DBUtil {
     //删除某一首歌曲
     public static boolean deleteSong(String data,int type)
     {
+
         ContentResolver resolver = mContext.getContentResolver();
         String where = null;
         String[] arg = null;
-        switch (type)
-        {
+        ArrayList<String> datas = new ArrayList<>();
+        LinkedList<Long> list = DBUtil.mFolderMap.get(data);
+        int ret = 0;
+        boolean ret2 = false;
+
+        //删除sd卡上文件
+        switch (type) {
             case Constants.DELETE_SINGLE:
                 where = new String(MediaStore.MediaColumns.DATA + "=?");
                 arg = new String[]{data};
@@ -434,29 +445,69 @@ public class DBUtil {
                 arg = new String[]{data};
                 break;
             case Constants.DELETE_FOLDER:
-                where = new String(MediaStore.Video.Media.BUCKET_DISPLAY_NAME + "=?");
-                arg = new String[]{data};
+                where = MediaStore.Audio.Media._ID + "=?";
                 break;
         }
-        if(!(where != null && arg != null))
-            return false;
-        try {
-            int ret = resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,where,arg);
-            if(ret > 0) {
-                //删除播放列表与全部歌曲列表中该歌曲
-                mAllSongList = mPlayingList = getAllSongsId();
-                //通知适配器刷新
-                mFolderList.remove(data);
-                if(FolderAdapter.mInstance != null)
-                    FolderAdapter.mInstance.notifyDataSetChanged();
-                return true;
+        Cursor cursor = null;
+        if(type != Constants.DELETE_FOLDER) {
+            try {
+                cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.Media.DATA},
+                        where, arg, null);
+                if (cursor != null) {
+                    while (cursor.moveToNext()) {
+                        String path = cursor.getString(0);
+                        ret2 = CommonUtil.deleteFile(path);
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                if(cursor != null)
+                    cursor.close();
+            }
+
+        }
+        else {
+            try {
+                for(int i = 0 ; i < list.size() ;i++){
+                    cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.Media.DATA},
+                            where, new String[]{String.valueOf(list.get(i))}, null);
+                    if(cursor != null && cursor.moveToFirst()){
+                        String path = cursor.getString(0);
+                        ret2 = CommonUtil.deleteFile(path);
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                if(cursor != null)
+                    cursor.close();
+            }
+
+        }
+
+        //删除mediastore中记录
+        if(type != Constants.DELETE_FOLDER) {
+            ret = resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, where, arg);
+        }else {
+            list = DBUtil.mFolderMap.get(data);
+            if (list == null)
+                return false;
+            where = MediaStore.Audio.Media._ID + "=?";
+            for (Long id : list) {
+                ret += resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, where,
+                        new String[]{String.valueOf(id)});
             }
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+        if (ret > 0) {
+            //删除播放列表与全部歌曲列表中该歌曲
+            mAllSongList = getAllSongsId();
+            mPlayingList = XmlUtil.getPlayingList();
+//            DBUtil.mFolderMap.remove(data);
+            if (FolderAdapter.mInstance != null)
+                FolderAdapter.mInstance.notifyDataSetChanged();
         }
-        return false;
+        return ret > 0 && ret2;
     }
 
     //压缩图片用于分享
@@ -466,16 +517,13 @@ public class DBUtil {
         if (needRecycle) {
             bmp.recycle();
         }
-
         byte[] result = output.toByteArray();
         try {
             output.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return result;
     }
-
 
 }

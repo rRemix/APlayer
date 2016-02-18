@@ -64,30 +64,29 @@ public class FolderAdapter extends BaseAdapter {
         if(DBUtil.mFolderMap == null || DBUtil.mFolderMap.size() < 0)
             return ItemView;
         Iterator it = DBUtil.mFolderMap.keySet().iterator();
-        String full_path = null;
+        String temp = null;
         for(int i = 0 ; i <= position ; i++)
-            full_path = it.next().toString();
+            temp = it.next().toString();
 
-
-        if(full_path != null){
-            mNameView.setText(full_path.substring(full_path.lastIndexOf("/")+ 1,full_path.length()));
-            mPathView.setText(full_path);
-            mNumView.setText(DBUtil.mFolderMap.get(full_path).size()+ "首");
+        if(temp != null){
+            mNameView.setText(temp.substring(temp.lastIndexOf("/")+ 1,temp.length()));
+            mPathView.setText(temp);
+            mNumView.setText(DBUtil.mFolderMap.get(temp).size()+ "首");
         }
-
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                final PopupMenu popupMenu = new PopupMenu(mContext,button);
-//                MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
-//                popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
-//                        position,
-//                        Constants.FOLDER_HOLDER,
-//                        DBUtil.mFolderList.get(position)));
-//                popupMenu.setGravity(Gravity.END );
-//                popupMenu.show();
-//            }
-//        });
+        final String full_path = temp;
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final PopupMenu popupMenu = new PopupMenu(mContext,button);
+                MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
+                        position,
+                        Constants.FOLDER_HOLDER,
+                        full_path));
+                popupMenu.setGravity(Gravity.END );
+                popupMenu.show();
+            }
+        });
 
         return ItemView;
     }

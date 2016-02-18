@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         try {
             DBUtil.mPlayingList = task1.get();
             if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size()  == 0)
-                DBUtil.mPlayingList = (ArrayList<Long>)task1.get().clone();
+                DBUtil.mPlayingList = (ArrayList<Long>)task.get().clone();
         } catch (Exception e) {
             e.printStackTrace();
         }
