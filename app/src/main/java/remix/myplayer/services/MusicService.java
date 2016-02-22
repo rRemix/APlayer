@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
@@ -52,38 +53,31 @@ public class MusicService extends Service {
     //回调接口的集合
     private static List<Callback> mCallBacklist  = new ArrayList<Callback>(){};;
     private static Context context;
-    private NotifyReceiver mNotifyReceiver;
+    private PlayerReceiver mRecevier;
     private static Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg)
         {
-            if(msg.what == Constants.UPDATE_INFORMATION)
-            {
+            if(msg.what == Constants.UPDATE_INFORMATION) {
                 if(mCallBacklist != null)
                     System.out.println(mCallBacklist);
                     //遍历集合，通知所有的实现类，即activity
-                for (int i = 0; i < mCallBacklist.size(); i++)
-                {
+                for (int i = 0; i < mCallBacklist.size(); i++) {
                     if(mCallBacklist.get(i) != null)
-                        try
-                        {
+                        try {
                             mCallBacklist.get(i).UpdateUI(mInfo,mIsplay);
-                        }
-                        catch (Exception e)
-                        {
+                        }catch (Exception e) {
                             e.printStackTrace();
                         }
                 }
             }
         }
     };
-
     public MusicService(){}
     public MusicService(Context context)
     {
         this.context = context;
     }
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -91,20 +85,21 @@ public class MusicService extends Service {
             mBinder = new PlayerBinder();
         return mBinder;
     }
-
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         mPlayer.release();
         mPlayer = null;
+//        unregisterReceiver(mRecevier);
     }
-
-
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+//        mRecevier = new PlayerReceiver();
+//        IntentFilter filter = new IntentFilter("remix.music.CTL_ACTION");
+//        registerReceiver(mRecevier,filter);
+
         int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mPos",-1);
         if(DBUtil.mPlayingList != null && DBUtil.mPlayingList.size() > 0) {
             mId = mPos == -1 ? DBUtil.mPlayingList.get(0) : DBUtil.mPlayingList.get(mPos);
@@ -117,16 +112,13 @@ public class MusicService extends Service {
 //        if(CommonUtil.mPlayingList.size() > 1)
 //            mNextInfo = CommonUtil.getMP3InfoById(CommonUtil.mPlayingList.get(1));
 
-
         mPlayer = new MediaPlayer();
         mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         //一定要先设置mediaplay的数据源
-//        try
-//        {
+//        try{
 //            if(mInfo != null)
 //                mPlayer.setDataSource(mInfo.getUrl());
-//        }
-//        catch (Exception e) {e.printStackTrace();}
+//        }catch (Exception e) {e.printStackTrace();}
 
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -151,16 +143,12 @@ public class MusicService extends Service {
         });
     }
 
-    public void UpdateBottomStatus(MP3Info info,boolean isPlaying)
-    {
+    public void UpdateBottomStatus(MP3Info info,boolean isPlaying) {
         BottomActionBarFragment fragment = BottomActionBarFragment.mInstance;
         fragment.UpdateBottomStatus(info, isPlaying);
     }
 
-
-
-    private static void Play(String Path)
-    {
+    private static void Play(String Path) {
         mIsplay = true;
         PrepareAndPlay(Path);
     }
@@ -172,13 +160,11 @@ public class MusicService extends Service {
     {
         PlayNextOrPrev(false,true);
     }
-    private static void PlayContinue()
-    {
+    private static void PlayContinue() {
         mIsplay = true;
         mPlayer.start();
     }
-    private static void PlayOrPause()
-    {
+    private static void PlayOrPause() {
         if(mPlayer.isPlaying())
             Pause();
         else
@@ -195,20 +181,15 @@ public class MusicService extends Service {
             mPlayer.start();
         }
     }
-    private static void Pause()
-    {
+    private static void Pause() {
         mIsplay = false;
         mPlayer.pause();
     }
-    private void Stop()
-    {
+    private void Stop() {
         mIsplay = false;
         mPlayer.stop();
     }
-
-
-    public class PlayerBinder extends Binder
-    {
+    public class PlayerBinder extends Binder {
         public MusicService getService() {
             return MusicService.this;
         }
@@ -225,17 +206,14 @@ public class MusicService extends Service {
         {
             PlayNextOrPrev(false,true);
         }
-        private void PlayContinue()
-        {
+        private void PlayContinue() {
             mIsplay = true;
             mPlayer.start();
         }
-        private void PlayOrPause()
-        {
+        private void PlayOrPause() {
             if(mPlayer.isPlaying())
                 Pause();
-            else
-            {
+            else {
                 mIsplay = true;
                 if(mFlag)
                 {
@@ -246,13 +224,11 @@ public class MusicService extends Service {
                 mPlayer.start();
             }
         }
-        private void Pause()
-        {
+        private void Pause() {
             mIsplay = false;
             mPlayer.pause();
         }
-        private void Stop()
-        {
+        private void Stop() {
             mIsplay = false;
             mPlayer.stop();
         }
@@ -265,8 +241,7 @@ public class MusicService extends Service {
         public int getType();
     }
     //添加回调接口的一个实现类
-    public static void addCallback(Callback callback)
-    {
+    public static void addCallback(Callback callback) {
         if(mCallBacklist.size() == 0)
             mCallBacklist.add(callback);
         else {
@@ -280,7 +255,6 @@ public class MusicService extends Service {
             mCallBacklist.add(callback);
         }
         System.out.println(mCallBacklist.toString());
-
     }
     //返回回调接口链表的长度
     public int getCallBackListSize()
@@ -292,6 +266,11 @@ public class MusicService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             int Control = intent.getIntExtra("Control",-1);
+            boolean FromNotify = intent.getBooleanExtra("FromNotify", false);
+            if(FromNotify){
+                NotifyService.mInstance.mHandler.sendEmptyMessage(0);
+//                sendBroadcast(new Intent(Constants.NOTIFY));
+            }
             switch (Control)
             {
                 //播放listview选中的歌曲
@@ -344,17 +323,12 @@ public class MusicService extends Service {
                 default:break;
             }
             handler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
-            boolean FromNotify = intent.getBooleanExtra("FromNotify",false);
-            if(FromNotify){
-                NotifyService.mInstance.UpdateNotify();
-            }
+
         }
     }
     //准备播放
-    private static void  PrepareAndPlay(String path)
-    {
-        try
-        {
+    private static void  PrepareAndPlay(String path) {
+        try {
 //            if(mFlag) {
 //                Intent intent = new Intent(CommonUtil.NOTIFY);
 //                MainActivity.mInstance.sendBroadcast(intent);
@@ -365,24 +339,20 @@ public class MusicService extends Service {
             mFlag = false;
             SharedPrefsUtil.putValue(MainActivity.mInstance,"setting","mPos",mCurrent);
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
     //根据当前播放列表的长度，得到一个随机数
-    private static int getShuffle()
-    {
+    private static int getShuffle(){
         if(DBUtil.mPlayingList.size() == 1)
             return 0;
         return new Random().nextInt(DBUtil.mPlayingList.size() - 1);
     }
     //根据当前播放模式，播放上一首或者下一首
-    public static void PlayNextOrPrev(boolean IsNext,boolean NeedPlay)
-    {
+    public static void PlayNextOrPrev(boolean IsNext,boolean NeedPlay){
         if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return;
-
         if(mPlayModel == Constants.PLAY_SHUFFLE) {
             mCurrent = getShuffle();
             mId = DBUtil.mPlayingList.get(mCurrent);
@@ -444,8 +414,7 @@ public class MusicService extends Service {
         return mInfo;
     }
     //获得当前播放进度
-    public static int getCurrentTime()
-    {
+    public static int getCurrentTime() {
         if(mPlayer != null)
             return mPlayer.getCurrentPosition();
         return -1;

@@ -38,7 +38,6 @@ import remix.myplayer.utils.DBUtil;
 public class AllSongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private LoaderManager mManager;
     private AllSongAdapter mAdapter;
-    private MusicService.PlayerReceiver mMusicReceiver;
     private int mPrev = -1;
     private Cursor mCursor = null;
     private ListView mListView = null;

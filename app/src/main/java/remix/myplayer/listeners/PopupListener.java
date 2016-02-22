@@ -33,7 +33,6 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
         this.mType = type;
         this.mKey = key;
     }
-
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         ArrayList<MP3Info> list = new ArrayList<>();

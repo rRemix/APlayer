@@ -19,8 +19,7 @@ public class CtrlButtonListener implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         Intent intent = new Intent(Constants.CTL_ACTION);
-        switch (v.getId())
-        {
+        switch (v.getId()) {
             case R.id.playbar_prev:
                 intent.putExtra("Control", Constants.PREV);
                 break;

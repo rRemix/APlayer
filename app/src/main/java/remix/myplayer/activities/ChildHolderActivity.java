@@ -37,7 +37,6 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     private TextView mNum;
     private TextView mTitle;
     private BottomActionBarFragment mActionbar;
-    private MusicService.PlayerReceiver mMusicReceiver;
     public static ChildHolderActivity mInstance = null;
 
     @Override

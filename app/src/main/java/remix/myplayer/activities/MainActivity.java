@@ -197,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             home.addCategory(Intent.CATEGORY_HOME);
             startActivity(home);
+            NotifyService.mIsPlay = MusicService.getIsplay();
             sendBroadcast(new Intent(Constants.NOTIFY));
         }
         return super.onKeyDown(keyCode, event);

@@ -16,27 +16,27 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
-
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
+import remix.myplayer.infos.MP3Info;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.infos.MP3Info;
-
 /**
  * Created by Remix on 2016/2/16.
  */
 public class NotifyService extends Service {
+    public Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            UpdateNotify();
+        }
+    };
     private NotifyReceiver mNotifyReceiver;
     public static NotifyService mInstance;
     private Context mContext;
-//    @Override
-//    public int onStartCommand(Intent intent, int flags, int startId) {
-//        return super.onStartCommand(intent, flags, startId);
-//    }
-
+    public static boolean mIsPlay = false;
     @Override
-    public void onCreate() {
+    public void onCreate(){
         super.onCreate();
         mContext = getApplicationContext();
         mInstance = this;
@@ -51,7 +51,6 @@ public class NotifyService extends Service {
         super.onDestroy();
         unregisterReceiver(mNotifyReceiver);
     }
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -60,21 +59,13 @@ public class NotifyService extends Service {
     public void UpdateNotify(){
         mNotifyReceiver.UpdateNotify();
     }
-
-
     class NotifyReceiver extends BroadcastReceiver {
-        private Handler mHandler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                UpdateNotify();
-            }
-        };
         private RemoteViews mRemoteView;
+
         @Override
         public void onReceive(Context context, Intent intent) {
             UpdateNotify();
         }
-
         private void UpdateNotify() {
             mRemoteView = new RemoteViews(mContext.getPackageName(), R.layout.notify_playbar);
             if(MusicService.getCurrentMP3() == null || !MusicService.getIsplay()) {
@@ -91,7 +82,7 @@ public class NotifyService extends Service {
             else
                 mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.default_recommend);
             //设置播放按钮
-            if(!MusicService.getIsplay()){
+            if(!mIsPlay){
                 mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_play_nor);
             }else{
                 mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_pause_nor);
@@ -115,7 +106,6 @@ public class NotifyService extends Service {
                     .setSmallIcon(R.drawable.app_icon);
 
             Intent result = new Intent(mContext,AudioHolderActivity.class);
-
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
             stackBuilder.addParentStack(AudioHolderActivity.class);
             stackBuilder.addNextIntent(result);
@@ -134,5 +124,4 @@ public class NotifyService extends Service {
             mNotificationManager.notify(0, mBuilder.build());
         }
     }
-
 }

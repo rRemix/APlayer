@@ -21,8 +21,7 @@ public class ViewPagerListener implements ViewPager.OnPageChangeListener {
     private int mImageWidth = 0;
     private int mOffSetX;
 
-    public ViewPagerListener(Context context,ImageView image,int index)
-    {
+    public ViewPagerListener(Context context,ImageView image,int index) {
         mImage = image;
         mIndex = index;
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
@@ -50,9 +49,7 @@ public class ViewPagerListener implements ViewPager.OnPageChangeListener {
         animation.setFillAfter(true);
         mImage.startAnimation(animation);
     }
-
     @Override
     public void onPageScrollStateChanged(int state) {
-
     }
 }

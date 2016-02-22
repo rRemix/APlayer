@@ -13,11 +13,9 @@ import remix.myplayer.utils.Constants;
  */
 public class SlideMenuListener implements AdapterView.OnItemClickListener {
     private Context mContext;
-
     public SlideMenuListener(Context mContext) {
         this.mContext = mContext;
     }
-
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         switch (view.getId()) {

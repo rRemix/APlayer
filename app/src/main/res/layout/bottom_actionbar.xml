@@ -28,6 +28,8 @@
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="200dp"
+                android:ellipsize="end"
+                android:lines="1"
                 android:textColor="#1b1c19"
                 android:textSize="16dp"
                 android:id="@+id/bottom_title"
@@ -35,17 +37,16 @@
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="200dp"
+                android:ellipsize="end"
+                android:lines="1"
                 android:id="@+id/bottom_artist"
                 android:textSize="14dp"
                 android:textColor="#6d6c69"
                 android:text="歌手"/>
-
         </LinearLayout>
-
         <!-- 前进播放后退三个按钮 -->
         <ImageButton
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
+            android:layout_centerVertical="true"
             android:layout_marginRight="19dp"
             android:layout_alignParentRight="true"
             android:id="@+id/playbar_play"
@@ -53,6 +54,5 @@
             android:layout_height="wrap_content"
             android:background="@drawable/holo_selector"
             android:src="@drawable/bf_but_play"/>
-
     </remix.myplayer.ui.BottomActionBar>
 </RelativeLayout>

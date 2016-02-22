@@ -2,8 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="164dp"
-    android:layout_height="208dp"
-    android:padding="8dp"
+    android:layout_height="228dp"
+    android:paddingTop="8dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
     android:background="@color/transparent">
     <RelativeLayout
         android:layout_width="match_parent"
@@ -13,15 +15,13 @@
             android:layout_width="164dp"
             android:layout_height="164dp"
             android:id="@+id/recycleview_simpleiview"
-            fresco:fadeDuration="300"
             fresco:actualImageScaleType="focusCrop"
             fresco:placeholderImage="@drawable/default_album_list"
             fresco:placeholderImageScaleType="fitCenter"
             android:layout_alignParentTop="true"/>
-
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:background="#f7f7f6"
             android:layout_below="@id/recycleview_simpleiview">
             <LinearLayout
@@ -29,7 +29,8 @@
                 android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:layout_marginLeft="8dp">
+                android:layout_marginLeft="8dp"
+                android:gravity="center_vertical">
                 <TextView
                     android:layout_gravity="center_vertical"
                     android:layout_width="100dp"
@@ -52,7 +53,6 @@
                     android:textColor="#6d6d69"
                     android:textSize="10dp"/>
             </LinearLayout>
-
             <ImageButton
                 android:layout_width="40dp"
                 android:layout_height="40dp"

@@ -9,8 +9,7 @@ import android.view.View;
 public class TabTextListener implements View.OnClickListener {
     private int mIndex = 0;
     private ViewPager mPager = null;
-    public TabTextListener(ViewPager pager,int index)
-    {
+    public TabTextListener(ViewPager pager,int index) {
         mIndex = index;
         mPager = pager;
     }

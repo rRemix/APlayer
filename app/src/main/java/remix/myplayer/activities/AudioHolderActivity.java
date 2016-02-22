@@ -97,7 +97,6 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     private AlphaAnimation mAnimOut;
     private Bitmap mNewBitMap;
     private boolean mFromNotify = false;
-    private MusicService.PlayerReceiver mMusicReceiver;
     private Handler mBlurHandler = new Handler()
     {
         @Override
@@ -118,30 +117,25 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
 //                    canvas.scale(1 / scaleFactor, 1 / scaleFactor);
                     Paint paint = new Paint();
                     paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-                    paint.setAlpha((int)(255 * 0.3));
+                    paint.setAlpha((int)(255 * 0.4));
                     canvas.drawBitmap(bkg, 0, 0, paint);
                     mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
                     //获得当前背景
 //                    mContainer.startAnimation(mAnimOut);
                     mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
-
                 }
             }
         }
     };
-
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mInstance = this;
         setContentView(R.layout.audio_holder);
-
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         //如果是从通知栏启动,关闭通知栏
         if(mFromNotify){
@@ -149,11 +143,9 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancel(0);
         }
-
         mInfo = MusicService.getCurrentMP3();
         mIsPlay = MusicService.getIsplay();
         MusicService.addCallback(this);
-
         //初始化动画相关
         initAnim();
         //初始化顶部信息

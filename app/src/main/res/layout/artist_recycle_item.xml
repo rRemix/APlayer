@@ -15,7 +15,6 @@
             android:layout_width="164dp"
             android:layout_height="164dp"
             android:id="@+id/recycleview_simpleiview"
-            fresco:fadeDuration="300"
             fresco:actualImageScaleType="focusCrop"
             fresco:placeholderImage="@drawable/default_album_list"
             fresco:placeholderImageScaleType="fitCenter"
