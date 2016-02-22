@@ -14,13 +14,19 @@ import android.view.MenuItem;
 import android.view.Window;
 
 
+import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.cache.MemoryCacheParams;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
-import remix.myplayer.broadcastreceivers.NotifyReceiver;
+import remix.myplayer.receivers.NotifyReceiver;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.fragments.MainFragment;
 import remix.myplayer.R;
@@ -71,18 +77,13 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        XmlUtil.setContext(getApplicationContext());
-        DBUtil.setContext(getApplicationContext());
-        CommonUtil.setContext(getApplicationContext());
-
-        Fresco.initialize(this);
+        initUtil();
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_main);
         mInstance = this;
-
 
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         if(!mFromNotify) {
@@ -109,6 +110,37 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
             mActionbar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)),mFromNotify);
         else
             mActionbar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(mPos)), mFromNotify);
+    }
+
+    private void initUtil() {
+        //初始化库和工具类
+        XmlUtil.setContext(getApplicationContext());
+        DBUtil.setContext(getApplicationContext());
+        CommonUtil.setContext(getApplicationContext());
+
+        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
+                .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {
+                    @Override
+                    public MemoryCacheParams get() {
+                        return new MemoryCacheParams(50 * 1024 * 1024,10,2048,5,1024);
+                    }
+                }).build();
+        Fresco.initialize(this,config);
+
+        DisplayImageOptions option = new DisplayImageOptions.Builder()
+                .showImageForEmptyUri(R.drawable.default_recommend)
+                .showImageOnFail(R.drawable.default_recommend                                                                                                                                                                                                                                                                                         )
+                .resetViewBeforeLoading(false)
+                .cacheOnDisk(true)
+                .cacheInMemory(true)
+                .build();
+
+        ImageLoaderConfiguration config1 = new ImageLoaderConfiguration.Builder(this)
+                .diskCacheSize(50 * 1024 * 1024) // 50 Mb sd卡(本地)缓存的最大值
+                .diskCacheFileCount(50)
+                .defaultDisplayImageOptions(option)
+                .build();
+        ImageLoader.getInstance().init(config1);
     }
 
     private void initMainFragment() {

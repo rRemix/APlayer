@@ -77,9 +77,10 @@ public class NotifyService extends Service {
 
         private void UpdateNotify() {
             mRemoteView = new RemoteViews(mContext.getPackageName(), R.layout.notify_playbar);
-            MP3Info temp = MusicService.getCurrentMP3();
-            if(temp == null)
+            if(MusicService.getCurrentMP3() == null || !MusicService.getIsplay()) {
                 return;
+            }
+            MP3Info temp = MusicService.getCurrentMP3();
             //设置歌手，歌曲名
             mRemoteView.setTextViewText(R.id.notify_song, temp.getDisplayname());
             mRemoteView.setTextViewText(R.id.notify_artist, temp.getArtist());

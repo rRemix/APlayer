@@ -11,12 +11,17 @@ import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+
 import java.lang.ref.WeakReference;
 
 import remix.myplayer.R;
 import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.ui.CircleImageView;
 import remix.myplayer.ui.SelectedPopupWindow;
+import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 
 /**
@@ -25,7 +30,7 @@ import remix.myplayer.utils.DBUtil;
 public class AllSongAdapter extends SimpleCursorAdapter {
     public static AllSongAdapter mInstance;
     private Context mContext;
-    private boolean mScrollState = false;
+    private Cursor mCurosr;
     //0:专辑 1:歌手
     private int mType = 0;
     public AllSongAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
@@ -33,9 +38,8 @@ public class AllSongAdapter extends SimpleCursorAdapter {
         mInstance = this;
         mContext = context;
     }
-    public void setScrollState(boolean isScroll)
-    {
-        mScrollState = isScroll;
+    public void setCursor(Cursor mCursor) {
+        this.mCurosr = mCursor;
     }
     public void setType(int mType) {
         this.mType = mType;
@@ -58,15 +62,17 @@ public class AllSongAdapter extends SimpleCursorAdapter {
 
         if((getItem(position)) == null)
             return convertView;
-        String name = ((Cursor)getItem(position)).getString(AllSongFragment.mDisPlayNameIndex);
+        String name = mCurosr.getString(AllSongFragment.mDisPlayNameIndex);
         name = name.substring(0, name.lastIndexOf("."));
-        String artist = ((Cursor)getItem(position)).getString(AllSongFragment.mArtistIndex);
-        String album = ((Cursor)getItem(position)).getString(AllSongFragment.mAlbumIndex);
+        String artist = mCurosr.getString(AllSongFragment.mArtistIndex);
+        String album = mCurosr.getString(AllSongFragment.mAlbumIndex);
 
         holder.mName.setText(name);
         holder.mOther.setText(artist + "-" + album);
-        AsynLoadImage task = new AsynLoadImage(holder.mImage);
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,((Cursor) getItem(position)).getInt(AllSongFragment.mSongId));
+        ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mCurosr.getString(AllSongFragment.mAlbumIdIndex),
+                holder.mImage);
+//        AsynLoadImage task = new AsynLoadImage(holder.mImage);
+//        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,((Cursor) getItem(position)).getInt(AllSongFragment.mSongId));
 
         final ImageView mItemButton = (ImageView)convertView.findViewById(R.id.allsong_item_button);
         mItemButton.setOnClickListener(new View.OnClickListener() {

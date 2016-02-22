@@ -147,11 +147,11 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
     {
         @Override
         public void onClick(View v) {
-            if (!mWechatApi.isWXAppInstalled()) {
-                Toast.makeText(SharePopupWindow.this, "您还未安装微信客户端",
-                        Toast.LENGTH_SHORT).show();
-                return;
-            }
+//            if (!mWechatApi.isWXAppInstalled()) {
+//                Toast.makeText(SharePopupWindow.this, "您还未安装微信客户端",
+//                        Toast.LENGTH_SHORT).show();
+//                return;
+//            }
 //            Bitmap bmp = CommonUtil.CheckBitmapBySongId((int)mInfo.getId());
 //            Bitmap thumbBmp = Bitmap.createScaledBitmap(bmp, 150, 150, true);
 //            bmp.recycle();

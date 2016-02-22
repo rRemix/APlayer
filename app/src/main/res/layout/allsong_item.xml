@@ -6,7 +6,6 @@
     <remix.myplayer.ui.CircleImageView
         android:layout_alignParentLeft="true"
         android:id="@+id/homepage_head_image"
-        android:src="@drawable/default_recommend"
         android:layout_centerVertical="true"
         android:layout_marginLeft="19dp"
         android:layout_width="40dp"

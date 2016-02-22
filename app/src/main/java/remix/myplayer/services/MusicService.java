@@ -12,7 +12,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 import remix.myplayer.activities.MainActivity;
-import remix.myplayer.broadcastreceivers.NotifyReceiver;
+import remix.myplayer.receivers.NotifyReceiver;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;

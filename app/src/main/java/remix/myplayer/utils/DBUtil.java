@@ -1,9 +1,7 @@
 package remix.myplayer.utils;
 
-import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -11,22 +9,17 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
 import remix.myplayer.adapters.FolderAdapter;
-import remix.myplayer.fragments.ArtistRecycleFragment;
 import remix.myplayer.infos.MP3Info;
 
 /**
@@ -222,7 +215,6 @@ public class DBUtil {
         }
         try {
             String album_art = null;
-
             cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,new String[]{MediaStore.Audio.Albums.ALBUM_ART},
                     selection,selectionArg,null);
             if(cursor != null && cursor.moveToFirst()) {

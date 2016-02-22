@@ -15,10 +15,14 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 
 import java.lang.ref.WeakReference;
 
@@ -52,14 +56,12 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         mListView.setAdapter(mAdapter);
     }
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
     }
-
 
     @Override
     public void onDestroy() {
@@ -75,6 +77,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         final View rootView = inflater.inflate(R.layout.allsong_list,null);
         mListView = (ListView)rootView.findViewById(R.id.list);
         mListView.setOnItemClickListener(new ListViewListener(getContext()));
+//        mListView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(),false,true));
         return rootView;
     }
 
@@ -96,10 +99,11 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         mAlbumIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM);
         mSongId = data.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
         mAlbumIdIndex = data.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-        if(mCursor != null)
-        {
-            mAdapter.changeCursor(data);
+        if(mCursor != null) {
+            mAdapter.changeCursor(mCursor);
+            mAdapter.setCursor(mCursor);
         }
+
     }
 
     @Override
@@ -108,21 +112,4 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
             mAdapter.changeCursor(null);
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-
-        switch (item.getItemId())
-        {
-            case 1:
-                Toast.makeText(getContext(),"单击了测试1",Toast.LENGTH_SHORT).show();
-                break;
-            case 2:
-                Toast.makeText(getContext(),"单击了测试2",Toast.LENGTH_SHORT).show();
-                break;
-            case 3:
-                Toast.makeText(getContext(),"单击了测试3",Toast.LENGTH_SHORT).show();
-                break;
-        }
-        return super.onContextItemSelected(item);
-    }
 }

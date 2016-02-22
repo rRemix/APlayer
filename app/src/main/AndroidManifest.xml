@@ -121,13 +121,13 @@
             <!--</intent-filter>-->
         <!--</receiver>-->
 
-        <receiver android:name=".broadcastreceivers.LineCtlReceiver">
+        <receiver android:name=".receivers.LineCtlReceiver">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".broadcastreceivers.ExitReceiver">
+        <receiver android:name=".receivers.ExitReceiver">
             <intent-filter>
                 <action android:name="remix.music.EXIT"/>
             </intent-filter>

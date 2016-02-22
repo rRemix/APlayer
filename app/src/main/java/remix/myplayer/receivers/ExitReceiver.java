@@ -1,0 +1,45 @@
+package remix.myplayer.receivers;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+
+import remix.myplayer.services.MusicService;
+import remix.myplayer.services.NotifyService;
+
+/**
+ * Created by taeja on 16-2-16.
+ */
+public class ExitReceiver extends BroadcastReceiver {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        try {
+            System.exit(0);
+            MusicService.mInstance.stopSelf();
+            NotifyService.mInstance.stopSelf();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+//            if(MainActivity.mInstance != null)
+//                MainActivity.mInstance.finish();
+//            if(AudioHolderActivity.mInstance != null)
+//                AudioHolderActivity.mInstance.finish();
+//            if(ChildHolderActivity.mInstance != null)
+//                ChildHolderActivity.mInstance.finish();
+//            if(PlayListActivity.mInstance != null)
+//                PlayListActivity.mInstance.finish();
+//            if(SearchActivity.mInstance != null)
+//                SearchActivity.mInstance.finish();
+//            if(MusicService.mInstance != null)
+//                MusicService.mInstance.stopSelf();
+//            AudioHolderActivity.mInstance.finish();
+//            ChildHolderActivity.mInstance.finish();
+//            MainActivity.mInstance.finish();
+//            PlayListActivity.mInstance.finish();
+//            SearchActivity.mInstance.finish();
+
+
+    }
+}

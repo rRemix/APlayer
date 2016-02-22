@@ -120,8 +120,8 @@ public class MainFragment extends Fragment {
     private void initPager() {
         mAdapter = new PagerAdapter(getActivity().getSupportFragmentManager());
         mAdapter.AddFragment(new AllSongFragment());
-        mAdapter.AddFragment(new AlbumRecyleFragment());
-        mAdapter.AddFragment(new ArtistRecycleFragment());
+        mAdapter.AddFragment(new AlbumFragment());
+        mAdapter.AddFragment(new ArtistFragment());
         mAdapter.AddFragment(new FolderFragment());
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(0);

@@ -1,10 +1,14 @@
 [
     {
-        "merged": "D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\slidingmenumain.xml",
-        "source": "D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\layout\\slidingmenumain.xml"
+        "merged": "/home/taeja/AndroidProject/MyPlayer/slidingmenu_library/build/intermediates/res/merged/androidTest/debug/layout/slidingmenumain.xml",
+        "source": "/home/taeja/AndroidProject/MyPlayer/slidingmenu_library/build/intermediates/bundles/debug/res/layout/slidingmenumain.xml"
     },
     {
-        "merged": "D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\slidingmenumain.xml",
-        "source": "D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\layout\\slidingmenumain.xml"
+        "merged": "/home/taeja/AndroidProject/MyPlayer/D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\slidingmenumain.xml",
+        "source": "/home/taeja/AndroidProject/MyPlayer/D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\layout\\slidingmenumain.xml"
+    },
+    {
+        "merged": "/home/taeja/AndroidProject/MyPlayer/D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\slidingmenumain.xml",
+        "source": "/home/taeja/AndroidProject/MyPlayer/D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\layout\\slidingmenumain.xml"
     }
 ]
