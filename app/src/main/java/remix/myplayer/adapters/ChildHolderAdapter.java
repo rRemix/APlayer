@@ -1,5 +1,6 @@
 package remix.myplayer.adapters;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import remix.myplayer.R;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.services.MusicService;
+
 /**
  * Created by Remix on 2015/12/4.
  */
@@ -50,6 +53,11 @@ public class ChildHolderAdapter extends BaseAdapter {
         if(mInfoList == null || mInfoList.size() == 0 )
             return convertView;
         MP3Info temp = mInfoList.get(position);
+
+        if(temp.getDisplayname().equals(MusicService.getCurrentMP3().getDisplayname()))
+            holder.mTitle.setTextColor(Color.parseColor("#ff0030"));
+        else
+            holder.mTitle.setTextColor(Color.parseColor("#1b1c19"));
         holder.mTitle.setText(temp.getDisplayname());
         holder.mArtist.setText(temp.getArtist());
         return convertView;

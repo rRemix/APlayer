@@ -23,7 +23,6 @@ import remix.myplayer.utils.DBUtil;
 public class NotifyReceiver extends BroadcastReceiver
 {
 
-    public static boolean misFromActivity = false;
     private RemoteViews mRemoteView;
     @Override
     public void onReceive(Context context, Intent intent) {

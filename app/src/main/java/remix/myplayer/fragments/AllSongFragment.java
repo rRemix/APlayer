@@ -2,8 +2,6 @@ package remix.myplayer.fragments;
 
 
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -12,25 +10,13 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
-
-
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
-
-import java.lang.ref.WeakReference;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.AllSongAdapter;
 import remix.myplayer.listeners.ListViewListener;
-import remix.myplayer.services.MusicService;
-import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -46,6 +32,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     public static int mAlbumIndex = -1;
     public static int mAlbumIdIndex = -1;
     public static int mSongId = -1;
+    public static AllSongFragment mInstance = null;
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -58,8 +45,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-
+        mInstance = this;
     }
 
     @Override
@@ -76,7 +62,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         final View rootView = inflater.inflate(R.layout.allsong_list,null);
         mListView = (ListView)rootView.findViewById(R.id.list);
         mListView.setOnItemClickListener(new ListViewListener(getContext()));
-//        mListView.setOnScrollListener(new PauseOnScrollListener(ImageLoader.getInstance(),false,true));
+
         return rootView;
     }
 
@@ -111,4 +97,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
             mAdapter.changeCursor(null);
     }
 
+    public AllSongAdapter getAdapter(){
+        return mAdapter;
+    }
 }

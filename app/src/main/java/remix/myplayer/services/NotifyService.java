@@ -1,21 +1,29 @@
 package remix.myplayer.services;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.service.notification.StatusBarNotification;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 import android.widget.RemoteViews;
+
+import java.util.List;
+
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.infos.MP3Info;
@@ -25,6 +33,7 @@ import remix.myplayer.utils.DBUtil;
  * Created by Remix on 2016/2/16.
  */
 public class NotifyService extends Service {
+    private final static String TAG = "NotifyService";
     public Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -34,7 +43,6 @@ public class NotifyService extends Service {
     private NotifyReceiver mNotifyReceiver;
     public static NotifyService mInstance;
     private Context mContext;
-    public static boolean mIsPlay = false;
     @Override
     public void onCreate(){
         super.onCreate();
@@ -45,6 +53,32 @@ public class NotifyService extends Service {
         filter.addAction(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         filter.addAction(Constants.NOTIFY);
         registerReceiver(mNotifyReceiver,filter);
+
+        new Thread(){
+            @Override
+            public void run(){
+                String packagename = getApplicationContext().getPackageName();
+                //每0.5秒检测是否app切换到前台，如果是，关闭通知栏
+                while(true){
+                    try {
+                        ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+                        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+                        if (!tasks.isEmpty()) {
+                            ComponentName topActivity = tasks.get(0).topActivity;
+                            if (topActivity.getPackageName().equals(packagename)) {
+                                NotificationManager mNotificationManager =
+                                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                                mNotificationManager.cancel(0);
+                            }
+                        }
+                        sleep(500);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        }.start();
     }
     @Override
     public void onDestroy() {
@@ -61,14 +95,16 @@ public class NotifyService extends Service {
     }
     class NotifyReceiver extends BroadcastReceiver {
         private RemoteViews mRemoteView;
-
+        private boolean mIsplay = false;
         @Override
         public void onReceive(Context context, Intent intent) {
             UpdateNotify();
         }
         private void UpdateNotify() {
+            mIsplay = MusicService.getIsplay();
+            Log.d(TAG,"isplay=" + mIsplay);
             mRemoteView = new RemoteViews(mContext.getPackageName(), R.layout.notify_playbar);
-            if(MusicService.getCurrentMP3() == null || !MusicService.getIsplay()) {
+            if(MusicService.getCurrentMP3() == null) {
                 return;
             }
             MP3Info temp = MusicService.getCurrentMP3();
@@ -82,7 +118,7 @@ public class NotifyService extends Service {
             else
                 mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.default_recommend);
             //设置播放按钮
-            if(!mIsPlay){
+            if(!mIsplay){
                 mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_play_nor);
             }else{
                 mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_pause_nor);
@@ -102,7 +138,7 @@ public class NotifyService extends Service {
                     .setContent(mRemoteView)
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
-                    .setOngoing(true)
+                    .setOngoing(mIsplay)
                     .setSmallIcon(R.drawable.app_icon);
 
             Intent result = new Intent(mContext,AudioHolderActivity.class);

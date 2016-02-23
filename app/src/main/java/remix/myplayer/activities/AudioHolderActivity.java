@@ -139,9 +139,9 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         //如果是从通知栏启动,关闭通知栏
         if(mFromNotify){
-            NotificationManager mNotificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.cancel(0);
+//            NotificationManager mNotificationManager =
+//                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//            mNotificationManager.cancel(0);
         }
         mInfo = MusicService.getCurrentMP3();
         mIsPlay = MusicService.getIsplay();
@@ -194,8 +194,6 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mContainer = (LinearLayout)findViewById(R.id.audio_holder_container);
         mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
     }
-
-
 
 
     private void initBottomButton()
@@ -272,8 +270,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         }
     };
 
-    private void initTopButton()
-    {
+    private void initTopButton(){
         mHide = (ImageButton)findViewById(R.id.top_hide);
         mHide.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -291,8 +288,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mGuideList.add((ImageView) findViewById(R.id.guide_03));
     }
 
-    private void initButton()
-    {
+    private void initButton() {
         mPlayBarPrev = (ImageButton)findViewById(R.id.playbar_prev);
         mPlayBarPlay = (ImageButton)findViewById(R.id.playbar_play);
         mPlayBarNext = (ImageButton)findViewById(R.id.playbar_next);
@@ -324,8 +320,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mPlayBarNext.setOnClickListener(listener);
     }
 
-    private void initSeekBar()
-    {
+    private void initSeekBar() {
         if(mInfo == null)
             return;
         mDuration = (int)mInfo.getDuration();
@@ -359,8 +354,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     }
 
     //更新顶部信息
-    public void UpdateTopStatus(MP3Info mp3Info)
-    {
+    public void UpdateTopStatus(MP3Info mp3Info) {
         if(mp3Info == null)
             return;
         String title = mp3Info.getDisplayname() == null ? "" : mp3Info.getDisplayname();
@@ -378,40 +372,38 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         else
             mTopDetail.setText(mp3Info.getArtist() + "-" + mp3Info.getAlbum());
     }
-    public void UpdatePlayButton(boolean isPlay)
-    {
+    public void UpdatePlayButton(boolean isPlay) {
         if(isPlay)
             mPlayBarPlay.setImageResource(R.drawable.play_btn_stop);
         else
             mPlayBarPlay.setImageResource(R.drawable.play_btn_paly);
     }
-    private void initTop()
-    {
+
+    private void initTop() {
         //初始化顶部信息
         mTopTitle = (TextView)findViewById(R.id.top_title);
         mTopDetail = (TextView)findViewById(R.id.top_detail);
         UpdateTopStatus(mInfo);
     }
-    private void initRecordFragment()
-    {
+
+    private void initRecordFragment() {
         RecordFragment fragment = new RecordFragment();
         mAdapter.AddFragment(fragment);
     }
-    private void initCoverFragment()
-    {
+
+    private void initCoverFragment() {
         CoverFragment fragment = new CoverFragment();
         fragment.setArguments(mBundle);
         mAdapter.AddFragment(fragment);
     }
-    private void initLrcFragment()
-    {
+
+    private void initLrcFragment() {
         LrcFragment fragment = new LrcFragment();
         fragment.setArguments(mBundle);
         mAdapter.AddFragment(fragment);
     }
 
-    private void initPager()
-    {
+    private void initPager() {
         //初始化Viewpager
         mPager = (AudioViewPager)findViewById(R.id.holder_pager);
         mAdapter = new PagerAdapter(getSupportFragmentManager());

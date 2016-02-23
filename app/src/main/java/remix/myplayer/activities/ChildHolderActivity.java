@@ -37,6 +37,7 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     private TextView mNum;
     private TextView mTitle;
     private BottomActionBarFragment mActionbar;
+    private ChildHolderAdapter mAdapter;
     public static ChildHolderActivity mInstance = null;
 
     @Override
@@ -80,7 +81,8 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
             return;
         setContentView(R.layout.child_holder);
         mListView = (ListView)findViewById(R.id.artist_album_holder_list);
-        mListView.setAdapter(new ChildHolderAdapter(mInfoList, getLayoutInflater()));
+        mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater());
+        mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -139,7 +141,6 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
         mActionbar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)), false);
 
 
-
     }
     @Override
     protected void onDestroy() {
@@ -149,6 +150,8 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     public void UpdateUI(MP3Info MP3info, boolean isplay) {
         MP3Info temp = MP3info;
         mActionbar.UpdateBottomStatus(MP3info, isplay);
+        if(mAdapter != null)
+            mAdapter.notifyDataSetChanged();
     }
 
     @Override

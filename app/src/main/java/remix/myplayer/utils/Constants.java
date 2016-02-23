@@ -40,6 +40,8 @@ public class Constants {
     public final static int UPDATE_TIME_ONLY = 0x011;
     //更新播放信息
     public final static int UPDATE_INFORMATION = 0x101;
+    //更新音量
+    public final static int UPDATE_VOL = 0x102;
     //更新背景
     public final static int UPDATE_BG = 0x102;
 

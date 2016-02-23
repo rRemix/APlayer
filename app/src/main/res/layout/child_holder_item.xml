@@ -11,7 +11,7 @@
         android:ellipsize="end"
         android:text="歌曲名"
         android:textSize="16dp"
-        android:textColor="#000"
+        android:textColor="#1b1c19"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp" />
     <TextView
@@ -24,5 +24,5 @@
         android:ellipsize="end"
         android:layout_marginLeft="10dp"
         android:layout_marginBottom="10dp"
-        android:textColor="#30000000"/>
+        android:textColor="#6d6c69"/>
 </LinearLayout>

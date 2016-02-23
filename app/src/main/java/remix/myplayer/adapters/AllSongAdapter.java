@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import java.lang.ref.WeakReference;
 
 import remix.myplayer.R;
 import remix.myplayer.fragments.AllSongFragment;
+import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.CircleImageView;
 import remix.myplayer.ui.SelectedPopupWindow;
 import remix.myplayer.utils.Constants;
@@ -62,12 +64,17 @@ public class AllSongAdapter extends SimpleCursorAdapter {
 
         if((getItem(position)) == null)
             return convertView;
+
         String name = mCurosr.getString(AllSongFragment.mDisPlayNameIndex);
         name = name.substring(0, name.lastIndexOf("."));
+        if(name.equals(MusicService.getCurrentMP3().getDisplayname()))
+            holder.mName.setTextColor(Color.parseColor("#ff0030"));
+        else
+            holder.mName.setTextColor(Color.parseColor("#1c1b19"));
+        holder.mName.setText(name);
+
         String artist = mCurosr.getString(AllSongFragment.mArtistIndex);
         String album = mCurosr.getString(AllSongFragment.mAlbumIndex);
-
-        holder.mName.setText(name);
         holder.mOther.setText(artist + "-" + album);
         ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mCurosr.getString(AllSongFragment.mAlbumIdIndex),
                 holder.mImage);

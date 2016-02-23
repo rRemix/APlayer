@@ -21,15 +21,17 @@
             android:layout_weight="9"
             android:queryHint="搜索歌曲"
             android:id="@+id/search_"/>
-        <TextView
-            android:id="@+id/search_text"
+        <Button
+            android:id="@+id/search_btn"
             android:layout_width="0dp"
             android:layout_weight="2"
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="搜索"
             android:textColor="#d1d0ce"
-            android:textSize="18dp"/>
+            android:textSize="18dp"
+            android:layout_marginRight="2dp"
+            android:background="@color/transparent"/>
     </LinearLayout>
     <ListView
         android:id="@+id/search_result"

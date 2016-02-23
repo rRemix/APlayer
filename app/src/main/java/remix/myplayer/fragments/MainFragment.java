@@ -53,7 +53,6 @@ public class MainFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         mInflater = inflater;
         View rootView = inflater.inflate(R.layout.homepage,null);
         initTab(rootView);
@@ -177,6 +176,4 @@ public class MainFragment extends Fragment {
             }
         }
     }
-
-
 }

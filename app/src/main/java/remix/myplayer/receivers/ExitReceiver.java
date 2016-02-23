@@ -1,5 +1,6 @@
 package remix.myplayer.receivers;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,28 +19,10 @@ public class ExitReceiver extends BroadcastReceiver {
             System.exit(0);
             MusicService.mInstance.stopSelf();
             NotifyService.mInstance.stopSelf();
+            ((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
             }catch (Exception e){
                 e.printStackTrace();
             }
-
-//            if(MainActivity.mInstance != null)
-//                MainActivity.mInstance.finish();
-//            if(AudioHolderActivity.mInstance != null)
-//                AudioHolderActivity.mInstance.finish();
-//            if(ChildHolderActivity.mInstance != null)
-//                ChildHolderActivity.mInstance.finish();
-//            if(PlayListActivity.mInstance != null)
-//                PlayListActivity.mInstance.finish();
-//            if(SearchActivity.mInstance != null)
-//                SearchActivity.mInstance.finish();
-//            if(MusicService.mInstance != null)
-//                MusicService.mInstance.stopSelf();
-//            AudioHolderActivity.mInstance.finish();
-//            ChildHolderActivity.mInstance.finish();
-//            MainActivity.mInstance.finish();
-//            PlayListActivity.mInstance.finish();
-//            SearchActivity.mInstance.finish();
-
 
     }
 }

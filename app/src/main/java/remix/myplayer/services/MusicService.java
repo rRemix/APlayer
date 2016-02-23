@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -20,8 +19,6 @@ import java.util.List;
 import java.util.Random;
 
 import remix.myplayer.activities.MainActivity;
-import remix.myplayer.receivers.NotifyReceiver;
-import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.infos.MP3Info;
@@ -32,6 +29,7 @@ import remix.myplayer.utils.SharedPrefsUtil;
  * Created by Remix on 2015/12/1.
  */
 public class MusicService extends Service {
+    private final static String TAG = "MusicService";
     //实例
     public static MusicService mInstance;
     //是否第一次启动
@@ -49,27 +47,36 @@ public class MusicService extends Service {
     //当前正在播放的mp3
     private static MP3Info mInfo = null;
     private static MediaPlayer mPlayer;
-    private static PlayerBinder mBinder;
+    private int mMaxVolume = -1;
+    private int mCurrentVolume = -1;
+    private AudioManager mAudioManager;
     //回调接口的集合
     private static List<Callback> mCallBacklist  = new ArrayList<Callback>(){};;
     private static Context context;
     private PlayerReceiver mRecevier;
-    private static Handler handler = new Handler() {
+    private AudioManager.OnAudioFocusChangeListener mAudioFocusListener;
+    private static Handler mUpdateUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg)
         {
             if(msg.what == Constants.UPDATE_INFORMATION) {
-                if(mCallBacklist != null)
-                    System.out.println(mCallBacklist);
-                    //遍历集合，通知所有的实现类，即activity
-                for (int i = 0; i < mCallBacklist.size(); i++) {
-                    if(mCallBacklist.get(i) != null)
-                        try {
+                try {
+                    for (int i = 0; i < mCallBacklist.size(); i++) {
+                        if(mCallBacklist.get(i) != null)
                             mCallBacklist.get(i).UpdateUI(mInfo,mIsplay);
-                        }catch (Exception e) {
-                            e.printStackTrace();
-                        }
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+            }
+        }
+    };
+    private Handler mUpdateVolHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg){
+            if(msg.what == Constants.UPDATE_VOL){
+
             }
         }
     };
@@ -81,24 +88,86 @@ public class MusicService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        if(mBinder == null)
-            mBinder = new PlayerBinder();
-        return mBinder;
+//        if(mBinder == null)
+//            mBinder = new PlayerBinder();
+        return null;
     }
     @Override
     public void onDestroy() {
         super.onDestroy();
         mPlayer.release();
         mPlayer = null;
-//        unregisterReceiver(mRecevier);
+        mAudioManager.abandonAudioFocus(mAudioFocusListener);
+        unregisterReceiver(mRecevier);
     }
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
-//        mRecevier = new PlayerReceiver();
-//        IntentFilter filter = new IntentFilter("remix.music.CTL_ACTION");
-//        registerReceiver(mRecevier,filter);
+        mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
+        mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
+            @Override
+            public void onAudioFocusChange(int focusChange) {
+                switch (focusChange){
+                    //播放
+                    case AudioManager.AUDIOFOCUS_GAIN:
+                        if(!mIsplay) {
+                            PlayStart();
+                            mIsplay = true;
+                        }
+                        break;
+                    //降低音量
+                    case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT:
+                        if(mIsplay){
+                            mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume / 2,
+                                    AudioManager.FLAG_PLAY_SOUND);
+                        }
+                        break;
+                    //暂停
+                    case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK:
+                        if(mIsplay) {
+                            Pause();
+                            mIsplay = false;
+                        }
+                        break;
+                    //暂停
+                    case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE:
+                        if(mIsplay) {
+                            Pause();
+                            mIsplay = false;
+                        }
+                        break;
+                    //暂停
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                        if(mIsplay) {
+                            Pause();
+                            mIsplay = false;
+                        }
+                        break;
+                    //降低音量
+                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                        if(mIsplay){
+                            mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume / 2,
+                                    AudioManager.FLAG_PLAY_SOUND);
+                        }
+                        break;
+                    //暂停
+                    case AudioManager.AUDIOFOCUS_LOSS:
+                        if(mIsplay) {
+                            Pause();
+                            mIsplay = false;
+                        }
+                        break;
+
+                }
+            }
+        };
+        mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+        mRecevier = new PlayerReceiver();
+        IntentFilter filter = new IntentFilter("remix.music.CTL_ACTION");
+        registerReceiver(mRecevier,filter);
 
         int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mPos",-1);
         if(DBUtil.mPlayingList != null && DBUtil.mPlayingList.size() > 0) {
@@ -109,129 +178,115 @@ public class MusicService extends Service {
         else
             mInfo = null;
 
-//        if(CommonUtil.mPlayingList.size() > 1)
-//            mNextInfo = CommonUtil.getMP3InfoById(CommonUtil.mPlayingList.get(1));
-
         mPlayer = new MediaPlayer();
         mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        //一定要先设置mediaplay的数据源
-//        try{
-//            if(mInfo != null)
-//                mPlayer.setDataSource(mInfo.getUrl());
-//        }catch (Exception e) {e.printStackTrace();}
+
 
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 PlayNextOrPrev(true,true);
-                handler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
+                mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
                 //SendUpdate();
             }
         });
         mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-                mPlayer.start();
+                PlayStart();
             }
         });
         mPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                Log.d("Error","what = " + what + " extar = " + extra);
+                Log.d(TAG,"what = " + what + " extar = " + extra);
                 return true;
             }
         });
     }
 
-    public void UpdateBottomStatus(MP3Info info,boolean isPlaying) {
-        BottomActionBarFragment fragment = BottomActionBarFragment.mInstance;
-        fragment.UpdateBottomStatus(info, isPlaying);
-    }
 
-    private static void Play(String Path) {
-        mIsplay = true;
+    private void Play(String Path) {
         PrepareAndPlay(Path);
     }
-    private static void PlayNext()
+    private void PlayNext()
     {
         PlayNextOrPrev(true,true);
     }
-    private static void PlayPrevious()
+    private void PlayPrevious()
     {
         PlayNextOrPrev(false,true);
     }
-    private static void PlayContinue() {
-        mIsplay = true;
-        mPlayer.start();
+    private void PlayStart() {
+        new Thread(){
+            @Override
+            //音量逐渐增大
+            public void run(){
+                mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
+                mPlayer.start();
+                if(mCurrentVolume == 0)
+                    return;
+                int temp = 0;
+                int sleeptime = 800 / mCurrentVolume;
+                while(temp++ < mCurrentVolume){
+                    try {
+                        sleep(sleeptime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
+                            AudioManager.FLAG_PLAY_SOUND);
+                }
+            }
+        }.start();
+
     }
-    private static void PlayOrPause() {
+    private void PlayOrPause() {
         if(mPlayer.isPlaying())
             Pause();
-        else
-        {
+        else {
             if(mInfo == null)
                 return;
-            mIsplay = true;
-            if(mFlag)
-            {
+            if(mFlag) {
                 Play(mInfo.getUrl());
                 mFlag = false;
                 return;
             }
-            mPlayer.start();
+            PlayStart();
         }
     }
-    private static void Pause() {
-        mIsplay = false;
-        mPlayer.pause();
-    }
-    private void Stop() {
-        mIsplay = false;
-        mPlayer.stop();
-    }
-    public class PlayerBinder extends Binder {
-        public MusicService getService() {
-            return MusicService.this;
-        }
-        private void Play(String path)
-        {
-            mIsplay = true;
-            PrepareAndPlay(path);
-        }
-        private void PlayNext()
-        {
-            PlayNextOrPrev(true,true);
-        }
-        private void PlayPrevious()
-        {
-            PlayNextOrPrev(false,true);
-        }
-        private void PlayContinue() {
-            mIsplay = true;
-            mPlayer.start();
-        }
-        private void PlayOrPause() {
-            if(mPlayer.isPlaying())
-                Pause();
-            else {
-                mIsplay = true;
-                if(mFlag)
-                {
-                    Play(mInfo.getUrl());
-                    mFlag = false;
+
+    private void Pause() {
+//        mIsplay = false;
+//        mPlayer.pause();
+        new Thread(){
+            //音量逐渐减小后暂停
+            @Override
+            public void run(){
+                mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                if(mCurrentVolume == 0){
+                    mPlayer.pause();
                     return;
                 }
-                mPlayer.start();
+                int sleeptime = 500 / mCurrentVolume;
+                int temp = mCurrentVolume;
+                while(temp-- > 0){
+                    try {
+                        sleep(sleeptime);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
+                            AudioManager.FLAG_PLAY_SOUND);
+                }
+                mIsplay = false;
+                mPlayer.pause();
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume,
+                        AudioManager.FLAG_PLAY_SOUND);
             }
-        }
-        private void Pause() {
-            mIsplay = false;
-            mPlayer.pause();
-        }
-        private void Stop() {
-            mIsplay = false;
-            mPlayer.stop();
-        }
+        }.start();
     }
 
 
@@ -254,25 +309,19 @@ public class MusicService extends Service {
             }
             mCallBacklist.add(callback);
         }
-        System.out.println(mCallBacklist.toString());
     }
     //返回回调接口链表的长度
     public int getCallBackListSize()
     {
         return mCallBacklist.size();
     }
-    public static class PlayerReceiver extends BroadcastReceiver
+    public class PlayerReceiver extends BroadcastReceiver
     {
         @Override
         public void onReceive(Context context, Intent intent) {
             int Control = intent.getIntExtra("Control",-1);
-            boolean FromNotify = intent.getBooleanExtra("FromNotify", false);
-            if(FromNotify){
-                NotifyService.mInstance.mHandler.sendEmptyMessage(0);
-//                sendBroadcast(new Intent(Constants.NOTIFY));
-            }
-            switch (Control)
-            {
+
+            switch (Control) {
                 //播放listview选中的歌曲
                 case Constants.PLAYSELECTEDSONG:
                     mCurrent = intent.getIntExtra("Position", -1);
@@ -284,6 +333,7 @@ public class MusicService extends Service {
 //                    }
                     mId = DBUtil.mPlayingList.get(mCurrent);
                     mInfo = DBUtil.getMP3InfoById(mId);
+                    mIsplay = true;
                     if(mInfo == null)
                         break;
                     Play(mInfo.getUrl());
@@ -291,23 +341,28 @@ public class MusicService extends Service {
                     break;
                 //播放上一首
                 case Constants.PREV:
+                    mIsplay = true;
                     PlayPrevious();
                     break;
                 //播放下一首
                 case Constants.NEXT:
+                    mIsplay = true;
                     PlayNext();
                     break;
                 //暂停或者继续播放
                 case Constants.PLAY:
+                    mIsplay = !mIsplay;
                     PlayOrPause();
                     break;
                 //暂停
                 case Constants.PAUSE:
+                    mIsplay = false;
                     Pause();
                     break;
                 //继续播放
                 case Constants.CONTINUE:
-                    PlayContinue();
+                    mIsplay = true;
+                    PlayStart();
                     break;
                 //顺序播放
                 case Constants.PLAY_LOOP:
@@ -322,17 +377,18 @@ public class MusicService extends Service {
                     mPlayModel = Constants.PLAY_REPEATONE;
                 default:break;
             }
-            handler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
-
+            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
+            boolean FromNotify = intent.getBooleanExtra("FromNotify", false);
+            if(FromNotify){
+//                NotifyService.mInstance.mHandler.sendEmptyMessage(0);
+//                sendBroadcast(new Intent(Constants.NOTIFY));
+                NotifyService.mInstance.UpdateNotify();
+            }
         }
     }
     //准备播放
-    private static void  PrepareAndPlay(String path) {
+    private static void PrepareAndPlay(String path) {
         try {
-//            if(mFlag) {
-//                Intent intent = new Intent(CommonUtil.NOTIFY);
-//                MainActivity.mInstance.sendBroadcast(intent);
-//            }
             mPlayer.reset();
             mPlayer.setDataSource(path);
             mPlayer.prepareAsync();
@@ -350,7 +406,7 @@ public class MusicService extends Service {
         return new Random().nextInt(DBUtil.mPlayingList.size() - 1);
     }
     //根据当前播放模式，播放上一首或者下一首
-    public static void PlayNextOrPrev(boolean IsNext,boolean NeedPlay){
+    public void PlayNextOrPrev(boolean IsNext,boolean NeedPlay){
         if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return;
         if(mPlayModel == Constants.PLAY_SHUFFLE) {

@@ -109,11 +109,11 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".services.MusicService$PlayerReceiver">
-            <intent-filter>
-                <action android:name="remix.music.CTL_ACTION"/>
-            </intent-filter>
-        </receiver>
+        <!--<receiver android:name=".services.MusicService$PlayerReceiver">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="remix.music.CTL_ACTION"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
 
         <!--<receiver android:name=".broadcastreceivers.NotifyReceiver">-->
             <!--<intent-filter>-->

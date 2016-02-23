@@ -21,15 +21,15 @@
         <TextView
             style="@style/songlist_item_title"
             android:id="@+id/displayname"
-            android:layout_marginTop="5dp"
-            android:text="歌曲名"/>
+            android:layout_marginTop="8dp"
+            android:text="歌曲名" />
         <TextView
             android:id="@+id/detail"
             style="@style/songlist_item_title"
             android:textColor="#6d6d69"
             android:textSize="14dp"
             android:text="歌手与专辑"
-            android:layout_marginBottom="5dp"/>
+            android:layout_marginBottom="8dp"/>
     </LinearLayout>
     <!--结尾处按钮-->
     <ImageView

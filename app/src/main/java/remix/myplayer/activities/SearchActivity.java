@@ -2,12 +2,15 @@ package remix.myplayer.activities;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -30,7 +33,7 @@ public class SearchActivity extends AppCompatActivity {
     private ListView mListView;
     private SearchView mSearchView;
     private SearchAdapter mAdapter;
-    private TextView mSearchText;
+    private Button mSearchBtn;
     private String mkey;
     public static SearchActivity mInstance = null;
     private static final String SDROOT = "/sdcard/";
@@ -40,7 +43,12 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         mInstance = this;
+
+//        EditText editText = (EditText)findViewById(R.id.search_test);
+//        boolean ret1 = editText.requestFocus();
+
         mSearchView = (SearchView) findViewById(R.id.search_);
+        boolean ret = mSearchView.requestFocus();
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -51,16 +59,26 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                return false;
+                if(newText != null && !newText.equals("")) {
+                    mkey = newText;
+                    mSearchBtn.setEnabled(true);
+                    mSearchBtn.setTextColor(Color.parseColor("#383838"));
+                } else{
+                    mSearchBtn.setEnabled(false);
+                    mSearchBtn.setTextColor(Color.parseColor("#d1d0ce"));
+                }
+                return true;
             }
         });
 
-        mSearchText = (TextView)findViewById(R.id.search_text) ;
-        mSearchText.setVisibility(View.INVISIBLE);
-        mSearchText.setOnClickListener(new View.OnClickListener() {
+
+        mSearchBtn = (Button) findViewById(R.id.search_btn);
+//        mSearchBtn.setEnabled(false);
+//        mSearchText.setVisibility(View.INVISIBLE);
+        mSearchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                mSearchView.setQuery(mkey,true);
             }
         });
 
