@@ -106,51 +106,77 @@ public class MusicService extends Service {
         mInstance = this;
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
         mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
+            //记录焦点变化之前是否在播放;
+            private boolean mFlag = false;
             @Override
             public void onAudioFocusChange(int focusChange) {
+                mFlag = mIsplay;
                 switch (focusChange){
-                    //播放
+                    //播放 获得焦点
                     case AudioManager.AUDIOFOCUS_GAIN:
-                        if(!mIsplay) {
-                            PlayStart();
-                            mIsplay = true;
-                        }
+                        //如果之前正在播放，则继续播放
+//                        if(mFlag) {
+//                            PlayStart();
+//                            mIsplay = true;
+//                        }
                         break;
-                    //降低音量
-                    case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT:
-                        if(mIsplay){
-                            mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume / 2,
-                                    AudioManager.FLAG_PLAY_SOUND);
-                        }
-                        break;
-                    //暂停
-                    case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK:
-                        if(mIsplay) {
-                            Pause();
-                            mIsplay = false;
-                        }
-                        break;
-                    //暂停
-                    case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE:
-                        if(mIsplay) {
-                            Pause();
-                            mIsplay = false;
-                        }
-                        break;
-                    //暂停
+                    //短暂失去焦点,比如有通知到来  暂停
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                         if(mIsplay) {
-                            Pause();
-                            mIsplay = false;
+                            mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                            mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                            new Thread(){
+                                @Override
+                                public void run(){
+                                    if((double)mCurrentVolume / mMaxVolume < 0.15)
+                                        return;
+                                    int sleeptime = (int)(1000 / (mCurrentVolume - (double)mCurrentVolume / mMaxVolume));
+                                    int temp = mCurrentVolume;
+                                    if(sleeptime > 0){
+                                        while (temp-- < mMaxVolume * 0.15){
+                                            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
+                                                    AudioManager.FLAG_PLAY_SOUND);
+                                            try {
+                                                sleep(sleeptime);
+                                            }catch (Exception e){
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume,
+                                            AudioManager.FLAG_PLAY_SOUND);
+                                }
+                            }.start();
                         }
                         break;
                     //降低音量
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                         if(mIsplay){
                             mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume / 2,
-                                    AudioManager.FLAG_PLAY_SOUND);
+                            mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                            new Thread(){
+                                @Override
+                                public void run(){
+                                    if((double)mCurrentVolume / mMaxVolume < 0.15)
+                                        return;
+                                    int sleeptime = (int)(1000 / (mCurrentVolume - (double)mCurrentVolume / mMaxVolume));
+                                    int temp = mCurrentVolume;
+                                    if(sleeptime > 0){
+                                        while (temp-- < mMaxVolume * 0.15){
+                                            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
+                                                    AudioManager.FLAG_PLAY_SOUND);
+                                            try {
+                                                sleep(sleeptime);
+                                            }catch (Exception e){
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume,
+                                            AudioManager.FLAG_PLAY_SOUND);
+                                }
+                            }.start();
+
                         }
                         break;
                     //暂停
@@ -160,11 +186,13 @@ public class MusicService extends Service {
                             mIsplay = false;
                         }
                         break;
-
                 }
+                mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
+                NotifyService.mInstance.UpdateNotify();
+
             }
         };
-        mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+        mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
         mRecevier = new PlayerReceiver();
         IntentFilter filter = new IntentFilter("remix.music.CTL_ACTION");
         registerReceiver(mRecevier,filter);
@@ -222,13 +250,16 @@ public class MusicService extends Service {
             @Override
             //音量逐渐增大
             public void run(){
+                int ret = mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
+                if(ret != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+                    return;
                 mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                 mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
                 mPlayer.start();
                 if(mCurrentVolume == 0)
                     return;
                 int temp = 0;
-                int sleeptime = 800 / mCurrentVolume;
+                int sleeptime = 500 / mCurrentVolume;
                 while(temp++ < mCurrentVolume){
                     try {
                         sleep(sleeptime);
@@ -387,8 +418,11 @@ public class MusicService extends Service {
         }
     }
     //准备播放
-    private static void PrepareAndPlay(String path) {
+    private void PrepareAndPlay(String path) {
         try {
+            int ret = mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
+            if(ret != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+                return;
             mPlayer.reset();
             mPlayer.setDataSource(path);
             mPlayer.prepareAsync();

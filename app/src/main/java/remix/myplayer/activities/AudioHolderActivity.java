@@ -97,11 +97,9 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     private AlphaAnimation mAnimOut;
     private Bitmap mNewBitMap;
     private boolean mFromNotify = false;
-    private Handler mBlurHandler = new Handler()
-    {
+    private Handler mBlurHandler = new Handler() {
         @Override
-        public void handleMessage(Message msg)
-        {
+        public void handleMessage(Message msg) {
             if(msg.what == Constants.UPDATE_BG) {
                 //对专辑图片进行高斯模糊，并将其设置为背景
                 float radius = 25;
