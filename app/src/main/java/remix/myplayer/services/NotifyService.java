@@ -36,12 +36,6 @@ import remix.myplayer.utils.DBUtil;
  */
 public class NotifyService extends Service {
     private final static String TAG = "NotifyService";
-    public Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            UpdateNotify();
-        }
-    };
     private NotifyReceiver mNotifyReceiver;
     public static NotifyService mInstance;
     private Context mContext;
@@ -60,7 +54,7 @@ public class NotifyService extends Service {
             @Override
             public void run(){
                 String packagename = getApplicationContext().getPackageName();
-                //每0.5秒检测是否app切换到前台，如果是，关闭通知栏
+                //每0.2秒检测是否app切换到前台，如果是，关闭通知栏
                 while(true){
                     try {
                         ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
@@ -136,9 +130,6 @@ public class NotifyService extends Service {
             PendingIntent mIntent_Next = PendingIntent.getBroadcast(mContext,2,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
             mRemoteView.setOnClickPendingIntent(R.id.notify_next,mIntent_Next);
 
-            mRemoteView.setImageViewResource(android.R.id.icon1, R.drawable.stat_notify);
-            mRemoteView.setImageViewResource(android.R.id.icon2, R.drawable.stat_notify);
-            mRemoteView.setImageViewResource(android.R.id.icon, R.drawable.stat_notify);
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext)
                     .setContent(mRemoteView)
                     .setWhen(System.currentTimeMillis())
@@ -158,12 +149,10 @@ public class NotifyService extends Service {
                             0,
                             PendingIntent.FLAG_UPDATE_CURRENT
                     );
-
             mBuilder.setContentIntent(resultPendingIntent);
             NotificationManager mNotificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(0, mBuilder.build());
         }
-
     }
 }
