@@ -51,7 +51,7 @@ public class LrcView extends TextView {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                if (AudioHolderActivity.mIsRun)
+                if (AudioHolderActivity.mIsRunning)
                     postInvalidate();
             }
         }, 0, 200);

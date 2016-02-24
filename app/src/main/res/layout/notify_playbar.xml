@@ -12,7 +12,7 @@
         android:src="@drawable/default_recommend"/>
     <LinearLayout
         android:id="@+id/notify_container"
-        android:layout_marginLeft="15dp"
+        android:layout_marginLeft="16dp"
         android:gravity="center_vertical"
         android:layout_toRightOf="@id/notify_image"
         android:orientation="vertical"
@@ -24,14 +24,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lines="1"
-            android:ellipsize="end"/>
+            android:ellipsize="end"
+            android:textColor="#fff"
+            android:textSize="17dp"/>
         <TextView
             android:id="@+id/notify_artist"
             android:text="歌手名"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lines="1"
-            android:ellipsize="end"/>
+            android:ellipsize="end"
+            android:textSize="15dp"
+            android:textColor="#fff"/>
     </LinearLayout>
     <ImageButton
         android:id="@+id/notify_next"

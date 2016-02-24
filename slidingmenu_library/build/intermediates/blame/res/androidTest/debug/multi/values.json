@@ -1,6 +1,6 @@
 [
     {
-        "outputFile": "D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+        "outputFile": "/home/taeja/AndroidProject/MyPlayer/slidingmenu_library/build/intermediates/res/merged/androidTest/debug/values/values.xml",
         "map": [
             {
                 "to": {
@@ -11,7 +11,7 @@
                     "endOffset": 941
                 },
                 "from": {
-                    "file": "D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "file": "/home/taeja/AndroidProject/MyPlayer/slidingmenu_library/build/intermediates/bundles/debug/res/values/values.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
@@ -24,7 +24,7 @@
         ]
     },
     {
-        "outputFile": "D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+        "outputFile": "/home/taeja/AndroidProject/MyPlayer/D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
         "map": [
             {
                 "to": {
@@ -35,7 +35,7 @@
                     "endOffset": 941
                 },
                 "from": {
-                    "file": "D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "file": "/home/taeja/AndroidProject/MyPlayer/D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
@@ -48,7 +48,7 @@
         ]
     },
     {
-        "outputFile": "D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+        "outputFile": "/home/taeja/AndroidProject/MyPlayer/D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
         "map": [
             {
                 "to": {
@@ -59,7 +59,7 @@
                     "endOffset": 941
                 },
                 "from": {
-                    "file": "D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "file": "/home/taeja/AndroidProject/MyPlayer/D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
@@ -72,7 +72,7 @@
         ]
     },
     {
-        "outputFile": "D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+        "outputFile": "/home/taeja/AndroidProject/MyPlayer/D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
         "map": [
             {
                 "to": {
@@ -83,7 +83,7 @@
                     "endOffset": 941
                 },
                 "from": {
-                    "file": "D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "file": "/home/taeja/AndroidProject/MyPlayer/D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
@@ -96,7 +96,7 @@
         ]
     },
     {
-        "outputFile": "D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+        "outputFile": "/home/taeja/AndroidProject/MyPlayer/D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
         "map": [
             {
                 "to": {
@@ -107,7 +107,7 @@
                     "endOffset": 941
                 },
                 "from": {
-                    "file": "D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "file": "/home/taeja/AndroidProject/MyPlayer/D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
@@ -120,7 +120,7 @@
         ]
     },
     {
-        "outputFile": "D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+        "outputFile": "/home/taeja/AndroidProject/MyPlayer/D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
         "map": [
             {
                 "to": {
@@ -131,7 +131,31 @@
                     "endOffset": 941
                 },
                 "from": {
-                    "file": "D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "file": "/home/taeja/AndroidProject/MyPlayer/D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 903,
+                        "endColumn": 42,
+                        "endOffset": 941
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "outputFile": "/home/taeja/AndroidProject/MyPlayer/D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 903,
+                    "endColumn": 42,
+                    "endOffset": 941
+                },
+                "from": {
+                    "file": "/home/taeja/AndroidProject/MyPlayer/D:\\home\\taeja\\AndroidProject\\MyPlayer\\D:\\home\\taeja\\AndroidProject\\MyPlayer\\slidingmenu_library\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,

@@ -1,12 +1,18 @@
 package remix.myplayer.activities;
 
 
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.session.MediaSession;
 import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.Window;
+import android.widget.LinearLayout;
 
 import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -26,6 +32,7 @@ import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.fragments.MainFragment;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.receivers.LineCtlReceiver;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.services.NotifyService;
 import remix.myplayer.utils.CommonUtil;
@@ -88,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
             startService(new Intent(this,MusicService.class));
             //NofityService
             startService(new Intent(this, NotifyService.class));
+
 
         }
         //加载主页fragment

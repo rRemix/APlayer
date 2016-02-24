@@ -1,27 +1,42 @@
 package remix.myplayer.services;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.RemoteControlClient;
+import android.media.session.PlaybackState;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.ResultReceiver;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;
+import remix.myplayer.infos.MP3Info;
+import remix.myplayer.receivers.LineCtlReceiver;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.infos.MP3Info;
 import remix.myplayer.utils.SharedPrefsUtil;
 
 
@@ -52,9 +67,23 @@ public class MusicService extends Service {
     private AudioManager mAudioManager;
     //回调接口的集合
     private static List<Callback> mCallBacklist  = new ArrayList<Callback>(){};;
-    private static Context context;
+    private Context mContext;
     private PlayerReceiver mRecevier;
+    private ComponentName mMediaComName;
+    private PendingIntent mMediaPendingIntent;
     private AudioManager.OnAudioFocusChangeListener mAudioFocusListener;
+    private RemoteControlClient mRemoteCtrlClient;
+    private MediaSessionCompat mMediaSession = null;
+    PlaybackStateCompat mPlayingbackState = new PlaybackStateCompat.Builder().setActions(PlaybackStateCompat.ACTION_PLAY
+            | PlaybackStateCompat.ACTION_PLAY_PAUSE   |  PlaybackStateCompat.ACTION_PAUSE
+            | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
+            .setState(PlaybackStateCompat.STATE_PLAYING,0,1)
+            .build();
+    PlaybackStateCompat mNotPlaybackState = new PlaybackStateCompat.Builder().setActions(PlaybackStateCompat.ACTION_PLAY
+            | PlaybackStateCompat.ACTION_PLAY_PAUSE   |  PlaybackStateCompat.ACTION_PAUSE
+            | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
+            .setState(PlaybackStateCompat.STATE_PAUSED,0,1)
+            .build();
     private static Handler mUpdateUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg)
@@ -64,7 +93,6 @@ public class MusicService extends Service {
                     for (int i = 0; i < mCallBacklist.size(); i++) {
                         if(mCallBacklist.get(i) != null)
                             mCallBacklist.get(i).UpdateUI(mInfo,mIsplay);
-
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -76,14 +104,13 @@ public class MusicService extends Service {
         @Override
         public void handleMessage(Message msg){
             if(msg.what == Constants.UPDATE_VOL){
-
             }
         }
     };
     public MusicService(){}
     public MusicService(Context context)
     {
-        this.context = context;
+        this.mContext = context;
     }
     @Nullable
     @Override
@@ -95,14 +122,12 @@ public class MusicService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mPlayer.release();
-        mPlayer = null;
-        mAudioManager.abandonAudioFocus(mAudioFocusListener);
-        unregisterReceiver(mRecevier);
+        UnInit();
     }
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext = getApplicationContext();
         mInstance = this;
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
         mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
@@ -110,92 +135,45 @@ public class MusicService extends Service {
             private boolean mFlag = false;
             @Override
             public void onAudioFocusChange(int focusChange) {
-                mFlag = mIsplay;
+
                 switch (focusChange){
                     //播放 获得焦点
                     case AudioManager.AUDIOFOCUS_GAIN:
-                        //如果之前正在播放，则继续播放
-//                        if(mFlag) {
+                        if(mPlayer == null)
+                            InitMediaPlayer();
+                        else if(!mIsplay){
 //                            PlayStart();
 //                            mIsplay = true;
-//                        }
+                        }
+                        mPlayer.setVolume(1.0f,1.0f);
+                        //如果之前正在播放，则继续播放
                         break;
                     //短暂失去焦点,比如有通知到来  暂停
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                        if(mIsplay) {
-                            mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                            mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-                            new Thread(){
-                                @Override
-                                public void run(){
-                                    if((double)mCurrentVolume / mMaxVolume < 0.15)
-                                        return;
-                                    int sleeptime = (int)(1000 / (mCurrentVolume - (double)mCurrentVolume / mMaxVolume));
-                                    int temp = mCurrentVolume;
-                                    if(sleeptime > 0){
-                                        while (temp-- < mMaxVolume * 0.15){
-                                            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
-                                                    AudioManager.FLAG_PLAY_SOUND);
-                                            try {
-                                                sleep(sleeptime);
-                                            }catch (Exception e){
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }
-                                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume,
-                                            AudioManager.FLAG_PLAY_SOUND);
-                                }
-                            }.start();
+                        if(mIsplay && mPlayer != null) {
+//                            new VolDownThread().start();
+                            mPlayer.setVolume(0.1f,0.1f);
                         }
                         break;
                     //降低音量
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                        if(mIsplay){
-                            mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-                            mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-                            new Thread(){
-                                @Override
-                                public void run(){
-                                    if((double)mCurrentVolume / mMaxVolume < 0.15)
-                                        return;
-                                    int sleeptime = (int)(1000 / (mCurrentVolume - (double)mCurrentVolume / mMaxVolume));
-                                    int temp = mCurrentVolume;
-                                    if(sleeptime > 0){
-                                        while (temp-- < mMaxVolume * 0.15){
-                                            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
-                                                    AudioManager.FLAG_PLAY_SOUND);
-                                            try {
-                                                sleep(sleeptime);
-                                            }catch (Exception e){
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }
-                                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume,
-                                            AudioManager.FLAG_PLAY_SOUND);
-                                }
-                            }.start();
-
+                        if(mIsplay && mPlayer != null){
+//                            new VolDownThread().start();
+                            mPlayer.setVolume(0.1f,0.1f);
                         }
                         break;
                     //暂停
                     case AudioManager.AUDIOFOCUS_LOSS:
-                        if(mIsplay) {
+                        if(mIsplay && mPlayer != null) {
                             Pause();
-                            mIsplay = false;
+//                           UnInit();
                         }
                         break;
                 }
                 mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
                 NotifyService.mInstance.UpdateNotify();
-
             }
         };
-        mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
-        mRecevier = new PlayerReceiver();
-        IntentFilter filter = new IntentFilter("remix.music.CTL_ACTION");
-        registerReceiver(mRecevier,filter);
 
         int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mPos",-1);
         if(DBUtil.mPlayingList != null && DBUtil.mPlayingList.size() > 0) {
@@ -206,9 +184,43 @@ public class MusicService extends Service {
         else
             mInfo = null;
 
+        InitMediaPlayer();
+    }
+
+    private void InitMediaPlayer() {
+        mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
+        mRecevier = new PlayerReceiver();
+        IntentFilter filter = new IntentFilter("remix.music.CTL_ACTION");
+        registerReceiver(mRecevier,filter);
+
+
+//        mMediaComName = new ComponentName(getPackageName(), LineCtlReceiver.class.getName());
+//        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+//        mediaButtonIntent.setComponent(mMediaComName);
+//        mMediaPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, mediaButtonIntent,0);
+
+        mMediaSession = new MediaSessionCompat(getApplicationContext(),"session");
+
+        mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
+                | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mMediaSession.setPlaybackState(mNotPlaybackState);
+        mMediaSession.setCallback(new SessionCallBack());
+        mMediaSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
+//        mMediaSession.setMediaButtonReceiver(mMediaPendingIntent);
+        UpdateLockScreen();
+        mMediaSession.setActive(true);
+//        mRemoteCtrlClient = new RemoteControlClient(mMediaPendingIntent);
+//        int flags = RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
+//                | RemoteControlClient.FLAG_KEY_MEDIA_NEXT
+//                | RemoteControlClient.FLAG_KEY_MEDIA_PLAY
+//                | RemoteControlClient.FLAG_KEY_MEDIA_PAUSE
+//                | RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE
+//                | RemoteControlClient.FLAG_KEY_MEDIA_STOP;
+//        mRemoteCtrlClient.setTransportControlFlags(flags);
+//        mAudioManager.registerRemoteControlClient(mRemoteCtrlClient);
+
         mPlayer = new MediaPlayer();
         mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
 
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -233,6 +245,27 @@ public class MusicService extends Service {
         });
     }
 
+    private void UpdateLockScreen() {
+        if(mInfo != null) {
+            Bitmap bitmap = DBUtil.CheckBitmapByAlbumId((int) mInfo.getAlbumId(), false);
+            if(bitmap == null)
+                bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
+            mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
+                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
+                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mInfo.getDisplayname())
+                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, mInfo.getAlbum() + " - " + mInfo.getArtist())
+                    .build());
+        }
+    }
+
+    private void UnInit(){
+        mPlayer.release();
+        mPlayer = null;
+//        mAudioManager.unregisterMediaButtonEventReceiver(mMediaPendingIntent);
+        mAudioManager.abandonAudioFocus(mAudioFocusListener);
+        unregisterReceiver(mRecevier);
+
+    }
 
     private void Play(String Path) {
         PrepareAndPlay(Path);
@@ -253,13 +286,15 @@ public class MusicService extends Service {
                 int ret = mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
                 if(ret != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
                     return;
+                mIsplay = true;
+                mMediaSession.setPlaybackState(mPlayingbackState);
                 mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                 mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
                 mPlayer.start();
                 if(mCurrentVolume == 0)
                     return;
                 int temp = 0;
-                int sleeptime = 500 / mCurrentVolume;
+                int sleeptime = 100 / mCurrentVolume;
                 while(temp++ < mCurrentVolume){
                     try {
                         sleep(sleeptime);
@@ -269,6 +304,7 @@ public class MusicService extends Service {
                     mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
                             AudioManager.FLAG_PLAY_SOUND);
                 }
+//                mRemoteCtrlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
             }
         }.start();
 
@@ -295,13 +331,15 @@ public class MusicService extends Service {
             //音量逐渐减小后暂停
             @Override
             public void run(){
+                mIsplay = false;
                 mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                 mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                mMediaSession.setPlaybackState(mNotPlaybackState);
                 if(mCurrentVolume == 0){
                     mPlayer.pause();
                     return;
                 }
-                int sleeptime = 500 / mCurrentVolume;
+                int sleeptime = 100 / mCurrentVolume;
                 int temp = mCurrentVolume;
                 while(temp-- > 0){
                     try {
@@ -312,10 +350,10 @@ public class MusicService extends Service {
                     mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
                             AudioManager.FLAG_PLAY_SOUND);
                 }
-                mIsplay = false;
                 mPlayer.pause();
                 mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume,
                         AudioManager.FLAG_PLAY_SOUND);
+//                mRemoteCtrlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
             }
         }.start();
     }
@@ -372,12 +410,10 @@ public class MusicService extends Service {
                     break;
                 //播放上一首
                 case Constants.PREV:
-                    mIsplay = true;
                     PlayPrevious();
                     break;
                 //播放下一首
                 case Constants.NEXT:
-                    mIsplay = true;
                     PlayNext();
                     break;
                 //暂停或者继续播放
@@ -387,12 +423,10 @@ public class MusicService extends Service {
                     break;
                 //暂停
                 case Constants.PAUSE:
-                    mIsplay = false;
                     Pause();
                     break;
                 //继续播放
                 case Constants.CONTINUE:
-                    mIsplay = true;
                     PlayStart();
                     break;
                 //顺序播放
@@ -409,11 +443,12 @@ public class MusicService extends Service {
                 default:break;
             }
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
-            boolean FromNotify = intent.getBooleanExtra("FromNotify", false);
-            if(FromNotify){
-//                NotifyService.mInstance.mHandler.sendEmptyMessage(0);
-//                sendBroadcast(new Intent(Constants.NOTIFY));
+            if(intent.getBooleanExtra("FromNotify", false)){
                 NotifyService.mInstance.UpdateNotify();
+            }
+            if(Control == Constants.NEXT || Control == Constants.PREV || Control == Constants.PLAYSELECTEDSONG) {
+                //更新锁屏界面
+                UpdateLockScreen();
             }
         }
     }
@@ -423,6 +458,8 @@ public class MusicService extends Service {
             int ret = mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
             if(ret != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
                 return;
+//            mRemoteCtrlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
+            mMediaSession.setPlaybackState(mPlayingbackState);
             mPlayer.reset();
             mPlayer.setDataSource(path);
             mPlayer.prepareAsync();
@@ -443,6 +480,7 @@ public class MusicService extends Service {
     public void PlayNextOrPrev(boolean IsNext,boolean NeedPlay){
         if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return;
+        mIsplay = true;
         if(mPlayModel == Constants.PLAY_SHUFFLE) {
             mCurrent = getShuffle();
             mId = DBUtil.mPlayingList.get(mCurrent);
@@ -467,6 +505,12 @@ public class MusicService extends Service {
         }
         if(NeedPlay)
             Play(mInfo.getUrl());
+
+//        RemoteControlClient.MetadataEditor editor = mRemoteCtrlClient.editMetadata(false);
+//        editor.putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK,DBUtil.CheckBitmapByAlbumId((int)mInfo.getAlbumId(),false));
+//        editor.putString(MediaMetadataRetriever.METADATA_KEY_ALBUM,mInfo.getAlbum());
+//        editor.putString(MediaMetadataRetriever.METADATA_KEY_ARTIST,mInfo.getArtist());
+//        editor.putString(MediaMetadataRetriever.METADATA_KEY_TITLE,mInfo.getDisplayname());
     }
     //获得播放状态
     public static int getPlayModel() {
@@ -518,5 +562,101 @@ public class MusicService extends Service {
     public static void setCurrentPos(int pos)
     {
         mCurrent = pos;
+    }
+
+    public class VolDownThread extends Thread{
+        @Override
+        public void run(){
+            mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            if((double)mCurrentVolume / mMaxVolume < 0.15)
+                return;
+            int sleeptime = (int)(1000 / (mCurrentVolume - (double)mCurrentVolume / mMaxVolume));
+            int temp = mCurrentVolume;
+            if(sleeptime > 0){
+                while (temp-- < mMaxVolume * 0.15){
+                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
+                            AudioManager.FLAG_PLAY_SOUND);
+                    try {
+                        sleep(sleeptime);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume,
+                    AudioManager.FLAG_PLAY_SOUND);
+        }
+    }
+
+    private static int mCount = 0;
+    public class SessionCallBack extends MediaSessionCompat.Callback{
+        @Override
+        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+            Intent intent_ctl = null;
+            KeyEvent event = (KeyEvent)mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            if(event == null) return  true;
+
+            //过滤按下事件
+            boolean isActionUp = (event.getAction() == KeyEvent.ACTION_UP);
+            if(!isActionUp) {
+                return true;
+            }
+
+            int keyCode = event.getKeyCode();
+            if(keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ||
+                    keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ||
+                    keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
+                intent_ctl = new Intent(Constants.CTL_ACTION);
+                int arg = keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.PLAY :
+                        keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Constants.NEXT : Constants.PREV;
+                intent_ctl.putExtra("Control", arg);
+                getApplicationContext().sendBroadcast(intent_ctl);
+                return true;
+            }
+
+            Log.d(TAG,"count=" + mCount);
+            //如果是第一次按下，开启一条线程去判断用户操作
+            if(mCount == 0){
+                new Thread(){
+                    @Override
+                    public void run() {
+                        try {
+                            sleep(800);
+                            int arg = -1;
+                            arg = mCount == 1 ? Constants.PLAY : mCount == 2 ? Constants.NEXT : Constants.PREV;
+                            mCount = 0;
+                            Intent intent = new Intent(Constants.CTL_ACTION);
+                            intent.putExtra("Control", arg);
+                            getApplicationContext().sendBroadcast(intent);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
+            }
+            mCount++;
+            return true;
+        }
+
+        @Override
+        public void onCommand(String command, Bundle extras, ResultReceiver cb) {
+            super.onCommand(command, extras, cb);
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
+        }
+
+        @Override
+        public void onSkipToPrevious() {
+            super.onSkipToPrevious();
+        }
+
+        @Override
+        public void onSkipToNext() {
+            super.onSkipToNext();
+        }
     }
 }

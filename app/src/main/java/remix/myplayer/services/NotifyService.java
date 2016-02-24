@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -26,6 +27,7 @@ import java.util.List;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
+import remix.myplayer.activities.MainActivity;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
@@ -71,7 +73,7 @@ public class NotifyService extends Service {
                                 mNotificationManager.cancel(0);
                             }
                         }
-                        sleep(500);
+                        sleep(200);
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -104,7 +106,7 @@ public class NotifyService extends Service {
             mIsplay = MusicService.getIsplay();
             Log.d(TAG,"isplay=" + mIsplay);
             mRemoteView = new RemoteViews(mContext.getPackageName(), R.layout.notify_playbar);
-            if(MusicService.getCurrentMP3() == null) {
+            if(MusicService.getCurrentMP3() == null ) {
                 return;
             }
             MP3Info temp = MusicService.getCurrentMP3();
@@ -134,12 +136,15 @@ public class NotifyService extends Service {
             PendingIntent mIntent_Next = PendingIntent.getBroadcast(mContext,2,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
             mRemoteView.setOnClickPendingIntent(R.id.notify_next,mIntent_Next);
 
+            mRemoteView.setImageViewResource(android.R.id.icon1, R.drawable.stat_notify);
+            mRemoteView.setImageViewResource(android.R.id.icon2, R.drawable.stat_notify);
+            mRemoteView.setImageViewResource(android.R.id.icon, R.drawable.stat_notify);
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext)
                     .setContent(mRemoteView)
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
                     .setOngoing(mIsplay)
-                    .setSmallIcon(R.drawable.app_icon);
+                    .setSmallIcon(R.drawable.stat_notify);
 
             Intent result = new Intent(mContext,AudioHolderActivity.class);
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
@@ -159,5 +164,6 @@ public class NotifyService extends Service {
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(0, mBuilder.build());
         }
+
     }
 }

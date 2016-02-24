@@ -1,10 +1,6 @@
 package remix.myplayer.activities;
 
-import android.app.NotificationManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -12,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
 
@@ -39,6 +34,7 @@ import remix.myplayer.adapters.PagerAdapter;
 import remix.myplayer.fragments.CoverFragment;
 import remix.myplayer.fragments.LrcFragment;
 import remix.myplayer.fragments.RecordFragment;
+import remix.myplayer.listeners.CtrlButtonListener;
 import remix.myplayer.services.MusicService;
 
 import remix.myplayer.ui.AudioViewPager;
@@ -57,7 +53,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     //记录操作是下一首还是上一首
     public static int mOperation = -1;
     //是否正在运行
-    public static boolean mIsRun;
+    public static boolean mIsRunning;
     //当前上次选中的Fragment
     private int mPrevPosition = 1;
     //是否播放的标志变量
@@ -224,13 +220,13 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         super.onResume();
         ProgeressThread thread = new ProgeressThread();
         thread.start();
-        mIsRun = true;
+        mIsRunning = true;
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mIsRun = false;
+        mIsRunning = false;
     }
 
     @Override
@@ -242,7 +238,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     class ProgeressThread extends Thread {
         @Override
         public void run() {
-            while (mIsRun && mInfo != null) {
+            while (mIsRunning && mInfo != null) {
                 if (MusicService.getIsplay()) {
                     mCurrent = MusicService.getCurrentTime();
                     mHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
@@ -291,31 +287,10 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mPlayBarPlay = (ImageButton)findViewById(R.id.playbar_play);
         mPlayBarNext = (ImageButton)findViewById(R.id.playbar_next);
         UpdatePlayButton(mIsPlay);
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Constants.CTL_ACTION);
-                switch (v.getId())
-                {
-                    case R.id.playbar_prev:
-                        intent.putExtra("Control", Constants.PREV);
-                        mOperation = Constants.PREV;
-                        break;
-                    case R.id.playbar_next:
-                        mOperation = Constants.NEXT;
-                        intent.putExtra("Control", Constants.NEXT);
-                        break;
-                    case R.id.playbar_play:
-                        mOperation = Constants.PLAY;
-                        intent.putExtra("Control", Constants.PLAY);
-                        break;
-                }
-                sendBroadcast(intent);
-            }
-        };
-        mPlayBarPrev.setOnClickListener(listener);
-        mPlayBarPlay.setOnClickListener(listener);
-        mPlayBarNext.setOnClickListener(listener);
+        CtrlButtonListener mListener = new CtrlButtonListener(getApplicationContext());
+        mPlayBarPrev.setOnClickListener(mListener);
+        mPlayBarPlay.setOnClickListener(mListener);
+        mPlayBarNext.setOnClickListener(mListener);
     }
 
     private void initSeekBar() {
@@ -374,7 +349,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         if(isPlay)
             mPlayBarPlay.setImageResource(R.drawable.play_btn_stop);
         else
-            mPlayBarPlay.setImageResource(R.drawable.play_btn_paly);
+            mPlayBarPlay.setImageResource(R.drawable.play_btn_play);
     }
 
     private void initTop() {
@@ -450,7 +425,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mInfo= MP3info;
         mIsPlay = isplay;
 
-        if(mOperation != Constants.PLAY && mIsRun) {
+        if(mOperation != Constants.PLAY && mIsRunning) {
             //更新顶部信息
             UpdateTopStatus(mInfo);
             //更新按钮状态
@@ -466,7 +441,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
 
         }
-        else if(mIsRun)
+        else if(mIsRunning)
             //更新按钮状态
             UpdatePlayButton(isplay);
 
