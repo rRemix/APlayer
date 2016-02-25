@@ -134,8 +134,11 @@ public class NotifyService extends Service {
                     .setContent(mRemoteView)
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
-                    .setOngoing(mIsplay)
+                    .setOngoing(true)
+                    .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setSmallIcon(R.drawable.stat_notify);
+//                    .setLargeIcon(DBUtil.CheckBitmapByAlbumId((int)MusicService.getCurrentMP3().getAlbumId(),false))
+//                    .setStyle(new android.support.v7.app.NotificationCompat.MediaStyle().setMediaSession(MusicService.mMediaSession.getSessionToken()));
 
             Intent result = new Intent(mContext,AudioHolderActivity.class);
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);

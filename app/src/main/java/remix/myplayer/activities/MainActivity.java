@@ -1,18 +1,22 @@
 package remix.myplayer.activities;
 
 
-import android.app.PendingIntent;
-import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.session.MediaSession;
 import android.os.Bundle;
-import android.os.ResultReceiver;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -28,13 +32,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import remix.myplayer.R;
+import remix.myplayer.adapters.SlideMenuAdapter;
 import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.fragments.MainFragment;
 import remix.myplayer.infos.MP3Info;
-import remix.myplayer.receivers.LineCtlReceiver;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.services.NotifyService;
+import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
@@ -47,6 +52,14 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     private BottomActionBarFragment mBottomBar;
     private final static String TAG = "MainActivity";
     private boolean mFromNotify = false;
+    private ListView mSlideMenuList;
+    private DrawerLayout mDrawerLayout;
+    private LinearLayout mDrawerMenu;
+    private ImageButton mSlideMenuBtn;
+    private ImageButton mSlideMenuAbout;
+    private ImageButton mSlideMenuExit;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private Toolbar mToolBar;
 //    private ServiceConnection mConnecting = new ServiceConnection() {
 //        @Override
 //        public void onServiceConnected(ComponentName name, IBinder service) {
@@ -95,13 +108,16 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
             startService(new Intent(this,MusicService.class));
             //NofityService
             startService(new Intent(this, NotifyService.class));
-
-
         }
         //加载主页fragment
         initMainFragment();
+        //初始化测滑菜单
+        initDrawerLayout();
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment)getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
+
+        initToolbar();
+
         if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return;
         //如果是第一次启动软件
@@ -114,6 +130,43 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         else
             mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(mPos)), mFromNotify);
     }
+
+    private void initToolbar() {
+        mToolBar = (Toolbar) findViewById(R.id.toolbar);
+        mToolBar.setTitle("");
+
+        setSupportActionBar(mToolBar);
+        mToolBar.setNavigationIcon(R.drawable.btn_toolbar_menu);
+        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDrawerLayout.openDrawer(mDrawerMenu);
+            }
+        });
+        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.toolbar_search:
+                        startActivity(new Intent(MainActivity.this, SearchActivity.class));
+                        break;
+                    case R.id.toolbar_timer:
+                        startActivity(new Intent(MainActivity.this, TimerPopupWindow.class));
+                        break;
+                }
+                return true;
+            }
+        });
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
 
     private void initUtil() {
         //初始化库和工具类
@@ -149,9 +202,60 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 
     private void initMainFragment() {
 
+
         getSupportFragmentManager().beginTransaction().add(R.id.main_fragment_container, new MainFragment(), "MainFragment").addToBackStack(null).commit();
     }
 
+    private void initDrawerLayout(){
+        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,mToolBar,R.string.drawerlayout_open,R.string.drawerlayout_open);
+//        mDrawerLayout.setDrawerListener(mDrawerToggle);
+//        mDrawerToggle.syncState();
+
+        mDrawerMenu = (LinearLayout)findViewById(R.id.slide_menu);
+        mSlideMenuList = (ListView) mDrawerMenu.findViewById(R.id.slide_menu_list);
+        mSlideMenuList.setAdapter(new SlideMenuAdapter(getLayoutInflater()));
+        mSlideMenuList.setOnItemClickListener(new SlideMenuListener(this));
+
+        mSlideMenuAbout = (ImageButton)findViewById(R.id.drawer_about);
+        mSlideMenuExit = (ImageButton)findViewById(R.id.drawer_exit);
+        mSlideMenuExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendBroadcast(new Intent(Constants.EXIT));
+            }
+        });
+
+    }
+
+    class SlideMenuListener implements AdapterView.OnItemClickListener {
+        private Context mContext;
+
+        public SlideMenuListener(Context mContext) {
+            this.mContext = mContext;
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            switch (view.getId()) {
+                case 0:
+                    mDrawerLayout.closeDrawer(mDrawerMenu);
+                    MainFragment.mInstance.getViewPager().setCurrentItem(0);
+//                    mDrawerMenu.toggle();
+//                    mViewPager.setCurrentItem(0);
+                    break;
+                case 1:
+                    startActivity(new Intent(MainActivity.this, PlayListActivity.class));
+                    break;
+                case 2:
+                    Intent intent = new Intent(Constants.CTL_ACTION);
+                    intent.putExtra("Control", Constants.PREV);
+                    sendBroadcast(intent);
+                    break;
+                default:break;
+            }
+        }
+    }
 
     //读取sd卡歌曲信息
     public static void loadsongs()
@@ -187,18 +291,32 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         }
     }
 
-    //后退返回桌面
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_BACK) {
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(mDrawerLayout.isDrawerOpen(mDrawerMenu))
+            mDrawerLayout.closeDrawer(mDrawerMenu);
+        else {
             Intent home = new Intent(Intent.ACTION_MAIN);
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             home.addCategory(Intent.CATEGORY_HOME);
             startActivity(home);
             sendBroadcast(new Intent(Constants.NOTIFY));
         }
-        return super.onKeyDown(keyCode, event);
     }
+
+    //后退返回桌面
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if(keyCode == KeyEvent.KEYCODE_BACK) {
+//            Intent home = new Intent(Intent.ACTION_MAIN);
+//            home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            home.addCategory(Intent.CATEGORY_HOME);
+//            startActivity(home);
+//            sendBroadcast(new Intent(Constants.NOTIFY));
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay){

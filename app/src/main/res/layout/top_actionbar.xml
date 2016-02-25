@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="19dp"
         android:layout_centerVertical="true"
-        android:background="@drawable/btn_actionbar_menu"/>
+        android:background="@drawable/btn_toolbar_menu"/>
     <ImageButton
         android:id="@+id/btn_top_search"
         android:layout_width="wrap_content"
@@ -19,7 +19,7 @@
         android:layout_marginRight="19dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:background="@drawable/actinobar_search" />
+        android:background="@drawable/toolbar_search" />
     <ImageButton
         android:id="@+id/btn_top_timer"
         android:layout_width="wrap_content"
@@ -27,5 +27,5 @@
         android:layout_marginRight="16dp"
         android:layout_toLeftOf="@id/btn_top_search"
         android:layout_centerVertical="true"
-        android:background="@drawable/actionbar_timer" />
+        android:background="@drawable/toolbar_timer" />
 </RelativeLayout>

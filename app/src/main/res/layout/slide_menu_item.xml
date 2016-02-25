@@ -17,5 +17,5 @@
         android:layout_margin="8dp"
         android:text="全部歌曲"
         android:textSize="16dp"
-        android:textColor="#fff"/>
+        android:textColor="#1b1c19"/>
 </LinearLayout>

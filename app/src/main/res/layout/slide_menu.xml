@@ -1,8 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="240dp"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/navigation_background">
+    android:background="@drawable/navigation_background"
+    android:id="@+id/slide_menu"
+    android:layout_gravity="left|start">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -18,13 +20,15 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
-        android:choiceMode="singleChoice">
+        android:choiceMode="singleChoice"
+        android:background="#ffffffff">
     </ListView>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:background="#ffffffff">
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,7 +36,7 @@
             android:src="@drawable/drawer_ic_abou"
             android:layout_marginLeft="46dp"
             android:layout_alignParentLeft="true"
-            android:background="#333333"/>
+            android:background="#ffffffff"/>
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,6 +44,6 @@
             android:src="@drawable/drawer_ic_exit_2"
             android:layout_marginRight="46dp"
             android:layout_alignParentRight="true"
-            android:background="#333333"/>
+            android:background="#ffffffff"/>
     </RelativeLayout>
 </LinearLayout>

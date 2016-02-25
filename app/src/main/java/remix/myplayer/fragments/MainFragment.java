@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +44,7 @@ public class MainFragment extends Fragment {
     private MyPager mViewPager;
     private LayoutInflater mInflater;
     private PagerAdapter mAdapter;
-
+    private DrawerLayout mDrawerLayout;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,56 +65,60 @@ public class MainFragment extends Fragment {
 
     private void initTimerandSearch(View v)
     {
-        mTimer = (ImageButton)v.findViewById(R.id.btn_top_timer);
-        mTimer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getActivity(), TimerPopupWindow.class));
-            }
-        });
-        mSearch = (ImageButton)v.findViewById(R.id.btn_top_search);
-        mSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getActivity(), SearchActivity.class));
-            }
-        });
+//        mTimer = (ImageButton)v.findViewById(R.id.btn_top_timer);
+//        mTimer.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startActivity(new Intent(getActivity(), TimerPopupWindow.class));
+//            }
+//        });
+//        mSearch = (ImageButton)v.findViewById(R.id.btn_top_search);
+//        mSearch.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startActivity(new Intent(getActivity(), SearchActivity.class));
+//            }
+//        });
     }
 
     private void initSlideMenu(View v)
     {
         //初始化菜单
-        mSlideMenu = new SlidingMenu(getContext());
-        mSlideMenu.setMode(SlidingMenu.LEFT);
-        mSlideMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-        mSlideMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
-        mSlideMenu.setFadeDegree(0.35f);
-        mSlideMenu.attachToActivity(getActivity(), SlidingMenu.SLIDING_CONTENT);
-        mSlideMenu.setMenu(R.layout.slide_menu);
-        mSlideMenuList = (ListView)mSlideMenu.findViewById(R.id.slide_menu_list);
-        mSlideMenuList.setAdapter(new SlideMenuAdapter(getActivity().getLayoutInflater()));
-        mSlideMenuList.setOnItemClickListener(new SlideMenuListener(getContext()));
-
-        mSlideMenuBtn = (ImageButton)v.findViewById(R.id.btn_slide_menu);
-        mSlideMenuBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSlideMenu.toggle();
-            }
-        });
-        mSlideMenuAbout = (ImageButton)mSlideMenu.findViewById(R.id.drawer_about);
-        mSlideMenuExit = (ImageButton)mSlideMenu.findViewById(R.id.drawer_exit);
-        mSlideMenuExit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getContext().sendBroadcast(new Intent(Constants.EXIT));
-            }
-        });
+//        mSlideMenu = new SlidingMenu(getContext());
+//        mSlideMenu.setMode(SlidingMenu.LEFT);
+//        mSlideMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+//        mSlideMenu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+//        mSlideMenu.setFadeDegree(0.35f);
+//        mSlideMenu.attachToActivity(getActivity(), SlidingMenu.SLIDING_CONTENT);
+//        mSlideMenu.setMenu(R.layout.slide_menu);
+//
+//        mSlideMenuList = (ListView)mSlideMenu.findViewById(R.id.slide_menu_list);
+//        mSlideMenuList.setAdapter(new SlideMenuAdapter(getActivity().getLayoutInflater()));
+//        mSlideMenuList.setOnItemClickListener(new SlideMenuListener(getContext()));
+//
+//        mSlideMenuBtn = (ImageButton)v.findViewById(R.id.btn_slide_menu);
+//        mSlideMenuBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mSlideMenu.toggle();
+//            }
+//        });
+//        mSlideMenuAbout = (ImageButton)mSlideMenu.findViewById(R.id.drawer_about);
+//        mSlideMenuExit = (ImageButton)mSlideMenu.findViewById(R.id.drawer_exit);
+//        mSlideMenuExit.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                getContext().sendBroadcast(new Intent(Constants.EXIT));
+//            }
+//        });
 
     }
     public PagerAdapter getAdapter()
     {
         return mAdapter;
+    }
+    public MyPager getViewPager(){
+        return mViewPager;
     }
     //初始化ViewPager
     private void initPager() {
@@ -150,30 +155,5 @@ public class MainFragment extends Fragment {
         mSlideMenu.toggle();
     }
 
-    class SlideMenuListener implements AdapterView.OnItemClickListener {
-        private Context mContext;
 
-        public SlideMenuListener(Context mContext) {
-            this.mContext = mContext;
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            switch (view.getId()) {
-                case 0:
-                    mSlideMenu.toggle();
-                    mViewPager.setCurrentItem(0);
-                    break;
-                case 1:
-                    startActivity(new Intent(getActivity(), PlayListActivity.class));
-                    break;
-                case 2:
-                    Intent intent = new Intent(Constants.CTL_ACTION);
-                    intent.putExtra("Control", Constants.PREV);
-                    mContext.sendBroadcast(intent);
-                    break;
-                default:break;
-            }
-        }
-    }
 }

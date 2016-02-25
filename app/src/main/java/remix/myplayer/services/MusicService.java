@@ -12,13 +12,16 @@ import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RemoteControlClient;
+import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.ResultReceiver;
 import android.os.SystemClock;
+import android.service.notification.StatusBarNotification;
 import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -73,17 +76,18 @@ public class MusicService extends Service {
     private PendingIntent mMediaPendingIntent;
     private AudioManager.OnAudioFocusChangeListener mAudioFocusListener;
     private RemoteControlClient mRemoteCtrlClient;
-    private MediaSessionCompat mMediaSession = null;
+    public static MediaSessionCompat mMediaSession = null;
     PlaybackStateCompat mPlayingbackState = new PlaybackStateCompat.Builder().setActions(PlaybackStateCompat.ACTION_PLAY
             | PlaybackStateCompat.ACTION_PLAY_PAUSE   |  PlaybackStateCompat.ACTION_PAUSE
             | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
-            .setState(PlaybackStateCompat.STATE_PLAYING,0,1)
+            .setState(PlaybackStateCompat.STATE_PLAYING,PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN,SystemClock.elapsedRealtime() + 10000)
             .build();
     PlaybackStateCompat mNotPlaybackState = new PlaybackStateCompat.Builder().setActions(PlaybackStateCompat.ACTION_PLAY
             | PlaybackStateCompat.ACTION_PLAY_PAUSE   |  PlaybackStateCompat.ACTION_PAUSE
             | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
-            .setState(PlaybackStateCompat.STATE_PAUSED,0,1)
+            .setState(PlaybackStateCompat.STATE_PAUSED,PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN,1,SystemClock.elapsedRealtime() + 10000)
             .build();
+
     private static Handler mUpdateUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg)
@@ -100,13 +104,13 @@ public class MusicService extends Service {
             }
         }
     };
-    private Handler mUpdateVolHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg){
-            if(msg.what == Constants.UPDATE_VOL){
-            }
-        }
-    };
+    private PlaybackStateCompat getPlaybackStateCompat(int state,int position) {
+        return new PlaybackStateCompat.Builder().setActions(PlaybackStateCompat.ACTION_PLAY
+                | PlaybackStateCompat.ACTION_PLAY_PAUSE   |  PlaybackStateCompat.ACTION_PAUSE
+                | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
+                .setState(state,position,1.0f,SystemClock.elapsedRealtime() + 10000)
+                .build();
+    }
     public MusicService(){}
     public MusicService(Context context)
     {
@@ -185,6 +189,22 @@ public class MusicService extends Service {
             mInfo = null;
 
         InitMediaPlayer();
+
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                while (true) {
+//                    if (mInfo != null && mIsplay) {
+//                        try {
+//                            sleep(1000);
+//                            UpdateLockScreen();
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }
+//        }.start();
     }
 
     private void InitMediaPlayer() {
@@ -192,7 +212,6 @@ public class MusicService extends Service {
         mRecevier = new PlayerReceiver();
         IntentFilter filter = new IntentFilter("remix.music.CTL_ACTION");
         registerReceiver(mRecevier,filter);
-
 
 //        mMediaComName = new ComponentName(getPackageName(), LineCtlReceiver.class.getName());
 //        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
@@ -204,10 +223,11 @@ public class MusicService extends Service {
         mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
                 | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
         mMediaSession.setPlaybackState(mNotPlaybackState);
+        UpdateLockScreen();
         mMediaSession.setCallback(new SessionCallBack());
         mMediaSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
 //        mMediaSession.setMediaButtonReceiver(mMediaPendingIntent);
-        UpdateLockScreen();
+
         mMediaSession.setActive(true);
 //        mRemoteCtrlClient = new RemoteControlClient(mMediaPendingIntent);
 //        int flags = RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
@@ -250,10 +270,14 @@ public class MusicService extends Service {
             Bitmap bitmap = DBUtil.CheckBitmapByAlbumId((int) mInfo.getAlbumId(), false);
             if(bitmap == null)
                 bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
+//            Uri uri = Uri.parse("res://包名(实际可以是任何字符串甚至留空)/" + R.drawable.ic_launcher);
+            Uri uri = Uri.parse("res://remix.myplayer/"+ R.drawable.stat_notify);
             mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
                     .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
                     .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mInfo.getDisplayname())
                     .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, mInfo.getAlbum() + " - " + mInfo.getArtist())
+                    .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,"res://remix.myplayer/"+ R.drawable.stat_notify)
+                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,mInfo.getDuration())
                     .build());
         }
     }
@@ -263,8 +287,8 @@ public class MusicService extends Service {
         mPlayer = null;
 //        mAudioManager.unregisterMediaButtonEventReceiver(mMediaPendingIntent);
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
+        mMediaSession.release();
         unregisterReceiver(mRecevier);
-
     }
 
     private void Play(String Path) {
@@ -287,7 +311,7 @@ public class MusicService extends Service {
                 if(ret != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
                     return;
                 mIsplay = true;
-                mMediaSession.setPlaybackState(mPlayingbackState);
+                mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING,getCurrentTime()));
                 mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                 mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
                 mPlayer.start();
@@ -334,7 +358,7 @@ public class MusicService extends Service {
                 mIsplay = false;
                 mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                 mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-                mMediaSession.setPlaybackState(mNotPlaybackState);
+                mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PAUSED,getCurrentTime()));
                 if(mCurrentVolume == 0){
                     mPlayer.pause();
                     return;
@@ -459,7 +483,7 @@ public class MusicService extends Service {
             if(ret != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
                 return;
 //            mRemoteCtrlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
-            mMediaSession.setPlaybackState(mPlayingbackState);
+            mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING,getCurrentTime()));
             mPlayer.reset();
             mPlayer.setDataSource(path);
             mPlayer.prepareAsync();

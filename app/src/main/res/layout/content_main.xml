@@ -1,20 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-    <!-- 主内容-->
-    <FrameLayout
+    android:orientation="vertical"
+    android:id="@+id/drawer_layout">
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="7"
-        android:background="#fef2f3f9"
-        android:id="@+id/main_fragment_container">
-    </FrameLayout>
-    <!-- 底部自定义ationbar -->
-    <fragment android:name="remix.myplayer.fragments.BottomActionBarFragment"
-        android:id="@+id/bottom_actionbar_new"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/layout_main">
+        <!-- 主内容-->
+        <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
+            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+            android:background="#ffffffff">
+        </android.support.v7.widget.Toolbar>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="7"
+            android:background="#fef2f3f9"
+            android:id="@+id/main_fragment_container"
+            android:layout_gravity="top">
+        </FrameLayout>
+        <!-- 底部自定义ationbar -->
+        <fragment android:name="remix.myplayer.fragments.BottomActionBarFragment"
+            android:id="@+id/bottom_actionbar_new"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <!--测滑菜单-->
+     <include layout="@layout/slide_menu"/>
+</android.support.v4.widget.DrawerLayout>
