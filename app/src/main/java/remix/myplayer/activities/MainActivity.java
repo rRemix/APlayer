@@ -43,6 +43,7 @@ import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.QQApi;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.XmlUtil;
 
@@ -92,6 +93,14 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        new Thread(){
+            @Override
+            public void run(){
+                String temp = QQApi.Test("七里香","周杰伦");
+            }
+        }.start();
+
+
         initUtil();
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -293,7 +302,6 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
         if(mDrawerLayout.isDrawerOpen(mDrawerMenu))
             mDrawerLayout.closeDrawer(mDrawerMenu);
         else {

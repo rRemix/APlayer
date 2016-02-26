@@ -134,7 +134,7 @@ public class NotifyService extends Service {
                     .setContent(mRemoteView)
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
-                    .setOngoing(true)
+                    .setOngoing(mIsplay)
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setSmallIcon(R.drawable.stat_notify);
 //                    .setLargeIcon(DBUtil.CheckBitmapByAlbumId((int)MusicService.getCurrentMP3().getAlbumId(),false))

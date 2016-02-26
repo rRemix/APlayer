@@ -42,49 +42,40 @@ public class SearchLRC {
         }
         String strUrl = "http://box.zhangmen.baidu.com/x?op=12&count=1&title=" +
                 musicName + "$$" + singerName +"$$$$";
-        try
-        {
+        try {
             url = new URL(strUrl);
-        }
-        catch (Exception e1)
-        {
+        } catch (Exception e1) {
             e1.printStackTrace();
         }
         BufferedReader br = null;
         String s = new String();
-        try
-        {
+        try {
             HttpURLConnection httpConn = (HttpURLConnection)url.openConnection();
             httpConn.connect();
             InputStreamReader inReader = new InputStreamReader(httpConn.getInputStream());
             br = new BufferedReader(inReader);
-        }
-        catch (IOException e1)
-        {
+        } catch (IOException e1) {
             e1.printStackTrace();
         }
-        try
-        {
+        try {
             if(br == null)
                 return;
-            while ((s = br.readLine()) != null)
-            {
+            while ((s = br.readLine()) != null) {
                 sb.append(s + "/r/n");
             }
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             e.printStackTrace();
-        }
-        finally
-        {
-            try
-            {
-                if(br != null)
+        } finally {
+            try {
+
+                if(br != null) {
+                    String tmep = sb.toString();
+                    System.out.println(tmep);
                     br.close();
+                }
             }
-            catch (IOException e)
-            {
+            catch (IOException e) {
                 e.printStackTrace();
             }
         }

@@ -82,7 +82,7 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
-        mListView = (ListView) findViewById(R.id.search_result);
+        mListView = (ListView) findViewById(R.id.search_result_native);
         mAdapter = new SearchAdapter(getApplicationContext(), R.layout.search_item, null, new String[]{}, new int[]{}, 0);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new ListViewListener());

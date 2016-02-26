@@ -2,10 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:enabled="true" >
-        <item android:id="@+id/toolbar_timer" android:icon="@drawable/toolbar_timer"
-            android:title="定时关闭" android:orderInCategory="90" app:showAsAction="always" />
         <item android:id="@+id/toolbar_search" android:icon="@drawable/toolbar_search"
-            android:title="搜索" android:orderInCategory="80" app:showAsAction="always" />
+            android:title="搜索" android:orderInCategory="90" app:showAsAction="always" />
+        <item android:id="@+id/toolbar_timer" android:icon="@drawable/toolbar_timer"
+            android:title="定时关闭" android:orderInCategory="80" app:showAsAction="always" />
         <item
             android:id="@+id/action_settings"
             android:orderInCategory="100"

@@ -247,6 +247,8 @@ public class MusicService extends Service {
             public void onCompletion(MediaPlayer mp) {
                 PlayNextOrPrev(true,true);
                 mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
+                //更新锁屏界面
+                UpdateLockScreen();
                 //SendUpdate();
             }
         });
@@ -485,6 +487,7 @@ public class MusicService extends Service {
 //            mRemoteCtrlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
             mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING,getCurrentTime()));
             mPlayer.reset();
+//            mPlayer.setDataSource(this,Uri.parse("http://www.electricbassworld.com/tunes/fugitives/boeing%20party/all%20of%20me.mp3"));
             mPlayer.setDataSource(path);
             mPlayer.prepareAsync();
             mFlag = false;
