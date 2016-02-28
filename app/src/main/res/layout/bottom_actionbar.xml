@@ -46,9 +46,9 @@
         </LinearLayout>
         <!-- 下一首与播放按钮 -->
         <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/play_btn_next"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/bf_btn_next"
             android:background="@drawable/holo_selector"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
