@@ -208,7 +208,6 @@ public class MusicService extends Service {
     }
 
     private void InitMediaPlayer() {
-        mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
         mRecevier = new PlayerReceiver();
         IntentFilter filter = new IntentFilter("remix.music.CTL_ACTION");
         registerReceiver(mRecevier,filter);

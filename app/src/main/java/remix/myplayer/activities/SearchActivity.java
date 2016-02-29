@@ -2,7 +2,6 @@ package remix.myplayer.activities;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -10,14 +9,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SearchView;
-import android.widget.TextView;
-
 import java.util.ArrayList;
 import remix.myplayer.R;
 import remix.myplayer.adapters.SearchAdapter;
+import remix.myplayer.ui.SearchView;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 
@@ -31,10 +27,11 @@ public class SearchActivity extends AppCompatActivity {
     public static int mAlbumIndex;
     private Cursor mCursor;
     private ListView mListView;
-    private SearchView mSearchView;
     private SearchAdapter mAdapter;
     private Button mSearchBtn;
     private String mkey;
+
+    private SearchView mSearchView;
     public static SearchActivity mInstance = null;
     private static final String SDROOT = "/sdcard/";
 
@@ -43,42 +40,12 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         mInstance = this;
-
-//        EditText editText = (EditText)findViewById(R.id.search_test);
-//        boolean ret1 = editText.requestFocus();
-
-        mSearchView = (SearchView) findViewById(R.id.search_);
-        boolean ret = mSearchView.requestFocus();
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView = (SearchView)findViewById(R.id.search_view);
+        mSearchView.addSearchListener(new SearchView.SearchListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                mkey = query;
+            public void onSearch(String key) {
+                mkey = key;
                 search();
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if(newText != null && !newText.equals("")) {
-                    mkey = newText;
-                    mSearchBtn.setEnabled(true);
-                    mSearchBtn.setTextColor(Color.parseColor("#383838"));
-                } else{
-                    mSearchBtn.setEnabled(false);
-                    mSearchBtn.setTextColor(Color.parseColor("#d1d0ce"));
-                }
-                return true;
-            }
-        });
-
-
-        mSearchBtn = (Button) findViewById(R.id.search_btn);
-//        mSearchBtn.setEnabled(false);
-//        mSearchText.setVisibility(View.INVISIBLE);
-        mSearchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSearchView.setQuery(mkey,true);
             }
         });
 
@@ -86,6 +53,38 @@ public class SearchActivity extends AppCompatActivity {
         mAdapter = new SearchAdapter(getApplicationContext(), R.layout.search_item, null, new String[]{}, new int[]{}, 0);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new ListViewListener());
+//        mSearchView = (SearchView) findViewById(R.id.search_);
+//        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                mkey = query;
+//                search();
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                if(newText != null && !newText.equals("")) {
+//                    mkey = newText;
+//                    mSearchBtn.setEnabled(true);
+//                    mSearchBtn.setTextColor(Color.parseColor("#383838"));
+//                } else{
+//                    mSearchBtn.setEnabled(false);
+//                    mSearchBtn.setTextColor(Color.parseColor("#d1d0ce"));
+//                }
+//                return true;
+//            }
+//        });
+//
+//
+//        mSearchBtn = (Button) findViewById(R.id.search_btn);
+//        mSearchBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mSearchView.setQuery(mkey,true);
+//            }
+//        });
+//
     }
 
     @Override
@@ -96,9 +95,12 @@ public class SearchActivity extends AppCompatActivity {
     private void search() {
         Cursor cursor = null;
         try {
+            String selection = MediaStore.Audio.Media.DISPLAY_NAME + " like ? " + "or " + MediaStore.Audio.Media.ARTIST + " like ? "
+                    + "or " + MediaStore.Audio.Media.ALBUM + " like ? ";
             cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.ARTIST},
-                    MediaStore.Audio.Media.DISPLAY_NAME + " like ?", new String[]{mkey + "%"}, null);
+                    selection,
+                    new String[]{mkey + "%",mkey + "%",mkey + "%"}, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,8 +112,7 @@ public class SearchActivity extends AppCompatActivity {
             mCursor = cursor;
             mAdapter.changeCursor(mCursor);
         }
-        else
-        {
+        else {
             mCursor = null;
             mAdapter.changeCursor(mCursor);
         }
@@ -125,7 +126,7 @@ public class SearchActivity extends AppCompatActivity {
         mAdapter.changeCursor(null);
     }
 
-    public void onBack(View v) {
+    public void onBack() {
         finish();
     }
 
@@ -153,4 +154,5 @@ public class SearchActivity extends AppCompatActivity {
             }
         }
     }
+
 }

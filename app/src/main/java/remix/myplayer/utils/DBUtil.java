@@ -87,11 +87,6 @@ public class DBUtil {
             e.printStackTrace();
         }
 
-
-
-
-
-
         return mAllSongList.size() > 0 ? mAllSongList : null;
 
     }

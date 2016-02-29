@@ -20,6 +20,7 @@ import java.lang.ref.WeakReference;
 
 import remix.myplayer.R;
 import remix.myplayer.fragments.AllSongFragment;
+import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.CircleImageView;
 import remix.myplayer.ui.SelectedPopupWindow;
@@ -67,10 +68,13 @@ public class AllSongAdapter extends SimpleCursorAdapter {
 
         String name = mCurosr.getString(AllSongFragment.mDisPlayNameIndex);
         name = name.substring(0, name.lastIndexOf("."));
-        if(name.equals(MusicService.getCurrentMP3().getDisplayname()))
-            holder.mName.setTextColor(Color.parseColor("#ff0030"));
-        else
-            holder.mName.setTextColor(Color.parseColor("#1c1b19"));
+        MP3Info temp = MusicService.getCurrentMP3();
+        if(temp != null){
+            if(name.equals(MusicService.getCurrentMP3().getDisplayname()))
+                holder.mName.setTextColor(Color.parseColor("#ff0030"));
+            else
+                holder.mName.setTextColor(Color.parseColor("#1c1b19"));
+        }
         holder.mName.setText(name);
 
         String artist = mCurosr.getString(AllSongFragment.mArtistIndex);

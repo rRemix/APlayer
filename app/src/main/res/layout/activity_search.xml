@@ -2,44 +2,98 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <LinearLayout
+
+    <remix.myplayer.ui.SearchView
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:background="#CD3700"
+        android:id="@+id/search_view">
         <ImageButton
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onBack"
-            android:src="@drawable/acbar_btn_back"
-            android:background="@color/transparent"
-            android:id="@+id/btn_search_back" />
-        <SearchView
-            android:layout_width="0dp"
+            android:id="@+id/btn_search_back"
+            android:background="@drawable/bg_btn_child_back"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"/>
+        <RelativeLayout
+            android:layout_width="240dp"
             android:layout_height="match_parent"
-            android:layout_weight="9"
-            android:queryHint="搜索歌曲"
-            android:id="@+id/search_"/>
-        <Button
-            android:id="@+id/search_btn"
-            android:layout_width="0dp"
-            android:layout_weight="2"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/search_bg">
+            <EditText
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical|left"
+                android:id="@+id/search_text"
+                android:textSize="14dp"
+                android:lines="1"
+                android:ellipsize="end"
+                android:hint="搜索歌曲 艺人 专辑"
+                android:drawableLeft="@drawable/desk2_search"
+                android:paddingLeft="8dp"
+                android:background="@null"
+                android:imeOptions="actionSearch"/>
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_alignParentRight="true"
+                android:id="@+id/btn_search_clear"
+                android:layout_centerVertical="true"
+                android:visibility="invisible"
+                android:background="@drawable/actionbar_delete"/>
+        </RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center"
+            android:id="@+id/btn_search_go"
             android:text="搜索"
-            android:textColor="#d1d0ce"
-            android:textSize="18dp"
-            android:layout_marginRight="2dp"
-            android:background="@color/transparent"/>
-    </LinearLayout>
+            android:textSize="16dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:gravity="center_vertical" />
+
+    </remix.myplayer.ui.SearchView>
+    <ListView
+        android:id="@+id/search_list_hint"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"/>
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:gravity="center_vertical">-->
+        <!--<ImageButton-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="onBack"-->
+            <!--android:src="@drawable/acbar_btn_back"-->
+            <!--android:background="@color/transparent"-->
+            <!--android:id="@+id/btn_search_back" />-->
+        <!--<SearchView-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="9"-->
+            <!--android:queryHint="搜索歌曲"-->
+            <!--android:id="@+id/search_"/>-->
+        <!--<Button-->
+            <!--android:id="@+id/search_btn"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="2"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:gravity="center"-->
+            <!--android:text="搜索"-->
+            <!--android:textColor="#d1d0ce"-->
+            <!--android:textSize="18dp"-->
+            <!--android:layout_marginRight="2dp"-->
+            <!--android:background="@color/transparent"/>-->
+    <!--</LinearLayout>-->
     <ListView
         android:id="@+id/search_result_native"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </ListView>
-    <ListView
-        android:id="@+id/search_result_online"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </ListView>
