@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="72dp"
     android:id="@+id/songlist_item">
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:layout_alignParentLeft="true"
         android:id="@+id/search_image"
-        android:src="@drawable/default_recommend"
         android:layout_centerVertical="true"
         android:layout_marginLeft="19dp"
         android:layout_width="45dp"
-        android:layout_height="45dp"/>
+        android:layout_height="45dp"
+        fresco:placeholderImage="@drawable/default_album_list"
+        fresco:placeholderImageScaleType="fitCenter"/>
     <!--歌曲名、歌手、专辑-->
     <LinearLayout
         android:layout_width="150dp"

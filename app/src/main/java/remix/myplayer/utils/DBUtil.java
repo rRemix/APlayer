@@ -29,6 +29,7 @@ public class DBUtil {
     private static final String TAG = "DBUtil";
     public static ArrayList<Long> mAllSongList = new ArrayList<>();
     public static ArrayList<Long> mPlayingList = new ArrayList<>();
+    public static ArrayList<String> mSearchKeyList = new ArrayList<>();
     public static Map<String,LinkedList<Long>> mFolderMap = new HashMap<>();
     public static ArrayList<String> mFolderList = new ArrayList<>();
 
@@ -42,7 +43,7 @@ public class DBUtil {
         mPlayingList = list;
         XmlUtil.updatePlayingListXml();
     }
-    //返回所有歌曲id，作为打开时默认的播放列表
+    //返回所有歌曲id
     public static ArrayList<Long> getAllSongsId() {
         ArrayList<Long> mAllSongList = new ArrayList<>();
         //查询sd卡上所有音乐文件信息，过滤小于800k的
@@ -50,22 +51,9 @@ public class DBUtil {
         Cursor cursor = null;
 
         try{
-//            cursor = resolver.query(
-//                    MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-//                    null,
-//                    null, null, null);
-//            if(cursor != null){
-//                cursor.moveToFirst();
-//                cursor.moveToPosition(3);
-//                for (int i = 0 ; i < cursor.getColumnCount() ; i++){
-//                    Log.d("DBUtil","name=" + cursor.getColumnName(i));
-//                    Log.d("DBUtil","value=" + cursor.getString(i));
-//                }
-//            }
-
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA},
+                    new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA,MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ARTIST},
                     MediaStore.Audio.Media.SIZE + ">80000", null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
         }catch (Exception e){
             e.printStackTrace();
@@ -76,8 +64,13 @@ public class DBUtil {
                 DBUtil.mFolderMap.clear();
                 while (cursor.moveToNext()) {
                     long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-                    if (id > 0)
-                        mAllSongList.add(id);
+                    mAllSongList.add(id);
+                    String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
+                    String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                    String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                    mSearchKeyList.add(album);
+                    mSearchKeyList.add(artist);
+                    mSearchKeyList.add(title);
                     String full_path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                     SortWithFolder(id,full_path);
                 }
@@ -88,7 +81,6 @@ public class DBUtil {
         }
 
         return mAllSongList.size() > 0 ? mAllSongList : null;
-
     }
 
     //根据文件夹名字获得所有歌曲id
