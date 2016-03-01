@@ -16,14 +16,15 @@
             android:background="@drawable/bg_btn_child_back"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"/>
+            android:layout_marginRight="15dp"
+            android:onClick="onBack"/>
         <RelativeLayout
             android:layout_width="240dp"
             android:layout_height="match_parent"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/search_bg">
-            <android.support.v7.widget.AppCompatAutoCompleteTextView
+            <EditText
                 android:layout_width="200dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical|left"
@@ -58,48 +59,49 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="10dp"
             android:gravity="center_vertical" />
-
     </remix.myplayer.ui.SearchView>
 
-    <!--<ListView-->
-        <!--android:id="@+id/search_list_hint"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="100dp"-->
-        <!--android:layout_marginTop="100dp"/>-->
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="50dp"-->
-        <!--android:orientation="horizontal"-->
-        <!--android:gravity="center_vertical">-->
-        <!--<ImageButton-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_weight="1"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:onClick="onBack"-->
-            <!--android:src="@drawable/acbar_btn_back"-->
-            <!--android:background="@color/transparent"-->
-            <!--android:id="@+id/btn_search_back" />-->
-        <!--<SearchView-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_weight="9"-->
-            <!--android:queryHint="搜索歌曲"-->
-            <!--android:id="@+id/search_"/>-->
-        <!--<Button-->
-            <!--android:id="@+id/search_btn"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_weight="2"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:gravity="center"-->
-            <!--android:text="搜索"-->
-            <!--android:textColor="#d1d0ce"-->
-            <!--android:textSize="18dp"-->
-            <!--android:layout_marginRight="2dp"-->
-            <!--android:background="@color/transparent"/>-->
-    <!--</LinearLayout>-->
-    <ListView
-        android:id="@+id/search_result_native"
+    <!--搜索历史与搜索结果-->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </ListView>
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/search_his_container">
+            <LinearLayout
+                android:id="@+id/search_his_container_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <ListView
+                    android:id="@+id/search_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:choiceMode="singleChoice"/>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/search_history_clear"
+                    android:text="清空搜索历史"
+                    android:layout_gravity="center_horizontal"/>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/search_history_tip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:gravity="center"
+                android:text="无搜索历史"
+                android:textSize="22dp"/>
+        </FrameLayout>
+
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/search_result_native"/>
+    </FrameLayout>
+
 </LinearLayout>

@@ -83,7 +83,7 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
                     if(name != null && !name.equals("")) {
                         PlayListActivity.mPlaylist.remove(name);
                         PlayListActivity.mInstance.getAdapter().notifyDataSetChanged();
-                        XmlUtil.updatePlaylistXml();
+                        XmlUtil.updatePlaylist();
                     }
                 }
                 break;

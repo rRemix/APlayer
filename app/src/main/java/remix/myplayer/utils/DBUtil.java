@@ -41,7 +41,7 @@ public class DBUtil {
     public static void setPlayingList(ArrayList<Long> list)
     {
         mPlayingList = list;
-        XmlUtil.updatePlayingListXml();
+        XmlUtil.updatePlayingList();
     }
     //返回所有歌曲id
     public static ArrayList<Long> getAllSongsId() {
@@ -68,9 +68,12 @@ public class DBUtil {
                     String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
                     String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                     String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                    mSearchKeyList.add(album);
-                    mSearchKeyList.add(artist);
-                    mSearchKeyList.add(title);
+                    if(!mSearchKeyList.contains(album))
+                        mSearchKeyList.add(album);
+                    if(!mSearchKeyList.contains(artist))
+                        mSearchKeyList.add(artist);
+                    if(!mSearchKeyList.contains(title))
+                        mSearchKeyList.add(title);
                     String full_path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                     SortWithFolder(id,full_path);
                 }

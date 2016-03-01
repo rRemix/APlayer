@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import remix.myplayer.activities.PlayListActivity;
+import remix.myplayer.activities.SearchActivity;
 import remix.myplayer.infos.PlayListItem;
 
 /**
@@ -34,12 +35,16 @@ public class XmlUtil {
             File file1 = new File("/data/data/remix.myplayer/files/playinglist.xml");
             if(!file1.exists())
                 file1.createNewFile();
+            File file2 = new File("data/data/remix.myplayer/files/searchhistory.xml");
+            if(!file2.exists())
+                file2.createNewFile();
         }
         catch (IOException e){
             e.printStackTrace();
         }
 
     }
+    private static final String TAG = "XmlUtil";
     private static Context mContext;
     public static void setContext(Context context)
     {
@@ -113,7 +118,6 @@ public class XmlUtil {
         ArrayList<Long> list = null;
         FileInputStream in = null;
         try {
-//            in = new FileInputStream(Environment.getExternalStorageDirectory().getCanonicalPath() + "/playinglist.xml");
             in = mContext.openFileInput("playinglist.xml");
             parser.setInput(in,"UTF-8");
             int eventType = parser.getEventType();
@@ -162,14 +166,14 @@ public class XmlUtil {
     public static void deletePlaylist(String name)  {
         if(name != null && !name.equals("")) {
             PlayListActivity.mPlaylist.remove(name);
-            updatePlaylistXml();
+            updatePlaylist();
         }
     }
     public static void addPlaylist(String name)
     {
         if(name != null && !name.equals("")) {
             PlayListActivity.mPlaylist.put(name, new ArrayList<PlayListItem>());
-            updatePlaylistXml();
+            updatePlaylist();
         }
     }
     public static void deleteSong(String name,String song)
@@ -177,7 +181,7 @@ public class XmlUtil {
         if(!name.equals("") && !song.equals("")) {
             ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
             list.remove(song);
-            updatePlaylistXml();
+            updatePlaylist();
         }
     }
 
@@ -186,7 +190,7 @@ public class XmlUtil {
         if(!name.equals("") && !song.equals("")) {
             ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
             list.add(new PlayListItem(song,id,album_id));
-            updatePlaylistXml();
+            updatePlaylist();
         }
     }
     public static void updateSong(String name,String _new,String _old,int id)
@@ -200,10 +204,10 @@ public class XmlUtil {
                     tmp.setId(id);
                 }
             }
-            updatePlaylistXml();
+            updatePlaylist();
         }
     }
-    public static void updatePlaylistXml()
+    public static void updatePlaylist()
     {
         FileOutputStream fos = null;
         try {
@@ -253,7 +257,7 @@ public class XmlUtil {
     {
         if(id > 0 && DBUtil.mPlayingList.contains(id)) {
             DBUtil.mPlayingList.remove(id);
-            updatePlayingListXml();
+            updatePlayingList();
         }
     }
 
@@ -261,27 +265,27 @@ public class XmlUtil {
     {
         if(id > 0) {
             DBUtil.mPlayingList.add(id);
-            updatePlayingListXml();
+            updatePlayingList();
         }
     }
 
-    public static void updatePlayingListXml()
+    public static void updatePlayingList()
     {
         FileOutputStream fos = null;
         try {
             fos = mContext.openFileOutput("playinglist.xml",Context.MODE_PRIVATE);
-            XmlSerializer parser =  XmlPullParserFactory.newInstance().newSerializer();
-            parser.setOutput(fos,"utf-8");
-            parser.startDocument("utf-8",true);
-            parser.startTag(null,"playinglist");
+            XmlSerializer serializer =  XmlPullParserFactory.newInstance().newSerializer();
+            serializer.setOutput(fos,"utf-8");
+            serializer.startDocument("utf-8",true);
+            serializer.startTag(null,"playinglist");
             for(int i = 0; i < DBUtil.mPlayingList.size(); i++)
             {
-                parser.startTag(null,"song");
-                parser.attribute(null,"id", DBUtil.mPlayingList.get(i).toString());
-                parser.endTag(null,"song");
+                serializer.startTag(null,"song");
+                serializer.attribute(null,"id", DBUtil.mPlayingList.get(i).toString());
+                serializer.endTag(null,"song");
             }
-            parser.endTag(null,"playinglist");
-            parser.endDocument();
+            serializer.endTag(null,"playinglist");
+            serializer.endDocument();
         }
         catch (XmlPullParserException e){
             e.printStackTrace();
@@ -298,5 +302,110 @@ public class XmlUtil {
                 e.printStackTrace();
             }
         }
+    }
+
+    //添加到搜索历史
+    public static void addKey(String key){
+        if(!SearchActivity.mSearchHisKeyList.contains(key)){
+            SearchActivity.mSearchHisKeyList.add(key);
+            updateSearchList();
+        }
+    }
+    //删除一个搜索记录
+    public static void deleteKey(String key){
+        if(SearchActivity.mSearchHisKeyList.contains(key)){
+            SearchActivity.mSearchHisKeyList.remove(key);
+            updateSearchList();
+        }
+    }
+    //清空搜索历史
+    public static void removeallKey(){
+        if(SearchActivity.mSearchHisKeyList.size() > 0){
+            SearchActivity.mSearchHisKeyList.clear();
+            updateSearchList();
+        }
+    }
+    //更新搜索历史记录
+    public static void updateSearchList(){
+        XmlSerializer serializer = null;
+        FileOutputStream fos = null;
+        try {
+//            File test = new File(Environment.getExternalStorageDirectory() + "/9133/searchhistory.xml");
+//            if(!test.exists())
+//                test.createNewFile();
+            serializer =  XmlPullParserFactory.newInstance().newSerializer();
+            fos = mContext.openFileOutput("searchhistory.xml",Context.MODE_PRIVATE);
+            serializer.setOutput(fos,"utf-8");
+            serializer.startDocument("utf-8",true);
+            serializer.startTag(null,"searchhistory");
+            for(int i = 0 ; i < SearchActivity.mSearchHisKeyList.size() ; i++){
+                serializer.startTag(null,"key");
+                serializer.text(SearchActivity.mSearchHisKeyList.get(i).toString());
+                serializer.endTag(null,"key");
+                Log.d(TAG,"key[" + i + "]: " + SearchActivity.mSearchHisKeyList.get(i));
+            }
+            serializer.endTag(null,"searchhistory");
+            serializer.endDocument();
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(fos != null)
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
+
+    //获得搜索历史记录
+    public static ArrayList<String> getSearchHisList()  {
+        XmlPullParser parser = Xml.newPullParser();
+        ArrayList<String> list = new ArrayList<>();
+        FileInputStream in = null;
+        try {
+            in = mContext.openFileInput("searchhistory.xml");
+//            File test = new File(Environment.getExternalStorageDirectory() + "/searchhistory.xml");
+//            boolean isExist = test.exists();
+//            in = new FileInputStream(test);
+            parser.setInput(in,"utf-8");
+            int eventType = parser.getEventType();
+            while(eventType != XmlPullParser.END_DOCUMENT){
+                switch (eventType){
+                    case XmlPullParser.START_DOCUMENT:
+                        break;
+                    case XmlPullParser.START_TAG:
+                        if(parser.getName().equals("key")) {
+                            list.add(parser.nextText());
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        break;
+                    case XmlPullParser.END_DOCUMENT:
+                        break;
+                }
+                eventType = parser.next();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(in != null)
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+        return list;
     }
 }

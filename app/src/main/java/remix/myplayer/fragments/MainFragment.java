@@ -1,7 +1,5 @@
 package remix.myplayer.fragments;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,24 +7,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-
 import remix.myplayer.R;
-import remix.myplayer.activities.PlayListActivity;
-import remix.myplayer.activities.SearchActivity;
 import remix.myplayer.adapters.PagerAdapter;
-import remix.myplayer.adapters.SlideMenuAdapter;
 import remix.myplayer.listeners.TabTextListener;
 import remix.myplayer.listeners.ViewPagerListener;
 import remix.myplayer.ui.MyPager;
-import remix.myplayer.ui.TimerPopupWindow;
-import remix.myplayer.utils.Constants;
 
 /**
  * Created by Remix on 2015/12/5.
@@ -34,13 +22,6 @@ import remix.myplayer.utils.Constants;
 public class MainFragment extends Fragment {
     public static MainFragment mInstance;
     private ImageView mTabImage = null;
-    private ImageButton mSlideMenuBtn;
-    private ImageButton mSlideMenuAbout;
-    private ImageButton mSlideMenuExit;
-    private ImageButton mTimer;
-    private ImageButton mSearch;
-    private ListView mSlideMenuList;
-    private SlidingMenu mSlideMenu;
     private MyPager mViewPager;
     private LayoutInflater mInflater;
     private PagerAdapter mAdapter;
@@ -145,15 +126,5 @@ public class MainFragment extends Fragment {
         view3.setOnClickListener(new TabTextListener(mViewPager, 2));
         view4.setOnClickListener(new TabTextListener(mViewPager, 3));
     }
-
-    public boolean isMenuShow()
-    {
-        return mSlideMenu.isMenuShowing();
-    }
-    public void toggleMenu()
-    {
-        mSlideMenu.toggle();
-    }
-
 
 }

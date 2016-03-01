@@ -60,4 +60,6 @@ public class Constants {
     public final static int NOTIFY_PREV = 0;
     public final static int NOTIFY_PLAY = 1;
     public final static int NOTIFY_NEXT = 2;
+    //刷新适配器
+    public final static int NOTIFYDATACHANGED = 0;
 }

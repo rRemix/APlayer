@@ -28,8 +28,7 @@
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:launchMode="singleTask">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -52,9 +51,7 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
-
         <activity android:name=".activities.ChildHolderActivity"/>
-
 
         <activity android:name=".ui.AddPopupWindow"
             android:theme="@style/PopupDialog"/>

@@ -27,12 +27,11 @@ import remix.myplayer.utils.DBUtil;
 public class SearchView extends LinearLayout {
     private static final String TAG = "SearchView";
     private Context mContext;
-    private AppCompatAutoCompleteTextView mEditText;
+    private EditText mEditText;
     private ImageButton mButtonBack;
     private ImageButton mButtonClear;
     private SearchListener mSearchListener;
     private TextView mButtonSearch;
-    private ListView mListView;
     public SearchView(Context context) {
         super(context);
         mContext = context;
@@ -47,9 +46,9 @@ public class SearchView extends LinearLayout {
     }
 
     private void init(){
-        mEditText = (AppCompatAutoCompleteTextView)findViewById(R.id.search_text);
-//        final int size = DBUtil.mSearchKeyList.size();
-//        String[] strs = (String[])DBUtil.mSearchKeyList.toArray(new String[size]);
+        mEditText = (EditText)findViewById(R.id.search_text);
+        final int size = DBUtil.mSearchKeyList.size();
+        String[] strs = (String[])DBUtil.mSearchKeyList.toArray(new String[size]);
 //        ArrayAdapter adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_list_item_1, strs);
 //        mEditText.setAdapter(adapter);
 
@@ -62,14 +61,19 @@ public class SearchView extends LinearLayout {
                 Log.d(TAG,"onTextChanged --- CharSequence:" + s);
                 //EditText不为空时显示尾部的删除按钮
                 if(s != null){
-                    if(mSearchListener != null)
-                        mSearchListener.onSearch(s.toString());
-                    mButtonClear.setVisibility(VISIBLE);
-                    mButtonSearch.setEnabled(true);
-                }
-                else {
-                    mButtonClear.setVisibility(INVISIBLE);
-                    mButtonSearch.setEnabled(true);
+                    if(s.toString().equals("")){
+                        if(mSearchListener != null) {
+                            mSearchListener.onClear();
+                            mButtonClear.setVisibility(INVISIBLE);
+                            mButtonSearch.setEnabled(false);
+                        }
+                    }else {
+                        if (mSearchListener != null) {
+                            mSearchListener.onSearch(s.toString(),false);
+                            mButtonClear.setVisibility(VISIBLE);
+                            mButtonSearch.setEnabled(true);
+                        }
+                    }
                 }
             }
             @Override
@@ -77,6 +81,14 @@ public class SearchView extends LinearLayout {
             }
         });
         mButtonBack = (ImageButton)findViewById(R.id.btn_search_back);
+        mButtonBack.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mSearchListener != null){
+                    mSearchListener.onBack();
+                }
+            }
+        });
         mButtonClear = (ImageButton)findViewById(R.id.btn_search_clear);
         mButtonClear.setOnClickListener(new OnClickListener() {
             @Override
@@ -92,34 +104,25 @@ public class SearchView extends LinearLayout {
             @Override
             public void onClick(View v) {
                 if(mSearchListener != null)
-                    mSearchListener.onSearch(mEditText.getText().toString());
+                    mSearchListener.onSearch(mEditText.getText().toString(),true);
             }
         });
-//        mListView = (ListView)findViewById(R.id.search_list_hint);
     }
-
-//    @Override
-//    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-//        super.onLayout(changed, l, t, r, b);
-//        init();
-//    }
-//
-//    @Override
-//    protected void onDraw(Canvas canvas) {
-//        super.onDraw(canvas);
-//        init();
-//    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         init();
     }
+    public void UpdateContent(String text){
+        mEditText.setText(text);
+    }
     public void addSearchListener(SearchListener listener){
         mSearchListener = listener;
     }
     public interface SearchListener{
-        public void onSearch(String key);
+        public void onSearch(String key,boolean isclick);
         public void onClear();
+        public void onBack();
     }
 }

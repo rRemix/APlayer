@@ -113,12 +113,12 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         if(!mFromNotify) {
             loadsongs();
-            //播放的service
-            MusicService.addCallback(MainActivity.this);
             startService(new Intent(this,MusicService.class));
             //NofityService
             startService(new Intent(this, NotifyService.class));
         }
+        //播放的service
+        MusicService.addCallback(MainActivity.this);
         //加载主页fragment
         initMainFragment();
         //初始化测滑菜单
@@ -168,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
             }
         });
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
