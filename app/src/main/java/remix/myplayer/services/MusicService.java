@@ -28,6 +28,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.widget.ImageView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -77,6 +78,7 @@ public class MusicService extends Service {
     private AudioManager.OnAudioFocusChangeListener mAudioFocusListener;
     private RemoteControlClient mRemoteCtrlClient;
     public static MediaSessionCompat mMediaSession = null;
+    private boolean mAudioFouus = false;
     PlaybackStateCompat mPlayingbackState = new PlaybackStateCompat.Builder().setActions(PlaybackStateCompat.ACTION_PLAY
             | PlaybackStateCompat.ACTION_PLAY_PAUSE   |  PlaybackStateCompat.ACTION_PAUSE
             | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
@@ -130,6 +132,7 @@ public class MusicService extends Service {
     }
     @Override
     public void onCreate() {
+
         super.onCreate();
         mContext = getApplicationContext();
         mInstance = this;
@@ -143,6 +146,7 @@ public class MusicService extends Service {
                 switch (focusChange){
                     //播放 获得焦点
                     case AudioManager.AUDIOFOCUS_GAIN:
+                        mAudioFouus = true;
                         if(mPlayer == null)
                             InitMediaPlayer();
                         else if(!mIsplay){
@@ -168,6 +172,7 @@ public class MusicService extends Service {
                         break;
                     //暂停
                     case AudioManager.AUDIOFOCUS_LOSS:
+                        mAudioFouus = false;
                         if(mIsplay && mPlayer != null) {
                             Pause();
 //                           UnInit();
@@ -308,8 +313,9 @@ public class MusicService extends Service {
             @Override
             //音量逐渐增大
             public void run(){
-                int ret = mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
-                if(ret != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+                mAudioFouus =  mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
+                                              AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+                if(!mAudioFouus)
                     return;
                 mIsplay = true;
                 mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING,getCurrentTime()));
@@ -414,7 +420,6 @@ public class MusicService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             int Control = intent.getIntExtra("Control",-1);
-
             switch (Control) {
                 //播放listview选中的歌曲
                 case Constants.PLAYSELECTEDSONG:
@@ -480,13 +485,13 @@ public class MusicService extends Service {
     //准备播放
     private void PrepareAndPlay(String path) {
         try {
-            int ret = mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
-            if(ret != AudioManager.AUDIOFOCUS_REQUEST_GRANTED)
+            mAudioFouus =  mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
+                    AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+            if(!mAudioFouus)
                 return;
 //            mRemoteCtrlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
             mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING,getCurrentTime()));
             mPlayer.reset();
-//            mPlayer.setDataSource(this,Uri.parse("http://www.electricbassworld.com/tunes/fugitives/boeing%20party/all%20of%20me.mp3"));
             mPlayer.setDataSource(path);
             mPlayer.prepareAsync();
             mFlag = false;
@@ -642,6 +647,9 @@ public class MusicService extends Service {
             }
 
             Log.d(TAG,"count=" + mCount);
+            Log.d(TAG,"AudioFocus:" + mAudioFouus);
+//            if(!mAudioFouus)
+//                return true;
             //如果是第一次按下，开启一条线程去判断用户操作
             if(mCount == 0){
                 new Thread(){
@@ -665,24 +673,5 @@ public class MusicService extends Service {
             return true;
         }
 
-        @Override
-        public void onCommand(String command, Bundle extras, ResultReceiver cb) {
-            super.onCommand(command, extras, cb);
-        }
-
-        @Override
-        public void onStop() {
-            super.onStop();
-        }
-
-        @Override
-        public void onSkipToPrevious() {
-            super.onSkipToPrevious();
-        }
-
-        @Override
-        public void onSkipToNext() {
-            super.onSkipToNext();
-        }
     }
 }

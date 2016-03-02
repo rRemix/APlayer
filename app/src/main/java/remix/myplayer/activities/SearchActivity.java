@@ -44,8 +44,10 @@ public class SearchActivity extends AppCompatActivity {
     private static final String SDROOT = "/sdcard/";
     public static ArrayList mSearchHisKeyList = new ArrayList();
     private FrameLayout mSearchHisContainer = null;
-    private TextView mSearchHisTip = null;
+    private TextView mSearchHisBlank = null;
     private LinearLayout mSearchHisContent = null;
+    private TextView mSearchResBlank;
+    private FrameLayout mSearchResContainer;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,7 +94,7 @@ public class SearchActivity extends AppCompatActivity {
                 mSearchView.UpdateContent(key);
             }
         });
-        mSearchHisTip = (TextView)findViewById(R.id.search_history_tip);
+        mSearchHisBlank = (TextView)findViewById(R.id.search_history_blank);
 
         mClearHistoryBtn = (Button)findViewById(R.id.search_history_clear);
         mClearHistoryBtn.setOnClickListener(new View.OnClickListener() {
@@ -104,6 +106,8 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
 
+        mSearchResContainer = (FrameLayout)findViewById(R.id.search_result_container);
+        mSearchResBlank = (TextView)findViewById(R.id.search_result_blank);
         mSearchResList = (ListView) findViewById(R.id.search_result_native);
         mSearchResAdapter = new SearchResAdapter(getApplicationContext(), R.layout.search_reulst_item, null, new String[]{}, new int[]{}, 0);
         mSearchResList.setAdapter(mSearchResAdapter);
@@ -156,13 +160,19 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void UpdateUI(){
+        //更新界面
+        // 如果搜素关键字为空，显示搜索历史或者无搜索历史
+        // 如果关键字不为空，显示搜索结果或者无搜索结果
         if(!mkey.equals("")){
-            mSearchResList.setVisibility(View.VISIBLE);
+            mSearchResContainer.setVisibility(View.VISIBLE);
             mSearchHisContainer.setVisibility(View.GONE);
+            boolean flag = mCursor != null && mCursor.getCount() > 0;
+            mSearchResList.setVisibility(flag == true ? View.VISIBLE : View.GONE);
+            mSearchResBlank.setVisibility(flag == true ? View.GONE :View.VISIBLE);
         }else {
-            mSearchResList.setVisibility(View.GONE);
+            mSearchResContainer.setVisibility(View.GONE);
             mSearchHisContainer.setVisibility(View.VISIBLE);
-            mSearchHisTip.setVisibility(mSearchHisKeyList.size() == 0 ? View.VISIBLE : View.GONE);
+            mSearchHisBlank.setVisibility(mSearchHisKeyList.size() == 0 ? View.VISIBLE : View.GONE);
             mSearchHisContent.setVisibility(mSearchHisKeyList.size() == 0 ? View.GONE : View.VISIBLE);
             mSearchHisAdapter.notifyDataSetChanged();
         }

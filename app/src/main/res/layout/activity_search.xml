@@ -87,7 +87,7 @@
                     android:layout_gravity="center_horizontal"/>
             </LinearLayout>
             <TextView
-                android:id="@+id/search_history_tip"
+                android:id="@+id/search_history_blank"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -98,10 +98,25 @@
         </FrameLayout>
 
 
-        <ListView
+        <FrameLayout
+            android:id="@+id/search_result_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/search_result_native"/>
+            android:layout_height="wrap_content">
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/search_result_native"/>
+            <TextView
+                android:id="@+id/search_result_blank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:gravity="center"
+                android:text="无搜索结果"
+                android:textSize="22dp"/>
+        </FrameLayout>
+
     </FrameLayout>
 
 </LinearLayout>
