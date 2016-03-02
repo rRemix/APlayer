@@ -108,6 +108,7 @@ public class MainFragment extends Fragment {
         mAdapter.AddFragment(new AlbumFragment());
         mAdapter.AddFragment(new ArtistFragment());
         mAdapter.AddFragment(new FolderFragment());
+
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(0);
         mViewPager.addOnPageChangeListener(new ViewPagerListener(getContext(), mTabImage, 0));
@@ -127,4 +128,13 @@ public class MainFragment extends Fragment {
         view4.setOnClickListener(new TabTextListener(mViewPager, 3));
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
 }

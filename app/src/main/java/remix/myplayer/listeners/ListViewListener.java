@@ -21,8 +21,7 @@ import remix.myplayer.utils.DBUtil;
 public class ListViewListener implements AdapterView.OnItemClickListener
 {
     private Context mContext;
-    public ListViewListener(Context context)
-    {
+    public ListViewListener(Context context) {
         mContext = context;
     }
     @Override

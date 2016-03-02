@@ -6,9 +6,11 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -23,6 +25,7 @@ import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.CircleImageView;
+import remix.myplayer.ui.ColumnView;
 import remix.myplayer.ui.SelectedPopupWindow;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
@@ -30,10 +33,11 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by Remix on 2015/11/30.
  */
-public class AllSongAdapter extends SimpleCursorAdapter {
+public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
     public static AllSongAdapter mInstance;
     private Context mContext;
     private Cursor mCurosr;
+    private ColumnView mColumnView;
     //0:专辑 1:歌手
     private int mType = 0;
     public AllSongAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
@@ -70,10 +74,18 @@ public class AllSongAdapter extends SimpleCursorAdapter {
         name = name.substring(0, name.lastIndexOf("."));
         MP3Info temp = MusicService.getCurrentMP3();
         if(temp != null){
-            if(name.equals(MusicService.getCurrentMP3().getDisplayname()))
-                holder.mName.setTextColor(Color.parseColor("#ff0030"));
+            boolean flag = name.equals(MusicService.getCurrentMP3().getDisplayname());
+            holder.mName.setTextColor(flag ? Color.parseColor("#ff0030") : Color.parseColor("#1c1b19"));
+            mColumnView = (ColumnView)convertView.findViewById(R.id.columnview);
+            mColumnView.setVisibility(flag ? View.VISIBLE : View.GONE);
+            if(flag){
+                Log.d("AllSongAdapter","song:" + name);
+                Log.d("AllSongAdapter","isplay" + MusicService.getIsplay());
+            }
+            if(MusicService.getIsplay())
+                mColumnView.startAnim();
             else
-                holder.mName.setTextColor(Color.parseColor("#1c1b19"));
+                mColumnView.stopAnim();
         }
         holder.mName.setText(name);
 
@@ -95,6 +107,16 @@ public class AllSongAdapter extends SimpleCursorAdapter {
             }
         });
         return convertView;
+    }
+
+    @Override
+    public void UpdateColumnView(boolean isplay) {
+        if(mColumnView != null){
+            if(isplay)
+                mColumnView.startAnim();
+            else
+                mColumnView.stopAnim();
+        }
     }
 
     class AsynLoadImage extends AsyncTask<Integer,Integer,Bitmap>

@@ -80,7 +80,7 @@ public class CoverFragment extends Fragment {
         mNewBitmap = bitmap;
         if(AudioHolderActivity.mOperation == Constants.PREV)
             mImage.startAnimation(mRightAnimation);
-        else
+        else if (AudioHolderActivity.mOperation == Constants.NEXT)
             mImage.startAnimation(mLeftAnimation);
     }
 }

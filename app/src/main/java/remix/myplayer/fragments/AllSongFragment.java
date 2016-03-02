@@ -62,7 +62,6 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         final View rootView = inflater.inflate(R.layout.allsong_list,null);
         mListView = (ListView)rootView.findViewById(R.id.list);
         mListView.setOnItemClickListener(new ListViewListener(getContext()));
-
         return rootView;
     }
 

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="72dp"
     android:id="@+id/songlist_item">
     <remix.myplayer.ui.CircleImageView
@@ -42,4 +44,15 @@
         android:scaleType="center"
         android:src="@drawable/list_icn_more"
         android:background="@drawable/bg_btn_gray_selector"/>
+
+    <remix.myplayer.ui.ColumnView
+        android:layout_centerVertical="true"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        app:columnwidth="4dp"
+        app:columncolor="#cd00"
+        android:id="@+id/columnview"
+        android:layout_toLeftOf="@id/allsong_item_button"
+        android:layout_marginRight="10dp"
+        android:visibility="gone"/>
 </RelativeLayout>

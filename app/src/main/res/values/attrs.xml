@@ -11,4 +11,9 @@
         <attr name="progress_color" format="color" />
         <attr name="progress_max" format="integer|reference" />
     </declare-styleable>
+
+    <declare-styleable name="ColumnView">
+        <attr name="columncolor" format="color"/>
+        <attr name="columnwidth" format="dimension|integer|reference"/>
+    </declare-styleable>
 </resources>

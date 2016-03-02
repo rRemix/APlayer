@@ -1,28 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:gravity="center_vertical">
-    <TextView
-        android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="70dp">
+    <LinearLayout
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
-        android:id="@+id/album_holder_item_title"
-        android:lines="1"
-        android:ellipsize="end"
-        android:text="歌曲名"
-        android:textSize="16dp"
-        android:textColor="#1b1c19"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/album_holder_item_artist"
-        android:text="歌手"
-        android:textSize="14dp"
-        android:lines="1"
-        android:ellipsize="end"
-        android:layout_marginLeft="10dp"
-        android:layout_marginBottom="10dp"
-        android:textColor="#6d6c69"/>
-</LinearLayout>
+        android:orientation="vertical"
+        android:layout_alignParentLeft="true"
+        android:gravity="center_vertical"
+        android:layout_centerVertical="true">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/album_holder_item_title"
+            android:lines="1"
+            android:ellipsize="end"
+            android:text="歌曲名"
+            android:textSize="16dp"
+            android:textColor="#1b1c19"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/album_holder_item_artist"
+            android:text="歌手"
+            android:textSize="14dp"
+            android:lines="1"
+            android:ellipsize="end"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="10dp"
+            android:textColor="#6d6c69"/>
+    </LinearLayout>
+
+    <remix.myplayer.ui.ColumnView
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        app:columnwidth="4dp"
+        app:columncolor="#cd00"
+        android:id="@+id/columnview"
+        android:layout_marginRight="10dp" />
+</RelativeLayout>
