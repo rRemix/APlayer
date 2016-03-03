@@ -63,14 +63,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         holder.mName.setText(name);
 
         ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
-        if(list != null && list.size() > 0)
-        {
+        if(list != null && list.size() > 0) {
             AsynLoadImage task = new AsynLoadImage(holder.mImage);
             task.execute(list.get(0).getAlbumId());
         }
 
-        if(mOnItemClickLitener != null)
-        {
+        if(mOnItemClickLitener != null) {
             holder.mImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -80,6 +78,13 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         }
         if(holder.mButton != null)
         {
+            //第一次个列表为收藏列表，需要做点处理
+            if(position == 0){
+                holder.mButton.setImageResource(R.drawable.rcd_icn_love);
+                holder.mButton.setClickable(false);
+                holder.mButton.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));
+                return;
+            }
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
