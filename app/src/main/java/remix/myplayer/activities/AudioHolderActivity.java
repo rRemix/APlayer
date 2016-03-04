@@ -97,27 +97,10 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == Constants.UPDATE_BG) {
-                //对专辑图片进行高斯模糊，并将其设置为背景
-                float radius = 25;
-                float scaleFactor = 12;
-                if (mWidth > 0 && mHeight > 0 ) {
-                    if(mInfo == null) return;
-                    Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
-                    if (bkg == null)
-                        bkg = BitmapFactory.decodeResource(getResources(), R.drawable.bg_lockscreen_default);
-                    mNewBitMap = Bitmap.createBitmap((int) (mWidth / scaleFactor), (int) (mHeight / scaleFactor), Bitmap.Config.ARGB_8888);
-                    Canvas canvas = new Canvas(mNewBitMap);
-//                    canvas.translate(-mContainer.getLeft() / scaleFactor, -mContainer.getTop() / scaleFactor);
-//                    canvas.scale(1 / scaleFactor, 1 / scaleFactor);
-                    Paint paint = new Paint();
-                    paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-                    paint.setAlpha((int)(255 * 0.4));
-                    canvas.drawBitmap(bkg, 0, 0, paint);
-                    mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
-                    //获得当前背景
-//                    mContainer.startAnimation(mAnimOut);
-                    mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
-                }
+                //设置高度模糊的背景
+                mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
+                //更新专辑封面
+                ((CoverFragment) mAdapter.getItem(1)).UpdateCover(DBUtil.CheckBitmapBySongId((int)mInfo.getId(),false));
             }
         }
     };
@@ -432,13 +415,39 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             UpdatePlayButton(isplay);
             //更新歌词
             ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
-            //更新专辑封面
-            ((CoverFragment) mAdapter.getItem(1)).UpdateCover(DBUtil.CheckBitmapBySongId((int)MP3info.getId(),false));
+
             //更新进度条
             mCurrent = MusicService.getCurrentTime();
             mDuration = (int) mInfo.getDuration();
             mSeekBar.setMax(mDuration);
-            mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
+            new Thread(){
+                @Override
+                public void run() {
+                    //对专辑图片进行高斯模糊，并将其设置为背景
+                    float radius = 25;
+                    float scaleFactor = 12;
+                    if (mWidth > 0 && mHeight > 0 ) {
+                        if(mInfo == null) return;
+                        Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
+                        if (bkg == null)
+                            bkg = BitmapFactory.decodeResource(getResources(), R.drawable.bg_lockscreen_default);
+                        mNewBitMap = Bitmap.createBitmap((int) (mWidth / scaleFactor), (int) (mHeight / scaleFactor), Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(mNewBitMap);
+//                    canvas.translate(-mContainer.getLeft() / scaleFactor, -mContainer.getTop() / scaleFactor);
+//                    canvas.scale(1 / scaleFactor, 1 / scaleFactor);
+                        Paint paint = new Paint();
+                        paint.setFlags(Paint.FILTER_BITMAP_FLAG);
+                        paint.setAlpha((int)(255 * 0.4));
+                        canvas.drawBitmap(bkg, 0, 0, paint);
+                        mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
+                        //获得当前背景
+//                    mContainer.startAnimation(mAnimOut);
+
+                    }
+                    mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
+                }
+            }.start();
+
 
         }
         else if(mIsRunning)

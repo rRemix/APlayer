@@ -10,13 +10,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.lang.ref.WeakReference;
 
@@ -27,7 +24,6 @@ import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.CircleImageView;
 import remix.myplayer.ui.ColumnView;
 import remix.myplayer.ui.SelectedPopupWindow;
-import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 
 /**
@@ -59,7 +55,7 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
         {
             convertView = super.getView(position, convertView, parent);
             holder = new ViewHolder();
-            holder.mImage = (CircleImageView)convertView.findViewById(R.id.homepage_head_image);
+            holder.mImage = (CircleImageView)convertView.findViewById(R.id.song_head_image);
             holder.mName = (TextView)convertView.findViewById(R.id.displayname);
             holder.mOther = (TextView)convertView.findViewById(R.id.detail);
             convertView.setTag(holder);
@@ -72,20 +68,25 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
 
         String name = mCurosr.getString(AllSongFragment.mDisPlayNameIndex);
         name = name.substring(0, name.lastIndexOf("."));
-        MP3Info temp = MusicService.getCurrentMP3();
-        if(temp != null){
-            boolean flag = name.equals(MusicService.getCurrentMP3().getDisplayname());
+        final MP3Info currentMP3 = MusicService.getCurrentMP3();
+        if(currentMP3 != null){
+            boolean flag = mCurosr.getInt(AllSongFragment.mSongId) == MusicService.getCurrentMP3().getId();
             holder.mName.setTextColor(flag ? Color.parseColor("#ff0030") : Color.parseColor("#1c1b19"));
             mColumnView = (ColumnView)convertView.findViewById(R.id.columnview);
             mColumnView.setVisibility(flag ? View.VISIBLE : View.GONE);
             if(flag){
                 Log.d("AllSongAdapter","song:" + name);
-                Log.d("AllSongAdapter","isplay" + MusicService.getIsplay());
+                Log.d("AllSongAdapter","isplay:" + MusicService.getIsplay());
             }
-            if(MusicService.getIsplay())
+            //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
+            if(MusicService.getIsplay() && !mColumnView.getStatus()){
                 mColumnView.startAnim();
-            else
+            }
+
+            else if(!MusicService.getIsplay() && mColumnView.getStatus()){
+                Log.d("AllSongAdapter","停止动画 -- 歌曲名字:" + mCurosr.getString(AllSongFragment.mDisPlayNameIndex));
                 mColumnView.stopAnim();
+            }
         }
         holder.mName.setText(name);
 
@@ -94,8 +95,6 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
         holder.mOther.setText(artist + "-" + album);
         ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mCurosr.getString(AllSongFragment.mAlbumIdIndex),
                 holder.mImage);
-//        AsynLoadImage task = new AsynLoadImage(holder.mImage);
-//        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,((Cursor) getItem(position)).getInt(AllSongFragment.mSongId));
 
         final ImageView mItemButton = (ImageView)convertView.findViewById(R.id.allsong_item_button);
         mItemButton.setOnClickListener(new View.OnClickListener() {

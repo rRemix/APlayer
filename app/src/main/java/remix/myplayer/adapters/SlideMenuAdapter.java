@@ -1,7 +1,5 @@
 package remix.myplayer.adapters;
 
-import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +13,9 @@ import remix.myplayer.R;
  * Created by Remix on 2015/12/10.
  */
 public class SlideMenuAdapter extends BaseAdapter {
-    //关于软件，搜索本地，随便来一曲，刷新乐库，退出
-    private int draws[] = new int[]{R.drawable.drawer_icon_allsong,R.drawable.drawer_icon_list};
-    private String strings[] = new String[]{"全部歌曲","播放列表"};
+    private int draws[] = new int[]{R.drawable.drawer_icon_allsong,R.drawable.drawer_icon_list,
+            R.drawable.drawer_icon_list,R.drawable.drawer_icon_list};
+    private String strings[] = new String[]{"最近添加","播放列表","全部歌曲","设置"};
     private LayoutInflater mInflater;
 
     public SlideMenuAdapter(LayoutInflater mInflater) {

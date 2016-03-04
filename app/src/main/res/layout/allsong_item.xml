@@ -7,7 +7,7 @@
     android:id="@+id/songlist_item">
     <remix.myplayer.ui.CircleImageView
         android:layout_alignParentLeft="true"
-        android:id="@+id/homepage_head_image"
+        android:id="@+id/song_head_image"
         android:layout_centerVertical="true"
         android:layout_marginLeft="19dp"
         android:layout_width="40dp"
@@ -53,6 +53,5 @@
         app:columncolor="#cd00"
         android:id="@+id/columnview"
         android:layout_toLeftOf="@id/allsong_item_button"
-        android:layout_marginRight="10dp"
-        android:visibility="gone"/>
+        android:layout_marginRight="10dp" />
 </RelativeLayout>

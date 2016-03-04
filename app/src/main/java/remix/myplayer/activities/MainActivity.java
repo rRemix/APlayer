@@ -14,7 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -100,7 +99,6 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
                 String temp = QQApi.Test("七里香","周杰伦");
             }
         }.start();
-
 
         initUtil();
 
@@ -215,8 +213,6 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     }
 
     private void initMainFragment() {
-
-
         getSupportFragmentManager().beginTransaction().add(R.id.main_fragment_container, new MainFragment(), "MainFragment").addToBackStack(null).commit();
     }
 
@@ -253,18 +249,18 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             switch (view.getId()) {
                 case 0:
-                    mDrawerLayout.closeDrawer(mDrawerMenu);
-                    MainFragment.mInstance.getViewPager().setCurrentItem(0);
-//                    mDrawerMenu.toggle();
-//                    mViewPager.setCurrentItem(0);
+                    //最近添加
+                    startActivity(new Intent(MainActivity.this,RecetenlyActivity.class));
                     break;
                 case 1:
                     startActivity(new Intent(MainActivity.this, PlayListActivity.class));
                     break;
                 case 2:
-                    Intent intent = new Intent(Constants.CTL_ACTION);
-                    intent.putExtra("Control", Constants.PREV);
-                    sendBroadcast(intent);
+                    mDrawerLayout.closeDrawer(mDrawerMenu);
+                    MainFragment.mInstance.getViewPager().setCurrentItem(0);
+                    break;
+                case 3:
+                    //设置
                     break;
                 default:break;
             }

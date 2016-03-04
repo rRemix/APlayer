@@ -65,6 +65,8 @@
         <activity android:name=".ui.TimerPopupWindow"
             android:theme="@style/PopupTimer"/>
 
+        <activity android:name=".activities.RecetenlyActivity"/>
+        
         <activity android:name=".ui.SharePopupWindow"
             android:theme="@style/PopupDialog"
             android:configChanges="keyboardHidden|orientation"

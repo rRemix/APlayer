@@ -62,4 +62,7 @@ public class Constants {
     public final static int NOTIFY_NEXT = 2;
     //刷新适配器
     public final static int NOTIFYDATACHANGED = 0;
+    //今天添加或者最近一周
+    public final static int DAY = 0;
+    public final static int WEEK = 1;
 }

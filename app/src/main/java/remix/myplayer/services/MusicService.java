@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Random;
 
 import remix.myplayer.R;
+import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.activities.MainActivity;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.receivers.LineCtlReceiver;
@@ -347,7 +348,8 @@ public class MusicService extends Service {
             if(mInfo == null)
                 return;
             if(mFlag) {
-                Play(mInfo.getUrl());
+                PlayStart();
+//                Play(mInfo.getUrl());
                 mFlag = false;
                 return;
             }
@@ -472,6 +474,9 @@ public class MusicService extends Service {
                     mPlayModel = Constants.PLAY_REPEATONE;
                 default:break;
             }
+            //保存控制命令,用于播放界面判断动画
+            AudioHolderActivity.mOperation = Control;
+
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
             if(intent.getBooleanExtra("FromNotify", false)){
                 NotifyService.mInstance.UpdateNotify();

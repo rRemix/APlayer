@@ -7,13 +7,23 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.Log;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -21,6 +31,7 @@ import java.util.Map;
 
 import remix.myplayer.adapters.FolderAdapter;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.infos.PlayListItem;
 
 /**
  * Created by taeja on 16-2-17.
@@ -30,8 +41,11 @@ public class DBUtil {
     public static ArrayList<Long> mAllSongList = new ArrayList<>();
     public static ArrayList<Long> mPlayingList = new ArrayList<>();
     public static ArrayList<String> mSearchKeyList = new ArrayList<>();
-    public static Map<String,LinkedList<Long>> mFolderMap = new HashMap<>();
+    public static Map<String,ArrayList<Long>> mFolderMap = new HashMap<>();
     public static ArrayList<String> mFolderList = new ArrayList<>();
+    public static ArrayList<Long> mTodayList = new ArrayList<>();
+    public static ArrayList<Long> mWeekList = new ArrayList<>();
+
 
     private static Context mContext;
     public static void setContext(Context context){
@@ -45,39 +59,70 @@ public class DBUtil {
     }
     //返回所有歌曲id
     public static ArrayList<Long> getAllSongsId() {
+        //获得今天日期
+        Calendar today = Calendar.getInstance();
+        today.setTime(new Date());
+        long today_mill = today.getTimeInMillis();
+        long day_mill = (1000 * 3600 * 24);
+
         ArrayList<Long> mAllSongList = new ArrayList<>();
         //查询sd卡上所有音乐文件信息，过滤小于800k的
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
 
         try{
+//            new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA,MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ARTIST},
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA,MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ARTIST},
+                    null,
                     MediaStore.Audio.Media.SIZE + ">80000", null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
         }
 
         try {
             if(cursor != null) {
+//                cursor.moveToFirst();
+//                for(int i = 0 ; i < cursor.getColumnCount() ;i++){
+//                    Log.d(TAG,"name:" + cursor.getColumnName(i) + " value:" + cursor.getString(i));
+//                }
+
                 DBUtil.mFolderMap.clear();
                 while (cursor.moveToNext()) {
+                    long temp = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)) * 1000 ;
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(new Date(temp));
+
+//                    Log.d(TAG,"添加时间:" + SimpleDateFormat.getInstance().format(calendar.getTime()));
+
+                    int between = (int)((today_mill - calendar.getTimeInMillis()) / day_mill);
+                    Log.d(TAG,"between:" + between);
+                    if(between <= 3 && between >= 0){
+//                        Log.d(TAG,"between <= 1," + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)));
+                        mWeekList.add(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
+                        if(between == 0){
+                            mTodayList.add(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
+                        }
+                    }
                     long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
                     mAllSongList.add(id);
-                    String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
-                    String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                    String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                    if(!mSearchKeyList.contains(album))
-                        mSearchKeyList.add(album);
-                    if(!mSearchKeyList.contains(artist))
-                        mSearchKeyList.add(artist);
-                    if(!mSearchKeyList.contains(title))
-                        mSearchKeyList.add(title);
+
                     String full_path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                     SortWithFolder(id,full_path);
+
+//                    String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
+//                    String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+//                    String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+//                    提醒列表
+//                    if(!mSearchKeyList.contains(album))
+//                        mSearchKeyList.add(album);
+//                    if(!mSearchKeyList.contains(artist))
+//                        mSearchKeyList.add(artist);
+//                    if(!mSearchKeyList.contains(title))
+//                        mSearchKeyList.add(title);
                 }
                 cursor.close();
+
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -87,23 +132,23 @@ public class DBUtil {
     }
 
     //根据文件夹名字获得所有歌曲id
-    public static LinkedList<Long> getIdsByFolderName(String foldername,int position){
+    public static ArrayList<Long> getIdsByFolderName(String foldername,int position){
         Iterator it = DBUtil.mFolderMap.keySet().iterator();
         String full_path = null;
         for(int i = 0 ; i <= position ; i++)
             full_path = it.next().toString();
-        return (LinkedList)DBUtil.mFolderMap.get(full_path);
+        return DBUtil.mFolderMap.get(full_path);
     }
 
     //将歌曲按文件夹分类
     public static void SortWithFolder(long id,String fullpath) {
         String dirpath = fullpath.substring(0, fullpath.lastIndexOf("/"));
         if (!mFolderMap.containsKey(dirpath)) {
-            LinkedList<Long> list = new LinkedList<>();
+            ArrayList<Long> list = new ArrayList<>();
             list.add(id);
             mFolderMap.put(dirpath, list);
         } else {
-            LinkedList<Long> list = mFolderMap.get(dirpath);
+            ArrayList<Long> list = mFolderMap.get(dirpath);
             list.add(id);
         }
     }
@@ -362,7 +407,7 @@ public class DBUtil {
     }
 
     //根据多个歌曲id返回多个歌曲详细信息
-    public static ArrayList<MP3Info> getMP3ListByIds(LinkedList<Long> ids)
+    public static ArrayList<MP3Info> getMP3ListByIds(ArrayList<Long> ids)
     {
         ArrayList<MP3Info> list = new ArrayList<>();
         for (Long id : ids)
@@ -408,7 +453,7 @@ public class DBUtil {
         String where = null;
         String[] arg = null;
         ArrayList<String> datas = new ArrayList<>();
-        LinkedList<Long> list = DBUtil.mFolderMap.get(data);
+        ArrayList<Long> list = DBUtil.mFolderMap.get(data);
         int ret = 0;
         boolean ret2 = false;
 

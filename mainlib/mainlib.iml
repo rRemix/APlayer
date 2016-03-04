@@ -71,8 +71,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/bundles" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/lint" />
@@ -85,24 +83,52 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="ShareSDK-Wechat-2.7.0" level="project" />
-    <orderEntry type="library" exported="" name="ShareSDK-Renren-2.7.0" level="project" />
-    <orderEntry type="library" exported="" name="ShareSDK-QQ-2.7.0" level="project" />
-    <orderEntry type="library" exported="" name="ShareSDK-Twitter-2.7.0" level="project" />
-    <orderEntry type="library" exported="" name="ShareSDK-SinaWeibo-2.7.0" level="project" />
-    <orderEntry type="library" exported="" name="MobTools-2016.0301.1053" level="project" />
-    <orderEntry type="library" exported="" name="ShareSDK-KaiXin-2.7.0" level="project" />
-    <orderEntry type="library" exported="" name="support-v4-23.1.1" level="project" />
-    <orderEntry type="library" exported="" name="ShareSDK-Douban-2.7.0" level="project" />
-    <orderEntry type="library" exported="" name="ShareSDK-Facebook-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-KakaoTalk-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Instapaper-2.7.0" level="project" />
     <orderEntry type="library" exported="" name="MobCommons-2016.0301.1053" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Yixin-Moments-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-WhatsApp-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Douban-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-VKontakte-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="MobTools-2016.0301.1053" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Mingdao-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Wechat-Favorite-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-KakaoStory-2.7.0" level="project" />
     <orderEntry type="library" exported="" name="ShareSDK-QZone-2.7.0" level="project" />
-    <orderEntry type="library" exported="" name="ShareSDK-Wechat-Moments-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-FacebookMessenger-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Flickr-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Facebook-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-YouDao-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-KaiXin-2.7.0" level="project" />
     <orderEntry type="library" exported="" name="ShareSDK-Core-2.7.0" level="project" />
-    <orderEntry type="library" exported="" name="ShareSDK-TencentWeibo-2.7.0" level="project" />
-    <orderEntry type="library" exported="" name="ShareSDK-Wechat-Core-2.7.0" level="project" />
-    <orderEntry type="library" exported="" name="support-annotations-23.1.1" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-ShortMessage-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Pocket-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Linkedin-2.7.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-23.1.1" level="project" />
-    <orderEntry type="library" exported="" name="android-android-23" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Dropbox-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Yixin-Core-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Renren-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Foursquare-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-QQ-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Email-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Bluetooth-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Wechat-Moments-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-23.1.1" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-SinaWeibo-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-TencentWeibo-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-GooglePlus-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Twitter-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Pinterest-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Kakao-Core-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Wechat-Core-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-23.1.1" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-SohuSuishenkan-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Yixin-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Line-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Tumblr-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Alipay-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Evernote-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Wechat-2.7.0" level="project" />
+    <orderEntry type="library" exported="" name="ShareSDK-Instagram-2.7.0" level="project" />
   </component>
 </module>

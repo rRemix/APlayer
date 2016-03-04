@@ -81,7 +81,7 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
             return;
         setContentView(R.layout.child_holder);
         mListView = (ListView)findViewById(R.id.artist_album_holder_list);
-        mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater());
+        mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),this);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

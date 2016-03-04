@@ -3,12 +3,15 @@ package remix.myplayer.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.viewpagerindicator.TabPageIndicator;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.PagerAdapter;
@@ -26,6 +29,7 @@ public class MainFragment extends Fragment {
     private LayoutInflater mInflater;
     private PagerAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
+    private TabPageIndicator mIndicator;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,20 +108,25 @@ public class MainFragment extends Fragment {
     //初始化ViewPager
     private void initPager() {
         mAdapter = new PagerAdapter(getActivity().getSupportFragmentManager());
+        mAdapter.setTitles(new String[]{"全部歌曲","专辑唱片","艺术家","文件夹"});
         mAdapter.AddFragment(new AllSongFragment());
         mAdapter.AddFragment(new AlbumFragment());
         mAdapter.AddFragment(new ArtistFragment());
         mAdapter.AddFragment(new FolderFragment());
 
+
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(0);
-        mViewPager.addOnPageChangeListener(new ViewPagerListener(getContext(), mTabImage, 0));
+        mViewPager.addOnPageChangeListener(new ViewPagerListener(getContext(), mTabImage, 0,4));
+
     }
     //初始化custontab
     private void initTab(View rootView)
     {
         mViewPager = (MyPager)rootView.findViewById(R.id.ViewPager);
         mTabImage = (ImageView)rootView.findViewById(R.id.tab_image);
+//        mIndicator = (TabPageIndicator)rootView.findViewById(R.id.tab_indicator);
+
         TextView view1 = (TextView) rootView.findViewById(R.id.tab_song);
         TextView view2 = (TextView)rootView.findViewById(R.id.tab_album);
         TextView view3 = (TextView)rootView.findViewById(R.id.tab_artist);

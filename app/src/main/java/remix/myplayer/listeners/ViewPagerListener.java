@@ -21,14 +21,14 @@ public class ViewPagerListener implements ViewPager.OnPageChangeListener {
     private int mImageWidth = 0;
     private int mOffSetX;
 
-    public ViewPagerListener(Context context,ImageView image,int index) {
+    public ViewPagerListener(Context context,ImageView image,int index,int tabcount) {
         mImage = image;
         mIndex = index;
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
         int screenW = dm.widthPixels;// 获取分辨率宽度
         mImageWidth = BitmapFactory.decodeResource(context.getResources(),
                 R.drawable.indicator).getWidth();// 获取图片宽度
-        mTabWidth = screenW / 4;
+        mTabWidth = screenW / tabcount;
         if (mImageWidth > mTabWidth) {
             mImage.getLayoutParams().width = mTabWidth;
             mImageWidth = mTabWidth;

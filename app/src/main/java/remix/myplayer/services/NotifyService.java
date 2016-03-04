@@ -10,13 +10,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Handler;
+import android.media.AudioManager;
 import android.os.IBinder;
-import android.os.Message;
-import android.service.notification.StatusBarNotification;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -27,7 +23,6 @@ import java.util.List;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
-import remix.myplayer.activities.MainActivity;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
@@ -39,6 +34,7 @@ public class NotifyService extends Service {
     private NotifyReceiver mNotifyReceiver;
     public static NotifyService mInstance;
     private Context mContext;
+    private boolean mIsShow = true;
     @Override
     public void onCreate(){
         super.onCreate();
@@ -65,6 +61,9 @@ public class NotifyService extends Service {
                                 NotificationManager mNotificationManager =
                                         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                                 mNotificationManager.cancel(0);
+                                mIsShow = false;
+                            }else {
+                                mIsShow = true;
                             }
                         }
                         sleep(200);
@@ -99,63 +98,64 @@ public class NotifyService extends Service {
         private void UpdateNotify() {
             mIsplay = MusicService.getIsplay();
             Log.d(TAG,"isplay=" + mIsplay);
+            Log.d(TAG,"isShow=" + mIsShow);
             mRemoteView = new RemoteViews(mContext.getPackageName(), R.layout.notify_playbar);
-            if(MusicService.getCurrentMP3() == null ) {
-                return;
-            }
-            MP3Info temp = MusicService.getCurrentMP3();
-            //设置歌手，歌曲名
-            mRemoteView.setTextViewText(R.id.notify_song, temp.getDisplayname());
-            mRemoteView.setTextViewText(R.id.notify_artist, temp.getArtist());
-            //设置封面
-            Bitmap bitmap = DBUtil.CheckBitmapBySongId((int) temp.getId(), true);
-            if(bitmap != null)
-                mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
-            else
-                mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.default_recommend);
-            //设置播放按钮
-            if(!mIsplay){
-                mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_play_nor);
-            }else{
-                mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_pause_nor);
-            }
+            if(mIsShow || (MusicService.getCurrentMP3() != null && mIsplay)) {
+                MP3Info temp = MusicService.getCurrentMP3();
+                //设置歌手，歌曲名
+                mRemoteView.setTextViewText(R.id.notify_song, temp.getDisplayname());
+                mRemoteView.setTextViewText(R.id.notify_artist, temp.getArtist());
+                //设置封面
+                Bitmap bitmap = DBUtil.CheckBitmapBySongId((int) temp.getId(), true);
+                if(bitmap != null)
+                    mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
+                else
+                    mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.default_recommend);
+                //设置播放按钮
+                if(!mIsplay){
+                    mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_play_nor);
+                }else{
+                    mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_pause_nor);
+                }
 
-            Intent mButtonIntent = new Intent(Constants.CTL_ACTION);
-            mButtonIntent.putExtra("FromNotify", true);
-            mButtonIntent.putExtra("Control", Constants.PLAY);
-            PendingIntent mIntent_Play = PendingIntent.getBroadcast(mContext,1,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-            mRemoteView.setOnClickPendingIntent(R.id.notify_play,mIntent_Play);
+                Intent mButtonIntent = new Intent(Constants.CTL_ACTION);
+                mButtonIntent.putExtra("FromNotify", true);
+                mButtonIntent.putExtra("Control", Constants.PLAY);
+                PendingIntent mIntent_Play = PendingIntent.getBroadcast(mContext,1,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+                mRemoteView.setOnClickPendingIntent(R.id.notify_play,mIntent_Play);
 
-            mButtonIntent.putExtra("Control", Constants.NEXT);
-            PendingIntent mIntent_Next = PendingIntent.getBroadcast(mContext,2,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-            mRemoteView.setOnClickPendingIntent(R.id.notify_next,mIntent_Next);
+                mButtonIntent.putExtra("Control", Constants.NEXT);
+                PendingIntent mIntent_Next = PendingIntent.getBroadcast(mContext,2,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+                mRemoteView.setOnClickPendingIntent(R.id.notify_next,mIntent_Next);
 
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext)
-                    .setContent(mRemoteView)
-                    .setWhen(System.currentTimeMillis())
-                    .setPriority(Notification.PRIORITY_DEFAULT)
-                    .setOngoing(mIsplay)
-                    .setVisibility(Notification.VISIBILITY_PUBLIC)
-                    .setSmallIcon(R.drawable.stat_notify);
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext)
+                        .setContent(mRemoteView)
+                        .setWhen(System.currentTimeMillis())
+                        .setPriority(Notification.PRIORITY_DEFAULT)
+                        .setOngoing(mIsplay)
+                        .setVisibility(Notification.VISIBILITY_PUBLIC)
+                        .setSmallIcon(R.drawable.stat_notify);
 //                    .setLargeIcon(DBUtil.CheckBitmapByAlbumId((int)MusicService.getCurrentMP3().getAlbumId(),false))
 //                    .setStyle(new android.support.v7.app.NotificationCompat.MediaStyle().setMediaSession(MusicService.mMediaSession.getSessionToken()));
 
-            Intent result = new Intent(mContext,AudioHolderActivity.class);
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-            stackBuilder.addParentStack(AudioHolderActivity.class);
-            stackBuilder.addNextIntent(result);
-            stackBuilder.editIntentAt(1).putExtra("Notify", true);
-            stackBuilder.editIntentAt(0).putExtra("Notify",true);
+                Intent result = new Intent(mContext,AudioHolderActivity.class);
+                TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
+                stackBuilder.addParentStack(AudioHolderActivity.class);
+                stackBuilder.addNextIntent(result);
+                stackBuilder.editIntentAt(1).putExtra("Notify", true);
+                stackBuilder.editIntentAt(0).putExtra("Notify",true);
 
-            PendingIntent resultPendingIntent =
-                    stackBuilder.getPendingIntent(
-                            0,
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    );
-            mBuilder.setContentIntent(resultPendingIntent);
-            NotificationManager mNotificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(0, mBuilder.build());
+                PendingIntent resultPendingIntent =
+                        stackBuilder.getPendingIntent(
+                                0,
+                                PendingIntent.FLAG_UPDATE_CURRENT
+                        );
+                mBuilder.setContentIntent(resultPendingIntent);
+                NotificationManager mNotificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.notify(0, mBuilder.build());
+            }
+
         }
     }
 }

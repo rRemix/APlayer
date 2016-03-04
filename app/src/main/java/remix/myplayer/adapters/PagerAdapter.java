@@ -20,12 +20,14 @@ public class PagerAdapter extends FragmentPagerAdapter {
     public PagerAdapter(FragmentManager fm) {
         super(fm);
     }
-    private String[] mTitles = new String[]{"全部歌曲","专辑唱片","艺术家","文件夹"};
+    private String[] mTitles;
     public void AddFragment(Fragment fragment)
     {
         mFragmentList.add(fragment);
     }
-
+    public void setTitles(String[] titles){
+        mTitles = titles;
+    }
 
     @Override
     public CharSequence getPageTitle(int position) {

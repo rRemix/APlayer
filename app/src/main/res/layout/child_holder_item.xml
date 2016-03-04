@@ -34,8 +34,20 @@
             android:textColor="#6d6c69"/>
     </LinearLayout>
 
-    <remix.myplayer.ui.ColumnView
+    <!--结尾处按钮-->
+    <ImageView
         android:layout_alignParentRight="true"
+        android:layout_marginRight="18dp"
+        android:id="@+id/song_item_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        android:scaleType="center"
+        android:src="@drawable/list_icn_more"
+        android:background="@drawable/bg_btn_gray_selector"/>
+
+    <remix.myplayer.ui.ColumnView
+        android:layout_toLeftOf="@id/song_item_button"
         android:layout_centerVertical="true"
         android:layout_width="16dp"
         android:layout_height="16dp"
@@ -43,4 +55,6 @@
         app:columncolor="#cd00"
         android:id="@+id/columnview"
         android:layout_marginRight="10dp" />
+
+
 </RelativeLayout>

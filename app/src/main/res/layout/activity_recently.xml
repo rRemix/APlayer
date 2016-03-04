@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tab_height"
+        android:orientation="horizontal"
+        android:background="#fff"
+        android:gravity="center_vertical|center_horizontal">
+        <TextView
+            android:id="@+id/tab_today"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textSize="16dp"
+            android:textColor="#1b1c19"
+            android:text="今天添加"
+            android:layout_height="match_parent"
+            android:gravity="center"/>
+        <TextView
+            android:id="@+id/tab_week"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textSize="16dp"
+            android:textColor="#1b1c19"
+            android:text="最近一周"
+            android:layout_height="match_parent"
+            android:gravity="center"/>
+    </LinearLayout>
+    <!-- Tab分割线-->
+    <ImageView
+        android:id="@+id/tab_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/indicator"/>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/line"/>
+    <!--中间四个fragment-->
+    <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:background="#fff"
+        android:id="@+id/ViewPager" />
+</LinearLayout>

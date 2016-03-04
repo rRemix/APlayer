@@ -10,10 +10,9 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.CycleInterpolator;
-import android.view.animation.DecelerateInterpolator;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -21,11 +20,16 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import remix.myplayer.R;
+import remix.myplayer.infos.MP3Info;
+import remix.myplayer.services.MusicService;
 
 /**
  * Created by taeja on 16-3-2.
  */
 public class ColumnView extends View {
+    private static final String TAG = "ColumnVIew";
+    //记录动画是否已经启动
+    private boolean mIsRun = false;
     //View高度
     private int mRawHeight;
     //View宽度
@@ -55,6 +59,9 @@ public class ColumnView extends View {
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
+//            Log.d(TAG,"action:" + msg.what);
+//            Log.d(TAG,"info:" + msg.obj.toString());
+//            Log.d(TAG,"isplay:" + MusicService.getIsplay());
             for(int i = 0 ; i < mObjectAnimList.size(); i++){
                 int from = mHeightList.get(i);
                 int to = msg.what == STARTANIM ? new Random().nextInt(mRawHeight) : (int)(mRawHeight * 0.1);
@@ -158,21 +165,34 @@ public class ColumnView extends View {
     }
 
     public void startAnim(){
+        mIsRun = true;
         mTimer = new Timer();
         mTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                mHandler.sendEmptyMessage(STARTANIM);
+                Message msg = new Message();
+                msg.what = STARTANIM;
+//                msg.obj = (MP3Info) MusicService.getCurrentMP3();
+                mHandler.sendMessage(msg);
             }
-        },0,300);
+        },50,300);
     }
 
     public void stopAnim(){
+        mIsRun = false;
         if(mTimer != null){
             mTimer.cancel();
             mTimer = null;
         }
-        mHandler.sendEmptyMessage(STOPANIM);
+        Message msg = new Message();
+        msg.what = STOPANIM;
+//        msg.obj = (MP3Info) MusicService.getCurrentMP3();
+        mHandler.sendMessage(msg);
+    }
+
+    //当前动画是否正在播放
+    public boolean getStatus(){
+        return mIsRun;
     }
 
 }
