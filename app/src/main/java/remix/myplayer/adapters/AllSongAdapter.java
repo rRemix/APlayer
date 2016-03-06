@@ -63,7 +63,7 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
         else
             holder = (ViewHolder)convertView.getTag();
 
-        if((getItem(position)) == null)
+        if(!mCurosr.moveToPosition(position))
             return convertView;
 
         String name = mCurosr.getString(AllSongFragment.mDisPlayNameIndex);
@@ -71,7 +71,7 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
         final MP3Info currentMP3 = MusicService.getCurrentMP3();
         if(currentMP3 != null){
             boolean flag = mCurosr.getInt(AllSongFragment.mSongId) == MusicService.getCurrentMP3().getId();
-            holder.mName.setTextColor(flag ? Color.parseColor("#ff0030") : Color.parseColor("#1c1b19"));
+            holder.mName.setTextColor(flag ? Color.parseColor("#ff0030") : Color.parseColor("#ffffffff"));
             mColumnView = (ColumnView)convertView.findViewById(R.id.columnview);
             mColumnView.setVisibility(flag ? View.VISIBLE : View.GONE);
             if(flag){
@@ -79,7 +79,7 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
                 Log.d("AllSongAdapter","isplay:" + MusicService.getIsplay());
             }
             //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
-            if(MusicService.getIsplay() && !mColumnView.getStatus()){
+            if(MusicService.getIsplay() && !mColumnView.getStatus() && flag){
                 mColumnView.startAnim();
             }
 
@@ -100,8 +100,10 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
         mItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MP3Info temp = DBUtil.getMP3InfoById(DBUtil.mAllSongList.get(position));
                 Intent intent = new Intent(mContext, SelectedPopupWindow.class);
-                intent.putExtra("Position",position);
+//                intent.putExtra("Position",position);
+                intent.putExtra("MP3Info",temp);
                 mContext.startActivity(intent);
             }
         });

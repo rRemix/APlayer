@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_color_3">
 
     <remix.myplayer.ui.SearchView
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal"
-        android:background="#CD3700"
         android:id="@+id/search_view">
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btn_search_back"
-            android:background="@drawable/bg_btn_child_back"
+            android:background="@drawable/common_btn_back"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
@@ -29,7 +29,8 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical|left"
                 android:id="@+id/search_text"
-                android:textSize="14dp"
+                android:textSize="@dimen/textsize_medium"
+                android:textColor="@color/text_color_blank"
                 android:lines="1"
                 android:ellipsize="end"
                 android:hint="搜索歌曲 艺人 专辑"
@@ -55,7 +56,8 @@
             android:layout_height="match_parent"
             android:id="@+id/btn_search_go"
             android:text="搜索"
-            android:textSize="16dp"
+            android:textSize="@dimen/textsize_huge"
+            android:textColor="@color/text_color_blank"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="10dp"
             android:gravity="center_vertical" />
@@ -78,12 +80,16 @@
                     android:id="@+id/search_history"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:choiceMode="singleChoice"/>
+                    android:choiceMode="singleChoice"
+                    android:divider="@color/list_divider"
+                    android:dividerHeight="1px"/>
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/search_history_clear"
                     android:text="清空搜索历史"
+                    android:textSize="@dimen/textsize_medium"
+                    android:textColor="@color/text_color_blank"
                     android:layout_gravity="center_horizontal"/>
             </LinearLayout>
             <TextView
@@ -94,6 +100,7 @@
                 android:layout_marginTop="30dp"
                 android:gravity="center"
                 android:text="无搜索历史"
+                android:textColor="@color/text_color_blank"
                 android:textSize="22dp"/>
         </FrameLayout>
 
@@ -105,7 +112,9 @@
             <ListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/search_result_native"/>
+                android:id="@+id/search_result_native"
+                android:divider="@color/list_divider"
+                android:dividerHeight="1px"/>
             <TextView
                 android:id="@+id/search_result_blank"
                 android:layout_width="wrap_content"
@@ -114,7 +123,8 @@
                 android:layout_marginTop="30dp"
                 android:gravity="center"
                 android:text="无搜索结果"
-                android:textSize="22dp"/>
+                android:textSize="22dp"
+                android:textColor="@color/text_color_blank"/>
         </FrameLayout>
 
     </FrameLayout>

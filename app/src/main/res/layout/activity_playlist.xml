@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color_3">
+
+    <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:background="@color/background_color_interval"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/playlist_recycleview">
+        </android.support.v7.widget.RecyclerView>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onAdd"
+            android:layout_margin="40dp"
+            android:src="@drawable/playlist_fab_btn_add"
+            android:background="@drawable/playlist_fab_btn_bg"
+            android:layout_gravity="bottom|right"/>
+    </FrameLayout>
+
+
+</LinearLayout>

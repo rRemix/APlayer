@@ -13,8 +13,8 @@ import remix.myplayer.R;
  * Created by Remix on 2015/12/10.
  */
 public class SlideMenuAdapter extends BaseAdapter {
-    private int draws[] = new int[]{R.drawable.drawer_icon_allsong,R.drawable.drawer_icon_list,
-            R.drawable.drawer_icon_list,R.drawable.drawer_icon_list};
+    private int draws[] = new int[]{R.drawable.drawer_icon_recently,R.drawable.drawer_icon_list,
+            R.drawable.drawer_icon_musicbox,R.drawable.drawer_icon_set};
     private String strings[] = new String[]{"最近添加","播放列表","全部歌曲","设置"};
     private LayoutInflater mInflater;
 

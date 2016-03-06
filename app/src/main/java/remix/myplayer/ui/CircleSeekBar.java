@@ -42,11 +42,11 @@ public class CircleSeekBar extends View {
     private Rect mTextRect = new Rect();
     private int mProgressWidth = 0;
     private int mProgressCorlor;
-    private int[] mThumbNormal = null;
-    private int[] mThumbPressed = null;
     private Context mContext;
     private AttributeSet mAttrs = null;
     private float mBaseLine = 0;
+    private int[] mThumbNormal = null;
+    private int[] mThumbPressed = null;
     private OnSeekBarChangeListener mOnSeekBarChangeListener;
     //是否开始计时
     private boolean mStart = false;
@@ -72,39 +72,45 @@ public class CircleSeekBar extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawCircle(mCenterX,mCenterY,mRadius, mCirclePaint);
-        canvas.drawArc(mRectF,-90,(float) Math.toDegrees(mRad),false, mArcPaint);
-        canvas.drawBitmap(mThumbBitmap,
-                mCenterX + mOffsetX - mThumbWidth / 2,
-                mCenterY + mOffsetY - mThumbHeight / 2 ,null);
+        canvas.drawCircle(mCenterX, mCenterY, mRadius, mCirclePaint);
+        canvas.drawArc(mRectF, -90, (float) Math.toDegrees(mRad), false, mArcPaint);
+        mThumbDrawable.setBounds((int)(mCenterX + mOffsetX - mThumbWidth / 2),
+                (int)(mCenterY + mOffsetY - mThumbHeight / 2),
+                (int)(mCenterX + mOffsetX + mThumbWidth / 2),
+                (int)(mCenterY + mOffsetY + mThumbHeight / 2));
+        mThumbDrawable.draw(canvas);
+//        canvas.drawBitmap(mThumbBitmap,
+//                mCenterX + mOffsetX - mThumbWidth / 2,
+//                mCenterY + mOffsetY - mThumbHeight / 2 ,null);
 //        canvas.drawText("60:00min",mCenterX,mBaseLine,mTextPaint);
         super.onDraw(canvas);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(isPointOnThumb(event.getX(),event.getY())
-                && event.getAction() != MotionEvent.ACTION_UP
-                && !mStart) {
-            seekTo(event.getX(),event.getY());
-        }
+        if(!mStart)
+            seekTo(event.getX(),event.getY(),event.getAction() == MotionEvent.ACTION_UP);
         return true;
     }
 
-    private void seekTo(float eventX,float eventY) {
-        mRad = Math.atan2(eventY - mCenterY, eventX - mCenterX);
-        //转换角度，以12点方向为0度
-        if(mRad > -0.5 * Math.PI && mRad < Math.PI)
-            mRad += 0.5 * Math.PI;
-        else
-            mRad = 2.5 * Math.PI + mRad;
-        setThumbPostion(mRad);
-        invalidate();
-        //设置当前进度
-        mProgress = (int)(Math.toDegrees(mRad) / 360.0 * mProgressMax);
-        if(mOnSeekBarChangeListener != null)
-            mOnSeekBarChangeListener.onProgressChanged(this,mProgress,true);
+    private void seekTo(float eventX,float eventY,boolean isUp) {
+        if(isPointOnThumb(eventX,eventY) && !isUp){
+            mRad = Math.atan2(eventY - mCenterY, eventX - mCenterX);
+            //转换角度，以12点方向为0度
+            if(mRad > -0.5 * Math.PI && mRad < Math.PI)
+                mRad += 0.5 * Math.PI;
+            else
+                mRad = 2.5 * Math.PI + mRad;
+            setThumbPostion(mRad);
+            //设置当前进度
+            mProgress = (int)(Math.toDegrees(mRad) / 360.0 * mProgressMax);
+            //设置thumb状态
 
+            if(mOnSeekBarChangeListener != null)
+                mOnSeekBarChangeListener.onProgressChanged(this,mProgress,true);
+        }
+        mThumbDrawable.setState(isUp ? mThumbNormal : mThumbPressed);
+        invalidate();
     }
 
 
@@ -130,16 +136,26 @@ public class CircleSeekBar extends View {
     //初始化
     private void init() {
         TypedArray typedArray = mContext.obtainStyledAttributes(mAttrs, R.styleable.CircleSeekBar);
-//        mThumbDrawable = typedArray.getDrawable(android.R.attr.thumb);
+
+        mThumbDrawable = getResources().getDrawable(R.drawable.bg_circkeseekbar_thumb);
+        mThumbNormal = new int[]{-android.R.attr.state_focused, -android.R.attr.state_pressed,
+                -android.R.attr.state_selected, -android.R.attr.state_checked};
+        mThumbPressed = new int[]{android.R.attr.state_focused, android.R.attr.state_pressed,
+                android.R.attr.state_selected, android.R.attr.state_checked};
+
+        if(mThumbDrawable != null){
+            int width = mThumbDrawable.getIntrinsicWidth();
+            int height= mThumbDrawable.getIntrinsicHeight();
+        }
 //        mThumbDrawable = typedArray.getDrawable(R.styleable.th);
         mProgressCorlor = typedArray.getColor(R.styleable.CircleSeekBar_progress_color, Color.parseColor("#8E24AA"));
         mProgressWidth = typedArray.getInteger(R.styleable.CircleSeekBar_progress_width,15);
-        mProgressMax = typedArray.getInteger(R.styleable.CircleSeekBar_progress_max,-1);
+        mProgressMax = typedArray.getInteger(R.styleable.CircleSeekBar_progress_max,60);
         typedArray.recycle();
 
         mCirclePaint = new Paint();
         mCirclePaint.setAntiAlias(true);
-        mCirclePaint.setColor(Color.parseColor("#EDEDED"));
+        mCirclePaint.setColor(Color.parseColor("#DCDCDC"));
         mCirclePaint.setStyle(Paint.Style.STROKE);
         mCirclePaint.setStrokeWidth(mProgressWidth);
 
@@ -157,10 +173,9 @@ public class CircleSeekBar extends View {
 //        Paint.FontMetricsInt fontMetrics = mTextPaint.getFontMetricsInt();
 //        mBaseLine = (mRectF.bottom + mRectF.top - fontMetrics.bottom - fontMetrics.top) / 2;
 
-
-        mThumbBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.progress_indicator);
-        mThumbWidth = mThumbBitmap.getWidth();
-        mThumbHeight = mThumbBitmap.getHeight();
+//        mThumbBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.timer_btn_pre_whirling);
+        mThumbWidth = mThumbDrawable.getIntrinsicWidth();
+        mThumbHeight = mThumbDrawable.getIntrinsicHeight();
         mThumbSize =  Math.sqrt(mThumbHeight * mThumbHeight + mThumbWidth * mThumbWidth);
 
     }

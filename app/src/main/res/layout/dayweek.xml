@@ -5,6 +5,8 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:dividerHeight="1px"
+        android:divider="@drawable/divider"
         android:id="@+id/dayweek_list"
         android:layout_centerInParent="true"/>
     <TextView

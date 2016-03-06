@@ -12,13 +12,13 @@
         <!-- 主内容-->
         <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
             android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-            android:background="#ffffffff">
+            android:background="@color/background_color_3">
         </android.support.v7.widget.Toolbar>
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="7"
-            android:background="#fef2f3f9"
+            android:background="@color/background_color_main"
             android:id="@+id/main_fragment_container"
             android:layout_gravity="top">
         </FrameLayout>

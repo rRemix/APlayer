@@ -1,25 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="200dp"
-    android:background="#fff">
-    <TextView
-        android:id="@+id/popup_title"
-        android:gravity="center"
+    android:layout_height="176dp"
+    android:background="#ffffffff">
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:lines="1"
-        android:ellipsize="end"
-        android:textColor="#001"
-        android:text="歌曲名"
-        android:textSize="17dp"/>
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <remix.myplayer.ui.CircleImageView
+            android:id="@+id/popup_image"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp" />
+        <TextView
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/popup_title"
+            android:lines="1"
+            android:ellipsize="end"
+            android:textSize="@dimen/textsize_large"
+            android:textColor="#1b1c19"
+            android:text="歌曲名-歌手"/>
+    </LinearLayout>
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#E6E6E6"/>
+        android:background="#d9d9d9"/>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="90dp">
+        android:layout_height="match_parent"
+        android:gravity="center_vertical">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -29,17 +42,17 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_margin="8dp"
                 android:id="@+id/popup_add"
                 android:background="#ffff"
                 android:src="@drawable/bg_btn_popup_add"/>
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="#6d6c69"
+                android:textColor="#1b1c19"
                 android:textSize="15dp"
-                android:text="添加"/>
+                android:text="加入"/>
         </LinearLayout>
 
         <LinearLayout
@@ -51,13 +64,13 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_margin="8dp"
                 android:id="@+id/popup_ring"
                 android:background="#ffff"
                 android:src="@drawable/bg_btn_popup_ring"/>
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textColor="#6d6c69"
                 android:textSize="15dp"
@@ -73,13 +86,13 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_margin="8dp"
                 android:id="@+id/popup_share"
                 android:background="#ffff"
                 android:src="@drawable/bg_btn_popup_share"/>
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="15dp"
                 android:textColor="#6d6c69"
@@ -95,13 +108,13 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_margin="8dp"
                 android:id="@+id/popup_delete"
                 android:background="#ffff"
                 android:src="@drawable/bg_btn_popup_delete"/>
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="15dp"
                 android:textColor="#6d6c69"
@@ -110,15 +123,15 @@
 
     </LinearLayout>
 
-    <Button
-        android:layout_marginTop="10dp"
-        android:layout_width="130dp"
-        android:layout_height="30dp"
-        android:gravity="center"
-        android:id="@+id/popup_cancel"
-        android:layout_gravity="center_horizontal"
-        android:text="取消"
-        android:textSize="18dp"
-        android:textColor="@color/translucence"
-        android:background="@drawable/bg_boder"/>
+    <!--<Button-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:layout_width="130dp"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:gravity="center"-->
+        <!--android:id="@+id/popup_cancel"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!--android:text="取消"-->
+        <!--android:textSize="18dp"-->
+        <!--android:textColor="@color/translucence"-->
+        <!--android:background="@drawable/bg_boder"/>-->
 </LinearLayout>

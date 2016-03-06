@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -39,6 +40,7 @@ import remix.myplayer.fragments.MainFragment;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.services.NotifyService;
+import remix.myplayer.services.TimerService;
 import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
@@ -54,24 +56,16 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     private final static String TAG = "MainActivity";
     private boolean mFromNotify = false;
     private ListView mSlideMenuList;
+    private Toolbar mToolBar;
     private DrawerLayout mDrawerLayout;
     private LinearLayout mDrawerMenu;
     private ImageButton mSlideMenuBtn;
     private ImageButton mSlideMenuAbout;
     private ImageButton mSlideMenuExit;
     private ActionBarDrawerToggle mDrawerToggle;
-    private Toolbar mToolBar;
-//    private ServiceConnection mConnecting = new ServiceConnection() {
-//        @Override
-//        public void onServiceConnected(ComponentName name, IBinder service) {
-//            mService = ((MusicService.PlayerBinder)service).getService();
-//            mService.addCallback(MainActivity.this);
-//        }
-//        @Override
-//        public void onServiceDisconnected(ComponentName name) {
-//            mService = null;
-//        }
-//    };
+
+
+    //
     @Override
     protected void onResume() {
         super.onResume();
@@ -93,15 +87,13 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        new Thread(){
-            @Override
-            public void run(){
-                String temp = QQApi.Test("七里香","周杰伦");
-            }
-        }.start();
-
+//        new Thread(){
+//            @Override
+//            public void run(){
+//                String temp = QQApi.Test("七里香","周杰伦");
+//            }
+//        }.start();
         initUtil();
-
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
@@ -111,9 +103,13 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         if(!mFromNotify) {
             loadsongs();
-            startService(new Intent(this,MusicService.class));
+            startService(new Intent(this, MusicService.class));
             //NofityService
             startService(new Intent(this, NotifyService.class));
+            //定时
+            Intent startIntent = new Intent(this, TimerService.class);
+            startService(startIntent);
+
         }
         //播放的service
         MusicService.addCallback(MainActivity.this);
@@ -129,9 +125,9 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return;
 
-        boolean mFir = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mFirst",true);
-        int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","mPos",-1);
-        SharedPrefsUtil.putValue(getApplicationContext(),"setting","mFirst",false);
+        boolean mFir = SharedPrefsUtil.getValue(getApplicationContext(),"setting","First",true);
+        int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","Pos",-1);
+        SharedPrefsUtil.putValue(getApplicationContext(),"setting","First",false);
 
         //第一次启动添加我的收藏列表
         if(mFir){
@@ -149,7 +145,8 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         mToolBar.setTitle("");
 
         setSupportActionBar(mToolBar);
-        mToolBar.setNavigationIcon(R.drawable.btn_toolbar_menu);
+        mToolBar.setNavigationIcon(R.drawable.actionbar_menu);
+        mToolBar.setLogo(R.drawable.allsong_icon_musicbox);
         mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -218,16 +215,12 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 
     private void initDrawerLayout(){
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,mToolBar,R.string.drawerlayout_open,R.string.drawerlayout_open);
-//        mDrawerLayout.setDrawerListener(mDrawerToggle);
-//        mDrawerToggle.syncState();
 
         mDrawerMenu = (LinearLayout)findViewById(R.id.slide_menu);
         mSlideMenuList = (ListView) mDrawerMenu.findViewById(R.id.slide_menu_list);
         mSlideMenuList.setAdapter(new SlideMenuAdapter(getLayoutInflater()));
         mSlideMenuList.setOnItemClickListener(new SlideMenuListener(this));
 
-        mSlideMenuAbout = (ImageButton)findViewById(R.id.drawer_about);
         mSlideMenuExit = (ImageButton)findViewById(R.id.drawer_exit);
         mSlideMenuExit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -301,6 +294,12 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         }
     }
 
+    //隐藏侧滑菜单
+    public void HideDrawer(){
+        if(mDrawerLayout.isDrawerOpen(mDrawerMenu))
+            mDrawerLayout.closeDrawer(mDrawerMenu);
+    }
+
     @Override
     public void onBackPressed() {
         if(mDrawerLayout.isDrawerOpen(mDrawerMenu))
@@ -341,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 
     @Override
     public int getType() {
-        return 0;
+        return Constants.MAINACTIVITY;
     }
 
 }

@@ -2,48 +2,31 @@
     android:layout_width="240dp"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/navigation_background"
+    android:background="@drawable/drawer_bg"
     android:id="@+id/slide_menu"
     android:layout_gravity="left|start">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3">
+        android:layout_height="192dp">
         <ImageView
            android:layout_centerInParent="true"
-           android:layout_width="wrap_content"
+           android:layout_width="match_parent"
            android:layout_height="wrap_content"
            android:src="@drawable/drawer_logo"/>
     </RelativeLayout>
     <ListView
         android:id="@+id/slide_menu_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="6"
-        android:choiceMode="singleChoice"
-        android:background="#ffffffff">
+        android:layout_height="374dp"
+        android:divider="@color/list_divider"
+        android:dividerHeight="1px"
+        android:background="@color/drawer_list_color">
     </ListView>
-    <RelativeLayout
+
+    <ImageButton
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:background="#ffffffff">
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/drawer_about"
-            android:src="@drawable/drawer_ic_abou"
-            android:layout_marginLeft="46dp"
-            android:layout_alignParentLeft="true"
-            android:background="#ffffffff"/>
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/drawer_exit"
-            android:src="@drawable/drawer_ic_exit_2"
-            android:layout_marginRight="46dp"
-            android:layout_alignParentRight="true"
-            android:background="#ffffffff"/>
-    </RelativeLayout>
+        android:layout_height="match_parent"
+        android:id="@+id/drawer_exit"
+        android:background="@drawable/bg_drawer_exit"/>
+
 </LinearLayout>

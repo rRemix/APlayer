@@ -49,9 +49,9 @@
     <remix.myplayer.ui.ColumnView
         android:layout_toLeftOf="@id/song_item_button"
         android:layout_centerVertical="true"
-        android:layout_width="16dp"
+        android:layout_width="18dp"
         android:layout_height="16dp"
-        app:columnwidth="4dp"
+        app:columnwidth="2dp"
         app:columncolor="#cd00"
         android:id="@+id/columnview"
         android:layout_marginRight="10dp" />

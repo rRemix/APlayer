@@ -1,73 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:CircleSeekBar="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#f6f6f5">
+    android:orientation="vertical" android:layout_width="274dp"
+    android:layout_height="410dp"
+    android:background="#efeef0" >
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:text="定时关闭"
+        android:layout_height="48dp"
+        android:text="伴着音乐入睡"
         android:textColor="#1c1b19"
-        android:textSize="18dp"
-        android:gravity="center"
-        android:layout_gravity="center"/>
+        android:textSize="20dp"
+        android:paddingLeft="32dp"
+        android:gravity="left|center_vertical" />
+
     <LinearLayout
+        android:layout_marginLeft="23dp"
+        android:layout_marginRight="23dp"
         android:layout_width="match_parent"
-        android:layout_height="2px"
-        android:background="#c0c0c0"/>
+        android:layout_height="1px"
+        android:background="#d3d2d3"/>
+
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="6"
+        android:layout_height="238dp"
         android:gravity="center">
         <remix.myplayer.ui.CircleSeekBar
+            android:layout_gravity="center"
             android:id="@+id/close_seekbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="36dp"
-            CircleSeekBar:progress_max="60"/>
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            CircleSeekBar:progress_max="60"
+            CircleSeekBar:progress_thumb="@drawable/bg_circkeseekbar_thumb"/>
         <TextView
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/close_time"
-            android:textSize="22dp"
+            android:textSize="24dp"
             android:textColor="#1b1c19"
             android:text="00:00min"/>
     </FrameLayout>
 
+    <!-- 默认设置-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="10dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#272628"
+            android:textSize="13dp"
+            android:text="设为默认"
+            android:layout_marginRight="8dp"/>
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/popup_timer_switch"
+            android:thumb="@drawable/timer_btn_seleted_btn"
+            android:track="@drawable/timer_btn_seleted_locus"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_marginLeft="55dp"
+            android:layout_marginRight="55dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#d3d2d3"
+            android:layout_marginBottom="5dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:text="设为默认后下次点击'定时停止'按钮将直接开始计时"
+            android:textSize="8dp"
+            android:textColor="#b2b1b2"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:text="在开始计时时点击'定时停止'按钮可重新设置"
+            android:textSize="8dp"
+            android:textColor="#b2b1b2"/>
+    </LinearLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-        <Button
-            android:layout_alignParentRight="true"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="16dp">
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#000"
-            android:id="@+id/close_stop"
-            android:background="@color/transparent"
-
-            android:layout_marginRight="16dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:textSize="16dp"
-            android:text="取消"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#000"
+            android:background="@drawable/bg_timer_toggle"
             android:id="@+id/close_toggle"
-            android:background="@color/transparent"
-            android:layout_toLeftOf="@id/close_stop"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:textSize="16dp"
-            android:text="开始计时" />
-
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"
+            android:gravity="center"
+            android:padding="3dp"
+            android:textSize="@dimen/textsize_large"
+            android:text="开始计时"
+            android:textColor="@drawable/timer_toggle_text_color_"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/close_stop"
+            android:background="@drawable/bg_timer_exit"
+            android:layout_toLeftOf="@id/close_toggle"
+            android:gravity="center"
+            android:padding="3dp"
+            android:textColor="@drawable/timer_exit_text_color"
+            android:textSize="@dimen/textsize_large"
+            android:text="取消"/>
     </RelativeLayout>
 </LinearLayout>

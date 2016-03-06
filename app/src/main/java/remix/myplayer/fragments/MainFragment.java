@@ -1,5 +1,6 @@
 package remix.myplayer.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,7 +18,10 @@ import remix.myplayer.R;
 import remix.myplayer.adapters.PagerAdapter;
 import remix.myplayer.listeners.TabTextListener;
 import remix.myplayer.listeners.ViewPagerListener;
+import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.MyPager;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2015/12/5.
@@ -30,6 +34,7 @@ public class MainFragment extends Fragment {
     private PagerAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
     private TabPageIndicator mIndicator;
+    public static TextView[] mTextViews = new TextView[4];
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,15 +131,22 @@ public class MainFragment extends Fragment {
         mViewPager = (MyPager)rootView.findViewById(R.id.ViewPager);
         mTabImage = (ImageView)rootView.findViewById(R.id.tab_image);
 //        mIndicator = (TabPageIndicator)rootView.findViewById(R.id.tab_indicator);
+        mTextViews[0] = (TextView) rootView.findViewById(R.id.tab_song);
+        mTextViews[1] = (TextView) rootView.findViewById(R.id.tab_album);
+        mTextViews[2] = (TextView) rootView.findViewById(R.id.tab_artist);
+        mTextViews[3] = (TextView) rootView.findViewById(R.id.tab_playlist);
+        for(int i = 0 ; i < mTextViews.length ;i++){
+            mTextViews[i].setOnClickListener(new TabTextListener(mViewPager,i));
+        }
 
-        TextView view1 = (TextView) rootView.findViewById(R.id.tab_song);
-        TextView view2 = (TextView)rootView.findViewById(R.id.tab_album);
-        TextView view3 = (TextView)rootView.findViewById(R.id.tab_artist);
-        TextView view4 = (TextView)rootView.findViewById(R.id.tab_playlist);
-        view1.setOnClickListener(new TabTextListener(mViewPager, 0));
-        view2.setOnClickListener(new TabTextListener(mViewPager, 1));
-        view3.setOnClickListener(new TabTextListener(mViewPager, 2));
-        view4.setOnClickListener(new TabTextListener(mViewPager, 3));
+    }
+
+    public void onPlayShuffle(View v){
+        MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
+        Intent intent = new Intent(Constants.CTL_ACTION);
+        intent.putExtra("Control", Constants.NEXT);
+        DBUtil.setPlayingList(DBUtil.mWeekList);
+        getActivity().sendBroadcast(intent);
     }
 
     @Override

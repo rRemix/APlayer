@@ -44,7 +44,7 @@
         <item name="android:layout_weight">1</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">16dp</item>
-        <item name="android:textColor">#1c1b19</item>
+        <item name="android:textColor">@color/text_allsong_unsel</item>
     </style>
 
     <style name="songlist_item_image">
@@ -124,7 +124,7 @@
     </style>
 
     <!--定时关闭-->
-    <style name="PopupTimer" parent="@android:style/Theme.Dialog" >
+    <style name="PopupTimer" parent="@style/AppTheme.PopupOverlay" >
         <item name="android:windowAnimationStyle">@style/popwin_anim_style</item>
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">true</item>

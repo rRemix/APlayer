@@ -65,4 +65,10 @@ public class Constants {
     //今天添加或者最近一周
     public final static int DAY = 0;
     public final static int WEEK = 1;
+
+    public final static int MAINACTIVITY = 0;
+    public final static int AUDIOHOLDERACTIVITY = 1;
+    public final static int CHILDHOLDERACTIVITY = 2;
+    public final static int RECENTLYACTIVITY = 3;
+    public final static int PLAYLISTACTIVITY = 4;
 }

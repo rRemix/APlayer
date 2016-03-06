@@ -45,7 +45,7 @@ public class ColumnView extends View {
     private int mSpaceWidth = 20;
     private Paint mPaint;
     //总共几个柱状图
-    private int mColNum = 3;
+    private int mColNum = 4;
     //动画列表
     private ArrayList<ObjectAnimator> mObjectAnimList = new ArrayList<>();
     //更新动画的定时器
@@ -107,7 +107,7 @@ public class ColumnView extends View {
                 mColWidth = (int)(mRawWdith * 0.6 / mColNum);
                 mSpaceWidth = (int)(mRawWdith * 0.4 / (mColNum - 1));
             }
-            int temp = (int)(mRawHeight * 0.1);
+            int temp = (int)(mRawHeight * 0.02);
             mHeight1 = temp;
             mHeight2 = temp;
             mHeight3 = temp;

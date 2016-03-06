@@ -71,12 +71,12 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
         final MP3Info currentMP3 = MusicService.getCurrentMP3();
         if(currentMP3 != null){
             boolean flag = temp.getId() == currentMP3.getId();
-            holder.mTitle.setTextColor(flag ? Color.parseColor("#ff0030") : Color.parseColor("#1c1b19"));
+            holder.mTitle.setTextColor(flag ? Color.parseColor("#ff0030") : Color.parseColor("#ffffffff"));
             mColumnView = (ColumnView)convertView.findViewById(R.id.columnview);
             mColumnView.setVisibility(flag ? View.VISIBLE : View.GONE);
 
             //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
-            if(MusicService.getIsplay() && !mColumnView.getStatus()){
+            if(MusicService.getIsplay() && !mColumnView.getStatus() && flag){
                 mColumnView.startAnim();
             }
             else if(!MusicService.getIsplay() && mColumnView.getStatus()){
@@ -92,7 +92,8 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, SelectedPopupWindow.class);
-                intent.putExtra("Position",position);
+//                intent.putExtra("Position",position);
+                intent.putExtra("MP3Info",temp);
                 mContext.startActivity(intent);
             }
         });

@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="72dp"
-    android:background="@drawable/bf_play_bg"
+    android:background="@drawable/commom_playercontrols_bg"
     android:id="@+id/bottom_actionbar_container">
     <!-- 底部自定义actionbar -->
     <RelativeLayout
@@ -30,8 +30,8 @@
                 android:layout_width="match_parent"
                 android:ellipsize="end"
                 android:lines="1"
-                android:textColor="#1b1c19"
-                android:textSize="16dp"
+                android:textColor="@color/text_color_blank"
+                android:textSize="@dimen/textsize_huge"
                 android:id="@+id/bottom_title"
                 android:text="歌曲名"/>
             <TextView
@@ -40,28 +40,29 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:id="@+id/bottom_artist"
-                android:textSize="14dp"
-                android:textColor="#6d6c69"
+                android:textSize="@dimen/textsize_medium"
+                android:textColor="@color/text_color_gray"
                 android:text="歌手"/>
         </LinearLayout>
         <!-- 下一首与播放按钮 -->
+        <!--<ImageButton-->
+            <!--android:layout_width="40dp"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:src="@drawable/bf_btn_next"-->
+            <!--android:background="@drawable/holo_selector"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_marginRight="19dp"-->
+            <!--android:layout_marginLeft="19dp"-->
+            <!--android:id="@+id/playbar_next"/>-->
         <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/bf_btn_next"
-            android:background="@drawable/holo_selector"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="19dp"
-            android:layout_marginLeft="19dp"
-            android:id="@+id/playbar_next"/>
-        <ImageButton
-            android:layout_toLeftOf="@id/playbar_next"
+            android:layout_marginRight="16dp"
             android:layout_centerVertical="true"
             android:id="@+id/playbar_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/holo_selector"
+            android:background="@color/background_color_1"
             android:src="@drawable/bf_but_play"/>
     </RelativeLayout>
 </RelativeLayout>

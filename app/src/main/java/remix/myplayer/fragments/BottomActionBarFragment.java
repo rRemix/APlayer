@@ -61,7 +61,7 @@ public class BottomActionBarFragment extends Fragment{
         mNextButton = (ImageButton)rootView.findViewById(R.id.playbar_next);
         CtrlButtonListener listener = new CtrlButtonListener(getContext());
         mPlayButton.setOnClickListener(listener);
-        mNextButton.setOnClickListener(listener);
+//        mNextButton.setOnClickListener(listener);
         //初始化底部标题与歌手
         mTitle = (TextView)rootView.findViewById(R.id.bottom_title);
         mArtist = (TextView)rootView.findViewById(R.id.bottom_artist);

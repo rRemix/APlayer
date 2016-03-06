@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 
 /**
@@ -22,6 +23,10 @@ public class TimerService extends Service {
     private Timer mTimer = null;
     private TimerReceiver mReceiver;
     public static long mStartTime;
+    public static TimerService mInstance;
+    public static boolean getStatus(){
+        return mRun;
+    }
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -31,6 +36,7 @@ public class TimerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        mInstance = this;
         mReceiver = new TimerReceiver();
         IntentFilter filter = new IntentFilter(Constants.CONTROL_TIMER);
         registerReceiver(mReceiver,filter);
@@ -55,8 +61,10 @@ public class TimerService extends Service {
             mRun = intent.getBooleanExtra("Run",false);
             //关闭定时
             if(!mRun) {
-                mTimer.cancel();
-                mTimer = null;
+                if(mTimer != null){
+                    mTimer.cancel();
+                    mTimer = null;
+                }
                 mStartTime = -1;
             }
             else {
@@ -69,8 +77,8 @@ public class TimerService extends Service {
                         try {
                             mStartTime= System.currentTimeMillis();
                             Thread.sleep(mTime * 60 * 1000);
-                            System.exit(0);
-//                            sendBroadcast(new Intent(CommonUtil.EXIT));
+//                            System.exit(0);
+                            sendBroadcast(new Intent(Constants.EXIT));
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

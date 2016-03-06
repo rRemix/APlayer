@@ -13,25 +13,35 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Timer;
+
 import remix.myplayer.R;
+import remix.myplayer.activities.MainActivity;
 import remix.myplayer.services.TimerService;
 import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DensityUtil;
+import remix.myplayer.utils.SharedPrefsUtil;
 
 /**
  * Created by taeja on 16-1-15.
  */
 public class TimerPopupWindow extends Activity {
     //正在计时
-    public static boolean misTime = false;
+    public static boolean misTiming = false;
     //正在运行
     public static boolean misRun = false;
     private TextView mText;
     private CircleSeekBar mSeekbar;
-    private Button mToggle;
-    private Button mCancel;
+    private TextView mToggle;
+    private TextView mCancel;
+    private Switch mSwitch;
     private static long mTime;
     private Handler mHandler = new Handler(){
         @Override
@@ -43,6 +53,7 @@ public class TimerPopupWindow extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.popup_timer);
         //居中显示
         Window w = getWindow();
@@ -51,14 +62,17 @@ public class TimerPopupWindow extends Activity {
         final DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.height = (int) (metrics.heightPixels * 0.6);
-        lp.width = (int) (metrics.widthPixels * 0.7);
+//        lp.height = (int) (metrics.heightPixels * 0.7);
+//        lp.width = (int) (metrics.widthPixels * 0.73);
+//        lp.height = (int) ();
+//        lp.width = (int) (metrics.widthPixels * 0.73);
+
         w.setAttributes(lp);
         w.setGravity(Gravity.CENTER);
 
         mText = (TextView)findViewById(R.id.close_time);
         mSeekbar = (CircleSeekBar) findViewById(R.id.close_seekbar);
-        if(misTime) {
+        if(misTiming) {
             int remain = (int)mTime * 60 - (int)(System.currentTimeMillis() - TimerService.mStartTime) / 1000;
             mSeekbar.setProgress(remain / 60);
             mSeekbar.setStart(true);
@@ -67,8 +81,8 @@ public class TimerPopupWindow extends Activity {
         mSeekbar.setOnSeekBarChangeListener(new CircleSeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(CircleSeekBar seekBar, long progress, boolean fromUser) {
-                if(progress > 0) {
-                    String text = (progress < 10 ? "0" + progress : "" + progress )+ ":00min";
+                if (progress > 0) {
+                    String text = (progress < 10 ? "0" + progress : "" + progress) + ":00min";
                     mText.setText(text);
                     mTime = progress;
                 }
@@ -81,26 +95,47 @@ public class TimerPopupWindow extends Activity {
             }
         });
 
-        Intent startIntent = new Intent(TimerPopupWindow.this, TimerService.class);
-        startService(startIntent);
+        //如果有默认设置并且没有开始计时，直接开始计时
+        //如果有默认设置但已经开始计时，打开该popupwindow
+        boolean hasdefault = SharedPrefsUtil.getValue(this, "setting", "TimerDefault", false);
+        final int time = SharedPrefsUtil.getValue(this,"setting","TimerNum",-1);
+        if(hasdefault && time > 0 && !misTiming){
+            mTime = time;
+            Toggle();
+        }
 
-        mToggle = (Button)findViewById(R.id.close_toggle);
-        mToggle.setText(misTime == true ? "取消计时" : "开始计时");
+        //默认选项
+        mSwitch = (Switch)findViewById(R.id.popup_timer_switch);
+        mSwitch.setChecked(hasdefault);
+        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    if(mTime > 0){
+                        Toast.makeText(TimerPopupWindow.this,"设置成功",Toast.LENGTH_SHORT).show();
+                        SharedPrefsUtil.putValue(TimerPopupWindow.this,"setting", "TimerDefault", true);
+                        SharedPrefsUtil.putValue(TimerPopupWindow.this,"setting","TimerNum",(int)mTime);
+                    } else{
+                        Toast.makeText(TimerPopupWindow.this,"请设置正确的时间",Toast.LENGTH_SHORT).show();
+                        mSwitch.setChecked(false);
+                    }
+                } else {
+                    Toast.makeText(TimerPopupWindow.this,"取消成功",Toast.LENGTH_SHORT).show();
+                    SharedPrefsUtil.putValue(TimerPopupWindow.this,"setting", "TimerDefault", false);
+                    SharedPrefsUtil.putValue(TimerPopupWindow.this,"setting","TimerNum",-1);
+                }
+            }
+        });
+
+        mToggle = (TextView)findViewById(R.id.close_toggle);
+        mToggle.setText(misTiming == true ? "取消计时" : "开始计时");
         mToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String msg = misTime == true ? "取消定时关闭" : "将在" + mTime + "分钟后关闭";
-                Toast.makeText(TimerPopupWindow.this,msg,Toast.LENGTH_SHORT).show();
-                misTime = !misTime;
-                mSeekbar.setStart(misTime);
-                Intent intent = new Intent(Constants.CONTROL_TIMER);
-                intent.putExtra("Time",mTime);
-                intent.putExtra("Run", misTime);
-                sendBroadcast(intent);
-                finish();
+                Toggle();
             }
         });
-        mCancel = (Button)findViewById(R.id.close_stop);
+        mCancel = (TextView)findViewById(R.id.close_stop);
         mCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,11 +145,25 @@ public class TimerPopupWindow extends Activity {
         });
     }
 
+    private void Toggle(){
+        if(mTime <= 0 && !misTiming)
+            Toast.makeText(TimerPopupWindow.this,"请设置正确的时间",Toast.LENGTH_SHORT).show();
+        String msg = misTiming == true ? "取消定时关闭" : "将在" + mTime + "分钟后关闭";
+        Toast.makeText(MainActivity.mInstance,msg,Toast.LENGTH_SHORT).show();
+        misTiming = !misTiming;
+        mSeekbar.setStart(misTiming);
+        Intent intent = new Intent(Constants.CONTROL_TIMER);
+        intent.putExtra("Time", mTime);
+        intent.putExtra("Run", misTiming);
+        sendBroadcast(intent);
+        finish();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         misRun = true;
-        if(misTime) {
+        if(misTiming) {
             TimeThread thread = new TimeThread();
             thread.start();
         }

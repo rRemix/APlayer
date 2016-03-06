@@ -5,4 +5,9 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="slidingmenu_offset">100dp</dimen>
     <dimen name="tab_height">30dp</dimen>
+    <dimen name="textsize_huge">18dp</dimen>
+    <dimen name="textsize_large">16dp</dimen>
+    <dimen name="textsize_medium">14dp</dimen>
+    <dimen name="textsize_small">12dp</dimen>
+    <dimen name="allsong_item_height">72dp</dimen>
 </resources>

@@ -13,8 +13,8 @@
         android:id="@+id/search_history_item_text"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:textSize="18dp"
-        android:textColor="#1b1c19"
+        android:textSize="@dimen/textsize_huge"
+        android:textColor="@color/text_color_blank"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="40dp"/>
@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:background="@drawable/search_history_btn_del"
+        android:background="@drawable/actionbar_delete"
         android:layout_centerVertical="true"
         android:layout_marginRight="10dp"/>
 

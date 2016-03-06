@@ -1,14 +1,18 @@
 package remix.myplayer.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -22,6 +26,8 @@ import java.util.Map;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.PlayListAdapter;
+import remix.myplayer.infos.MP3Info;
+import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DensityUtil;
@@ -31,19 +37,21 @@ import remix.myplayer.utils.XmlUtil;
 /**
  * Created by taeja on 16-1-15.
  */
-public class PlayListActivity extends AppCompatActivity{
+public class PlayListActivity extends AppCompatActivity  implements MusicService.Callback{
     public static PlayListActivity mInstance = null;
     private RecyclerView mRecycleView;
     private PlayListAdapter mAdapter;
     public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
-    private ImageButton mButton;
+    private Toolbar mToolBar;
+    private ImageButton mDrawerExit;
     static {
         mPlaylist = XmlUtil.getPlayList("playlist.xml");
     }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.playlist);
+        setContentView(R.layout.activity_playlist);
+        MusicService.addCallback(PlayListActivity.this);
         mInstance = this;
         mRecycleView = (RecyclerView)findViewById(R.id.playlist_recycleview);
         mRecycleView.setLayoutManager(new GridLayoutManager(this, 2));
@@ -53,8 +61,7 @@ public class PlayListActivity extends AppCompatActivity{
             public void onItemClick(View view, int position) {
                 String name = null;
                 Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
-                for(int i = 0 ; i <= position ; i++)
-                {
+                for (int i = 0; i <= position; i++) {
                     it.hasNext();
                     name = it.next().toString();
                 }
@@ -70,17 +77,38 @@ public class PlayListActivity extends AppCompatActivity{
             }
         });
         mRecycleView.setAdapter(mAdapter);
-        mButton = (ImageButton)findViewById(R.id.btn_top_timer);
+
+
+        //初始化tooblar
+        initToolbar();
     }
 
-    public void onSearch(View v)
-    {
-        startActivity(new Intent(this, SearchActivity.class));
-    }
-
-    public void onTimer(View v)
-    {
-        startActivity(new Intent(this, TimerPopupWindow.class));
+    private void initToolbar() {
+        mToolBar = (Toolbar) findViewById(R.id.toolbar);
+        mToolBar.setTitle("返回");
+        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
+        setSupportActionBar(mToolBar);
+        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
+        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.toolbar_search:
+                        startActivity(new Intent(PlayListActivity.this, SearchActivity.class));
+                        break;
+                    case R.id.toolbar_timer:
+                        startActivity(new Intent(PlayListActivity.this, TimerPopupWindow.class));
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     public void onAdd(View v)
@@ -128,5 +156,22 @@ public class PlayListActivity extends AppCompatActivity{
     public PlayListAdapter getAdapter()
     {
         return mAdapter;
+    }
+
+    @Override
+    public void UpdateUI(MP3Info MP3info, boolean isplay) {
+
+    }
+
+    @Override
+    public int getType() {
+        return Constants.PLAYLISTACTIVITY;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
     }
 }

@@ -3,21 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!-- CustonTab -->
-    <!--<com.viewpagerindicator.TabPageIndicator-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="@dimen/tab_height"-->
-        <!--android:id="@+id/tab_indicator"/>-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/tab_height"
         android:orientation="horizontal"
-        android:background="#fff"
-        android:gravity="center_vertical|center_horizontal">
+        android:gravity="center_vertical|center_horizontal"
+        android:background="@color/background_color_3">
         <TextView
             android:id="@+id/tab_song"
             style="@style/CustomTab"
-            android:text="@string/tab_song"/>
+            android:text="@string/tab_song"
+            android:textColor="@color/text_allsong_sel"/>
         <TextView
             android:id="@+id/tab_album"
             style="@style/CustomTab"
@@ -36,17 +32,33 @@
         android:id="@+id/tab_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/indicator"/>
-    <ImageView
+        android:src="@drawable/tab_indicator"/>
+
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/line"/>
+        android:layout_height="48dp"
+        android:background="@color/background_color_interval"
+        android:orientation="horizontal"
+        android:onClick="onPlayShuffle">
+        <ImageButton
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_btn_common_play_shuffle"
+            android:layout_marginLeft="16dp" />
+        <TextView
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="随进播放全部"
+            android:layout_marginLeft="72dp"/>
+    </RelativeLayout>
+
     <!--中间四个fragment-->
     <remix.myplayer.ui.MyPager
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        android:background="#fff"
         android:id="@+id/ViewPager" />
 
     <!--

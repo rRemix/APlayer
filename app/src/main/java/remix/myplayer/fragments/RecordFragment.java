@@ -27,7 +27,5 @@ public class RecordFragment extends Fragment{
         return rootView;
     }
 
-
-
 }
 

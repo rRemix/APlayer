@@ -16,4 +16,34 @@
     <color name="progress_bg">#d1d0ce</color>
     <!-- 已完成轨道背景-->
     <color name="progress_complete">#8e24aa</color>
+
+    <!-- 主色-->
+    <color name="background_color_main">#242428</color>
+    <!-- 背景色1(底部播放控件背景色)-->
+    <color name="background_color_1">#232023</color>
+    <!-- 背景色2(卡片背景色)-->
+    <color name="background_color_2">#2a282b</color>
+    <!-- 背景色3-->
+    <color name="background_color_3">#1d1a1d</color>
+    <!-- 间隔色-->
+    <color name="background_color_interval">#e2e1e2</color>
+
+    <!-- 分割线颜色-->
+    <color name="list_divider">#373237</color>
+    <!-- 点缀色-->
+    <color name="intersperse_color">#782899</color>
+    <!-- 抽屉字体颜色-->
+    <color name="drawer_text_color">#929092</color>
+    <!-- 抽屉ListView背景颜色-->
+    <color name="drawer_list_color">#1d1a1d</color>
+    <!-- 白色字体-->
+    <color name="text_color_blank">#ffffffff</color>
+    <!-- 灰色字体 -->
+    <color name="text_color_gray">#6c6a6c</color>
+
+    <!-- 歌曲库标题选中与未选中-->
+    <color name="text_allsong_unsel">#666466</color>
+    <color name="text_allsong_sel">#ffffffff</color>
+    <!-- 定时器背景色-->
+    <color name="background_timer_color">#efeef0</color>
 </resources>

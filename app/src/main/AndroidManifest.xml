@@ -65,7 +65,8 @@
         <activity android:name=".ui.TimerPopupWindow"
             android:theme="@style/PopupTimer"/>
 
-        <activity android:name=".activities.RecetenlyActivity"/>
+        <activity android:name=".activities.RecetenlyActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         
         <activity android:name=".ui.SharePopupWindow"
             android:theme="@style/PopupDialog"

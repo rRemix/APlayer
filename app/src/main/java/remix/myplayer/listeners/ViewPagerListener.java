@@ -5,11 +5,11 @@ import android.graphics.BitmapFactory;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 
 import remix.myplayer.R;
+import remix.myplayer.fragments.MainFragment;
 
 /**
  * Created by Remix on 2015/11/29.
@@ -20,8 +20,9 @@ public class ViewPagerListener implements ViewPager.OnPageChangeListener {
     private int mTabWidth = 0;
     private int mImageWidth = 0;
     private int mOffSetX;
-
+    private Context mContext;
     public ViewPagerListener(Context context,ImageView image,int index,int tabcount) {
+        mContext = context;
         mImage = image;
         mIndex = index;
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
@@ -44,6 +45,12 @@ public class ViewPagerListener implements ViewPager.OnPageChangeListener {
     @Override
     public void onPageSelected(int position) {
         mIndex = position;
+        for(int i = 0 ; i < MainFragment.mTextViews.length ;i++){
+            if(i == position)
+                MainFragment.mTextViews[i].setTextColor(mContext.getResources().getColor(R.color.text_allsong_sel));
+            else
+                MainFragment.mTextViews[i].setTextColor(mContext.getResources().getColor(R.color.text_allsong_unsel));
+        }
         Animation animation = new TranslateAnimation(mTabWidth * mIndex, mTabWidth * position, 0, 0);
         animation.setDuration(2000);
         animation.setFillAfter(true);

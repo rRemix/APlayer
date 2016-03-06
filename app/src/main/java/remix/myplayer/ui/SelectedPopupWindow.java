@@ -21,6 +21,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.net.URL;
 import java.util.HashMap;
 
 import cn.sharesdk.framework.Platform;
@@ -30,6 +33,7 @@ import cn.sharesdk.onekeyshare.OnekeyShare;
 import remix.myplayer.R;
 import remix.myplayer.adapters.FolderAdapter;
 import remix.myplayer.adapters.AllSongAdapter;
+import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.infos.MP3Info;
@@ -45,18 +49,23 @@ public class SelectedPopupWindow extends Activity {
     private Button mCancel;
     private TextView mTitle;
     private MP3Info mInfo = null;
+    private CircleImageView mCircleView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.popup_option);
-        int pos = getIntent().getIntExtra("Position",-1);
-        if(pos > 0 && pos < DBUtil.mAllSongList.size() - 1)
-            mInfo = new MP3Info(DBUtil.getMP3InfoById(DBUtil.mAllSongList.get(pos)));
+//        int pos = getIntent().getIntExtra("Position",-1);
+//        if(pos > 0 && pos < DBUtil.mAllSongList.size() - 1)
+//            mInfo = new MP3Info(DBUtil.getMP3InfoById(DBUtil.mAllSongList.get(pos)));
+        mInfo = (MP3Info)getIntent().getExtras().getSerializable("MP3Info");
         if(mInfo == null)
             return;
         mTitle = (TextView)findViewById(R.id.popup_title);
-        mTitle.setText(mInfo.getDisplayname());
+        mTitle.setText(mInfo.getDisplayname() + "-" + mInfo.getArtist());
 
+        mCircleView = (CircleImageView)findViewById(R.id.popup_image);
+        ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mInfo.getAlbumId(),
+                mCircleView);
         //改变高度，并置于底部
         Window w = getWindow();
         WindowManager wm = getWindowManager();
@@ -64,16 +73,16 @@ public class SelectedPopupWindow extends Activity {
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.height = (int) (200 * metrics.densityDpi / 160);
+        lp.height = (int) (176 * metrics.densityDpi / 160);
         lp.width = (int) (metrics.widthPixels);
         w.setAttributes(lp);
-        w.setGravity(Gravity.BOTTOM);
+        w.setGravity(Gravity.BOTTOM | Gravity.END);
 
         mAdd = (ImageButton)findViewById(R.id.popup_add);
         mRing= (ImageButton)findViewById(R.id.popup_ring);
         mShare = (ImageButton)findViewById(R.id.popup_share);
         mDelete= (ImageButton)findViewById(R.id.popup_delete);
-        mCancel= (Button)findViewById(R.id.popup_cancel);
+//        mCancel= (Button)findViewById(R.id.popup_cancel);
         //添加到播放列表
         mAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,12 +157,12 @@ public class SelectedPopupWindow extends Activity {
                 finish();
             }
         });
-        mCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+//        mCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+//            }
+//        });
     }
 
     public void delete()

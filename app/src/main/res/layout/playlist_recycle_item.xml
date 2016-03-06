@@ -6,42 +6,48 @@
     android:paddingTop="8dp"
     android:paddingLeft="8dp"
     android:paddingRight="8dp"
-    android:background="@color/transparent">
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:layout_width="164dp"
-        android:layout_height="164dp"
-        android:id="@+id/recycleview_simpleiview"
-        fresco:fadeDuration="300"
-        fresco:actualImageScaleType="focusCrop"
-        fresco:placeholderImage="@drawable/default_album_list"
-        fresco:placeholderImageScaleType="fitCenter"
-        android:layout_alignParentTop="true" />
+    android:background="@color/background_color_3">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:background="#f7f7f6"
-        android:layout_below="@id/recycleview_simpleiview">
-        <TextView
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_centerVertical="true"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="播放列表名"
-            android:id="@+id/playlist_item_name"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textColor="#1c1b19"
-            android:textSize="12dp"/>
-        <ImageButton
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:id="@+id/recycleview_button"
-            android:src="@drawable/list_icn_more"
-            android:background="@drawable/bg_btn_gray_selector"/>
-        <!--android:background="@drawable/list_icn_more" />-->
+        android:layout_height="match_parent"
+        android:background="@color/background_color_2">
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:layout_width="164dp"
+            android:layout_height="164dp"
+            android:id="@+id/recycleview_simpleiview"
+            fresco:fadeDuration="300"
+            fresco:actualImageScaleType="focusCrop"
+            fresco:placeholderImage="@drawable/default_album_list"
+            fresco:placeholderImageScaleType="fitCenter"
+            android:layout_alignParentTop="true" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_below="@id/recycleview_simpleiview">
+            <TextView
+                android:layout_marginLeft="8dp"
+                android:layout_centerVertical="true"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="播放列表名"
+                android:id="@+id/playlist_item_name"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textColor="@color/text_color_blank"
+                android:textSize="@dimen/textsize_medium"/>
+            <ImageButton
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="6dp"
+                android:id="@+id/recycleview_button"
+                android:src="@drawable/list_icn_more"
+                android:background="@drawable/bg_btn_gray_selector"/>
+        </RelativeLayout>
     </RelativeLayout>
+
+
 </RelativeLayout>

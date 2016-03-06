@@ -458,7 +458,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
 
     @Override
     public int getType() {
-        return 1;
+        return Constants.AUDIOHOLDERACTIVITY;
     }
 
 }
