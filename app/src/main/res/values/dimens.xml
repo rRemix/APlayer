@@ -10,4 +10,5 @@
     <dimen name="textsize_medium">14dp</dimen>
     <dimen name="textsize_small">12dp</dimen>
     <dimen name="allsong_item_height">72dp</dimen>
+    <dimen name="item_text_width">230dp</dimen>
 </resources>

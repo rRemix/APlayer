@@ -1,6 +1,7 @@
 package remix.myplayer.fragments;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -13,10 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.AllSongAdapter;
 import remix.myplayer.listeners.ListViewListener;
+import remix.myplayer.services.MusicService;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -38,7 +43,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         super.onActivityCreated(savedInstanceState);
         mManager = getLoaderManager();
         mManager.initLoader(1000, null, this);
-        mAdapter = new AllSongAdapter(getContext(),R.layout.allsong_item,null,new String[]{},new int[]{},0);
+        mAdapter = new AllSongAdapter(getActivity(),R.layout.allsong_item,null,new String[]{},new int[]{},0);
         mListView.setAdapter(mAdapter);
     }
 
@@ -59,17 +64,27 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
-        final View rootView = inflater.inflate(R.layout.allsong_list,null);
+        final View rootView = inflater.inflate(R.layout.fragment_allsong,null);
+        rootView.findViewById(R.id.play_shuffle).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
+                Intent intent = new Intent(Constants.CTL_ACTION);
+                intent.putExtra("Control", Constants.NEXT);
+                DBUtil.setPlayingList(DBUtil.mAllSongList);
+                getActivity().sendBroadcast(intent);
+            }
+        });
         mListView = (ListView)rootView.findViewById(R.id.list);
-        mListView.setOnItemClickListener(new ListViewListener(getContext()));
+        mListView.setOnItemClickListener(new ListViewListener(getActivity()));
         return rootView;
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        CursorLoader loader = new CursorLoader(getContext(),
+        CursorLoader loader = new CursorLoader(getActivity(),
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                null,MediaStore.Audio.Media.SIZE + ">80000",null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                null,MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
         return  loader;
     }
 
@@ -87,7 +102,6 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
             mAdapter.changeCursor(mCursor);
             mAdapter.setCursor(mCursor);
         }
-
     }
 
     @Override
@@ -95,6 +109,8 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         if (mAdapter != null)
             mAdapter.changeCursor(null);
     }
+
+
 
     public AllSongAdapter getAdapter(){
         return mAdapter;

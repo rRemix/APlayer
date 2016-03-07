@@ -37,7 +37,7 @@ public class CoverFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mInfo = (MP3Info)getArguments().getSerializable("MP3Info");
-        View rootView = inflater.inflate(R.layout.cover,container,false);
+        View rootView = inflater.inflate(R.layout.fragment_cover,container,false);
         mImage = (ImageView)rootView.findViewById(R.id.cover_image);
         if(mInfo != null && (mBitmap = DBUtil.CheckBitmapBySongId((int)mInfo.getId(),false)) != null)
             mImage.setImageBitmap(mBitmap);

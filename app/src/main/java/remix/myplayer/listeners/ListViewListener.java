@@ -26,13 +26,14 @@ public class ListViewListener implements AdapterView.OnItemClickListener
     }
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        DBUtil.setPlayingList((ArrayList<Long>) DBUtil.mAllSongList.clone());
         Intent intent = new Intent(Constants.CTL_ACTION);
         Bundle arg = new Bundle();
         arg.putInt("Control", Constants.PLAYSELECTEDSONG);
         arg.putInt("Position", position);
         intent.putExtras(arg);
         mContext.sendBroadcast(intent);
-        DBUtil.setPlayingList((ArrayList<Long>) DBUtil.mAllSongList.clone());
+
         view.setSelected(true);
 //        mName.setTextColor(Color.parseColor("#ff0030"));
         //选中item的歌曲名变红

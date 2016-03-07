@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -59,6 +60,9 @@ public class DBUtil {
     }
     //返回所有歌曲id
     public static ArrayList<Long> getAllSongsId() {
+
+
+
         //获得今天日期
         Calendar today = Calendar.getInstance();
         today.setTime(new Date());
@@ -70,12 +74,36 @@ public class DBUtil {
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
 
+        Constants.SCAN_SIZE = SharedPrefsUtil.getValue(mContext,"setting","scansize",-1);
+        if( Constants.SCAN_SIZE < 0)
+            Constants.SCAN_SIZE = 512000;
+
+        try {
+
+            Uri temp = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+            Cursor test = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,
+                             },
+                            MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,null,null);
+
+            if(test != null){
+                while (test.moveToNext()){
+                    for(int j = 0 ; j < test.getColumnCount() ; j++){
+                            Log.d(TAG,"name: " + test.getColumnName(j) + " value: " + test.getString(j));
+                    }
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+
         try{
 //            new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA,MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ARTIST},
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
-                    MediaStore.Audio.Media.SIZE + ">80000", null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -92,13 +120,9 @@ public class DBUtil {
                     long temp = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)) * 1000 ;
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(new Date(temp));
-
-//                    Log.d(TAG,"添加时间:" + SimpleDateFormat.getInstance().format(calendar.getTime()));
-
                     int between = (int)((today_mill - calendar.getTimeInMillis()) / day_mill);
-                    Log.d(TAG,"between:" + between);
                     if(between <= 3 && between >= 0){
-//                        Log.d(TAG,"between <= 1," + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)));
+//
                         mWeekList.add(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
                         if(between == 0){
                             mTodayList.add(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
@@ -168,12 +192,12 @@ public class DBUtil {
         ArrayList<MP3Info> mp3Info = new ArrayList<>();
         if (type == Constants.ALBUM_HOLDER) {
             cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                    MediaStore.Audio.Media.ALBUM_ID + "=" + _id, null, null);
+                    MediaStore.Audio.Media.ALBUM_ID + "=" + _id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
         }
 
         if (type == Constants.ARTIST_HOLDER) {
             cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                    MediaStore.Audio.Media.ARTIST_ID + "=" + _id, null, null);
+                    MediaStore.Audio.Media.ARTIST_ID + "=" + _id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
         }
 
         if(cursor != null && cursor.getCount() > 0) {
@@ -371,7 +395,7 @@ public class DBUtil {
             {
                 cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                         null,
-                        MediaStore.Audio.Media.TITLE + "=?",
+                        MediaStore.Audio.Media.TITLE + "=?" + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,
                         new String[]{list.get(i)}, null);
                 cursor.moveToFirst();
                 if (cursor != null && cursor.getCount() > 0)
@@ -423,7 +447,8 @@ public class DBUtil {
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = resolver.query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                MediaStore.Audio.Media._ID + "=" + Baseid, null, null);
+                MediaStore.Audio.Media._ID + "=" + Baseid +
+                        " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
         while (cursor.moveToNext()) {
             mp3info = getMP3Info(cursor);
         }

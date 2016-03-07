@@ -39,6 +39,7 @@ public class ColumnView extends View {
     private int mHeight1;
     private int mHeight2;
     private int mHeight3;
+    private int mHeight4;
     //每个柱状图的宽度
     private int mColWidth = 80;
     //两个柱状图之间的间隙
@@ -111,6 +112,7 @@ public class ColumnView extends View {
             mHeight1 = temp;
             mHeight2 = temp;
             mHeight3 = temp;
+            mHeight4 = temp;
             for(int i = 0 ; i < mColNum ; i++){
                 mHeightList.add(temp);
                 mObjectAnimList.add(new ObjectAnimator());
@@ -123,6 +125,8 @@ public class ColumnView extends View {
         TypedArray t = getContext().obtainStyledAttributes(attrs, R.styleable.ColumnView);
         mColumnColor = t.getColor(R.styleable.ColumnView_columncolor,0xffCD0000);
         mColWidth = (int)t.getDimension(R.styleable.ColumnView_columnwidth,80);
+        mColNum = t.getInteger(R.styleable.ColumnView_columnnum,4);
+        mHeightList = new ArrayList<>(mColNum);
         if(mPaint == null){
             mPaint = new Paint();
             mPaint.setColor(mColumnColor);
@@ -157,6 +161,16 @@ public class ColumnView extends View {
     public void setHeight3(int mHeight3) {
         this.mHeight3 = mHeight3;
         mHeightList.set(2,mHeight3);
+        invalidate();
+    }
+
+    public int getHeight4() {
+        return mHeight4;
+    }
+
+    public void setHeight4(int mHeight4) {
+        this.mHeight4 = mHeight4;
+        mHeightList.set(3,mHeight4);
         invalidate();
     }
 

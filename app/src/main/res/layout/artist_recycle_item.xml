@@ -10,23 +10,19 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/art_bg">
+        android:background="@color/background_color_2">
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="164dp"
             android:layout_height="164dp"
             android:id="@+id/recycleview_simpleiview"
-            fresco:actualImageScaleType="focusCrop"
-            fresco:placeholderImage="@drawable/default_album_list"
-            fresco:placeholderImageScaleType="fitCenter"
+            fresco:placeholderImage="@drawable/artist_empty_bg"
             android:layout_alignParentTop="true" />
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="32dp"
-            android:background="#f7f7f6"
             android:layout_below="@id/recycleview_simpleiview">
             <TextView
                 android:layout_marginLeft="8dp"
-                android:layout_marginTop="8dp"
                 android:layout_centerVertical="true"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
@@ -34,8 +30,8 @@
                 android:id="@+id/recycleview_text1"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:textColor="#1c1b19"
-                android:textSize="12dp"/>
+                android:textColor="@color/text_color_blank"
+                android:textSize="@dimen/textsize_medium"/>
             <ImageButton
                 android:layout_width="30dp"
                 android:layout_height="30dp"

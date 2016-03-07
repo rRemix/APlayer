@@ -15,5 +15,6 @@
     <declare-styleable name="ColumnView">
         <attr name="columncolor" format="color"/>
         <attr name="columnwidth" format="dimension|integer|reference"/>
+        <attr name="columnnum" format="integer"/>
     </declare-styleable>
 </resources>

@@ -41,28 +41,29 @@
         android:id="@+id/notify_next"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:background="@color/transparent"
         android:layout_marginRight="10dp"
-        android:src="@drawable/bt_lockscreen_next_nor"/>
+        android:src="@drawable/notifbar_btn_pre_next"/>
     <!--分割线-->
-    <LinearLayout
-        android:orientation="vertical"
-        android:id="@+id/notify_divier"
-        android:layout_width="1dp"
-        android:layout_height="30dp"
-        android:background="@color/divider"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/notify_next"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"/>
+    <!--<LinearLayout-->
+        <!--android:orientation="vertical"-->
+        <!--android:id="@+id/notify_divier"-->
+        <!--android:layout_width="1dp"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:background="@color/divider"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_toLeftOf="@id/notify_next"-->
+        <!--android:layout_marginLeft="10dp"-->
+        <!--android:layout_marginRight="10dp"/>-->
     <ImageButton
         android:id="@+id/notify_play"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/notify_divier"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_toLeftOf="@id/notify_next"
+        android:layout_marginRight="25dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:background="@color/transparent"
-        android:src="@drawable/bt_lockscreen_play_nor" />
+        android:src="@drawable/notifbar_btn_play" />
 </RelativeLayout>

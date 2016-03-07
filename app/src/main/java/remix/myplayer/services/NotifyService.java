@@ -100,6 +100,8 @@ public class NotifyService extends Service {
             Log.d(TAG,"isplay=" + mIsplay);
             Log.d(TAG,"isShow=" + mIsShow);
             mRemoteView = new RemoteViews(mContext.getPackageName(), R.layout.notify_playbar);
+
+
             if(mIsShow || (MusicService.getCurrentMP3() != null && mIsplay)) {
                 MP3Info temp = MusicService.getCurrentMP3();
                 //设置歌手，歌曲名
@@ -110,12 +112,12 @@ public class NotifyService extends Service {
                 if(bitmap != null)
                     mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
                 else
-                    mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.default_recommend);
+                    mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.song_artist_empty_bg);
                 //设置播放按钮
                 if(!mIsplay){
-                    mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_play_nor);
+                    mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notifbar_btn_play);
                 }else{
-                    mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.bt_lockscreen_pause_nor);
+                    mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notifbar_btn_stop);
                 }
 
                 Intent mButtonIntent = new Intent(Constants.CTL_ACTION);
@@ -133,8 +135,7 @@ public class NotifyService extends Service {
                         .setWhen(System.currentTimeMillis())
                         .setPriority(Notification.PRIORITY_DEFAULT)
                         .setOngoing(mIsplay)
-                        .setVisibility(Notification.VISIBILITY_PUBLIC)
-                        .setSmallIcon(R.drawable.stat_notify);
+                        .setSmallIcon(R.drawable.notifbar_icon);
 //                    .setLargeIcon(DBUtil.CheckBitmapByAlbumId((int)MusicService.getCurrentMP3().getAlbumId(),false))
 //                    .setStyle(new android.support.v7.app.NotificationCompat.MediaStyle().setMediaSession(MusicService.mMediaSession.getSessionToken()));
 

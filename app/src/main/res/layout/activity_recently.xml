@@ -25,7 +25,7 @@
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="随进播放全部"
+            android:text="随机播放全部"
             android:layout_marginLeft="72dp"/>
     </RelativeLayout>
 

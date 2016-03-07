@@ -122,7 +122,7 @@ public class MainFragment extends Fragment {
 
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(0);
-        mViewPager.addOnPageChangeListener(new ViewPagerListener(getContext(), mTabImage, 0,4));
+        mViewPager.setOnPageChangeListener(new ViewPagerListener(getActivity(), mTabImage, 0,4));
 
     }
     //初始化custontab

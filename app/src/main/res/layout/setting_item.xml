@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="56dp">
+    <TextView
+        android:id="@+id/setting_item_text"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:textSize="@dimen/textsize_large"
+        android:textColor="@color/text_color_blank"
+        android:layout_marginLeft="16dp"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:text="设置"/>
+
+</LinearLayout>

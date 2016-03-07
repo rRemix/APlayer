@@ -38,7 +38,7 @@ public class RecentlyFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.dayweek,null);
+        View rootView = inflater.inflate(R.layout.fragment_recently,null);
         mTextTip = (TextView)rootView.findViewById(R.id.dayweek_text);
         mListView = (ListView)rootView.findViewById(R.id.dayweek_list);
         if(mInfoList == null || mInfoList.size() == 0){

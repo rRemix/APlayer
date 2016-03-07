@@ -12,6 +12,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,6 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     public static int mAlbumIdIndex = -1;
     public static int mAlbumIndex = -1;
     public static int mArtistIndex = -1;
-    public static int mAlbumArtIndex = -1;
     public static int mNumofSongsIndex = -1;
     private LoaderManager mManager;
     private AlbumAdater mAdapter;
@@ -41,7 +41,7 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onActivityCreated(savedInstanceState);
         mManager = getLoaderManager();
         mManager.initLoader(1001, null, this);
-        mAdapter = new AlbumAdater(mCursor,getContext());
+        mAdapter = new AlbumAdater(mCursor,getActivity());
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -65,15 +65,15 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.album_recycle_list,null);
+        View rootView = inflater.inflate(R.layout.fragment_album,null);
         mRecycleView = (RecyclerView)rootView.findViewById(R.id.album_recycleview);
-        mRecycleView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         return rootView;
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        CursorLoader loader = new CursorLoader(getContext(), MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+        CursorLoader loader = new CursorLoader(getActivity(), MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
                 new String[]{BaseColumns._ID,MediaStore.Audio.AlbumColumns.ALBUM,
                         MediaStore.Audio.AlbumColumns.ARTIST,
                         MediaStore.Audio.AlbumColumns.ALBUM_ART,
@@ -85,11 +85,15 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(data == null)
             return;
+        while (data.moveToNext()){
+            for(int i = 0 ; i < data.getColumnCount() ; i++){
+                Log.d("DBUtil","name: " + data.getColumnName(i) + " value: " + data.getString(i));
+            }
+        }
         mCursor = data;
         mAlbumIdIndex = data.getColumnIndex(BaseColumns._ID);
         mAlbumIndex = data.getColumnIndex(MediaStore.Audio.AlbumColumns.ALBUM);
         mArtistIndex = data.getColumnIndex(MediaStore.Audio.AlbumColumns.ARTIST);
-        mAlbumArtIndex = data.getColumnIndex(MediaStore.Audio.AlbumColumns.ALBUM_ART);
         mNumofSongsIndex = data.getColumnIndex(MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS);
         mAdapter.setCursor(data);
     }

@@ -30,13 +30,13 @@ public class FolderFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        LinearLayout rootView = new LinearLayout(getContext());
+        LinearLayout rootView = new LinearLayout(getActivity());
         rootView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        mListView = new ListView(getContext());
+        mListView = new ListView(getActivity());
         mListView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,AbsListView.LayoutParams.MATCH_PARENT));
         mListView.setOnItemClickListener(new ListViewListener());
-        mListView.setAdapter(new FolderAdapter(getContext(),inflater));
+        mListView.setAdapter(new FolderAdapter(getActivity(),inflater));
         rootView.addView(mListView);
         return rootView;
     }

@@ -56,7 +56,7 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
         {
             convertView = mInflater.inflate(R.layout.child_holder_item,null);
             holder = new ViewHolder();
-            holder.mArtist = (TextView)convertView.findViewById(R.id.album_holder_item_artist);
+//            holder.mArtist = (TextView)convertView.findViewById(R.id.album_holder_item_artist);
             holder.mTitle = (TextView)convertView.findViewById(R.id.album_holder_item_title);
             convertView.setTag(holder);
         }
@@ -85,7 +85,7 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
         }
 
         holder.mTitle.setText(temp.getDisplayname());
-        holder.mArtist.setText(temp.getArtist());
+//        holder.mArtist.setText(temp.getArtist());
 
         final ImageView mItemButton = (ImageView)convertView.findViewById(R.id.song_item_button);
         mItemButton.setOnClickListener(new View.OnClickListener() {
@@ -112,6 +112,6 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
 
     class ViewHolder {
         private TextView mTitle;
-        private TextView mArtist;
+//        private TextView mArtist;
     }
 }

@@ -127,7 +127,10 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
         MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control", Constants.NEXT);
-        DBUtil.setPlayingList(DBUtil.mWeekList);
+        ArrayList<Long> ids = new ArrayList<Long>();
+        for (MP3Info info : mInfoList)
+            ids.add(info.getId());
+        DBUtil.setPlayingList((ArrayList) ids.clone());
         sendBroadcast(intent);
     }
 

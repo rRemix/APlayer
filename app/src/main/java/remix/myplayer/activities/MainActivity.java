@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.common.internal.Supplier;
@@ -192,10 +193,9 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
                     }
                 }).build();
         Fresco.initialize(this,config);
-
         DisplayImageOptions option = new DisplayImageOptions.Builder()
-                .showImageForEmptyUri(R.drawable.default_recommend)
-                .showImageOnFail(R.drawable.default_recommend                                                                                                                                                                                                                                                                                         )
+                .showImageForEmptyUri(R.drawable.song_artist_empty_bg)
+                .showImageOnFail(R.drawable.song_artist_empty_bg                                                                                                                                                                                                                                                                                         )
                 .resetViewBeforeLoading(false)
                 .cacheOnDisk(true)
                 .cacheInMemory(true)
@@ -254,6 +254,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
                     break;
                 case 3:
                     //设置
+                    startActivity(new Intent(MainActivity.this,SettingActivity.class));
                     break;
                 default:break;
             }

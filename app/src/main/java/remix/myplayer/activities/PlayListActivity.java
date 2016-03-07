@@ -118,7 +118,7 @@ public class PlayListActivity extends AppCompatActivity  implements MusicService
                 DensityUtil.dip2px(getApplicationContext(),254f),
                 DensityUtil.dip2px(getApplicationContext(),180f),
                 true);
-        window.setBackgroundDrawable(getResources().getDrawable(R.drawable.playlist_add_bg));
+        window.setBackgroundDrawable(getResources().getDrawable(R.drawable.createlist_bg));
         window.setTouchInterceptor(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {

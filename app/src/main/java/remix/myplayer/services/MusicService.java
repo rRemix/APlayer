@@ -184,7 +184,6 @@ public class MusicService extends Service {
                 NotifyService.mInstance.UpdateNotify();
             }
         };
-
         int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","Pos",-1);
         if(DBUtil.mPlayingList != null && DBUtil.mPlayingList.size() > 0) {
             mId = mPos == -1 ? DBUtil.mPlayingList.get(0) : DBUtil.mPlayingList.get(mPos);

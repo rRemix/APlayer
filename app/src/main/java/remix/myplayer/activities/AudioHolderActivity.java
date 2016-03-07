@@ -169,7 +169,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             }
         });
         mContainer = (LinearLayout)findViewById(R.id.audio_holder_container);
-        mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
+//        mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
     }
 
 

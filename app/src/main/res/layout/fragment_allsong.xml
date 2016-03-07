@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/allsong_list">
+    <RelativeLayout
+        android:id="@+id/play_shuffle"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/background_color_interval"
+        android:orientation="horizontal"
+        android:onClick="onPlayShuffle">
+        <ImageButton
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_btn_common_play_shuffle"
+            android:layout_marginLeft="16dp" />
+        <TextView
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="随机播放全部"
+            android:layout_marginLeft="72dp"/>
+    </RelativeLayout>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/list"
+        android:choiceMode="singleChoice" />
+</LinearLayout>

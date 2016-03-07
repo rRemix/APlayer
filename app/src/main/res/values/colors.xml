@@ -40,10 +40,12 @@
     <color name="text_color_blank">#ffffffff</color>
     <!-- 灰色字体 -->
     <color name="text_color_gray">#6c6a6c</color>
-
+    <!--专辑与艺术家灰色字体-->
+    <color name="text_color_gray_1">#8d8c8e</color>
     <!-- 歌曲库标题选中与未选中-->
     <color name="text_allsong_unsel">#666466</color>
     <color name="text_allsong_sel">#ffffffff</color>
     <!-- 定时器背景色-->
     <color name="background_timer_color">#efeef0</color>
+
 </resources>

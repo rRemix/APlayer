@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color_3"
+    android:gravity="center_horizontal">
+
+    <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+    </android.support.v7.widget.Toolbar>
+
+    <EditText
+        android:id="@+id/feedback_edittext"
+        android:background="@drawable/set_submit_input_bg"
+        android:gravity="left|top"
+        android:textSize="@dimen/textsize_large"
+        android:textColor="@color/text_color_blank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:id="@+id/feedback_submit"
+        android:onClick="onSubmit"
+        android:background="@drawable/bg_btn_feedback_submit"/>
+</LinearLayout>

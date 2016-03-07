@@ -38,7 +38,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
         super.onActivityCreated(savedInstanceState);
         mManager = getLoaderManager();
         mManager.initLoader(1001, null, this);
-        mAdapter = new ArtistAdapter(mCursor,getContext());
+        mAdapter = new ArtistAdapter(mCursor,getActivity());
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -62,14 +62,14 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.artist_recycle_list,null);
+        View rootView = inflater.inflate(R.layout.fragment_artist,null);
         mRecycleView = (RecyclerView)rootView.findViewById(R.id.artist_recycleview);
-        mRecycleView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         return rootView;
     }
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        CursorLoader loader = new CursorLoader(getContext(),MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
+        CursorLoader loader = new CursorLoader(getActivity(),MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
                 new String[]{BaseColumns._ID,MediaStore.Audio.ArtistColumns.ARTIST},null,null,null);
         return loader;
     }
