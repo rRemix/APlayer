@@ -125,9 +125,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
     }
     @Override
     public int getItemCount() {
-        if(mCursor != null)
-            return mCursor.getCount();
-        return 0;
+        return mCursor != null ? mCursor.getCount() : 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -32,7 +32,6 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     public static int mAlbumIdIndex = -1;
     public static int mAlbumIndex = -1;
     public static int mArtistIndex = -1;
-    public static int mNumofSongsIndex = -1;
     private LoaderManager mManager;
     private AlbumAdater mAdapter;
 
@@ -73,11 +72,17 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        CursorLoader loader = new CursorLoader(getActivity(), MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                new String[]{BaseColumns._ID,MediaStore.Audio.AlbumColumns.ALBUM,
-                        MediaStore.Audio.AlbumColumns.ARTIST,
-                        MediaStore.Audio.AlbumColumns.ALBUM_ART,
-                        MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS}, null,null,null);
+        CursorLoader loader = new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ARTIST},
+                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
+                null,
+                null);
+
+//        CursorLoader loader = new CursorLoader(getActivity(), MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+//                new String[]{BaseColumns._ID,MediaStore.Audio.AlbumColumns.ALBUM,
+//                        MediaStore.Audio.AlbumColumns.ARTIST,
+//                        MediaStore.Audio.AlbumColumns.ALBUM_ART,
+//                        MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS}, null,null,null);
         return loader;
     }
 
@@ -85,16 +90,10 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(data == null)
             return;
-        while (data.moveToNext()){
-            for(int i = 0 ; i < data.getColumnCount() ; i++){
-                Log.d("DBUtil","name: " + data.getColumnName(i) + " value: " + data.getString(i));
-            }
-        }
         mCursor = data;
-        mAlbumIdIndex = data.getColumnIndex(BaseColumns._ID);
-        mAlbumIndex = data.getColumnIndex(MediaStore.Audio.AlbumColumns.ALBUM);
-        mArtistIndex = data.getColumnIndex(MediaStore.Audio.AlbumColumns.ARTIST);
-        mNumofSongsIndex = data.getColumnIndex(MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS);
+        mAlbumIdIndex = data.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+        mAlbumIndex = data.getColumnIndex(MediaStore.Audio.Media.ALBUM);
+        mArtistIndex = data.getColumnIndex(MediaStore.Audio.Media.ARTIST);
         mAdapter.setCursor(data);
     }
 

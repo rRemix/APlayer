@@ -69,8 +69,14 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     }
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        CursorLoader loader = new CursorLoader(getActivity(),MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
-                new String[]{BaseColumns._ID,MediaStore.Audio.ArtistColumns.ARTIST},null,null,null);
+        CursorLoader loader = new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                new String[]{"distinct " + MediaStore.Audio.Media.ARTIST_ID,MediaStore.Audio.Media.ARTIST},
+                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
+                null,
+                null);
+//
+//        CursorLoader loader = new CursorLoader(getActivity(),MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
+//                new String[]{BaseColumns._ID,MediaStore.Audio.ArtistColumns.ARTIST},null,null,null);
         return loader;
     }
     @Override
@@ -82,8 +88,8 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(data != null)
             mCursor = data;
-        mArtistIdIndex = data.getColumnIndex(BaseColumns._ID);
-        mArtistIndex = data.getColumnIndex(MediaStore.Audio.ArtistColumns.ARTIST);
+        mArtistIdIndex = data.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
+        mArtistIndex = data.getColumnIndex(MediaStore.Audio.Media.ARTIST);
         mAdapter.setCursor(data);
     }
 

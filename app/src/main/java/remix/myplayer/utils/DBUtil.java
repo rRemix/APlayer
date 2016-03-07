@@ -74,29 +74,10 @@ public class DBUtil {
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
 
+        //默认过滤文件大小500K
         Constants.SCAN_SIZE = SharedPrefsUtil.getValue(mContext,"setting","scansize",-1);
         if( Constants.SCAN_SIZE < 0)
-            Constants.SCAN_SIZE = 512000;
-
-        try {
-
-            Uri temp = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-            Cursor test = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,
-                             },
-                            MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,null,null);
-
-            if(test != null){
-                while (test.moveToNext()){
-                    for(int j = 0 ; j < test.getColumnCount() ; j++){
-                            Log.d(TAG,"name: " + test.getColumnName(j) + " value: " + test.getString(j));
-                    }
-                }
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
+            Constants.SCAN_SIZE = 51200000;
 
         try{
 //            new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA,MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ARTIST},
@@ -152,7 +133,7 @@ public class DBUtil {
             e.printStackTrace();
         }
 
-        return mAllSongList.size() > 0 ? mAllSongList : null;
+        return mAllSongList;
     }
 
     //根据文件夹名字获得所有歌曲id

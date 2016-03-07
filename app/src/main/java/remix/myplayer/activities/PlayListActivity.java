@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +65,10 @@ public class PlayListActivity extends AppCompatActivity  implements MusicService
                 for (int i = 0; i <= position; i++) {
                     it.hasNext();
                     name = it.next().toString();
+                }
+                if(mPlaylist.get(name).size() == 0) {
+                    Toast.makeText(PlayListActivity.this, "该列表为空", Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 Intent intent = new Intent(PlayListActivity.this, ChildHolderActivity.class);
                 intent.putExtra("Id", position);
