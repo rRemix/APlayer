@@ -1,7 +1,9 @@
 package remix.myplayer.fragments;
 
+import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,6 +16,8 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
@@ -40,7 +44,7 @@ public class CoverFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_cover,container,false);
         mImage = (ImageView)rootView.findViewById(R.id.cover_image);
         if(mInfo != null && (mBitmap = DBUtil.CheckBitmapBySongId((int)mInfo.getId(),false)) != null)
-            mImage.setImageBitmap(mBitmap);
+            mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
         if(mLeftAnimation == null || mScaleAnimation == null || mRightAnimation == null)
         {
             mLeftAnimation = (TranslateAnimation) AnimationUtils.loadAnimation(getContext(),R.anim.cover_left_out);

@@ -24,12 +24,11 @@
                 android:id="@+id/top_hide"
                 android:layout_alignParentLeft="true"/>
             <LinearLayout
-                android:layout_marginTop="22dp"
                 android:layout_centerInParent="true"
                 android:layout_width="240dp"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center">
                 <TextView
                     android:id="@+id/top_title"
                     android:text="歌曲名歌曲名"

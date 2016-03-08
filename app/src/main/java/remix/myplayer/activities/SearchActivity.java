@@ -2,6 +2,7 @@ package remix.myplayer.activities;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -9,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -76,8 +78,6 @@ public class SearchActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-
 
         mSearchHisContainer = (FrameLayout)findViewById(R.id.search_his_container);
         mSearchHisContent = (LinearLayout)findViewById(R.id.search_his_container_content);

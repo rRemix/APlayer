@@ -2,6 +2,7 @@ package remix.myplayer.ui;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.PorterDuff;
 import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -47,6 +48,9 @@ public class SearchView extends LinearLayout {
 
     private void init(){
         mEditText = (EditText)findViewById(R.id.search_text);
+        //设置EditText光标与下划线颜色
+//        mEditText.getBackground().setColorFilter(getResources().getColor(R.color.progress_complete), PorterDuff.Mode.SRC_ATOP);
+
         final int size = DBUtil.mSearchKeyList.size();
         String[] strs = (String[])DBUtil.mSearchKeyList.toArray(new String[size]);
 //        ArrayAdapter adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_list_item_1, strs);

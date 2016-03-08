@@ -113,12 +113,13 @@ public class ColumnView extends View {
             mHeight2 = temp;
             mHeight3 = temp;
             mHeight4 = temp;
+            mHeightList.clear();
+            mObjectAnimList.clear();
             for(int i = 0 ; i < mColNum ; i++){
                 mHeightList.add(temp);
                 mObjectAnimList.add(new ObjectAnimator());
             }
         }
-
     }
 
     private void init(AttributeSet attrs){

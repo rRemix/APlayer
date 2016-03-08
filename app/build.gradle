@@ -36,4 +36,5 @@ dependencies {
     compile files('libs/universal-image-loader-1.9.5-javadoc.jar')
     compile files('libs/universal-image-loader-1.9.5-sources.jar')
     compile project(':onekeyshare')
+    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
 }

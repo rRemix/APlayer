@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:CustomSeekBar="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_color_3">
     <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
@@ -29,5 +32,17 @@
         android:layout_marginTop="22dp"
         android:src="@drawable/set_scanning_divder"/>
 
-
+    <remix.myplayer.ui.CustomSeekBar
+        android:layout_marginTop="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/custom_seekbar"
+        app:trackheight="4px"
+        app:dotnum="6"
+        app:dotwidth="4px"
+        app:trackcolor="#6c6a6c"
+        app:progresscolor="#782899"
+        app:thumb="@drawable/bg_thumb"/>
 </LinearLayout>

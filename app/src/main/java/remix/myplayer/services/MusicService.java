@@ -637,7 +637,6 @@ public class MusicService extends Service {
             if(!isActionUp) {
                 return true;
             }
-
             int keyCode = event.getKeyCode();
             if(keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ||
                     keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ||

@@ -17,8 +17,6 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -46,11 +44,10 @@ import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.QQApi;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.XmlUtil;
 
-public class MainActivity extends AppCompatActivity implements MusicService.Callback{
+public class MainActivity extends AppCompatActivity implements MusicService.Callback {
     public static MainActivity mInstance = null;
     private MusicService mService;
     private BottomActionBarFragment mBottomBar;
@@ -65,16 +62,11 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     private ImageButton mSlideMenuExit;
     private ActionBarDrawerToggle mDrawerToggle;
 
-
-    //
     @Override
     protected void onResume() {
         super.onResume();
     }
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -88,12 +80,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        new Thread(){
-//            @Override
-//            public void run(){
-//                String temp = QQApi.Test("七里香","周杰伦");
-//            }
-//        }.start();
+
         initUtil();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -101,8 +88,8 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         setContentView(R.layout.content_main);
         mInstance = this;
 
-        mFromNotify = getIntent().getBooleanExtra("Notify",false);
-        if(!mFromNotify) {
+        mFromNotify = getIntent().getBooleanExtra("Notify", false);
+        if (!mFromNotify) {
             loadsongs();
             startService(new Intent(this, MusicService.class));
             //NofityService
@@ -119,24 +106,24 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         //初始化测滑菜单
         initDrawerLayout();
         //初始化底部状态栏
-        mBottomBar = (BottomActionBarFragment)getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
+        mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
 
         initToolbar();
 
-        if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
+        if (DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return;
 
-        boolean mFir = SharedPrefsUtil.getValue(getApplicationContext(),"setting","First",true);
-        int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","Pos",-1);
-        SharedPrefsUtil.putValue(getApplicationContext(),"setting","First",false);
+        boolean mFir = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "First", true);
+        int mPos = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "Pos", -1);
+        SharedPrefsUtil.putValue(getApplicationContext(), "setting", "First", false);
 
         //第一次启动添加我的收藏列表
-        if(mFir){
+        if (mFir) {
             XmlUtil.addPlaylist("我的收藏");
         }
         //如果是第一次启动软件,将第一首歌曲设置为正在播放的
-        if(mFir || mPos < 0)
-            mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)),mFromNotify);
+        if (mFir || mPos < 0)
+            mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)), mFromNotify);
         else
             mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(mPos)), mFromNotify);
     }
@@ -157,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.toolbar_search:
                         startActivity(new Intent(MainActivity.this, SearchActivity.class));
                         break;
@@ -189,13 +176,13 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
                     @Override
                     public MemoryCacheParams get() {
                         //50M内存缓存
-                        return new MemoryCacheParams(50 * 1024 * 1024,10,2048,5,1024);
+                        return new MemoryCacheParams(50 * 1024 * 1024, 10, 2048, 5, 1024);
                     }
                 }).build();
-        Fresco.initialize(this,config);
+        Fresco.initialize(this, config);
         DisplayImageOptions option = new DisplayImageOptions.Builder()
                 .showImageForEmptyUri(R.drawable.song_artist_empty_bg)
-                .showImageOnFail(R.drawable.song_artist_empty_bg                                                                                                                                                                                                                                                                                         )
+                .showImageOnFail(R.drawable.song_artist_empty_bg)
                 .resetViewBeforeLoading(false)
                 .cacheOnDisk(true)
                 .cacheInMemory(true)
@@ -213,15 +200,15 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         getSupportFragmentManager().beginTransaction().add(R.id.main_fragment_container, new MainFragment(), "MainFragment").addToBackStack(null).commit();
     }
 
-    private void initDrawerLayout(){
-        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+    private void initDrawerLayout() {
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        mDrawerMenu = (LinearLayout)findViewById(R.id.slide_menu);
+        mDrawerMenu = (LinearLayout) findViewById(R.id.slide_menu);
         mSlideMenuList = (ListView) mDrawerMenu.findViewById(R.id.slide_menu_list);
         mSlideMenuList.setAdapter(new SlideMenuAdapter(getLayoutInflater()));
         mSlideMenuList.setOnItemClickListener(new SlideMenuListener(this));
 
-        mSlideMenuExit = (ImageButton)findViewById(R.id.drawer_exit);
+        mSlideMenuExit = (ImageButton) findViewById(R.id.drawer_exit);
         mSlideMenuExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -230,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         });
 
     }
+
 
     class SlideMenuListener implements AdapterView.OnItemClickListener {
         private Context mContext;
@@ -243,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
             switch (view.getId()) {
                 case 0:
                     //最近添加
-                    startActivity(new Intent(MainActivity.this,RecetenlyActivity.class));
+                    startActivity(new Intent(MainActivity.this, RecetenlyActivity.class));
                     break;
                 case 1:
                     startActivity(new Intent(MainActivity.this, PlayListActivity.class));
@@ -254,16 +242,16 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
                     break;
                 case 3:
                     //设置
-                    startActivity(new Intent(MainActivity.this,SettingActivity.class));
+                    startActivity(new Intent(MainActivity.this, SettingActivity.class));
                     break;
-                default:break;
+                default:
+                    break;
             }
         }
     }
 
     //读取sd卡歌曲信息
-    public static void loadsongs()
-    {
+    public static void loadsongs() {
         //读取所有歌曲信息
         FutureTask<ArrayList<Long>> task = new FutureTask<ArrayList<Long>>(new Callable<ArrayList<Long>>() {
             @Override
@@ -288,22 +276,22 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         new Thread(task1, "getPlayingList").start();
         try {
             DBUtil.mPlayingList = task1.get();
-            if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size()  == 0)
-                DBUtil.mPlayingList = (ArrayList<Long>)task.get().clone();
+            if (DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
+                DBUtil.mPlayingList = (ArrayList<Long>) task.get().clone();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     //隐藏侧滑菜单
-    public void HideDrawer(){
-        if(mDrawerLayout.isDrawerOpen(mDrawerMenu))
+    public void HideDrawer() {
+        if (mDrawerLayout.isDrawerOpen(mDrawerMenu))
             mDrawerLayout.closeDrawer(mDrawerMenu);
     }
 
     @Override
     public void onBackPressed() {
-        if(mDrawerLayout.isDrawerOpen(mDrawerMenu))
+        if (mDrawerLayout.isDrawerOpen(mDrawerMenu))
             mDrawerLayout.closeDrawer(mDrawerMenu);
         else {
             Intent home = new Intent(Intent.ACTION_MAIN);
@@ -328,12 +316,12 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 //    }
 
     @Override
-    public void UpdateUI(MP3Info MP3info, boolean isplay){
+    public void UpdateUI(MP3Info MP3info, boolean isplay) {
         MP3Info temp = MP3info;
         mBottomBar.UpdateBottomStatus(MP3info, isplay);
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
-        for(Fragment fragment : fragmentList){
-            if(fragment instanceof AllSongFragment){
+        for (Fragment fragment : fragmentList) {
+            if (fragment instanceof AllSongFragment) {
                 ((AllSongFragment) fragment).getAdapter().notifyDataSetChanged();
             }
         }

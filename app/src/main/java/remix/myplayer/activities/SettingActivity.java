@@ -37,6 +37,7 @@ public class SettingActivity extends AppCompatActivity {
                 switch (position){
                     case 0:
                         //扫描大小
+                        startActivity(new Intent(SettingActivity.this,ScanActivity.class));
                         break;
                     case 1:
                         //意见与反馈

@@ -3,7 +3,6 @@ package remix.myplayer.ui;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -15,7 +14,6 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import remix.myplayer.R;
-import remix.myplayer.utils.DensityUtil;
 
 /**
  * Created by taeja on 16-2-15.
@@ -32,7 +30,6 @@ public class CircleSeekBar extends View {
     private int mThumbHeight = 0;
     private double mThumbSize = 0;
     private Bitmap mThumbBitmap = null;
-    private Drawable mThumbDrawable = null;
     private double mRad = 0;
     private float mOffsetX = 0;
     private float mOffsetY = 0;
@@ -45,6 +42,7 @@ public class CircleSeekBar extends View {
     private Context mContext;
     private AttributeSet mAttrs = null;
     private float mBaseLine = 0;
+    private Drawable mThumbDrawable = null;
     private int[] mThumbNormal = null;
     private int[] mThumbPressed = null;
     private OnSeekBarChangeListener mOnSeekBarChangeListener;
@@ -137,7 +135,7 @@ public class CircleSeekBar extends View {
     private void init() {
         TypedArray typedArray = mContext.obtainStyledAttributes(mAttrs, R.styleable.CircleSeekBar);
 
-        mThumbDrawable = getResources().getDrawable(R.drawable.bg_circkeseekbar_thumb);
+        mThumbDrawable = getResources().getDrawable(R.drawable.bg_thumb);
         mThumbNormal = new int[]{-android.R.attr.state_focused, -android.R.attr.state_pressed,
                 -android.R.attr.state_selected, -android.R.attr.state_checked};
         mThumbPressed = new int[]{android.R.attr.state_focused, android.R.attr.state_pressed,

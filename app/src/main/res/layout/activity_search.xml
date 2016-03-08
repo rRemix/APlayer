@@ -36,7 +36,6 @@
                 android:hint="搜索歌曲 艺人 专辑"
                 android:drawableLeft="@drawable/desk2_search"
                 android:paddingLeft="8dp"
-                android:background="@null"
                 android:imeOptions="actionSearch"
                 android:dropDownHeight="300dp"
                 android:dropDownWidth="match_parent"

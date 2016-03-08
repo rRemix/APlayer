@@ -112,7 +112,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mInstance = this;
-        setContentView(R.layout.audio_holder);
+        setContentView(R.layout.activity_audio_holder);
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         //如果是从通知栏启动,关闭通知栏
         if(mFromNotify){
@@ -437,7 +437,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
 //                    canvas.scale(1 / scaleFactor, 1 / scaleFactor);
                         Paint paint = new Paint();
                         paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-                        paint.setAlpha((int)(255 * 0.4));
+                        paint.setAlpha((int)(255 * 0.6));
                         canvas.drawBitmap(bkg, 0, 0, paint);
                         mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
                         //获得当前背景

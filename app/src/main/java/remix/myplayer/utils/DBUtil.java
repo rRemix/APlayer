@@ -76,8 +76,10 @@ public class DBUtil {
 
         //默认过滤文件大小500K
         Constants.SCAN_SIZE = SharedPrefsUtil.getValue(mContext,"setting","scansize",-1);
-        if( Constants.SCAN_SIZE < 0)
-            Constants.SCAN_SIZE = 51200000;
+        if( Constants.SCAN_SIZE < 0) {
+            Constants.SCAN_SIZE = 512000;
+            SharedPrefsUtil.putValue(mContext,"setting","scansize",512000);
+        }
 
         try{
 //            new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA,MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ARTIST},
