@@ -12,23 +12,17 @@ import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RemoteControlClient;
-import android.media.session.MediaSessionManager;
-import android.media.session.PlaybackState;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.ResultReceiver;
 import android.os.SystemClock;
-import android.service.notification.StatusBarNotification;
 import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.widget.ImageView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +33,6 @@ import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.activities.MainActivity;
 import remix.myplayer.infos.MP3Info;
-import remix.myplayer.receivers.LineCtlReceiver;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.SharedPrefsUtil;
@@ -53,7 +46,7 @@ public class MusicService extends Service {
     //实例
     public static MusicService mInstance;
     //是否第一次启动
-    private static boolean mFlag = true;
+    private static boolean mFirstFlag = true;
     //播放模式
     private static int mPlayModel = Constants.PLAY_LOOP;
     //当前是否在播放
@@ -175,6 +168,7 @@ public class MusicService extends Service {
                     case AudioManager.AUDIOFOCUS_LOSS:
                         mAudioFouus = false;
                         if(mIsplay && mPlayer != null) {
+                            AudioHolderActivity.mOperation = Constants.PLAYORPAUSE;
                             Pause();
 //                           UnInit();
                         }
@@ -250,10 +244,13 @@ public class MusicService extends Service {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 PlayNextOrPrev(true,true);
+                AudioHolderActivity.mOperation = Constants.NEXT;
                 mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
                 //更新锁屏界面
                 UpdateLockScreen();
-                //SendUpdate();
+                //更新通知栏
+                NotifyService.mInstance.UpdateNotify();
+                //更新所有Activity
             }
         });
         mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -297,9 +294,7 @@ public class MusicService extends Service {
         unregisterReceiver(mRecevier);
     }
 
-    private void Play(String Path) {
-        PrepareAndPlay(Path);
-    }
+
     private void PlayNext()
     {
         PlayNextOrPrev(true,true);
@@ -346,10 +341,10 @@ public class MusicService extends Service {
         else {
             if(mInfo == null)
                 return;
-            if(mFlag) {
-                PlayStart();
-//                Play(mInfo.getUrl());
-                mFlag = false;
+            if(mFirstFlag) {
+//                PlayStart();
+                PrepareAndPlay(mInfo.getUrl());
+                mFirstFlag = false;
                 return;
             }
             PlayStart();
@@ -389,7 +384,16 @@ public class MusicService extends Service {
             }
         }.start();
     }
-
+    private void PlaySelectSong(int position){
+        if((mCurrent = position) == -1 || (mCurrent > DBUtil.mPlayingList.size()))
+            return;
+        mId = DBUtil.mPlayingList.get(mCurrent);
+        mInfo = DBUtil.getMP3InfoById(mId);
+        mIsplay = true;
+        if(mInfo == null)
+            return;
+        PrepareAndPlay(mInfo.getUrl());
+    }
 
     //回调接口，当发生更新时，通知所有activity更新
     public interface Callback {
@@ -424,20 +428,7 @@ public class MusicService extends Service {
             switch (Control) {
                 //播放listview选中的歌曲
                 case Constants.PLAYSELECTEDSONG:
-                    mCurrent = intent.getIntExtra("Position", -1);
-                    if(mCurrent == -1)
-                        return;
-//                    if(mCurrent > DBUtil.mPlayingList.size() - 1){
-//                        Toast.makeText(context,"请先添加歌曲到该播放列表",Toast.LENGTH_SHORT).show();
-//                        return;
-//                    }
-                    mId = DBUtil.mPlayingList.get(mCurrent);
-                    mInfo = DBUtil.getMP3InfoById(mId);
-                    mIsplay = true;
-                    if(mInfo == null)
-                        break;
-                    Play(mInfo.getUrl());
-//                    mBinder.Play(mInfo.getUrl());
+                    PlaySelectSong(intent.getIntExtra("Position", -1));
                     break;
                 //播放上一首
                 case Constants.PREV:
@@ -448,7 +439,7 @@ public class MusicService extends Service {
                     PlayNext();
                     break;
                 //暂停或者继续播放
-                case Constants.PLAY:
+                case Constants.PLAYORPAUSE:
                     mIsplay = !mIsplay;
                     PlayOrPause();
                     break;
@@ -477,9 +468,10 @@ public class MusicService extends Service {
             AudioHolderActivity.mOperation = Control;
 
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
-            if(intent.getBooleanExtra("FromNotify", false)){
-                NotifyService.mInstance.UpdateNotify();
-            }
+//            if(intent.getBooleanExtra("FromNotify", false)){
+//                NotifyService.mInstance.UpdateNotify();
+//            }
+            NotifyService.mInstance.UpdateNotify();
             if(Control == Constants.NEXT || Control == Constants.PREV || Control == Constants.PLAYSELECTEDSONG) {
                 //更新锁屏界面
                 UpdateLockScreen();
@@ -498,8 +490,8 @@ public class MusicService extends Service {
             mPlayer.reset();
             mPlayer.setDataSource(path);
             mPlayer.prepareAsync();
-            mFlag = false;
-            SharedPrefsUtil.putValue(MainActivity.mInstance,"setting","mPos",mCurrent);
+            mFirstFlag = false;
+            SharedPrefsUtil.putValue(MainActivity.mInstance,"setting","Pos",mCurrent);
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -539,7 +531,7 @@ public class MusicService extends Service {
 
         }
         if(NeedPlay)
-            Play(mInfo.getUrl());
+            PrepareAndPlay(mInfo.getUrl());
 
 //        RemoteControlClient.MetadataEditor editor = mRemoteCtrlClient.editMetadata(false);
 //        editor.putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK,DBUtil.CheckBitmapByAlbumId((int)mInfo.getAlbumId(),false));
@@ -642,7 +634,7 @@ public class MusicService extends Service {
                     keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ||
                     keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
                 intent_ctl = new Intent(Constants.CTL_ACTION);
-                int arg = keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.PLAY :
+                int arg = keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.PLAYORPAUSE :
                         keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Constants.NEXT : Constants.PREV;
                 intent_ctl.putExtra("Control", arg);
                 getApplicationContext().sendBroadcast(intent_ctl);
@@ -661,7 +653,7 @@ public class MusicService extends Service {
                         try {
                             sleep(800);
                             int arg = -1;
-                            arg = mCount == 1 ? Constants.PLAY : mCount == 2 ? Constants.NEXT : Constants.PREV;
+                            arg = mCount == 1 ? Constants.PLAYORPAUSE : mCount == 2 ? Constants.NEXT : Constants.PREV;
                             mCount = 0;
                             Intent intent = new Intent(Constants.CTL_ACTION);
                             intent.putExtra("Control", arg);

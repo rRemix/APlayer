@@ -3,7 +3,7 @@
     xmlns:CircleSeekBar="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="274dp"
     android:layout_height="410dp"
-    android:background="#efeef0" >
+    android:background="@drawable/timer_bg" >
     <TextView
         android:layout_width="match_parent"
         android:layout_height="48dp"
@@ -59,8 +59,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/popup_timer_switch"
-            android:thumb="@drawable/timer_btn_seleted_btn"
-            android:track="@drawable/timer_btn_seleted_locus"/>
+            android:thumb="@drawable/timer_btn_normal_btn"
+            android:track="@drawable/timer_btn_normal_locus"/>
     </LinearLayout>
 
     <LinearLayout

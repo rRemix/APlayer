@@ -3,20 +3,11 @@ package remix.myplayer.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.media.RemoteControlClient;
-import android.media.session.MediaController;
-import android.media.session.MediaSession;
-import android.os.Bundle;
-import android.os.Message;
-import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.widget.Toast;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
-import remix.myplayer.R;
 import remix.myplayer.utils.Constants;
 
 /**
@@ -53,7 +44,7 @@ public class LineCtlReceiver extends BroadcastReceiver {
                 keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
             Log.d(TAG,"receive remote ctrl");
             intent_ctl = new Intent(Constants.CTL_ACTION);
-            int arg = keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.PLAY :
+            int arg = keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.PLAYORPAUSE :
                     keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Constants.NEXT : Constants.PREV;
             intent_ctl.putExtra("Control", arg);
             context.sendBroadcast(intent_ctl);
@@ -71,7 +62,7 @@ public class LineCtlReceiver extends BroadcastReceiver {
                     try {
                         sleep(800);
                         int arg = -1;
-                        arg = mCount == 1 ? Constants.PLAY : mCount == 2 ? Constants.NEXT : Constants.PREV;
+                        arg = mCount == 1 ? Constants.PLAYORPAUSE : mCount == 2 ? Constants.NEXT : Constants.PREV;
                         mCount = 0;
                         Intent intent = new Intent(Constants.CTL_ACTION);
                         intent.putExtra("Control", arg);

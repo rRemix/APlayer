@@ -73,7 +73,7 @@ public class RecentlyAdapter extends BaseAdapter {
         final MP3Info currentMP3 = MusicService.getCurrentMP3();
         if(currentMP3 != null){
             boolean flag = temp.getId() == currentMP3.getId();
-            holder.mName.setTextColor(flag ? Color.parseColor("#ff0030") : Color.parseColor("#ffffffff"));
+            holder.mName.setTextColor(flag ? Color.parseColor("#782899") : Color.parseColor("#ffffffff"));
             mColumnView = (ColumnView)convertView.findViewById(R.id.columnview);
             mColumnView.setVisibility(flag ? View.VISIBLE : View.GONE);
 

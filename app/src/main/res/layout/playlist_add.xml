@@ -17,7 +17,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:textCursorDrawable="@drawable/playlist_add_cursor"/>
+        android:textCursorDrawable="@drawable/bg_cursor"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

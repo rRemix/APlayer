@@ -3,10 +3,14 @@ package remix.myplayer.fragments;
 import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +25,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
+import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.infos.MP3Info;
@@ -75,6 +80,7 @@ public class CoverFragment extends Fragment {
         return rootView;
 
     }
+
     public void UpdateCover(Bitmap bitmap)
     {
         if(!isAdded())

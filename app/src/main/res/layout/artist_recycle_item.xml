@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background_color_2">
+        android:background="@drawable/artist_bg">
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="164dp"
             android:layout_height="164dp"

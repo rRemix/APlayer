@@ -53,12 +53,13 @@ public class BottomActionBarFragment extends Fragment{
                 bundle.putSerializable("MP3Info",MusicService.getCurrentMP3());
                 intent.putExtras(bundle);
                 intent.putExtra("Isplay",MusicService.getIsplay());
+                intent.putExtra("FromMainActivity",true);
                 getContext().startActivity(intent);
             }
         });
         //初始化底部三个按钮
         mPlayButton = (ImageButton)rootView.findViewById(R.id.playbar_play);
-        mNextButton = (ImageButton)rootView.findViewById(R.id.playbar_next);
+//        mNextButton = (ImageButton)rootView.findViewById(R.id.playbar_next);
         CtrlButtonListener listener = new CtrlButtonListener(getContext());
         mPlayButton.setOnClickListener(listener);
 //        mNextButton.setOnClickListener(listener);

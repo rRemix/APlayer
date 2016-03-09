@@ -113,6 +113,8 @@ public class TimerPopupWindow extends Activity {
                 if(isChecked){
                     if(mTime > 0){
                         Toast.makeText(TimerPopupWindow.this,"设置成功",Toast.LENGTH_SHORT).show();
+                        mSwitch.setThumbResource(R.drawable.timer_btn_seleted_btn);
+                        mSwitch.setTrackResource(R.drawable.timer_btn_seleted_locus);
                         SharedPrefsUtil.putValue(TimerPopupWindow.this,"setting", "TimerDefault", true);
                         SharedPrefsUtil.putValue(TimerPopupWindow.this,"setting","TimerNum",(int)mTime);
                     } else{
@@ -121,6 +123,8 @@ public class TimerPopupWindow extends Activity {
                     }
                 } else {
                     Toast.makeText(TimerPopupWindow.this,"取消成功",Toast.LENGTH_SHORT).show();
+                    mSwitch.setThumbResource(R.drawable.timer_btn_normal_btn);
+                    mSwitch.setTrackResource(R.drawable.timer_btn_normal_locus);
                     SharedPrefsUtil.putValue(TimerPopupWindow.this,"setting", "TimerDefault", false);
                     SharedPrefsUtil.putValue(TimerPopupWindow.this,"setting","TimerNum",-1);
                 }

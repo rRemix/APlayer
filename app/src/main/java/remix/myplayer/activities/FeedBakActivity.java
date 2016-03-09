@@ -27,7 +27,7 @@ public class FeedBakActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback);
         mEditText = (EditText)findViewById(R.id.feedback_edittext);
-        mEditText.getBackground().setColorFilter(getResources().getColor(R.color.progress_complete), PorterDuff.Mode.SRC_ATOP);
+        
         initToolbar();
     }
 

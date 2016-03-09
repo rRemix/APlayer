@@ -23,7 +23,7 @@ public class Constants {
     //控制命令
     public final static int PLAYSELECTEDSONG = 0;
     public final static int PREV = 1;
-    public final static int PLAY = 2;
+    public final static int PLAYORPAUSE = 2;
     public final static int NEXT = 3;
     public final static int PAUSE = 4;
     public final static int CONTINUE = 5;

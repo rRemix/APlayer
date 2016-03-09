@@ -144,7 +144,7 @@
             android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/play_btn_play"
+            android:src="@drawable/bg_btn_holder_play"
             android:background="@color/transparent"/>
         <ImageButton
             android:id="@+id/playbar_prev"

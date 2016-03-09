@@ -15,7 +15,7 @@
         android:background="@drawable/set_submit_input_bg"
         android:gravity="left|top"
         android:textSize="@dimen/textsize_large"
-        android:textColor="@color/text_color_blank"
+        android:textColor="@color/drawer_list_color"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="23dp"/>

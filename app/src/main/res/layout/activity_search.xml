@@ -29,6 +29,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical|left"
                 android:id="@+id/search_text"
+                android:background="@null"
                 android:textSize="@dimen/textsize_medium"
                 android:textColor="@color/text_color_blank"
                 android:lines="1"
@@ -37,9 +38,7 @@
                 android:drawableLeft="@drawable/desk2_search"
                 android:paddingLeft="8dp"
                 android:imeOptions="actionSearch"
-                android:dropDownHeight="300dp"
-                android:dropDownWidth="match_parent"
-                android:completionThreshold="1"/>
+                android:textCursorDrawable="@drawable/bg_cursor"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -80,8 +79,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:choiceMode="singleChoice"
-                    android:divider="@color/list_divider"
-                    android:dividerHeight="1px"/>
+                    android:divider="@drawable/divider" />
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -89,7 +87,8 @@
                     android:text="清空搜索历史"
                     android:textSize="@dimen/textsize_medium"
                     android:textColor="@color/text_color_blank"
-                    android:layout_gravity="center_horizontal"/>
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="15dp"/>
             </LinearLayout>
             <TextView
                 android:id="@+id/search_history_blank"
@@ -112,8 +111,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/search_result_native"
-                android:divider="@color/list_divider"
-                android:dividerHeight="1px"/>
+                android:divider="@drawable/divider" />
             <TextView
                 android:id="@+id/search_result_blank"
                 android:layout_width="wrap_content"

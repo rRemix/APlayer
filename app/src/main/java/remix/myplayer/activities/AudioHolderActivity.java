@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,8 +14,10 @@ import android.support.v4.view.ViewPager;
 
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -48,6 +51,7 @@ import remix.myplayer.infos.MP3Info;
  * Created by Remix on 2015/12/1.
  */
 public class AudioHolderActivity extends AppCompatActivity implements MusicService.Callback{
+    private static final String TAG = "AudioHolderActivity";
     public static AudioHolderActivity mInstance = null;
     public static String mFLAG = "CHILD";
     //记录操作是下一首还是上一首
@@ -93,11 +97,13 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     private AlphaAnimation mAnimOut;
     private Bitmap mNewBitMap;
     private boolean mFromNotify = false;
+    private boolean mFromMainActivity = false;
     private Handler mBlurHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == Constants.UPDATE_BG) {
                 //设置高度模糊的背景
+//                mContainer.startAnimation(mAnimOut);
                 mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
                 //更新专辑封面
                 ((CoverFragment) mAdapter.getItem(1)).UpdateCover(DBUtil.CheckBitmapBySongId((int)mInfo.getId(),false));
@@ -112,8 +118,11 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mInstance = this;
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_audio_holder);
+
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
+        mFromMainActivity =  getIntent().getBooleanExtra("FromMainActivity",false);
         //如果是从通知栏启动,关闭通知栏
         if(mFromNotify){
 //            NotificationManager mNotificationManager =
@@ -146,9 +155,11 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         Display display = wm.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
-        mWidth = (int)(metrics.widthPixels  * 0.95);
-        mHeight = (int)(metrics.heightPixels * 7 / 9.5);
-//        mHeight = metrics.heightPixels;
+//        mWidth = (int)(metrics.widthPixels  * 0.95);
+//        mHeight = (int)(metrics.heightPixels * 7 / 9.5);
+
+        mWidth = (int)(metrics.widthPixels  * 1);
+        mHeight = (int)(metrics.heightPixels * 1);
         mAnimIn = (AlphaAnimation)AnimationUtils.loadAnimation(this,R.anim.audio_bg_in);
         mAnimIn.setFillAfter(true);
         mAnimOut = (AlphaAnimation)AnimationUtils.loadAnimation(this,R.anim.audio_bg_out);
@@ -169,7 +180,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             }
         });
         mContainer = (LinearLayout)findViewById(R.id.audio_holder_container);
-//        mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
+        new BlurThread().start();
     }
 
 
@@ -184,7 +195,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
                 MusicService.setPlayModel(currentmodel);
                 mPlayModel.setBackground(getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
                                         currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.bg_btn_holder_playmodel_shuffle :
-                                        R.drawable.bg_btn_holder_playmodel_repeat,getTheme()));
+                                        R.drawable.bg_btn_holder_playmodel_repeat));
                 String msg = currentmodel == Constants.PLAY_LOOP ? "顺序播放" : currentmodel == Constants.PLAY_SHUFFLE ? "随机播放" : "单曲播放";
                 Toast.makeText(AudioHolderActivity.this,msg,Toast.LENGTH_SHORT).show();
             }
@@ -201,8 +212,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     @Override
     protected void onResume() {
         super.onResume();
-        ProgeressThread thread = new ProgeressThread();
-        thread.start();
+        new ProgeressThread().start();
         mIsRunning = true;
     }
 
@@ -216,23 +226,6 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     public void onDestroy()
     {
         super.onDestroy();
-    }
-
-    class ProgeressThread extends Thread {
-        @Override
-        public void run() {
-            while (mIsRunning && mInfo != null) {
-                if (MusicService.getIsplay()) {
-                    mCurrent = MusicService.getCurrentTime();
-                    mHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     public  Handler mHandler = new Handler()
@@ -330,9 +323,9 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     }
     public void UpdatePlayButton(boolean isPlay) {
         if(isPlay)
-            mPlayBarPlay.setImageResource(R.drawable.play_btn_stop);
+            mPlayBarPlay.setImageResource(R.drawable.bg_btn_holder_stop);
         else
-            mPlayBarPlay.setImageResource(R.drawable.play_btn_play);
+            mPlayBarPlay.setImageResource(R.drawable.bg_btn_holder_play);
     }
 
     private void initTop() {
@@ -395,7 +388,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     @Override
     protected void onStart() {
         super.onStart();
-        if(!mFromNotify)
+        if(!mFromNotify && mFromMainActivity)
             overridePendingTransition(R.anim.slide_bottom_in, 0);
     }
     @Override
@@ -408,7 +401,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         mInfo= MP3info;
         mIsPlay = isplay;
 
-        if(mOperation != Constants.PLAY && mIsRunning) {
+        if(mOperation != Constants.PLAYORPAUSE && mIsRunning) {
             //更新顶部信息
             UpdateTopStatus(mInfo);
             //更新按钮状态
@@ -420,35 +413,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             mCurrent = MusicService.getCurrentTime();
             mDuration = (int) mInfo.getDuration();
             mSeekBar.setMax(mDuration);
-            new Thread(){
-                @Override
-                public void run() {
-                    //对专辑图片进行高斯模糊，并将其设置为背景
-                    float radius = 25;
-                    float scaleFactor = 12;
-                    if (mWidth > 0 && mHeight > 0 ) {
-                        if(mInfo == null) return;
-                        Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
-                        if (bkg == null)
-                            bkg = BitmapFactory.decodeResource(getResources(), R.drawable.bg_lockscreen_default);
-                        mNewBitMap = Bitmap.createBitmap((int) (mWidth / scaleFactor), (int) (mHeight / scaleFactor), Bitmap.Config.ARGB_8888);
-                        Canvas canvas = new Canvas(mNewBitMap);
-//                    canvas.translate(-mContainer.getLeft() / scaleFactor, -mContainer.getTop() / scaleFactor);
-//                    canvas.scale(1 / scaleFactor, 1 / scaleFactor);
-                        Paint paint = new Paint();
-                        paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-                        paint.setAlpha((int)(255 * 0.6));
-                        canvas.drawBitmap(bkg, 0, 0, paint);
-                        mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
-                        //获得当前背景
-//                    mContainer.startAnimation(mAnimOut);
-
-                    }
-                    mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
-                }
-            }.start();
-
-
+            new BlurThread().start();
         }
         else if(mIsRunning)
             //更新按钮状态
@@ -459,6 +424,76 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     @Override
     public int getType() {
         return Constants.AUDIOHOLDERACTIVITY;
+    }
+
+    private int getOtherHeight() {
+        Rect frame = new Rect();
+        getWindow().getDecorView().getWindowVisibleDisplayFrame(frame);
+        int statusBarHeight = frame.top;
+        int contentTop = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getTop();
+        int titleBarHeight = contentTop - statusBarHeight;
+        return statusBarHeight + titleBarHeight;
+    }
+
+    //更新进度条线程
+    class ProgeressThread extends Thread {
+        @Override
+        public void run() {
+            while (mIsRunning && mInfo != null) {
+                if (MusicService.getIsplay()) {
+                    mCurrent = MusicService.getCurrentTime();
+                    mHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+
+    //高斯模糊的线程
+    class BlurThread extends Thread{
+        @Override
+        public void run() {
+            long start = System.currentTimeMillis();
+            //对专辑图片进行高斯模糊，并将其设置为背景
+//            View view = getWindow().getDecorView();
+//            view.setDrawingCacheEnabled(true);
+//            view.buildDrawingCache(true);
+//            Bitmap bmp1 = view.getDrawingCache();
+//            int height1 = bmp1.getHeight();
+//            int width1 = bmp1.getWidth();
+//            int otherheight = getOtherHeight();
+//            Bitmap bmp2 = Bitmap.createBitmap(bmp1, 0, otherheight,bmp1.getWidth(), bmp1.getHeight() - otherheight);
+
+            float radius = 25;
+            float scaleFactor = 14;
+            if (mWidth > 0 && mHeight > 0 ) {
+                if(mInfo == null) return;
+                Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
+                if (bkg == null)
+                    bkg = BitmapFactory.decodeResource(getResources(), R.drawable.bg_lockscreen_default);
+
+                mNewBitMap = Bitmap.createBitmap((int) (mWidth / scaleFactor), (int) (mHeight / scaleFactor), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(mNewBitMap);
+//                canvas.translate(-mContainer.getLeft() / scaleFactor, -mContainer.getTop() / scaleFactor);
+//                canvas.scale(1 / scaleFactor, 1 / scaleFactor);
+                Paint paint = new Paint();
+                paint.setFlags(Paint.FILTER_BITMAP_FLAG);
+                paint.setAlpha((int)(255 * 0.4));
+                canvas.drawBitmap(bkg, 0, 0, paint);
+                mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
+                //获得当前背景
+//                    mContainer.startAnimation(mAnimOut);
+
+            }
+            Log.d(TAG,"mill: " + (System.currentTimeMillis() - start));
+            mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
+        }
     }
 
 }

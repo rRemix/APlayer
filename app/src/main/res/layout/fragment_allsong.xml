@@ -4,18 +4,17 @@
     android:layout_height="match_parent"
     android:id="@+id/allsong_list">
     <RelativeLayout
-        android:id="@+id/play_shuffle"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@color/background_color_interval"
-        android:orientation="horizontal"
-        android:onClick="onPlayShuffle">
+        android:orientation="horizontal">
         <ImageButton
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_btn_common_play_shuffle"
-            android:layout_marginLeft="16dp" />
+            android:layout_marginLeft="16dp"
+            android:id="@+id/play_shuffle"/>
         <TextView
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"

@@ -71,7 +71,7 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
         final MP3Info currentMP3 = MusicService.getCurrentMP3();
         if(currentMP3 != null){
             boolean flag = mCurosr.getInt(AllSongFragment.mSongId) == MusicService.getCurrentMP3().getId();
-            holder.mName.setTextColor(flag ? Color.parseColor("#ff0030") : Color.parseColor("#ffffffff"));
+            holder.mName.setTextColor(flag ? Color.parseColor("#782899") : Color.parseColor("#ffffffff"));
             mColumnView = (ColumnView)convertView.findViewById(R.id.columnview);
             mColumnView.setVisibility(flag ? View.VISIBLE : View.GONE);
             if(flag){

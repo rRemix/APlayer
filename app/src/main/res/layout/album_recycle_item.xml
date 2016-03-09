@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background_color_2">
+        android:background="@drawable/album_bg">
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="164dp"
             android:layout_height="164dp"
@@ -37,7 +37,7 @@
                     android:id="@+id/recycleview_text1"
                     android:singleLine="true"
                     android:ellipsize="end"
-                    android:textColor="@color/text_color_gray_1"
+                    android:textColor="@color/text_color_blank"
                     android:textSize="@dimen/textsize_medium"/>
                 <TextView
                     android:layout_marginTop="2dp"

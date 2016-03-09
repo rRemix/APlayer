@@ -52,7 +52,7 @@
         android:layout_width="18dp"
         android:layout_height="16dp"
         app:columnwidth="2dp"
-        app:columncolor="#cd00"
+        app:columncolor="#782899"
         app:columnnum="4"
         android:id="@+id/columnview"
         android:layout_marginRight="10dp" />

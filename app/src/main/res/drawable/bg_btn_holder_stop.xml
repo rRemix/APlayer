@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/play_btn_stop_prs" android:state_pressed="true"/>
+    <item android:drawable="@drawable/play_btn_stop" android:state_pressed="false" android:state_focused="false"/>
+    <item android:drawable="@drawable/play_btn_stop" android:state_focused="false"/>
+</selector>

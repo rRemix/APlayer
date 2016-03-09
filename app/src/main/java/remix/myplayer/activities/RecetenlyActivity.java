@@ -70,7 +70,7 @@ public class RecetenlyActivity extends AppCompatActivity  implements MusicServic
 
     private void initToolbar() {
         mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        mToolBar.setTitle("返回");
+        mToolBar.setTitle("最近添加");
         mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
         setSupportActionBar(mToolBar);
         mToolBar.setNavigationIcon(R.drawable.common_btn_back);

@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import java.util.Iterator;
 
+import remix.myplayer.R;
 import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.adapters.FolderAdapter;
 import remix.myplayer.utils.Constants;
@@ -30,14 +31,10 @@ public class FolderFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        LinearLayout rootView = new LinearLayout(getActivity());
-        rootView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
-        mListView = new ListView(getActivity());
-        mListView.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,AbsListView.LayoutParams.MATCH_PARENT));
+        View rootView = inflater.inflate(R.layout.fragment_folder,null);
+        mListView = (ListView)rootView.findViewById(R.id.folder_list);
         mListView.setOnItemClickListener(new ListViewListener());
         mListView.setAdapter(new FolderAdapter(getActivity(),inflater));
-        rootView.addView(mListView);
         return rootView;
     }
     private class ListViewListener implements AdapterView.OnItemClickListener

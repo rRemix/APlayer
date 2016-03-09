@@ -57,7 +57,7 @@ public class SettingActivity extends AppCompatActivity {
     private void initToolbar() {
 
         mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        mToolBar.setTitle("返回");
+        mToolBar.setTitle("设置");
         mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
         setSupportActionBar(mToolBar);
         mToolBar.setNavigationIcon(R.drawable.common_btn_back);

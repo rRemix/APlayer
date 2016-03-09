@@ -90,7 +90,7 @@ public class PlayListActivity extends AppCompatActivity  implements MusicService
 
     private void initToolbar() {
         mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        mToolBar.setTitle("返回");
+        mToolBar.setTitle("播放列表");
         mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
         setSupportActionBar(mToolBar);
         mToolBar.setNavigationIcon(R.drawable.common_btn_back);
@@ -135,7 +135,7 @@ public class PlayListActivity extends AppCompatActivity  implements MusicService
 
         //修改获得焦点时下划线的颜色
         EditText editText = (EditText)contentView.findViewById(R.id.playlist_add_edit);
-        editText.getBackground().setColorFilter(getResources().getColor(R.color.progress_complete), PorterDuff.Mode.SRC_ATOP);
+        editText.getBackground().setColorFilter(getResources().getColor(R.color.cursor_color), PorterDuff.Mode.SRC_ATOP);
         editText.setText("本地歌单" + mPlaylist.size());
         contentView.findViewById(R.id.playlist_cancel).setOnClickListener(new View.OnClickListener() {
             @Override

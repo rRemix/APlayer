@@ -48,7 +48,7 @@ public class NotifyReceiver extends BroadcastReceiver
         }
 
         Intent mButtonIntent = new Intent(Constants.CTL_ACTION);
-        mButtonIntent.putExtra("Control", Constants.PLAY);
+        mButtonIntent.putExtra("Control", Constants.PLAYORPAUSE);
         PendingIntent mIntent_Play = PendingIntent.getBroadcast(context,1,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteView.setOnClickPendingIntent(R.id.notify_play,mIntent_Play);
 
