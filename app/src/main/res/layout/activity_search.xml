@@ -38,7 +38,7 @@
                 android:drawableLeft="@drawable/desk2_search"
                 android:paddingLeft="8dp"
                 android:imeOptions="actionSearch"
-                android:textCursorDrawable="@drawable/bg_cursor"/>
+                android:textCursorDrawable="@drawable/bg_cursor_gray"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

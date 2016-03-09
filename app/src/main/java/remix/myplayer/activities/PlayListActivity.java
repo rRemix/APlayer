@@ -135,7 +135,7 @@ public class PlayListActivity extends AppCompatActivity  implements MusicService
 
         //修改获得焦点时下划线的颜色
         EditText editText = (EditText)contentView.findViewById(R.id.playlist_add_edit);
-        editText.getBackground().setColorFilter(getResources().getColor(R.color.cursor_color), PorterDuff.Mode.SRC_ATOP);
+        editText.getBackground().setColorFilter(getResources().getColor(R.color.intersperse_color), PorterDuff.Mode.SRC_ATOP);
         editText.setText("本地歌单" + mPlaylist.size());
         contentView.findViewById(R.id.playlist_cancel).setOnClickListener(new View.OnClickListener() {
             @Override

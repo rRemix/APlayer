@@ -16,6 +16,8 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name="android.permission.DEVICE_POWER"/>
     <application
         android:allowBackup="true"
         android:icon="@drawable/aplayer_icon"
@@ -48,6 +50,9 @@
         <activity android:name=".activities.PlayListActivity"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+
+        <activity android:name=".activities.LockScreenActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity android:name=".activities.ChildHolderActivity"/>
 
@@ -151,11 +156,8 @@
 
         <service android:name=".services.MusicService"/>
         <service android:name=".services.TimerService"/>
-        <service android:name=".services.NotifyService"/><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
-     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+        <service android:name=".services.NotifyService"/>
+        <service android:name=".services.ScreenService"/>
 
     </application>
 

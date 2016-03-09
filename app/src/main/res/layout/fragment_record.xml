@@ -15,5 +15,5 @@
         android:layout_marginRight="22dp"
         android:layout_marginTop="30dp"
         android:background="@drawable/play_note_bg"
-        android:textCursorDrawable="@drawable/bg_cursor"/>
+        android:textCursorDrawable="@drawable/bg_cursor_gray"/>
 </LinearLayout>

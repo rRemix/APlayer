@@ -170,8 +170,8 @@
             android:id="@+id/playbar_playinglist"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/drawer_icon_list"
-            android:background="@drawable/bg_btn_gray_selector"
+            android:src="@drawable/bg_btn_holder_playlist"
+            android:background="@color/transparent"
             android:layout_marginRight="20dp"/>
     </RelativeLayout>
 

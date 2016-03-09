@@ -6,7 +6,7 @@
     android:paddingTop="8dp"
     android:paddingLeft="8dp"
     android:paddingRight="8dp"
-    android:background="@color/background_color_3">
+    android:background="#000000">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             android:id="@+id/recycleview_simpleiview"
             fresco:fadeDuration="300"
             fresco:actualImageScaleType="focusCrop"
-            fresco:placeholderImage="@drawable/default_album_list"
+            fresco:placeholderImage="@drawable/playlist_empty_bg"
             fresco:placeholderImageScaleType="fitCenter"
             android:layout_alignParentTop="true" />
 

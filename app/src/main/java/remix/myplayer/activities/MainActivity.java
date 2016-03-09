@@ -39,6 +39,7 @@ import remix.myplayer.fragments.MainFragment;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.services.NotifyService;
+import remix.myplayer.services.ScreenService;
 import remix.myplayer.services.TimerService;
 import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.CommonUtil;
@@ -97,7 +98,8 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
             //定时
             Intent startIntent = new Intent(this, TimerService.class);
             startService(startIntent);
-
+            //锁屏
+            startService(new Intent(this, ScreenService.class));
         }
         //播放的service
         MusicService.addCallback(MainActivity.this);

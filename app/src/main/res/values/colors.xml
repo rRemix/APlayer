@@ -47,6 +47,8 @@
     <color name="text_allsong_sel">#ffffffff</color>
     <!-- 定时器背景色-->
     <color name="background_timer_color">#efeef0</color>
-    <!--光标颜色-->
-    <color name="cursor_color">#484746</color>
+    <!--光标颜色(灰))-->
+    <color name="cursor_color_gray">#484746</color>
+    <!--光标颜色(紫)-->
+    <color name="cursor_color_purple">#782899</color>
 </resources>

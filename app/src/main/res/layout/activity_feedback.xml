@@ -10,12 +10,18 @@
         android:layout_height="?attr/actionBarSize">
     </android.support.v7.widget.Toolbar>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:background="@color/background_color_interval"/>
+
     <EditText
         android:id="@+id/feedback_edittext"
         android:background="@drawable/set_submit_input_bg"
         android:gravity="left|top"
         android:textSize="@dimen/textsize_large"
         android:textColor="@color/drawer_list_color"
+        android:textCursorDrawable="@drawable/bg_cursor_gray"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="23dp"/>
