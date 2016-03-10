@@ -25,8 +25,8 @@
             android:layout_height="wrap_content"
             android:lines="1"
             android:ellipsize="end"
-            android:textColor="#fff"
-            android:textSize="17dp"/>
+            android:textColor="@color/text_color_blank"
+            android:textSize="@dimen/textsize_large"/>
         <TextView
             android:id="@+id/notify_artist"
             android:text="歌手名"
@@ -34,29 +34,30 @@
             android:layout_height="wrap_content"
             android:lines="1"
             android:ellipsize="end"
-            android:textSize="15dp"
-            android:textColor="#fff"/>
+            android:textSize="@dimen/textsize_medium"
+            android:textColor="@color/text_color_gray"/>
     </LinearLayout>
+
     <ImageButton
-        android:id="@+id/notify_next"
+        android:id="@+id/notify_close"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/transparent"
         android:layout_marginRight="10dp"
-        android:src="@drawable/notifbar_btn_pre_next"/>
-    <!--分割线-->
-    <!--<LinearLayout-->
-        <!--android:orientation="vertical"-->
-        <!--android:id="@+id/notify_divier"-->
-        <!--android:layout_width="1dp"-->
-        <!--android:layout_height="30dp"-->
-        <!--android:background="@color/divider"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:layout_toLeftOf="@id/notify_next"-->
-        <!--android:layout_marginLeft="10dp"-->
-        <!--android:layout_marginRight="10dp"/>-->
+        android:src="@drawable/notify_btn_close_white"/>
+
+    <ImageButton
+        android:id="@+id/notify_next"
+        android:layout_centerVertical="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/notify_close"
+        android:src="@drawable/notifbar_btn_normal_next"/>
+
     <ImageButton
         android:id="@+id/notify_play"
         android:layout_centerVertical="true"
@@ -66,4 +67,5 @@
         android:layout_height="wrap_content"
         android:background="@color/transparent"
         android:src="@drawable/notifbar_btn_play" />
+
 </RelativeLayout>

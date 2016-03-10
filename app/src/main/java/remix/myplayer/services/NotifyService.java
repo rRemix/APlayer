@@ -34,6 +34,7 @@ public class NotifyService extends Service {
     public static NotifyService mInstance;
     private Context mContext;
     private boolean mIsForeground = true;
+    private NotificationManager mNotificationManager;
     @Override
     public void onCreate(){
         super.onCreate();
@@ -41,38 +42,39 @@ public class NotifyService extends Service {
         mInstance = this;
         mNotifyReceiver = new NotifyReceiver();
         IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+//        filter.addAction(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         filter.addAction(Constants.NOTIFY);
-        registerReceiver(mNotifyReceiver,filter);
+        registerReceiver(mNotifyReceiver, filter);
 
-        new Thread(){
-            @Override
-            public void run(){
-                String packagename = getApplicationContext().getPackageName();
-                //每0.1秒检测是否app切换到前台，如果是，关闭通知栏
-                while(true){
-                    try {
-                        ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
-                        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
-                        if (!tasks.isEmpty()) {
-                            ComponentName topActivity = tasks.get(0).topActivity;
-                            if (topActivity.getPackageName().equals(packagename)) {
-                                NotificationManager mNotificationManager =
-                                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                                mNotificationManager.cancel(0);
-                                mIsForeground = false;
-                            }else {
-                                mIsForeground = true;
-                            }
-                        }
-                        sleep(100);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-            }
-        }.start();
+
+//        new Thread(){
+//            @Override
+//            public void run(){
+//                String packagename = getApplicationContext().getPackageName();
+//                //每0.1秒检测是否app切换到前台，如果是，关闭通知栏
+//                while(true){
+//                    try {
+//                        ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+//                        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+//                        if (!tasks.isEmpty()) {
+//                            ComponentName topActivity = tasks.get(0).topActivity;
+//                            if (topActivity.getPackageName().equals(packagename)) {
+//                                mNotificationManager.cancel(0);
+//                                mIsForeground = true;
+//                            }else {
+//                                mIsForeground = false;
+//                            }
+//                        }
+//                        sleep(100);
+//                    }catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//            }
+//        }.start();
     }
     @Override
     public void onDestroy() {
@@ -92,16 +94,17 @@ public class NotifyService extends Service {
         private boolean mIsplay = false;
         @Override
         public void onReceive(Context context, Intent intent) {
+
             UpdateNotify();
         }
         private void UpdateNotify() {
             mIsplay = MusicService.getIsplay();
-            Log.d(TAG,"isplay=" + mIsplay);
-            Log.d(TAG,"isShow=" + mIsForeground);
+
             mRemoteView = new RemoteViews(mContext.getPackageName(), R.layout.notify_playbar);
+//            if(mIsForeground)
+//                return;
 
-
-            if(mIsForeground || (MusicService.getCurrentMP3() != null && mIsplay)) {
+            if((MusicService.getCurrentMP3() != null)) {
                 MP3Info temp = MusicService.getCurrentMP3();
                 //设置歌手，歌曲名
                 mRemoteView.setTextViewText(R.id.notify_song, temp.getDisplayname());
@@ -111,7 +114,7 @@ public class NotifyService extends Service {
                 if(bitmap != null)
                     mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
                 else
-                    mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.song_artist_empty_bg);
+                    mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.default_recommend);
                 //设置播放按钮
                 if(!mIsplay){
                     mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notifbar_btn_play);
@@ -122,20 +125,24 @@ public class NotifyService extends Service {
                 Intent mButtonIntent = new Intent(Constants.CTL_ACTION);
                 mButtonIntent.putExtra("FromNotify", true);
                 mButtonIntent.putExtra("Control", Constants.PLAYORPAUSE);
-                PendingIntent mIntent_Play = PendingIntent.getBroadcast(mContext,1,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-                mRemoteView.setOnClickPendingIntent(R.id.notify_play,mIntent_Play);
+                PendingIntent mIntent_Play = PendingIntent.getBroadcast(mContext, 1, mButtonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                mRemoteView.setOnClickPendingIntent(R.id.notify_play, mIntent_Play);
 
                 mButtonIntent.putExtra("Control", Constants.NEXT);
                 PendingIntent mIntent_Next = PendingIntent.getBroadcast(mContext,2,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
                 mRemoteView.setOnClickPendingIntent(R.id.notify_next,mIntent_Next);
 
+                mButtonIntent.putExtra("Close", true);
+                PendingIntent mIntent_Prev = PendingIntent.getBroadcast(mContext,3,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+                mRemoteView.setOnClickPendingIntent(R.id.notify_close, mIntent_Prev);
+
                 NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(mContext)
                         .setContent(mRemoteView)
                         .setWhen(System.currentTimeMillis())
                         .setPriority(Notification.PRIORITY_DEFAULT)
-                        .setOngoing(mIsplay)
+                        .setOngoing(true)
                         .setSmallIcon(R.drawable.notifbar_icon);
-//                    .setLargeIcon(DBUtil.CheckBitmapByAlbumId((int)MusicService.getCurrentMP3().getAlbumId(),false))
+//                        .setStyle(new NotificationCompat.BigPictureStyle());
 //                    .setStyle(new android.support.v7.app.NotificationCompat.MediaStyle().setMediaSession(MusicService.mMediaSession.getSessionToken()));
 
                 Intent result = new Intent(mContext,AudioHolderActivity.class);
@@ -143,7 +150,7 @@ public class NotifyService extends Service {
                 stackBuilder.addParentStack(AudioHolderActivity.class);
                 stackBuilder.addNextIntent(result);
                 stackBuilder.editIntentAt(1).putExtra("Notify", true);
-                stackBuilder.editIntentAt(0).putExtra("Notify",true);
+                stackBuilder.editIntentAt(0).putExtra("Notify", true);
 
                 PendingIntent resultPendingIntent =
                         stackBuilder.getPendingIntent(
@@ -151,8 +158,6 @@ public class NotifyService extends Service {
                                 PendingIntent.FLAG_UPDATE_CURRENT
                         );
                 mBuilder.setContentIntent(resultPendingIntent);
-                NotificationManager mNotificationManager =
-                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 mNotificationManager.notify(0, mBuilder.build());
             }
 

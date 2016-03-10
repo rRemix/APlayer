@@ -1,5 +1,6 @@
 package remix.myplayer.services;
 
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -423,6 +424,13 @@ public class MusicService extends Service {
     {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Boolean close = intent.getExtras().getBoolean("Close");
+            NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+            if(intent.getExtras().getBoolean("Close")){
+                manager.cancel(0);
+                return;
+            }
+
             int Control = intent.getIntExtra("Control",-1);
             switch (Control) {
                 //播放listview选中的歌曲
