@@ -38,6 +38,7 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
         ArrayList<MP3Info> list = new ArrayList<>();
         ArrayList<Long> ids = new ArrayList<Long>();
         String name = null;
+        //根据不同参数获得mp3信息列表
         if(mType == Constants.ARTIST_HOLDER || mType == Constants.ALBUM_HOLDER) {
             list = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, mType);
             for(MP3Info info : list)

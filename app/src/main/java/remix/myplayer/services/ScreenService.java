@@ -63,14 +63,14 @@ public class ScreenService extends Service {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             Log.d(TAG,"intent:" + intent.getAction());
-            if(action.equals(Intent.ACTION_SCREEN_ON)){
-//                try {
-//                    Intent intent1 = new Intent(context,LockScreenActivity.class);
-//                    intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    startActivity(intent1);
-//                } catch (Exception e){
-//                    e.printStackTrace();
-//                }
+            if(action.equals(Intent.ACTION_SCREEN_ON) && MusicService.getIsplay()){
+                try {
+                    Intent intent1 = new Intent(context,LockScreenActivity.class);
+                    intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent1);
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
 
 //                mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK|PowerManager.ACQUIRE_CAUSES_WAKEUP,"Tag");
 //                mWakeLock.acquire();

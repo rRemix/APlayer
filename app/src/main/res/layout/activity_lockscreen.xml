@@ -1,10 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/lockscreen_container">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/lockscreen_image"
+        fresco:placeholderImage="@drawable/artist_empty_bg"
+        fresco:placeholderImageScaleType="fitXY"
+        android:scaleType="fitXY"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="left|top"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="40dp">
+        <TextView
+            android:id="@+id/lockscreen_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:textSize="24dp"
+            android:textColor="@color/text_color_blank"/>
+        <TextView
+            android:id="@+id/lockscreen_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="@dimen/textsize_large"
+            android:textColor="@color/text_color_gray_1"
+            android:text="1月1日 星期一"/>
+        <TextView
+            android:id="@+id/lockscreen_song"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textSize="@dimen/textsize_large"
+            android:textColor="@color/text_color_blank"
+            android:text="歌曲"/>
+        <TextView
+            android:id="@+id/lockscreen_artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textSize="@dimen/textsize_large"
+            android:textColor="@color/text_color_gray_1"
+            android:text="歌手"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginBottom="80dp"
+        android:layout_gravity="bottom">
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/playbar_prev"
+            android:background="@drawable/wy_lock_btn_prev"/>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/playbar_play"
+            android:background="@drawable/wy_lock_btn_play"/>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/playbar_next"
+            android:background="@drawable/wy_lock_btn_next"/>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/lockscreen_love"
+            android:onClick="onLove"
+            android:background="@drawable/wy_lock_btn_love"/>
+    </LinearLayout>
+
     <TextView
+        android:id="@+id/lockscreen_unlock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="锁屏测试"
-        android:textSize="50dp"/>
-</LinearLayout>
+        android:textSize="@dimen/textsize_huge"
+        android:textColor="@color/text_color_gray"
+        android:text="滑动解锁"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="20dp"/>
+
+</FrameLayout>

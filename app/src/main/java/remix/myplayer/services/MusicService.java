@@ -64,7 +64,7 @@ public class MusicService extends Service {
     private int mCurrentVolume = -1;
     private AudioManager mAudioManager;
     //回调接口的集合
-    private static List<Callback> mCallBacklist  = new ArrayList<Callback>(){};;
+    private static List<Callback> mCallBacklist  = new ArrayList<Callback>(){};
     private Context mContext;
     private PlayerReceiver mRecevier;
     private ComponentName mMediaComName;
@@ -220,13 +220,14 @@ public class MusicService extends Service {
 
         mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
                 | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-        mMediaSession.setPlaybackState(mNotPlaybackState);
+//        mMediaSession.setPlaybackState(mNotPlaybackState);
         UpdateLockScreen();
         mMediaSession.setCallback(new SessionCallBack());
         mMediaSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
-//        mMediaSession.setMediaButtonReceiver(mMediaPendingIntent);
 
-        mMediaSession.setActive(true);
+//        mMediaSession.setActive(true);
+
+
 //        mRemoteCtrlClient = new RemoteControlClient(mMediaPendingIntent);
 //        int flags = RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
 //                | RemoteControlClient.FLAG_KEY_MEDIA_NEXT
@@ -273,15 +274,13 @@ public class MusicService extends Service {
             Bitmap bitmap = DBUtil.CheckBitmapByAlbumId((int) mInfo.getAlbumId(), false);
             if(bitmap == null)
                 bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
-//            Uri uri = Uri.parse("res://包名(实际可以是任何字符串甚至留空)/" + R.drawable.ic_launcher);
-            Uri uri = Uri.parse("res://remix.myplayer/"+ R.drawable.stat_notify);
-            mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
-                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
-                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mInfo.getDisplayname())
-                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, mInfo.getAlbum() + " - " + mInfo.getArtist())
-                    .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,"res://remix.myplayer/"+ R.drawable.stat_notify)
-                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,mInfo.getDuration())
-                    .build());
+//            mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
+//                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
+//                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mInfo.getDisplayname())
+//                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, mInfo.getAlbum() + " - " + mInfo.getArtist())
+//                    .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,"res://remix.myplayer/"+ R.drawable.stat_notify)
+//                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,mInfo.getDuration())
+//                    .build());
         }
     }
 
@@ -440,7 +439,6 @@ public class MusicService extends Service {
                     break;
                 //暂停或者继续播放
                 case Constants.PLAYORPAUSE:
-                    mIsplay = !mIsplay;
                     PlayOrPause();
                     break;
                 //暂停

@@ -126,8 +126,14 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         //如果是第一次启动软件,将第一首歌曲设置为正在播放的
         if (mFir || mPos < 0)
             mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)), mFromNotify);
-        else
+        else {
+            if(mPos == DBUtil.mPlayingList.size()){
+                mPos = DBUtil.mPlayingList.size() - 1;
+                if(mPos >= 0)
+                    SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", mPos);
+            }
             mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(mPos)), mFromNotify);
+        }
     }
 
     private void initToolbar() {

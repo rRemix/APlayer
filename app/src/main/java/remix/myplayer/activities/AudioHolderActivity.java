@@ -63,7 +63,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     //是否播放的标志变量
     public static boolean mIsPlay = false;
     //第一次启动的标志变量
-    private static boolean mFlag = true;
+    private boolean mFistStart = true;
     //用于更新进度条的定时器
     private Timer mTimer;
     //拖动进度条与更新进度条的互斥量
@@ -106,7 +106,9 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
 //                mContainer.startAnimation(mAnimOut);
                 mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
                 //更新专辑封面
-                ((CoverFragment) mAdapter.getItem(1)).UpdateCover(DBUtil.CheckBitmapBySongId((int)mInfo.getId(),false));
+                ((CoverFragment) mAdapter.getItem(1)).UpdateCover(DBUtil.CheckBitmapBySongId((int)mInfo.getId(),false),!mFistStart);
+                if(mFistStart)
+                    mFistStart = false;
             }
         }
     };
@@ -131,23 +133,28 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         }
         mInfo = MusicService.getCurrentMP3();
         mIsPlay = MusicService.getIsplay();
-        MusicService.addCallback(this);
-        //初始化动画相关
-        initAnim();
-        //初始化顶部信息
-        initTop();
-        //初始化顶部两个按钮
-        initTopButton();
-        //初始化三个指示标志
-        initGuide();
-        //初始化ViewPager
-        initPager();
-        //初始化seekbar以及播放时间
-        initSeekBar();
-        //初始化三个控制按钮
-        initButton();
-        //初始化底部四个按钮
-        initBottomButton();
+        try {
+            MusicService.addCallback(this);
+            //初始化动画相关
+            initAnim();
+            //初始化顶部信息
+            initTop();
+            //初始化顶部两个按钮
+            initTopButton();
+            //初始化三个指示标志
+            initGuide();
+            //初始化ViewPager
+            initPager();
+            //初始化seekbar以及播放时间
+            initSeekBar();
+            //初始化三个控制按钮
+            initButton();
+            //初始化底部四个按钮
+            initBottomButton();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     private void initAnim() {
@@ -439,8 +446,8 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     class ProgeressThread extends Thread {
         @Override
         public void run() {
-            while (mIsRunning && mInfo != null) {
-                if (MusicService.getIsplay()) {
+            while (mIsRunning) {
+                if (MusicService.getIsplay() && MusicService.getCurrentTime() > 0) {
                     mCurrent = MusicService.getCurrentTime();
                     mHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
                 }
@@ -453,9 +460,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
         }
     }
 
-
-
-    //高斯模糊的线程
+    //高斯模糊线程
     class BlurThread extends Thread{
         @Override
         public void run() {

@@ -81,16 +81,20 @@ public class CoverFragment extends Fragment {
 
     }
 
-    public void UpdateCover(Bitmap bitmap)
-    {
+    public void UpdateCover(Bitmap bitmap,boolean withAnim){
         if(!isAdded())
             return;
         if (mImage == null)
             return;
         mNewBitmap = bitmap;
-        if(AudioHolderActivity.mOperation == Constants.PREV)
-            mImage.startAnimation(mRightAnimation);
-        else if (AudioHolderActivity.mOperation == Constants.NEXT)
-            mImage.startAnimation(mLeftAnimation);
+        if(withAnim){
+            if(AudioHolderActivity.mOperation == Constants.PREV)
+                mImage.startAnimation(mRightAnimation);
+            else if (AudioHolderActivity.mOperation == Constants.NEXT)
+                mImage.startAnimation(mLeftAnimation);
+        } else {
+            mImage.setImageBitmap(bitmap);
+        }
+
     }
 }

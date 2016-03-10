@@ -61,8 +61,6 @@ public class DBUtil {
     //返回所有歌曲id
     public static ArrayList<Long> getAllSongsId() {
 
-
-
         //获得今天日期
         Calendar today = Calendar.getInstance();
         today.setTime(new Date());
@@ -453,7 +451,7 @@ public class DBUtil {
         return -1;
     }
 
-    //删除某一首歌曲
+    //删除歌曲
     public static boolean deleteSong(String data,int type)
     {
 
@@ -465,7 +463,6 @@ public class DBUtil {
         int ret = 0;
         boolean ret2 = false;
 
-        //删除sd卡上文件
         switch (type) {
             case Constants.DELETE_SINGLE:
                 where = new String(MediaStore.MediaColumns.DATA + "=?");
@@ -484,14 +481,18 @@ public class DBUtil {
                 break;
         }
         Cursor cursor = null;
+        //删除其他
         if(type != Constants.DELETE_FOLDER) {
             try {
-                cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.Media.DATA},
+                cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.Media.DATA,
+                        MediaStore.Audio.Media._ID},
                         where, arg, null);
                 if (cursor != null) {
                     while (cursor.moveToNext()) {
-                        String path = cursor.getString(0);
+                        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                         ret2 = CommonUtil.deleteFile(path);
+                        //删除正在播放列表
+                        mPlayingList.remove(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
                     }
                 }
             }catch (Exception e){
@@ -502,6 +503,7 @@ public class DBUtil {
             }
 
         }
+        //删除文件夹
         else {
             try {
                 for(int i = 0 ; i < list.size() ;i++){
@@ -532,16 +534,22 @@ public class DBUtil {
             for (Long id : list) {
                 ret += resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, where,
                         new String[]{String.valueOf(id)});
+                //删除正在播放列表中该歌曲
+                mPlayingList.remove(id);
             }
         }
         if (ret > 0) {
             //删除播放列表与全部歌曲列表中该歌曲
             mAllSongList = getAllSongsId();
-            mPlayingList = XmlUtil.getPlayingList();
+            XmlUtil.updatePlayingList();
+            XmlUtil.updatePlaylist();
+//            mPlayingList = XmlUtil.getPlayingList();
 //            DBUtil.mFolderMap.remove(data);
             if (FolderAdapter.mInstance != null)
                 FolderAdapter.mInstance.notifyDataSetChanged();
         }
+        if(cursor != null)
+            cursor.close();
         return ret > 0 && ret2;
     }
 

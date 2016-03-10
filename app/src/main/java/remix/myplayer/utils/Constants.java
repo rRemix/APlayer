@@ -71,6 +71,7 @@ public class Constants {
     public final static int CHILDHOLDERACTIVITY = 2;
     public final static int RECENTLYACTIVITY = 3;
     public final static int PLAYLISTACTIVITY = 4;
+    public final static int LOCKSCREENACTIIVITY = 5;
 
     //扫描文件大小设置
     public static int SCAN_SIZE = 512000;

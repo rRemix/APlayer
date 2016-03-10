@@ -52,7 +52,7 @@
         </activity>
 
         <activity android:name=".activities.LockScreenActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/LockScreenDialog" />
 
         <activity android:name=".activities.ChildHolderActivity"/>
 
@@ -145,6 +145,13 @@
         <receiver android:name=".receivers.LineCtlReceiver">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".receivers.ScreenReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.SCREEN_ON"/>
+                <action android:name="android.intent.action.SCREEN_OFF"/>
             </intent-filter>
         </receiver>
 

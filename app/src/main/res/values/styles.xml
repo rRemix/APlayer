@@ -123,6 +123,16 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
+    <!--锁屏-->
+    <style name="LockScreenDialog" parent="AppTheme.NoActionBar.Translucent">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
     <!--定时关闭-->
     <style name="PopupTimer" parent="@style/AppTheme.PopupOverlay" >
         <item name="android:windowAnimationStyle">@style/popwin_anim_style</item>
