@@ -4,6 +4,7 @@ package remix.myplayer.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -37,9 +38,8 @@ import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.fragments.MainFragment;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.listeners.LockScreenListener;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.services.NotifyService;
-import remix.myplayer.services.ScreenService;
 import remix.myplayer.services.TimerService;
 import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.CommonUtil;
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     private ImageButton mSlideMenuAbout;
     private ImageButton mSlideMenuExit;
     private ActionBarDrawerToggle mDrawerToggle;
-
+    private static boolean isFirst = true;
     @Override
     protected void onResume() {
         super.onResume();
@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
+        startActivity(intent);
 
         initUtil();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -90,16 +92,17 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         mInstance = this;
 
         mFromNotify = getIntent().getBooleanExtra("Notify", false);
-        if (!mFromNotify) {
+        if (isFirst) {
             loadsongs();
             startService(new Intent(this, MusicService.class));
             //NofityService
-            startService(new Intent(this, NotifyService.class));
+//            startService(new Intent(this, NotifyService.class));
             //定时
-            Intent startIntent = new Intent(this, TimerService.class);
-            startService(startIntent);
+            startService(new Intent(this, TimerService.class));
             //锁屏
-            startService(new Intent(this, ScreenService.class));
+//            startService(new Intent(this, ScreenService.class));
+            new LockScreenListener(getApplicationContext()).beginListen();
+
         }
         //播放的service
         MusicService.addCallback(MainActivity.this);

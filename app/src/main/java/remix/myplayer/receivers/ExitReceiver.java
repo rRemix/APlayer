@@ -9,6 +9,7 @@ import android.content.Intent;
 import java.util.List;
 
 import remix.myplayer.activities.MainActivity;
+import remix.myplayer.listeners.LockScreenListener;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.services.NotifyService;
 import remix.myplayer.services.TimerService;
@@ -33,9 +34,12 @@ public class ExitReceiver extends BroadcastReceiver {
             NotifyService.mInstance.stopSelf();
             TimerService.mInstance.stopSelf();
             ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
-            }catch (Exception e){
-                e.printStackTrace();
+            if(LockScreenListener.mInstance != null){
+                LockScreenListener.mInstance.stopListen();
             }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
 
     }

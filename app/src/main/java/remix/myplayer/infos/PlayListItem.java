@@ -14,7 +14,7 @@ public class PlayListItem {
         this.mAlbumId = AlbumId;
     }
 
-    public String getmSongame() {
+    public String getSongame() {
         return mSongName;
     }
 
@@ -44,5 +44,11 @@ public class PlayListItem {
                 "SongName='" + mSongName + '\'' +
                 ", Id=" + mId +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        PlayListItem item = (PlayListItem)o;
+        return item.getId() == mId;
     }
 }

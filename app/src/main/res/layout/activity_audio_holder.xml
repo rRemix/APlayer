@@ -5,6 +5,12 @@
     android:id="@+id/audio_holder_container"
     android:background="@color/transparent">
 
+    <!--<ImageView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:id="@+id/image_test"-->
+        <!--android:scaleType="centerCrop"/>-->
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:id="@+id/blur_container"
@@ -15,7 +21,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:id="@+id/top_actionbar">
+            android:id="@+id/top_actionbar"
+            android:layout_marginTop="10dp">
             <ImageButton
                 style="@style/TopImageButton"
                 android:layout_centerVertical="true"

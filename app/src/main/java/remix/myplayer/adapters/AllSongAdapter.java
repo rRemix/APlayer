@@ -32,7 +32,7 @@ import remix.myplayer.utils.DBUtil;
 public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
     public static AllSongAdapter mInstance;
     private Context mContext;
-    private Cursor mCurosr;
+    private Cursor mCursor;
     private ColumnView mColumnView;
     //0:专辑 1:歌手
     private int mType = 0;
@@ -42,7 +42,7 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
         mContext = context;
     }
     public void setCursor(Cursor mCursor) {
-        this.mCurosr = mCursor;
+        this.mCursor = mCursor;
     }
     public void setType(int mType) {
         this.mType = mType;
@@ -63,14 +63,14 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
         else
             holder = (ViewHolder)convertView.getTag();
 
-        if(!mCurosr.moveToPosition(position))
+        if(!mCursor.moveToPosition(position))
             return convertView;
 
-        String name = mCurosr.getString(AllSongFragment.mDisPlayNameIndex);
+        String name = mCursor.getString(AllSongFragment.mDisPlayNameIndex);
         name = name.substring(0, name.lastIndexOf("."));
         final MP3Info currentMP3 = MusicService.getCurrentMP3();
         if(currentMP3 != null){
-            boolean flag = mCurosr.getInt(AllSongFragment.mSongId) == MusicService.getCurrentMP3().getId();
+            boolean flag = mCursor.getInt(AllSongFragment.mSongId) == MusicService.getCurrentMP3().getId();
             holder.mName.setTextColor(flag ? Color.parseColor("#782899") : Color.parseColor("#ffffffff"));
             mColumnView = (ColumnView)convertView.findViewById(R.id.columnview);
             mColumnView.setVisibility(flag ? View.VISIBLE : View.GONE);
@@ -84,16 +84,16 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
             }
 
             else if(!MusicService.getIsplay() && mColumnView.getStatus()){
-                Log.d("AllSongAdapter","停止动画 -- 歌曲名字:" + mCurosr.getString(AllSongFragment.mDisPlayNameIndex));
+                Log.d("AllSongAdapter","停止动画 -- 歌曲名字:" + mCursor.getString(AllSongFragment.mDisPlayNameIndex));
                 mColumnView.stopAnim();
             }
         }
         holder.mName.setText(name);
 
-        String artist = mCurosr.getString(AllSongFragment.mArtistIndex);
-        String album = mCurosr.getString(AllSongFragment.mAlbumIndex);
+        String artist = mCursor.getString(AllSongFragment.mArtistIndex);
+        String album = mCursor.getString(AllSongFragment.mAlbumIndex);
         holder.mOther.setText(artist + "-" + album);
-        ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mCurosr.getString(AllSongFragment.mAlbumIdIndex),
+        ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mCursor.getString(AllSongFragment.mAlbumIdIndex),
                 holder.mImage);
 
         final ImageView mItemButton = (ImageView)convertView.findViewById(R.id.allsong_item_button);

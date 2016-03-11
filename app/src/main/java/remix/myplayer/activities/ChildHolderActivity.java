@@ -69,7 +69,7 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
                     ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(Title);
                     ArrayList<String> names = new ArrayList<>();
                     for(PlayListItem item : list)
-                        names.add(item.getmSongame());
+                        names.add(item.getSongame());
                     mInfoList = DBUtil.getMP3ListByNames(names);
                     break;
             }

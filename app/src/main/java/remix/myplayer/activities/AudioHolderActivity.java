@@ -98,6 +98,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     private Bitmap mNewBitMap;
     private boolean mFromNotify = false;
     private boolean mFromMainActivity = false;
+    private ImageView mImageTest;
     private Handler mBlurHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -105,6 +106,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
                 //设置高度模糊的背景
 //                mContainer.startAnimation(mAnimOut);
                 mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
+//                mImageTest.setImageBitmap(mNewBitMap);
                 //更新专辑封面
                 ((CoverFragment) mAdapter.getItem(1)).UpdateCover(DBUtil.CheckBitmapBySongId((int)mInfo.getId(),false),!mFistStart);
                 if(mFistStart)
@@ -120,8 +122,9 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mInstance = this;
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_audio_holder);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+//        mImageTest = (ImageView)findViewById(R.id.image_test);
 
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         mFromMainActivity =  getIntent().getBooleanExtra("FromMainActivity",false);
@@ -476,7 +479,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
 //            Bitmap bmp2 = Bitmap.createBitmap(bmp1, 0, otherheight,bmp1.getWidth(), bmp1.getHeight() - otherheight);
 
             float radius = 25;
-            float scaleFactor = 14;
+            float scaleFactor = 15;
             if (mWidth > 0 && mHeight > 0 ) {
                 if(mInfo == null) return;
                 Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
@@ -486,10 +489,10 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
                 mNewBitMap = Bitmap.createBitmap((int) (mWidth / scaleFactor), (int) (mHeight / scaleFactor), Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(mNewBitMap);
 //                canvas.translate(-mContainer.getLeft() / scaleFactor, -mContainer.getTop() / scaleFactor);
-//                canvas.scale(1 / scaleFactor, 1 / scaleFactor);
+//                canvas.scale(scaleFactor,  scaleFactor);
                 Paint paint = new Paint();
                 paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-                paint.setAlpha((int)(255 * 0.4));
+                paint.setAlpha((int)(255 * 0.6));
                 canvas.drawBitmap(bkg, 0, 0, paint);
                 mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
                 //获得当前背景

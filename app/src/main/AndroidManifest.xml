@@ -15,12 +15,10 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
     <uses-permission android:name="android.permission.GET_TASKS" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
-    <uses-permission android:name="android.permission.DEVICE_POWER"/>
+
     <application
         android:allowBackup="true"
-        android:icon="@drawable/aplayer_icon"
+        android:icon="@mipmap/sideaplayer_icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -52,7 +50,10 @@
         </activity>
 
         <activity android:name=".activities.LockScreenActivity"
-            android:theme="@style/LockScreenDialog" />
+            android:theme="@style/LockScreenDialog"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleInstance"/>
 
         <activity android:name=".activities.ChildHolderActivity"/>
 
@@ -148,10 +149,9 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receivers.ScreenReceiver">
+        <receiver android:name=".receivers.NotifyReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.SCREEN_ON"/>
-                <action android:name="android.intent.action.SCREEN_OFF"/>
+                <action android:name="remix.music.NOTIFY"/>
             </intent-filter>
         </receiver>
 
@@ -164,8 +164,12 @@
         <service android:name=".services.MusicService"/>
         <service android:name=".services.TimerService"/>
         <service android:name=".services.NotifyService"/>
-        <service android:name=".services.ScreenService"/>
-
+        <!--<service android:name=".services.NotifyListener"-->
+            <!--android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.service.notification.NotificationListenerService" />-->
+            <!--</intent-filter>-->
+        <!--</service>-->
     </application>
 
 </manifest>

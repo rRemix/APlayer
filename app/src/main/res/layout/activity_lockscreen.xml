@@ -1,47 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/lockscreen_container">
+    android:id="@+id/lockscreen_container"
+    android:background="#fff">
 
-    <com.facebook.drawee.view.SimpleDraweeView
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/image_test"
+        android:visibility="visible"
+        android:scaleType="centerCrop"/>
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:layout_gravity="center"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:id="@+id/lockscreen_image"
         fresco:placeholderImage="@drawable/artist_empty_bg"
-        fresco:placeholderImageScaleType="fitXY"
-        android:scaleType="fitXY"/>
+        fresco:placeholderImageScaleType="centerCrop"
+        fresco:actualImageScaleType="centerCrop"
+        android:scaleType="centerCrop"
+        fresco:roundAsCircle="true"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="110dp"/>
 
     <LinearLayout
+        android:id="@+id/lockscreen_detail_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_gravity="left|top"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="40dp">
-        <TextView
-            android:id="@+id/lockscreen_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00:00"
-            android:textSize="24dp"
-            android:textColor="@color/text_color_blank"/>
-        <TextView
-            android:id="@+id/lockscreen_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textSize="@dimen/textsize_large"
-            android:textColor="@color/text_color_gray_1"
-            android:text="1月1日 星期一"/>
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:layout_below="@id/lockscreen_image">
         <TextView
             android:id="@+id/lockscreen_song"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textSize="@dimen/textsize_large"
+            android:textSize="@dimen/textsize_huge"
             android:textColor="@color/text_color_blank"
             android:text="歌曲"/>
         <TextView
@@ -59,8 +58,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:layout_marginBottom="80dp"
-        android:layout_gravity="bottom">
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/lockscreen_detail_container">
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -91,7 +90,10 @@
         android:textSize="@dimen/textsize_huge"
         android:textColor="@color/text_color_gray"
         android:text="滑动解锁"
-        android:layout_gravity="bottom|center_horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"/>
 
-</FrameLayout>
+
+
+</RelativeLayout>

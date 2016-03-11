@@ -1,12 +1,16 @@
 package remix.myplayer.activities;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.Animatable;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.net.Uri;
@@ -29,12 +33,15 @@ import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
+import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.interfaces.DraweeHierarchy;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -46,16 +53,20 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import remix.myplayer.R;
 import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.listeners.CtrlButtonListener;
 import remix.myplayer.services.MusicService;
+import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.XmlUtil;
 
 /**
  * Created by Remix on 2016/3/9.
@@ -63,9 +74,8 @@ import remix.myplayer.utils.DBUtil;
 public class LockScreenActivity extends Activity implements MusicService.Callback{
     private WindowManager mWmManager;
     private final static String TAG = "LockScreenActivity";
+    public static LockScreenActivity mInstance;
     private MP3Info mInfo;
-    private TextView mTime;
-    private TextView mDate;
     private TextView mSong;
     private TextView mArtist;
     private String[] mDayWeekStrs = new String[]{"一","二","三","四","五","六","天"};
@@ -73,38 +83,44 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
     private ImageButton mNextBUtton;
     private ImageButton mPlayButton;
     private ImageButton mLoveButton;
-    private FrameLayout mContainer;
+    private RelativeLayout mContainer;
     private View mView;
     private static boolean mIsRunning = false;
+    public static boolean mIsDestory = true;
     private SimpleDraweeView mImage;
-    private int mWidth;
-    private GestureDetector mDetector;
+    private ImageView mImageTest;
     private Postprocessor mProcessor;
     private ImageRequest mImageRequest;
-    private Handler mTimeHandler = new Handler(){
+    private Bitmap mNewBitMap;
+    private int mWidth;
+    private int mHeight;
+    private boolean mIsLove = false;
+    private Handler mBlurHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            mTime.setText(msg.arg1 + ":" + (msg.arg2 < 10 ? "0" + msg.arg2 : msg.arg2));
+//            mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
+            mImageTest.setImageBitmap(mNewBitMap);
         }
     };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lockscreen);
-
+        mIsDestory = false;
+        mInstance = this;
         if((mInfo = MusicService.getCurrentMP3()) == null)
             return;
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         mWidth = metric.widthPixels;
-
+        mHeight = metric.heightPixels;
         MusicService.addCallback(this);
         //解锁屏幕并全屏
         WindowManager.LayoutParams attr = getWindow().getAttributes();
-        attr.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+//        attr.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
         attr.flags |= WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
         attr.flags |= WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
-
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         //初始化按钮
         mPrevButton = (ImageButton)findViewById(R.id.playbar_prev);
         mNextBUtton = (ImageButton)findViewById(R.id.playbar_next);
@@ -117,13 +133,11 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         mPlayButton.setOnClickListener(listener);
 
         //初始化界面
+        mImageTest = (ImageView)findViewById(R.id.image_test);
         mImage = (SimpleDraweeView)findViewById(R.id.lockscreen_image);
-        mTime = (TextView)findViewById(R.id.lockscreen_time);
-        mDate = (TextView)findViewById(R.id.lockscreen_date);
         mSong = (TextView)findViewById(R.id.lockscreen_song);
         mArtist = (TextView)findViewById(R.id.lockscreen_artist);
-        mContainer = (FrameLayout)findViewById(R.id.lockscreen_container);
-        mDetector = new GestureDetector(this,new SimGesDetectorListener());
+        mContainer = (RelativeLayout)findViewById(R.id.lockscreen_container);
 
         mProcessor = new BasePostprocessor() {
             @Override
@@ -139,6 +153,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
             }
         };
         mView = getWindow().getDecorView();
+        mView.setBackgroundColor(getResources().getColor(R.color.transparent));
     }
 
 
@@ -150,6 +165,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         int action = event.getAction();
         Log.d(TAG,"scollX:" + mView.getScrollX() + "\r\n");
 
+        ObjectAnimator animator = null;
         switch (action){
             case MotionEvent.ACTION_DOWN:
                 mScrollX1 = event.getX();
@@ -159,8 +175,16 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
                 mDistance = mScrollX2 - mScrollX1;
                 mScrollX1 = mScrollX2;
                 //如果往右或者是往左没有超过最左边,移动View
-                if(mDistance > 0 || ((mView.getScrollX() + (-mDistance)) < 0))
-                    mView.scrollBy((int)-mDistance,0);
+                if(mDistance > 0 || ((mView.getScrollX() + (-mDistance)) < 0)) {
+                    mView.scrollBy((int) -mDistance, 0);
+//                    try {
+//                        animator = ObjectAnimator.ofInt(mView,"ScrollX",(int)-mDistance);
+//                        animator.setDuration(20);
+//                        animator.start();
+//                    } catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+                }
                 Log.d(TAG,"distance:" + mDistance + "\r\n");
                 break;
             case MotionEvent.ACTION_UP:
@@ -168,8 +192,12 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
                 //超过则finish;没有则移动回初始状态
                 if(-mView.getScrollX() > mWidth * 0.25)
                     finish();
-                else
-                    mView.scrollTo(0,0);
+                else {
+//                    mView.scrollTo(0, 0);
+                    animator = ObjectAnimator.ofInt(mView,"ScrollX",0);
+                    animator.setDuration(20);
+                    animator.start();
+                }
                 mDistance = mScrollX1 = 0;
                 break;
         }
@@ -190,11 +218,17 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mIsDestory = true;
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         mIsRunning = true;
         UpdateUI(mInfo,MusicService.getIsplay());
-        new TimeThread().start();
+//        new TimeThread().start();
     }
 
 
@@ -203,18 +237,25 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         mInfo = MP3info;
         if(!mIsRunning )
             return;
-        //日期
-        Calendar c = Calendar.getInstance();
-        int day_week = c.get(Calendar.DAY_OF_WEEK);
-        int month = c.get(Calendar.MONTH);
-        int day_month = c.get(Calendar.DAY_OF_MONTH);
-        mDate.setText(month + "月" + day_month + "日" + "  星期" + mDayWeekStrs[day_week]);
+        if(AudioHolderActivity.mOperation == Constants.PLAYORPAUSE){
+            mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.wy_lock_btn_pause : R.drawable.wy_lock_btn_play));
+            return;
+        }
         //标题
         mSong.setText(mInfo.getDisplayname());
         mArtist.setText(mInfo.getArtist());
+        //收藏
+        mIsLove = false;
+        ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get("我的收藏");
+        for(PlayListItem item : list){
+            if(item.getId() == mInfo.getId()){
+                mIsLove = true;
+            }
+        }
+        mLoveButton.setImageResource(mIsLove ? R.drawable.wy_lock_btn_loved : R.drawable.wy_lock_btn_love);
+
         mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.wy_lock_btn_pause : R.drawable.wy_lock_btn_play));
         //背景
-
         mImageRequest = ImageRequestBuilder.newBuilderWithSource(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()))
                 .setPostprocessor(mProcessor)
                 .build();
@@ -226,7 +267,9 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
                         // other setters as you need
                         .build();
         mImage.setController(controller);
-//        mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
+
+
+        new BlurThread().start();
     }
 
     /**
@@ -247,36 +290,54 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
     }
 
     public void onLove(View v){
+        if(mInfo == null)
+            return;
+        if(!mIsLove){
+            XmlUtil.addSong("我的收藏",mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId());
+        } else {
+            XmlUtil.deleteSong("我的收藏",new PlayListItem(mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId()));
+        }
+        mIsLove = !mIsLove;
+        mLoveButton.setImageResource(mIsLove ? R.drawable.wy_lock_btn_loved : R.drawable.wy_lock_btn_love);
+    }
+
+    public boolean IsDestory(){
+        return mIsDestory;
+    }
+
+    @Override
+    public void onBackPressed() {
 
     }
 
-
-    class SimGesDetectorListener extends GestureDetector.SimpleOnGestureListener{
+    //高斯模糊线程
+    class BlurThread extends Thread{
         @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            try {
-                Log.d(TAG,"distanceX:" + distanceX);
-                Log.d(TAG,"X:" + mView.getX());
-                Log.d(TAG,"scollX:" + mView.getScrollX() + "\n");
+        public void run() {
+            long start = System.currentTimeMillis();
+            //对专辑图片进行高斯模糊，并将其设置为背景
+            float radius = 25;
+            float scaleFactor = 15;
+            if (mWidth > 0 && mHeight > 0 ) {
+                if(mInfo == null) return;
+                Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
+                if (bkg == null)
+                    bkg = BitmapFactory.decodeResource(getResources(), R.drawable.bg_lockscreen_default);
 
-
-                //判断滑动后的位置是否比最左边还远
-                if((mView.getScrollX() + distanceX) > 0)
-                    return super.onScroll(e1, e2, distanceX, distanceY);
-                //当前位置划过三分之一finish
-                if(-mView.getScrollX() > mWidth * 0.3)
-                    finish();
-
-                mView.scrollBy((int)distanceX,0);
+                mNewBitMap = Bitmap.createBitmap((int) (mWidth / scaleFactor), (int) (mHeight / scaleFactor), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(mNewBitMap);
+//                canvas.translate(-mContainer.getLeft() / scaleFactor, -mContainer.getTop() / scaleFactor);
+//                canvas.scale(1 / scaleFactor, 1 / scaleFactor);
+                Paint paint = new Paint();
+                paint.setFlags(Paint.FILTER_BITMAP_FLAG);
+                paint.setAlpha((int)(255 * 0.6));
+                canvas.drawBitmap(bkg, 0, 0, paint);
+                mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
 
             }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-
-            return super.onScroll(e1, e2, distanceX, distanceY);
+            Log.d(TAG,"mill: " + (System.currentTimeMillis() - start));
+            mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
         }
-
     }
 
     //更新时间线程
@@ -292,7 +353,6 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
                 msg.arg1 = hour;
                 msg.arg2 = minute;
                 msg.what = sec;
-                mTimeHandler.sendMessage(msg);
                 try {
                     sleep(1000);
                 } catch (InterruptedException e){
@@ -301,4 +361,5 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
             }
         }
     }
+
 }

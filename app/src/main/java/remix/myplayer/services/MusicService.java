@@ -176,7 +176,8 @@ public class MusicService extends Service {
                         break;
                 }
                 mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
-                NotifyService.mInstance.UpdateNotify();
+//                NotifyService.mInstance.UpdateNotify();
+                sendBroadcast(new Intent(Constants.NOTIFY));
             }
         };
         int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","Pos",-1);
@@ -251,7 +252,8 @@ public class MusicService extends Service {
                 //更新锁屏界面
                 UpdateLockScreen();
                 //更新通知栏
-                NotifyService.mInstance.UpdateNotify();
+                sendBroadcast(new Intent(Constants.NOTIFY));
+//                NotifyService.mInstance.UpdateNotify();
                 //更新所有Activity
             }
         });
@@ -272,9 +274,9 @@ public class MusicService extends Service {
 
     private void UpdateLockScreen() {
         if(mInfo != null) {
-            Bitmap bitmap = DBUtil.CheckBitmapByAlbumId((int) mInfo.getAlbumId(), false);
-            if(bitmap == null)
-                bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
+//            Bitmap bitmap = DBUtil.CheckBitmapByAlbumId((int) mInfo.getAlbumId(), false);
+//            if(bitmap == null)
+//                bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
 //            mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
 //                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
 //                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mInfo.getDisplayname())
@@ -424,9 +426,8 @@ public class MusicService extends Service {
     {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Boolean close = intent.getExtras().getBoolean("Close");
-            NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
             if(intent.getExtras().getBoolean("Close")){
+                NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                 manager.cancel(0);
                 return;
             }
@@ -477,10 +478,15 @@ public class MusicService extends Service {
 //            if(intent.getBooleanExtra("FromNotify", false)){
 //                NotifyService.mInstance.UpdateNotify();
 //            }
-            NotifyService.mInstance.UpdateNotify();
-            if(Control == Constants.NEXT || Control == Constants.PREV || Control == Constants.PLAYSELECTEDSONG) {
+//            NotifyService.mInstance.UpdateNotify();
+            if(Control == Constants.NEXT ||
+                    Control == Constants.PREV ||
+                    Control == Constants.PLAYSELECTEDSONG ||
+                    Control == Constants.PLAYORPAUSE) {
                 //更新锁屏界面
                 UpdateLockScreen();
+                //更新通知栏
+                sendBroadcast(new Intent(Constants.NOTIFY));
             }
         }
     }

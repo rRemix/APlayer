@@ -50,6 +50,8 @@ public class XmlUtil {
     {
         mContext = context;
     }
+
+
     public static Map<String,ArrayList<PlayListItem>> getPlayList(String name)  {
         Map<String,ArrayList<PlayListItem>> map = new HashMap<String,ArrayList<PlayListItem>>();
         XmlPullParser parser = Xml.newPullParser();
@@ -169,24 +171,22 @@ public class XmlUtil {
             updatePlaylist();
         }
     }
-    public static void addPlaylist(String name)
-    {
+
+    public static void addPlaylist(String name) {
         if(name != null && !name.equals("")) {
             PlayListActivity.mPlaylist.put(name, new ArrayList<PlayListItem>());
             updatePlaylist();
         }
     }
-    public static void deleteSong(String name,String song)
-    {
-        if(!name.equals("") && !song.equals("")) {
+    public static void deleteSong(String name,PlayListItem item) {
+        if(!item.getSongame().equals("") && !name.equals("")) {
             ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
-            list.remove(song);
+            boolean ret = list.remove(item);
             updatePlaylist();
         }
     }
 
-    public static void addSong(String name,String song,int id,int album_id)
-    {
+    public static void addSong(String name,String song,int id,int album_id) {
         if(!name.equals("") && !song.equals("")) {
             ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
             list.add(new PlayListItem(song,id,album_id));
@@ -199,7 +199,7 @@ public class XmlUtil {
             ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
             for (int i = 0; i < list.size(); i++) {
                 PlayListItem tmp = list.get(i);
-                if (tmp.getmSongame().equals(_old)){
+                if (tmp.getSongame().equals(_old)){
                     tmp.setSongName(_new);
                     tmp.setId(id);
                 }
@@ -225,7 +225,7 @@ public class XmlUtil {
                 for(int i = 0 ; i < list.size() ;i++)
                 {
                     parser.startTag(null,"song");
-                    parser.attribute(null,"name",list.get(i).getmSongame());
+                    parser.attribute(null,"name",list.get(i).getSongame());
                     parser.attribute(null,"id",String.valueOf(list.get(i).getId()));
                     parser.attribute(null,"albumid",String.valueOf(list.get(i).getAlbumId()));
                     parser.endTag(null,"song");

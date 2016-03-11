@@ -48,33 +48,6 @@ public class NotifyService extends Service {
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-
-//        new Thread(){
-//            @Override
-//            public void run(){
-//                String packagename = getApplicationContext().getPackageName();
-//                //每0.1秒检测是否app切换到前台，如果是，关闭通知栏
-//                while(true){
-//                    try {
-//                        ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
-//                        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
-//                        if (!tasks.isEmpty()) {
-//                            ComponentName topActivity = tasks.get(0).topActivity;
-//                            if (topActivity.getPackageName().equals(packagename)) {
-//                                mNotificationManager.cancel(0);
-//                                mIsForeground = true;
-//                            }else {
-//                                mIsForeground = false;
-//                            }
-//                        }
-//                        sleep(100);
-//                    }catch (Exception e){
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//            }
-//        }.start();
     }
     @Override
     public void onDestroy() {
