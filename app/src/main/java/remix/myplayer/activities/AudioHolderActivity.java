@@ -41,6 +41,7 @@ import remix.myplayer.listeners.CtrlButtonListener;
 import remix.myplayer.services.MusicService;
 
 import remix.myplayer.ui.AudioViewPager;
+import remix.myplayer.ui.LrcView;
 import remix.myplayer.ui.PlayingListPopupWindow;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
@@ -298,6 +299,8 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser)
                     mHandler.sendEmptyMessage(Constants.UPDATE_TIME_ONLY);
+                if(LrcView.mInstance != null)
+                    LrcView.mInstance.seekTo(progress,fromUser);
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -492,7 +495,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
 //                canvas.scale(scaleFactor,  scaleFactor);
                 Paint paint = new Paint();
                 paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-                paint.setAlpha((int)(255 * 0.6));
+                paint.setAlpha((int)(255 * 0.4));
                 canvas.drawBitmap(bkg, 0, 0, paint);
                 mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
                 //获得当前背景

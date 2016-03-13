@@ -448,6 +448,7 @@ public class MusicService extends Service {
                     break;
                 //暂停或者继续播放
                 case Constants.PLAYORPAUSE:
+                    mIsplay = !mIsplay;
                     PlayOrPause();
                     break;
                 //暂停
@@ -499,6 +500,7 @@ public class MusicService extends Service {
                 return;
 //            mRemoteCtrlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
             mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING,getCurrentTime()));
+            mIsplay = true;
             mPlayer.reset();
             mPlayer.setDataSource(path);
             mPlayer.prepareAsync();

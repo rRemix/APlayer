@@ -27,32 +27,26 @@ public class LrcFragment extends Fragment {
     private static int NO_LRC = 2;
     private static int NO_NETWORK = 3;
     private MP3Info mInfo;
-    private LrcView mTextLrc;
+    private LrcView mLrcView;
     private LinkedList<LrcInfo> mTextList;
     private Handler mHandler = new Handler()
     {
         @Override
         public void handleMessage(Message msg)
         {
-            if(msg.what == UPDATE_LRC)
-            {
-                if(mTextList != null && mTextLrc != null)
-                {
-                    mTextLrc.setText("");
-                    mTextLrc.mlrcList = mTextList;
+            if(msg.what == UPDATE_LRC) {
+                if(mTextList != null && mLrcView != null) {
+//                    mLrcView.setText("");
+                    mLrcView.UpdateLrc(mTextList);
                 }
-            }
-            else if (msg.what == NO_LRC)
-            {
-                mTextLrc.mlrcList = null;
-                mTextLrc.setText("");
-                mTextLrc.setText("暂无歌词");
-            }
-            else if (msg.what == NO_NETWORK)
-            {
-                mTextLrc.mlrcList = null;
-                mTextLrc.setText("");
-                mTextLrc.setText("请检查网络连接");
+            } else if (msg.what == NO_LRC) {
+                mLrcView.UpdateLrc(null);
+//                mLrcView.setText("");
+//                mLrcView.setText("暂无歌词");
+            } else if (msg.what == NO_NETWORK) {
+                mLrcView.UpdateLrc(null);
+//                mLrcView.setText("");
+//                mLrcView.setText("请检查网络连接");
             }
         }
     };
@@ -60,9 +54,9 @@ public class LrcFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.lrc,container,false);
+        View rootView = inflater.inflate(R.layout.fragment_lrc,container,false);
         mInfo = (MP3Info)getArguments().getSerializable("MP3Info");
-        mTextLrc = (LrcView)rootView.findViewById(R.id.lrc_text);
+        mLrcView = (LrcView)rootView.findViewById(R.id.lrc_text);
         UpdateLrc(mInfo);
         return rootView;
     }

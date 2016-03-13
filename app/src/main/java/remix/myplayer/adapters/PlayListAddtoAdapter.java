@@ -43,8 +43,7 @@ public class PlayListAddtoAdapter extends BaseAdapter{
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        if(convertView == null)
-        {
+        if(convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.playlist_addto_item,null);
             holder = new ViewHolder();
             holder.mText = (TextView)convertView.findViewById(R.id.playlist_addto_text);
@@ -64,8 +63,7 @@ public class PlayListAddtoAdapter extends BaseAdapter{
         return convertView;
     }
 
-    class ViewHolder
-    {
+    class ViewHolder {
         private TextView mText;
     }
 }

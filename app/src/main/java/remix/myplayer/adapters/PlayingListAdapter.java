@@ -59,8 +59,7 @@ public class PlayingListAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        if(convertView == null)
-        {
+        if(convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.playinglist_item,null);
             holder = new ViewHolder(convertView);
             convertView.setTag(holder);
@@ -80,8 +79,7 @@ public class PlayingListAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View v) {
                     DBUtil.mPlayingList.remove(temp.getId());
-                    if(temp.getId() == MusicService.getCurrentMP3().getId())
-                    {
+                    if(temp.getId() == MusicService.getCurrentMP3().getId()) {
                         Intent intent = new Intent(Constants.CTL_ACTION);
                         intent.putExtra("Control", Constants.NEXT);
                         mContext.sendBroadcast(intent);

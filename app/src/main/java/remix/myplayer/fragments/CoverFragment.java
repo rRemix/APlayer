@@ -93,8 +93,7 @@ public class CoverFragment extends Fragment {
             else if (AudioHolderActivity.mOperation == Constants.NEXT)
                 mImage.startAnimation(mLeftAnimation);
         } else {
-            mImage.setImageBitmap(bitmap);
+            mImage.setImageBitmap(bitmap == null ? BitmapFactory.decodeResource(getResources(),R.drawable.no_art_normal) : mNewBitmap);
         }
-
     }
 }
