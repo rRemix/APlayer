@@ -26,10 +26,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.net.URL;
 import java.util.HashMap;
 
-import cn.sharesdk.framework.Platform;
-import cn.sharesdk.framework.PlatformActionListener;
-import cn.sharesdk.framework.ShareSDK;
-import cn.sharesdk.onekeyshare.OnekeyShare;
+
 import remix.myplayer.R;
 import remix.myplayer.adapters.FolderAdapter;
 import remix.myplayer.adapters.AllSongAdapter;
@@ -109,42 +106,12 @@ public class SelectedPopupWindow extends Activity {
         mShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(SelectedPopupWindow.this,SharePopupWindow.class);
-//                Bundle arg = new Bundle();
-//                arg.putSerializable("MP3Info",mInfo);
-//                intent.putExtras(arg);
-//                startActivity(intent);
-
-                ShareSDK.initSDK(SelectedPopupWindow.this);
-                OnekeyShare oks = new OnekeyShare();
-                oks.disableSSOWhenAuthorize();
-
-                oks.setTitle("分享测试");
-//                oks.setTitleUrl("http://sharesdk.cn");
-                oks.setText("分享一首好歌: " + mInfo.getArtist() + "的" + "《" + mInfo.getDisplayname() + "》");
-                oks.setUrl("http://sharesdk.cn");
-//                oks.setComment("我是测试评论文本");
-//                oks.setImageUrl(DBUtil.CheckUrlByAlbumId(mInfo.getAlbumId()));
-                oks.setSite(getString(R.string.app_name));
-//                oks.setSiteUrl("http://sharesdk.cn");
-                oks.setSilent(false);
-                oks.setCallback(new PlatformActionListener() {
-                    @Override
-                    public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
-                        Toast.makeText(SelectedPopupWindow.this,"分享成功",Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onError(Platform platform, int i, Throwable throwable) {
-                        Toast.makeText(SelectedPopupWindow.this,"分享失败",Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onCancel(Platform platform, int i) {
-                        Toast.makeText(SelectedPopupWindow.this,"分享取消",Toast.LENGTH_SHORT).show();
-                    }
-                });
-                oks.show(SelectedPopupWindow.this);
+                Intent intent = new Intent(SelectedPopupWindow.this,SharePopupWindow.class);
+                Bundle arg = new Bundle();
+                arg.putSerializable("MP3Info",mInfo);
+                arg.putInt("Type",Constants.SHARESONG);
+                intent.putExtras(arg);
+                startActivity(intent);
                 finish();
             }
         });

@@ -234,8 +234,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy() {
         super.onDestroy();
     }
 

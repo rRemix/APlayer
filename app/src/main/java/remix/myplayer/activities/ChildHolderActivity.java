@@ -37,10 +37,12 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     private ChildHolderAdapter mAdapter;
     public static ChildHolderActivity mInstance = null;
     private CircleImageView mCircleView;
+    private TextView mTextTest;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mInstance = this;
+        setContentView(R.layout.activity_child_holder);
         //绑定控制播放的service;
         MusicService.addCallback(ChildHolderActivity.this);
 
@@ -74,9 +76,30 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
                     break;
             }
         }
+
+//        mTextTest = (TextView)findViewById(R.id.audio_text_test);
+//        if(mInfoList == null){
+//            mTextTest.setText("没有数据");
+//            return;
+//        }
+//        if(mInfoList.size() == 0) {
+//            mTextTest.setText("列表为空");
+//            return;
+//        }
+//
+//        StringBuilder sb = new StringBuilder();
+//        for(int i = 0 ; i < mInfoList.size() ; i++){
+//            sb.append(mInfoList.get(i).toString() + "\r\n");
+//        }
+//        if(mInfoList != null && mInfoList.size() > 0) {
+//            mTextTest.setText(sb.toString());
+//            return;
+//        }
+
+
         if(mInfoList == null || mInfoList.size() == 0)
             return;
-        setContentView(R.layout.activity_child_holder);
+
         mListView = (ListView)findViewById(R.id.artist_album_holder_list);
         mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),this);
         mListView.setAdapter(mAdapter);

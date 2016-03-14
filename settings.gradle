@@ -1,2 +1,2 @@
-include ':app', ':mainlib', ':onekeyshare'
+include ':app'
 include ':viewpageindicator'

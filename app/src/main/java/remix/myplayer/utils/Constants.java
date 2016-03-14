@@ -73,6 +73,10 @@ public class Constants {
     public final static int PLAYLISTACTIVITY = 4;
     public final static int LOCKSCREENACTIIVITY = 5;
 
-    //扫描文件大小设置
+    //扫描文件默认大小设置
     public static int SCAN_SIZE = 512000;
+
+    //分享心情还是歌曲
+    public final static int SHARESONG = 1;
+    public final static int SHARERECORD = 0;
 }

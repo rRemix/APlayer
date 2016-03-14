@@ -372,20 +372,17 @@ public class DBUtil {
         ArrayList<MP3Info> mlist = new ArrayList<>();
         Cursor cursor = null;
         try {
-            for(int i = 0 ; i < list.size(); i++)
-            {
+            for(int i = 0 ; i < list.size(); i++) {
                 cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                         null,
                         MediaStore.Audio.Media.TITLE + "=?" + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,
                         new String[]{list.get(i)}, null);
                 cursor.moveToFirst();
-                if (cursor != null && cursor.getCount() > 0)
-                {
+                if (cursor != null && cursor.getCount() > 0) {
                     mlist.add(getMP3Info(cursor));
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         finally {

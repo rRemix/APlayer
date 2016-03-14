@@ -36,7 +36,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginBottom="5dp"/>
             <TextView
-                android:id="@+id/notify_artist"
+                android:id="@+id/notify_artist_album"
                 android:text="歌手名-专辑"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.service.notification.NotificationListenerService;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -309,7 +310,10 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             home.addCategory(Intent.CATEGORY_HOME);
             startActivity(home);
-            sendBroadcast(new Intent(Constants.NOTIFY));
+            Intent intent = new Intent(Constants.NOTIFY);
+            intent.putExtra("FromMainActivity",true);
+            sendBroadcast(intent);
+            
         }
     }
 

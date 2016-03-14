@@ -10,6 +10,7 @@
         android:textColor="#50452f"
         android:textSize="14dp"
         android:hint="写点什么吧"
+        android:text="心情分享测试"
         android:padding="15dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="22dp"

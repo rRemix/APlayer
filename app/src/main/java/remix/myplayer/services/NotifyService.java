@@ -81,7 +81,7 @@ public class NotifyService extends Service {
                 MP3Info temp = MusicService.getCurrentMP3();
                 //设置歌手，歌曲名
                 mRemoteView.setTextViewText(R.id.notify_song, temp.getDisplayname());
-                mRemoteView.setTextViewText(R.id.notify_artist, temp.getArtist());
+                mRemoteView.setTextViewText(R.id.notify_artist_album, temp.getArtist());
                 //设置封面
                 Bitmap bitmap = DBUtil.CheckBitmapBySongId((int) temp.getId(), true);
                 if(bitmap != null)
