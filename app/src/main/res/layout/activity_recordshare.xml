@@ -1,61 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/text_color_blank">
-    <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize">
-    </android.support.v7.widget.Toolbar>
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:background="#f4f4f5">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="16dp"
-        android:background="@color/background_color_interval"/>
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:id="@+id/record_container">
-        <ImageView
-            android:padding="15dp"
-            android:layout_gravity="center_horizontal"
+        android:padding="6dp"
+        android:paddingTop="0dp"
+        android:id="@+id/recordshare_container">
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="5"
-            android:id="@+id/share_image"
-            android:src="@drawable/artist_empty_bg"
-            android:scaleType="centerCrop"/>
-
-        <TextView
-            android:layout_margin="15dp"
-            android:padding="15dp"
-            android:background="#f0f"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="5"
-            android:id="@+id/share_text"
-            android:textSize="@dimen/textsize_huge"
-            android:textColor="@color/text_color_blank"/>
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/recordshare_image"
+                android:layout_gravity="center_horizontal"
+                android:scaleType="centerCrop"/>
+            <LinearLayout
+                android:id="@+id/recordshare_content_container"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_gravity="bottom|center_horizontal"
+                android:orientation="vertical"
+                android:background="#000000">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginLeft="18dp"
+                    android:id="@+id/recordshare_name_artist"
+                    android:textSize="20sp"
+                    android:textColor="@color/text_color_blank"
+                    android:gravity="center_vertical"/>
+                <ImageView
+                    android:layout_marginLeft="18dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="1px"
+                    android:src="@drawable/divider2"/>
+                <TextView
+                    android:layout_marginLeft="18dp"
+                    android:paddingTop="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/recordshare_content"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_color_blank"/>
+            </LinearLayout>
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="34dp"
             android:orientation="horizontal"
-            android:gravity="center">
-            <Button
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:background="#f4f4f5">
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="分享"
-                android:onClick="onShare"
-                android:layout_marginRight="40dp"/>
-            <Button
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/share_player_icon"/>
+            <TextView
+                android:layout_marginLeft="12dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="保存"/>
+                android:text="来自APlayer播放器"
+                android:layout_gravity="center_vertical"
+                android:textColor="#a09f9d"
+                android:textSize="@dimen/textsize_medium"/>
         </LinearLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#000000"
+        android:orientation="horizontal"
+        android:id="@+id/recordshare_button_container"
+        android:layout_gravity="bottom">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:onClick="onShare"
+            android:gravity="center">
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="12dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/bg_btn_activity_share"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_color_blank"
+                android:textSize="16sp"
+                android:text="分享"/>
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/divider1"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:onClick="onCancel">
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="12dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/bg_btn_activity_cancel"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_color_blank"
+                android:textSize="16sp"
+                android:text="取消"/>
+        </LinearLayout>
+
     </LinearLayout>
 
-</LinearLayout>
+
+
+
+</FrameLayout>

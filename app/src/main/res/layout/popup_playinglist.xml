@@ -10,7 +10,7 @@
         android:gravity="center"
         android:layout_gravity="center_horizontal"
         android:text="正在播放列表"
-        android:textSize="16dp"
+        android:textSize="@dimen/textsize_large"
         android:textColor="#002"
         android:background="#EFEEED"/>
     <LinearLayout

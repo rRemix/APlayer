@@ -20,6 +20,8 @@ import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.sina.weibo.sdk.api.share.Base;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,7 +40,7 @@ import remix.myplayer.utils.XmlUtil;
 /**
  * Created by taeja on 16-1-15.
  */
-public class PlayListActivity extends AppCompatActivity  implements MusicService.Callback{
+public class PlayListActivity extends BaseToolbarActivity implements MusicService.Callback{
     public static PlayListActivity mInstance = null;
     private RecyclerView mRecycleView;
     private PlayListAdapter mAdapter;
@@ -85,36 +87,37 @@ public class PlayListActivity extends AppCompatActivity  implements MusicService
 
 
         //初始化tooblar
-        initToolbar();
+        mToolBar = (Toolbar) findViewById(R.id.toolbar);
+        initToolbar(mToolBar,"播放列表");
     }
 
-    private void initToolbar() {
-        mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        mToolBar.setTitle("播放列表");
-        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
-        setSupportActionBar(mToolBar);
-        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.toolbar_search:
-                        startActivity(new Intent(PlayListActivity.this, SearchActivity.class));
-                        break;
-                    case R.id.toolbar_timer:
-                        startActivity(new Intent(PlayListActivity.this, TimerPopupWindow.class));
-                        break;
-                }
-                return true;
-            }
-        });
-    }
+//    private void initToolbar() {
+//        mToolBar = (Toolbar) findViewById(R.id.toolbar);
+//        mToolBar.setTitle("播放列表");
+//        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
+//        setSupportActionBar(mToolBar);
+//        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
+//        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+//            }
+//        });
+//        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//                switch (item.getItemId()) {
+//                    case R.id.toolbar_search:
+//                        startActivity(new Intent(PlayListActivity.this, SearchActivity.class));
+//                        break;
+//                    case R.id.toolbar_timer:
+//                        startActivity(new Intent(PlayListActivity.this, TimerPopupWindow.class));
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
+//    }
 
     public void onAdd(View v)
     {

@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <ImageView
-        android:layout_margin="10dp"
-        android:layout_marginTop="20dp"
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:layout_margin="15dp"
+        android:layout_marginTop="25dp"
         android:layout_centerInParent="true"
         android:id="@+id/cover_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/no_art_normal" />
+        android:layout_width="328dp"
+        android:layout_height="328dp"
+        android:src="@drawable/no_art_normal"
+        fresco:failureImage="@drawable/no_art_normal"
+        fresco:failureImageScaleType="centerCrop"
+        fresco:roundedCornerRadius="8dp"/>
 </RelativeLayout>

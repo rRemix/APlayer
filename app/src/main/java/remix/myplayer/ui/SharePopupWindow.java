@@ -3,7 +3,6 @@ package remix.myplayer.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -126,7 +125,7 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
                 if(mType == Constants.SHARESONG)
                     shareSongtoWeibo();
                 else
-                    ShareMindtoWeibo();
+                    shareMindtoWeibo();
 
             }
         });
@@ -147,6 +146,7 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
         });
     }
 
+    //分享心情到qq
     private void shareMindtoQQ() {
         Bundle params = new Bundle();
         params.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, Uri.parse(mImageUrl.toString()).toString());
@@ -154,7 +154,7 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
         params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
         mTencentApi.shareToQQ(SharePopupWindow.this, params, mQQListener);
     }
-
+    //分享歌曲到qq
     private void shareSongtoQQ() {
         Bundle bundle = new Bundle();
         String album_url = DBUtil.CheckUrlByAlbumId(mInfo.getAlbumId());
@@ -170,6 +170,7 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
         mTencentApi.shareToQQ(SharePopupWindow.this, bundle, mQQListener);
     }
 
+    //分享歌曲到微博
     private void shareSongtoWeibo() {
         TextObject textObject = new TextObject();
         textObject.text = "推荐一首好歌：" + mInfo.getArtist() +
@@ -182,14 +183,15 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
         mWeiboApi.sendRequest(SharePopupWindow.this, request);
     }
 
-    private void ShareMindtoWeibo(){
+    //分享心情到微博
+    private void shareMindtoWeibo(){
 //        TextObject textObject = new TextObject();
 //        textObject.text = "推荐一首好歌：" + mInfo.getArtist() +
 //                "的《" + mInfo.getDisplayname() + "》，" + " 来自@" + getResources().getString(R.string.app_name) + "安卓客户端";
         ImageObject imageObject = new ImageObject();
+        imageObject.imagePath = mImageUrl;
         imageObject.setImageObject(RecordShareActivity.getBg());
         WeiboMultiMessage msg = new WeiboMultiMessage();
-//                    msg.textObject  = textObject;
         msg.imageObject = imageObject;
         SendMultiMessageToWeiboRequest request = new SendMultiMessageToWeiboRequest();
         request.transaction = String.valueOf(System.currentTimeMillis());
@@ -216,14 +218,18 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
         }
     }
 
+    //分享心情到微信
     private void shareMindtoWeChat(View v) {
         WXImageObject imgObj = new WXImageObject();
         imgObj.setImagePath(mImageUrl);
+
         WXMediaMessage msg = new WXMediaMessage();
         msg.mediaObject = imgObj;
+
         //设置缩略图
-        Bitmap thumbBmp = Bitmap.createScaledBitmap(RecordShareActivity.getBg(), 150, 150, true);
-        msg.thumbData = CommonUtil.bmpToByteArray(thumbBmp, true);  // 设置缩略图
+//        Bitmap thumbBmp = Bitmap.createScaledBitmap(RecordShareActivity.getBg(), 150, 150, true);
+//        msg.thumbData = CommonUtil.bmpToByteArray(thumbBmp, true);
+
         //发送请求
         SendMessageToWX.Req req = new SendMessageToWX.Req();
         req.transaction = buildTransaction("img");
@@ -232,6 +238,7 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
         mWechatApi.sendReq(req);
     }
 
+    //分享歌曲到微信
     private void shareSongtoWechat(View v) {
         WXTextObject textObject = new WXTextObject();
         textObject.text = "推荐一首好歌：" + mInfo.getArtist() +
@@ -243,7 +250,7 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
                 "的《" + mInfo.getDisplayname() + "》";
         SendMessageToWX.Req req = new SendMessageToWX.Req();
         req.scene = v.getId() == R.id.share_wechat ? SendMessageToWX.Req.WXSceneSession : SendMessageToWX.Req.WXSceneTimeline;
-        req.transaction = buildTransaction("img"); // transaction字段用于唯一标识一个请求
+        req.transaction = buildTransaction("text"); // transaction字段用于唯一标识一个请求
         req.message = msg;
         mWechatApi.sendReq(req);
     }
@@ -272,6 +279,9 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
                         Toast.LENGTH_LONG).show();
                 break;
         }
+//        if(RecordShareActivity.mInstance != null){
+//            RecordShareActivity.mInstance.finish();
+//        }
         finish();
     }
 
@@ -284,23 +294,33 @@ public class SharePopupWindow extends Activity implements IWeiboHandler.Response
         if(requestCode != 765)
             Tencent.onActivityResultData(requestCode,resultCode,data, mQQListener);
     }
+
     //qq分享回调接口
     private class BaseUiListener implements IUiListener
     {
         @Override
         public void onComplete(Object o) {
             Toast.makeText(SharePopupWindow.this,"分享成功",Toast.LENGTH_SHORT).show();
+//            if(RecordShareActivity.mInstance != null){
+//                RecordShareActivity.mInstance.finish();
+//            }
             finish();
         }
 
         @Override
         public void onError(UiError uiError) {
             Toast.makeText(SharePopupWindow.this,"分享失败",Toast.LENGTH_SHORT).show();
+//            if(RecordShareActivity.mInstance != null){
+//                RecordShareActivity.mInstance.finish();
+//            }
             finish();
         }
         @Override
         public void onCancel() {
             Toast.makeText(SharePopupWindow.this,"分享取消",Toast.LENGTH_SHORT).show();
+//            if(RecordShareActivity.mInstance != null){
+//                RecordShareActivity.mInstance.finish();
+//            }
             finish();
         }
     }

@@ -17,7 +17,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#3C3C3C"
-                android:textSize="18dp"
+                android:textSize="@dimen/textsize_huge"
                 android:lines="1"
                 android:ellipsize="end"
                 android:text="未知专辑"/>
@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#30000000"
-                android:textSize="12dp"
+                android:textSize="@dimen/textsize_small"
                 android:text="0首"/>
         </LinearLayout>
         <ImageView

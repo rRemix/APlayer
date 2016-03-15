@@ -1,64 +1,102 @@
 package remix.myplayer.activities;
 
+import android.app.ProgressDialog;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 import remix.myplayer.R;
 import remix.myplayer.infos.MP3Info;
-import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.SharePopupWindow;
-import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.DensityUtil;
 
 /**
  * Created by taeja on 16-3-14.
  */
 public class RecordShareActivity extends AppCompatActivity {
+    public static RecordShareActivity mInstance;
     private ImageView mImage;
-    private TextView mText;
+    private TextView mSongArtist;
+    private TextView mContent;
     private View mView;
     private static Bitmap mBackgroudCache;
     private Toolbar mToolBar;
-    private LinearLayout mContainer;
+    private RelativeLayout mContainer;
     private MP3Info mInfo;
+    private ProgressDialog mProgressDialog;
+    private final int START = 0;
+    private final int STOP = 1;
+    private final int COMPLETE = 2;
+    private final int ERROR = 3;
+    private File mFile;
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case START:
+                    mProgressDialog = ProgressDialog.show(RecordShareActivity.this,"请稍候","图片处理中",true,false);
+                    break;
+                case STOP:
+                    if(mProgressDialog != null)
+                        mProgressDialog.dismiss();
+                    break;
+                case COMPLETE:
+                    if(mFile != null)
+                        Toast.makeText(RecordShareActivity.this, "截屏文件已保存至" + mFile.getAbsolutePath(),Toast.LENGTH_LONG).show();
+                    break;
+                case ERROR:
+                    Toast.makeText(RecordShareActivity.this,"分享失败",Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mInstance = this;
         setContentView(R.layout.activity_recordshare);
-        initToolbar();
-        mImage = (ImageView)findViewById(R.id.share_image);
-        mText = (TextView)findViewById(R.id.share_text);
+
+        mImage = (ImageView)findViewById(R.id.recordshare_image);
+        mSongArtist = (TextView)findViewById(R.id.recordshare_name_artist);
+        mContent = (TextView)findViewById(R.id.recordshare_content);
         mView = getWindow().getDecorView();
-        mContainer = (LinearLayout)findViewById(R.id.record_container);
+        mContainer = (RelativeLayout)findViewById(R.id.recordshare_container);
         mContainer.setDrawingCacheEnabled(true);
+
+        findViewById(R.id.recordshare_content_container).setAlpha((float)0.8);
+
         mInfo = (MP3Info)getIntent().getExtras().getSerializable("MP3Info");
         if(mInfo == null)
             return;
-        Bitmap bitmap = DBUtil.CheckBitmapByAlbumId((int)mInfo.getAlbumId(),false);
 
-        mImage.setImageBitmap(bitmap == null ? BitmapFactory.decodeResource(getResources(),R.drawable.artist_empty_bg) : bitmap);
-//        mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), temp.getAlbumId()));
-        mText.setText(getIntent().getExtras().getString("Content"));
+        mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
+        mContent.setText(getIntent().getExtras().getString("Content"));
+        mSongArtist.setText("《" + mInfo.getDisplayname() + "》 " + mInfo.getArtist());
     }
 
     public static Bitmap getBg(){
@@ -66,66 +104,54 @@ public class RecordShareActivity extends AppCompatActivity {
     }
 
     public void onShare(View v){
-        mBackgroudCache = mContainer.getDrawingCache(true);
-        mImage.setImageBitmap(mBackgroudCache);
-
-        File file = null;
-        try {
-            file = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + getPackageName() + "/record.png");
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            FileOutputStream fos = null;
-            fos = new FileOutputStream(file);
-            if (null != fos) {
-                mBackgroudCache.compress(Bitmap.CompressFormat.PNG, 90, fos);
-                fos.flush();
-                fos.close();
-                Toast.makeText(this, "截屏文件已保存至" + file.getAbsolutePath(),
-                        Toast.LENGTH_LONG).show();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this,"分享失败",Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Intent intent = new Intent(this, SharePopupWindow.class);
-        Bundle arg = new Bundle();
-        arg.putInt("Type", Constants.SHARERECORD);
-//        arg.putSerializable("Bitmap",mBackgroudCache);
-        arg.putString("Url",file.getAbsolutePath());
-        arg.putSerializable("MP3Info",mInfo);
-        intent.putExtras(arg);
-        startActivity(intent);
+        new ProcessThread().start();
     }
 
-    private void initToolbar() {
-        mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        mToolBar.setTitle("分享");
-        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
-        setSupportActionBar(mToolBar);
-        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.toolbar_search:
-                        startActivity(new Intent(RecordShareActivity.this, SearchActivity.class));
-                        break;
-                    case R.id.toolbar_timer:
-                        startActivity(new Intent(RecordShareActivity.this, TimerPopupWindow.class));
-                        break;
+    public void onCancel(View v){
+        finish();
+    }
+
+    class ProcessThread extends Thread{
+        FileOutputStream fos = null;
+        @Override
+        public void run() {
+            mHandler.sendEmptyMessage(START);
+            mBackgroudCache = mContainer.getDrawingCache(true);
+            mFile = null;
+            try {
+                mFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + getPackageName() + "/record.png");
+                if (!mFile.exists()) {
+                    mFile.createNewFile();
                 }
-                return true;
+                fos = new FileOutputStream(mFile);
+                if (null != fos) {
+                    mBackgroudCache.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                    fos.flush();
+                    fos.close();
+                }
+                mHandler.sendEmptyMessage(COMPLETE);
+                mHandler.sendEmptyMessage(STOP);
+
+            } catch (Exception e) {
+                mHandler.sendEmptyMessage(ERROR);
+                e.printStackTrace();
+            } finally {
+                if(fos != null)
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
             }
-        });
+
+            Intent intent = new Intent(RecordShareActivity.this, SharePopupWindow.class);
+            Bundle arg = new Bundle();
+            arg.putInt("Type", Constants.SHARERECORD);
+            arg.putString("Url",mFile.getAbsolutePath());
+            arg.putSerializable("MP3Info",mInfo);
+            intent.putExtras(arg);
+            startActivity(intent);
+        }
     }
+
 }

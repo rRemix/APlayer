@@ -12,6 +12,7 @@ import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 
+import remix.myplayer.activities.RecordShareActivity;
 import remix.myplayer.ui.SharePopupWindow;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.SharedPrefsUtil;
@@ -48,21 +49,23 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler{
             String result = "";
             switch (baseResp.errCode) {
                 case BaseResp.ErrCode.ERR_OK:
-                    result = "发送成功";
+                    result = "分享成功";
                     break;
                 case BaseResp.ErrCode.ERR_USER_CANCEL:
-                    result = "发送取消";
+                    result = "分享取消";
                     break;
                 case BaseResp.ErrCode.ERR_AUTH_DENIED:
-                    result = "发送失败";
+                    result = "分享失败";
                     break;
                 default:
-                    result = "位置错误";
+                    result = "未知错误";
                     break;
             }
             Toast.makeText(this, result, Toast.LENGTH_LONG).show();
             SharePopupWindow.mInstance.finish();
         }
-
+//        if(RecordShareActivity.mInstance != null){
+//            RecordShareActivity.mInstance.finish();
+//        }
     }
 }

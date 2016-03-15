@@ -24,7 +24,7 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by taeja on 16-3-4.
  */
-public class RecetenlyActivity extends AppCompatActivity  implements MusicService.Callback{
+public class RecetenlyActivity extends BaseToolbarActivity  implements MusicService.Callback{
     private RecentlyAdapter mAdapter;
     private Toolbar mToolBar;
     private ListView mListView;
@@ -36,7 +36,9 @@ public class RecetenlyActivity extends AppCompatActivity  implements MusicServic
         setContentView(R.layout.activity_recently);
         MusicService.addCallback(RecetenlyActivity.this);
         initListView();
-        initToolbar();
+
+        mToolBar = (Toolbar) findViewById(R.id.toolbar);
+        initToolbar(mToolBar,"最近添加");
     }
 
     private void initListView() {
@@ -68,33 +70,33 @@ public class RecetenlyActivity extends AppCompatActivity  implements MusicServic
         sendBroadcast(intent);
     }
 
-    private void initToolbar() {
-        mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        mToolBar.setTitle("最近添加");
-        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
-        setSupportActionBar(mToolBar);
-        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.toolbar_search:
-                        startActivity(new Intent(RecetenlyActivity.this, SearchActivity.class));
-                        break;
-                    case R.id.toolbar_timer:
-                        startActivity(new Intent(RecetenlyActivity.this, TimerPopupWindow.class));
-                        break;
-                }
-                return true;
-            }
-        });
-    }
+//    private void initToolbar() {
+//        mToolBar = (Toolbar) findViewById(R.id.toolbar);
+//        mToolBar.setTitle("最近添加");
+//        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
+//        setSupportActionBar(mToolBar);
+//        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
+//        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+//            }
+//        });
+//        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//                switch (item.getItemId()) {
+//                    case R.id.toolbar_search:
+//                        startActivity(new Intent(RecetenlyActivity.this, SearchActivity.class));
+//                        break;
+//                    case R.id.toolbar_timer:
+//                        startActivity(new Intent(RecetenlyActivity.this, TimerPopupWindow.class));
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
+//    }
 
 
     @Override

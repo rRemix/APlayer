@@ -19,10 +19,9 @@ import remix.myplayer.ui.TimerPopupWindow;
 /**
  * Created by taeja on 16-3-7.
  */
-public class SettingActivity extends AppCompatActivity {
+public class SettingActivity extends BaseToolbarActivity {
     private ListView mListView;
     private Toolbar mToolBar;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,7 +50,8 @@ public class SettingActivity extends AppCompatActivity {
         });
 
         //初始化tooblar
-        initToolbar();
+        mToolBar = (Toolbar) findViewById(R.id.toolbar);
+        initToolbar(mToolBar,"设置");
     }
 
     private void initToolbar() {

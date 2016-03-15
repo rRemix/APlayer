@@ -12,6 +12,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.sina.weibo.sdk.api.share.Base;
+
 import java.util.ArrayList;
 
 import remix.myplayer.R;
@@ -23,7 +25,7 @@ import remix.myplayer.utils.SharedPrefsUtil;
 /**
  * Created by taeja on 16-3-7.
  */
-public class ScanActivity extends AppCompatActivity {
+public class ScanActivity extends BaseToolbarActivity {
     private Toolbar mToolBar;
     private CustomSeekBar mCustomSeekbar;
     private int mPosition;
@@ -46,7 +48,8 @@ public class ScanActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
-        initToolbar();
+        mToolBar = (Toolbar) findViewById(R.id.toolbar);
+        initToolbar(mToolBar,"返回");
         initSeekbar();
     }
 

@@ -30,7 +30,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:id="@+id/playlist_cancel"
-            android:textSize="16dp"
+            android:textSize="@dimen/textsize_large"
             android:layout_marginRight="24dp"
             android:text="取消"/>
         <TextView
@@ -38,7 +38,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:id="@+id/playlist_continue"
-            android:textSize="16dp"
+            android:textSize="@dimen/textsize_large"
             android:textColor="@color/progress_complete"
             android:layout_marginRight="16dp"
             android:text="继续"/>

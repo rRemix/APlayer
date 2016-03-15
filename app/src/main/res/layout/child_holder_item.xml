@@ -19,7 +19,7 @@
             android:lines="1"
             android:ellipsize="end"
             android:text="歌曲名"
-            android:textSize="16dp"
+            android:textSize="@dimen/textsize_large"
             android:textColor="@color/text_color_blank"/>
         <!--<TextView-->
         <!--android:layout_width="match_parent"-->

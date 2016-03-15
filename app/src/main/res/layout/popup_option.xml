@@ -51,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textColor="#1b1c19"
-                android:textSize="15dp"
+                android:textSize="15sp"
                 android:text="加入"/>
         </LinearLayout>
 
@@ -94,7 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textSize="15dp"
+                android:textSize="15sp"
                 android:textColor="#6d6c69"
                 android:text="分享"/>
         </LinearLayout>
@@ -116,7 +116,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textSize="15dp"
+                android:textSize="15sp"
                 android:textColor="#6d6c69"
                 android:text="删除"/>
         </LinearLayout>

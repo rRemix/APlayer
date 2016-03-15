@@ -9,7 +9,7 @@
         android:layout_height="48dp"
         android:text="伴着音乐入睡"
         android:textColor="#1c1b19"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:paddingLeft="32dp"
         android:gravity="left|center_vertical" />
 
@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/close_time"
-            android:textSize="24dp"
+            android:textSize="24sp"
             android:textColor="#1b1c19"
             android:text="00:00min"/>
     </FrameLayout>
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#272628"
-            android:textSize="13dp"
+            android:textSize="13sp"
             android:text="设为默认"
             android:layout_marginRight="8dp"/>
         <Switch
@@ -81,7 +81,7 @@
             android:layout_marginBottom="5dp"
             android:gravity="center"
             android:text="设为默认后下次点击'定时停止'按钮将直接开始计时"
-            android:textSize="8dp"
+            android:textSize="8sp"
             android:textColor="#b2b1b2"/>
         <TextView
             android:layout_width="match_parent"
@@ -89,7 +89,7 @@
             android:layout_marginBottom="5dp"
             android:gravity="center"
             android:text="在开始计时时点击'定时停止'按钮可重新设置"
-            android:textSize="8dp"
+            android:textSize="8sp"
             android:textColor="#b2b1b2"/>
     </LinearLayout>
 

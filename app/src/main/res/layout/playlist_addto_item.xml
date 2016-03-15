@@ -9,7 +9,7 @@
         android:layout_marginBottom="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="17dp"
+        android:textSize="17sp"
         android:textColor="#001"
         android:text="歌单"
         android:gravity="center_vertical"/>

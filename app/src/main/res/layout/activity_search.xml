@@ -99,7 +99,7 @@
                 android:gravity="center"
                 android:text="无搜索历史"
                 android:textColor="@color/text_color_blank"
-                android:textSize="22dp"/>
+                android:textSize="@dimen/textsize_huge"/>
         </FrameLayout>
 
 
@@ -120,7 +120,7 @@
                 android:layout_marginTop="30dp"
                 android:gravity="center"
                 android:text="无搜索结果"
-                android:textSize="22dp"
+                android:textSize="22sp"
                 android:textColor="@color/text_color_blank"/>
         </FrameLayout>
 

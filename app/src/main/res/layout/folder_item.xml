@@ -20,7 +20,7 @@
             android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:id="@+id/folder_name"
-            android:textSize="12dp"
+            android:textSize="@dimen/textsize_small"
             android:textColor="@color/text_color_blank"
             android:text="文件夹名"/>
         <TextView
@@ -29,7 +29,7 @@
             android:lines="1"
             android:ellipsize="end"
             android:id="@+id/folder_path"
-            android:textSize="10dp"
+            android:textSize="10sp"
             android:text="路径"
             android:textColor="@color/text_color_gray"/>
     </LinearLayout>
@@ -51,7 +51,7 @@
         android:layout_marginRight="18dp"
         android:layout_toLeftOf="@id/folder_button"
         android:id="@+id/folder_num"
-        android:textSize="12dp"
+        android:textSize="@dimen/textsize_small"
         android:text="__首"
         android:textColor="@color/text_color_blank"/>
 </RelativeLayout>

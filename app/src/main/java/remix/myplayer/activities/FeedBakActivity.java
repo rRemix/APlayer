@@ -19,7 +19,7 @@ import remix.myplayer.ui.TimerPopupWindow;
 /**
  * Created by taeja on 16-3-7.
  */
-public class FeedBakActivity extends AppCompatActivity {
+public class FeedBakActivity extends BaseToolbarActivity {
     private Toolbar mToolBar;
     private EditText mEditText;
     @Override
@@ -27,8 +27,9 @@ public class FeedBakActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback);
         mEditText = (EditText)findViewById(R.id.feedback_edittext);
-        
-        initToolbar();
+
+        mToolBar = (Toolbar) findViewById(R.id.toolbar);
+        initToolbar(mToolBar,"返回");
     }
 
     public void onSubmit(View v){
@@ -39,31 +40,31 @@ public class FeedBakActivity extends AppCompatActivity {
         startActivity(data);
     }
 
-    private void initToolbar() {
-        mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        mToolBar.setTitle("返回");
-        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
-        setSupportActionBar(mToolBar);
-        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.toolbar_search:
-                        startActivity(new Intent(FeedBakActivity.this, SearchActivity.class));
-                        break;
-                    case R.id.toolbar_timer:
-                        startActivity(new Intent(FeedBakActivity.this, TimerPopupWindow.class));
-                        break;
-                }
-                return true;
-            }
-        });
-    }
+//    private void initToolbar() {
+//        mToolBar = (Toolbar) findViewById(R.id.toolbar);
+//        mToolBar.setTitle("返回");
+//        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
+//        setSupportActionBar(mToolBar);
+//        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
+//        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+//            }
+//        });
+//        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem item) {
+//                switch (item.getItemId()) {
+//                    case R.id.toolbar_search:
+//                        startActivity(new Intent(FeedBakActivity.this, SearchActivity.class));
+//                        break;
+//                    case R.id.toolbar_timer:
+//                        startActivity(new Intent(FeedBakActivity.this, TimerPopupWindow.class));
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
+//    }
 }

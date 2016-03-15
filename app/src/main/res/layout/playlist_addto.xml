@@ -11,7 +11,7 @@
         android:ellipsize="end"
         android:textColor="#001"
         android:text="添加到本地歌单"
-        android:textSize="17dp"
+        android:textSize="17sp"
         android:id="@+id/playlist_addto_text"/>
     <ImageView
         android:layout_width="match_parent"
@@ -35,7 +35,7 @@
         android:onClick="onCancel"
         android:layout_gravity="center_horizontal"
         android:text="取消"
-        android:textSize="18dp"
+        android:textSize="@dimen/textsize_huge"
         android:textColor="@color/translucence"
         android:background="@drawable/bg_boder"
         android:layout_alignParentBottom="true"

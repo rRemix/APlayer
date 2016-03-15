@@ -12,7 +12,7 @@
         android:ellipsize="end"
         android:textColor="#001"
         android:text="分享到"
-        android:textSize="17dp"/>
+        android:textSize="17sp"/>
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="1px"
@@ -59,7 +59,7 @@
         android:id="@+id/popup_share_cancel"
         android:layout_gravity="center_horizontal"
         android:text="取消"
-        android:textSize="18dp"
+        android:textSize="@dimen/textsize_huge"
         android:textColor="@color/translucence"
         android:background="@drawable/bg_boder"/>
 </LinearLayout>

@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.Scroller;
+import android.widget.TextView;
 
 import java.util.LinkedList;
 
@@ -16,7 +17,7 @@ import remix.myplayer.infos.LrcInfo;
 /**
  * Created by Remix on 2015/12/8.
  */
-public class LrcView extends View {
+public class LrcView extends TextView {
     public static LrcView mInstance;
     private static final String TAG = LrcView.class.getSimpleName();
     private LinkedList<LrcInfo> mlrcList;
@@ -87,8 +88,10 @@ public class LrcView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if(mlrcList == null)
+        if(mlrcList == null){
+//            canvas.drawText("暂无歌词", mViewCenterX, getHeight() / 2, mPaint);
             return;
+        }
         if(mCurRow == -1)
             return;
         if(mTotalRow == 0){
@@ -114,9 +117,6 @@ public class LrcView extends View {
                     canvas.drawText(mlrcList.get(i).getSentence(), mViewCenterX, mCenterY, mPaint);
                 }
             }
-
-
-//
 
         } catch (Exception e) {
             e.printStackTrace();

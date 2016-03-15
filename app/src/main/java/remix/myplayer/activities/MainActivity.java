@@ -82,8 +82,6 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
-        startActivity(intent);
 
         initUtil();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -114,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
 
+        mToolBar = (Toolbar) findViewById(R.id.toolbar);
         initToolbar();
 
         if (DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)

@@ -35,7 +35,7 @@ import remix.myplayer.infos.MP3Info;
  */
 public class CoverFragment extends Fragment {
 
-    private ImageView mImage;
+    private SimpleDraweeView mImage;
     private Bitmap mBitmap;
     private MP3Info mInfo;
     private TranslateAnimation mLeftAnimation;
@@ -47,8 +47,8 @@ public class CoverFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mInfo = (MP3Info)getArguments().getSerializable("MP3Info");
         View rootView = inflater.inflate(R.layout.fragment_cover,container,false);
-        mImage = (ImageView)rootView.findViewById(R.id.cover_image);
-        if(mInfo != null && (mBitmap = DBUtil.CheckBitmapBySongId((int)mInfo.getId(),false)) != null)
+        mImage = (SimpleDraweeView)rootView.findViewById(R.id.cover_image);
+        if(mInfo != null)
             mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
         if(mLeftAnimation == null || mScaleAnimation == null || mRightAnimation == null)
         {
@@ -62,10 +62,11 @@ public class CoverFragment extends Fragment {
                 }
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    if(mNewBitmap != null)
-                        mImage.setImageBitmap(mNewBitmap);
-                    else
-                        mImage.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.no_art_normal));
+                    mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
+//                    if(mNewBitmap != null)
+//                        mImage.setImageBitmap(mNewBitmap);
+//                    else
+//                        mImage.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.no_art_normal));
                     mImage.startAnimation(mScaleAnimation);
                 }
 
@@ -81,19 +82,22 @@ public class CoverFragment extends Fragment {
 
     }
 
-    public void UpdateCover(Bitmap bitmap,boolean withAnim){
+    public void UpdateCover(MP3Info info,boolean withAnim){
         if(!isAdded())
             return;
         if (mImage == null)
             return;
-        mNewBitmap = bitmap;
+        if((mInfo = info) == null)
+            return;
+//        mNewBitmap = bitmap;
         if(withAnim){
             if(AudioHolderActivity.mOperation == Constants.PREV)
                 mImage.startAnimation(mRightAnimation);
             else if (AudioHolderActivity.mOperation == Constants.NEXT)
                 mImage.startAnimation(mLeftAnimation);
         } else {
-            mImage.setImageBitmap(bitmap == null ? BitmapFactory.decodeResource(getResources(),R.drawable.no_art_normal) : mNewBitmap);
+//            mImage.setImageBitmap(bitmap == null ? BitmapFactory.decodeResource(getResources(),R.drawable.no_art_normal) : mNewBitmap);
+            mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
         }
     }
 }

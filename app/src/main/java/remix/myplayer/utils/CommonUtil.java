@@ -60,6 +60,17 @@ public class CommonUtil {
         return result;
     }
 
+    //按比例压缩
+    public static Bitmap CompressByScale(Bitmap src){
+        BitmapFactory.Options newOpts = new BitmapFactory.Options();
+        //开始读入图片，此时把options.inJustDecodeBounds 设回true了
+        newOpts.inJustDecodeBounds = true;
+
+
+
+        return null;
+    }
+
     //高斯模糊
     public static Bitmap doBlur(Bitmap sentBitmap, int radius,
                                 boolean canReuseInBitmap)

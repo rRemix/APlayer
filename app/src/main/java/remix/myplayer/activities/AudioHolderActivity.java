@@ -22,6 +22,7 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -99,6 +100,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     private Bitmap mNewBitMap;
     private boolean mFromNotify = false;
     private boolean mFromMainActivity = false;
+    private boolean mFromBack = false;
     private ImageView mImageTest;
     private Handler mBlurHandler = new Handler() {
         @Override
@@ -109,7 +111,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
                 mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
 //                mImageTest.setImageBitmap(mNewBitMap);
                 //更新专辑封面
-                ((CoverFragment) mAdapter.getItem(1)).UpdateCover(DBUtil.CheckBitmapBySongId((int)mInfo.getId(),false),!mFistStart);
+                ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
                 if(mFistStart)
                     mFistStart = false;
             }
@@ -155,6 +157,7 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
             initButton();
             //初始化底部四个按钮
             initBottomButton();
+
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -400,13 +403,25 @@ public class AudioHolderActivity extends AppCompatActivity implements MusicServi
     @Override
     protected void onStart() {
         super.onStart();
-        if(!mFromNotify && mFromMainActivity)
+        if(!mFromNotify && mFromMainActivity) {
             overridePendingTransition(R.anim.slide_bottom_in, 0);
+            mFromMainActivity = false;
+        }
     }
+
+    @Override
+    public void onBackPressed() {
+        mFromBack = true;
+        super.onBackPressed();
+    }
+
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(0, R.anim.slide_bottom_out);
+        if(mFromBack) {
+            overridePendingTransition(0, R.anim.slide_bottom_out);
+            mFromBack = false;
+        }
     }
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay){
