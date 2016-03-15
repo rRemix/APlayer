@@ -235,8 +235,7 @@ public class DBUtil {
         String selection = null;
         String[] selectionArg = null;
 
-        switch (type)
-        {
+        switch (type) {
             case Constants.URL_ARTIST:
                 selection = MediaStore.Audio.Media.ARTIST_ID + "=" + arg;
                 selectionArg = null;

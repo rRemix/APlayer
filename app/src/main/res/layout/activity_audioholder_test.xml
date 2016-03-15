@@ -5,5 +5,6 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/audio_text_test"/>
+        android:id="@+id/audio_text_test"
+        android:text="测试界面"/>
 </LinearLayout>

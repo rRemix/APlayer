@@ -2,12 +2,15 @@ package remix.myplayer.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -20,11 +23,13 @@ import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.CircleImageView;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.ErrUtil;
 
 /**
  * Created by Remix on 2015/12/4.
  */
 public class ChildHolderActivity extends AppCompatActivity implements MusicService.Callback{
+    private final static String TAG = "ChildHolderActivity";
     private MusicService mService;
     private ImageView mBack;
     public static String mFLAG = "CHILD";
@@ -38,6 +43,8 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     public static ChildHolderActivity mInstance = null;
     private CircleImageView mCircleView;
     private TextView mTextTest;
+    private String mError = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,29 +59,34 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
         if(mId >= 0)
         {
             mInfoList = new ArrayList<>();
-            switch (type)
-            {
-                case Constants.ALBUM_HOLDER:
-                    mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ALBUM_HOLDER);
-                    break;
-                case Constants.ARTIST_HOLDER:
-                    mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST_HOLDER);
-                    break;
-                case Constants.FOLDER_HOLDER:
-                    mInfoList = DBUtil.getMP3ListByIds(DBUtil.mFolderMap.get(Title));
-                    Title = Title.substring(Title.lastIndexOf("/")+ 1,Title.length());
-//                    String bucket_display_name = DBUtil.mFolderList.get(mId);
-//                    mInfoList = DBUtil.getMP3ListByFolder(bucket_display_name);
-//                    Title = bucket_display_name;
-                    break;
-                case Constants.PLAYLIST_HOLDER:
-                    ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(Title);
-                    ArrayList<String> names = new ArrayList<>();
-                    for(PlayListItem item : list)
-                        names.add(item.getSongame());
-                    mInfoList = DBUtil.getMP3ListByNames(names);
-                    break;
+            try {
+                switch (type)
+                {
+                    case Constants.ALBUM_HOLDER:
+                        mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ALBUM_HOLDER);
+                        break;
+                    case Constants.ARTIST_HOLDER:
+                        mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST_HOLDER);
+                        break;
+                    case Constants.FOLDER_HOLDER:
+                        mInfoList = DBUtil.getMP3ListByIds(DBUtil.mFolderMap.get(Title));
+                        Title = Title.substring(Title.lastIndexOf("/")+ 1,Title.length());
+                        break;
+                    case Constants.PLAYLIST_HOLDER:
+                        ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(Title);
+                        ArrayList<String> names = new ArrayList<>();
+                        if(list == null)
+                            break;
+                        for(PlayListItem item : list)
+                            names.add(item.getSongame());
+                        mInfoList = DBUtil.getMP3ListByNames(names);
+                        break;
+
+                }
+            } catch (Exception e){
+                ErrUtil.writeError(TAG + "---getPlaylist---" + e.toString());
             }
+
         }
 
 //        mTextTest = (TextView)findViewById(R.id.audio_text_test);

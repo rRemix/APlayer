@@ -82,7 +82,7 @@ public class RecordShareActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recordshare);
 
         mImage = (ImageView)findViewById(R.id.recordshare_image);
-        mSongArtist = (TextView)findViewById(R.id.recordshare_name_artist);
+        mSongArtist = (TextView)findViewById(R.id.recordshare_name);
         mContent = (TextView)findViewById(R.id.recordshare_content);
         mView = getWindow().getDecorView();
         mContainer = (RelativeLayout)findViewById(R.id.recordshare_container);
@@ -96,7 +96,7 @@ public class RecordShareActivity extends AppCompatActivity {
 
         mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
         mContent.setText(getIntent().getExtras().getString("Content"));
-        mSongArtist.setText("《" + mInfo.getDisplayname() + "》 " + mInfo.getArtist());
+        mSongArtist.setText("《" + mInfo.getDisplayname() + "》 ");
     }
 
     public static Bitmap getBg(){

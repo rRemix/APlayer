@@ -53,6 +53,7 @@ public class RecordFragment extends Fragment{
                 if(event.getAction() == MotionEvent.ACTION_DOWN){
                     if(mEdit.getText().toString().equals("")){
                         Toast.makeText(getContext(),"请输入分享内容",Toast.LENGTH_SHORT).show();
+                        return false;
                     }
                     Intent intent = new Intent(getActivity(), RecordShareActivity.class);
                     Bundle arg = new Bundle();

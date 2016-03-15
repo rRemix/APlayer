@@ -46,6 +46,7 @@ import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.ErrUtil;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.XmlUtil;
 
@@ -181,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         XmlUtil.setContext(getApplicationContext());
         DBUtil.setContext(getApplicationContext());
         CommonUtil.setContext(getApplicationContext());
+        ErrUtil.setContext(getApplicationContext());
 
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
                 .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {

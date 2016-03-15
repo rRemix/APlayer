@@ -62,7 +62,7 @@
             android:id="@+id/playbar_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/background_color_1"
+            android:background="@color/background_color_3"
             android:src="@drawable/bf_but_play"/>
     </RelativeLayout>
 </RelativeLayout>

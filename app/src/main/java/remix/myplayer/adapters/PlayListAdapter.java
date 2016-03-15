@@ -1,5 +1,6 @@
 package remix.myplayer.adapters;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -24,6 +25,7 @@ import remix.myplayer.listeners.PopupListener;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.infos.PlayListItem;
+import remix.myplayer.utils.ErrUtil;
 
 /**
  * Created by taeja on 16-1-15.
@@ -53,55 +55,59 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
-        PlayListItem item = null;
-        String name = null;
-        for(int i = 0 ; i<= position ;i++) {
-            it.hasNext();
-            name = it.next().toString();
-        }
-        holder.mName.setText(name);
-
-        ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
-        if(list != null && list.size() > 0) {
-            AsynLoadImage task = new AsynLoadImage(holder.mImage);
-            task.execute(list.get(0).getAlbumId());
-        }
-
-        if(mOnItemClickLitener != null) {
-            holder.mImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mOnItemClickLitener.onItemClick(holder.mImage,position);
-                }
-            });
-        }
-        if(holder.mButton != null)
-        {
-            //第一次个列表为收藏列表，需要做点处理
-            if(position == 0){
-                holder.mButton.setImageResource(R.drawable.rcd_icn_love);
-                holder.mButton.setClickable(false);
-                holder.mButton.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));
-                return;
+        try {
+            Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
+            PlayListItem item = null;
+            String name = "";
+            for(int i = 0 ; i<= position ;i++) {
+                it.hasNext();
+                name = it.next().toString();
             }
-            holder.mButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Context wrapper = new ContextThemeWrapper(mContext, R.style.MyPopupMenu);
-                    final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-                    PlayListActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
-                    popupMenu.setOnMenuItemClickListener(new PopupListener(mContext, position, Constants.PLAYLIST_HOLDER, ""));
-                    popupMenu.setGravity(Gravity.END);
-                    popupMenu.show();
+            holder.mName.setText(name);
+
+            ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
+            if(list != null && list.size() > 0) {
+                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), list.get(0).getAlbumId()));
+            }
+
+            if(mOnItemClickLitener != null) {
+                holder.mImage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mOnItemClickLitener.onItemClick(holder.mImage,position);
+                    }
+                });
+            }
+
+            if(holder.mButton != null) {
+                //第一次个列表为收藏列表，需要做点处理
+                if(position == 0){
+                    holder.mButton.setImageResource(R.drawable.rcd_icn_love);
+                    holder.mButton.setClickable(false);
+                    holder.mButton.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));
+                    return;
                 }
-            });
+                holder.mButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Context wrapper = new ContextThemeWrapper(mContext, R.style.MyPopupMenu);
+                        final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
+                        PlayListActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
+                        popupMenu.setOnMenuItemClickListener(new PopupListener(mContext, position, Constants.PLAYLIST_HOLDER, ""));
+                        popupMenu.setGravity(Gravity.END);
+                        popupMenu.show();
+                    }
+                });
+            }
+        } catch (Exception e){
+            ErrUtil.writeError("PlayListAdapter" + "---onBindViewHolder---" + e.toString());
         }
+
     }
 
     @Override
     public int getItemCount() {
-        return PlayListActivity.mPlaylist.size();
+        return PlayListActivity.mPlaylist == null ? 0 : PlayListActivity.mPlaylist.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -116,22 +122,4 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         }
     }
 
-    class AsynLoadImage extends AsyncTask<Integer,Integer,String>
-    {
-        private final SimpleDraweeView mImage;
-        public AsynLoadImage(SimpleDraweeView imageView)
-        {
-            mImage = imageView;
-        }
-        @Override
-        protected String doInBackground(Integer... params) {
-            return DBUtil.getImageUrl(params[0] + "", Constants.URL_ALBUM);
-        }
-        @Override
-        protected void onPostExecute(String url) {
-            Uri uri = Uri.parse("file:///" + url);
-            if(url != null && mImage != null)
-                mImage.setImageURI(uri);
-        }
-    }
 }

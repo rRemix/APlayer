@@ -98,10 +98,13 @@ public class XmlUtil {
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            ErrUtil.writeError(TAG + "---getPlayList---" + e.toString());
         } catch (XmlPullParserException e) {
             e.printStackTrace();
+            ErrUtil.writeError(TAG + "---getPlayList---" + e.toString());
         } catch (IOException e) {
             e.printStackTrace();
+            ErrUtil.writeError(TAG + "---getPlayList---" + e.toString());
         }
         finally {
                 try {
@@ -149,10 +152,12 @@ public class XmlUtil {
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            ErrUtil.writeError(TAG + "---getPlayingList---" + e.toString());
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            ErrUtil.writeError(TAG + "---getPlayingList---" + e.toString());
         }
         finally {
             try {
@@ -237,9 +242,11 @@ public class XmlUtil {
         }
         catch (XmlPullParserException e){
             e.printStackTrace();
+            ErrUtil.writeError(TAG + "---updatePlaylist---" + e.toString());
         }
         catch (IOException e){
             e.printStackTrace();
+            ErrUtil.writeError(TAG + "---updatePlaylist---" + e.toString());
         }
         finally {
             try {
@@ -289,9 +296,11 @@ public class XmlUtil {
         }
         catch (XmlPullParserException e){
             e.printStackTrace();
+            ErrUtil.writeError(TAG + "---updatePlayingList---" + e.toString());
         }
         catch (IOException e){
             e.printStackTrace();
+            ErrUtil.writeError(TAG + "---updatePlayingList---" + e.toString());
         }
         finally {
             try {

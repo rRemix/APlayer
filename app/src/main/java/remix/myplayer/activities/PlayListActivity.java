@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -35,18 +37,20 @@ import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DensityUtil;
 import remix.myplayer.infos.PlayListItem;
+import remix.myplayer.utils.ErrUtil;
 import remix.myplayer.utils.XmlUtil;
 
 /**
  * Created by taeja on 16-1-15.
  */
 public class PlayListActivity extends BaseToolbarActivity implements MusicService.Callback{
+    private static final String TAG = "PlayListActivity";
     public static PlayListActivity mInstance = null;
     private RecyclerView mRecycleView;
     private PlayListAdapter mAdapter;
     public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
     private Toolbar mToolBar;
-    private ImageButton mDrawerExit;
+
     static {
         mPlaylist = XmlUtil.getPlayList("playlist.xml");
     }
@@ -62,21 +66,26 @@ public class PlayListActivity extends BaseToolbarActivity implements MusicServic
         mAdapter.setOnItemClickLitener(new PlayListAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(View view, int position) {
-                String name = null;
-                Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
-                for (int i = 0; i <= position; i++) {
-                    it.hasNext();
-                    name = it.next().toString();
+                try {
+                    String name = "";
+                    Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
+                    for (int i = 0; i <= position; i++) {
+                        it.hasNext();
+                        name = it.next().toString();
+                    }
+                    if(mPlaylist.get(name).size() == 0) {
+                        Toast.makeText(PlayListActivity.this, "该列表为空", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Intent intent = new Intent(PlayListActivity.this, ChildHolderActivity.class);
+                    intent.putExtra("Id", position);
+                    intent.putExtra("Title", name);
+                    intent.putExtra("Type", Constants.PLAYLIST_HOLDER);
+                    startActivity(intent);
+                } catch (Exception e){
+                    e.printStackTrace();
+                    ErrUtil.writeError(TAG + "---onItemClick---" + e.toString());
                 }
-                if(mPlaylist.get(name).size() == 0) {
-                    Toast.makeText(PlayListActivity.this, "该列表为空", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                Intent intent = new Intent(PlayListActivity.this, ChildHolderActivity.class);
-                intent.putExtra("Id", position);
-                intent.putExtra("Title", name);
-                intent.putExtra("Type", Constants.PLAYLIST_HOLDER);
-                startActivity(intent);
             }
 
             @Override

@@ -74,21 +74,18 @@ public class NotifyReceiver extends BroadcastReceiver {
             mRemoteView.setOnClickPendingIntent(R.id.notify_close, mIntent_Close);
 
 
-//            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-////                    .setContent(mRemoteView)
-//                    .setWhen(System.currentTimeMillis())
-//                    .setPriority(Notification.PRIORITY_DEFAULT)
-//                    .setOngoing(mIsplay)
-//                    .setSmallIcon(R.drawable.notifbar_icon)
-//                    .setContentText("Slide down on note to expand");
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                    .setWhen(System.currentTimeMillis())
+                    .setPriority(Notification.PRIORITY_DEFAULT)
+                    .setOngoing(true)
+                    .setSmallIcon(R.drawable.notifbar_icon);
 //                        .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(DBUtil.CheckBitmapByAlbumId((int)temp.getAlbumId(),false)));
 //                    .setStyle(new android.support.v7.app.NotificationCompat.MediaStyle().setMediaSession(MusicService.mMediaSession.getSessionToken()));
-
-            Notification mNotify;
-            Notification.Builder mNotifyBuilder = new Notification.Builder(context);
-            mNotify = mNotifyBuilder.setSmallIcon(R.drawable.notifbar_icon)
-                    .setOngoing(mIsplay)
-                    .build();
+            Notification mNotify = mBuilder.build();
+//            Notification.Builder mNotifyBuilder = new Notification.Builder(context);
+//            mNotify = mNotifyBuilder.setSmallIcon(R.drawable.notifbar_icon)
+//                    .setOngoing(true)
+//                    .build();
             mNotify.bigContentView = mRemoteView;
 
             Intent result = new Intent(context,AudioHolderActivity.class);
@@ -103,8 +100,8 @@ public class NotifyReceiver extends BroadcastReceiver {
                             0,
                             PendingIntent.FLAG_UPDATE_CURRENT
                     );
-//            mBuilder.setContentIntent(resultPendingIntent);
-            mNotify.contentIntent = resultPendingIntent;
+            mBuilder.setContentIntent(resultPendingIntent);
+//            mNotify.contentIntent = resultPendingIntent;
             mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(0, mNotify);
         }
