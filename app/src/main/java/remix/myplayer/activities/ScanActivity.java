@@ -1,31 +1,27 @@
 package remix.myplayer.activities;
 
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.sina.weibo.sdk.api.share.Base;
-
 import java.util.ArrayList;
 
 import remix.myplayer.R;
-import remix.myplayer.ui.CustomSeekBar;
-import remix.myplayer.ui.TimerPopupWindow;
+import remix.myplayer.ui.customviews.CustomSeekBar;
+import remix.myplayer.ui.popupwindow.TimerPopupWindow;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.SharedPrefsUtil;
 
 /**
  * Created by taeja on 16-3-7.
  */
-public class ScanActivity extends BaseToolbarActivity {
+public class ScanActivity extends ToolbarActivity {
     private Toolbar mToolBar;
     private CustomSeekBar mCustomSeekbar;
     private int mPosition;
@@ -115,5 +111,15 @@ public class ScanActivity extends BaseToolbarActivity {
                 return true;
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 }

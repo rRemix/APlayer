@@ -35,25 +35,25 @@ public class XmlUtil {
     private static File mSearchHistoryFile;
     public static void setContext(Context context) {
         mContext = context;
-        try {
-            File mDir = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName());
-            if(!mDir.exists())
-                mDir.mkdir();
-            mPlayListFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/playlist.xml");
-            if(!mPlayListFile.exists())
-                mPlayListFile.createNewFile();
-            mPlayingListFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/playinglist.xml");
-            if(!mPlayingListFile.exists())
-                mPlayingListFile.createNewFile();
-            mSearchHistoryFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/searchhistory.xml");
-            if(!mSearchHistoryFile.exists())
-                mSearchHistoryFile.createNewFile();
-
-        }
-        catch (IOException e){
-            e.printStackTrace();
-            ErrUtil.writeError(TAG + "---CreateListFile---" + e.toString());
-        }
+//        try {
+//            File mDir = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName());
+//            if(!mDir.exists())
+//                mDir.mkdir();
+//            mPlayListFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/playlist.xml");
+//            if(!mPlayListFile.exists())
+//                mPlayListFile.createNewFile();
+//            mPlayingListFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/playinglist.xml");
+//            if(!mPlayingListFile.exists())
+//                mPlayingListFile.createNewFile();
+//            mSearchHistoryFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/searchhistory.xml");
+//            if(!mSearchHistoryFile.exists())
+//                mSearchHistoryFile.createNewFile();
+//
+//        }
+//        catch (IOException e){
+//            e.printStackTrace();
+//            ErrUtil.writeError(TAG + "---CreateListFile---" + e.toString());
+//        }
     }
 
 

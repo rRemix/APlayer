@@ -10,17 +10,9 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,14 +23,13 @@ import java.io.IOException;
 
 import remix.myplayer.R;
 import remix.myplayer.infos.MP3Info;
-import remix.myplayer.ui.SharePopupWindow;
+import remix.myplayer.ui.popupwindow.SharePopupWindow;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DensityUtil;
 
 /**
  * Created by taeja on 16-3-14.
  */
-public class RecordShareActivity extends AppCompatActivity {
+public class RecordShareActivity extends BaseAppCompatActivity {
     public static RecordShareActivity mInstance;
     private ImageView mImage;
     private TextView mSongArtist;
@@ -153,4 +144,13 @@ public class RecordShareActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 }

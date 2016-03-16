@@ -20,7 +20,7 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by taeja on 16-3-4.
  */
-public class RecetenlyActivity extends BaseToolbarActivity  implements MusicService.Callback{
+public class RecetenlyActivity extends ToolbarActivity implements MusicService.Callback{
     private RecentlyAdapter mAdapter;
     private Toolbar mToolBar;
     private ListView mListView;
@@ -115,5 +115,15 @@ public class RecetenlyActivity extends BaseToolbarActivity  implements MusicServ
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 }

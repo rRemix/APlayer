@@ -79,6 +79,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         if (mDefaultCrashHandler != null) {
             mDefaultCrashHandler.uncaughtException(thread, ex);
         } else {
+            MobclickAgent.onKillProcess(mContext);
             Process.killProcess(Process.myPid());
         }
 
@@ -148,6 +149,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
     private void uploadExceptionToServer(Throwable ex) {
         //TODO Upload Exception Message To Your Web Server
         MobclickAgent.reportError(mContext,ex);
+
     }
 
 }

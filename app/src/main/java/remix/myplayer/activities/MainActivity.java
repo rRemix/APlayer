@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,7 +25,6 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.umeng.analytics.MobclickAgent;
-import com.umeng.update.UmengUpdateAgent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +40,7 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.listeners.LockScreenListener;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.services.TimerService;
-import remix.myplayer.ui.TimerPopupWindow;
+import remix.myplayer.ui.popupwindow.TimerPopupWindow;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
@@ -50,7 +48,7 @@ import remix.myplayer.utils.ErrUtil;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.XmlUtil;
 
-public class MainActivity extends AppCompatActivity implements MusicService.Callback {
+public class MainActivity extends BaseAppCompatActivity implements MusicService.Callback {
     public static MainActivity mInstance = null;
     private MusicService mService;
     private BottomActionBarFragment mBottomBar;
@@ -70,6 +68,10 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
         super.onResume();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -85,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
     protected void onCreate(Bundle savedInstanceState) {
         //检查更新
 //        UmengUpdateAgent.update(this);
+//        MobclickAgent.setDebugMode(true);
         MobclickAgent.setCatchUncaughtExceptions(true);
         initUtil();
         requestWindowFeature(Window.FEATURE_NO_TITLE);

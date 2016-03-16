@@ -24,7 +24,7 @@
         android:theme="@style/AppTheme"
         android:name=".application.Application">
         <meta-data android:value="56d6563367e58e6aa70005af" android:name="UMENG_APPKEY"/>
-        <meta-data android:value="Channel ID" android:name="UMENG_CHANNEL"/>
+        <meta-data android:value="Umeng" android:name="UMENG_CHANNEL"/>
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
@@ -61,16 +61,16 @@
 
         <activity android:name=".activities.RecordShareActivity"/>
 
-        <activity android:name=".ui.AddPopupWindow"
+        <activity android:name=".ui.popupwindow.AddPopupWindow"
             android:theme="@style/PopupDialog"/>
 
-        <activity android:name=".ui.PlayingListPopupWindow"
+        <activity android:name=".ui.popupwindow.PlayingListPopupWindow"
             android:theme="@style/PopupDialog"/>
 
-        <activity android:name=".ui.SelectedPopupWindow"
+        <activity android:name=".ui.popupwindow.SelectedPopupWindow"
             android:theme="@style/PopupDialog"/>
 
-        <activity android:name=".ui.TimerPopupWindow"
+        <activity android:name=".ui.popupwindow.TimerPopupWindow"
             android:theme="@style/PopupTimer"/>
 
         <activity android:name=".activities.RecetenlyActivity"
@@ -85,7 +85,7 @@
         <activity android:name=".activities.ScanActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
 
-        <activity android:name=".ui.SharePopupWindow"
+        <activity android:name=".ui.popupwindow.SharePopupWindow"
             android:theme="@style/PopupDialog"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="portrait" >

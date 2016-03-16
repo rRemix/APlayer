@@ -3,7 +3,6 @@ package remix.myplayer.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
 import remix.myplayer.R;
-import remix.myplayer.activities.MainActivity;
-import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.ui.ColumnView;
-import remix.myplayer.ui.SelectedPopupWindow;
+import remix.myplayer.ui.customviews.ColumnView;
+import remix.myplayer.ui.popupwindow.SelectedPopupWindow;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -52,8 +49,7 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        if(convertView == null)
-        {
+        if(convertView == null) {
             convertView = mInflater.inflate(R.layout.child_holder_item,null);
             holder = new ViewHolder();
 //            holder.mArtist = (TextView)convertView.findViewById(R.id.album_holder_item_artist);

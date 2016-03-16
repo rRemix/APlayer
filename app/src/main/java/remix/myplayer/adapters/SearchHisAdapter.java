@@ -12,7 +12,6 @@ import android.widget.TextView;
 import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;
 import remix.myplayer.activities.SearchActivity;
-import remix.myplayer.ui.CircleImageView;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.XmlUtil;
 

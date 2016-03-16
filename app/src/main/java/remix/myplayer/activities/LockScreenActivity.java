@@ -45,7 +45,7 @@ import remix.myplayer.utils.XmlUtil;
 /**
  * Created by Remix on 2016/3/9.
  */
-public class LockScreenActivity extends Activity implements MusicService.Callback{
+public class LockScreenActivity extends BaseActivity implements MusicService.Callback{
     private WindowManager mWmManager;
     private final static String TAG = "LockScreenActivity";
     public static LockScreenActivity mInstance;
@@ -197,6 +197,10 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         mIsDestory = true;
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
     @Override
     protected void onResume() {
         super.onResume();

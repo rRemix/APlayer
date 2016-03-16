@@ -2,7 +2,6 @@ package remix.myplayer.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -17,16 +16,14 @@ import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.ui.CircleImageView;
+import remix.myplayer.ui.customviews.CircleImageView;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.CrashHandler;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.ErrUtil;
 
 /**
  * Created by Remix on 2015/12/4.
  */
-public class ChildHolderActivity extends AppCompatActivity implements MusicService.Callback{
+public class ChildHolderActivity extends BaseAppCompatActivity implements MusicService.Callback{
     private final static String TAG = "ChildHolderActivity";
     private MusicService mService;
     private ImageView mBack;
@@ -45,13 +42,12 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        CrashHandler crashHandler = CrashHandler.getInstance();
-        crashHandler.init(this);
+        //测试错误收集
+//        String test = null;
+//        test.toString();
 
         mInstance = this;
         setContentView(R.layout.activity_child_holder);
-        int count = 49;
         //绑定控制播放的service;
         MusicService.addCallback(ChildHolderActivity.this);
 
@@ -156,5 +152,15 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     @Override
     public int getType() {
         return Constants.CHILDHOLDERACTIVITY;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 }

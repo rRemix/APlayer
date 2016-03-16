@@ -46,7 +46,7 @@
         android:src="@drawable/list_icn_more"
         android:background="@drawable/bg_btn_gray_selector"/>
 
-    <remix.myplayer.ui.ColumnView
+    <remix.myplayer.ui.customviews.ColumnView
         android:layout_toLeftOf="@id/song_item_button"
         android:layout_centerVertical="true"
         android:layout_width="18dp"

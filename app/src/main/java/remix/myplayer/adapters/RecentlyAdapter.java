@@ -3,7 +3,6 @@ package remix.myplayer.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +15,11 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import java.util.ArrayList;
 
 import remix.myplayer.R;
-import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.ui.CircleImageView;
-import remix.myplayer.ui.ColumnView;
-import remix.myplayer.ui.SelectedPopupWindow;
+import remix.myplayer.ui.customviews.CircleImageView;
+import remix.myplayer.ui.customviews.ColumnView;
+import remix.myplayer.ui.popupwindow.SelectedPopupWindow;
 
 /**
  * Created by taeja on 16-3-4.

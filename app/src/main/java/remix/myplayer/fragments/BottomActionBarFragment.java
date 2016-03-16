@@ -4,12 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -18,7 +16,6 @@ import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.listeners.CtrlButtonListener;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.ui.BottomActionBar;
 
 /**
  * Created by Remix on 2015/12/1.

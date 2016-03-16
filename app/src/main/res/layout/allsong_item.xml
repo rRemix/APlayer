@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/allsong_item_height"
     android:id="@+id/songlist_item">
-    <remix.myplayer.ui.CircleImageView
+    <remix.myplayer.ui.customviews.CircleImageView
         android:layout_alignParentLeft="true"
         android:id="@+id/song_head_image"
         android:layout_centerVertical="true"
@@ -52,7 +52,7 @@
         android:src="@drawable/list_icn_more"
         android:background="@drawable/bg_btn_gray_selector"/>
 
-    <remix.myplayer.ui.ColumnView
+    <remix.myplayer.ui.customviews.ColumnView
         android:layout_centerVertical="true"
         android:layout_width="18dp"
         android:layout_height="16dp"

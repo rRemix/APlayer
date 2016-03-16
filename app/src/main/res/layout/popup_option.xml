@@ -8,7 +8,7 @@
         android:layout_height="56dp"
         android:orientation="horizontal"
         android:gravity="center_vertical">
-        <remix.myplayer.ui.CircleImageView
+        <remix.myplayer.ui.customviews.CircleImageView
             android:id="@+id/popup_image"
             android:layout_width="40dp"
             android:layout_height="40dp"

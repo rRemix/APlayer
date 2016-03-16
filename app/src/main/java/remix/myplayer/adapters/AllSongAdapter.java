@@ -21,9 +21,9 @@ import remix.myplayer.R;
 import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.ui.CircleImageView;
-import remix.myplayer.ui.ColumnView;
-import remix.myplayer.ui.SelectedPopupWindow;
+import remix.myplayer.ui.customviews.CircleImageView;
+import remix.myplayer.ui.customviews.ColumnView;
+import remix.myplayer.ui.popupwindow.SelectedPopupWindow;
 import remix.myplayer.utils.DBUtil;
 
 /**

@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="238dp"
         android:gravity="center">
-        <remix.myplayer.ui.CircleSeekBar
+        <remix.myplayer.ui.customviews.CircleSeekBar
             android:layout_gravity="center"
             android:id="@+id/close_seekbar"
             android:layout_width="200dp"

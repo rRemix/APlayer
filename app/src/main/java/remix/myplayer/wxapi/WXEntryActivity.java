@@ -12,10 +12,8 @@ import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 
-import remix.myplayer.activities.RecordShareActivity;
-import remix.myplayer.ui.SharePopupWindow;
+import remix.myplayer.ui.popupwindow.SharePopupWindow;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.SharedPrefsUtil;
 
 
 /**

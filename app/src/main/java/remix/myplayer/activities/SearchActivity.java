@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -18,7 +17,7 @@ import java.util.ArrayList;
 import remix.myplayer.R;
 import remix.myplayer.adapters.SearchHisAdapter;
 import remix.myplayer.adapters.SearchResAdapter;
-import remix.myplayer.ui.SearchView;
+import remix.myplayer.ui.customviews.SearchView;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.XmlUtil;
@@ -26,7 +25,7 @@ import remix.myplayer.utils.XmlUtil;
 /**
  * Created by taeja on 16-1-22.
  */
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends BaseAppCompatActivity {
     public static int mIdIndex = -1;
     public static int mDisplayNameIndex = -1;
     public static int mArtistIndex = -1;
@@ -174,6 +173,16 @@ public class SearchActivity extends AppCompatActivity {
             mSearchHisContent.setVisibility(mSearchHisKeyList.size() == 0 ? View.GONE : View.VISIBLE);
             mSearchHisAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     class ListViewListener implements AdapterView.OnItemClickListener {

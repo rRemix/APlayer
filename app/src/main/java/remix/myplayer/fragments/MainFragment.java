@@ -18,7 +18,7 @@ import remix.myplayer.adapters.PagerAdapter;
 import remix.myplayer.listeners.TabTextListener;
 import remix.myplayer.listeners.ViewPagerListener;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.ui.MyPager;
+import remix.myplayer.ui.customviews.MyPager;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 

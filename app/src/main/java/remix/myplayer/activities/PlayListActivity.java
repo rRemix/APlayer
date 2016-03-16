@@ -1,30 +1,20 @@
 package remix.myplayer.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Toast;
-
-import com.sina.weibo.sdk.api.share.Base;
-import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +25,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapters.PlayListAdapter;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DensityUtil;
 import remix.myplayer.infos.PlayListItem;
@@ -45,7 +34,7 @@ import remix.myplayer.utils.XmlUtil;
 /**
  * Created by taeja on 16-1-15.
  */
-public class PlayListActivity extends BaseToolbarActivity implements MusicService.Callback{
+public class PlayListActivity extends ToolbarActivity implements MusicService.Callback{
     private static final String TAG = "PlayListActivity";
     public static PlayListActivity mInstance = null;
     private RecyclerView mRecycleView;
@@ -61,9 +50,6 @@ public class PlayListActivity extends BaseToolbarActivity implements MusicServic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
         MusicService.addCallback(PlayListActivity.this);
-        //测试错误统计
-//        String Test = null;
-//        int Count = Test.length();
 
         mInstance = this;
         mRecycleView = (RecyclerView)findViewById(R.id.playlist_recycleview);
@@ -169,7 +155,7 @@ public class PlayListActivity extends BaseToolbarActivity implements MusicServic
         window.showAtLocation(v, Gravity.CENTER,0,0);
 
         //修改获得焦点时下划线的颜色
-        EditText editText = (EditText)contentView.findViewById(R.id.playlist_add_edit);
+        final EditText editText = (EditText)contentView.findViewById(R.id.playlist_add_edit);
         editText.getBackground().setColorFilter(getResources().getColor(R.color.intersperse_color), PorterDuff.Mode.SRC_ATOP);
         editText.setText("本地歌单" + mPlaylist.size());
         contentView.findViewById(R.id.playlist_cancel).setOnClickListener(new View.OnClickListener() {
@@ -183,8 +169,8 @@ public class PlayListActivity extends BaseToolbarActivity implements MusicServic
             @Override
             public void onClick(View v) {
 
-                String name = ((EditText)contentView.findViewById(R.id.playlist_add_edit)).getText().toString();
-                if(name != null && !name.equals("")) {
+                String name = ((EditText) contentView.findViewById(R.id.playlist_add_edit)).getText().toString();
+                if (name != null && !name.equals("")) {
                     XmlUtil.addPlaylist(name);
                     mAdapter.notifyDataSetChanged();
                 }
@@ -213,5 +199,15 @@ public class PlayListActivity extends BaseToolbarActivity implements MusicServic
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 }
