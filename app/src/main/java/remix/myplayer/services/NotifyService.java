@@ -1,12 +1,10 @@
 package remix.myplayer.services;
 
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -15,16 +13,14 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 import android.widget.RemoteViews;
-
-import java.util.List;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+
 /**
  * Created by Remix on 2016/2/16.
  */

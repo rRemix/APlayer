@@ -4,8 +4,6 @@ package remix.myplayer.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.service.notification.NotificationListenerService;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -27,6 +25,8 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.update.UmengUpdateAgent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +83,9 @@ public class MainActivity extends AppCompatActivity implements MusicService.Call
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        //检查更新
+//        UmengUpdateAgent.update(this);
+        MobclickAgent.setCatchUncaughtExceptions(true);
         initUtil();
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);

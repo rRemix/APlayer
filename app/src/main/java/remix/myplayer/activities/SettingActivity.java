@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.umeng.update.UmengUpdateAgent;
+
 import remix.myplayer.R;
 import remix.myplayer.adapters.SettingAdapter;
 import remix.myplayer.ui.TimerPopupWindow;
@@ -45,6 +47,9 @@ public class SettingActivity extends BaseToolbarActivity {
                     case 2:
                         //关于我们
                         break;
+                        //检查更新
+                    case 3:
+                        UmengUpdateAgent.forceUpdate(SettingActivity.this);
                 }
             }
         });

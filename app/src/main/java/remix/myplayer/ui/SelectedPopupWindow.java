@@ -23,14 +23,10 @@ import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.net.URL;
-import java.util.HashMap;
-
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.FolderAdapter;
 import remix.myplayer.adapters.AllSongAdapter;
-import remix.myplayer.fragments.AllSongFragment;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.infos.MP3Info;
@@ -132,8 +128,7 @@ public class SelectedPopupWindow extends Activity {
 //        });
     }
 
-    public void delete()
-    {
+    public void delete() {
         ContentResolver resolver = getContentResolver();
         if(resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,MediaStore.MediaColumns.DATA + "=?",new String[]{mInfo.getUrl()}) > 0)
         {
@@ -178,8 +173,7 @@ public class SelectedPopupWindow extends Activity {
 
     }
 
-    private void setVoice(String path,int Id)
-    {
+    private void setVoice(String path,int Id) {
         ContentValues cv = new ContentValues();
         cv.put(MediaStore.Audio.Media.IS_RINGTONE, true);
         cv.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);

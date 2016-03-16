@@ -14,8 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import remix.myplayer.R;
+import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.adapters.PlayListAddtoAdapter;
+import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.listeners.TabTextListener;
+import remix.myplayer.utils.ErrUtil;
 import remix.myplayer.utils.XmlUtil;
 
 /**
@@ -53,15 +56,31 @@ public class AddPopupWindow extends Activity {
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView textView = (TextView)view.findViewById(R.id.playlist_addto_text);
-                String playlist = textView.getText().toString();
-                if(playlist != null && mSongName != null && mId > 0) {
-                    XmlUtil.addSong(playlist, mSongName,mId,mAlbumId);
-                    Toast.makeText(AddPopupWindow.this,"添加成功", Toast.LENGTH_SHORT).show();
+                try {
+                    TextView textView = (TextView)view.findViewById(R.id.playlist_addto_text);
+                    String playlist = textView.getText().toString();
+                    boolean isExist = false;
+                    if(playlist != null && mSongName != null && mId > 0) {
+                        for(PlayListItem item : PlayListActivity.mPlaylist.get(playlist)){
+                            if(item.getId() == mId){
+                                isExist = true;
+                            }
+                        }
+                        if(isExist){
+                            Toast.makeText(AddPopupWindow.this,"该歌曲已经存在", Toast.LENGTH_SHORT).show();
+                        } else {
+                            XmlUtil.addSong(playlist, mSongName,mId,mAlbumId);
+                            Toast.makeText(AddPopupWindow.this,"添加成功", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else
+                        Toast.makeText(AddPopupWindow.this,"添加失败", Toast.LENGTH_SHORT).show();
+                    finish();
+                } catch (Exception e){
+                    e.printStackTrace();
+                    ErrUtil.writeError("AddPopupWindow" + "---onItemClick---" + e.toString());
                 }
-                else
-                    Toast.makeText(AddPopupWindow.this,"添加失败", Toast.LENGTH_SHORT).show();
-                finish();
+
             }
         });
     }

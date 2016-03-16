@@ -36,7 +36,7 @@ public class ErrUtil {
             String time = formatter.format(curDate);
             String msg = time + error + "\r\n";
             fos.write(msg.getBytes());
-
+            fos.flush();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

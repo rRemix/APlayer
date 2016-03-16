@@ -2,7 +2,6 @@ package remix.myplayer.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -41,7 +40,6 @@ import java.net.URLEncoder;
 import remix.myplayer.R;
 import remix.myplayer.activities.RecordShareActivity;
 import remix.myplayer.infos.MP3Info;
-import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 

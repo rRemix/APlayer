@@ -1,0 +1,47 @@
+<html>
+	<head>
+	<script type="text/javascript">
+	
+	    function onEvent(tag, label, duration) {
+	    	prompt("event", JSON.stringify({tag:tag,label:label, duration:duration}));
+	    }
+	    
+	    function onKVEvent(tag, map, duration) {
+	    	map.id = tag;
+	    	map.duration = duration;
+	    	
+	    	prompt("ekv", JSON.stringify( map ));
+	    }
+	   
+	</script>  
+	
+	<style type="text/css">
+		a{
+		  	border: 1px solid #555;
+		  	-webkit-border-radius: 5px;
+		  	border-radius: 5px;
+		  	text-align:center;
+		  	display:block;
+		  	float:left;
+		  	background:#444;
+		  	width:300px;
+		  	color:#9ab;
+		  	font-size:1.1em;
+		  	text-decoration:none;
+		  	padding:1.2em 0;
+		  	margin:3px 0px 3px 5px;
+  		}
+	</style>
+	</head>
+	<body>
+	    <!-- Calls into the javascript interface for the activity -->
+	    <a onClick="onEvent('click')"> SimpleEvent</a>
+		<a onClick="onEvent('click','button')"> EventWithLabel </a>
+		<a onClick="onEvent('play','music',123)"> EventWithLabelAndDuration </a>
+		<a onClick="onEvent('play','',123)"> EventWithDuration </a>
+		
+		<a onClick="onKVEvent('buy',{'item':'gun'})"> KVEvent </a>
+		<a onClick="onKVEvent('play',{'music':'blue'}, 123)"> KVEventWithDuration </a>
+
+	</body>
+</html>

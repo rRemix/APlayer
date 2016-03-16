@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,6 +24,7 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.sina.weibo.sdk.api.share.Base;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,6 +61,10 @@ public class PlayListActivity extends BaseToolbarActivity implements MusicServic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
         MusicService.addCallback(PlayListActivity.this);
+        //测试错误统计
+//        String Test = null;
+//        int Count = Test.length();
+
         mInstance = this;
         mRecycleView = (RecyclerView)findViewById(R.id.playlist_recycleview);
         mRecycleView.setLayoutManager(new GridLayoutManager(this, 2));
@@ -66,6 +72,27 @@ public class PlayListActivity extends BaseToolbarActivity implements MusicServic
         mAdapter.setOnItemClickLitener(new PlayListAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(View view, int position) {
+
+                String name = "";
+                Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
+                for (int i = 0; i <= position; i++) {
+                    it.hasNext();
+                    name = it.next().toString();
+                }
+                if(mPlaylist.get(name).size() == 0) {
+                    Toast.makeText(PlayListActivity.this, "该列表为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Intent intent = new Intent(PlayListActivity.this, ChildHolderActivity.class);
+                intent.putExtra("Test",true);
+                intent.putExtra("Id", position);
+                intent.putExtra("Title", name);
+                intent.putExtra("Type", Constants.PLAYLIST_HOLDER);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
                 try {
                     String name = "";
                     Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
@@ -78,22 +105,18 @@ public class PlayListActivity extends BaseToolbarActivity implements MusicServic
                         return;
                     }
                     Intent intent = new Intent(PlayListActivity.this, ChildHolderActivity.class);
+                    intent.putExtra("Test",false);
                     intent.putExtra("Id", position);
                     intent.putExtra("Title", name);
                     intent.putExtra("Type", Constants.PLAYLIST_HOLDER);
                     startActivity(intent);
                 } catch (Exception e){
                     e.printStackTrace();
-                    ErrUtil.writeError(TAG + "---onItemClick---" + e.toString());
+                    ErrUtil.writeError(TAG + "---onItemLongClick---" + e.toString());
                 }
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
             }
         });
         mRecycleView.setAdapter(mAdapter);
-
 
         //初始化tooblar
         mToolBar = (Toolbar) findViewById(R.id.toolbar);

@@ -3,7 +3,6 @@ package remix.myplayer.adapters;
 import android.content.ContentUris;
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +22,6 @@ import remix.myplayer.R;
 import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.listeners.PopupListener;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DBUtil;
 import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.utils.ErrUtil;
 
@@ -75,6 +73,13 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                     @Override
                     public void onClick(View v) {
                         mOnItemClickLitener.onItemClick(holder.mImage,position);
+                    }
+                });
+                holder.mImage.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        mOnItemClickLitener.onItemLongClick(holder.mImage,position);
+                        return true;
                     }
                 });
             }

@@ -2,15 +2,12 @@ package remix.myplayer.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -22,6 +19,7 @@ import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.CircleImageView;
 import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.CrashHandler;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.ErrUtil;
 
@@ -43,76 +41,53 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
     public static ChildHolderActivity mInstance = null;
     private CircleImageView mCircleView;
     private TextView mTextTest;
-    private String mError = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        CrashHandler crashHandler = CrashHandler.getInstance();
+        crashHandler.init(this);
+
         mInstance = this;
         setContentView(R.layout.activity_child_holder);
+        int count = 49;
         //绑定控制播放的service;
         MusicService.addCallback(ChildHolderActivity.this);
 
         mId = getIntent().getIntExtra("Id",-1);
         int type = getIntent().getIntExtra("Type",-1);
         String Title = getIntent().getStringExtra("Title");
-        if(mId >= 0)
-        {
-            mInfoList = new ArrayList<>();
-            try {
-                switch (type)
-                {
-                    case Constants.ALBUM_HOLDER:
-                        mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ALBUM_HOLDER);
-                        break;
-                    case Constants.ARTIST_HOLDER:
-                        mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST_HOLDER);
-                        break;
-                    case Constants.FOLDER_HOLDER:
-                        mInfoList = DBUtil.getMP3ListByIds(DBUtil.mFolderMap.get(Title));
-                        Title = Title.substring(Title.lastIndexOf("/")+ 1,Title.length());
-                        break;
-                    case Constants.PLAYLIST_HOLDER:
-                        ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(Title);
-                        ArrayList<String> names = new ArrayList<>();
-                        if(list == null)
-                            break;
-                        for(PlayListItem item : list)
-                            names.add(item.getSongame());
-                        mInfoList = DBUtil.getMP3ListByNames(names);
-                        break;
 
-                }
-            } catch (Exception e){
-                ErrUtil.writeError(TAG + "---getPlaylist---" + e.toString());
+        if(mId >= 0) {
+            mInfoList = new ArrayList<>();
+            switch (type)
+            {
+                case Constants.ALBUM_HOLDER:
+                    mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ALBUM_HOLDER);
+                    break;
+                case Constants.ARTIST_HOLDER:
+                    mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST_HOLDER);
+                    break;
+                case Constants.FOLDER_HOLDER:
+                    mInfoList = DBUtil.getMP3ListByIds(DBUtil.mFolderMap.get(Title));
+                    Title = Title.substring(Title.lastIndexOf("/")+ 1,Title.length());
+                    break;
+                case Constants.PLAYLIST_HOLDER:
+                    ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(Title);
+                    ArrayList<Long> ids = new ArrayList<>();
+                    if(list == null)
+                        break;
+                    for(PlayListItem item : list)
+                        ids.add(Long.valueOf(item.getId() + ""));
+                    mInfoList = DBUtil.getMP3ListByIds(ids);
+                    break;
             }
 
         }
-
-//        mTextTest = (TextView)findViewById(R.id.audio_text_test);
-//        if(mInfoList == null){
-//            mTextTest.setText("没有数据");
-//            return;
-//        }
-//        if(mInfoList.size() == 0) {
-//            mTextTest.setText("列表为空");
-//            return;
-//        }
-//
-//        StringBuilder sb = new StringBuilder();
-//        for(int i = 0 ; i < mInfoList.size() ; i++){
-//            sb.append(mInfoList.get(i).toString() + "\r\n");
-//        }
-//        if(mInfoList != null && mInfoList.size() > 0) {
-//            mTextTest.setText(sb.toString());
-//            return;
-//        }
-
-
         if(mInfoList == null || mInfoList.size() == 0)
             return;
-
-        mListView = (ListView)findViewById(R.id.artist_album_holder_list);
+        mListView = (ListView)findViewById(R.id.child_holder_list);
         mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),this);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -146,16 +121,13 @@ public class ChildHolderActivity extends AppCompatActivity implements MusicServi
         mNum.setText(mInfoList.size() + "首歌曲");
         mTitle = (TextView)findViewById(R.id.artist_album_title);
         mTitle.setText(Title);
-        //CircleImageView
-//        mCircleView = (CircleImageView)findViewById(R.id.child_holder_image);
-//        mCircleView.setImageResource(null);
 
         //初始化底部状态栏
         mActionbar = (BottomActionBarFragment)getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        if(DBUtil.mPlayingList.size() == 0)
+        if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return;
-        mActionbar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)), false);
 
+        mActionbar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
 
     public void onPlayShuffle(View v){

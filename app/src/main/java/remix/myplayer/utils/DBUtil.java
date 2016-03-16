@@ -3,36 +3,27 @@ package remix.myplayer.utils;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.ParcelFileDescriptor;
-import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileDescriptor;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 
 import remix.myplayer.adapters.FolderAdapter;
 import remix.myplayer.infos.MP3Info;
-import remix.myplayer.infos.PlayListItem;
 
 /**
  * Created by taeja on 16-2-17.
@@ -61,6 +52,7 @@ public class DBUtil {
     //返回所有歌曲id
     public static ArrayList<Long> getAllSongsId() {
 
+
         //获得今天日期
         Calendar today = Calendar.getInstance();
         today.setTime(new Date());
@@ -71,6 +63,24 @@ public class DBUtil {
         //查询sd卡上所有音乐文件信息，过滤小于800k的
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
+
+//        Cursor cursor1 = resolver.query(
+//                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+//                null,
+//                null, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+//        if(cursor1 != null){
+//            try {
+//                while(cursor1.moveToNext()){
+//                    for(int i = 0 ; i < cursor1.getColumnCount() ;i++){
+//                        Log.d(TAG,"name:" + cursor1.getColumnName(i) + " value:" + cursor1.getString(i));
+//                    }
+//                }
+//            } catch (Exception e){
+//                e.printStackTrace();
+//            }
+//
+//        }
+
 
         //默认过滤文件大小500K
         Constants.SCAN_SIZE = SharedPrefsUtil.getValue(mContext,"setting","scansize",-1);
@@ -170,36 +180,32 @@ public class DBUtil {
     public static ArrayList<MP3Info> getMP3InfoByArtistIdOrAlbumId(int _id, int type) {
         Cursor cursor = null;
         ContentResolver resolver = mContext.getContentResolver();
-        ArrayList<MP3Info> mp3Info = new ArrayList<>();
-        if (type == Constants.ALBUM_HOLDER) {
-            cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                    MediaStore.Audio.Media.ALBUM_ID + "=" + _id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
-        }
-
-        if (type == Constants.ARTIST_HOLDER) {
-            cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                    MediaStore.Audio.Media.ARTIST_ID + "=" + _id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
-        }
-
-        if(cursor != null && cursor.getCount() > 0) {
-            while (cursor.moveToNext()) {
-                long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-                String name = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
-                name = name.substring(0, name.lastIndexOf("."));
-                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
-                long albumid = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-                String realtime = CommonUtil.getTime(duration);
-                String url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
-                MP3Info mp3temp = new MP3Info(id, name, album, albumid,artist, duration, realtime, url, size, null);
-                mp3Info.add(mp3temp);
+        ArrayList<MP3Info> mp3Infolist = new ArrayList<>();
+        try {
+            if (type == Constants.ALBUM_HOLDER) {
+                cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
+                        MediaStore.Audio.Media.ALBUM_ID + "=" + _id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
             }
-            cursor.close();
-            return mp3Info;
+
+            if (type == Constants.ARTIST_HOLDER) {
+                cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
+                        MediaStore.Audio.Media.ARTIST_ID + "=" + _id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
+            }
+
+            if(cursor != null && cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    mp3Infolist.add(getMP3Info(cursor));
+                }
+                cursor.close();
+                return mp3Infolist;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(cursor != null)
+                cursor.close();
         }
-        cursor.close();
+
         return null;
     }
     //根据歌曲id查询图片url
@@ -374,7 +380,7 @@ public class DBUtil {
             for(int i = 0 ; i < list.size(); i++) {
                 cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                         null,
-                        MediaStore.Audio.Media.TITLE + "=?" + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,
+                        MediaStore.Audio.Media.TITLE + "=?",
                         new String[]{list.get(i)}, null);
                 cursor.moveToFirst();
                 if (cursor != null && cursor.getCount() > 0) {

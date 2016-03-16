@@ -4,6 +4,7 @@ package remix.myplayer.utils;
  * Created by taeja on 16-2-17.
  */
 public class Constants {
+
     //删除选项
     public final static int DELETE_SINGLE = 0;
     public final static int DELETE_ALBUM = 1;
@@ -51,6 +52,8 @@ public class Constants {
     public final static String WEIBO_APIID = "949172486";
     //微信APi Id
     public final static String WECHAT_APIID = "wx10775467a6664fbb";
+    //有盟appkey
+    public final static String UMENG_APPKEY = "56d6563367e58e6aa70005af";
     //获得专辑封面类型
     public final static int URL_ALBUM = 0;
     public final static int URL_ARTIST = 1;

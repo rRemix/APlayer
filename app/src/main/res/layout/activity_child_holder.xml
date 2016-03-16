@@ -60,6 +60,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/line"
         android:scaleType="fitXY"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -71,7 +72,7 @@
             android:headerDividersEnabled="true"
             android:footerDividersEnabled="true"
             android:divider="@drawable/divider"
-            android:id="@+id/artist_album_holder_list">
+            android:id="@+id/child_holder_list">
         </ListView>
         <TextView
             android:layout_width="wrap_content"

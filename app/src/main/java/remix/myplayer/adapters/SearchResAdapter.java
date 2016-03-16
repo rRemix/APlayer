@@ -17,9 +17,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.SearchActivity;
-import remix.myplayer.fragments.AlbumFragment;
-import remix.myplayer.utils.CommonUtil;
-import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 
 /**

@@ -1,6 +1,5 @@
 package remix.myplayer.adapters;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -20,7 +19,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;
-import remix.myplayer.fragments.AlbumFragment;
 import remix.myplayer.fragments.ArtistFragment;
 import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.listeners.PopupListener;

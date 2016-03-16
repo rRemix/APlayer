@@ -1,25 +1,17 @@
 package remix.myplayer.ui;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.PorterDuff;
-import android.support.v7.widget.AppCompatAutoCompleteTextView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.SearchActivity;
 import remix.myplayer.utils.DBUtil;
 
 /**
@@ -52,7 +44,7 @@ public class SearchView extends LinearLayout {
 //        mEditText.getBackground().setColorFilter(getResources().getColor(R.color.progress_complete), PorterDuff.Mode.SRC_ATOP);
 
         final int size = DBUtil.mSearchKeyList.size();
-        String[] strs = (String[])DBUtil.mSearchKeyList.toArray(new String[size]);
+        String[] strs = (String[]) DBUtil.mSearchKeyList.toArray(new String[size]);
 //        ArrayAdapter adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_list_item_1, strs);
 //        mEditText.setAdapter(adapter);
 

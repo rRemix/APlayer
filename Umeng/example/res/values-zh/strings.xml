@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">友盟SDK</string>
+    <string name="online_config">在线参数</string>
+    <string name="make_crash">程序崩溃</string>
+    <string name="kv_event">多属性(K-V)事件</string>
+    <string name="normal_event">普通事件</string>
+    <string name="event_begin">事件开始</string>
+    <string name="event_end">事件结束</string>
+    <string name="event_duration">数值型统计</string>
+    <string name="page_stack">统计 Fragment 页面(Stack)</string>
+    <string name="page_tabs"> 统计 Fragment 页面( Tab )</string>
+    <string name="social_analytics">社交统计</string>
+    <string name="js_in_webview">Webview 统计</string>
+    <string name="flush_cache">手动发送数据</string>
+    <string name="signin">用户登录</string>
+    <string name="signoff">用户退出</string>
+    <string name="webview_text">在webview中调用统计分析代码</string>
+
+</resources>

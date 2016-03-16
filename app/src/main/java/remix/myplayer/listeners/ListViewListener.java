@@ -2,16 +2,12 @@ package remix.myplayer.listeners;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
-import android.view.inputmethod.CorrectionInfo;
 import android.widget.AdapterView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import remix.myplayer.R;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 

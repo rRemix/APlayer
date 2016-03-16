@@ -1,5 +1,7 @@
 package remix.myplayer.fragments;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
@@ -7,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,41 +35,45 @@ public class RecordFragment extends Fragment{
         View rootView = inflater.inflate(R.layout.fragment_record,null);
         mEdit = (EditText)rootView.findViewById(R.id.edit_record);
 //        mEdit.getBackground().setColorFilter(getResources().getColor(R.color.cursor_color), PorterDuff.Mode.SRC_ATOP);
-//        (rootView.findViewById(R.id.sharebtn)).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(mEdit.getText().toString().equals("")){
-//                    Toast.makeText(getContext(),"请输入分享内容",Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-//                Intent intent = new Intent(getActivity(), RecordShareActivity.class);
-//                Bundle arg = new Bundle();
-//                arg.putString("Content",mEdit.getText().toString());
-//                arg.putSerializable("MP3Info", MusicService.getCurrentMP3());
-//                intent.putExtras(arg);
-//                startActivity(intent);
-//            }
-//        });
-        (rootView.findViewById(R.id.sharebtn)).setOnTouchListener(new View.OnTouchListener() {
+        (rootView.findViewById(R.id.sharebtn)).setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    if(mEdit.getText().toString().equals("")){
-                        Toast.makeText(getContext(),"请输入分享内容",Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
-                    Intent intent = new Intent(getActivity(), RecordShareActivity.class);
-                    Bundle arg = new Bundle();
-                    arg.putString("Content",mEdit.getText().toString());
-                    arg.putSerializable("MP3Info", MusicService.getCurrentMP3());
-                    intent.putExtras(arg);
-                    startActivity(intent);
+            public void onClick(View v) {
+                if(mEdit.getText().toString().equals("")){
+                    Toast.makeText(getContext(),"请输入分享内容",Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                return false;
+                Intent intent = new Intent(getActivity(), RecordShareActivity.class);
+                Bundle arg = new Bundle();
+                arg.putString("Content",mEdit.getText().toString());
+                arg.putSerializable("MP3Info", MusicService.getCurrentMP3());
+                intent.putExtras(arg);
+                startActivity(intent);
             }
         });
+//        (rootView.findViewById(R.id.sharebtn)).setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                if(event.getAction() == MotionEvent.ACTION_DOWN){
+//                    if(mEdit.getText().toString().equals("")){
+//                        Toast.makeText(getContext(),"请输入分享内容",Toast.LENGTH_SHORT).show();
+//                        return false;
+//                    }
+//
+//                    Intent intent = new Intent(getActivity(), RecordShareActivity.class);
+//                    Bundle arg = new Bundle();
+//                    arg.putString("Content",mEdit.getText().toString());
+//                    arg.putSerializable("MP3Info", MusicService.getCurrentMP3());
+//                    intent.putExtras(arg);
+//                    startActivity(intent);
+//
+//
+//                }
+//                return false;
+//            }
+//        });
         return rootView;
     }
+
 
 }
 

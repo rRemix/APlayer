@@ -1,13 +1,10 @@
 package remix.myplayer.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -17,7 +14,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapters.RecentlyAdapter;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.ui.TimerPopupWindow;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 
@@ -42,7 +38,7 @@ public class RecetenlyActivity extends BaseToolbarActivity  implements MusicServ
     }
 
     private void initListView() {
-        mAdapter = new RecentlyAdapter(this,DBUtil.getMP3ListByIds(DBUtil.mWeekList));
+        mAdapter = new RecentlyAdapter(this, DBUtil.getMP3ListByIds(DBUtil.mWeekList));
         mListView = (ListView)findViewById(R.id.recently_listview);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

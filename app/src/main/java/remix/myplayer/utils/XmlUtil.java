@@ -1,6 +1,7 @@
 package remix.myplayer.utils;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 import android.util.Xml;
 
@@ -27,28 +28,32 @@ import remix.myplayer.infos.PlayListItem;
  * Created by taeja on 16-1-26.
  */
 public class XmlUtil {
-    static {
+    private static final String TAG = "XmlUtil";
+    private static Context mContext;
+    private static File mPlayListFile;
+    private static File mPlayingListFile;
+    private static File mSearchHistoryFile;
+    public static void setContext(Context context) {
+        mContext = context;
         try {
-            File file = new File("/data/data/remix.myplayer/files/playlist.xml");
-            if(!file.exists())
-                file.createNewFile();
-            File file1 = new File("/data/data/remix.myplayer/files/playinglist.xml");
-            if(!file1.exists())
-                file1.createNewFile();
-            File file2 = new File("data/data/remix.myplayer/files/searchhistory.xml");
-            if(!file2.exists())
-                file2.createNewFile();
+            File mDir = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName());
+            if(!mDir.exists())
+                mDir.mkdir();
+            mPlayListFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/playlist.xml");
+            if(!mPlayListFile.exists())
+                mPlayListFile.createNewFile();
+            mPlayingListFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/playinglist.xml");
+            if(!mPlayingListFile.exists())
+                mPlayingListFile.createNewFile();
+            mSearchHistoryFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/searchhistory.xml");
+            if(!mSearchHistoryFile.exists())
+                mSearchHistoryFile.createNewFile();
+
         }
         catch (IOException e){
             e.printStackTrace();
+            ErrUtil.writeError(TAG + "---CreateListFile---" + e.toString());
         }
-
-    }
-    private static final String TAG = "XmlUtil";
-    private static Context mContext;
-    public static void setContext(Context context)
-    {
-        mContext = context;
     }
 
 
@@ -60,7 +65,7 @@ public class XmlUtil {
         FileInputStream in = null;
         try {
             in = mContext.openFileInput(name);
-
+//            in = new FileInputStream(mPlayListFile);
             parser.setInput(in,"UTF-8");
             int eventType = parser.getEventType();
             String tag = null;
@@ -124,6 +129,7 @@ public class XmlUtil {
         FileInputStream in = null;
         try {
             in = mContext.openFileInput("playinglist.xml");
+//            in = new FileInputStream(mPlayingListFile);
             parser.setInput(in,"UTF-8");
             int eventType = parser.getEventType();
             String tag = null;
@@ -217,6 +223,7 @@ public class XmlUtil {
         FileOutputStream fos = null;
         try {
             fos = mContext.openFileOutput("playlist.xml",Context.MODE_PRIVATE);
+//            fos = new FileOutputStream(mPlayListFile);
             XmlSerializer parser =  XmlPullParserFactory.newInstance().newSerializer();
             parser.setOutput(fos,"utf-8");
             parser.startDocument("utf-8",true);
@@ -281,6 +288,7 @@ public class XmlUtil {
         FileOutputStream fos = null;
         try {
             fos = mContext.openFileOutput("playinglist.xml",Context.MODE_PRIVATE);
+//            fos = new FileOutputStream(mPlayingListFile);
             XmlSerializer serializer =  XmlPullParserFactory.newInstance().newSerializer();
             serializer.setOutput(fos,"utf-8");
             serializer.startDocument("utf-8",true);
@@ -339,9 +347,7 @@ public class XmlUtil {
         XmlSerializer serializer = null;
         FileOutputStream fos = null;
         try {
-//            File test = new File(Environment.getExternalStorageDirectory() + "/9133/searchhistory.xml");
-//            if(!test.exists())
-//                test.createNewFile();
+//            fos = new FileOutputStream(mSearchHistoryFile);
             serializer =  XmlPullParserFactory.newInstance().newSerializer();
             fos = mContext.openFileOutput("searchhistory.xml",Context.MODE_PRIVATE);
             serializer.setOutput(fos,"utf-8");
@@ -379,10 +385,9 @@ public class XmlUtil {
         ArrayList<String> list = new ArrayList<>();
         FileInputStream in = null;
         try {
+//            in = new FileInputStream(mSearchHistoryFile);
             in = mContext.openFileInput("searchhistory.xml");
-//            File test = new File(Environment.getExternalStorageDirectory() + "/searchhistory.xml");
-//            boolean isExist = test.exists();
-//            in = new FileInputStream(test);
+//
             parser.setInput(in,"utf-8");
             int eventType = parser.getEventType();
             while(eventType != XmlPullParser.END_DOCUMENT){

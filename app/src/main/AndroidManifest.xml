@@ -21,8 +21,10 @@
         android:icon="@mipmap/sideaplayer_icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-
+        android:theme="@style/AppTheme"
+        android:name=".application.Application">
+        <meta-data android:value="56d6563367e58e6aa70005af" android:name="UMENG_APPKEY"/>
+        <meta-data android:value="Channel ID" android:name="UMENG_CHANNEL"/>
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
@@ -112,6 +114,17 @@
                 <!--<category android:name="android.intent.category.DEFAULT" />-->
             <!--</intent-filter>-->
         <!--</activity>-->
+
+        <!--有盟-->
+        <service
+            android:name="com.umeng.update.net.DownloadingService"
+            android:process=":DownloadingService" >
+        </service>
+        <activity
+            android:name="com.umeng.update.UpdateDialogActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
+
 
         <!--微信-->
         <activity

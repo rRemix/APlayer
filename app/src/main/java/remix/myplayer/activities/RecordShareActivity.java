@@ -96,7 +96,7 @@ public class RecordShareActivity extends AppCompatActivity {
 
         mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
         mContent.setText(getIntent().getExtras().getString("Content"));
-        mSongArtist.setText("《" + mInfo.getDisplayname() + "》 ");
+        mSongArtist.setText(" " + mInfo.getDisplayname() + " ");
     }
 
     public static Bitmap getBg(){
@@ -143,7 +143,6 @@ public class RecordShareActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
             }
-
             Intent intent = new Intent(RecordShareActivity.this, SharePopupWindow.class);
             Bundle arg = new Bundle();
             arg.putInt("Type", Constants.SHARERECORD);

@@ -1,8 +1,6 @@
 package remix.myplayer.adapters;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.provider.MediaStore;
 import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -13,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;

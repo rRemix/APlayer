@@ -18,6 +18,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions{
+        checkReleaseBuilds false
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -36,4 +40,5 @@ dependencies {
     compile files('libs/universal-image-loader-1.9.5.jar')
     compile files('libs/universal-image-loader-1.9.5-javadoc.jar')
     compile files('libs/universal-image-loader-1.9.5-sources.jar')
+    compile 'com.umeng.analytics:analytics:latest.integration'
 }
