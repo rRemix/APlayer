@@ -25,6 +25,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapters.PlayListAdapter;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
+import remix.myplayer.ui.popupwindow.AddPlayListDialog;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DensityUtil;
 import remix.myplayer.infos.PlayListItem;
@@ -79,27 +80,6 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 
             @Override
             public void onItemLongClick(View view, int position) {
-                try {
-                    String name = "";
-                    Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
-                    for (int i = 0; i <= position; i++) {
-                        it.hasNext();
-                        name = it.next().toString();
-                    }
-                    if(mPlaylist.get(name).size() == 0) {
-                        Toast.makeText(PlayListActivity.this, "该列表为空", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    Intent intent = new Intent(PlayListActivity.this, ChildHolderActivity.class);
-                    intent.putExtra("Test",false);
-                    intent.putExtra("Id", position);
-                    intent.putExtra("Title", name);
-                    intent.putExtra("Type", Constants.PLAYLIST_HOLDER);
-                    startActivity(intent);
-                } catch (Exception e){
-                    e.printStackTrace();
-                    ErrUtil.writeError(TAG + "---onItemLongClick---" + e.toString());
-                }
             }
         });
         mRecycleView.setAdapter(mAdapter);
@@ -129,7 +109,7 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 //                        startActivity(new Intent(PlayListActivity.this, SearchActivity.class));
 //                        break;
 //                    case R.id.toolbar_timer:
-//                        startActivity(new Intent(PlayListActivity.this, TimerPopupWindow.class));
+//                        startActivity(new Intent(PlayListActivity.this, TimerDialog.class));
 //                        break;
 //                }
 //                return true;
@@ -137,46 +117,47 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 //        });
 //    }
 
-    public void onAdd(View v)
-    {
-        final View contentView = LayoutInflater.from(this).inflate(R.layout.playlist_add,null);
-        final PopupWindow window = new PopupWindow(contentView,
-                DensityUtil.dip2px(getApplicationContext(),254f),
-                DensityUtil.dip2px(getApplicationContext(),180f),
-                true);
-        window.setBackgroundDrawable(getResources().getDrawable(R.drawable.createlist_bg));
-        window.setTouchInterceptor(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return false;
-            }
-        });
-        window.setAnimationStyle(R.style.popwin_anim_style);
-        window.showAtLocation(v, Gravity.CENTER,0,0);
+    public void onAdd(View v) {
+        startActivity(new Intent(PlayListActivity.this, AddPlayListDialog.class));
 
-        //修改获得焦点时下划线的颜色
-        final EditText editText = (EditText)contentView.findViewById(R.id.playlist_add_edit);
-        editText.getBackground().setColorFilter(getResources().getColor(R.color.intersperse_color), PorterDuff.Mode.SRC_ATOP);
-        editText.setText("本地歌单" + mPlaylist.size());
-        contentView.findViewById(R.id.playlist_cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                window.dismiss();
-            }
-        });
-
-        contentView.findViewById(R.id.playlist_continue).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String name = ((EditText) contentView.findViewById(R.id.playlist_add_edit)).getText().toString();
-                if (name != null && !name.equals("")) {
-                    XmlUtil.addPlaylist(name);
-                    mAdapter.notifyDataSetChanged();
-                }
-                window.dismiss();
-            }
-        });
+//        final View contentView = LayoutInflater.from(this).inflate(R.layout.playlist_add,null);
+//        final PopupWindow window = new PopupWindow(contentView,
+//                DensityUtil.dip2px(getApplicationContext(),254f),
+//                DensityUtil.dip2px(getApplicationContext(),174f),
+//                true);
+//        window.setBackgroundDrawable(getResources().getDrawable(R.drawable.creatlist_bg));
+//        window.setTouchInterceptor(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                return false;
+//            }
+//        });
+//        window.setAnimationStyle(R.style.popwin_anim_style);
+//        window.showAtLocation(v, Gravity.CENTER,0,0);
+//
+//        //修改获得焦点时下划线的颜色
+//        final EditText editText = (EditText)contentView.findViewById(R.id.playlist_add_edit);
+//        editText.getBackground().setColorFilter(getResources().getColor(R.color.intersperse_color), PorterDuff.Mode.SRC_ATOP);
+//        editText.setText("本地歌单" + mPlaylist.size());
+//        contentView.findViewById(R.id.playlist_cancel).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                window.dismiss();
+//            }
+//        });
+//
+//        contentView.findViewById(R.id.playlist_continue).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                String name = ((EditText) contentView.findViewById(R.id.playlist_add_edit)).getText().toString();
+//                if (name != null && !name.equals("")) {
+//                    XmlUtil.addPlaylist(name);
+//                    mAdapter.notifyDataSetChanged();
+//                }
+//                window.dismiss();
+//            }
+//        });
     }
 
     public PlayListAdapter getAdapter()

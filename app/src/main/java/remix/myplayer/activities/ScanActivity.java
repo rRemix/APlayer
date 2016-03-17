@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 import remix.myplayer.R;
 import remix.myplayer.ui.customviews.CustomSeekBar;
-import remix.myplayer.ui.popupwindow.TimerPopupWindow;
+import remix.myplayer.ui.popupwindow.TimerDialog;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.SharedPrefsUtil;
 
@@ -105,7 +105,7 @@ public class ScanActivity extends ToolbarActivity {
                         startActivity(new Intent(ScanActivity.this, SearchActivity.class));
                         break;
                     case R.id.toolbar_timer:
-                        startActivity(new Intent(ScanActivity.this, TimerPopupWindow.class));
+                        startActivity(new Intent(ScanActivity.this, TimerDialog.class));
                         break;
                 }
                 return true;

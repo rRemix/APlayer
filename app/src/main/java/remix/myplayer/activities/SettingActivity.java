@@ -15,7 +15,7 @@ import com.umeng.update.UmengUpdateAgent;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.SettingAdapter;
-import remix.myplayer.ui.popupwindow.TimerPopupWindow;
+import remix.myplayer.ui.popupwindow.TimerDialog;
 
 /**
  * Created by taeja on 16-3-7.
@@ -79,7 +79,7 @@ public class SettingActivity extends ToolbarActivity {
                         startActivity(new Intent(SettingActivity.this, SearchActivity.class));
                         break;
                     case R.id.toolbar_timer:
-                        startActivity(new Intent(SettingActivity.this, TimerPopupWindow.class));
+                        startActivity(new Intent(SettingActivity.this, TimerDialog.class));
                         break;
                 }
                 return true;

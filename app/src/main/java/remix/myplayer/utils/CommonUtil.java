@@ -280,7 +280,7 @@ public class CommonUtil {
     }
 
     //高斯模糊
-    public Bitmap blurBitmap(Bitmap bitmap){
+    public static Bitmap blurBitmap(Bitmap bitmap){
 
         //Let's create an empty bitmap with the same size of the bitmap we want to blur
         Bitmap outBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);

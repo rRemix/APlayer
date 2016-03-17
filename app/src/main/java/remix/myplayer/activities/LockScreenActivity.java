@@ -1,7 +1,6 @@
 package remix.myplayer.activities;
 
 import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,12 +20,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.request.BasePostprocessor;
 import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.imagepipeline.request.Postprocessor;
 
 import java.util.ArrayList;
@@ -60,9 +56,8 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     private RelativeLayout mContainer;
     private View mView;
     private static boolean mIsRunning = false;
-    public static boolean mIsDestory = true;
-    private SimpleDraweeView mImage;
-    private ImageView mImageTest;
+    private SimpleDraweeView mSimpleImage;
+    private ImageView mImageBackground;
     private Postprocessor mProcessor;
     private ImageRequest mImageRequest;
     private Bitmap mNewBitMap;
@@ -73,14 +68,14 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         @Override
         public void handleMessage(Message msg) {
 //            mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
-            mImageTest.setImageBitmap(mNewBitMap);
+            mImageBackground.setImageBitmap(mNewBitMap);
         }
     };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lockscreen);
-        mIsDestory = false;
+
         mInstance = this;
         if((mInfo = MusicService.getCurrentMP3()) == null)
             return;
@@ -107,8 +102,8 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         mPlayButton.setOnClickListener(listener);
 
         //初始化界面
-        mImageTest = (ImageView)findViewById(R.id.image_test);
-        mImage = (SimpleDraweeView)findViewById(R.id.lockscreen_image);
+        mImageBackground = (ImageView)findViewById(R.id.lockscreen_background);
+        mSimpleImage = (SimpleDraweeView)findViewById(R.id.lockscreen_image);
         mSong = (TextView)findViewById(R.id.lockscreen_song);
         mArtist = (TextView)findViewById(R.id.lockscreen_artist);
         mContainer = (RelativeLayout)findViewById(R.id.lockscreen_container);
@@ -194,7 +189,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mIsDestory = true;
     }
 
     @Override
@@ -206,7 +200,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         super.onResume();
         mIsRunning = true;
         UpdateUI(mInfo,MusicService.getIsplay());
-//        new TimeThread().start();
     }
 
 
@@ -234,33 +227,22 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
 
         mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.wy_lock_btn_pause : R.drawable.wy_lock_btn_play));
         //背景
-        mImageRequest = ImageRequestBuilder.newBuilderWithSource(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()))
-                .setPostprocessor(mProcessor)
-                .build();
-
-        PipelineDraweeController controller = (PipelineDraweeController)
-                Fresco.newDraweeControllerBuilder()
-                        .setImageRequest(mImageRequest)
-                        .setOldController(mImage.getController())
-                        // other setters as you need
-                        .build();
-        mImage.setController(controller);
-
+//        mImageRequest = ImageRequestBuilder.newBuilderWithSource(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()))
+//                .setPostprocessor(mProcessor)
+//                .build();
+//
+//        PipelineDraweeController controller = (PipelineDraweeController)
+//                Fresco.newDraweeControllerBuilder()
+//                        .setImageRequest(mImageRequest)
+//                        .setOldController(mSimpleImage.getController())
+//                        // other setters as you need
+//                        .build();
+//        mSimpleImage.setController(controller);
+        mSimpleImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),mInfo.getAlbumId()));
 
         new BlurThread().start();
     }
 
-    /**
-     * 按正方形裁切图片
-     */
-    public static Bitmap ImageCrop(Bitmap bitmap) {
-        int w = bitmap.getWidth(); // 得到图片的宽，高
-        int h = bitmap.getHeight();
-        int wh = w > h ? h : w;// 裁切后所取的正方形区域边长
-        int retX = w > h ? (w - h) / 2 : 0;//基于原图，取正方形左上角x坐标
-        int retY = w > h ? 0 : (h - w) / 2;
-        return Bitmap.createBitmap(bitmap, retX, retY, wh, wh, null, false);
-    }
 
     @Override
     public int getType() {
@@ -279,9 +261,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         mLoveButton.setImageResource(mIsLove ? R.drawable.wy_lock_btn_loved : R.drawable.wy_lock_btn_love);
     }
 
-    public boolean IsDestory(){
-        return mIsDestory;
-    }
 
     @Override
     public void onBackPressed() {
@@ -293,26 +272,27 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         @Override
         public void run() {
             long start = System.currentTimeMillis();
-            //对专辑图片进行高斯模糊，并将其设置为背景
-            float radius = 25;
-            float scaleFactor = 15;
             if (mWidth > 0 && mHeight > 0 ) {
-                if(mInfo == null) return;
-                Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
-                if (bkg == null)
-                    bkg = BitmapFactory.decodeResource(getResources(), R.drawable.bg_lockscreen_default);
+                if (mInfo == null) return;
+                float radius = 40;
+                float widthscaleFactor = 3.3f;
+                float heightscaleFactor = (float) (widthscaleFactor * (mHeight * 1.0 / mWidth));
 
-                mNewBitMap = Bitmap.createBitmap((int) (mWidth / scaleFactor), (int) (mHeight / scaleFactor), Bitmap.Config.ARGB_8888);
+                Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(), false);
+                if (bkg == null)
+                    bkg = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
+
+                mNewBitMap = Bitmap.createBitmap((int) (mWidth / widthscaleFactor), (int) (mHeight / heightscaleFactor), Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(mNewBitMap);
 //                canvas.translate(-mContainer.getLeft() / scaleFactor, -mContainer.getTop() / scaleFactor);
-//                canvas.scale(1 / scaleFactor, 1 / scaleFactor);
+//                canvas.scale(scaleFactor,  scaleFactor);
                 Paint paint = new Paint();
                 paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-                paint.setAlpha((int)(255 * 0.6));
+                paint.setAlpha((int) (255 * 0.3));
                 canvas.drawBitmap(bkg, 0, 0, paint);
                 mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
-
             }
+
             Log.d(TAG,"mill: " + (System.currentTimeMillis() - start));
             mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
         }

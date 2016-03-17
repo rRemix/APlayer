@@ -7,7 +7,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import remix.myplayer.R;
-import remix.myplayer.ui.popupwindow.TimerPopupWindow;
+import remix.myplayer.ui.popupwindow.TimerDialog;
 
 /**
  * Created by taeja on 16-3-15.
@@ -33,7 +33,7 @@ public class ToolbarActivity extends BaseAppCompatActivity {
                         startActivity(new Intent(ToolbarActivity.this, SearchActivity.class));
                         break;
                     case R.id.toolbar_timer:
-                        startActivity(new Intent(ToolbarActivity.this, TimerPopupWindow.class));
+                        startActivity(new Intent(ToolbarActivity.this, TimerDialog.class));
                         break;
                 }
                 return true;

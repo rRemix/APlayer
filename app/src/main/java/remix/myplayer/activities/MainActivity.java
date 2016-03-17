@@ -40,7 +40,7 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.listeners.LockScreenListener;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.services.TimerService;
-import remix.myplayer.ui.popupwindow.TimerPopupWindow;
+import remix.myplayer.ui.popupwindow.TimerDialog;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
@@ -166,7 +166,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                         startActivity(new Intent(MainActivity.this, SearchActivity.class));
                         break;
                     case R.id.toolbar_timer:
-                        startActivity(new Intent(MainActivity.this, TimerPopupWindow.class));
+                        startActivity(new Intent(MainActivity.this, TimerDialog.class));
                         break;
                 }
                 return true;

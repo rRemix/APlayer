@@ -14,7 +14,7 @@ import remix.myplayer.R;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.customviews.ColumnView;
-import remix.myplayer.ui.popupwindow.SelectedPopupWindow;
+import remix.myplayer.ui.popupwindow.OptionDialog;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -87,7 +87,7 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
         mItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, SelectedPopupWindow.class);
+                Intent intent = new Intent(mContext, OptionDialog.class);
 //                intent.putExtra("Position",position);
                 intent.putExtra("MP3Info",temp);
                 mContext.startActivity(intent);

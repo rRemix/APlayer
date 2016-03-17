@@ -16,6 +16,7 @@ import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.utils.XmlUtil;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -79,6 +80,7 @@ public class PlayingListAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View v) {
                     DBUtil.mPlayingList.remove(temp.getId());
+                    XmlUtil.updatePlayingList();
                     if(temp.getId() == MusicService.getCurrentMP3().getId()) {
                         Intent intent = new Intent(Constants.CTL_ACTION);
                         intent.putExtra("Control", Constants.NEXT);

@@ -12,7 +12,7 @@ import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 
-import remix.myplayer.ui.popupwindow.SharePopupWindow;
+import remix.myplayer.ui.popupwindow.ShareDialog;
 import remix.myplayer.utils.Constants;
 
 
@@ -43,7 +43,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler{
     @Override
     public void onResp(BaseResp baseResp) {
         Log.d("WX",baseResp.toString());
-        if(SharePopupWindow.mInstance != null ){
+        if(ShareDialog.mInstance != null ){
             String result = "";
             switch (baseResp.errCode) {
                 case BaseResp.ErrCode.ERR_OK:
@@ -60,7 +60,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler{
                     break;
             }
             Toast.makeText(this, result, Toast.LENGTH_LONG).show();
-            SharePopupWindow.mInstance.finish();
+            ShareDialog.mInstance.finish();
         }
 //        if(RecordShareActivity.mInstance != null){
 //            RecordShareActivity.mInstance.finish();

@@ -23,7 +23,7 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.customviews.CircleImageView;
 import remix.myplayer.ui.customviews.ColumnView;
-import remix.myplayer.ui.popupwindow.SelectedPopupWindow;
+import remix.myplayer.ui.popupwindow.OptionDialog;
 import remix.myplayer.utils.DBUtil;
 
 /**
@@ -101,7 +101,7 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
             @Override
             public void onClick(View v) {
                 MP3Info temp = DBUtil.getMP3InfoById(DBUtil.mAllSongList.get(position));
-                Intent intent = new Intent(mContext, SelectedPopupWindow.class);
+                Intent intent = new Intent(mContext, OptionDialog.class);
 //                intent.putExtra("Position",position);
                 intent.putExtra("MP3Info",temp);
                 mContext.startActivity(intent);

@@ -9,7 +9,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/image_test"
+        android:id="@+id/lockscreen_background"
         android:visibility="visible"
         android:scaleType="centerCrop"/>
 

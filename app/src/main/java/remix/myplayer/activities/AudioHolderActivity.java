@@ -21,12 +21,14 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -41,7 +43,7 @@ import remix.myplayer.services.MusicService;
 
 import remix.myplayer.ui.customviews.AudioViewPager;
 import remix.myplayer.ui.customviews.LrcView;
-import remix.myplayer.ui.popupwindow.PlayingListPopupWindow;
+import remix.myplayer.ui.popupwindow.PlayingListDialog;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
@@ -89,7 +91,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     private ArrayList<ImageView> mGuideList;
     private int mCurrentTime;
     private int mDuration;
-    private LinearLayout mContainer;
+    private FrameLayout mContainer;
     private TextView mNextText = null;
     public static int mWidth;
     public static int mHeight;
@@ -100,14 +102,19 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     private boolean mFromMainActivity = false;
     private boolean mFromBack = false;
     private ImageView mImageTest;
+    private SimpleDraweeView mSimpleImage;
     private Handler mBlurHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == Constants.UPDATE_BG) {
                 //设置高度模糊的背景
-//                mContainer.startAnimation(mAnimOut);
-                mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
-//                mImageTest.setImageBitmap(mNewBitMap);
+                long start = System.currentTimeMillis();
+                if(!mFistStart)
+                    mContainer.startAnimation(mAnimOut);
+                else
+                    mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
+
+                Log.d(TAG,"duration:" + (System.currentTimeMillis() - start));
                 //更新专辑封面
                 ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
                 if(mFistStart)
@@ -170,8 +177,8 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
 //        mWidth = (int)(metrics.widthPixels  * 0.95);
 //        mHeight = (int)(metrics.heightPixels * 7 / 9.5);
 
-        mWidth = (int)(metrics.widthPixels  * 1);
-        mHeight = (int)(metrics.heightPixels * 1);
+        mWidth = metrics.widthPixels;
+        mHeight = metrics.heightPixels;
         mAnimIn = (AlphaAnimation)AnimationUtils.loadAnimation(this,R.anim.audio_bg_in);
         mAnimIn.setFillAfter(true);
         mAnimOut = (AlphaAnimation)AnimationUtils.loadAnimation(this,R.anim.audio_bg_out);
@@ -191,7 +198,9 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
             public void onAnimationRepeat(Animation animation) {
             }
         });
-        mContainer = (LinearLayout)findViewById(R.id.audio_holder_container);
+        mContainer = (FrameLayout)findViewById(R.id.audio_holder_container);
+        mSimpleImage = (SimpleDraweeView)findViewById(R.id.audio_holder_background);
+//        mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
         new BlurThread().start();
     }
 
@@ -216,7 +225,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         mPlayingList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(AudioHolderActivity.this,PlayingListPopupWindow.class));
+                startActivity(new Intent(AudioHolderActivity.this,PlayingListDialog.class));
             }
         });
     }
@@ -385,7 +394,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             }
-
             @Override
             public void onPageSelected(int position) {
                 mGuideList.get(mPrevPosition).setImageResource(R.drawable.play_icon_unselected_dot);
@@ -396,7 +404,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 else
                     mPager.setIntercept(false);
             }
-
             @Override
             public void onPageScrollStateChanged(int state) {
 
@@ -445,6 +452,42 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
             mDuration = (int) mInfo.getDuration();
             mSeekBar.setMax(mDuration);
             new BlurThread().start();
+
+//            mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
+//
+//            Postprocessor blurPostprocessor = new BasePostprocessor() {
+//                @Override
+//                public String getName() {
+//                    return "blurPostprocessor";
+//                }
+//
+//                @Override
+//                public void process(Bitmap bitmap) {
+//                    Bitmap bkg = bitmap;
+//
+//                    mNewBitMap = Bitmap.createBitmap((int) (mWidth / 3.5), (int) (mHeight / 7 ), Bitmap.Config.ARGB_8888);
+//                    Canvas canvas = new Canvas(mNewBitMap);
+////                canvas.translate(-mContainer.getLeft() / scaleFactor, -mContainer.getTop() / scaleFactor);
+////                canvas.scale(scaleFactor,  scaleFactor);
+//                    Paint paint = new Paint();
+//                    paint.setFlags(Paint.FILTER_BITMAP_FLAG);
+//                    paint.setAlpha((int)(255 * 0.4));
+//                    canvas.drawBitmap(bitmap, 0, 0, paint);
+//                    mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) 30, true);
+//                }
+//            };
+//
+//            ImageRequest request = ImageRequestBuilder.newBuilderWithSource(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()))
+//                    .setPostprocessor(blurPostprocessor)
+//                    .build();
+//
+//            PipelineDraweeController controller = (PipelineDraweeController)
+//                    Fresco.newDraweeControllerBuilder()
+//                            .setImageRequest(request)
+//                            .setOldController(mSimpleImage.getController())
+//                            // other setters as you need
+//                            .build();
+//            mSimpleImage.setController(controller);
         }
         else if(mIsRunning)
             //更新按钮状态
@@ -490,30 +533,24 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         public void run() {
             long start = System.currentTimeMillis();
             //对专辑图片进行高斯模糊，并将其设置为背景
-//            View view = getWindow().getDecorView();
-//            view.setDrawingCacheEnabled(true);
-//            view.buildDrawingCache(true);
-//            Bitmap bmp1 = view.getDrawingCache();
-//            int height1 = bmp1.getHeight();
-//            int width1 = bmp1.getWidth();
-//            int otherheight = getOtherHeight();
-//            Bitmap bmp2 = Bitmap.createBitmap(bmp1, 0, otherheight,bmp1.getWidth(), bmp1.getHeight() - otherheight);
 
-            float radius = 25;
-            float scaleFactor = 15;
             if (mWidth > 0 && mHeight > 0 ) {
                 if(mInfo == null) return;
+                float radius = 40;
+                float widthscaleFactor = 3.3f;
+                float heightscaleFactor = (float)(widthscaleFactor * (mHeight * 1.0 / mWidth));
+
                 Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
                 if (bkg == null)
-                    bkg = BitmapFactory.decodeResource(getResources(), R.drawable.bg_lockscreen_default);
+                    bkg = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
 
-                mNewBitMap = Bitmap.createBitmap((int) (mWidth / scaleFactor), (int) (mHeight / scaleFactor), Bitmap.Config.ARGB_8888);
+                mNewBitMap = Bitmap.createBitmap((int) (mWidth / widthscaleFactor), (int) (mHeight / heightscaleFactor ), Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(mNewBitMap);
 //                canvas.translate(-mContainer.getLeft() / scaleFactor, -mContainer.getTop() / scaleFactor);
 //                canvas.scale(scaleFactor,  scaleFactor);
                 Paint paint = new Paint();
                 paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-                paint.setAlpha((int)(255 * 0.4));
+                paint.setAlpha((int)(255 * 0.3));
                 canvas.drawBitmap(bkg, 0, 0, paint);
                 mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
                 //获得当前背景

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="@drawable/createlist_bg">
+    android:orientation="vertical" android:layout_width="254dp"
+    android:layout_height="174dp"
+    android:background="@drawable/creatlist_bg"
+    style="@style/PopupCenterDialog">
     <TextView
         android:layout_gravity="center"
         android:textColor="#1b1c19"
@@ -15,9 +16,11 @@
         android:id="@+id/playlist_add_edit"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
         android:layout_marginTop="18dp"
+        android:lines="1"
+        android:ellipsize="end"
         android:textCursorDrawable="@drawable/bg_cursor_purple"/>
     <LinearLayout
         android:layout_width="match_parent"
@@ -32,7 +35,8 @@
             android:id="@+id/playlist_cancel"
             android:textSize="@dimen/textsize_large"
             android:layout_marginRight="24dp"
-            android:text="取消"/>
+            android:text="取消"
+            android:onClick="onCancel"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -41,6 +45,7 @@
             android:textSize="@dimen/textsize_large"
             android:textColor="@color/progress_complete"
             android:layout_marginRight="16dp"
-            android:text="继续"/>
+            android:text="继续"
+            android:onClick="onAdd"/>
     </LinearLayout>
 </LinearLayout>

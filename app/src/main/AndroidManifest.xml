@@ -55,23 +55,26 @@
             android:theme="@style/LockScreenDialog"
             android:excludeFromRecents="true"
             android:exported="false"
-            android:launchMode="singleInstance"/>
+            android:launchMode="singleTop"/>
 
         <activity android:name=".activities.ChildHolderActivity"/>
 
         <activity android:name=".activities.RecordShareActivity"/>
 
-        <activity android:name=".ui.popupwindow.AddPopupWindow"
-            android:theme="@style/PopupDialog"/>
+        <activity android:name=".ui.popupwindow.AddtoPlayListDialog"
+            android:theme="@style/PopupBottomDialog"/>
 
-        <activity android:name=".ui.popupwindow.PlayingListPopupWindow"
-            android:theme="@style/PopupDialog"/>
+        <activity android:name=".ui.popupwindow.PlayingListDialog"
+            android:theme="@style/PopupBottomDialog"/>
 
-        <activity android:name=".ui.popupwindow.SelectedPopupWindow"
-            android:theme="@style/PopupDialog"/>
+        <activity android:name=".ui.popupwindow.OptionDialog"
+            android:theme="@style/PopupBottomDialog"/>
 
-        <activity android:name=".ui.popupwindow.TimerPopupWindow"
-            android:theme="@style/PopupTimer"/>
+        <activity android:name=".ui.popupwindow.TimerDialog"
+            android:theme="@style/PopupCenterDialog"/>
+
+        <activity android:name=".ui.popupwindow.AddPlayListDialog"
+            android:theme="@style/PopupCenterDialog"/>
 
         <activity android:name=".activities.RecetenlyActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
@@ -85,8 +88,10 @@
         <activity android:name=".activities.ScanActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
 
-        <activity android:name=".ui.popupwindow.SharePopupWindow"
-            android:theme="@style/PopupDialog"
+
+
+        <activity android:name=".ui.popupwindow.ShareDialog"
+            android:theme="@style/PopupBottomDialog"
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="portrait" >
              <!--微博分享-->

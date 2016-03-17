@@ -58,7 +58,7 @@ public class MainFragment extends Fragment {
 //        mTimer.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                startActivity(new Intent(getActivity(), TimerPopupWindow.class));
+//                startActivity(new Intent(getActivity(), TimerDialog.class));
 //            }
 //        });
 //        mSearch = (ImageButton)v.findViewById(R.id.btn_top_search);

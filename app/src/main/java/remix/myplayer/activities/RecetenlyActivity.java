@@ -86,7 +86,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
 //                        startActivity(new Intent(RecetenlyActivity.this, SearchActivity.class));
 //                        break;
 //                    case R.id.toolbar_timer:
-//                        startActivity(new Intent(RecetenlyActivity.this, TimerPopupWindow.class));
+//                        startActivity(new Intent(RecetenlyActivity.this, TimerDialog.class));
 //                        break;
 //                }
 //                return true;

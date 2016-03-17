@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import remix.myplayer.R;
 import remix.myplayer.infos.MP3Info;
-import remix.myplayer.ui.popupwindow.SharePopupWindow;
+import remix.myplayer.ui.popupwindow.ShareDialog;
 import remix.myplayer.utils.Constants;
 
 /**
@@ -134,7 +134,7 @@ public class RecordShareActivity extends BaseAppCompatActivity {
                         e.printStackTrace();
                     }
             }
-            Intent intent = new Intent(RecordShareActivity.this, SharePopupWindow.class);
+            Intent intent = new Intent(RecordShareActivity.this, ShareDialog.class);
             Bundle arg = new Bundle();
             arg.putInt("Type", Constants.SHARERECORD);
             arg.putString("Url",mFile.getAbsolutePath());

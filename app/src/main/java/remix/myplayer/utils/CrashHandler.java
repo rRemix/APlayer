@@ -93,15 +93,19 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
                 return;
             }
         }
-        PATH = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + mContext.getPackageName() + "/log/";
+
+        long current = System.currentTimeMillis();
+        String time = new SimpleDateFormat("HH:mm:ss").format(new Date(current));
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date(current));
+
+        PATH = Environment.getExternalStorageDirectory().getPath() + "/Android/data/" + mContext.getPackageName() + "/log/" + date + "/";
         File dir = new File(PATH);
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        long current = System.currentTimeMillis();
-        String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(current));
+
         //以当前时间创建log文件
-        File file = new File(PATH + FILE_NAME + time + FILE_NAME_SUFFIX);
+        File file = new File(PATH + time + FILE_NAME_SUFFIX);
 
         try {
             PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
