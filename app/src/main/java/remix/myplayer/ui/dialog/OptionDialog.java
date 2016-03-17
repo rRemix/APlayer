@@ -1,4 +1,4 @@
-package remix.myplayer.ui.popupwindow;
+package remix.myplayer.ui.dialog;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;

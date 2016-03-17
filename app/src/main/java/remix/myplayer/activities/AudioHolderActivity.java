@@ -43,7 +43,7 @@ import remix.myplayer.services.MusicService;
 
 import remix.myplayer.ui.customviews.AudioViewPager;
 import remix.myplayer.ui.customviews.LrcView;
-import remix.myplayer.ui.popupwindow.PlayingListDialog;
+import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
@@ -201,12 +201,11 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         mContainer = (FrameLayout)findViewById(R.id.audio_holder_container);
         mSimpleImage = (SimpleDraweeView)findViewById(R.id.audio_holder_background);
 //        mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
-        new BlurThread().start();
+//        new BlurThread().start();
     }
 
 
-    private void initBottomButton()
-    {
+    private void initBottomButton() {
         mPlayModel = (ImageButton)findViewById(R.id.playbar_model);
         mPlayModel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -235,6 +234,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         super.onResume();
         new ProgeressThread().start();
         mIsRunning = true;
+        UpdateUI(MusicService.getCurrentMP3(),MusicService.getIsplay());
     }
 
     @Override
@@ -436,7 +436,10 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     }
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay){
-        mInfo= MP3info;
+        if(MP3info == null || !mIsRunning)
+            return;
+
+        mInfo = MP3info;
         mIsPlay = isplay;
 
         if(mOperation != Constants.PLAYORPAUSE && mIsRunning) {

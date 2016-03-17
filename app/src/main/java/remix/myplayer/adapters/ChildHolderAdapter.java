@@ -14,7 +14,7 @@ import remix.myplayer.R;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.customviews.ColumnView;
-import remix.myplayer.ui.popupwindow.OptionDialog;
+import remix.myplayer.ui.dialog.OptionDialog;
 
 /**
  * Created by Remix on 2015/12/4.

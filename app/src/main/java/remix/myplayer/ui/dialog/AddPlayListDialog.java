@@ -1,6 +1,5 @@
-package remix.myplayer.ui.popupwindow;
+package remix.myplayer.ui.dialog;
 
-import android.app.Activity;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.Gravity;

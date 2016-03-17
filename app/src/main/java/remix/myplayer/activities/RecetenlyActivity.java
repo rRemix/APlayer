@@ -24,6 +24,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     private RecentlyAdapter mAdapter;
     private Toolbar mToolBar;
     private ListView mListView;
+    private static boolean mIsRunning = false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -101,7 +102,8 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
 //        for(Fragment fragment : fragmentList){
 //            ((RecentlyFragment) fragment).getAdapter().notifyDataSetChanged();
 //        }
-        mAdapter.notifyDataSetChanged();
+        if(mIsRunning)
+            mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -120,10 +122,17 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     @Override
     protected void onResume() {
         super.onResume();
+        mIsRunning = true;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mIsRunning = false;
     }
 }

@@ -25,6 +25,7 @@ import remix.myplayer.utils.DBUtil;
  */
 public class ChildHolderActivity extends BaseAppCompatActivity implements MusicService.Callback{
     private final static String TAG = "ChildHolderActivity";
+    private static boolean mIsRunning = false;
     private MusicService mService;
     private ImageView mBack;
     public static String mFLAG = "CHILD";
@@ -143,6 +144,8 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
     }
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay) {
+        if(!mIsRunning || MP3info == null)
+            return;
         MP3Info temp = MP3info;
         mActionbar.UpdateBottomStatus(MP3info, isplay);
         if(mAdapter != null)
@@ -157,10 +160,18 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
     @Override
     protected void onResume() {
         super.onResume();
+        mIsRunning = true;
+        UpdateUI(MusicService.getCurrentMP3(),MusicService.getIsplay());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mIsRunning = false;
     }
 }

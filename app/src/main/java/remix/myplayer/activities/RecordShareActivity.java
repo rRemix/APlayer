@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import remix.myplayer.R;
 import remix.myplayer.infos.MP3Info;
-import remix.myplayer.ui.popupwindow.ShareDialog;
+import remix.myplayer.ui.dialog.ShareDialog;
 import remix.myplayer.utils.Constants;
 
 /**

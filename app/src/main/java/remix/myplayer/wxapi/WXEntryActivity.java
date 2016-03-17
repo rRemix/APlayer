@@ -12,7 +12,7 @@ import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 
-import remix.myplayer.ui.popupwindow.ShareDialog;
+import remix.myplayer.ui.dialog.ShareDialog;
 import remix.myplayer.utils.Constants;
 
 
@@ -56,7 +56,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler{
                     result = "分享失败";
                     break;
                 default:
-                    result = "未知错误";
+                    result = "未知错误" + " errstr:" + baseResp.errStr + " errcode:" + baseResp.errCode;
                     break;
             }
             Toast.makeText(this, result, Toast.LENGTH_LONG).show();

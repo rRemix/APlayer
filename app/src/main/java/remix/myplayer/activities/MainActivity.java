@@ -40,7 +40,7 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.listeners.LockScreenListener;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.services.TimerService;
-import remix.myplayer.ui.popupwindow.TimerDialog;
+import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;

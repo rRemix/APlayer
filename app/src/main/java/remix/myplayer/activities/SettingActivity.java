@@ -15,7 +15,7 @@ import com.umeng.update.UmengUpdateAgent;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.SettingAdapter;
-import remix.myplayer.ui.popupwindow.TimerDialog;
+import remix.myplayer.ui.dialog.TimerDialog;
 
 /**
  * Created by taeja on 16-3-7.
