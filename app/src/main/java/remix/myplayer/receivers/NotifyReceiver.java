@@ -32,7 +32,10 @@ public class NotifyReceiver extends BroadcastReceiver {
     }
     private void UpdateNotify(Context context,boolean frommainactivity) {
         mIsplay = MusicService.getIsplay();
-        mRemoteView = new RemoteViews(context.getPackageName(), R.layout.notify_playbar);
+        boolean isBig = context.getResources().getDisplayMetrics().widthPixels >= 1000;
+
+        mRemoteView = new RemoteViews(context.getPackageName(), isBig ? R.layout.notify_playbar_big : R.layout.notify_playbar);
+
         if(frommainactivity && !MusicService.getIsplay())
             return;
         
@@ -41,6 +44,7 @@ public class NotifyReceiver extends BroadcastReceiver {
             //设置歌手，歌曲名
             mRemoteView.setTextViewText(R.id.notify_song, temp.getDisplayname());
             mRemoteView.setTextViewText(R.id.notify_artist_album, temp.getArtist() + "-" + temp.getAlbum());
+
             //设置封面
             Bitmap bitmap = DBUtil.CheckBitmapBySongId((int) temp.getId(), true);
             if(bitmap != null)
@@ -54,38 +58,47 @@ public class NotifyReceiver extends BroadcastReceiver {
                 mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notifbar_btn_stop);
             }
 
+
             Intent mButtonIntent = new Intent(Constants.CTL_ACTION);
             mButtonIntent.putExtra("FromNotify", true);
+            //播放或者暂停
             mButtonIntent.putExtra("Control", Constants.PLAYORPAUSE);
             PendingIntent mIntent_Play = PendingIntent.getBroadcast(context, 1, mButtonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             mRemoteView.setOnClickPendingIntent(R.id.notify_play, mIntent_Play);
-
+            //下一首
             mButtonIntent.putExtra("Control", Constants.NEXT);
             PendingIntent mIntent_Next = PendingIntent.getBroadcast(context,2,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-            mRemoteView.setOnClickPendingIntent(R.id.notify_next,mIntent_Next);
+            mRemoteView.setOnClickPendingIntent(R.id.notify_next, mIntent_Next);
+            //上一首
+            if(isBig){
+                mButtonIntent.putExtra("Control", Constants.PREV);
+                PendingIntent mIntent_Prev = PendingIntent.getBroadcast(context, 2, mButtonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                mRemoteView.setOnClickPendingIntent(R.id.notify_prev,mIntent_Prev);
+            }
 
-            mButtonIntent.putExtra("Control", Constants.PREV);
-            PendingIntent mIntent_Prev = PendingIntent.getBroadcast(context,2,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-            mRemoteView.setOnClickPendingIntent(R.id.notify_next,mIntent_Prev);
-
+            //关闭通知栏
             mButtonIntent.putExtra("Close", true);
-            PendingIntent mIntent_Close = PendingIntent.getBroadcast(context,4,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent mIntent_Close = PendingIntent.getBroadcast(context, 4, mButtonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             mRemoteView.setOnClickPendingIntent(R.id.notify_close, mIntent_Close);
 
-
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+//                    .setLargeIcon(DBUtil.CheckBitmapByAlbumId((int)temp.getAlbumId(),false))
+//                    .setContent(mRemoteView)
+                    .setContentText("")
+                    .setContentTitle("")
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_DEFAULT)
                     .setOngoing(true)
+                    .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setSmallIcon(R.drawable.notifbar_icon);
-//                        .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(DBUtil.CheckBitmapByAlbumId((int)temp.getAlbumId(),false)));
-//                    .setStyle(new android.support.v7.app.NotificationCompat.MediaStyle().setMediaSession(MusicService.mMediaSession.getSessionToken()));
+
             Notification mNotify = mBuilder.build();
-//            Notification.Builder mNotifyBuilder = new Notification.Builder(context);
-//            mNotify = mNotifyBuilder.setSmallIcon(R.drawable.notifbar_icon)
-//                    .setOngoing(true)
-//                    .build();
-            mNotify.bigContentView = mRemoteView;
+
+            if(isBig)
+                mNotify.bigContentView = mRemoteView;
+            else
+                mNotify.contentView = mRemoteView;
+
 
             Intent result = new Intent(context,AudioHolderActivity.class);
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);

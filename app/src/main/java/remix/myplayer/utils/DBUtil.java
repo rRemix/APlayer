@@ -417,9 +417,8 @@ public class DBUtil {
     public static ArrayList<MP3Info> getMP3ListByIds(ArrayList<Long> ids)
     {
         ArrayList<MP3Info> list = new ArrayList<>();
-        if(ids == null)
-            return null;
-        for (Long id : ids) {
+        for (Long id : ids)
+        {
             list.add(getMP3InfoById(id));
         }
         return list.size() > 0 ? list : null;

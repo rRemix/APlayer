@@ -56,7 +56,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler{
                     result = "分享失败";
                     break;
                 default:
-                    result = "未知错误" + " errstr:" + baseResp.errStr + " errcode:" + baseResp.errCode;
+                    result = "未知错误";
                     break;
             }
             Toast.makeText(this, result, Toast.LENGTH_LONG).show();

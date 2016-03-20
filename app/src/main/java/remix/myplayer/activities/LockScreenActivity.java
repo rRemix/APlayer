@@ -206,7 +206,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay) {
         mInfo = MP3info;
-        if(!mIsRunning  || MP3info == null)
+        if(!mIsRunning )
             return;
         if(AudioHolderActivity.mOperation == Constants.PLAYORPAUSE){
             mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.wy_lock_btn_pause : R.drawable.wy_lock_btn_play));

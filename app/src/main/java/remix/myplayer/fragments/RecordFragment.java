@@ -50,27 +50,7 @@ public class RecordFragment extends Fragment{
                 startActivity(intent);
             }
         });
-//        (rootView.findViewById(R.id.sharebtn)).setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                if(event.getAction() == MotionEvent.ACTION_DOWN){
-//                    if(mEdit.getText().toString().equals("")){
-//                        Toast.makeText(getContext(),"请输入分享内容",Toast.LENGTH_SHORT).show();
-//                        return false;
-//                    }
-//
-//                    Intent intent = new Intent(getActivity(), RecordShareActivity.class);
-//                    Bundle arg = new Bundle();
-//                    arg.putString("Content",mEdit.getText().toString());
-//                    arg.putSerializable("MP3Info", MusicService.getCurrentMP3());
-//                    intent.putExtras(arg);
-//                    startActivity(intent);
-//
-//
-//                }
-//                return false;
-//            }
-//        });
+
         return rootView;
     }
 

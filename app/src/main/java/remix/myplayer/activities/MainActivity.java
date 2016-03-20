@@ -44,6 +44,7 @@ import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.DensityUtil;
 import remix.myplayer.utils.ErrUtil;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.XmlUtil;
@@ -85,6 +86,9 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        int width = DensityUtil.px2dip(this,144);
+        int height = DensityUtil.px2dip(this,60);
+
         //检查更新
 //        UmengUpdateAgent.update(this);
 //        MobclickAgent.setDebugMode(true);

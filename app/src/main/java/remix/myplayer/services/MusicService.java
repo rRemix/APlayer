@@ -292,8 +292,7 @@ public class MusicService extends Service {
     }
 
 
-    private void PlayNext()
-    {
+    private void PlayNext() {
         PlayNextOrPrev(true,true);
     }
     private void PlayPrevious()
@@ -443,6 +442,8 @@ public class MusicService extends Service {
                     break;
                 //暂停或者继续播放
                 case Constants.PLAYORPAUSE:
+                    if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
+                        return;
                     mIsplay = !mIsplay;
                     PlayOrPause();
                     break;

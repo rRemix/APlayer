@@ -1,13 +1,19 @@
 package remix.myplayer.activities;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -21,7 +27,9 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.dialog.AddPlayListDialog;
 import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DensityUtil;
 import remix.myplayer.infos.PlayListItem;
+import remix.myplayer.utils.ErrUtil;
 import remix.myplayer.utils.XmlUtil;
 
 /**
@@ -128,7 +136,7 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 //        window.showAtLocation(v, Gravity.CENTER,0,0);
 //
 //        //修改获得焦点时下划线的颜色
-//        final EditText editText = (EditText)contentView.findViewById(R.id.playlist_add_edit);
+//        final PagerEditText editText = (PagerEditText)contentView.findViewById(R.id.playlist_add_edit);
 //        editText.getBackground().setColorFilter(getResources().getColor(R.color.intersperse_color), PorterDuff.Mode.SRC_ATOP);
 //        editText.setText("本地歌单" + mPlaylist.size());
 //        contentView.findViewById(R.id.playlist_cancel).setOnClickListener(new View.OnClickListener() {
@@ -142,7 +150,7 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 //            @Override
 //            public void onClick(View v) {
 //
-//                String name = ((EditText) contentView.findViewById(R.id.playlist_add_edit)).getText().toString();
+//                String name = ((PagerEditText) contentView.findViewById(R.id.playlist_add_edit)).getText().toString();
 //                if (name != null && !name.equals("")) {
 //                    XmlUtil.addPlaylist(name);
 //                    mAdapter.notifyDataSetChanged();

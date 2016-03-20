@@ -16,6 +16,7 @@ import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.customviews.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 
+
 /**
  * Created by Remix on 2015/12/4.
  */

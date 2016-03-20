@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,6 @@ import remix.myplayer.adapters.PagerAdapter;
 import remix.myplayer.listeners.TabTextListener;
 import remix.myplayer.listeners.ViewPagerListener;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.ui.customviews.MyPager;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 
@@ -28,7 +28,7 @@ import remix.myplayer.utils.DBUtil;
 public class MainFragment extends Fragment {
     public static MainFragment mInstance;
     private ImageView mTabImage = null;
-    private MyPager mViewPager;
+    private ViewPager mViewPager;
     private LayoutInflater mInflater;
     private PagerAdapter mAdapter;
     private DrawerLayout mDrawerLayout;
@@ -106,7 +106,7 @@ public class MainFragment extends Fragment {
     {
         return mAdapter;
     }
-    public MyPager getViewPager(){
+    public ViewPager getViewPager(){
         return mViewPager;
     }
     //初始化ViewPager
@@ -121,13 +121,13 @@ public class MainFragment extends Fragment {
 
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(0);
-        mViewPager.setOnPageChangeListener(new ViewPagerListener(getActivity(), mTabImage, 0,4));
+        mViewPager.addOnPageChangeListener(new ViewPagerListener(getActivity(), mTabImage, 0,4));
 
     }
     //初始化custontab
     private void initTab(View rootView)
     {
-        mViewPager = (MyPager)rootView.findViewById(R.id.ViewPager);
+        mViewPager = (ViewPager)rootView.findViewById(R.id.ViewPager);
         mTabImage = (ImageView)rootView.findViewById(R.id.tab_image);
 //        mIndicator = (TabPageIndicator)rootView.findViewById(R.id.tab_indicator);
         mTextViews[0] = (TextView) rootView.findViewById(R.id.tab_song);

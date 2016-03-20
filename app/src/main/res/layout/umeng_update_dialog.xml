@@ -89,7 +89,7 @@
 	        android:button="@drawable/umeng_update_button_check_selector"
 	        android:textColor="#000" />
 
-        <!-- OK&Cancel Button -->
+        <!-- OK&Cancel PagerButton -->
 
         <LinearLayout
             android:layout_width="fill_parent"

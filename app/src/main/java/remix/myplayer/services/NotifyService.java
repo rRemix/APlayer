@@ -69,7 +69,7 @@ public class NotifyService extends Service {
         private void UpdateNotify() {
             mIsplay = MusicService.getIsplay();
 
-            mRemoteView = new RemoteViews(mContext.getPackageName(), R.layout.notify_playbar);
+            mRemoteView = new RemoteViews(mContext.getPackageName(), R.layout.notify_playbar_big);
 //            if(mIsForeground)
 //                return;
 

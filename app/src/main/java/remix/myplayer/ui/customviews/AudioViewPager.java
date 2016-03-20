@@ -22,49 +22,47 @@ public class AudioViewPager extends ViewPager{
 
 
     private int mActionCount = 0 ;
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        Log.d("AudioViewPager","mIntercept:" + mIntercept);
-//        mActionCount++;
-//        if(mIntercept){
-//            int action = ev.getAction();
-//            switch (action){
-//                case MotionEvent.ACTION_DOWN:
-//                    ret = false;
-//                    break;
-//                case MotionEvent.ACTION_MOVE:
-//                    break;
-//                case MotionEvent.ACTION_UP:
-//                    ret = mActionCount == 2 ? false : true;
-//                    break;
-//            }
-//        } else {
-//            return super.onInterceptTouchEvent(ev);
-//        }
-
-        if(mIntercept && ev.getAction() == MotionEvent.ACTION_MOVE)
-            return true;
-//        boolean ret = super.onInterceptTouchEvent(ev);
+    private int mOriginX1 = 0;
+    private int mOriginX2 = 0;
+//    @Override
+//    public boolean onInterceptTouchEvent(MotionEvent ev) {
+////        Log.d("AudioViewPager","mIntercept:" + mIntercept);
+//
 //        String event = "";
+//
+//        mActionCount++;
 //        switch (ev.getAction()){
 //            case MotionEvent.ACTION_DOWN:
+//                mActionCount = 1;
 //                event = "ACTION_DOWN";
 //                break;
 //            case MotionEvent.ACTION_MOVE:
 //                event = "ACTION_MOVE";
+//                if(mActionCount == 2) {
+//                    mActionCount = 0;
+////                    return true;
+//                }
 //                break;
 //            case MotionEvent.ACTION_UP:
 //                event = "ACTION_UP";
+//                if(mActionCount == 2){
+////                    return false;
+//                }
 //                break;
 //            case MotionEvent.ACTION_CANCEL:
 //                event = "ACTION_CANCEL";
 //                break;
 //        }
-//        Log.d("AudioViewPager","event:" + event);
-//        Log.d("AudioViewPager","ret:" + ret);
+//
+//        boolean ret = super.onInterceptTouchEvent(ev);
+//        Log.d("AudioViewPager","event: " + event);
+//        Log.d("AudioViewPager","ret: " + ret);
 //        return ret;
-        return super.onInterceptTouchEvent(ev);
-    }
+//
+////        if(mIntercept && ev.getAction() == MotionEvent.ACTION_MOVE)
+////            return true;
+////        return super.onInterceptTouchEvent(ev);
+//    }
 
     public void setIntercept(boolean value)
     {
@@ -72,8 +70,4 @@ public class AudioViewPager extends ViewPager{
     }
 
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        return super.dispatchTouchEvent(ev);
-    }
 }
