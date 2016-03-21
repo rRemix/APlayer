@@ -35,13 +35,11 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         this.mContext = context;
     }
     private OnItemClickLitener mOnItemClickLitener;
-    public interface OnItemClickLitener
-    {
+    public interface OnItemClickLitener {
         void onItemClick(View view, int position);
         void onItemLongClick(View view , int position);
     }
-    public void setOnItemClickLitener(OnItemClickLitener mOnItemClickLitener)
-    {
+    public void setOnItemClickLitener(OnItemClickLitener mOnItemClickLitener) {
         this.mOnItemClickLitener = mOnItemClickLitener;
     }
 

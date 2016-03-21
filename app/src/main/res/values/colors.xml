@@ -37,11 +37,13 @@
     <!-- 抽屉ListView背景颜色-->
     <color name="drawer_list_color">#1d1a1d</color>
     <!-- 白色字体-->
-    <color name="text_color_blank">#ffffffff</color>
+    <color name="text_color_white">#ffffffff</color>
     <!-- 灰色字体 -->
     <color name="text_color_gray">#6c6a6c</color>
     <!--专辑与艺术家灰色字体-->
     <color name="text_color_gray_1">#8d8c8e</color>
+    <!--黑色字体-->
+    <color name="text_color_black">#1b1a1c</color>
     <!-- 歌曲库标题选中与未选中-->
     <color name="text_allsong_unsel">#666466</color>
     <color name="text_allsong_sel">#ffffffff</color>

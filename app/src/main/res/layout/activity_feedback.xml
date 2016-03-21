@@ -22,12 +22,12 @@
         android:textSize="@dimen/textsize_large"
         android:textColor="@color/drawer_list_color"
         android:textCursorDrawable="@drawable/bg_cursor_gray"
-        android:layout_width="wrap_content"
+        android:layout_width="352dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="23dp"/>
 
     <ImageButton
-        android:layout_width="wrap_content"
+        android:layout_width="352dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:id="@+id/feedback_submit"

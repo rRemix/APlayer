@@ -206,8 +206,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     }
 
 
-    private void initBottomButton()
-    {
+    private void initBottomButton() {
         mPlayModel = (ImageButton)findViewById(R.id.playbar_model);
         mPlayModel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -234,8 +233,9 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     @Override
     public void onResume() {
         super.onResume();
-        new ProgeressThread().start();
+        UpdateUI(MusicService.getCurrentMP3(),MusicService.getIsplay());
         mIsRunning = true;
+        new ProgeressThread().start();
     }
 
     @Override
@@ -254,11 +254,13 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         super.onDestroy();
     }
 
-    public  Handler mHandler = new Handler() {
+    public  Handler mProgressHandler = new Handler() {
         @Override
-        public void handleMessage(Message msg)
-        {
-            if(mHasPlay != null && mRemainPlay != null && mCurrentTime > 0){
+        public void handleMessage(Message msg) {
+            if(mHasPlay != null
+                    && mRemainPlay != null
+                    && mCurrentTime > 0
+                    && (mDuration - mCurrentTime) > 0){
                 mHasPlay.setText(CommonUtil.getTime(mCurrentTime));
                 mRemainPlay.setText(CommonUtil.getTime(mDuration - mCurrentTime));
             }
@@ -299,22 +301,34 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     private void initSeekBar() {
         if(mInfo == null)
             return;
-        mDuration = (int)mInfo.getDuration();
-        mCurrentTime = MusicService.getCurrentTime();
         //初始化已播放时间与剩余时间
+        mDuration = (int)mInfo.getDuration();
+        int temp = MusicService.getCurrentTime();
+        mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
         mHasPlay = (TextView)findViewById(R.id.text_hasplay);
         mRemainPlay = (TextView)findViewById(R.id.text_remain);
-        mHasPlay.setText(CommonUtil.getTime(mCurrentTime));
-        mRemainPlay.setText(CommonUtil.getTime(mDuration - mCurrentTime));
+        Log.d(TAG,"Duration:" + mDuration + "  CurrentTime:" + mCurrentTime);
+        if(mDuration > 0 && mCurrentTime >= 0 && (mDuration - mCurrentTime) > 0){
+            mHasPlay.setText(CommonUtil.getTime(mCurrentTime));
+            mRemainPlay.setText(CommonUtil.getTime(mDuration - mCurrentTime));
+        }
 
         mSeekBar = (SeekBar)findViewById(R.id.seekbar);
-        mSeekBar.setMax((int) mInfo.getDuration());
-        mSeekBar.setProgress(MusicService.getCurrentTime());
+        if(mDuration > 0 && mDuration < Integer.MAX_VALUE)
+            mSeekBar.setMax(mDuration);
+        else
+            mSeekBar.setMax(1000);
+
+        if(mCurrentTime > 0 && mCurrentTime < mDuration)
+            mSeekBar.setProgress(mCurrentTime);
+        else
+            mSeekBar.setProgress(0);
+
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser)
-                    mHandler.sendEmptyMessage(Constants.UPDATE_TIME_ONLY);
+                    mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ONLY);
                 if(LrcView.mInstance != null)
                     LrcView.mInstance.seekTo(progress,fromUser);
             }
@@ -437,22 +451,28 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     }
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay){
-        mInfo= MP3info;
+        mInfo = MP3info;
         mIsPlay = isplay;
 
         if(mOperation != Constants.PLAYORPAUSE && mIsRunning) {
-            //更新顶部信息
-            UpdateTopStatus(mInfo);
-            //更新按钮状态
-            UpdatePlayButton(isplay);
-            //更新歌词
-            ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
+            try {
+                //更新顶部信息
+                UpdateTopStatus(mInfo);
+                //更新按钮状态
+                UpdatePlayButton(isplay);
+                //更新歌词
+                ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
 
-            //更新进度条
-            mCurrentTime = MusicService.getCurrentTime();
-            mDuration = (int) mInfo.getDuration();
-            mSeekBar.setMax(mDuration);
-            new BlurThread().start();
+                //更新进度条
+                int temp = MusicService.getCurrentTime();
+                mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
+                mDuration = (int) mInfo.getDuration();
+                mSeekBar.setMax(mDuration);
+                new BlurThread().start();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+
 
 //            mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
 //
@@ -515,14 +535,15 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         @Override
         public void run() {
             while (mIsRunning) {
-                if (MusicService.getIsplay() && MusicService.getCurrentTime() > 0) {
-                    mCurrentTime = MusicService.getCurrentTime();
-                    mHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                int temp = MusicService.getCurrentTime();
+                if (MusicService.getIsplay() && temp > 0 && temp < mDuration) {
+                    mCurrentTime = temp;
+                    mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
+                    try {
+                        sleep(1000);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -556,7 +577,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
                 //获得当前背景
 //                    mContainer.startAnimation(mAnimOut);
-
             }
             Log.d(TAG,"mill: " + (System.currentTimeMillis() - start));
             mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);

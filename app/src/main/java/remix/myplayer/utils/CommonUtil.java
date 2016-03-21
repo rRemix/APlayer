@@ -66,8 +66,6 @@ public class CommonUtil {
         //开始读入图片，此时把options.inJustDecodeBounds 设回true了
         newOpts.inJustDecodeBounds = true;
 
-
-
         return null;
     }
 
@@ -316,8 +314,7 @@ public class CommonUtil {
     }
 
     //获得歌曲时长，分：秒
-    public static String getTime(long duration)
-    {
+    public static String getTime(long duration) {
         int minute = (int)duration / 1000 / 60;
         int second = ((int)duration - minute * 60000) / 1000;
         //如果分钟数小于10
@@ -337,8 +334,7 @@ public class CommonUtil {
         }
     }
     //判断网路是否连接
-    public static boolean isNetWorkConnected()
-    {
+    public static boolean isNetWorkConnected() {
         if(mContext != null)
         {
             ConnectivityManager mConnectivityManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);

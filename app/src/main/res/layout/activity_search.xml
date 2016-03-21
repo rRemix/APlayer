@@ -31,7 +31,7 @@
                 android:id="@+id/search_text"
                 android:background="@null"
                 android:textSize="@dimen/textsize_medium"
-                android:textColor="@color/text_color_blank"
+                android:textColor="@color/text_color_white"
                 android:lines="1"
                 android:ellipsize="end"
                 android:hint="搜索歌曲 艺人 专辑"
@@ -55,7 +55,7 @@
             android:id="@+id/btn_search_go"
             android:text="搜索"
             android:textSize="@dimen/textsize_huge"
-            android:textColor="@color/text_color_blank"
+            android:textColor="@color/text_color_white"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="10dp"
             android:gravity="center_vertical" />
@@ -86,7 +86,7 @@
                     android:id="@+id/search_history_clear"
                     android:text="清空搜索历史"
                     android:textSize="@dimen/textsize_medium"
-                    android:textColor="@color/text_color_blank"
+                    android:textColor="@color/text_color_white"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="15dp"/>
             </LinearLayout>
@@ -98,7 +98,7 @@
                 android:layout_marginTop="30dp"
                 android:gravity="center"
                 android:text="无搜索历史"
-                android:textColor="@color/text_color_blank"
+                android:textColor="@color/text_color_white"
                 android:textSize="@dimen/textsize_huge"/>
         </FrameLayout>
 
@@ -121,7 +121,7 @@
                 android:gravity="center"
                 android:text="无搜索结果"
                 android:textSize="22sp"
-                android:textColor="@color/text_color_blank"/>
+                android:textColor="@color/text_color_white"/>
         </FrameLayout>
 
     </FrameLayout>

@@ -7,7 +7,8 @@
     android:layout_gravity="left|start">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="192dp">
+        android:layout_height="0dp"
+        android:layout_weight="37">
         <ImageView
            android:layout_centerInParent="true"
            android:layout_width="match_parent"
@@ -17,7 +18,8 @@
     <ListView
         android:id="@+id/slide_menu_list"
         android:layout_width="match_parent"
-        android:layout_height="374dp"
+        android:layout_height="0dp"
+        android:layout_weight="72"
         android:divider="@color/list_divider"
         android:dividerHeight="1px"
         android:background="@color/drawer_list_color">
@@ -25,7 +27,8 @@
 
     <ImageButton
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="10"
         android:id="@+id/drawer_exit"
         android:background="@drawable/bg_drawer_exit"/>
 

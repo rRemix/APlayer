@@ -81,6 +81,7 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
             }
         }
 
+
         holder.mTitle.setText(temp.getDisplayname());
 //        holder.mArtist.setText(temp.getArtist());
 

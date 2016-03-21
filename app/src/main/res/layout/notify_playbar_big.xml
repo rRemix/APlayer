@@ -16,21 +16,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingLeft="10dp">
+        android:paddingLeft="10dp"
+        android:gravity="center_vertical">
         <!--歌曲名与关闭按钮-->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
             android:layout_marginTop="10dp">
             <TextView
                 android:id="@+id/notify_song"
                 android:text="歌曲名"
-                android:layout_width="170dp"
+                android:layout_width="190dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:lines="1"
                 android:ellipsize="end"
-                android:textColor="@color/text_color_blank"
+                android:textColor="@color/text_color_white"
                 android:textSize="@dimen/textsize_large"/>
             <ImageButton
                 android:id="@+id/notify_close"
@@ -39,7 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
-                android:layout_marginRight="10dp"
+                android:layout_marginRight="15dp"
                 android:src="@drawable/notify_btn_close_white"/>
         </RelativeLayout>
         <!--歌手与专辑-->
@@ -47,9 +49,11 @@
         <TextView
             android:id="@+id/notify_artist_album"
             android:text="歌手名"
-            android:layout_width="170dp"
+            android:layout_width="190dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
             android:lines="1"
             android:ellipsize="end"
             android:textSize="@dimen/textsize_medium"

@@ -51,13 +51,11 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
 
 
     //<Params, Progress, Result>
-    class AsynLoadImage extends AsyncTask<Integer,Integer,Object>
-    {
+    class AsynLoadImage extends AsyncTask<Integer,Integer,Object> {
 //        private final WeakReference mImageView;
 //        private final ImageView mImage;
         private final SimpleDraweeView mImage;
-        public AsynLoadImage(SimpleDraweeView imageView)
-        {
+        public AsynLoadImage(SimpleDraweeView imageView) {
 //            mImageView = new WeakReference(imageView);
             mImage = imageView;
         }
@@ -84,16 +82,19 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        if(mCursor.moveToPosition(position))
-        {
-            holder.mText1.setText(mCursor.getString(AlbumFragment.mAlbumIndex));
-            holder.mText2.setText(mCursor.getString(AlbumFragment.mArtistIndex));
+        if(mCursor.moveToPosition(position)) {
+            String artist = mCursor.getString(AlbumFragment.mArtistIndex);
+            String album = mCursor.getString(AlbumFragment.mAlbumIndex);
+            artist = artist.indexOf("unknown") > 0 ? "未知歌手" : artist;
+            album = album.indexOf("unknown") > 0 ? "未知专辑" : album;
+
+            holder.mText1.setText(album);
+            holder.mText2.setText(artist);
 //            AsynLoadImage task = new AsynLoadImage(holder.mImage);
 //            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,mCursor.getInt(AlbumFragment.mAlbumIdIndex));
 //            task.execute(mCursor.getInt(AlbumFragment.mAlbumIdIndex));
             holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
-            if(mOnItemClickLitener != null)
-            {
+            if(mOnItemClickLitener != null) {
                 holder.mImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -102,8 +103,8 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
                     }
                 });
             }
-            if(holder.mButton != null)
-            {
+
+            if(holder.mButton != null) {
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -146,36 +147,4 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
 
     }
 
-    class DraweeListener implements ControllerListener
-    {
-
-        @Override
-        public void onSubmit(String id, Object callerContext) {
-
-        }
-
-        @Override
-        public void onFinalImageSet(String id, Object imageInfo, Animatable animatable) {
-
-        }
-
-        @Override
-        public void onIntermediateImageSet(String id, Object imageInfo) {
-
-        }
-
-        @Override
-        public void onIntermediateImageFailed(String id, Throwable throwable) {
-
-        }
-
-        @Override
-        public void onFailure(String id, Throwable throwable) {
-        }
-
-        @Override
-        public void onRelease(String id) {
-
-        }
-    }
 }

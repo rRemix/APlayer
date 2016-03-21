@@ -20,7 +20,7 @@
             android:ellipsize="end"
             android:text="歌曲名"
             android:textSize="@dimen/textsize_large"
-            android:textColor="@color/text_color_blank"/>
+            android:textColor="@color/text_color_white"/>
         <!--<TextView-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="wrap_content"-->

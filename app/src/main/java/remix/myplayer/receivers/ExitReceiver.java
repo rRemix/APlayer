@@ -1,6 +1,5 @@
 package remix.myplayer.receivers;
 
-import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,13 +7,10 @@ import android.content.Intent;
 
 import com.umeng.analytics.MobclickAgent;
 
-import java.util.List;
-
-import remix.myplayer.activities.MainActivity;
 import remix.myplayer.listeners.LockScreenListener;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.services.NotifyService;
 import remix.myplayer.services.TimerService;
+import remix.myplayer.utils.ActivityManager;
 
 /**
  * Created by taeja on 16-2-16.
@@ -31,6 +27,7 @@ public class ExitReceiver extends BroadcastReceiver {
                 LockScreenListener.mInstance.stopListen();
             }
             MobclickAgent.onKillProcess(context);
+            ActivityManager.FinishAll();
             System.exit(0);
         }catch (Exception e){
             e.printStackTrace();

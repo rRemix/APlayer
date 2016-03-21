@@ -2,11 +2,14 @@ package remix.myplayer.activities;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,7 +47,6 @@ import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.DensityUtil;
 import remix.myplayer.utils.ErrUtil;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.XmlUtil;
@@ -63,10 +65,14 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     private ImageButton mSlideMenuAbout;
     private ImageButton mSlideMenuExit;
     private ActionBarDrawerToggle mDrawerToggle;
-    private static boolean isFirst = true;
+    //是否正在运行
+    private static boolean mIsRunning = false;
+    private static boolean mIsFirst = true;
     @Override
     protected void onResume() {
         super.onResume();
+        mIsRunning = true;
+        UpdateUI(MusicService.getCurrentMP3(),MusicService.getIsplay());
     }
 
     @Override
@@ -80,15 +86,13 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
+        mIsRunning = false;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        int width = DensityUtil.px2dip(this,144);
-        int height = DensityUtil.px2dip(this,60);
-
         //检查更新
 //        UmengUpdateAgent.update(this);
 //        MobclickAgent.setDebugMode(true);
@@ -101,7 +105,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         mInstance = this;
 
         mFromNotify = getIntent().getBooleanExtra("Notify", false);
-        if (isFirst) {
+        if (mIsFirst) {
+            mIsFirst = false;
             loadsongs();
             startService(new Intent(this, MusicService.class));
             //NofityService
@@ -125,28 +130,32 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         mToolBar = (Toolbar) findViewById(R.id.toolbar);
         initToolbar();
 
-        if (DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
+        if (DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0){
+            SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", -1);
             return;
+        }
 
-        boolean mFir = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "First", true);
-        int mPos = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "Pos", -1);
+        boolean isFirst = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "First", true);
+        int position = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "Pos", -1);
         SharedPrefsUtil.putValue(getApplicationContext(), "setting", "First", false);
 
         //第一次启动添加我的收藏列表
-        if (mFir) {
+        if (isFirst) {
             XmlUtil.addPlaylist("我的收藏");
         }
-        //如果是第一次启动软件,将第一首歌曲设置为正在播放的
-        if (mFir || mPos < 0)
+        //如果是第一次启动软件,将第一首歌曲设置为正在播放
+        if (isFirst || position < 0) {
             mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)), mFromNotify);
-        else {
-            if(mPos == DBUtil.mPlayingList.size()){
-                mPos = DBUtil.mPlayingList.size() - 1;
-                if(mPos >= 0)
-                    SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", mPos);
+            SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", 0);
+        } else {
+            if(position == DBUtil.mPlayingList.size()){
+                position = DBUtil.mPlayingList.size() - 1;
+                if(position >= 0)
+                    SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", position);
             }
-            mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(mPos)), mFromNotify);
+            mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(position)), mFromNotify);
         }
+
     }
 
     private void initToolbar() {
@@ -327,21 +336,10 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         }
     }
 
-    //后退返回桌面
-//    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        if(keyCode == KeyEvent.KEYCODE_BACK) {
-//            Intent home = new Intent(Intent.ACTION_MAIN);
-//            home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            home.addCategory(Intent.CATEGORY_HOME);
-//            startActivity(home);
-//            sendBroadcast(new Intent(Constants.NOTIFY));
-//        }
-//        return super.onKeyDown(keyCode, event);
-//    }
-
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay) {
+        if(!mIsRunning)
+            return;;
         MP3Info temp = MP3info;
         mBottomBar.UpdateBottomStatus(MP3info, isplay);
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();

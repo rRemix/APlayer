@@ -175,13 +175,12 @@ public class MusicService extends Service {
                 sendBroadcast(new Intent(Constants.NOTIFY));
             }
         };
-        int mPos = SharedPrefsUtil.getValue(getApplicationContext(),"setting","Pos",-1);
+        int Position = SharedPrefsUtil.getValue(getApplicationContext(),"setting","Pos",-1);
         if(DBUtil.mPlayingList != null && DBUtil.mPlayingList.size() > 0) {
-            mId = mPos == -1 ? DBUtil.mPlayingList.get(0) : DBUtil.mPlayingList.get(mPos);
+            mId = Position == -1 ? DBUtil.mPlayingList.get(0) : DBUtil.mPlayingList.get(Position);
             mInfo = DBUtil.getMP3InfoById(mId);
-            mCurrent = mPos == -1 ? 0 : mPos;
-        }
-        else
+            mCurrent = Position == -1 ? 0 : Position;
+        } else
             mInfo = null;
 
         InitMediaPlayer();

@@ -88,7 +88,8 @@ public class LrcView extends TextView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if(mlrcList == null){
-//            canvas.drawText("暂无歌词", mViewCenterX, getHeight() / 2, mPaint);
+            scrollTo(0,0);
+            canvas.drawText("暂无歌词", mViewCenterX, getHeight() / 2, mPaint);
             return;
         }
         if(mCurRow == -1)
@@ -125,6 +126,10 @@ public class LrcView extends TextView {
 
     public void seekTo(int progress,boolean fromuser){
         mCurRow = selectIndex(progress);
+        if(mlrcList == null || mlrcList.size() == 0){
+            invalidate();
+            return;
+        }
         if(!fromuser) {
             smoothScrollTo((mInterval + mLTextSize) * mCurRow, 800);
         } else {
@@ -162,8 +167,8 @@ public class LrcView extends TextView {
 
         }
         index -= 1;
-        if(index<0){
-            index=0;
+        if(index < 0){
+            index = 0;
         }
         return index;
     }

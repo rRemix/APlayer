@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:textSize="@dimen/textsize_huge"
-            android:textColor="@color/text_color_blank"
+            android:textColor="@color/text_color_black"
             android:text="歌曲"/>
         <TextView
             android:id="@+id/lockscreen_artist"

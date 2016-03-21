@@ -31,8 +31,7 @@ public class PlayingListAdapter extends BaseAdapter {
             notifyDataSetChanged();
         }
     };
-    public PlayingListAdapter(LayoutInflater inflater, Context context)
-    {
+    public PlayingListAdapter(LayoutInflater inflater, Context context) {
         mContext = context;
         mInflater = inflater;
     }
@@ -45,8 +44,7 @@ public class PlayingListAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position)
-    {
+    public Object getItem(int position) {
         if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return null;
         return DBUtil.mPlayingList.get(position);
@@ -64,8 +62,7 @@ public class PlayingListAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.playinglist_item,null);
             holder = new ViewHolder(convertView);
             convertView.setTag(holder);
-        }
-        else
+        } else
             holder = (ViewHolder)convertView.getTag();
 
 
@@ -74,6 +71,7 @@ public class PlayingListAdapter extends BaseAdapter {
 
         final MP3Info temp = new MP3Info(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(position)));
         if(temp != null) {
+
             holder.mSong.setText(temp.getDisplayname());
             holder.mArtist.setText(temp.getArtist());
             holder.mButton.setOnClickListener(new View.OnClickListener() {

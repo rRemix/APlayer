@@ -64,6 +64,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     private int mWidth;
     private int mHeight;
     private boolean mIsLove = false;
+    private static boolean mIsPlay = false;
     private Handler mBlurHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -199,7 +200,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     protected void onResume() {
         super.onResume();
         mIsRunning = true;
-        UpdateUI(mInfo,MusicService.getIsplay());
+        UpdateUI(mInfo,mIsPlay);
     }
 
 

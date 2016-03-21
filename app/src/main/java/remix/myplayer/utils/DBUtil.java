@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -44,8 +45,7 @@ public class DBUtil {
         mContext = context;
     }
 
-    public static void setPlayingList(ArrayList<Long> list)
-    {
+    public static void setPlayingList(ArrayList<Long> list) {
         mPlayingList = list;
         XmlUtil.updatePlayingList();
     }
@@ -95,6 +95,7 @@ public class DBUtil {
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -231,8 +232,7 @@ public class DBUtil {
     //根据参数获得图片url
     // 0:专辑id 1:歌手id 2:歌曲id 3:歌曲名
 
-    public static String getImageUrl(String arg,int type)
-    {
+    public static String getImageUrl(String arg,int type) {
         if(arg == null || arg.equals(""))
             return null;
 
@@ -280,8 +280,7 @@ public class DBUtil {
     }
 
     //根据专辑id查询图片url
-    public static String CheckUrlByAlbumId(long Id)
-    {
+    public static String CheckUrlByAlbumId(long Id) {
         ContentResolver resolver = mContext.getContentResolver();
         String url = null;
         Cursor cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{"album_art"},
@@ -296,9 +295,9 @@ public class DBUtil {
 
         return url;
     }
+
     //根据专辑id查询图片
-    public static Bitmap CheckBitmapByAlbumId(int albumId, boolean isthumb)
-    {
+    public static Bitmap CheckBitmapByAlbumId(int albumId, boolean isthumb) {
         try {
             Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId);
             ParcelFileDescriptor pfd = mContext.getContentResolver().openFileDescriptor(uri, "r");
@@ -323,8 +322,7 @@ public class DBUtil {
     }
 
     //根据歌曲id查询图片
-    public static Bitmap CheckBitmapBySongId(int id,boolean isthumb)
-    {
+    public static Bitmap CheckBitmapBySongId(int id,boolean isthumb) {
         try {
             Uri uri = Uri.parse("content://media/external/audio/media/" + id + "/albumart");
             ParcelFileDescriptor pfd = mContext.getContentResolver().openFileDescriptor(uri, "r");
@@ -403,8 +401,17 @@ public class DBUtil {
         long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
         String name = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
         name = name.substring(0, name.lastIndexOf("."));
+        if(name.indexOf("unknown") > 0)
+            name = "未知歌曲";
+
         String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+        if(artist.indexOf("unknown") > 0)
+            artist = "未知歌手";
+
         String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
+        if(album.indexOf("unknown") > 0)
+            album = "未知专辑";
+
         long albumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
         long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
         String realtime = CommonUtil.getTime(duration);
@@ -414,8 +421,7 @@ public class DBUtil {
     }
 
     //根据多个歌曲id返回多个歌曲详细信息
-    public static ArrayList<MP3Info> getMP3ListByIds(ArrayList<Long> ids)
-    {
+    public static ArrayList<MP3Info> getMP3ListByIds(ArrayList<Long> ids) {
         ArrayList<MP3Info> list = new ArrayList<>();
         for (Long id : ids)
         {
@@ -423,6 +429,7 @@ public class DBUtil {
         }
         return list.size() > 0 ? list : null;
     }
+
     //根据歌曲id查询歌曲详细信息
     public static MP3Info getMP3InfoById(long Baseid) {
         MP3Info mp3info = null;
@@ -442,8 +449,7 @@ public class DBUtil {
     }
 
     //根据歌手id获得歌手的歌曲数
-    public static int getSongNumByArtistId(long ArtistId)
-    {
+    public static int getSongNumByArtistId(long ArtistId) {
         Cursor cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
                 MediaStore.Audio.Media.ARTIST_ID + "=" + ArtistId, null, null);
         int count = cursor.getCount();
@@ -454,9 +460,7 @@ public class DBUtil {
     }
 
     //删除歌曲
-    public static boolean deleteSong(String data,int type)
-    {
-
+    public static boolean deleteSong(String data,int type) {
         ContentResolver resolver = mContext.getContentResolver();
         String where = null;
         String[] arg = null;
@@ -483,7 +487,7 @@ public class DBUtil {
                 break;
         }
         Cursor cursor = null;
-        //删除其他
+        //删除非文件夹
         if(type != Constants.DELETE_FOLDER) {
             try {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.Media.DATA,

@@ -92,12 +92,7 @@ public class NotifyReceiver extends BroadcastReceiver {
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setSmallIcon(R.drawable.notifbar_icon);
 
-            Notification mNotify = mBuilder.build();
 
-            if(isBig)
-                mNotify.bigContentView = mRemoteView;
-            else
-                mNotify.contentView = mRemoteView;
 
 
             Intent result = new Intent(context,AudioHolderActivity.class);
@@ -113,6 +108,11 @@ public class NotifyReceiver extends BroadcastReceiver {
                             PendingIntent.FLAG_UPDATE_CURRENT
                     );
             mBuilder.setContentIntent(resultPendingIntent);
+            Notification mNotify = mBuilder.build();
+            if(isBig)
+                mNotify.bigContentView = mRemoteView;
+            else
+                mNotify.contentView = mRemoteView;
 //            mNotify.contentIntent = resultPendingIntent;
             mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(0, mNotify);

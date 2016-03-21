@@ -51,16 +51,14 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        if(convertView == null)
-        {
+        if(convertView == null) {
             convertView = super.getView(position, convertView, parent);
             holder = new ViewHolder();
             holder.mImage = (CircleImageView)convertView.findViewById(R.id.song_head_image);
             holder.mName = (TextView)convertView.findViewById(R.id.displayname);
             holder.mOther = (TextView)convertView.findViewById(R.id.detail);
             convertView.setTag(holder);
-        }
-        else
+        } else
             holder = (ViewHolder)convertView.getTag();
 
         if(!mCursor.moveToPosition(position))
@@ -88,10 +86,14 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
                 mColumnView.stopAnim();
             }
         }
+        name = name.indexOf("unknown") > 0 ? "未知歌曲" : name;
         holder.mName.setText(name);
 
         String artist = mCursor.getString(AllSongFragment.mArtistIndex);
         String album = mCursor.getString(AllSongFragment.mAlbumIndex);
+        artist = artist.indexOf("unknown") > 0 ? "未知歌手" : artist;
+        album = album.indexOf("unknown") > 0 ? "未知专辑" : album;
+
         holder.mOther.setText(artist + "-" + album);
         ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mCursor.getString(AllSongFragment.mAlbumIdIndex),
                 holder.mImage);

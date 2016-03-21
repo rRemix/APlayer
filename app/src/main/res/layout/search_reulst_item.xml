@@ -26,7 +26,7 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:id="@+id/search_name"
-            android:textColor="@color/text_color_blank"
+            android:textColor="@color/text_color_white"
             android:textSize="@dimen/textsize_medium"
             android:text="歌曲名"
             android:layout_marginBottom="5dp"

@@ -36,17 +36,17 @@ public class LrcFragment extends Fragment {
         {
             if(msg.what == UPDATE_LRC) {
                 if(mTextList != null && mLrcView != null) {
-                    mLrcView.setText("");
+//                    mLrcView.setText("");
                     mLrcView.UpdateLrc(mTextList);
                 }
             } else if (msg.what == NO_LRC) {
                 mLrcView.UpdateLrc(null);
-                mLrcView.setText("");
-                mLrcView.setText("暂无歌词");
+//                mLrcView.setText("");
+//                mLrcView.setText("暂无歌词");
             } else if (msg.what == NO_NETWORK) {
                 mLrcView.UpdateLrc(null);
-                mLrcView.setText("");
-                mLrcView.setText("请检查网络连接");
+//                mLrcView.setText("");
+//                mLrcView.setText("请检查网络连接");
             }
         }
     };

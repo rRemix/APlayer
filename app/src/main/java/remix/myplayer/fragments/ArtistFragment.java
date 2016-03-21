@@ -1,5 +1,6 @@
 package remix.myplayer.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -34,10 +35,23 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     private ArtistAdapter mAdapter;
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         mManager = getLoaderManager();
         mManager.initLoader(1001, null, this);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_artist,null);
+        mRecycleView = (RecyclerView)rootView.findViewById(R.id.artist_recycleview);
+        mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         mAdapter = new ArtistAdapter(mCursor,getActivity());
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
@@ -58,13 +72,6 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
             }
         });
         mRecycleView.setAdapter(mAdapter);
-    }
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_artist,null);
-        mRecycleView = (RecyclerView)rootView.findViewById(R.id.artist_recycleview);
-        mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         return rootView;
     }
     @Override

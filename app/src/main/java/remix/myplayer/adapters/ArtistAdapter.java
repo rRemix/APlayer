@@ -52,8 +52,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
 
 
     //<Params, Progress, Result>
-    class AsynLoadImage extends AsyncTask<String,Integer,String>
-    {
+    class AsynLoadImage extends AsyncTask<String,Integer,String> {
         private final SimpleDraweeView mImage;
         public AsynLoadImage(SimpleDraweeView imageView)
         {
@@ -80,7 +79,10 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         if(mCursor.moveToPosition(position)) {
-            holder.mText1.setText(mCursor.getString(ArtistFragment.mArtistIndex));
+            String artist = mCursor.getString(ArtistFragment.mArtistIndex);
+            artist = artist.indexOf("unknown") > 0 ? "未知歌手" : artist;
+            holder.mText1.setText(artist);
+
             AsynLoadImage task = new AsynLoadImage(holder.mImage);
             task.execute(mCursor.getString(ArtistFragment.mArtistIdIndex));
 

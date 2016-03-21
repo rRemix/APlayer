@@ -1,6 +1,7 @@
 package remix.myplayer.fragments;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -37,14 +38,14 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     public static int mAlbumIdIndex = -1;
     public static int mSongId = -1;
     public static AllSongFragment mInstance = null;
+
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         mManager = getLoaderManager();
         mManager.initLoader(1000, null, this);
-        mAdapter = new AllSongAdapter(getActivity(),R.layout.allsong_item,null,new String[]{},new int[]{},0);
-        mListView.setAdapter(mAdapter);
     }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,6 +77,8 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         });
         mListView = (ListView)rootView.findViewById(R.id.list);
         mListView.setOnItemClickListener(new ListViewListener(getActivity()));
+        mAdapter = new AllSongAdapter(getActivity(),R.layout.allsong_item,null,new String[]{},new int[]{},0);
+        mListView.setAdapter(mAdapter);
         return rootView;
     }
 

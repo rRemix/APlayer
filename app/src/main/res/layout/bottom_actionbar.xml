@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:ellipsize="end"
                 android:lines="1"
-                android:textColor="@color/text_color_blank"
+                android:textColor="@color/text_color_white"
                 android:textSize="@dimen/textsize_huge"
                 android:id="@+id/bottom_title"
                 android:text="歌曲名"/>

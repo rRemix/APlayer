@@ -25,7 +25,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:textSize="@dimen/textsize_huge"
-            android:textColor="@color/text_color_blank"
+            android:textColor="@color/text_color_white"
             android:layout_marginLeft="8dp"
             android:text="专辑名"
             android:lines="1"
@@ -80,7 +80,7 @@
             android:layout_weight="1"
             android:layout_marginTop="10dp"
             android:id="@+id/album_holder_item_num"
-            android:textColor="@color/text_color_blank"
+            android:textColor="@color/text_color_white"
             android:textSize="@dimen/textsize_small"
             android:text="歌曲数目"
             android:layout_gravity="center_horizontal"/>

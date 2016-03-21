@@ -1,6 +1,8 @@
 package remix.myplayer.fragments;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -36,10 +38,19 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     private AlbumAdater mAdapter;
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         mManager = getLoaderManager();
         mManager.initLoader(1001, null, this);
+       
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_album,null);
+        mRecycleView = (RecyclerView)rootView.findViewById(R.id.album_recycleview);
+        mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         mAdapter = new AlbumAdater(mCursor,getActivity());
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
@@ -60,13 +71,6 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
             }
         });
         mRecycleView.setAdapter(mAdapter);
-    }
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_album,null);
-        mRecycleView = (RecyclerView)rootView.findViewById(R.id.album_recycleview);
-        mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         return rootView;
     }
 
