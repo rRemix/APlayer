@@ -134,7 +134,7 @@
     </style>
 
     <!--中心消失-->
-    <style name="PopupCenterDialog" parent="@style/AppTheme.PopupOverlay" >
+    <style name="PopupCenterDialog" parent="@style/AppTheme" >
         <item name="android:windowAnimationStyle">@style/popwin_anim_style</item>
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">true</item>
@@ -165,7 +165,7 @@
     <!--popup_style-->
     <style name="popwin_anim_style">
         <item name="android:windowEnterAnimation">@anim/popup_in</item>
-        <item name="android:windowExitAnimation">@anim/popup_out</item>
+        <!--<item name="android:windowExitAnimation">@anim/popup_out</item>-->
     </style>
 
     <!--ViewpagerIndicaor-->

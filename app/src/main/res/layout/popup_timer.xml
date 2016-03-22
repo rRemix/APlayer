@@ -55,12 +55,16 @@
             android:textSize="13sp"
             android:text="设为默认"
             android:layout_marginRight="8dp"/>
-        <Switch
+        <android.support.v7.widget.SwitchCompat
+            android:background="@color/transparent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textOn=""
+            android:textOff=""
             android:id="@+id/popup_timer_switch"
             android:thumb="@drawable/timer_btn_normal_btn"
-            android:track="@drawable/timer_btn_normal_locus"/>
+            android:track="@drawable/timer_btn_normal_locus"
+            />
     </LinearLayout>
 
     <LinearLayout
@@ -107,7 +111,7 @@
             android:layout_marginRight="16dp"
             android:layout_marginLeft="16dp"
             android:gravity="center"
-            android:padding="3dp"
+            android:padding="2dp"
             android:textSize="@dimen/textsize_large"
             android:text="开始计时"
             android:textColor="@drawable/timer_toggle_text_color_"/>
@@ -118,7 +122,7 @@
             android:background="@drawable/bg_timer_exit"
             android:layout_toLeftOf="@id/close_toggle"
             android:gravity="center"
-            android:padding="3dp"
+            android:padding="2dp"
             android:textColor="@drawable/timer_exit_text_color"
             android:textSize="@dimen/textsize_large"
             android:text="取消"/>

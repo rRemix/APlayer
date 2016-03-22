@@ -54,4 +54,10 @@ public class AddPlayListDialog extends BaseActivity {
     protected void onPause() {
         super.onPause();
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, R.anim.popup_out);
+    }
 }

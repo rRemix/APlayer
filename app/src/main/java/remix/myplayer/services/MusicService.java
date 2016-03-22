@@ -224,12 +224,12 @@ public class MusicService extends Service {
 //        mAudioManager.registerRemoteControlClient(mRemoteCtrlClient);
 
         mPlayer = new MediaPlayer();
-        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        try {
-            mPlayer.setDataSource(mInfo != null ? mInfo.getUrl() : "");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//        try {
+//            mPlayer.setDataSource(mInfo != null ? mInfo.getUrl() : "");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {

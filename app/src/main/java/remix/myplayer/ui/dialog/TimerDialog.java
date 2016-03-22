@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.SwitchCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -36,7 +37,7 @@ public class TimerDialog extends BaseActivity {
     private CircleSeekBar mSeekbar;
     private TextView mToggle;
     private TextView mCancel;
-    private Switch mSwitch;
+    private SwitchCompat mSwitch;
     private static long mTime;
     private Handler mHandler = new Handler(){
         @Override
@@ -90,41 +91,49 @@ public class TimerDialog extends BaseActivity {
             }
         });
 
-        //如果有默认设置并且没有开始计时，直接开始计时
-        //如果有默认设置但已经开始计时，打开该popupwindow
         boolean hasdefault = SharedPrefsUtil.getValue(this, "setting", "TimerDefault", false);
         final int time = SharedPrefsUtil.getValue(this,"setting","TimerNum",-1);
-        if(hasdefault && time > 0 && !misTiming){
-            mTime = time;
-            Toggle();
-        }
-
         //默认选项
-        mSwitch = (Switch)findViewById(R.id.popup_timer_switch);
+        mSwitch = (SwitchCompat)findViewById(R.id.popup_timer_switch);
+
+        if(hasdefault && time > 0){
+            //如果有默认设置并且没有开始计时，直接开始计时
+            //如果有默认设置但已经开始计时，打开该popupwindow,并更改switch外观
+            if(!misTiming) {
+                mTime = time;
+                Toggle();
+            } else {
+                mTime = 0;
+                mSwitch.setThumbResource(R.drawable.timer_btn_seleted_btn);
+                mSwitch.setTrackResource(R.drawable.timer_btn_seleted_locus);
+            }
+        }
         mSwitch.setChecked(hasdefault);
+
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    if(mTime > 0){
-                        Toast.makeText(TimerDialog.this,"设置成功",Toast.LENGTH_SHORT).show();
+                if (isChecked) {
+                    if (mTime > 0) {
+                        Toast.makeText(TimerDialog.this, "设置成功", Toast.LENGTH_SHORT).show();
                         mSwitch.setThumbResource(R.drawable.timer_btn_seleted_btn);
                         mSwitch.setTrackResource(R.drawable.timer_btn_seleted_locus);
-                        SharedPrefsUtil.putValue(TimerDialog.this,"setting", "TimerDefault", true);
-                        SharedPrefsUtil.putValue(TimerDialog.this,"setting","TimerNum",(int)mTime);
-                    } else{
-                        Toast.makeText(TimerDialog.this,"请设置正确的时间",Toast.LENGTH_SHORT).show();
+                        SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerDefault", true);
+                        SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerNum", (int) mTime);
+                    } else {
+                        Toast.makeText(TimerDialog.this, "请设置正确的时间", Toast.LENGTH_SHORT).show();
                         mSwitch.setChecked(false);
                     }
                 } else {
-                    Toast.makeText(TimerDialog.this,"取消成功",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TimerDialog.this, "取消成功", Toast.LENGTH_SHORT).show();
                     mSwitch.setThumbResource(R.drawable.timer_btn_normal_btn);
                     mSwitch.setTrackResource(R.drawable.timer_btn_normal_locus);
-                    SharedPrefsUtil.putValue(TimerDialog.this,"setting", "TimerDefault", false);
-                    SharedPrefsUtil.putValue(TimerDialog.this,"setting","TimerNum",-1);
+                    SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerDefault", false);
+                    SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerNum", -1);
                 }
             }
         });
+
 
         mToggle = (TextView)findViewById(R.id.close_toggle);
         mToggle.setText(misTiming == true ? "取消计时" : "开始计时");
@@ -145,8 +154,10 @@ public class TimerDialog extends BaseActivity {
     }
 
     private void Toggle(){
-        if(mTime <= 0 && !misTiming)
-            Toast.makeText(TimerDialog.this,"请设置正确的时间",Toast.LENGTH_SHORT).show();
+        if(mTime <= 0 && !misTiming) {
+            Toast.makeText(TimerDialog.this, "请设置正确的时间", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String msg = misTiming == true ? "取消定时关闭" : "将在" + mTime + "分钟后关闭";
         Toast.makeText(MainActivity.mInstance,msg,Toast.LENGTH_SHORT).show();
         misTiming = !misTiming;
@@ -176,6 +187,12 @@ public class TimerDialog extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         misRun = false;
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, R.anim.popup_out);
     }
 
     class TimeThread extends Thread{

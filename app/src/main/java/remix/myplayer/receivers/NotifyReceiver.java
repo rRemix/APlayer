@@ -83,7 +83,7 @@ public class NotifyReceiver extends BroadcastReceiver {
 
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
 //                    .setLargeIcon(DBUtil.CheckBitmapByAlbumId((int)temp.getAlbumId(),false))
-//                    .setContent(mRemoteView)
+                    .setContent(mRemoteView)
                     .setContentText("")
                     .setContentTitle("")
                     .setWhen(System.currentTimeMillis())
@@ -91,8 +91,6 @@ public class NotifyReceiver extends BroadcastReceiver {
                     .setOngoing(true)
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setSmallIcon(R.drawable.notifbar_icon);
-
-
 
 
             Intent result = new Intent(context,AudioHolderActivity.class);
