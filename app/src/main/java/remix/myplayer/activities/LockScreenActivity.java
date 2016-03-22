@@ -42,7 +42,6 @@ import remix.myplayer.utils.XmlUtil;
  * Created by Remix on 2016/3/9.
  */
 public class LockScreenActivity extends BaseActivity implements MusicService.Callback{
-    private WindowManager mWmManager;
     private final static String TAG = "LockScreenActivity";
     public static LockScreenActivity mInstance;
     private MP3Info mInfo;
@@ -203,9 +202,9 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         UpdateUI(mInfo,mIsPlay);
     }
 
-
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay) {
+        Log.d(TAG,this.toString());
         mInfo = MP3info;
         if(!mIsRunning )
             return;
@@ -218,12 +217,18 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         mArtist.setText(mInfo.getArtist());
         //收藏
         mIsLove = false;
-        ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get("我的收藏");
-        for(PlayListItem item : list){
-            if(item.getId() == mInfo.getId()){
-                mIsLove = true;
+        try {
+            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get("我的收藏");
+            for(PlayListItem item : list){
+                if(item.getId() == mInfo.getId()){
+                    mIsLove = true;
+                }
             }
+        } catch (Exception e){
+            Log.d(TAG,"list error:" + e.toString());
+            e.printStackTrace();
         }
+
         mLoveButton.setImageResource(mIsLove ? R.drawable.wy_lock_btn_loved : R.drawable.wy_lock_btn_love);
 
         mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.wy_lock_btn_pause : R.drawable.wy_lock_btn_play));
@@ -294,7 +299,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
                 mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
             }
 
-            Log.d(TAG,"mill: " + (System.currentTimeMillis() - start));
+//            Log.d(TAG,"mill: " + (System.currentTimeMillis() - start));
             mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
         }
     }

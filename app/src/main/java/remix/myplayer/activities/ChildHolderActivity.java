@@ -70,7 +70,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                     Title = Title.substring(Title.lastIndexOf("/")+ 1,Title.length());
                     break;
                 case Constants.PLAYLIST_HOLDER:
-                    ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(Title);
+                    ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(Title);
                     ArrayList<Long> ids = new ArrayList<>();
                     if(list == null)
                         break;

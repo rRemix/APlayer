@@ -85,8 +85,7 @@ public class SearchLRC {
      * 生成歌词的ArryList
      * 每句歌词是一个String
      */
-    public LinkedList<LrcInfo> fetchLyric()
-    {
+    public LinkedList<LrcInfo> fetchLyric() {
 
         int begin = 0, end = 0, number = 0;// number=0表示暂无歌词
         String strid = "";
@@ -148,14 +147,13 @@ public class SearchLRC {
         Iterator it = lrcMap.keySet().iterator();
 
 
-        while (it.hasNext())
-        {
+        while (it.hasNext()) {
             int startime = (int)it.next();
             String sentence = lrcMap.get(startime);
             list.add(new LrcInfo(sentence,startime));
         }
-        for(int i = 0 ; i < list.size() - 1 ;i++)
-        {
+
+        for(int i = 0 ; i < list.size() - 1 ;i++) {
             LrcInfo cur = list.get(i);
             LrcInfo nxt = list.get(i + 1);
             list.get(i).setEndTime(nxt.getStartTime());
@@ -165,8 +163,8 @@ public class SearchLRC {
         return list;
     }
 
-    public int getMill(String strTime)
-    {
+
+    public int getMill(String strTime) {
         int min;
         int sec;
         int mill;
@@ -185,8 +183,8 @@ public class SearchLRC {
         return min * 60000 + sec * 1000 + mill;
     }
 
-    public boolean ParseLrc()
-    {
+
+    public boolean ParseLrc() {
         String test = "[00:01:02]";
         String test1 = "[00:01:02][00:01:02]";
 

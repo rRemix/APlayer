@@ -55,7 +55,7 @@
             android:theme="@style/LockScreenDialog"
             android:excludeFromRecents="true"
             android:exported="false"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleInstance"/>
 
         <activity android:name=".activities.ChildHolderActivity"/>
 

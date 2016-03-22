@@ -1,7 +1,6 @@
 package remix.myplayer.utils;
 
 import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
 import android.util.Xml;
 
@@ -103,13 +102,10 @@ public class XmlUtil {
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            ErrUtil.writeError(TAG + "---getPlayList---" + e.toString());
         } catch (XmlPullParserException e) {
             e.printStackTrace();
-            ErrUtil.writeError(TAG + "---getPlayList---" + e.toString());
         } catch (IOException e) {
             e.printStackTrace();
-            ErrUtil.writeError(TAG + "---getPlayList---" + e.toString());
         }
         finally {
                 try {
@@ -158,12 +154,10 @@ public class XmlUtil {
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            ErrUtil.writeError(TAG + "---getPlayingList---" + e.toString());
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-            ErrUtil.writeError(TAG + "---getPlayingList---" + e.toString());
         }
         finally {
             try {
@@ -178,20 +172,20 @@ public class XmlUtil {
 
     public static void deletePlaylist(String name)  {
         if(name != null && !name.equals("")) {
-            PlayListActivity.mPlaylist.remove(name);
+            PlayListActivity.getPlayList().remove(name);
             updatePlaylist();
         }
     }
 
     public static void addPlaylist(String name) {
         if(name != null && !name.equals("")) {
-            PlayListActivity.mPlaylist.put(name, new ArrayList<PlayListItem>());
+            PlayListActivity.getPlayList().put(name, new ArrayList<PlayListItem>());
             updatePlaylist();
         }
     }
     public static void deleteSong(String name,PlayListItem item) {
         if(!item.getSongame().equals("") && !name.equals("")) {
-            ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
+            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
             boolean ret = list.remove(item);
             updatePlaylist();
         }
@@ -199,7 +193,7 @@ public class XmlUtil {
 
     public static void addSong(String name,String song,int id,int album_id) {
         if(!name.equals("") && !song.equals("")) {
-            ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
+            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
             list.add(new PlayListItem(song,id,album_id));
             updatePlaylist();
         }
@@ -207,7 +201,7 @@ public class XmlUtil {
     public static void updateSong(String name,String _new,String _old,int id)
     {
         if(!name.equals("") && !_new.equals("")) {
-            ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
+            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
             for (int i = 0; i < list.size(); i++) {
                 PlayListItem tmp = list.get(i);
                 if (tmp.getSongame().equals(_old)){
@@ -228,11 +222,11 @@ public class XmlUtil {
             parser.setOutput(fos,"utf-8");
             parser.startDocument("utf-8",true);
             parser.startTag(null,"playlist");
-            Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
+            Iterator it = PlayListActivity.getPlayList().keySet().iterator();
             while(it.hasNext())
             {
                 String key = it.next().toString();
-                ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(key);
+                ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(key);
                 parser.startTag(null,key);
                 for(int i = 0 ; i < list.size() ;i++)
                 {
@@ -249,11 +243,9 @@ public class XmlUtil {
         }
         catch (XmlPullParserException e){
             e.printStackTrace();
-            ErrUtil.writeError(TAG + "---updatePlaylist---" + e.toString());
         }
         catch (IOException e){
             e.printStackTrace();
-            ErrUtil.writeError(TAG + "---updatePlaylist---" + e.toString());
         }
         finally {
             try {
@@ -304,11 +296,9 @@ public class XmlUtil {
         }
         catch (XmlPullParserException e){
             e.printStackTrace();
-            ErrUtil.writeError(TAG + "---updatePlayingList---" + e.toString());
         }
         catch (IOException e){
             e.printStackTrace();
-            ErrUtil.writeError(TAG + "---updatePlayingList---" + e.toString());
         }
         finally {
             try {

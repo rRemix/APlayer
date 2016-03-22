@@ -52,7 +52,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         try {
-            Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
+            Iterator it = PlayListActivity.getPlayList().keySet().iterator();
             PlayListItem item = null;
             String name = "";
             for(int i = 0 ; i<= position ;i++) {
@@ -61,7 +61,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             }
             holder.mName.setText(name);
 
-            ArrayList<PlayListItem> list = PlayListActivity.mPlaylist.get(name);
+            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
             if(list != null && list.size() > 0) {
                 holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), list.get(0).getAlbumId()));
             }
@@ -103,14 +103,14 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                 });
             }
         } catch (Exception e){
-            ErrUtil.writeError("PlayListAdapter" + "---onBindViewHolder---" + e.toString());
+            e.toString();
         }
 
     }
 
     @Override
     public int getItemCount() {
-        return PlayListActivity.mPlaylist == null ? 0 : PlayListActivity.mPlaylist.size();
+        return PlayListActivity.getPlayList() == null ? 0 : PlayListActivity.getPlayList().size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

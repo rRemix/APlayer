@@ -51,12 +51,12 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
                 ids.add(info.getId());
         }
         else {
-            Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
+            Iterator it = PlayListActivity.getPlayList().keySet().iterator();
             for(int i = 0 ; i <= mId ; i++) {
                 it.hasNext();
                 name = it.next().toString();
             }
-            for(PlayListItem tmp : PlayListActivity.mPlaylist.get(name))
+            for(PlayListItem tmp : PlayListActivity.getPlayList().get(name))
                 ids.add((long)tmp.getId());
         }
         switch (item.getItemId()) {
@@ -82,7 +82,7 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
                     DBUtil.deleteSong(mKey,mType);
                 else {
                     if(name != null && !name.equals("")) {
-                        PlayListActivity.mPlaylist.remove(name);
+                        PlayListActivity.getPlayList().remove(name);
                         PlayListActivity.mInstance.getAdapter().notifyDataSetChanged();
                         XmlUtil.updatePlaylist();
                     }

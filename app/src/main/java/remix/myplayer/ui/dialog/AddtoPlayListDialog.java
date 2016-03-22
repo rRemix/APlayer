@@ -60,7 +60,7 @@ public class AddtoPlayListDialog extends BaseActivity {
                     String playlist = textView.getText().toString();
                     boolean isExist = false;
                     if(playlist != null && mSongName != null && mId > 0) {
-                        for(PlayListItem item : PlayListActivity.mPlaylist.get(playlist)){
+                        for(PlayListItem item : PlayListActivity.getPlayList().get(playlist)){
                             if(item.getId() == mId){
                                 isExist = true;
                             }
@@ -77,7 +77,6 @@ public class AddtoPlayListDialog extends BaseActivity {
                     finish();
                 } catch (Exception e){
                     e.printStackTrace();
-                    ErrUtil.writeError("AddtoPlayListDialog" + "---onItemClick---" + e.toString());
                 }
 
             }

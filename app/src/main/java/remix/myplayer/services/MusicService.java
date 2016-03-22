@@ -43,6 +43,8 @@ public class MusicService extends Service {
     public static MusicService mInstance;
     //是否第一次启动
     private static boolean mFirstFlag = true;
+    //是否正在初始化
+    private static boolean mIsIniting = false;
     //播放模式
     private static int mPlayModel = Constants.PLAY_LOOP;
     //当前是否在播放
@@ -63,22 +65,9 @@ public class MusicService extends Service {
     private static List<Callback> mCallBacklist  = new ArrayList<Callback>(){};
     private Context mContext;
     private PlayerReceiver mRecevier;
-    private ComponentName mMediaComName;
-    private PendingIntent mMediaPendingIntent;
     private AudioManager.OnAudioFocusChangeListener mAudioFocusListener;
-    private RemoteControlClient mRemoteCtrlClient;
-    public static MediaSessionCompat mMediaSession = null;
+    private MediaSessionCompat mMediaSession = null;
     private boolean mAudioFouus = false;
-    PlaybackStateCompat mPlayingbackState = new PlaybackStateCompat.Builder().setActions(PlaybackStateCompat.ACTION_PLAY
-            | PlaybackStateCompat.ACTION_PLAY_PAUSE   |  PlaybackStateCompat.ACTION_PAUSE
-            | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
-            .setState(PlaybackStateCompat.STATE_PLAYING,PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN,SystemClock.elapsedRealtime() + 10000)
-            .build();
-    PlaybackStateCompat mNotPlaybackState = new PlaybackStateCompat.Builder().setActions(PlaybackStateCompat.ACTION_PLAY
-            | PlaybackStateCompat.ACTION_PLAY_PAUSE   |  PlaybackStateCompat.ACTION_PAUSE
-            | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
-            .setState(PlaybackStateCompat.STATE_PAUSED,PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN,1,SystemClock.elapsedRealtime() + 10000)
-            .build();
 
     private static Handler mUpdateUIHandler = new Handler() {
         @Override
@@ -236,7 +225,11 @@ public class MusicService extends Service {
 
         mPlayer = new MediaPlayer();
         mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
+        try {
+            mPlayer.setDataSource(mInfo != null ? mInfo.getUrl() : "");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
@@ -282,7 +275,8 @@ public class MusicService extends Service {
     }
 
     private void UnInit(){
-        mPlayer.release();
+        if(mPlayer != null)
+            mPlayer.release();
         mPlayer = null;
 //        mAudioManager.unregisterMediaButtonEventReceiver(mMediaPendingIntent);
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
@@ -294,10 +288,10 @@ public class MusicService extends Service {
     private void PlayNext() {
         PlayNextOrPrev(true,true);
     }
-    private void PlayPrevious()
-    {
-        PlayNextOrPrev(false,true);
+    private void PlayPrevious() {
+        PlayNextOrPrev(false, true);
     }
+
     private void PlayStart() {
         new Thread(){
             @Override
@@ -489,20 +483,23 @@ public class MusicService extends Service {
     //准备播放
     private void PrepareAndPlay(String path) {
         try {
+
             mAudioFouus =  mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
                     AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
             if(!mAudioFouus)
                 return;
 //            mRemoteCtrlClient.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
             mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING,getCurrentTime()));
-            mIsplay = true;
+            mIsIniting = true;
             mPlayer.reset();
             mPlayer.setDataSource(path);
+            mIsIniting = false;
             mPlayer.prepareAsync();
             mFirstFlag = false;
+            mIsplay = true;
             SharedPrefsUtil.putValue(MainActivity.mInstance,"setting","Pos",mCurrent);
         }
-        catch (IOException e) {
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -558,10 +555,10 @@ public class MusicService extends Service {
     }
 
     //获得是否在播放
-    public static boolean getIsplay()
-    {
+    public static boolean getIsplay() {
         return mIsplay;
     }
+
     //获得mediaplayer
     public static void setProgress(int current)
     {
@@ -585,9 +582,10 @@ public class MusicService extends Service {
     }
     //获得当前播放进度
     public static int getCurrentTime() {
-        if(mPlayer != null)
+//        return 1;
+        if(mPlayer != null && !mIsIniting)
             return mPlayer.getCurrentPosition();
-        return -1;
+        return 0;
     }
     //获得当前播放索引
     public static int getCurrentPos()

@@ -45,16 +45,7 @@
                 android:text="歌手"/>
         </LinearLayout>
         <!-- 下一首与播放按钮 -->
-        <!--<ImageButton-->
-            <!--android:layout_width="40dp"-->
-            <!--android:layout_height="40dp"-->
-            <!--android:src="@drawable/bf_btn_next"-->
-            <!--android:background="@drawable/holo_selector"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_marginRight="19dp"-->
-            <!--android:layout_marginLeft="19dp"-->
-            <!--android:id="@+id/playbar_next"/>-->
+
         <ImageButton
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
@@ -64,5 +55,17 @@
             android:layout_height="wrap_content"
             android:background="@color/background_color_3"
             android:src="@drawable/bf_but_play"/>
+
+        <ImageButton
+            android:visibility="gone"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/bt_lockscreen_next_nor"
+            android:background="@color/background_color_3"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/playbar_play"
+            android:layout_marginRight="19dp"
+            android:layout_marginLeft="19dp"
+            android:id="@+id/playbar_next"/>
     </RelativeLayout>
 </RelativeLayout>

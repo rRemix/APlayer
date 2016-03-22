@@ -279,8 +279,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         });
     }
 
-    private void initGuide()
-    {
+    private void initGuide() {
         mGuideList = new ArrayList<>();
         mGuideList.add((ImageView) findViewById(R.id.guide_01));
         mGuideList.add((ImageView) findViewById(R.id.guide_02));
@@ -364,6 +363,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         else
             mTopDetail.setText(mp3Info.getArtist() + "-" + mp3Info.getAlbum());
     }
+
     public void UpdatePlayButton(boolean isPlay) {
         if(isPlay)
             mPlayBarPlay.setImageResource(R.drawable.bg_btn_holder_stop);

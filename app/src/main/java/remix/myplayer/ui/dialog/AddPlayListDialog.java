@@ -29,7 +29,7 @@ public class AddPlayListDialog extends BaseActivity {
 
         mEdit = (EditText)findViewById(R.id.playlist_add_edit);
         mEdit.getBackground().setColorFilter(getResources().getColor(R.color.intersperse_color), PorterDuff.Mode.SRC_ATOP);
-        mEdit.setText("本地歌单" + PlayListActivity.mPlaylist.size());
+        mEdit.setText("本地歌单" + PlayListActivity.getPlayList().size());
     }
 
     public void onCancel(View v){

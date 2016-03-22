@@ -46,6 +46,11 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     static {
         mPlaylist = XmlUtil.getPlayList("playlist.xml");
     }
+
+    public static Map<String,ArrayList<PlayListItem>> getPlayList(){
+        return mPlaylist;
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

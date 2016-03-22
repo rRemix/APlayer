@@ -56,10 +56,10 @@ public class BottomActionBarFragment extends Fragment{
         });
         //初始化底部三个按钮
         mPlayButton = (ImageButton)rootView.findViewById(R.id.playbar_play);
-//        mNextButton = (ImageButton)rootView.findViewById(R.id.playbar_next);
+        mNextButton = (ImageButton)rootView.findViewById(R.id.playbar_next);
         CtrlButtonListener listener = new CtrlButtonListener(getContext());
         mPlayButton.setOnClickListener(listener);
-//        mNextButton.setOnClickListener(listener);
+        mNextButton.setOnClickListener(listener);
         //初始化底部标题与歌手
         mTitle = (TextView)rootView.findViewById(R.id.bottom_title);
         mArtist = (TextView)rootView.findViewById(R.id.bottom_artist);

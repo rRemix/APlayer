@@ -27,7 +27,7 @@ public class PlayListAddtoAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
-        return PlayListActivity.mPlaylist.size();
+        return PlayListActivity.getPlayList().size();
     }
 
     @Override
@@ -53,7 +53,7 @@ public class PlayListAddtoAdapter extends BaseAdapter{
             holder = (ViewHolder)convertView.getTag();
 
         String name = null;
-        Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
+        Iterator it = PlayListActivity.getPlayList().keySet().iterator();
         for(int i = 0 ; i<= position ;i++) {
             it.hasNext();
             name = it.next().toString();
