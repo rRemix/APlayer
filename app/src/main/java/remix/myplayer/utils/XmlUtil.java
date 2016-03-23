@@ -311,63 +311,63 @@ public class XmlUtil {
         }
     }
 
-    //添加到搜索历史
-    public static void addKey(String key){
-        if(!SearchActivity.mSearchHisKeyList.contains(key)){
-            SearchActivity.mSearchHisKeyList.add(key);
-            updateSearchList();
-        }
-    }
-    //删除一个搜索记录
-    public static void deleteKey(String key){
-        if(SearchActivity.mSearchHisKeyList.contains(key)){
-            SearchActivity.mSearchHisKeyList.remove(key);
-            updateSearchList();
-        }
-    }
-    //清空搜索历史
-    public static void removeallKey(){
-        if(SearchActivity.mSearchHisKeyList.size() > 0){
-            SearchActivity.mSearchHisKeyList.clear();
-            updateSearchList();
-        }
-    }
-    //更新搜索历史记录
-    public static void updateSearchList(){
-        XmlSerializer serializer = null;
-        FileOutputStream fos = null;
-        try {
-//            fos = new FileOutputStream(mSearchHistoryFile);
-            serializer =  XmlPullParserFactory.newInstance().newSerializer();
-            fos = mContext.openFileOutput("searchhistory.xml",Context.MODE_PRIVATE);
-            serializer.setOutput(fos,"utf-8");
-            serializer.startDocument("utf-8",true);
-            serializer.startTag(null,"searchhistory");
-            for(int i = 0 ; i < SearchActivity.mSearchHisKeyList.size() ; i++){
-                serializer.startTag(null,"key");
-                serializer.text(SearchActivity.mSearchHisKeyList.get(i).toString());
-                serializer.endTag(null,"key");
-                Log.d(TAG,"key[" + i + "]: " + SearchActivity.mSearchHisKeyList.get(i));
-            }
-            serializer.endTag(null,"searchhistory");
-            serializer.endDocument();
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            if(fos != null)
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-        }
-    }
+//    //添加到搜索历史
+//    public static void addKey(String key){
+//        if(!SearchActivity.mSearchHisKeyList.contains(key)){
+//            SearchActivity.mSearchHisKeyList.add(key);
+//            updateSearchList();
+//        }
+//    }
+//    //删除一个搜索记录
+//    public static void deleteKey(String key){
+//        if(SearchActivity.mSearchHisKeyList.contains(key)){
+//            SearchActivity.mSearchHisKeyList.remove(key);
+//            updateSearchList();
+//        }
+//    }
+//    //清空搜索历史
+//    public static void removeallKey(){
+//        if(SearchActivity.mSearchHisKeyList.size() > 0){
+//            SearchActivity.mSearchHisKeyList.clear();
+//            updateSearchList();
+//        }
+//    }
+//    //更新搜索历史记录
+//    public static void updateSearchList(){
+//        XmlSerializer serializer = null;
+//        FileOutputStream fos = null;
+//        try {
+////            fos = new FileOutputStream(mSearchHistoryFile);
+//            serializer =  XmlPullParserFactory.newInstance().newSerializer();
+//            fos = mContext.openFileOutput("searchhistory.xml",Context.MODE_PRIVATE);
+//            serializer.setOutput(fos,"utf-8");
+//            serializer.startDocument("utf-8",true);
+//            serializer.startTag(null,"searchhistory");
+//            for(int i = 0 ; i < SearchActivity.mSearchHisKeyList.size() ; i++){
+//                serializer.startTag(null,"key");
+//                serializer.text(SearchActivity.mSearchHisKeyList.get(i).toString());
+//                serializer.endTag(null,"key");
+//                Log.d(TAG,"key[" + i + "]: " + SearchActivity.mSearchHisKeyList.get(i));
+//            }
+//            serializer.endTag(null,"searchhistory");
+//            serializer.endDocument();
+//        } catch (XmlPullParserException e) {
+//            e.printStackTrace();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        } finally {
+//            if(fos != null)
+//                try {
+//                    fos.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//        }
+//    }
 
     //获得搜索历史记录
     public static ArrayList<String> getSearchHisList()  {

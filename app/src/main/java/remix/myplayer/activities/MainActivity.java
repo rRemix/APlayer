@@ -98,7 +98,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.content_main);
+        setContentView(R.layout.activity_content);
         mInstance = this;
 
 

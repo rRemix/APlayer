@@ -218,6 +218,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
 
     //分享心情到微信
     private void shareMindtoWeChat(View v) {
+
         WXImageObject imgObj = new WXImageObject();
         imgObj.setImagePath(mImageUrl);
 
@@ -294,8 +295,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     }
 
     //qq分享回调接口
-    private class BaseUiListener implements IUiListener
-    {
+    private class BaseUiListener implements IUiListener {
         @Override
         public void onComplete(Object o) {
             Toast.makeText(ShareDialog.this,"分享成功",Toast.LENGTH_SHORT).show();

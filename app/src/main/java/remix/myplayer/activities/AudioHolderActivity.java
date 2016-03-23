@@ -102,7 +102,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     private boolean mFromNotify = false;
     private boolean mFromMainActivity = false;
     private boolean mFromBack = false;
-    private ImageView mImageTest;
     private SimpleDraweeView mSimpleImage;
     private Handler mBlurHandler = new Handler() {
         @Override
@@ -470,47 +469,11 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
                 mDuration = (int) mInfo.getDuration();
                 mSeekBar.setMax(mDuration);
-                new BlurThread().start();
+                if(mOperation != Constants.PLAYSELECTEDSONG)
+                    new BlurThread().start();
             } catch (Exception e){
                 e.printStackTrace();
             }
-
-
-//            mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
-//
-//            Postprocessor blurPostprocessor = new BasePostprocessor() {
-//                @Override
-//                public String getName() {
-//                    return "blurPostprocessor";
-//                }
-//
-//                @Override
-//                public void process(Bitmap bitmap) {
-//                    Bitmap bkg = bitmap;
-//
-//                    mNewBitMap = Bitmap.createBitmap((int) (mWidth / 3.5), (int) (mHeight / 7 ), Bitmap.Config.ARGB_8888);
-//                    Canvas canvas = new Canvas(mNewBitMap);
-////                canvas.translate(-mContainer.getLeft() / scaleFactor, -mContainer.getTop() / scaleFactor);
-////                canvas.scale(scaleFactor,  scaleFactor);
-//                    Paint paint = new Paint();
-//                    paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-//                    paint.setAlpha((int)(255 * 0.4));
-//                    canvas.drawBitmap(bitmap, 0, 0, paint);
-//                    mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) 30, true);
-//                }
-//            };
-//
-//            ImageRequest request = ImageRequestBuilder.newBuilderWithSource(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()))
-//                    .setPostprocessor(blurPostprocessor)
-//                    .build();
-//
-//            PipelineDraweeController controller = (PipelineDraweeController)
-//                    Fresco.newDraweeControllerBuilder()
-//                            .setImageRequest(request)
-//                            .setOldController(mSimpleImage.getController())
-//                            // other setters as you need
-//                            .build();
-//            mSimpleImage.setController(controller);
         }
         else if(mIsRunning)
             //更新按钮状态
@@ -537,8 +500,8 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         @Override
         public void run() {
             while (mIsRunning) {
-//                int temp = MusicService.getCurrentTime();
-                int temp = 1;
+                int temp = MusicService.getCurrentTime();
+//                int temp = 1;
                 if (MusicService.getIsplay() && temp > 0 && temp < mDuration) {
                     mCurrentTime = temp;
                     mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);

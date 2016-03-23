@@ -30,7 +30,8 @@
             android:background="@drawable/bg_btn_record_share"
             android:id="@+id/sharebtn"
             android:text="以海报分享"
-            android:textColor="#b5a979"/>
+            android:textColor="#b5a979"
+            android:textSize="@dimen/textsize_large"/>
     </FrameLayout>
 
 

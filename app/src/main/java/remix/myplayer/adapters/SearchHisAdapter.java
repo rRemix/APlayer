@@ -27,12 +27,14 @@ public class SearchHisAdapter extends BaseAdapter {
     };
     @Override
     public int getCount() {
-        return SearchActivity.mSearchHisKeyList.size();
+//        return SearchActivity.mSearchHisKeyList.size();
+        return 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return SearchActivity.mSearchHisKeyList.get(position);
+//        return SearchActivity.mSearchHisKeyList.get(position);
+        return 0;
     }
 
     @Override
@@ -59,7 +61,7 @@ public class SearchHisAdapter extends BaseAdapter {
         holder.mDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                XmlUtil.deleteKey(getItem(position).toString());
+//                XmlUtil.deleteKey(getItem(position).toString());
                 mHandler.sendEmptyMessage(Constants.NOTIFYDATACHANGED);
             }
         });

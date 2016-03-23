@@ -61,6 +61,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler{
             }
             Toast.makeText(this, result, Toast.LENGTH_LONG).show();
             ShareDialog.mInstance.finish();
+            finish();
         }
 //        if(RecordShareActivity.mInstance != null){
 //            RecordShareActivity.mInstance.finish();

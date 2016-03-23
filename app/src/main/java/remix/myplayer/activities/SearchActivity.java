@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -37,14 +38,11 @@ public class SearchActivity extends BaseAppCompatActivity {
     private SearchResAdapter mSearchResAdapter = null;
     private Button mClearHistoryBtn = null;
     private String mkey = "";
-    private SearchHisAdapter mSearchHisAdapter = null;
     private SearchView mSearchView = null;
     public static SearchActivity mInstance = null;
     private static final String SDROOT = "/sdcard/";
-    public static ArrayList mSearchHisKeyList = new ArrayList();
-    private FrameLayout mSearchHisContainer = null;
-    private TextView mSearchHisBlank = null;
-    private LinearLayout mSearchHisContent = null;
+
+    private ImageView mSearchLogo;
     private TextView mSearchResBlank;
     private FrameLayout mSearchResContainer;
     @Override
@@ -52,15 +50,13 @@ public class SearchActivity extends BaseAppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         mInstance = this;
-        mSearchHisKeyList = XmlUtil.getSearchHisList();
 
-
+        mSearchLogo = (ImageView)findViewById(R.id.search_logo);
         mSearchView = (SearchView)findViewById(R.id.search_view);
         mSearchView.addSearchListener(new SearchView.SearchListener() {
-
             @Override
             public void onSearch(String key, boolean isclick) {
-                search(key,isclick);
+                search(key, isclick);
             }
 
             @Override
@@ -70,36 +66,10 @@ public class SearchActivity extends BaseAppCompatActivity {
                 mkey = "";
                 UpdateUI();
             }
+
             @Override
             public void onBack() {
                 finish();
-            }
-        });
-
-        mSearchHisContainer = (FrameLayout)findViewById(R.id.search_his_container);
-        mSearchHisContent = (LinearLayout)findViewById(R.id.search_his_container_content);
-        mSearchHisKeyList = XmlUtil.getSearchHisList();
-        mSearchHisAdapter = new SearchHisAdapter();
-        mSearchHisList = (ListView)findViewById(R.id.search_history);
-        mSearchHisList.setAdapter(mSearchHisAdapter);
-        mSearchHisList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView temp = (TextView)view.findViewById(R.id.search_history_item_text);
-                String key = temp.getText().toString();
-                search(key,false);
-                mSearchView.UpdateContent(key);
-            }
-        });
-        mSearchHisBlank = (TextView)findViewById(R.id.search_history_blank);
-
-        mClearHistoryBtn = (Button)findViewById(R.id.search_history_clear);
-        mClearHistoryBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                XmlUtil.removeallKey();
-                mSearchHisAdapter.notifyDataSetChanged();
-                UpdateUI();
             }
         });
 
@@ -117,8 +87,9 @@ public class SearchActivity extends BaseAppCompatActivity {
         mkey = key;
         if(mkey == null)
             mkey = "";
-        if(isclick && !mkey.equals(""))
-            XmlUtil.addKey(mkey);
+        if(isclick && !mkey.equals("")){
+            //            XmlUtil.addKey(mkey);
+        }
 
         Cursor cursor = null;
         try {
@@ -162,16 +133,13 @@ public class SearchActivity extends BaseAppCompatActivity {
         // 如果关键字不为空，显示搜索结果或者无搜索结果
         if(!mkey.equals("")){
             mSearchResContainer.setVisibility(View.VISIBLE);
-            mSearchHisContainer.setVisibility(View.GONE);
+            mSearchLogo.setVisibility(View.GONE);
             boolean flag = mCursor != null && mCursor.getCount() > 0;
             mSearchResList.setVisibility(flag == true ? View.VISIBLE : View.GONE);
             mSearchResBlank.setVisibility(flag == true ? View.GONE :View.VISIBLE);
         }else {
             mSearchResContainer.setVisibility(View.GONE);
-            mSearchHisContainer.setVisibility(View.VISIBLE);
-            mSearchHisBlank.setVisibility(mSearchHisKeyList.size() == 0 ? View.VISIBLE : View.GONE);
-            mSearchHisContent.setVisibility(mSearchHisKeyList.size() == 0 ? View.GONE : View.VISIBLE);
-            mSearchHisAdapter.notifyDataSetChanged();
+            mSearchLogo.setVisibility(View.VISIBLE);
         }
     }
 
@@ -197,8 +165,7 @@ public class SearchActivity extends BaseAppCompatActivity {
             if (mCursor != null && mCursor.getCount() > 0 && mCursor.moveToFirst()) {
                 {
                     ArrayList<Long> list = new ArrayList<>();
-                    for(int i = 0 ; i < mCursor.getCount(); i++)
-                    {
+                    for(int i = 0 ; i < mCursor.getCount(); i++) {
                         mCursor.moveToPosition(i);
                         list.add(mCursor.getLong(mIdIndex));
                     }

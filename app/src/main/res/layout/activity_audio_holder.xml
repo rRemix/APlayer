@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/audio_holder_container"
-    android:background="@color/transparent">
+    >
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:layout_width="match_parent"
