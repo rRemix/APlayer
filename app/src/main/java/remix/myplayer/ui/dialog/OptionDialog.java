@@ -37,7 +37,7 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by Remix on 2015/12/6.
  */
-public class OptionDialog extends BaseAppCompatActivity {
+public class OptionDialog extends BaseActivity {
     private ImageView mAdd;
     private ImageView mRing;
     private ImageView mShare;

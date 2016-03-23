@@ -18,7 +18,7 @@ public class Application extends android.app.Application {
         crashHandler.init(this);
     }
 
-    public static Context getContext(Context context){
+    public static Context getContext(){
         return mContext;
     }
 }

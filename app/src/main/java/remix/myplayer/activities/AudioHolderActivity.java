@@ -233,6 +233,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     @Override
     public void onResume() {
         super.onResume();
+        if(MusicService.getCurrentMP3() != mInfo && MusicService.getIsplay())
         UpdateUI(MusicService.getCurrentMP3(),MusicService.getIsplay());
         mIsRunning = true;
         new ProgeressThread().start();
@@ -307,6 +308,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         mHasPlay = (TextView)findViewById(R.id.text_hasplay);
         mRemainPlay = (TextView)findViewById(R.id.text_remain);
         Log.d(TAG,"Duration:" + mDuration + "  CurrentTime:" + mCurrentTime);
+
         if(mDuration > 0 && mCurrentTime >= 0 && (mDuration - mCurrentTime) > 0){
             mHasPlay.setText(CommonUtil.getTime(mCurrentTime));
             mRemainPlay.setText(CommonUtil.getTime(mDuration - mCurrentTime));
@@ -535,7 +537,8 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         @Override
         public void run() {
             while (mIsRunning) {
-                int temp = MusicService.getCurrentTime();
+//                int temp = MusicService.getCurrentTime();
+                int temp = 1;
                 if (MusicService.getIsplay() && temp > 0 && temp < mDuration) {
                     mCurrentTime = temp;
                     mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);

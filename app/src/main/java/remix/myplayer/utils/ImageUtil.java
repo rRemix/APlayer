@@ -1,0 +1,68 @@
+package remix.myplayer.utils;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import remix.myplayer.R;
+import remix.myplayer.application.Application;
+
+/**
+ * Created by taeja on 16-3-23.
+ */
+public class ImageUtil {
+    private static ImageUtil mInstance;
+    public static ImageUtil getInstance(){
+        return mInstance == null ? new ImageUtil() : mInstance;
+    }
+
+
+
+    /**
+     *
+     * @param resid 图片资源id
+     * @return 返回图片高度与宽度
+     */
+    public static int[] getImageSize(int resid){
+        //获得图片参数
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        //不为其分配内存
+        options.inJustDecodeBounds = true;
+
+        BitmapFactory.decodeResource(Application.getContext().getResources(), resid,options);
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
+        String imageType = options.outMimeType;
+        return imageHeight > 0 && imageWidth > 0 ? new int[]{imageHeight,imageWidth} : null;
+    }
+
+    /**
+     * @param originWidth 原始高度
+     * @param originHeight 原始宽度
+     * @param reqWidth 期望宽度
+     * @param reqHeight 期望高度
+     * @return 压缩比
+     */
+    public static int calculateInSampleSize(int originWidth,int originHeight,int reqWidth,int reqHeight){
+        int inSampleSize = 1;
+        if(originHeight > reqHeight || originWidth > reqWidth){
+            final int heightRatio = Math.round((float)originHeight / reqHeight);
+            final int widthRatio = Math.round((float)originWidth / reqWidth);
+            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+        }
+        return inSampleSize;
+    }
+
+    /**
+     *
+     */
+    public static Bitmap decodeSampledBitmapFromResource(int reqHeight,int reqWidth,int resid){
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(Application.getContext().getResources(),resid,options);
+
+        options.inSampleSize = calculateInSampleSize(options.outWidth,options.outHeight,reqWidth,reqHeight);
+        options.inJustDecodeBounds = false;
+
+        return BitmapFactory.decodeResource(Application.getContext().getResources(),resid,options);
+    }
+}

@@ -103,7 +103,6 @@ public class TimerDialog extends BaseActivity {
                 mTime = time;
                 Toggle();
             } else {
-                mTime = 0;
                 mSwitch.setThumbResource(R.drawable.timer_btn_seleted_btn);
                 mSwitch.setTrackResource(R.drawable.timer_btn_seleted_locus);
             }

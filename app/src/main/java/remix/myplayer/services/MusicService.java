@@ -224,12 +224,12 @@ public class MusicService extends Service {
 //        mAudioManager.registerRemoteControlClient(mRemoteCtrlClient);
 
         mPlayer = new MediaPlayer();
-//        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-//        try {
-//            mPlayer.setDataSource(mInfo != null ? mInfo.getUrl() : "");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            mPlayer.setDataSource(mInfo != null ? mInfo.getUrl() : "");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
@@ -324,6 +324,7 @@ public class MusicService extends Service {
         }.start();
 
     }
+
     private void PlayOrPause() {
         if(mPlayer.isPlaying())
             Pause();
@@ -493,10 +494,11 @@ public class MusicService extends Service {
             mIsIniting = true;
             mPlayer.reset();
             mPlayer.setDataSource(path);
-            mIsIniting = false;
+
             mPlayer.prepareAsync();
             mFirstFlag = false;
             mIsplay = true;
+            mIsIniting = false;
             SharedPrefsUtil.putValue(MainActivity.mInstance,"setting","Pos",mCurrent);
         }
         catch (Exception e) {
@@ -559,30 +561,31 @@ public class MusicService extends Service {
         return mIsplay;
     }
 
-    //获得mediaplayer
-    public static void setProgress(int current)
-    {
-        mPlayer.seekTo(current);
+    //s何止进度
+    public static void setProgress(int current) {
+        if(mPlayer != null)
+            mPlayer.seekTo(current);
     }
 
     //设置当前播放列表
-    public static void setCurrentList(ArrayList<Long> list)
-    {
+    public static void setCurrentList(ArrayList<Long> list) {
         DBUtil.mPlayingList = list;
     }
+
     //返回当前播放列表
-    public static ArrayList<Long> getCurrentList()
-    {
+    public static ArrayList<Long> getCurrentList() {
         return DBUtil.mPlayingList;
     }
+
     //返回当前播放歌曲
-    public static MP3Info getCurrentMP3()
-    {
+    public static MP3Info getCurrentMP3() {
         return mInfo;
     }
     //获得当前播放进度
     public static int getCurrentTime() {
 //        return 1;
+        if(mIsIniting)
+            Log.d(TAG,"IsIniting:" + mIsIniting);
         if(mPlayer != null && !mIsIniting)
             return mPlayer.getCurrentPosition();
         return 0;
