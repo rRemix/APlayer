@@ -410,11 +410,10 @@ public class DBUtil {
      */
     public static MP3Info getMP3InfoById(long id) {
         MP3Info mp3info = null;
-        //查询sd卡上所有音乐文件信息
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
         try {
-            resolver.query(
+            cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
                     MediaStore.Audio.Media._ID + "=" + id +
                             " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);

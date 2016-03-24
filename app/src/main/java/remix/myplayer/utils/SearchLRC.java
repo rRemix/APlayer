@@ -1,5 +1,7 @@
 package remix.myplayer.utils;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,15 +14,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-import android.util.Log;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import remix.myplayer.application.Application;
 import remix.myplayer.infos.LrcInfo;
 
 /**
@@ -35,14 +28,9 @@ public class SearchLRC {
     private static final String DEFAULT_LOCAL = "GB2312";
     private String mSongName;
     private String mArtistName;
-    private static RequestQueue mQueue;
     private boolean mIsFind = false;
 
     public SearchLRC(String musicName, String singerName) {
-        //创建RequestQueue对象
-        if(mQueue == null)
-            mQueue = Volley.newRequestQueue(Application.getContext());
-        
         //传进来的如果是汉字，那么就要进行编码转化
         try {
             mSongName = URLEncoder.encode(musicName, "utf-8");

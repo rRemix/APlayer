@@ -53,7 +53,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
             mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),ChildHolderActivity.this);
             mListView.setAdapter(mAdapter);
             mNum.setText(mInfoList.size() + "首歌曲");
-            mTitle.setText(mArg);
+
         }
     };
     @Override
@@ -65,8 +65,8 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         MusicService.addCallback(ChildHolderActivity.this);
 
         //参数id，类型，标题
-        mId = getIntent().getIntExtra("Id",-1);
-        mType = getIntent().getIntExtra("Type",-1);
+        mId = getIntent().getIntExtra("Id", -1);
+        mType = getIntent().getIntExtra("Type", -1);
         mArg = getIntent().getStringExtra("Title");
 
         new Thread(){
@@ -100,9 +100,12 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         //歌曲数目与标题
         mNum = (TextView)findViewById(R.id.album_holder_item_num);
         mTitle = (TextView)findViewById(R.id.artist_album_title);
-
+        if(mType != Constants.FOLDER_HOLDER)
+            mTitle.setText(mArg);
+        else
+            mTitle.setText(mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length()));
         //初始化底部状态栏
-        mActionbar = (BottomActionBarFragment)getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
+        mActionbar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return;
 

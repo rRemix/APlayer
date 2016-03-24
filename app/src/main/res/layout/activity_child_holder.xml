@@ -28,7 +28,7 @@
             android:textSize="@dimen/textsize_huge"
             android:textColor="@color/text_color_white"
             android:layout_marginLeft="8dp"
-            android:text="专辑名"
+            android:text=""
             android:lines="1"
             android:ellipsize="end"
             android:id="@+id/artist_album_title" />
@@ -83,7 +83,7 @@
             android:id="@+id/album_holder_item_num"
             android:textColor="@color/text_color_white"
             android:textSize="@dimen/textsize_small"
-            android:text="歌曲数目"
+            android:text=""
             android:layout_gravity="center_horizontal"/>
         <fragment android:name="remix.myplayer.fragments.BottomActionBarFragment"
             android:id="@+id/bottom_actionbar_new"
