@@ -21,9 +21,12 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by Remix on 2015/12/5.
  */
+
+/**
+ * 文件夹Fragment
+ */
 public class FolderFragment extends Fragment {
     private ListView mListView;
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -33,8 +36,8 @@ public class FolderFragment extends Fragment {
         mListView.setAdapter(new FolderAdapter(getActivity(),inflater));
         return rootView;
     }
-    private class ListViewListener implements AdapterView.OnItemClickListener
-    {
+
+    private class ListViewListener implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Intent intent = new Intent(getActivity(), ChildHolderActivity.class);

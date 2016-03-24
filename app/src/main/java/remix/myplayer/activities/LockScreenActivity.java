@@ -1,6 +1,5 @@
 package remix.myplayer.activities;
 
-import android.animation.ObjectAnimator;
 import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,16 +16,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.request.BasePostprocessor;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.Postprocessor;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import remix.myplayer.R;
 import remix.myplayer.infos.MP3Info;
@@ -41,33 +35,46 @@ import remix.myplayer.utils.XmlUtil;
 /**
  * Created by Remix on 2016/3/9.
  */
+
+/**
+ * 锁屏界面
+ * 实际为将手机解锁并对Activity进行处理，使其看起来像锁屏界面
+ */
+
 public class LockScreenActivity extends BaseActivity implements MusicService.Callback{
     private final static String TAG = "LockScreenActivity";
     public static LockScreenActivity mInstance;
+    //当前播放的歌曲信息
     private MP3Info mInfo;
+    //歌曲与艺术家
     private TextView mSong;
     private TextView mArtist;
-    private String[] mDayWeekStrs = new String[]{"一","二","三","四","五","六","天"};
+    //控制按钮
     private ImageButton mPrevButton;
     private ImageButton mNextBUtton;
     private ImageButton mPlayButton;
     private ImageButton mLoveButton;
-    private RelativeLayout mContainer;
+    //DecorView, 跟随手指滑动
     private View mView;
+    //是否正在运行
     private static boolean mIsRunning = false;
+
     private SimpleDraweeView mSimpleImage;
+    //背景
     private ImageView mImageBackground;
-    private Postprocessor mProcessor;
-    private ImageRequest mImageRequest;
+    //高斯模糊后的bitmap
     private Bitmap mNewBitMap;
     private int mWidth;
     private int mHeight;
+    //是否添加到收藏列表
     private boolean mIsLove = false;
+    //是否正在播放
     private static boolean mIsPlay = false;
     private Handler mBlurHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
 //            mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
+            //设置背景
             mImageBackground.setImageBitmap(mNewBitMap);
         }
     };
@@ -101,40 +108,26 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         mNextBUtton.setOnClickListener(listener);
         mPlayButton.setOnClickListener(listener);
 
-        //初始化界面
+        //初始化控件
         mImageBackground = (ImageView)findViewById(R.id.lockscreen_background);
         mSimpleImage = (SimpleDraweeView)findViewById(R.id.lockscreen_image);
         mSong = (TextView)findViewById(R.id.lockscreen_song);
         mArtist = (TextView)findViewById(R.id.lockscreen_artist);
-        mContainer = (RelativeLayout)findViewById(R.id.lockscreen_container);
 
-        mProcessor = new BasePostprocessor() {
-            @Override
-            public String getName() {
-                return "Postprocessor";
-            }
-            @Override
-            public void process(Bitmap bitmap) {
-                double scale = 1.0 * bitmap.getWidth() / bitmap.getHeight();
-                if(scale > 0.6){
-//                    bitmap = ImageCrop(bitmap);
-                }
-            }
-        };
+
         mView = getWindow().getDecorView();
         mView.setBackgroundColor(getResources().getColor(R.color.transparent));
     }
 
-
+    //前后两次触摸的X
     private float mScrollX1;
     private float mScrollX2;
+    //一次移动的距离
     private float mDistance;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int action = event.getAction();
-        Log.d(TAG,"scollX:" + mView.getScrollX() + "\r\n");
 
-        ObjectAnimator animator = null;
         switch (action){
             case MotionEvent.ACTION_DOWN:
                 mScrollX1 = event.getX();
@@ -146,13 +139,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
                 //如果往右或者是往左没有超过最左边,移动View
                 if(mDistance > 0 || ((mView.getScrollX() + (-mDistance)) < 0)) {
                     mView.scrollBy((int) -mDistance, 0);
-//                    try {
-//                        animator = ObjectAnimator.ofInt(mView,"ScrollX",(int)-mDistance);
-//                        animator.setDuration(20);
-//                        animator.start();
-//                    } catch (Exception e){
-//                        e.printStackTrace();
-//                    }
                 }
                 Log.d(TAG,"distance:" + mDistance + "\r\n");
                 break;
@@ -161,12 +147,8 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
                 //超过则finish;没有则移动回初始状态
                 if(-mView.getScrollX() > mWidth * 0.25)
                     finish();
-                else {
-//                    mView.scrollTo(0, 0);
-                    animator = ObjectAnimator.ofInt(mView,"ScrollX",0);
-                    animator.setDuration(20);
-                    animator.start();
-                }
+                else
+                    mView.scrollTo(0,0);
                 mDistance = mScrollX1 = 0;
                 break;
         }
@@ -208,14 +190,15 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         mInfo = MP3info;
         if(!mIsRunning )
             return;
+        //只更新播放按钮
+        mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.wy_lock_btn_pause : R.drawable.wy_lock_btn_play));
         if(AudioHolderActivity.mOperation == Constants.PLAYORPAUSE){
-            mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.wy_lock_btn_pause : R.drawable.wy_lock_btn_play));
             return;
         }
         //标题
         mSong.setText(mInfo.getDisplayname());
         mArtist.setText(mInfo.getArtist());
-        //收藏
+        //判断是否收藏
         mIsLove = false;
         try {
             ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get("我的收藏");
@@ -228,10 +211,9 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
             Log.d(TAG,"list error:" + e.toString());
             e.printStackTrace();
         }
-
         mLoveButton.setImageResource(mIsLove ? R.drawable.wy_lock_btn_loved : R.drawable.wy_lock_btn_love);
 
-        mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.wy_lock_btn_pause : R.drawable.wy_lock_btn_play));
+
         //背景
 //        mImageRequest = ImageRequestBuilder.newBuilderWithSource(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()))
 //                .setPostprocessor(mProcessor)
@@ -255,13 +237,14 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         return Constants.LOCKSCREENACTIIVITY;
     }
 
+    //添加或取消收藏
     public void onLove(View v){
         if(mInfo == null)
             return;
         if(!mIsLove){
-            XmlUtil.addSong("我的收藏",mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId());
+            XmlUtil.addSongToPlayList("我的收藏",mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId());
         } else {
-            XmlUtil.deleteSong("我的收藏",new PlayListItem(mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId()));
+            XmlUtil.deleteSongFromPlayList("我的收藏",new PlayListItem(mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId()));
         }
         mIsLove = !mIsLove;
         mLoveButton.setImageResource(mIsLove ? R.drawable.wy_lock_btn_loved : R.drawable.wy_lock_btn_love);
@@ -301,28 +284,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
 
 //            Log.d(TAG,"mill: " + (System.currentTimeMillis() - start));
             mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
-        }
-    }
-
-    //更新时间线程
-    class TimeThread extends Thread{
-        @Override
-        public void run() {
-            while(mIsRunning){
-                Calendar c = Calendar.getInstance();
-                int hour = c.get(Calendar.HOUR_OF_DAY);
-                int minute = c.get(Calendar.MINUTE);
-                int sec = c.get(Calendar.SECOND);
-                Message msg = new Message();
-                msg.arg1 = hour;
-                msg.arg2 = minute;
-                msg.what = sec;
-                try {
-                    sleep(1000);
-                } catch (InterruptedException e){
-                    e.printStackTrace();
-                }
-            }
         }
     }
 

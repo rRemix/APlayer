@@ -21,15 +21,20 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by taeja on 16-2-4.
  */
+
+/**
+ * 接收更新通知栏的广播
+ * 当用户播放任意一首歌曲时，显示通知栏
+ */
 public class NotifyReceiver extends BroadcastReceiver {
     private RemoteViews mRemoteView;
     private boolean mIsplay = false;
     private NotificationManager mNotificationManager;
     @Override
     public void onReceive(Context context, Intent intent) {
-
         UpdateNotify(context,intent.getBooleanExtra("FromMainActivity",false));
     }
+
     private void UpdateNotify(Context context,boolean frommainactivity) {
         mIsplay = MusicService.getIsplay();
         boolean isBig = context.getResources().getDisplayMetrics().widthPixels >= 1000;
@@ -58,7 +63,7 @@ public class NotifyReceiver extends BroadcastReceiver {
                 mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notifbar_btn_stop);
             }
 
-
+            //添加Action
             Intent mButtonIntent = new Intent(Constants.CTL_ACTION);
             mButtonIntent.putExtra("FromNotify", true);
             //播放或者暂停
@@ -81,6 +86,7 @@ public class NotifyReceiver extends BroadcastReceiver {
             PendingIntent mIntent_Close = PendingIntent.getBroadcast(context, 4, mButtonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             mRemoteView.setOnClickPendingIntent(R.id.notify_close, mIntent_Close);
 
+
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
 //                    .setLargeIcon(DBUtil.CheckBitmapByAlbumId((int)temp.getAlbumId(),false))
                     .setContent(mRemoteView)
@@ -92,7 +98,8 @@ public class NotifyReceiver extends BroadcastReceiver {
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setSmallIcon(R.drawable.notifbar_icon);
 
-
+            //点击通知栏打开播放界面
+            //后退回到主界面
             Intent result = new Intent(context,AudioHolderActivity.class);
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
             stackBuilder.addParentStack(AudioHolderActivity.class);
@@ -107,11 +114,12 @@ public class NotifyReceiver extends BroadcastReceiver {
                     );
             mBuilder.setContentIntent(resultPendingIntent);
             Notification mNotify = mBuilder.build();
+            //根据分辨率设置大布局或者普通布局
             if(isBig)
                 mNotify.bigContentView = mRemoteView;
             else
                 mNotify.contentView = mRemoteView;
-//            mNotify.contentIntent = resultPendingIntent;
+
             mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(0, mNotify);
         }

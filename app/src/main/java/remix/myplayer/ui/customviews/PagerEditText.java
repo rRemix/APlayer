@@ -8,6 +8,10 @@ import android.widget.EditText;
 /**
  * Created by taeja on 16-3-16.
  */
+
+/**
+ * 自定义EdittText 嵌套与ViewPagrer
+ */
 public class PagerEditText extends EditText {
 
     public PagerEditText(Context context) {

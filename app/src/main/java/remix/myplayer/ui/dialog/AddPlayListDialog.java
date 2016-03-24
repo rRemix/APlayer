@@ -15,6 +15,11 @@ import remix.myplayer.utils.XmlUtil;
 /**
  * Created by taeja on 16-3-17.
  */
+
+/**
+ * 添加播放列表的对话框
+ */
+
 public class AddPlayListDialog extends BaseActivity {
     private EditText mEdit;
     @Override

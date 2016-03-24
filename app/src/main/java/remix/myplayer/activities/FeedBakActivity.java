@@ -13,6 +13,11 @@ import remix.myplayer.R;
 /**
  * Created by taeja on 16-3-7.
  */
+
+/**
+ * 反馈界面
+ * 将用户的反馈通过邮箱发送
+ */
 public class FeedBakActivity extends ToolbarActivity {
     private Toolbar mToolBar;
     private EditText mEditText;

@@ -21,6 +21,10 @@ import remix.myplayer.ui.dialog.TimerDialog;
 /**
  * Created by taeja on 16-3-7.
  */
+
+/**
+ * 设置界面，目前包括扫描文件、意见与反馈、关于我们、检查更新
+ */
 public class SettingActivity extends ToolbarActivity {
     private ListView mListView;
     private Toolbar mToolBar;
@@ -59,34 +63,6 @@ public class SettingActivity extends ToolbarActivity {
         initToolbar(mToolBar,"设置");
     }
 
-    private void initToolbar() {
-
-        mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        mToolBar.setTitle("设置");
-        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
-        setSupportActionBar(mToolBar);
-        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.toolbar_search:
-                        startActivity(new Intent(SettingActivity.this, SearchActivity.class));
-                        break;
-                    case R.id.toolbar_timer:
-                        startActivity(new Intent(SettingActivity.this, TimerDialog.class));
-                        break;
-                }
-                return true;
-            }
-        });
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

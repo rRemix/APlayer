@@ -50,10 +50,10 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
+        //检查是否有缓存
         if(convertView == null) {
             convertView = mInflater.inflate(R.layout.child_holder_item,null);
             holder = new ViewHolder();
-//            holder.mArtist = (TextView)convertView.findViewById(R.id.album_holder_item_artist);
             holder.mTitle = (TextView)convertView.findViewById(R.id.album_holder_item_title);
             convertView.setTag(holder);
         }
@@ -61,11 +61,16 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
             holder = (ViewHolder)convertView.getTag();
         if(mInfoList == null || mInfoList.size() == 0 )
             return convertView;
+
         final MP3Info temp = mInfoList.get(position);
         if(temp == null)
             return convertView;
 
+
+        //获得正在播放的歌曲
         final MP3Info currentMP3 = MusicService.getCurrentMP3();
+        //判断该歌曲是否是正在播放的歌曲
+        //如果是,高亮该歌曲，并显示动画
         if(currentMP3 != null){
             boolean flag = temp.getId() == currentMP3.getId();
             holder.mTitle.setTextColor(flag ? Color.parseColor("#782899") : Color.parseColor("#ffffffff"));
@@ -81,16 +86,15 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
             }
         }
 
-
+        //设置标题
         holder.mTitle.setText(temp.getDisplayname());
-//        holder.mArtist.setText(temp.getArtist());
 
+        //选项dialog
         final ImageView mItemButton = (ImageView)convertView.findViewById(R.id.song_item_button);
         mItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, OptionDialog.class);
-//                intent.putExtra("Position",position);
                 intent.putExtra("MP3Info",temp);
                 mContext.startActivity(intent);
             }

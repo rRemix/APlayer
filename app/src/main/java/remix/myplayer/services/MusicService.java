@@ -1,16 +1,13 @@
 package remix.myplayer.services;
 
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.RemoteControlClient;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -29,49 +26,115 @@ import java.util.Random;
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.activities.MainActivity;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.receivers.HeadsetPlugReceiver;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.ServiceManager;
 import remix.myplayer.utils.SharedPrefsUtil;
 
 
 /**
  * Created by Remix on 2015/12/1.
  */
+
+/**
+ * 播放Service
+ * 歌曲的播放 控制
+ * 回调相关activity的界面更新
+ * 通知栏的控制
+ */
 public class MusicService extends Service {
     private final static String TAG = "MusicService";
-    //实例
     public static MusicService mInstance;
-    //是否第一次启动
+    /**
+     * 是否第一次启动
+     */
     private static boolean mFirstFlag = true;
-    //是否正在初始化
+
+    /**
+     * 是否正在设置mediapplayer的datasource
+     */
     private static boolean mIsIniting = false;
-    //播放模式
+
+    /**
+     * 播放模式
+     */
     private static int mPlayModel = Constants.PLAY_LOOP;
-    //当前是否在播放
+
+    /**
+     * 当前是否正在播放那个
+     */
     private static Boolean mIsplay = false;
-    //记录当前播放的角标
+
+    /**
+     * 当前播放的索引
+     */
     private static int mCurrent = 0;
-    //记录下一首歌曲的角标
-    private static int mNext = 1;
-    //当前正在播放的歌曲id
+
+    /**
+     * 当前正在播放的歌曲id
+     */
     private static long mId = -1;
-    //当前正在播放的mp3
+
+    /**
+     * 当前正在播放的mp3
+     */
     private static MP3Info mInfo = null;
+
+    /**
+     * MediaPlayer 负责歌曲的播放等
+     */
     private static MediaPlayer mPlayer;
+
+    /**
+     * 最大音量
+     */
     private int mMaxVolume = -1;
+
+    /**
+     * 当前音量
+     */
     private int mCurrentVolume = -1;
+
+    /**
+     * AudiaoManager
+     */
     private AudioManager mAudioManager;
-    //回调接口的集合
+
+    /**
+     * 回调接口的集合
+     */
     private static List<Callback> mCallBacklist  = new ArrayList<Callback>(){};
-    private Context mContext;
-    //播放控制
+
+    /**
+     * 播放控制的Receiver
+     */
     private PlayerReceiver mRecevier;
-    //监测耳机拔出
+
+
+    /**
+     * 监测耳机拔出的Receiver
+     */
     private HeadsetPlugReceiver mHeadSetReceiver;
+
+    /**
+     * 监听AudioFocus的改变
+     */
     private AudioManager.OnAudioFocusChangeListener mAudioFocusListener;
+
+    /**
+     * MediaSession
+     */
     private MediaSessionCompat mMediaSession = null;
+
+    /**
+     * 当前是否获得AudioFocus
+     */
     private boolean mAudioFouus = false;
 
+    /**
+     * 更新相关Activity的Handler
+     */
     private static Handler mUpdateUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg)
@@ -88,6 +151,8 @@ public class MusicService extends Service {
             }
         }
     };
+
+
     private PlaybackStateCompat getPlaybackStateCompat(int state,int position) {
         return new PlaybackStateCompat.Builder().setActions(PlaybackStateCompat.ACTION_PLAY
                 | PlaybackStateCompat.ACTION_PLAY_PAUSE   |  PlaybackStateCompat.ACTION_PAUSE
@@ -95,9 +160,11 @@ public class MusicService extends Service {
                 .setState(state,position,1.0f,SystemClock.elapsedRealtime() + 10000)
                 .build();
     }
+
+    private Context mContext;
+
     public MusicService(){}
-    public MusicService(Context context)
-    {
+    public MusicService(Context context) {
         this.mContext = context;
     }
     @Nullable
@@ -114,8 +181,10 @@ public class MusicService extends Service {
     }
     @Override
     public void onCreate() {
-
         super.onCreate();
+        //添加到servicemanager
+        ServiceManager.AddService(this);
+
         mContext = getApplicationContext();
         mInstance = this;
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
@@ -130,7 +199,7 @@ public class MusicService extends Service {
                     case AudioManager.AUDIOFOCUS_GAIN:
                         mAudioFouus = true;
                         if(mPlayer == null)
-                            InitMediaPlayer();
+                            Init();
                         else if(!mIsplay){
 //                            PlayStart();
 //                            mIsplay = true;
@@ -138,7 +207,7 @@ public class MusicService extends Service {
                         mPlayer.setVolume(1.0f,1.0f);
                         //如果之前正在播放，则继续播放
                         break;
-                    //短暂失去焦点,比如有通知到来  暂停
+                    //短暂失去焦点,比如有通知到来,减小音量
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                         if(mIsplay && mPlayer != null) {
 //                            new VolDownThread().start();
@@ -152,7 +221,7 @@ public class MusicService extends Service {
                             mPlayer.setVolume(0.1f,0.1f);
                         }
                         break;
-                    //暂停
+                    //失去焦点, 比如有其他播放器开始播放  暂停
                     case AudioManager.AUDIOFOCUS_LOSS:
                         mAudioFouus = false;
                         if(mIsplay && mPlayer != null) {
@@ -163,10 +232,11 @@ public class MusicService extends Service {
                         break;
                 }
                 mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
-//                NotifyService.mInstance.UpdateNotify();
                 sendBroadcast(new Intent(Constants.NOTIFY));
             }
         };
+
+        //获得上次退出时正在播放的歌曲
         int Position = SharedPrefsUtil.getValue(getApplicationContext(),"setting","Pos",-1);
         if(DBUtil.mPlayingList != null && DBUtil.mPlayingList.size() > 0) {
             mId = Position == -1 ? DBUtil.mPlayingList.get(0) : DBUtil.mPlayingList.get(Position);
@@ -175,26 +245,12 @@ public class MusicService extends Service {
         } else
             mInfo = null;
 
-        InitMediaPlayer();
+        Init();
 
-//        new Thread(){
-//            @Override
-//            public void run() {
-//                while (true) {
-//                    if (mInfo != null && mIsplay) {
-//                        try {
-//                            sleep(1000);
-//                            UpdateLockScreen();
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//            }
-//        }.start();
     }
 
-    private void InitMediaPlayer() {
+    private void Init() {
+        //初始化两个Receiver
         mRecevier = new PlayerReceiver();
         registerReceiver(mRecevier,new IntentFilter("remix.music.CTL_ACTION"));
         mHeadSetReceiver = new HeadsetPlugReceiver();
@@ -204,6 +260,7 @@ public class MusicService extends Service {
 //        mediaButtonIntent.setComponent(mMediaComName);
 //        mMediaPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, mediaButtonIntent,0);
 
+        //初始化MediaSesson 用于监听线控操作
         mMediaSession = new MediaSessionCompat(getApplicationContext(),"session");
 
         mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
@@ -225,6 +282,7 @@ public class MusicService extends Service {
 //        mRemoteCtrlClient.setTransportControlFlags(flags);
 //        mAudioManager.registerRemoteControlClient(mRemoteCtrlClient);
 
+        //初始化Mediaplayer
         mPlayer = new MediaPlayer();
         mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
@@ -288,13 +346,23 @@ public class MusicService extends Service {
     }
 
 
+    /**
+     * 播放下一首
+     */
     private void PlayNext() {
         PlayNextOrPrev(true,true);
     }
+
+    /**
+     * 播放上一首
+     */
     private void PlayPrevious() {
         PlayNextOrPrev(false, true);
     }
 
+    /**
+     * 开始播放
+     */
     private void PlayStart() {
         new Thread(){
             @Override
@@ -327,6 +395,10 @@ public class MusicService extends Service {
 
     }
 
+
+    /**
+     * 根据当前播放状态暂停或者继续播放
+     */
     private void PlayOrPause() {
         if(mPlayer.isPlaying()) {
             Pause();
@@ -344,6 +416,9 @@ public class MusicService extends Service {
         }
     }
 
+    /**
+     * 暂停
+     */
     private void Pause() {
         mIsplay = false;
         mPlayer.pause();
@@ -376,6 +451,12 @@ public class MusicService extends Service {
 //            }
 //        }.start();
     }
+
+    /**
+     * 播放选中的歌曲
+     * 比如在全部歌曲或者专辑详情里面选中某一首歌曲
+     * @param position 播放索引
+     */
     private void PlaySelectSong(int position){
         if(mCurrent == position && mIsplay)
             return;
@@ -390,12 +471,15 @@ public class MusicService extends Service {
         PrepareAndPlay(mInfo.getUrl());
     }
 
-    //回调接口，当发生更新时，通知所有activity更新
+
+    /**
+     * 回调接口，当发生更新时，通知相关activity更新
+     */
     public interface Callback {
         public void UpdateUI(MP3Info MP3info, boolean isplay);
         public int getType();
     }
-    //添加回调接口的一个实现类
+    //添加Activity到回调接口
     public static void addCallback(Callback callback) {
         if(mCallBacklist.size() == 0)
             mCallBacklist.add(callback);
@@ -410,13 +494,12 @@ public class MusicService extends Service {
             mCallBacklist.add(callback);
         }
     }
-    //返回回调接口链表的长度
-    public int getCallBackListSize()
-    {
-        return mCallBacklist.size();
-    }
-    public class PlayerReceiver extends BroadcastReceiver
-    {
+
+    /**
+     * 接受控制命令
+     * 包括暂停、播放、上下首、播放模式
+     */
+    public class PlayerReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getExtras().getBoolean("Close")){
@@ -482,7 +565,11 @@ public class MusicService extends Service {
             }
         }
     }
-    //准备播放
+
+    /**
+     * 准备播放
+     * @param path 播放歌曲的路径
+     */
     private void PrepareAndPlay(String path) {
         try {
             mAudioFouus =  mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
@@ -504,13 +591,22 @@ public class MusicService extends Service {
             e.printStackTrace();
         }
     }
-    //根据当前播放列表的长度，得到一个随机数
+
+    /**
+     * 根据当前播放列表的长度，得到一个随机数
+     * @return 随机索引
+     */
     private static int getShuffle(){
         if(DBUtil.mPlayingList.size() == 1)
             return 0;
         return new Random().nextInt(DBUtil.mPlayingList.size() - 1);
     }
-    //根据当前播放模式，播放上一首或者下一首
+
+    /**
+     * 根据当前播放模式，切换到上一首或者下一首
+     * @param IsNext 是否是播放下一首
+     * @param NeedPlay 是否需要播放
+     */
     public void PlayNextOrPrev(boolean IsNext,boolean NeedPlay){
         if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return;
@@ -546,60 +642,81 @@ public class MusicService extends Service {
 //        editor.putString(MediaMetadataRetriever.METADATA_KEY_ARTIST,mInfo.getArtist());
 //        editor.putString(MediaMetadataRetriever.METADATA_KEY_TITLE,mInfo.getDisplayname());
     }
-    //获得播放状态
+
+    /**
+     * 获得播放模式
+     * @return
+     */
     public static int getPlayModel() {
         return mPlayModel;
     }
-    //设置播放状态
+
+    /**
+     * 设置播放模式
+     * @param PlayModel
+     */
     public static void setPlayModel(int PlayModel) {
         mPlayModel = PlayModel;
     }
 
-    //获得是否在播放
+    /**
+     * 获得是否正在播放
+     * @return
+     */
     public static boolean getIsplay() {
         return mIsplay;
     }
 
+    /**
+     * 设置MediaPlayer播放进度
+     * @param current
+     */
     //s何止进度
     public static void setProgress(int current) {
         if(mPlayer != null)
             mPlayer.seekTo(current);
     }
 
-    //设置当前播放列表
-    public static void setCurrentList(ArrayList<Long> list) {
-        DBUtil.mPlayingList = list;
-    }
-
-    //返回当前播放列表
-    public static ArrayList<Long> getCurrentList() {
-        return DBUtil.mPlayingList;
-    }
-
-    //返回当前播放歌曲
+    /**
+     * 返回当前播放歌曲
+     * @return
+     */
     public static MP3Info getCurrentMP3() {
         return mInfo;
     }
-    //获得当前播放进度
+
+
+    /**
+     * 获得当前播放进度
+     * @return
+     */
     public static int getCurrentTime() {
-//        return 1;
-//        if(mIsIniting)
-//            Log.d(TAG,"IsIniting:" + mIsIniting);
         if(mPlayer != null && !mIsIniting)
             return mPlayer.getCurrentPosition();
         return 0;
     }
-    //获得当前播放索引
-    public static int getCurrentPos()
-    {
+
+
+    /**
+     * 获得当前播放索引
+     * @return
+     */
+    public static int getCurrentPos() {
         return mCurrent;
     }
-    //设置当前索引
-    public static void setCurrentPos(int pos)
-    {
+
+    /**
+     * 设置当前索引
+     * @param pos
+     */
+    public static void setCurrentPos(int pos) {
         mCurrent = pos;
     }
 
+
+    /**
+     * 逐步减小音量
+     */
     public class VolDownThread extends Thread{
         @Override
         public void run(){
@@ -625,7 +742,16 @@ public class MusicService extends Service {
         }
     }
 
+
+    /**
+     * 记录在一秒中线控按下的次数
+     */
     private static int mCount = 0;
+
+    /**
+     * 接受线控事件
+     * 根据线控按下次数,做出相应操作
+     */
     public class SessionCallBack extends MediaSessionCompat.Callback{
         @Override
         public boolean onMediaButtonEvent(Intent mediaButtonEvent) {

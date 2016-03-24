@@ -48,22 +48,25 @@ import remix.myplayer.utils.ErrUtil;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.XmlUtil;
 
+
+/**
+ *
+ */
 public class MainActivity extends BaseAppCompatActivity implements MusicService.Callback {
     public static MainActivity mInstance = null;
-    private MusicService mService;
     private BottomActionBarFragment mBottomBar;
     private final static String TAG = "MainActivity";
-    private boolean mFromNotify = false;
+    //测滑的Listview
     private ListView mSlideMenuList;
     private Toolbar mToolBar;
+    //测滑
     private DrawerLayout mDrawerLayout;
     private LinearLayout mDrawerMenu;
-    private ImageButton mSlideMenuBtn;
-    private ImageButton mSlideMenuAbout;
     private ImageButton mSlideMenuExit;
     private ActionBarDrawerToggle mDrawerToggle;
     //是否正在运行
     private static boolean mIsRunning = false;
+    //是否第一次启动
     private static boolean mIsFirst = true;
     @Override
     protected void onResume() {
@@ -101,18 +104,14 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         setContentView(R.layout.activity_content);
         mInstance = this;
 
-
-        mFromNotify = getIntent().getBooleanExtra("Notify", false);
         if (mIsFirst) {
             mIsFirst = false;
+            //读取歌曲
             loadsongs();
             startService(new Intent(this, MusicService.class));
-            //NofityService
-//            startService(new Intent(this, NotifyService.class));
             //定时
             startService(new Intent(this, TimerService.class));
-            //锁屏
-//            startService(new Intent(this, ScreenService.class));
+            //监听锁屏
             new LockScreenListener(getApplicationContext()).beginListen();
 
         }
@@ -124,7 +123,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         initDrawerLayout();
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-
+        //初始化toolbar
         mToolBar = (Toolbar) findViewById(R.id.toolbar);
         initToolbar();
 
@@ -143,7 +142,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         }
         //如果是第一次启动软件,将第一首歌曲设置为正在播放
         if (isFirst || position < 0) {
-            mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)), mFromNotify);
+            mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)), MusicService.getIsplay());
             SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", 0);
         } else {
             if(position == DBUtil.mPlayingList.size()){
@@ -151,7 +150,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                 if(position >= 0)
                     SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", position);
             }
-            mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(position)), mFromNotify);
+            mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(position)), MusicService.getIsplay());
         }
 
     }
@@ -194,7 +193,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
 
     private void initUtil() {
-        //初始化库和工具类
+        //初始化工具类
         XmlUtil.setContext(getApplicationContext());
         DBUtil.setContext(getApplicationContext());
         CommonUtil.setContext(getApplicationContext());
@@ -231,7 +230,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     private void initDrawerLayout() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
         mDrawerMenu = (LinearLayout) findViewById(R.id.slide_menu);
         mSlideMenuList = (ListView) mDrawerMenu.findViewById(R.id.slide_menu_list);
         mSlideMenuList.setAdapter(new SlideMenuAdapter(getLayoutInflater()));
@@ -330,15 +328,14 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             Intent intent = new Intent(Constants.NOTIFY);
             intent.putExtra("FromMainActivity",true);
             sendBroadcast(intent);
-            
         }
     }
 
+    //更新界面
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay) {
         if(!mIsRunning)
-            return;;
-        MP3Info temp = MP3info;
+            return;
         mBottomBar.UpdateBottomStatus(MP3info, isplay);
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         for (Fragment fragment : fragmentList) {

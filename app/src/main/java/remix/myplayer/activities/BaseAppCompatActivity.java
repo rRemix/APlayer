@@ -11,11 +11,15 @@ import remix.myplayer.utils.ActivityManager;
 /**
  * Created by Remix on 2016/3/16.
  */
+
+
 public class BaseAppCompatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //静止横屏
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //将该activity添加到ActivityManager,用于退出程序时关闭
         ActivityManager.AddActivity(this);
     }
 

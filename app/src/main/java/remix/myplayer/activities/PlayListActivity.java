@@ -122,6 +122,7 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 //        });
 //    }
 
+    //打开添加播放列表的Dialog
     public void onAdd(View v) {
         startActivity(new Intent(PlayListActivity.this, AddPlayListDialog.class));
 

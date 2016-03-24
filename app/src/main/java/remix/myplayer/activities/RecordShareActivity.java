@@ -10,7 +10,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -29,37 +28,51 @@ import remix.myplayer.utils.Constants;
 /**
  * Created by taeja on 16-3-14.
  */
+
+/**
+ * 将分享内容与专辑封面进行处理用于分享
+ */
 public class RecordShareActivity extends BaseAppCompatActivity {
     public static RecordShareActivity mInstance;
     private ImageView mImage;
-    private TextView mSongArtist;
+
+    //歌曲名与分享内容
+    private TextView mSong;
     private TextView mContent;
-    private View mView;
+    //保存截屏
     private static Bitmap mBackgroudCache;
-    private Toolbar mToolBar;
     private RelativeLayout mContainer;
+    //当前正在播放的歌曲
     private MP3Info mInfo;
+    //处理图片的进度条
     private ProgressDialog mProgressDialog;
+    //处理状态
     private final int START = 0;
     private final int STOP = 1;
     private final int COMPLETE = 2;
     private final int ERROR = 3;
+    //截屏文件
     private File mFile;
+    //更新处理结果的Handler
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
+                //开始处理
                 case START:
                     mProgressDialog = ProgressDialog.show(RecordShareActivity.this,"请稍候","图片处理中",true,false);
                     break;
+                //处理中止
                 case STOP:
                     if(mProgressDialog != null)
                         mProgressDialog.dismiss();
                     break;
+                //处理完成
                 case COMPLETE:
                     if(mFile != null)
                         Toast.makeText(RecordShareActivity.this, "截屏文件已保存至" + mFile.getAbsolutePath(),Toast.LENGTH_LONG).show();
                     break;
+                //处理错误
                 case ERROR:
                     Toast.makeText(RecordShareActivity.this,"分享失败",Toast.LENGTH_SHORT).show();
                     break;
@@ -72,22 +85,24 @@ public class RecordShareActivity extends BaseAppCompatActivity {
         mInstance = this;
         setContentView(R.layout.activity_recordshare);
 
+        //初始化控件
         mImage = (ImageView)findViewById(R.id.recordshare_image);
-        mSongArtist = (TextView)findViewById(R.id.recordshare_name);
+        mSong = (TextView)findViewById(R.id.recordshare_name);
         mContent = (TextView)findViewById(R.id.recordshare_content);
-        mView = getWindow().getDecorView();
+
         mContainer = (RelativeLayout)findViewById(R.id.recordshare_container);
         mContainer.setDrawingCacheEnabled(true);
 
-        findViewById(R.id.recordshare_content_container).setAlpha((float)0.8);
+//        findViewById(R.id.recordshare_content_container).setAlpha((float)0.8);
 
         mInfo = (MP3Info)getIntent().getExtras().getSerializable("MP3Info");
         if(mInfo == null)
             return;
-
+        //设置专辑封面
         mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
+        //设置歌曲名与分享内容
         mContent.setText(getIntent().getExtras().getString("Content"));
-        mSongArtist.setText(" " + mInfo.getDisplayname() + " ");
+        mSong.setText(" " + mInfo.getDisplayname() + " ");
     }
 
     public static Bitmap getBg(){
@@ -106,10 +121,12 @@ public class RecordShareActivity extends BaseAppCompatActivity {
         FileOutputStream fos = null;
         @Override
         public void run() {
+            //开始处理,显示进度条
             mHandler.sendEmptyMessage(START);
             mBackgroudCache = mContainer.getDrawingCache(true);
             mFile = null;
             try {
+                //将截屏内容保存到文件
                 mFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + getPackageName() + "/record.png");
                 if (!mFile.exists()) {
                     mFile.createNewFile();
@@ -120,6 +137,7 @@ public class RecordShareActivity extends BaseAppCompatActivity {
                     fos.flush();
                     fos.close();
                 }
+                //处理完成
                 mHandler.sendEmptyMessage(COMPLETE);
                 mHandler.sendEmptyMessage(STOP);
 
@@ -134,6 +152,7 @@ public class RecordShareActivity extends BaseAppCompatActivity {
                         e.printStackTrace();
                     }
             }
+            //打开分享的Dialog
             Intent intent = new Intent(RecordShareActivity.this, ShareDialog.class);
             Bundle arg = new Bundle();
             arg.putInt("Type", Constants.SHARERECORD);

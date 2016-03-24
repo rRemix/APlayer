@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -23,17 +24,22 @@ import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.listeners.PopupListener;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.infos.PlayListItem;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.ErrUtil;
 
 /**
  * Created by taeja on 16-1-15.
  */
+
+/**
+ * 播放列表的适配器
+ */
 public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHolder> {
     private Context mContext;
-    public PlayListAdapter(Context context)
-    {
+    public PlayListAdapter(Context context) {
         this.mContext = context;
     }
+
     private OnItemClickLitener mOnItemClickLitener;
     public interface OnItemClickLitener {
         void onItemClick(View view, int position);
@@ -52,18 +58,31 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         try {
+            //根据当前索引，获得歌曲列表
             Iterator it = PlayListActivity.getPlayList().keySet().iterator();
-            PlayListItem item = null;
             String name = "";
             for(int i = 0 ; i<= position ;i++) {
                 it.hasNext();
                 name = it.next().toString();
             }
+            //设置播放列表名字
             holder.mName.setText(name);
 
+            //设置专辑封面
+            boolean hasCover = false;
             ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
             if(list != null && list.size() > 0) {
-                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), list.get(0).getAlbumId()));
+                for(PlayListItem item : list){
+                    String url = DBUtil.getImageUrl(item.getAlbumId() + "",Constants.URL_ALBUM);
+                    if(url != null && !url.equals("")) {
+                        File file = new File(url);
+                        if(!file.exists())
+                            continue;
+                        holder.mImage.setImageURI(Uri.parse(url));
+                        hasCover = true;
+                        break;
+                    }
+                }
             }
 
             if(mOnItemClickLitener != null) {
@@ -83,7 +102,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             }
 
             if(holder.mButton != null) {
-                //第一次个列表为收藏列表，需要做点处理
+                //第一次个列表为收藏列表，不能删除
                 if(position == 0){
                     holder.mButton.setImageResource(R.drawable.rcd_icn_love);
                     holder.mButton.setClickable(false);

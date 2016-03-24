@@ -39,17 +39,20 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
         ArrayList<Long> ids = new ArrayList<Long>();
         String name = null;
         //根据不同参数获得mp3信息列表
+        //艺术家与专辑
         if(mType == Constants.ARTIST_HOLDER || mType == Constants.ALBUM_HOLDER) {
             list = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, mType);
             for(MP3Info info : list)
                 ids.add(info.getId());
         }
+        //文件夹
         else if(mType == Constants.FOLDER_HOLDER) {
 //            list = DBUtil.getMP3ListByFolder(DBUtil.mFolderList.get(mId));
             list = DBUtil.getMP3ListByIds(DBUtil.getIdsByFolderName(mKey,mId));
             for(MP3Info info : list)
                 ids.add(info.getId());
         }
+        //播放列表
         else {
             Iterator it = PlayListActivity.getPlayList().keySet().iterator();
             for(int i = 0 ; i <= mId ; i++) {
@@ -63,7 +66,6 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
             //播放
             case R.id.menu_play:
                 DBUtil.setPlayingList((ArrayList) ids.clone());
-//                MusicService.mInstance.UpdateNextSong(0);
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 Bundle arg = new Bundle();
                 arg.putInt("Control", Constants.PLAYSELECTEDSONG);

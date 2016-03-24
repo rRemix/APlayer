@@ -7,6 +7,10 @@ import remix.myplayer.utils.CrashHandler;
 /**
  * Created by taeja on 16-3-16.
  */
+
+/**
+ * 错误收集与上报
+ */
 public class Application extends android.app.Application {
     private static Context mContext;
 

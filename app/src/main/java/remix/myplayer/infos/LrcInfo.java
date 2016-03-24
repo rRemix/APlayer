@@ -3,6 +3,10 @@ package remix.myplayer.infos;
 /**
  * Created by Remix on 2015/12/8.
  */
+
+/**
+ * 歌词信息
+ */
 public class LrcInfo {
     private String mSentence;
     private int mStartTime;

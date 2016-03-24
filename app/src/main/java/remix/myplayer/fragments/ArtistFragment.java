@@ -26,9 +26,14 @@ import remix.myplayer.utils.Constants;
 /**
  * Created by Remix on 2015/12/22.
  */
+
+/**
+ * 艺术家Fragment
+ */
 public class ArtistFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
     RecyclerView mRecycleView;
     Cursor mCursor = null;
+    //艺术家与艺术家id的索引
     public static int mArtistIdIndex = -1;
     public static int mArtistIndex = -1;
     private LoaderManager mManager;
@@ -95,6 +100,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(data != null)
             mCursor = data;
+        //设置查询索引
         mArtistIdIndex = data.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
         mArtistIndex = data.getColumnIndex(MediaStore.Audio.Media.ARTIST);
         mAdapter.setCursor(data);

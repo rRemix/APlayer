@@ -24,6 +24,10 @@ import remix.myplayer.ui.dialog.OptionDialog;
 /**
  * Created by taeja on 16-3-4.
  */
+
+/**
+ * 最近添加界面的适配器
+ */
 public class RecentlyAdapter extends BaseAdapter {
     private ArrayList<MP3Info> mInfoList;
     private ColumnView mColumnView;
@@ -52,23 +56,24 @@ public class RecentlyAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        if(convertView == null)
-        {
+        //检查缓存
+        if(convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.allsong_item,null);
             holder = new ViewHolder();
             holder.mImage = (CircleImageView)convertView.findViewById(R.id.song_head_image);
             holder.mName = (TextView)convertView.findViewById(R.id.displayname);
             holder.mOther = (TextView)convertView.findViewById(R.id.detail);
             convertView.setTag(holder);
-        }
-        else
+        } else
             holder = (ViewHolder)convertView.getTag();
 
         final MP3Info temp = (MP3Info) getItem(position);
         if(temp == null)
             return convertView;
-
+        //获得正在播放的歌曲
         final MP3Info currentMP3 = MusicService.getCurrentMP3();
+        //判断该歌曲是否是正在播放的歌曲
+        //如果是,高亮该歌曲，并显示动画
         if(currentMP3 != null){
             boolean flag = temp.getId() == currentMP3.getId();
             holder.mName.setTextColor(flag ? Color.parseColor("#782899") : Color.parseColor("#ffffffff"));
@@ -82,14 +87,17 @@ public class RecentlyAdapter extends BaseAdapter {
                 mColumnView.stopAnim();
             }
         }
+        //设置歌曲名
         holder.mName.setText(temp.getDisplayname());
 
         String artist = temp.getArtist();
         String album = temp.getAlbum();
+        //设置艺术家与专辑名
         holder.mOther.setText(artist + "-" + album);
+        //设置封面
         ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + temp.getAlbumId(),
                 holder.mImage);
-
+        //选项Dialog
         final ImageView mItemButton = (ImageView)convertView.findViewById(R.id.allsong_item_button);
         mItemButton.setOnClickListener(new View.OnClickListener() {
             @Override

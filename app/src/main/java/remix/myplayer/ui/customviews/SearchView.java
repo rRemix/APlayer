@@ -17,6 +17,10 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by taeja on 16-2-29.
  */
+
+/**
+ * 自定义搜索控件
+ */
 public class SearchView extends LinearLayout {
     private static final String TAG = "SearchView";
     private Context mContext;
@@ -43,8 +47,8 @@ public class SearchView extends LinearLayout {
         //设置EditText光标与下划线颜色
 //        mEditText.getBackground().setColorFilter(getResources().getColor(R.color.progress_complete), PorterDuff.Mode.SRC_ATOP);
 
-        final int size = DBUtil.mSearchKeyList.size();
-        String[] strs = (String[]) DBUtil.mSearchKeyList.toArray(new String[size]);
+//        final int size = DBUtil.mSearchKeyList.size();
+//        String[] strs = (String[]) DBUtil.mSearchKeyList.toArray(new String[size]);
 //        ArrayAdapter adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_list_item_1, strs);
 //        mEditText.setAdapter(adapter);
 

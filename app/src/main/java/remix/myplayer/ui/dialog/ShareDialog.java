@@ -46,14 +46,20 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by Remix on 2015/12/9.
  */
+
+/**
+ * 分享的Dialog
+ */
 public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     public static ShareDialog mInstance;
+    //四个分享按钮
     private ImageView mQQ;
     private ImageView mWeibo;
     private ImageView mWechat;
     private ImageView mCircleFrient;
     private MP3Info mInfo;
     private Button mCancel;
+    //Api
     private Tencent mTencentApi;
     private IWeiboShareAPI mWeiboApi;
     private BaseUiListener mQQListener;
@@ -197,6 +203,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         mWeiboApi.sendRequest(ShareDialog.this, request);
     }
 
+    //微信
     class WeChatClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -264,6 +271,8 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         if(intent.getAction() == "com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY")
             mWeiboApi.handleWeiboResponse(intent, this);
     }
+
+    //微博回调
     @Override
     public void onResponse(BaseResponse baseResponse) {
         switch (baseResponse.errCode) {
@@ -283,6 +292,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
 //        }
         finish();
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

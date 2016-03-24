@@ -10,6 +10,10 @@ import remix.myplayer.utils.Constants;
 /**
  * Created by Remix on 2015/12/3.
  */
+
+/**
+ * 播放控制
+ */
 public class CtrlButtonListener implements View.OnClickListener {
     private Context context;
     public CtrlButtonListener(Context context)

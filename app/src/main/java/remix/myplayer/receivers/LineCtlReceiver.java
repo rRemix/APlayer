@@ -13,6 +13,10 @@ import remix.myplayer.utils.Constants;
 /**
  * Created by taeja on 16-2-5.
  */
+
+/**
+ * 接收线控的广播
+ */
 public class LineCtlReceiver extends BroadcastReceiver {
     private final static String TAG = "LineCtlReceiver";
     //按下了几次

@@ -26,15 +26,19 @@ import remix.myplayer.utils.DensityUtil;
 /**
  * Created by Remix on 2015/12/28.
  */
+
+/**
+ * 心情记录的Fragment
+ */
 public class RecordFragment extends Fragment{
     private EditText mEdit;
-    private Button mShare;
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_record,null);
         mEdit = (EditText)rootView.findViewById(R.id.edit_record);
-//        mEdit.getBackground().setColorFilter(getResources().getColor(R.color.cursor_color), PorterDuff.Mode.SRC_ATOP);
+
+        //启动分享心情的Activity
         (rootView.findViewById(R.id.sharebtn)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -17,11 +17,14 @@ import remix.myplayer.activities.BaseActivity;
 import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.adapters.PlayListAddtoAdapter;
 import remix.myplayer.infos.PlayListItem;
-import remix.myplayer.utils.ErrUtil;
 import remix.myplayer.utils.XmlUtil;
 
 /**
  * Created by taeja on 16-2-1.
+ */
+
+/**
+ * 将歌曲添加到播放列表的对话框
  */
 public class AddtoPlayListDialog extends BaseActivity {
     private ListView mList;
@@ -68,7 +71,7 @@ public class AddtoPlayListDialog extends BaseActivity {
                         if(isExist){
                             Toast.makeText(AddtoPlayListDialog.this,"该歌曲已经存在", Toast.LENGTH_SHORT).show();
                         } else {
-                            XmlUtil.addSong(playlist, mSongName,mId,mAlbumId);
+                            XmlUtil.addSongToPlayList(playlist, mSongName,mId,mAlbumId);
                             Toast.makeText(AddtoPlayListDialog.this,"添加成功", Toast.LENGTH_SHORT).show();
                         }
                     }

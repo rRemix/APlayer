@@ -31,18 +31,25 @@ import remix.myplayer.adapters.FolderAdapter;
 /**
  * Created by Remix on 2015/11/30.
  */
+
+/**
+ * 通用工具类
+ */
 public class CommonUtil {
     public static CommonUtil mInstace = null;
-
-
     private static Context mContext;
 
-    public static void setContext(Context context)
-    {
+    public static void setContext(Context context) {
         mContext = context;
     }
 
-    //压缩图片用于分享
+
+    /**
+     * 压缩图片用于分享
+     * @param bmp 原始图片
+     * @param needRecycle 是否需要回收
+     * @return 压缩后的byte数组
+     */
     public static byte[] bmpToByteArray(final Bitmap bmp, final boolean needRecycle) {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, output);
@@ -60,19 +67,16 @@ public class CommonUtil {
         return result;
     }
 
-    //按比例压缩
-    public static Bitmap CompressByScale(Bitmap src){
-        BitmapFactory.Options newOpts = new BitmapFactory.Options();
-        //开始读入图片，此时把options.inJustDecodeBounds 设回true了
-        newOpts.inJustDecodeBounds = true;
-
-        return null;
-    }
-
     //高斯模糊
-    public static Bitmap doBlur(Bitmap sentBitmap, int radius,
-                                boolean canReuseInBitmap)
-    {
+
+    /**
+     *
+     * @param sentBitmap 需要模糊的bitmap
+     * @param radius 模糊半径 数值越大，模糊程度越高
+     * @param canReuseInBitmap
+     * @return 高斯模糊后的bitmap
+     */
+    public static Bitmap doBlur(Bitmap sentBitmap, int radius, boolean canReuseInBitmap) {
         Bitmap bitmap;
         if (canReuseInBitmap) {
             bitmap = sentBitmap;
@@ -277,43 +281,14 @@ public class CommonUtil {
         return (bitmap);
     }
 
-    //高斯模糊
-    public static Bitmap blurBitmap(Bitmap bitmap){
-
-        //Let's create an empty bitmap with the same size of the bitmap we want to blur
-        Bitmap outBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-
-        //Instantiate a new Renderscript
-        RenderScript rs = RenderScript.create(mContext);
-
-        //Create an Intrinsic Blur Script using the Renderscript
-        ScriptIntrinsicBlur blurScript = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
-        //Create the Allocations (in/out) with the Renderscript and the in/out bitmaps
-        Allocation allIn = Allocation.createFromBitmap(rs, bitmap);
-        Allocation allOut = Allocation.createFromBitmap(rs, outBitmap);
-
-        //Set the radius of the blur
-        blurScript.setRadius(25.f);
-
-        //Perform the Renderscript
-        blurScript.setInput(allIn);
-        blurScript.forEach(allOut);
-
-        //Copy the final bitmap created by the out Allocation to the outBitmap
-        allOut.copyTo(outBitmap);
-
-        //recycle the original bitmap
-        bitmap.recycle();
-
-        //After finishing everything, we destroy the Renderscript.
-        rs.destroy();
-
-        return outBitmap;
-
-
-    }
 
     //获得歌曲时长，分：秒
+
+    /**
+     * 根据时间戳，解析时间
+     * @param duration 时间戳
+     * @return 00:00格式的时间
+     */
     public static String getTime(long duration) {
         int minute = (int)duration / 1000 / 60;
         int second = ((int)duration - minute * 60000) / 1000;
@@ -333,7 +308,11 @@ public class CommonUtil {
                 return minute + ":" + second;
         }
     }
-    //判断网路是否连接
+
+    /**
+     * 判断网路是否连接
+     * @return
+     */
     public static boolean isNetWorkConnected() {
         if(mContext != null)
         {
@@ -345,6 +324,11 @@ public class CommonUtil {
         return false;
     }
 
+    /**
+     * 删除歌曲
+     * @param path 歌曲路径
+     * @return 是否删除成功
+     */
     public static boolean deleteFile(String path){
         File file = new File(path);
         if(file.exists())

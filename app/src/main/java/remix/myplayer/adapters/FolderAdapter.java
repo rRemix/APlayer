@@ -21,6 +21,10 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by Remix on 2015/12/5.
  */
+
+/**
+ * 文件夹界面的适配器
+ */
 public class FolderAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     public static FolderAdapter mInstance;
@@ -60,16 +64,18 @@ public class FolderAdapter extends BaseAdapter {
 
         if(DBUtil.mFolderMap == null || DBUtil.mFolderMap.size() < 0)
             return ItemView;
+        //根据当前索引 获得对应的歌曲列表
         Iterator it = DBUtil.mFolderMap.keySet().iterator();
         String temp = null;
         for(int i = 0 ; i <= position ; i++)
             temp = it.next().toString();
-
+        //设置文件夹名字 路径名 歌曲数量
         if(temp != null){
             mNameView.setText(temp.substring(temp.lastIndexOf("/")+ 1,temp.length()));
             mPathView.setText(temp);
             mNumView.setText(DBUtil.mFolderMap.get(temp).size()+ "首");
         }
+        //popupmenu
         final String full_path = temp;
         button.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -18,36 +18,104 @@ import remix.myplayer.R;
 /**
  * Created by taeja on 16-2-15.
  */
+
+/**
+ * 圆形seekar
+ * 用于定时关闭界面
+ */
 public class CircleSeekBar extends View {
+    /**
+     * 圆圈画笔
+     */
     private Paint mCirclePaint;
+
+    /**
+     * 圆弧画笔
+     */
     private Paint mArcPaint;
-    private Paint mTextPaint;
+
+    /**
+     * 圆的中心点
+     */
     private int mCenterX = 0;
     private int mCenterY = 0;
+
+    /**
+     * 圆半径
+     */
     private int mRadius = 0;
-    private boolean mRadiusFlag = true;
+
+    /**
+     * Thumb的高度与宽度
+     */
     private int mThumbWidth = 0;
     private int mThumbHeight = 0;
     private double mThumbSize = 0;
-    private Bitmap mThumbBitmap = null;
+
+    /**
+     * 滑过的弧度
+     */
     private double mRad = 0;
+
+    /**
+     * 距离圆中心的距离
+     */
     private float mOffsetX = 0;
     private float mOffsetY = 0;
+
+    /**
+     * 最大进度值
+     */
     private long mProgressMax = 100;
+
+    /**
+     * 当前进度
+     */
     private long mProgress = 0;
+
+    /**
+     * 整个圆所在的长方形
+     */
     private RectF mRectF = new RectF();
-    private Rect mTextRect = new Rect();
+
+    /**
+     * 轨道宽度
+     */
     private int mProgressWidth = 0;
+
+    /**
+     * 轨道颜色
+     */
     private int mProgressCorlor;
     private Context mContext;
+
+    /**
+     * 属性
+     */
     private AttributeSet mAttrs = null;
-    private float mBaseLine = 0;
+
+    /**
+     * ThumbDrawable
+     */
     private Drawable mThumbDrawable = null;
+
+    /**
+     * Thumb的两种状态： 按下与普通
+     */
     private int[] mThumbNormal = null;
     private int[] mThumbPressed = null;
+
+    /**
+     *
+     */
     private OnSeekBarChangeListener mOnSeekBarChangeListener;
-    //是否开始计时
+
+    /**
+     * 是否开始计时
+     */
     private boolean mStart = false;
+
+
     public CircleSeekBar(Context context) {
         super(context);
         mContext = context;
@@ -84,13 +152,23 @@ public class CircleSeekBar extends View {
         super.onDraw(canvas);
     }
 
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        //没有开始计时，更新界面
         if(!mStart)
             seekTo(event.getX(),event.getY(),event.getAction() == MotionEvent.ACTION_UP);
         return true;
     }
 
+    //根据触摸位置更新界面
+
+    /**
+     * 根据触摸位置计算偏移大小并更新界面
+     * @param eventX
+     * @param eventY
+     * @param isUp 是否抬起，用于更新thumb状态
+     */
     private void seekTo(float eventX,float eventY,boolean isUp) {
         if(isPointOnThumb(eventX,eventY) && !isUp){
             mRad = Math.atan2(eventY - mCenterY, eventX - mCenterX);
@@ -103,7 +181,6 @@ public class CircleSeekBar extends View {
             //设置当前进度
             mProgress = (int)(Math.toDegrees(mRad) / 360.0 * mProgressMax);
             //设置thumb状态
-
             if(mOnSeekBarChangeListener != null)
                 mOnSeekBarChangeListener.onProgressChanged(this,mProgress,true);
         }
@@ -112,7 +189,10 @@ public class CircleSeekBar extends View {
     }
 
 
-    //设置thumb坐标
+    /**
+     * 根据弧度计算偏移量
+     * @param radian 滑过的弧度
+     */
     private void setThumbPostion(double radian) {
 //        mOffsetX = (float) Math.cos(radian) * mRadius;
 //        mOffsetY = (float) Math.sin(radian) * mRadius;
@@ -145,33 +225,25 @@ public class CircleSeekBar extends View {
             int width = mThumbDrawable.getIntrinsicWidth();
             int height= mThumbDrawable.getIntrinsicHeight();
         }
-//        mThumbDrawable = typedArray.getDrawable(R.styleable.th);
+        //轨道颜色 宽度 最大值
         mProgressCorlor = typedArray.getColor(R.styleable.CircleSeekBar_progress_color, Color.parseColor("#8E24AA"));
         mProgressWidth = typedArray.getInteger(R.styleable.CircleSeekBar_progress_width,15);
         mProgressMax = typedArray.getInteger(R.styleable.CircleSeekBar_progress_max,60);
         typedArray.recycle();
 
+        //圆圈画笔
         mCirclePaint = new Paint();
         mCirclePaint.setAntiAlias(true);
         mCirclePaint.setColor(Color.parseColor("#DCDCDC"));
         mCirclePaint.setStyle(Paint.Style.STROKE);
         mCirclePaint.setStrokeWidth(mProgressWidth);
-
+        //圆弧画笔
         mArcPaint = new Paint();
         mArcPaint.setAntiAlias(true);
         mArcPaint.setColor(mProgressCorlor);
         mArcPaint.setStyle(Paint.Style.STROKE);
         mArcPaint.setStrokeWidth(mProgressWidth);
 
-//        mTextPaint = new Paint();
-//        mTextPaint.setAntiAlias(true);
-//        mTextPaint.setColor(Color.parseColor("#1b1c19"));
-//        mTextPaint.setTextSize(DensityUtil.dip2px(getContext(),22));
-//        mTextPaint.setTextAlign(Paint.Align.CENTER);
-//        Paint.FontMetricsInt fontMetrics = mTextPaint.getFontMetricsInt();
-//        mBaseLine = (mRectF.bottom + mRectF.top - fontMetrics.bottom - fontMetrics.top) / 2;
-
-//        mThumbBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.timer_btn_pre_whirling);
         mThumbWidth = mThumbDrawable.getIntrinsicWidth();
         mThumbHeight = mThumbDrawable.getIntrinsicHeight();
         mThumbSize =  Math.sqrt(mThumbHeight * mThumbHeight + mThumbWidth * mThumbWidth);
@@ -201,20 +273,23 @@ public class CircleSeekBar extends View {
 //        }
     }
 
-    public void setMax(long max)
-    {
+    public void setMax(long max) {
         mProgressMax = max;
     }
-    public long getProgress()
-    {
+
+    public long getProgress() {
+
         return mProgress;
     }
-    public void setStart(boolean start)
-    {
+    public void setStart(boolean start) {
         mStart = start;
     }
-    public void setProgress(long progress)
-    {
+
+    /**
+     * 设置进度，并根据进度值，计算划过角度，再计算偏移距离
+     * @param progress
+     */
+    public void setProgress(long progress) {
         if(progress >= mProgressMax)
             progress = mProgressMax;
         if(progress <= 0)
@@ -231,8 +306,8 @@ public class CircleSeekBar extends View {
         void onStartTrackingTouch(CircleSeekBar seekBar);
         void onStopTrackingTouch(CircleSeekBar seekBar);
     }
-    public void setOnSeekBarChangeListener(OnSeekBarChangeListener l)
-    {
+
+    public void setOnSeekBarChangeListener(OnSeekBarChangeListener l) {
         mOnSeekBarChangeListener = l;
     }
 }

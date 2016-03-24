@@ -25,15 +25,17 @@ import remix.myplayer.infos.MP3Info;
 /**
  * Created by Remix on 2015/12/2.
  */
-public class CoverFragment extends Fragment {
 
+/**
+ * 专辑封面Fragment
+ *
+ */
+public class CoverFragment extends Fragment {
     private SimpleDraweeView mImage;
-    private Bitmap mBitmap;
     private MP3Info mInfo;
     private TranslateAnimation mLeftAnimation;
     private ScaleAnimation mScaleAnimation;
     private TranslateAnimation mRightAnimation;
-    private Bitmap mNewBitmap;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,10 +44,13 @@ public class CoverFragment extends Fragment {
         mImage = (SimpleDraweeView)rootView.findViewById(R.id.cover_image);
         if(mInfo != null)
             mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
-        if(mLeftAnimation == null || mScaleAnimation == null || mRightAnimation == null)
-        {
+
+        if(mLeftAnimation == null || mScaleAnimation == null || mRightAnimation == null) {
+            //往左侧消失的动画
             mLeftAnimation = (TranslateAnimation) AnimationUtils.loadAnimation(getContext(),R.anim.cover_left_out);
+            //往右侧消失的动画
             mRightAnimation = (TranslateAnimation)AnimationUtils.loadAnimation(getContext(),R.anim.cover_right_out);
+            //中心方法的动画
             mScaleAnimation = (ScaleAnimation) AnimationUtils.loadAnimation(getContext(),R.anim.cover_center_in);
 
             Animation.AnimationListener listener = new Animation.AnimationListener() {
@@ -54,6 +59,7 @@ public class CoverFragment extends Fragment {
                 }
                 @Override
                 public void onAnimationEnd(Animation animation) {
+                    //当消失的动画播放完毕后，设置新的封面背景，并播放中心放大的动画
                     mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
 //                    if(mNewBitmap != null)
 //                        mImage.setImageBitmap(mNewBitmap);
@@ -74,6 +80,12 @@ public class CoverFragment extends Fragment {
 
     }
 
+    /**
+     * 操作为上一首歌曲时，显示往左侧消失的动画
+     *       下一首歌曲时，显示往右侧消失的动画
+     * @param info 需要更新的歌曲
+     * @param withAnim 是否需要动画
+     */
     public void UpdateCover(MP3Info info,boolean withAnim){
         if(!isAdded())
             return;
@@ -81,14 +93,15 @@ public class CoverFragment extends Fragment {
             return;
         if((mInfo = info) == null)
             return;
-//        mNewBitmap = bitmap;
+
         if(withAnim){
+            //根据操作是上一首还是下一首播放动画
             if(AudioHolderActivity.mOperation == Constants.PREV)
                 mImage.startAnimation(mRightAnimation);
             else if (AudioHolderActivity.mOperation == Constants.NEXT)
                 mImage.startAnimation(mLeftAnimation);
         } else {
-//            mImage.setImageBitmap(bitmap == null ? BitmapFactory.decodeResource(getResources(),R.drawable.no_art_normal) : mNewBitmap);
+            //如果不需要动画，直接设置背景
             mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
         }
     }

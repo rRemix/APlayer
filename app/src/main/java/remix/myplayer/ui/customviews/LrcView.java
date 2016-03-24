@@ -99,8 +99,8 @@ public class LrcView extends TextView {
             mTotalRow = (getHeight()/(mLTextSize + mInterval)) + 4;
         }
 
-        mMinRow = mCurRow - (mTotalRow-1)/2;
-        mMaxRow = mCurRow + (mTotalRow-1)/2;
+        mMinRow = mCurRow - (mTotalRow-1) / 2;
+        mMaxRow = mCurRow + (mTotalRow-1) / 2;
         mMinRow = Math.max(mMinRow, 0); //处理上边界
         mMaxRow = Math.min(mMaxRow, mlrcList.size() - 1); //处理下边界
         Log.d(TAG,"totalrow:" + mTotalRow);

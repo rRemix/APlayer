@@ -19,6 +19,10 @@ import remix.myplayer.utils.Constants;
 /**
  * Created by Remix on 2015/12/6.
  */
+
+/**
+ * 正在播放列表Dialog
+ */
 public class PlayingListDialog extends BaseActivity {
     private ListView mListView;
     @Override
@@ -41,13 +45,6 @@ public class PlayingListDialog extends BaseActivity {
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
     }
-
-    //实现onTouchEvent触屏函数但点击屏幕时销毁本Activity
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event){
-//        finish();
-//        return true;
-//    }
 
     private class ListViewListener implements AdapterView.OnItemClickListener {
         @Override

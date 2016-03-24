@@ -8,6 +8,10 @@ import android.widget.Button;
 /**
  * Created by taeja on 16-3-18.
  */
+
+/**
+ * 自定义Button 主要用于嵌套与ViewPagrer
+ */
 public class PagerButton extends Button {
     public PagerButton(Context context) {
         super(context);

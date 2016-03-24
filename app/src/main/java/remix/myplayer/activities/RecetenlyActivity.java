@@ -20,6 +20,11 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by taeja on 16-3-4.
  */
+
+/**
+ * 最近添加歌曲的界面
+ * 目前为最近7天添加
+ */
 public class RecetenlyActivity extends ToolbarActivity implements MusicService.Callback{
     private RecentlyAdapter mAdapter;
     private Toolbar mToolBar;
@@ -58,6 +63,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
 
     }
 
+    //随机播放
     public void onPlayShuffle(View v){
         MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
         Intent intent = new Intent(Constants.CTL_ACTION);

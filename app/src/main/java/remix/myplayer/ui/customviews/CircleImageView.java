@@ -1,8 +1,4 @@
 package remix.myplayer.ui.customviews;
-
-/**
- * Created by Remix on 2015/12/21.
- */
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -20,7 +16,13 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 import remix.myplayer.R;
+/**
+ * Created by Remix on 2015/12/21.
+ */
 
+/**
+ * 圆形ImageView
+ */
 public class CircleImageView extends ImageView {
 
     private static final ScaleType SCALE_TYPE = ScaleType.CENTER_CROP;

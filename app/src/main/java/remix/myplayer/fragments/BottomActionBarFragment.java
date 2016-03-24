@@ -20,9 +20,15 @@ import remix.myplayer.services.MusicService;
 /**
  * Created by Remix on 2015/12/1.
  */
+
+/**
+ * 底部控制的Fragment
+ */
 public class BottomActionBarFragment extends Fragment{
+    //播放与下一首按钮
     private ImageButton mPlayButton;
     private ImageButton mNextButton;
+    //歌曲名艺术家
     private TextView mTitle;
     private TextView mArtist;
     private RelativeLayout mBottomActionBar;
@@ -41,12 +47,12 @@ public class BottomActionBarFragment extends Fragment{
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.bottom_actionbar,container);
         mBottomActionBar = (RelativeLayout)rootView.findViewById(R.id.bottom_action_bar);
+        //点击打开播放界面
         mBottomActionBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), AudioHolderActivity.class);
                 Bundle bundle = new Bundle();
-                MP3Info temp = MusicService.getCurrentMP3();
                 bundle.putSerializable("MP3Info",MusicService.getCurrentMP3());
                 intent.putExtras(bundle);
                 intent.putExtra("Isplay",MusicService.getIsplay());
@@ -65,13 +71,12 @@ public class BottomActionBarFragment extends Fragment{
         mArtist = (TextView)rootView.findViewById(R.id.bottom_artist);
         return rootView;
     }
+    //更新界面
     public void UpdateBottomStatus(MP3Info mp3Info,boolean isPlaying) {
         if(mp3Info != null) {
-            String strtitle = mp3Info.getDisplayname();
-            String strartist = mp3Info.getArtist();
-            String stralbum = mp3Info.getAlbum();
-            mTitle.setText(strtitle);
-            mArtist.setText(strartist);
+
+            mTitle.setText(mp3Info.getDisplayname());
+            mArtist.setText(mp3Info.getArtist());
         }
         if(isPlaying)
             mPlayButton.setImageResource(R.drawable.bf_btn_stop);

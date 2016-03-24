@@ -3,6 +3,10 @@ package remix.myplayer.infos;
 /**
  * Created by taeja on 16-2-1.
  */
+
+/**
+ * 播放列表Item
+ */
 public class PlayListItem {
     private String mSongName;
     private int mId;

@@ -28,13 +28,16 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by Remix on 2015/12/22.
  */
+
+/**
+ * 艺术家界面的适配器
+ */
 public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder>{
     private Cursor mCursor;
     private Context mContext;
     private Bitmap mDefaultBmp;
 
-    public void setOnItemClickLitener(OnItemClickListener mOnItemClickLitener)
-    {
+    public void setOnItemClickLitener(OnItemClickListener mOnItemClickLitener) {
         this.mOnItemClickLitener = mOnItemClickLitener;
     }
 
@@ -79,10 +82,11 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         if(mCursor.moveToPosition(position)) {
+            //设置歌手名
             String artist = mCursor.getString(ArtistFragment.mArtistIndex);
             artist = artist.indexOf("unknown") > 0 ? "未知歌手" : artist;
             holder.mText1.setText(artist);
-
+            //设置封面
             AsynLoadImage task = new AsynLoadImage(holder.mImage);
             task.execute(mCursor.getString(ArtistFragment.mArtistIdIndex));
 
@@ -100,6 +104,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
                     }
                 });
             }
+            //popupmenu
             if(holder.mButton != null) {
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override

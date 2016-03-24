@@ -14,8 +14,12 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by Remix on 2015/12/6.
  */
-public class ListViewListener implements AdapterView.OnItemClickListener
-{
+
+/**
+ * 播放选中歌曲
+ */
+
+public class ListViewListener implements AdapterView.OnItemClickListener {
     private Context mContext;
     public ListViewListener(Context context) {
         mContext = context;

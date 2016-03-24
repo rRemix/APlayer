@@ -34,23 +34,21 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
     private Context mContext;
     private Cursor mCursor;
     private ColumnView mColumnView;
-    //0:专辑 1:歌手
-    private int mType = 0;
+
     public AllSongAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
         super(context, layout, c, from, to, flags);
         mInstance = this;
         mContext = context;
     }
+
     public void setCursor(Cursor mCursor) {
         this.mCursor = mCursor;
-    }
-    public void setType(int mType) {
-        this.mType = mType;
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
+        //查看是否有缓存
         if(convertView == null) {
             convertView = super.getView(position, convertView, parent);
             holder = new ViewHolder();
@@ -63,10 +61,13 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
 
         if(!mCursor.moveToPosition(position))
             return convertView;
-
+        //设置歌曲名
         String name = mCursor.getString(AllSongFragment.mDisPlayNameIndex);
         name = name.substring(0, name.lastIndexOf("."));
+        //获得当前播放的歌曲
         final MP3Info currentMP3 = MusicService.getCurrentMP3();
+        //判断该歌曲是否是正在播放的歌曲
+        //如果是,高亮该歌曲，并显示动画
         if(currentMP3 != null){
             boolean flag = mCursor.getInt(AllSongFragment.mSongId) == MusicService.getCurrentMP3().getId();
             holder.mName.setTextColor(flag ? Color.parseColor("#782899") : Color.parseColor("#ffffffff"));
@@ -89,15 +90,16 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
         name = name.indexOf("unknown") > 0 ? "未知歌曲" : name;
         holder.mName.setText(name);
 
+        //艺术家与专辑
         String artist = mCursor.getString(AllSongFragment.mArtistIndex);
         String album = mCursor.getString(AllSongFragment.mAlbumIndex);
         artist = artist.indexOf("unknown") > 0 ? "未知歌手" : artist;
         album = album.indexOf("unknown") > 0 ? "未知专辑" : album;
-
+        //封面
         holder.mOther.setText(artist + "-" + album);
         ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mCursor.getString(AllSongFragment.mAlbumIdIndex),
                 holder.mImage);
-
+        //选项Dialog
         final ImageView mItemButton = (ImageView)convertView.findViewById(R.id.allsong_item_button);
         mItemButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,26 +124,7 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
         }
     }
 
-    class AsynLoadImage extends AsyncTask<Integer,Integer,Bitmap>
-    {
-        private final WeakReference mImageView;
-        public AsynLoadImage(ImageView imageView)
-        {
-            mImageView = new WeakReference(imageView);
-        }
-        @Override
-        protected Bitmap doInBackground(Integer... params) {
-            return DBUtil.CheckBitmapBySongId(params[0],true);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            if(bitmap != null)
-                ((ImageView)mImageView.get()).setImageBitmap(bitmap);
-        }
-    }
-    class ViewHolder
-    {
+    class ViewHolder {
         public TextView mName;
         public TextView mOther;
         public CircleImageView mImage;

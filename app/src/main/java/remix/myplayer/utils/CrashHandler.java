@@ -21,6 +21,11 @@ import java.util.Date;
 /**
  * Created by taeja on 16-3-16.
  */
+
+/**
+ * 处理未捕获异常
+ * 记录到sd卡并上传到有盟
+ */
 public class CrashHandler implements Thread.UncaughtExceptionHandler {
     private static final String TAG = "CrashHandler";
     private static final boolean DEBUG = true;

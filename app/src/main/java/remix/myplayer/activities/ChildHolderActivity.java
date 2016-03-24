@@ -2,6 +2,8 @@ package remix.myplayer.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -23,69 +25,59 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by Remix on 2015/12/4.
  */
+
+/**
+ * 专辑、艺术家、文件夹、播放列表详情
+ */
 public class ChildHolderActivity extends BaseAppCompatActivity implements MusicService.Callback{
     private final static String TAG = "ChildHolderActivity";
-    private MusicService mService;
     private ImageView mBack;
-    public static String mFLAG = "CHILD";
+    //获得歌曲信息列表的参数
     private int mId;
+    private int mType;
+    private String mArg;
     private ArrayList<MP3Info> mInfoList;
     private ListView mListView;
+    //歌曲数目与标题
     private TextView mNum;
     private TextView mTitle;
     private BottomActionBarFragment mActionbar;
     private ChildHolderAdapter mAdapter;
     public static ChildHolderActivity mInstance = null;
-    private CircleImageView mCircleView;
-    private TextView mTextTest;
-
+    //更新ListView
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if(mInfoList == null || mInfoList.size() == 0)
+                return;
+            mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),ChildHolderActivity.this);
+            mListView.setAdapter(mAdapter);
+            mNum.setText(mInfoList.size() + "首歌曲");
+            mTitle.setText(mArg);
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //测试错误收集
-//        String test = null;
-//        test.toString();
 
         mInstance = this;
         setContentView(R.layout.activity_child_holder);
-        //绑定控制播放的service;
         MusicService.addCallback(ChildHolderActivity.this);
 
+        //参数id，类型，标题
         mId = getIntent().getIntExtra("Id",-1);
-        int type = getIntent().getIntExtra("Type",-1);
-        String Title = getIntent().getStringExtra("Title");
+        mType = getIntent().getIntExtra("Type",-1);
+        mArg = getIntent().getStringExtra("Title");
 
-        if(mId >= 0) {
-            mInfoList = new ArrayList<>();
-            switch (type)
-            {
-                case Constants.ALBUM_HOLDER:
-                    mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ALBUM_HOLDER);
-                    break;
-                case Constants.ARTIST_HOLDER:
-                    mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST_HOLDER);
-                    break;
-                case Constants.FOLDER_HOLDER:
-                    mInfoList = DBUtil.getMP3ListByIds(DBUtil.mFolderMap.get(Title));
-                    Title = Title.substring(Title.lastIndexOf("/")+ 1,Title.length());
-                    break;
-                case Constants.PLAYLIST_HOLDER:
-                    ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(Title);
-                    ArrayList<Long> ids = new ArrayList<>();
-                    if(list == null)
-                        break;
-                    for(PlayListItem item : list)
-                        ids.add(Long.valueOf(item.getId() + ""));
-                    mInfoList = DBUtil.getMP3ListByIds(ids);
-                    break;
+        new Thread(){
+            @Override
+            public void run() {
+                mInfoList = getMP3List();
+                mHandler.sendEmptyMessage(0);
             }
+        }.start();
 
-        }
-        if(mInfoList == null || mInfoList.size() == 0)
-            return;
         mListView = (ListView)findViewById(R.id.child_holder_list);
-        mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),this);
-        mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -94,6 +86,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                 ArrayList<Long> ids = new ArrayList<Long>();
                 for (MP3Info info : mInfoList)
                     ids.add(info.getId());
+                //设置正在播放列表
                 DBUtil.setPlayingList((ArrayList) ids.clone());
 
                 Intent intent = new Intent(Constants.CTL_ACTION);
@@ -104,19 +97,9 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                 sendBroadcast(intent);
             }
         });
-        //返回键
-        mBack = (ImageView)findViewById(R.id.back_view);
-        mBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
         //歌曲数目与标题
         mNum = (TextView)findViewById(R.id.album_holder_item_num);
-        mNum.setText(mInfoList.size() + "首歌曲");
         mTitle = (TextView)findViewById(R.id.artist_album_title);
-        mTitle.setText(Title);
 
         //初始化底部状态栏
         mActionbar = (BottomActionBarFragment)getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
@@ -126,10 +109,54 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         mActionbar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
 
+
+    /**
+     * 根据参数(专辑id 歌手id 文件夹名 播放列表名)获得对应的歌曲信息列表
+     * @return 对应歌曲信息列表
+     */
+    private ArrayList<MP3Info> getMP3List(){
+        if(mId < 0)
+            return  null;
+        mInfoList = new ArrayList<>();
+        switch (mType) {
+            //专辑id
+            case Constants.ALBUM_HOLDER:
+                mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ALBUM_HOLDER);
+                break;
+            //歌手id
+            case Constants.ARTIST_HOLDER:
+                mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST_HOLDER);
+                break;
+            //文件夹名
+            case Constants.FOLDER_HOLDER:
+                mInfoList = DBUtil.getMP3ListByIds(DBUtil.mFolderMap.get(mArg));
+                mArg = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
+                break;
+            //播放列表名
+            case Constants.PLAYLIST_HOLDER:
+                ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(mArg);
+                ArrayList<Long> ids = new ArrayList<>();
+                if(list == null)
+                    break;
+                for(PlayListItem item : list)
+                    ids.add(Long.valueOf(item.getId() + ""));
+                mInfoList = DBUtil.getMP3ListByIds(ids);
+                break;
+        }
+        return mInfoList;
+    }
+
+    //退出按钮
+    public void onBack(View v){
+        finish();
+    }
+
+    //随机播放按钮
     public void onPlayShuffle(View v){
         MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control", Constants.NEXT);
+        //设置正在播放列表
         ArrayList<Long> ids = new ArrayList<Long>();
         for (MP3Info info : mInfoList)
             ids.add(info.getId());
@@ -141,10 +168,13 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
     protected void onDestroy() {
         super.onDestroy();
     }
+
+    //更新界面
     @Override
     public void UpdateUI(MP3Info MP3info, boolean isplay) {
-        MP3Info temp = MP3info;
+        //底部状态兰
         mActionbar.UpdateBottomStatus(MP3info, isplay);
+        //更新高亮歌曲
         if(mAdapter != null)
             mAdapter.notifyDataSetChanged();
     }

@@ -3,6 +3,10 @@ package remix.myplayer.utils;
 /**
  * Created by taeja on 16-2-17.
  */
+
+/**
+ * 常量值
+ */
 public class Constants {
 
     //删除选项

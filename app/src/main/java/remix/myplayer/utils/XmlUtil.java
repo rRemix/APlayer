@@ -26,36 +26,24 @@ import remix.myplayer.infos.PlayListItem;
 /**
  * Created by taeja on 16-1-26.
  */
+
+/**
+ * Xml工具类
+ * 包括播放列表 正在播放列表 搜素历史
+ */
 public class XmlUtil {
     private static final String TAG = "XmlUtil";
     private static Context mContext;
-    private static File mPlayListFile;
-    private static File mPlayingListFile;
-    private static File mSearchHistoryFile;
+
     public static void setContext(Context context) {
         mContext = context;
-//        try {
-//            File mDir = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName());
-//            if(!mDir.exists())
-//                mDir.mkdir();
-//            mPlayListFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/playlist.xml");
-//            if(!mPlayListFile.exists())
-//                mPlayListFile.createNewFile();
-//            mPlayingListFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/playinglist.xml");
-//            if(!mPlayingListFile.exists())
-//                mPlayingListFile.createNewFile();
-//            mSearchHistoryFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/searchhistory.xml");
-//            if(!mSearchHistoryFile.exists())
-//                mSearchHistoryFile.createNewFile();
-//
-//        }
-//        catch (IOException e){
-//            e.printStackTrace();
-//            ErrUtil.writeError(TAG + "---CreateListFile---" + e.toString());
-//        }
     }
 
-
+    /**
+     * 根据播放列表名字获得相应的歌曲信息列表
+     * @param name 播放列表名字
+     * @return
+     */
     public static Map<String,ArrayList<PlayListItem>> getPlayList(String name)  {
         Map<String,ArrayList<PlayListItem>> map = new HashMap<String,ArrayList<PlayListItem>>();
         XmlPullParser parser = Xml.newPullParser();
@@ -64,15 +52,12 @@ public class XmlUtil {
         FileInputStream in = null;
         try {
             in = mContext.openFileInput(name);
-//            in = new FileInputStream(mPlayListFile);
             parser.setInput(in,"UTF-8");
             int eventType = parser.getEventType();
             String tag = null;
             PlayListItem item = null;
-            while(eventType != XmlPullParser.END_DOCUMENT)
-            {
-                switch (eventType)
-                {
+            while(eventType != XmlPullParser.END_DOCUMENT) {
+                switch (eventType) {
                     case XmlPullParser.START_DOCUMENT:
                         list = new ArrayList<>();
                         break;
@@ -106,8 +91,7 @@ public class XmlUtil {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
                 try {
                     if(in != null)
                         in.close();
@@ -118,7 +102,10 @@ public class XmlUtil {
         return map;
     }
 
-
+    /**
+     * 获得正在播放列表
+     * @return
+     */
     public static ArrayList<Long> getPlayingList()  {
         XmlPullParser parser = Xml.newPullParser();
         ArrayList<Long> list = null;
@@ -170,6 +157,10 @@ public class XmlUtil {
         return list;
     }
 
+    /**
+     * 删除某个播放列表
+     * @param name 需要删除的播放列表的名字
+     */
     public static void deletePlaylist(String name)  {
         if(name != null && !name.equals("")) {
             PlayListActivity.getPlayList().remove(name);
@@ -177,13 +168,23 @@ public class XmlUtil {
         }
     }
 
+    /**
+     * 添加某个播放列表
+     * @param name 需要添加的播放列表名字
+     */
     public static void addPlaylist(String name) {
         if(name != null && !name.equals("")) {
             PlayListActivity.getPlayList().put(name, new ArrayList<PlayListItem>());
             updatePlaylist();
         }
     }
-    public static void deleteSong(String name,PlayListItem item) {
+
+    /**
+     * 删除某个播放列表下的歌曲
+     * @param name 播放列表名字
+     * @param item 删除歌曲
+     */
+    public static void deleteSongFromPlayList(String name, PlayListItem item) {
         if(!item.getSongame().equals("") && !name.equals("")) {
             ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
             boolean ret = list.remove(item);
@@ -191,29 +192,27 @@ public class XmlUtil {
         }
     }
 
-    public static void addSong(String name,String song,int id,int album_id) {
+
+    /**
+     * 某个播放列表下新增歌曲
+     * @param name 播放列表名字
+     * @param song 歌曲名
+     * @param id 歌曲id
+     * @param album_id 专辑id
+     */
+    public static void addSongToPlayList(String name, String song, int id, int album_id) {
         if(!name.equals("") && !song.equals("")) {
             ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
             list.add(new PlayListItem(song,id,album_id));
             updatePlaylist();
         }
     }
-    public static void updateSong(String name,String _new,String _old,int id)
-    {
-        if(!name.equals("") && !_new.equals("")) {
-            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
-            for (int i = 0; i < list.size(); i++) {
-                PlayListItem tmp = list.get(i);
-                if (tmp.getSongame().equals(_old)){
-                    tmp.setSongName(_new);
-                    tmp.setId(id);
-                }
-            }
-            updatePlaylist();
-        }
-    }
-    public static void updatePlaylist()
-    {
+
+
+    /**
+     * 更新播放列表
+     */
+    public static void updatePlaylist() {
         FileOutputStream fos = null;
         try {
             fos = mContext.openFileOutput("playlist.xml",Context.MODE_PRIVATE);
@@ -259,24 +258,32 @@ public class XmlUtil {
     }
 
 
-    public static void deleteSong(long id)
-    {
+    /**
+     * 删除正在播放列表中歌曲
+     * @param id 需要删除的歌曲id
+     */
+    public static void deleteSongFromPlayingList(long id) {
         if(id > 0 && DBUtil.mPlayingList.contains(id)) {
             DBUtil.mPlayingList.remove(id);
             updatePlayingList();
         }
     }
 
-    public static void addSong(long id)
-    {
+    /**
+     * 添加歌曲到正在播放列表
+     * @param id 需要添加的歌曲id
+     */
+    public static void addSongToPlayingList(long id) {
         if(id > 0) {
             DBUtil.mPlayingList.add(id);
             updatePlayingList();
         }
     }
 
-    public static void updatePlayingList()
-    {
+    /**
+     * 更新正在播放列表
+     */
+    public static void updatePlayingList() {
         FileOutputStream fos = null;
         try {
             fos = mContext.openFileOutput("playinglist.xml",Context.MODE_PRIVATE);

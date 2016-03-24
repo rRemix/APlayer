@@ -22,31 +22,35 @@ import remix.myplayer.utils.SearchLRC;
 /**
  * Created by Remix on 2015/12/2.
  */
+
+/**
+ * 歌词界面Fragment
+ */
 public class LrcFragment extends Fragment {
+    //是否找到歌词的三种状态
     private static int UPDATE_LRC = 1;
     private static int NO_LRC = 2;
     private static int NO_NETWORK = 3;
     private MP3Info mInfo;
     private LrcView mLrcView;
-    private LinkedList<LrcInfo> mTextList;
+    //歌词列表
+    private LinkedList<LrcInfo> mLrcList;
     private Handler mHandler = new Handler()
     {
         @Override
         public void handleMessage(Message msg)
         {
             if(msg.what == UPDATE_LRC) {
-                if(mTextList != null && mLrcView != null) {
-//                    mLrcView.setText("");
-                    mLrcView.UpdateLrc(mTextList);
+                //更新歌词
+                if(mLrcList != null && mLrcView != null) {
+                    mLrcView.UpdateLrc(mLrcList);
                 }
             } else if (msg.what == NO_LRC) {
+                //没有找到歌词
                 mLrcView.UpdateLrc(null);
-//                mLrcView.setText("");
-//                mLrcView.setText("暂无歌词");
             } else if (msg.what == NO_NETWORK) {
+                //没用网络
                 mLrcView.UpdateLrc(null);
-//                mLrcView.setText("");
-//                mLrcView.setText("请检查网络连接");
             }
         }
     };
@@ -61,19 +65,16 @@ public class LrcFragment extends Fragment {
         return rootView;
     }
 
-    public void UpdateLrc(MP3Info mp3Info)
-    {
+    public void UpdateLrc(MP3Info mp3Info) {
         if(mp3Info == null)
             return;
         new DownloadThread(mp3Info.getDisplayname(),mp3Info.getArtist()).start();
     }
 
-    class DownloadThread extends Thread
-    {
+    class DownloadThread extends Thread {
         private String mName;
         private String mArtist;
-        public DownloadThread(String name,String artist)
-        {
+        public DownloadThread(String name,String artist) {
             mName = name;
             mArtist = artist;
         }
@@ -83,13 +84,12 @@ public class LrcFragment extends Fragment {
                 mHandler.sendEmptyMessage(NO_NETWORK);
                 return;
             }
-            SearchLRC searchLRC = new SearchLRC(mName,mArtist);
-            mTextList = searchLRC.fetchLyric();
-            if(mTextList == null) {
+
+            mLrcList = new SearchLRC(mName,mArtist).getLrc();
+            if(mLrcList == null) {
                 mHandler.sendEmptyMessage(NO_LRC);
                 return;
             }
-            AudioHolderActivity activity = (AudioHolderActivity)getActivity();
             mHandler.sendEmptyMessage(UPDATE_LRC);
         }
 

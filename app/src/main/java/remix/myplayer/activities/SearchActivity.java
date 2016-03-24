@@ -26,23 +26,30 @@ import remix.myplayer.utils.XmlUtil;
 /**
  * Created by taeja on 16-1-22.
  */
+
+
+/**
+ * 搜索界面，根据关键字，搜索歌曲名，艺术家，专辑中的记录
+ */
 public class SearchActivity extends BaseAppCompatActivity {
+    //查询索引
     public static int mIdIndex = -1;
     public static int mDisplayNameIndex = -1;
     public static int mArtistIndex = -1;
     public static int mAlbumIndex = -1;
     public static int mAlbumIdIndex = -1;
     private Cursor mCursor = null;
-    private ListView mSearchHisList = null;
+    //搜索结果的listview
     private ListView mSearchResList = null;
     private SearchResAdapter mSearchResAdapter = null;
-    private Button mClearHistoryBtn = null;
+    //搜索的关键字
     private String mkey = "";
     private SearchView mSearchView = null;
     public static SearchActivity mInstance = null;
     private static final String SDROOT = "/sdcard/";
-
+    //背景
     private ImageView mSearchLogo;
+    //无搜索结果
     private TextView mSearchResBlank;
     private FrameLayout mSearchResContainer;
     @Override
@@ -61,6 +68,7 @@ public class SearchActivity extends BaseAppCompatActivity {
 
             @Override
             public void onClear() {
+                //清空搜索结果，并更新界面
                 mCursor = null;
                 mSearchResAdapter.changeCursor(mCursor);
                 mkey = "";
@@ -83,6 +91,12 @@ public class SearchActivity extends BaseAppCompatActivity {
         UpdateUI();
     }
 
+
+    /**
+     * 搜索歌曲名，专辑，艺术家中包含该关键的记录
+     * @param key 搜索关键字
+     * @param isclick 是否点击，决定是否保存搜索历史
+     */
     private void search(String key,boolean isclick) {
         mkey = key;
         if(mkey == null)
@@ -127,10 +141,12 @@ public class SearchActivity extends BaseAppCompatActivity {
         mSearchResAdapter.changeCursor(null);
     }
 
+    /**
+     * 更新界面
+     * 如果搜素关键字为空，显示搜索历史或者无搜索历史
+     * 如果关键字不为空，显示搜索结果或者无搜索结果
+     */
     private void UpdateUI(){
-        //更新界面
-        // 如果搜素关键字为空，显示搜索历史或者无搜索历史
-        // 如果关键字不为空，显示搜索结果或者无搜索结果
         if(!mkey.equals("")){
             mSearchResContainer.setVisibility(View.VISIBLE);
             mSearchLogo.setVisibility(View.GONE);

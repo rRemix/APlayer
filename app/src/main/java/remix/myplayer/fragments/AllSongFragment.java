@@ -26,12 +26,16 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by Remix on 2015/11/30.
  */
+
+/**
+ * 全部歌曲的Fragment
+ */
 public class AllSongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private LoaderManager mManager;
     private AllSongAdapter mAdapter;
-    private int mPrev = -1;
     private Cursor mCursor = null;
     private ListView mListView = null;
+    //歌曲名 艺术家 专辑名 专辑id 歌曲id对应的索引
     public static int mDisPlayNameIndex = -1;
     public static int mArtistIndex = -1;
     public static int mAlbumIndex = -1;
@@ -84,6 +88,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        //查询所有歌曲
         CursorLoader loader = new CursorLoader(getActivity(),
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null,MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
@@ -94,6 +99,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(data == null)
             return;
+        //保存查询结果，并设置查询索引
         mCursor = data;
         mDisPlayNameIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
         mArtistIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);

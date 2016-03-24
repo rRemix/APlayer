@@ -1,8 +1,5 @@
 package remix.myplayer.utils;
 
-/**
- * Created by Remix on 2015/12/7.
- */
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,40 +14,65 @@ import java.util.TreeMap;
 
 import android.util.Log;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import remix.myplayer.application.Application;
 import remix.myplayer.infos.LrcInfo;
 
+/**
+ * Created by Remix on 2015/12/7.
+ */
+
+/**
+ * 根据歌曲名和歌手名 搜索歌词并解析成固定格式
+ */
 public class SearchLRC {
-    public static TreeMap<Integer,String> lrcMap = new TreeMap<>();
-    private URL url;
-    public static final String DEFAULT_LOCAL = "GB2312";
-    StringBuffer sb = new StringBuffer();
+    private static final String TAG = "SearchLRC";
+    private static final String DEFAULT_LOCAL = "GB2312";
+    private String mSongName;
+    private String mArtistName;
+    private static RequestQueue mQueue;
+    private boolean mIsFind = false;
 
-    private boolean findNumber = false;
-    public SearchLRC(){};
-    /*
-     * 初始化，根据参数取得lrc的地址
-     */
     public SearchLRC(String musicName, String singerName) {
-
+        //创建RequestQueue对象
+        if(mQueue == null)
+            mQueue = Volley.newRequestQueue(Application.getContext());
+        
         //传进来的如果是汉字，那么就要进行编码转化
         try {
-            musicName = URLEncoder.encode(musicName, "utf-8");
-            singerName = URLEncoder.encode(singerName, "utf-8");
+            mSongName = URLEncoder.encode(musicName, "utf-8");
+            mArtistName = URLEncoder.encode(singerName, "utf-8");
+
         } catch (UnsupportedEncodingException e2) {
             // TODO Auto-generated catch block
             e2.printStackTrace();
         }
-        String strUrl = "http://box.zhangmen.baidu.com/x?op=12&count=1&title=" +
-                musicName + "$$" + singerName +"$$$$";
+        
+    }
+
+    /**
+     * 根据歌手与歌手名,获得歌词id
+     * @return 歌词id
+     */
+    public int getLrcId(){
+        URL lrcIdUrl = null;
         try {
-            url = new URL(strUrl);
+            lrcIdUrl = new URL("http://box.zhangmen.baidu.com/x?op=12&count=1&title=" +
+                    mSongName + "$$" + mArtistName +"$$$$");
         } catch (Exception e1) {
             e1.printStackTrace();
         }
+
         BufferedReader br = null;
         String s = new String();
+        StringBuffer strBuffer = new StringBuffer();
         try {
-            HttpURLConnection httpConn = (HttpURLConnection)url.openConnection();
+            HttpURLConnection httpConn = (HttpURLConnection) lrcIdUrl.openConnection();
             httpConn.connect();
             InputStreamReader inReader = new InputStreamReader(httpConn.getInputStream());
             br = new BufferedReader(inReader);
@@ -59,19 +81,27 @@ public class SearchLRC {
         }
         try {
             if(br == null)
-                return;
+                return 0;
             while ((s = br.readLine()) != null) {
-                sb.append(s + "/r/n");
+                strBuffer.append(s + "/r/n");
+
+                int begin = 0, end = 0, number = 0;// number=0表示暂无歌词
+                String strid = "";
+                begin = strBuffer.indexOf("<lrcid>");
+                if (begin != -1) {
+                    end = strBuffer.indexOf("</lrcid>", begin);
+                    strid = strBuffer.substring(begin + 7, end);
+                    number = Integer.parseInt(strid);
+                }
+                return number;
             }
         }
         catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-
                 if(br != null) {
-                    String tmep = sb.toString();
-                    System.out.println(tmep);
+                    Log.d(TAG,"StringBuffer:" + strBuffer);
                     br.close();
                 }
             }
@@ -79,49 +109,46 @@ public class SearchLRC {
                 e.printStackTrace();
             }
         }
+        return 0;
     }
-    /*
-     * 根据lrc的地址，读取lrc文件流
-     * 生成歌词的ArryList
-     * 每句歌词是一个String
-     */
-    public LinkedList<LrcInfo> fetchLyric() {
 
-        int begin = 0, end = 0, number = 0;// number=0表示暂无歌词
-        String strid = "";
-        begin = sb.indexOf("<lrcid>");
-        Log.d("test", "sb = " + sb);
-        if (begin != -1) {
-            end = sb.indexOf("</lrcid>", begin);
-            strid = sb.substring(begin + 7, end);
-            number = Integer.parseInt(strid);
-        }
-        if(number <= 0)
+
+    /**
+     * 根据歌词id,发送请求并解析歌词
+     * @return 歌词信息list
+     */
+    public LinkedList<LrcInfo> getLrc() {
+        int lrcId = getLrcId();
+        if(lrcId <= 0)
             return null;
+        
+        //拼接url
         String geciURL = "http://box.zhangmen.baidu.com/bdlrc/"
-                + number / 100 + "/" + number + ".lrc";
-        SetFindLRC(number);
-        Log.d("test", "geciURL = " + geciURL);
-        //ArrayList gcContent =new ArrayList();
-        String s = new String();
+                + lrcId / 100 + "/" + lrcId + ".lrc";
+        SetFindLRC(lrcId);
+       
+        URL url = null;
         try {
             url = new URL(geciURL);
         } catch (MalformedURLException e2) {
             e2.printStackTrace();
         }
-
+        //获得输入流
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(url.openStream(), "GB2312"));
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+        
+        //解析歌词
+        TreeMap<Integer,String> lrcMap = new TreeMap<>();
         lrcMap.clear();
+        String s = new String();
         if (br == null) {
-            System.out.print("stream is null");
+            Log.d(TAG,"stream is null");
         } else {
             try {
-
                 while ((s = br.readLine()) != null) {
                     //判断是否是歌词内容
                     if(s.startsWith("[ti") || s.startsWith("[ar") || s.startsWith("[al") ||
@@ -143,16 +170,15 @@ public class SearchLRC {
             }
         }
 
+        //将解析后的歌词封装
         LinkedList<LrcInfo> list = new LinkedList();
         Iterator it = lrcMap.keySet().iterator();
-
-
         while (it.hasNext()) {
             int startime = (int)it.next();
             String sentence = lrcMap.get(startime);
             list.add(new LrcInfo(sentence,startime));
         }
-
+        //设置每句歌词开始与结束时间
         for(int i = 0 ; i < list.size() - 1 ;i++) {
             LrcInfo cur = list.get(i);
             LrcInfo nxt = list.get(i + 1);
@@ -164,6 +190,11 @@ public class SearchLRC {
     }
 
 
+    /**
+     * 根据字符串形式的时间，得到毫秒值
+     * @param strTime 时间字符串
+     * @return
+     */
     public int getMill(String strTime) {
         int min;
         int sec;
@@ -184,25 +215,13 @@ public class SearchLRC {
     }
 
 
-    public boolean ParseLrc() {
-        String test = "[00:01:02]";
-        String test1 = "[00:01:02][00:01:02]";
-
-        String reg = "//[/d+2./d+2./d+2//]";
-        boolean b1 = test.matches(reg);
-        boolean b2 = test.matches(reg);
-        System.out.println(b1);
-        System.out.println(b2);
-        return true;
-    }
-
     private void SetFindLRC(int number) {
         if(number == 0)
-            findNumber = false;
+            mIsFind = false;
         else
-            findNumber = true;
+            mIsFind = true;
     }
     public boolean GetFindLRC(){
-        return findNumber;
+        return mIsFind;
     }
 }

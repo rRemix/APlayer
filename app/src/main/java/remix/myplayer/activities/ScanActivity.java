@@ -27,6 +27,7 @@ public class ScanActivity extends ToolbarActivity {
     private CustomSeekBar mCustomSeekbar;
     private int mPosition;
     public static ArrayList<Integer> mSizeList = new ArrayList<>();
+    //几种扫描代写哦啊
     static {
         mSizeList.add(0);
         mSizeList.add(300 * 1024);
@@ -52,6 +53,7 @@ public class ScanActivity extends ToolbarActivity {
 
     private void initSeekbar() {
         mCustomSeekbar = (CustomSeekBar)findViewById(R.id.custom_seekbar);
+        //获得之前设置的大小对应的索引
         for (int i = 0 ; i < mSizeList.size() ;i++){
             mPosition = i;
             if(mSizeList.get(i) == Constants.SCAN_SIZE)
@@ -62,6 +64,7 @@ public class ScanActivity extends ToolbarActivity {
             public void onProgressChanged(CustomSeekBar seekBar, int position, boolean fromUser) {
                 int size = mSizeList.get(position);
                 if(size >= 0) {
+                    //纪录下设置的大小
                     SharedPrefsUtil.putValue(ScanActivity.this, "setting", "scansize", size);
                     Constants.SCAN_SIZE = size;
                 }
@@ -84,34 +87,6 @@ public class ScanActivity extends ToolbarActivity {
                 mHandler.sendMessage(msg);
             }
         }.start();
-    }
-
-    private void initToolbar() {
-        mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        mToolBar.setTitle("返回");
-        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
-        setSupportActionBar(mToolBar);
-        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.toolbar_search:
-                        startActivity(new Intent(ScanActivity.this, SearchActivity.class));
-                        break;
-                    case R.id.toolbar_timer:
-                        startActivity(new Intent(ScanActivity.this, TimerDialog.class));
-                        break;
-                }
-                return true;
-            }
-        });
     }
 
     @Override

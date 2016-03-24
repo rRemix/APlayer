@@ -3,6 +3,10 @@ package remix.myplayer.infos;
 /**
  * Created by Remix on 2015/12/4.
  */
+
+/**
+ * 专辑信息
+ */
 public class AlbumInfo {
     private int AlbumId;
     private String Album;

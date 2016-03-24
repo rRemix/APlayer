@@ -14,6 +14,10 @@ import remix.myplayer.fragments.MainFragment;
 /**
  * Created by Remix on 2015/11/29.
  */
+
+/**
+ * 监听ViewPager
+ */
 public class ViewPagerListener implements ViewPager.OnPageChangeListener {
     private ImageView mImage= null;
     private int mIndex = 0;
@@ -44,6 +48,7 @@ public class ViewPagerListener implements ViewPager.OnPageChangeListener {
 
     @Override
     public void onPageSelected(int position) {
+        //根据当前索引，移动ImageView
         mIndex = position;
         for(int i = 0 ; i < MainFragment.mTextViews.length ;i++){
             if(i == position)

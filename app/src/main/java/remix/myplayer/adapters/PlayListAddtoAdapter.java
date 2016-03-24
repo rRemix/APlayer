@@ -18,6 +18,10 @@ import remix.myplayer.activities.PlayListActivity;
 /**
  * Created by taeja on 16-2-1.
  */
+
+/**
+ * 将歌曲添加到播放列表的适配器
+ */
 public class PlayListAddtoAdapter extends BaseAdapter{
     private Context mContext;
 
@@ -43,6 +47,7 @@ public class PlayListAddtoAdapter extends BaseAdapter{
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
+        //检查缓存
         if(convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.playlist_addto_item,null);
             holder = new ViewHolder();
@@ -52,6 +57,7 @@ public class PlayListAddtoAdapter extends BaseAdapter{
         else
             holder = (ViewHolder)convertView.getTag();
 
+        //根据索引显示播放列表名
         String name = null;
         Iterator it = PlayListActivity.getPlayList().keySet().iterator();
         for(int i = 0 ; i<= position ;i++) {

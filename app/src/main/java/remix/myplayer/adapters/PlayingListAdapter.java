@@ -21,6 +21,10 @@ import remix.myplayer.utils.XmlUtil;
 /**
  * Created by Remix on 2015/12/2.
  */
+
+/**
+ * 正在播放列表的适配器
+ */
 public class PlayingListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private Context mContext;
@@ -38,16 +42,12 @@ public class PlayingListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if(DBUtil.mPlayingList == null)
-            return 0;
-        return DBUtil.mPlayingList.size();
+        return DBUtil.mPlayingList != null ? DBUtil.mPlayingList.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
-            return null;
-        return DBUtil.mPlayingList.get(position);
+        return DBUtil.mPlayingList != null ? DBUtil.mPlayingList.get(position) : null;
     }
 
     @Override
@@ -58,6 +58,7 @@ public class PlayingListAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
+        //检查是否有缓存
         if(convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.playinglist_item,null);
             holder = new ViewHolder(convertView);
@@ -71,19 +72,22 @@ public class PlayingListAdapter extends BaseAdapter {
 
         final MP3Info temp = new MP3Info(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(position)));
         if(temp != null) {
-
+            //设置歌曲与艺术家
             holder.mSong.setText(temp.getDisplayname());
             holder.mArtist.setText(temp.getArtist());
+            //删除按钮
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    DBUtil.mPlayingList.remove(temp.getId());
-                    XmlUtil.updatePlayingList();
+//                    DBUtil.mPlayingList.remove(temp.getId());
+                    XmlUtil.deleteSongFromPlayingList(temp.getId());
+//                    XmlUtil.updatePlayingList();
                     if(temp.getId() == MusicService.getCurrentMP3().getId()) {
                         Intent intent = new Intent(Constants.CTL_ACTION);
                         intent.putExtra("Control", Constants.NEXT);
                         mContext.sendBroadcast(intent);
                     }
+                    //更新界面
                     mHandler.sendEmptyMessage(Constants.NOTIFYDATACHANGED);
 //                    notifyDataSetChanged();
                 }

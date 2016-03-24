@@ -15,7 +15,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/common_btn_back" />
+            android:src="@drawable/common_btn_back"
+            android:onClick="onBack"/>
         <!--<remix.myplayer.ui.customviews.CircleImageView-->
             <!--android:id="@+id/child_holder_image"-->
             <!--android:layout_width="32dp"-->

@@ -23,37 +23,81 @@ import remix.myplayer.R;
 /**
  * Created by taeja on 16-3-2.
  */
+
+/**
+ * 高亮歌曲的动画
+ * 四个柱状体随机改变个哦啊读
+ */
 public class ColumnView extends View {
     private static final String TAG = "ColumnVIew";
-    //记录动画是否已经启动
+    /**
+     * 动画是否已经启动
+     */
     private boolean mIsRun = false;
-    //View高度
+
+    /**
+     * 整个View的高度与宽度
+     */
     private int mRawHeight;
-    //View宽度
     private int mRawWdith;
-    //多个柱状图
+
+    /**
+     * 多个柱状图的高度
+     */
     private ArrayList<Integer> mHeightList = new ArrayList<>();
     private int mHeight1;
     private int mHeight2;
     private int mHeight3;
     private int mHeight4;
-    //每个柱状图的宽度
+
+    /**
+     * 每个柱状图的宽度
+     */
     private int mColWidth = 80;
-    //两个柱状图之间的间隙
+
+    /**
+     * 两个柱状图之间的间隙
+     */
     private int mSpaceWidth = 20;
+
+    /**
+     * 画笔
+     */
     private Paint mPaint;
-    //总共几个柱状图
+
+    /**
+     * 总共几个柱状图
+     */
     private int mColNum = 4;
-    //动画列表
+
+    /**
+     * 动画链表
+     */
     private ArrayList<ObjectAnimator> mObjectAnimList = new ArrayList<>();
-    //更新动画的定时器
+
+    /**
+     * 更新动画的定时器
+     */
     private Timer mTimer;
-    //柱状图背景色
+
+    /**
+     * 柱状图背景色
+     */
     private int mColumnColor;
-    //整个View背景色
-    private Color mBackgroundColor;
+
+    /**
+     * 开始动画
+     */
     private final static int STARTANIM = 0;
+
+    /**
+     * 停止动画
+     */
     private final static int STOPANIM = 1;
+
+    /**
+     * 更新动画
+     */
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -72,6 +116,7 @@ public class ColumnView extends View {
             }
         }
     };
+
     public ColumnView(Context context, AttributeSet attrs) {
         super(context,attrs);
         init(attrs);
@@ -176,6 +221,7 @@ public class ColumnView extends View {
         return mRawHeight;
     }
 
+    //开始动画
     public void startAnim(){
         mIsRun = true;
         mTimer = new Timer();
@@ -190,6 +236,7 @@ public class ColumnView extends View {
         },50,300);
     }
 
+    //停止动画
     public void stopAnim(){
         mIsRun = false;
         if(mTimer != null){

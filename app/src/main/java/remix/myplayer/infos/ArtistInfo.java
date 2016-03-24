@@ -3,6 +3,10 @@ package remix.myplayer.infos;
 /**
  * Created by Remix on 2015/12/4.
  */
+
+/**
+ * 艺术家信息
+ */
 public class ArtistInfo {
     private String Artist;
     private int Artist_Id;

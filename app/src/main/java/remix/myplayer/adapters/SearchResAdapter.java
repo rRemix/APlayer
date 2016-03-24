@@ -22,8 +22,11 @@ import remix.myplayer.utils.DBUtil;
 /**
  * Created by Remix on 2016/1/23.
  */
-public class SearchResAdapter extends SimpleCursorAdapter
-{
+
+/**
+ * 搜索结果的适配器
+ */
+public class SearchResAdapter extends SimpleCursorAdapter {
     private Cursor mCurosr;
     private Context mContext;
     public SearchResAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
@@ -37,19 +40,18 @@ public class SearchResAdapter extends SimpleCursorAdapter
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        if(convertView == null)
-        {
+        if(convertView == null) {
             convertView = super.getView(position,convertView,parent);
             holder = new ViewHolder();
             holder.mImage = (SimpleDraweeView)convertView.findViewById(R.id.search_image);
             holder.mName = (TextView)convertView.findViewById(R.id.search_name);
             holder.mOther = (TextView)convertView.findViewById(R.id.search_detail);
             convertView.setTag(holder);
-        }
-        holder = (ViewHolder)convertView.getTag();
+        } else
+            holder = (ViewHolder)convertView.getTag();
 
-        if(mCurosr != null && mCurosr.moveToPosition(position))
-        {
+        //设置歌曲名、专辑名、封面
+        if(mCurosr != null && mCurosr.moveToPosition(position)) {
             try{
                 String name = mCurosr.getString(SearchActivity.mDisplayNameIndex);
                 holder.mName.setText(name.substring(0,name.lastIndexOf(".")));
@@ -62,27 +64,8 @@ public class SearchResAdapter extends SimpleCursorAdapter
 
         return convertView;
     }
-    class AsynLoadImage extends AsyncTask<Integer,Integer,Bitmap>
-    {
-        private final ImageView mImageView;
-        public AsynLoadImage(ImageView imageView)
-        {
-            mImageView = imageView;
-        }
-        @Override
-        protected Bitmap doInBackground(Integer... params) {
-            return DBUtil.CheckBitmapBySongId(params[0], true);
-        }
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            if(bitmap != null)
-                mImageView.setImageBitmap(bitmap);
-            else
-                mImageView.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(),R.drawable.default_recommend));
-        }
-    }
-    class ViewHolder
-    {
+
+    class ViewHolder {
         public SimpleDraweeView mImage;
         public TextView mName;
         public TextView mOther;

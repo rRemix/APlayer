@@ -5,6 +5,10 @@ import java.io.Serializable;
 /**
  * Created by Remix on 2015/11/30.
  */
+
+/**
+ * 歌曲信息
+ */
 public class MP3Info implements Serializable,Cloneable {
     private long Id;
     private String Displayname;

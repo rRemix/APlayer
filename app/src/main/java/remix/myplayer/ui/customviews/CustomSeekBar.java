@@ -19,52 +19,110 @@ import remix.myplayer.utils.DensityUtil;
 /**
  * Created by Remix on 2016/3/7.
  */
+
+/**
+ * 设置扫描文件大小的seekbar
+ */
 public class CustomSeekBar extends View {
     private OnSeekBarChangeListener mOnSeekBarChangeListener;
     private static final String TAG = "CustomSeekBar";
     private Context mContext;
-    //控件高度与宽度
+    /**
+     * 控件高度与宽度
+     */
     private int mViewWidth;
     private int mViewHeight;
-    //提示字体
+
+    /**
+     * 提示字体
+     */
     private Paint mTextPaint;
-    //轨道垂直中心点
+
+    /**
+     * 轨道垂直中心点
+     */
     private int mTrackCenterY;
-    //整个轨道颜色
+
+    /**
+     * 整个轨道的颜色
+     */
     private int mTrackColor;
-    //画整个轨道
+
+    /**
+     * 整个轨道画笔
+     */
     private Paint mTrackPaint;
-    //已完成轨道颜色
+
+    /**
+     * 已完成轨道的颜色
+     */
     private int  mProgressColor;
-    //画已完成轨道
+
+    /**
+     * 已完成轨道的画笔
+     */
     private Paint mProgressPaint;
-    //画小圆点
+
+    /**
+     * 小圆点的画笔
+     */
     private Paint mDotPaint;
-    //轨道高度与长度
+
+    /**
+     * 轨道的高度与长度
+     */
     private int mTrackHeigh;
     private int mTrackWidth;
-    //总共几个小圆点
+
+    /**
+     * 总共几个小圆点
+     */
     private int mDotNum;
-    //小圆点宽度
+
+    /**
+     * 小圆点宽度
+     */
     private int mDotWidth;
-    //两个小圆点之间的距离
+
+    /**
+     * 两个小圆点之间的距离
+     */
     private int mDotBetween;
-    //所有小圆点的坐标
+
+    /**
+     * 所有小圆点的坐标
+     */
     private ArrayList<Integer> mDotPosition  = new ArrayList<>();
+
+    /**
+     * Thumb的高度与宽度
+     */
     private int mThumbWidth = 0;
     private int mThumbHeight = 0;
+
+    /**
+     * ThumbDrawable 以及两个状态
+     */
     private Drawable mThumbDrawable = null;
     private int[] mThumbNormal = null;
     private int[] mThumbPressed = null;
+
+    /**
+     * Thumb所在位置的中心点
+     */
     private int mThumbCenterX;
     private int mThumbCenterY;
-    //中心高度
-    private int mCenterY;
-    //大小字符串
-    private String[] mTexts = new String[]{"0","300k","500K","800k","1MB","2MB"};
+
     private int mPositon;
-    //是否初始化完成
+    /**
+     * 是否初始化完成
+     */
     private boolean mInit = false;
+
+    /**
+     * 扫描大小设置常量
+     */
+    private String[] mTexts = new String[]{"0","300k","500K","800k","1MB","2MB"};
     public CustomSeekBar(Context context) {
         super(context);
         mContext = context;
@@ -108,6 +166,7 @@ public class CustomSeekBar extends View {
             return true;
         boolean isUp = event.getAction() == MotionEvent.ACTION_UP ;
         if(isUp){
+            //寻找与当前触摸点最近的值
             int temp = Integer.MAX_VALUE;
             for(int i = 0 ; i < mDotPosition.size() ;i++){
                 if(Math.abs(mDotPosition.get(i) - eventX) < temp){
@@ -121,6 +180,7 @@ public class CustomSeekBar extends View {
         } else {
             mThumbCenterX = eventX;
         }
+        //设置thumb状态
         mThumbDrawable.setState(isUp ? mThumbNormal : mThumbPressed);
         invalidate();
         return true;
@@ -130,10 +190,11 @@ public class CustomSeekBar extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         if((mViewWidth = getMeasuredWidth()) > 0 && (mViewHeight = getMeasuredHeight()) > 0){
-            mCenterY = mViewHeight / 2;
+            //计算轨道宽度 两个小圆点之间的距离
             mTrackWidth = mViewWidth - mThumbWidth * 2;
             mDotBetween = mTrackWidth / (mDotNum - 1);
             mDotPosition.clear();
+            //设置所有小圆点的坐标
             for(int i = 0 ; i < mDotNum ; i++){
                 mDotPosition.add(mThumbWidth + mDotBetween * i);
             }
@@ -145,6 +206,7 @@ public class CustomSeekBar extends View {
     private void init(AttributeSet attrs){
         mInit = false;
         TypedArray typedArray = mContext.obtainStyledAttributes(attrs, R.styleable.CustomSeekBar);
+        //初始化thumbdrawable及其状态
         mThumbDrawable = typedArray.getDrawable(R.styleable.CustomSeekBar_thumb);
         if(mThumbDrawable == null)
             mThumbDrawable = getResources().getDrawable(R.drawable.bg_thumb);
@@ -152,24 +214,31 @@ public class CustomSeekBar extends View {
                 -android.R.attr.state_selected, -android.R.attr.state_checked};
         mThumbPressed = new int[]{android.R.attr.state_focused, android.R.attr.state_pressed,
                 android.R.attr.state_selected, android.R.attr.state_checked};
+
+        //计算thumb的大小
         mThumbHeight = mThumbDrawable.getIntrinsicHeight();
         mThumbWidth = mThumbDrawable.getIntrinsicWidth();
         mThumbCenterY = mThumbHeight / 2;
         mTrackCenterY = mThumbHeight / 2;
 
+        //轨道颜色与已完成轨道的颜色
         mTrackColor = typedArray.getColor(R.styleable.CustomSeekBar_trackcolor,Color.parseColor("#6c6a6c"));
         mProgressColor = typedArray.getColor(R.styleable.CustomSeekBar_progresscolor,Color.parseColor("#782899"));
 
+        //小圆点数量与宽度
         mDotNum = typedArray.getInteger(R.styleable.CustomSeekBar_dotnum,6);
         mDotWidth = (int)typedArray.getDimension(R.styleable.CustomSeekBar_dotwidth,4);
 
+        //轨道高度
         mTrackHeigh = (int)typedArray.getDimension(R.styleable.CustomSeekBar_trackheight,4);
 
+        //小圆点画笔
         mDotPaint = new Paint();
         mDotPaint.setAntiAlias(true);
         mDotPaint.setColor(Color.parseColor("#ffffffff"));
         mDotPaint.setStyle(Paint.Style.FILL);
 
+        //提示文字画笔
         mTextPaint = new Paint();
         mTextPaint.setAntiAlias(true);
         mTextPaint.setColor(Color.parseColor("#ffffffff"));
@@ -177,12 +246,14 @@ public class CustomSeekBar extends View {
         mTextPaint.setTextSize(DensityUtil.dip2px(getContext(),13));
         mTextPaint.setTextAlign(Paint.Align.CENTER);
 
+        //整个轨道的画笔
         mTrackPaint = new Paint();
         mTrackPaint.setAntiAlias(true);
         mTrackPaint.setColor(mTrackColor);
         mTrackPaint.setStyle(Paint.Style.STROKE);
         mTrackPaint.setStrokeWidth(mTrackHeigh);
 
+        //已完成轨道的画笔
         mProgressPaint = new Paint();
         mProgressPaint.setAntiAlias(true);
         mProgressPaint.setColor(mProgressColor);
@@ -192,12 +263,11 @@ public class CustomSeekBar extends View {
         typedArray.recycle();
     }
 
-    public long getPosition()
-    {
+    public long getPosition() {
         return mPositon;
     }
-    public void setPosition(int position)
-    {
+
+    public void setPosition(int position) {
         if(position > mDotPosition.size())
             position = mDotPosition.size();
         if(position < 0)
@@ -211,8 +281,8 @@ public class CustomSeekBar extends View {
         void onStartTrackingTouch(CustomSeekBar seekBar);
         void onStopTrackingTouch(CustomSeekBar seekBar);
     }
-    public void setOnSeekBarChangeListener(OnSeekBarChangeListener l)
-    {
+
+    public void setOnSeekBarChangeListener(OnSeekBarChangeListener l) {
         mOnSeekBarChangeListener = l;
     }
     //是否初始化完成

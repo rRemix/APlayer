@@ -7,6 +7,11 @@ import java.util.ArrayList;
 /**
  * Created by taeja on 16-3-21.
  */
+
+/**
+ * 管理所有Activity
+ * 当程序退出时，关闭所有activity
+ */
 public class ActivityManager {
     private static ArrayList<Activity> mActivityList = new ArrayList<>();
 
