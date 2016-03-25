@@ -15,10 +15,8 @@ public class ImageUtil {
         return mInstance == null ? new ImageUtil() : mInstance;
     }
 
-
-
     /**
-     *
+     * 获取图片大小
      * @param resid 图片资源id
      * @return 返回图片高度与宽度
      */
@@ -53,7 +51,11 @@ public class ImageUtil {
     }
 
     /**
-     *
+     * 将图片压缩到期望大小
+     * @param reqHeight 期望高度
+     * @param reqWidth 期望宽度
+     * @param resid 资源id
+     * @return 压缩后的bitmap
      */
     public static Bitmap decodeSampledBitmapFromResource(int reqHeight,int reqWidth,int resid){
         final BitmapFactory.Options options = new BitmapFactory.Options();

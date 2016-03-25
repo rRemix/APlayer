@@ -227,7 +227,7 @@ public class CircleSeekBar extends View {
         }
         //轨道颜色 宽度 最大值
         mProgressCorlor = typedArray.getColor(R.styleable.CircleSeekBar_progress_color, Color.parseColor("#8E24AA"));
-        mProgressWidth = typedArray.getInteger(R.styleable.CircleSeekBar_progress_width,15);
+        mProgressWidth = (int)typedArray.getDimension(R.styleable.CircleSeekBar_progress_width,15);
         mProgressMax = typedArray.getInteger(R.styleable.CircleSeekBar_progress_max,60);
         typedArray.recycle();
 
