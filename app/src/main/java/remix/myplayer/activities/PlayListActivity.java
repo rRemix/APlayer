@@ -1,19 +1,13 @@
 package remix.myplayer.activities;
 
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -24,12 +18,10 @@ import java.util.Map;
 import remix.myplayer.R;
 import remix.myplayer.adapters.PlayListAdapter;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.dialog.AddPlayListDialog;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DensityUtil;
-import remix.myplayer.infos.PlayListItem;
-import remix.myplayer.utils.ErrUtil;
 import remix.myplayer.utils.XmlUtil;
 
 /**

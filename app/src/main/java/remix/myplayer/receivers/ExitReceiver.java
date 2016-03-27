@@ -8,8 +8,8 @@ import android.content.Intent;
 import com.umeng.analytics.MobclickAgent;
 
 import remix.myplayer.listeners.LockScreenListener;
-import remix.myplayer.utils.ActivityManager;
-import remix.myplayer.utils.ServiceManager;
+import remix.myplayer.managers.ActivityManager;
+import remix.myplayer.managers.ServiceManager;
 
 /**
  * Created by taeja on 16-2-16.

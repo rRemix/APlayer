@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="remix.myplayer">
-    <uses-permission android:name="android.permission.READ_SMS"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
@@ -60,6 +59,8 @@
         <activity android:name=".activities.ChildHolderActivity"/>
 
         <activity android:name=".activities.RecordShareActivity"/>
+
+        <activity android:name=".activities.AboutActivity"/>
 
         <activity android:name=".ui.dialog.AddtoPlayListDialog"
             android:theme="@style/PopupBottomDialog"/>
@@ -183,7 +184,7 @@
 
         <service android:name=".services.MusicService"/>
         <service android:name=".services.TimerService"/>
-        <service android:name=".services.NotifyService"/>
+
 
     </application>
 

@@ -1,6 +1,5 @@
 package remix.myplayer.adapters;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.view.ContextThemeWrapper;
@@ -21,11 +20,10 @@ import java.util.Iterator;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.PlayListActivity;
+import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.listeners.PopupListener;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.ErrUtil;
 
 /**
  * Created by taeja on 16-1-15.

@@ -3,9 +3,7 @@ package remix.myplayer.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +12,6 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-
-import java.lang.ref.WeakReference;
 
 import remix.myplayer.R;
 import remix.myplayer.fragments.AllSongFragment;

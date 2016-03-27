@@ -1,6 +1,5 @@
 package remix.myplayer.services;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,9 +10,7 @@ import android.support.annotation.Nullable;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.ServiceManager;
 
 /**
  * Created by taeja on 16-1-15.
@@ -22,7 +19,7 @@ import remix.myplayer.utils.ServiceManager;
 /**
  * 定时关闭Service
  */
-public class TimerService extends Service {
+public class TimerService extends BaseService {
     /**
      * 是否正在计时
      */
@@ -59,7 +56,6 @@ public class TimerService extends Service {
     public void onCreate() {
         super.onCreate();
         //添加到servicemanager
-        ServiceManager.AddService(this);
         mInstance = this;
         mReceiver = new TimerReceiver();
         IntentFilter filter = new IntentFilter(Constants.CONTROL_TIMER);

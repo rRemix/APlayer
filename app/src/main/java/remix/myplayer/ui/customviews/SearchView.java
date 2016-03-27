@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import remix.myplayer.R;
-import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by taeja on 16-2-29.

@@ -72,7 +72,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     protected void onResume() {
         super.onResume();
         mIsRunning = true;
-        UpdateUI(MusicService.getCurrentMP3(),MusicService.getIsplay());
+        UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
 
     @Override
@@ -93,6 +93,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         //检查更新
 //        UmengUpdateAgent.update(this);
 //        MobclickAgent.setDebugMode(true);

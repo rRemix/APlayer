@@ -3,7 +3,6 @@ package remix.myplayer.ui.customviews;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.view.View;
 
 /**
  * Created by Remix on 2015/12/5.

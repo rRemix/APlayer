@@ -12,11 +12,10 @@ import android.view.ViewGroup;
 import java.util.LinkedList;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.AudioHolderActivity;
-import remix.myplayer.ui.customviews.LrcView;
-import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.infos.LrcInfo;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.ui.customviews.LrcView;
+import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.SearchLRC;
 
 /**

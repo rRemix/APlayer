@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color_3">
+
+    <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:id="@+id/divider"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:background="@color/background_color_interval"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/aboutus_bg"
+        android:layout_marginTop="28dp">
+        <TextView
+            android:layout_marginTop="28dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/textsize_huge"
+            android:textColor="@color/text_color_white"
+            android:text="勇敢踏出第一步"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/divider_about_big"
+            android:layout_marginTop="21dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/textsize_medium"
+            android:textColor="@color/text_color_white"
+            android:text="我们的第一个应用"
+            android:layout_marginTop="20dp"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/divider_about_small"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/textsize_small"
+                android:textColor="@color/text_color_white"
+                android:text="APlayer V1.0.0"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/divider_about_small"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!--<TextView-->
+        <!--android:id="@+id/about_text"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textColor="@color/text_color_white"-->
+        <!--android:textSize="@dimen/textsize_huge"-->
+        <!--android:text="APlayer V1.0.0"/>-->
+
+    <!--<ImageView-->
+        <!--android:id="@+id/about_icon"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:layout_marginBottom="20dp"-->
+        <!--android:layout_above="@id/about_text"-->
+        <!--android:layout_width="180dp"-->
+        <!--android:layout_height="180dp"-->
+        <!--android:src="@mipmap/sideaplayer_icon"/>-->
+
+</LinearLayout>

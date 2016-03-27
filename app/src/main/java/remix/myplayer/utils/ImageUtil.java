@@ -3,7 +3,6 @@ package remix.myplayer.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import remix.myplayer.R;
 import remix.myplayer.application.Application;
 
 /**

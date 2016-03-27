@@ -5,18 +5,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
-
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -35,17 +32,15 @@ import remix.myplayer.adapters.PagerAdapter;
 import remix.myplayer.fragments.CoverFragment;
 import remix.myplayer.fragments.LrcFragment;
 import remix.myplayer.fragments.RecordFragment;
+import remix.myplayer.infos.MP3Info;
 import remix.myplayer.listeners.CtrlButtonListener;
 import remix.myplayer.services.MusicService;
-
 import remix.myplayer.ui.customviews.AudioViewPager;
 import remix.myplayer.ui.customviews.LrcView;
-
 import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.infos.MP3Info;
 
 /**
  * Created by Remix on 2015/12/1.

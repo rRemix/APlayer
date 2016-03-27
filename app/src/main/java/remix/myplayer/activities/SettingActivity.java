@@ -50,6 +50,7 @@ public class SettingActivity extends ToolbarActivity {
                         break;
                     case 2:
                         //关于我们
+                        startActivity(new Intent(SettingActivity.this,AboutActivity.class));
                         break;
                         //检查更新
                     case 3:

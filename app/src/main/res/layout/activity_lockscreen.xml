@@ -89,7 +89,7 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/textsize_huge"
         android:textColor="@color/text_color_gray"
-        android:text="滑动解锁"
+        android:text="右滑解锁"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"/>

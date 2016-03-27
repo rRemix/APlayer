@@ -3,13 +3,9 @@ package remix.myplayer.adapters;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -17,7 +13,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.SearchActivity;
-import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2016/1/23.

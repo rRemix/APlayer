@@ -90,28 +90,30 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="support-annotations-23.1.1" level="project" />
-    <orderEntry type="library" exported="" name="fresco-0.8.1" level="project" />
-    <orderEntry type="library" exported="" name="design-23.1.1" level="project" />
-    <orderEntry type="library" exported="" name="mta-sdk-1.6.2" level="project" />
-    <orderEntry type="library" exported="" name="imagepipeline-0.8.1" level="project" />
-    <orderEntry type="library" exported="" name="universal-image-loader-1.9.5-sources" level="project" />
-    <orderEntry type="library" exported="" name="recyclerview-v7-23.1.1" level="project" />
-    <orderEntry type="library" exported="" name="universal-image-loader-1.9.5-javadoc" level="project" />
-    <orderEntry type="library" exported="" name="support-v4-23.1.1" level="project" />
-    <orderEntry type="library" exported="" name="weiboSDKCore_3.1.2" level="project" />
+    <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
+    <orderEntry type="library" exported="" name="open_sdk_r5509" level="project" />
     <orderEntry type="library" exported="" name="libammsdk" level="project" />
-    <orderEntry type="library" exported="" name="appcompat-v7-23.1.1" level="project" />
-    <orderEntry type="library" exported="" name="umeng-update-v2.7.0" level="project" />
-    <orderEntry type="library" exported="" name="fbcore-0.8.1" level="project" />
+    <orderEntry type="library" exported="" name="cardview-v7-23.1.1" level="project" />
     <orderEntry type="library" exported="" name="universal-image-loader-1.9.5" level="project" />
     <orderEntry type="library" exported="" name="1_universal-image-loader-1.9.5" level="project" />
+    <orderEntry type="library" exported="" name="fbcore-0.8.1" level="project" />
+    <orderEntry type="library" exported="" name="universal-image-loader-1.9.5-javadoc" level="project" />
+    <orderEntry type="library" exported="" name="mta-sdk-1.6.2" level="project" />
+    <orderEntry type="library" exported="" name="design-23.1.1" level="project" />
+    <orderEntry type="library" exported="" name="recyclerview-v7-23.1.1" level="project" />
+    <orderEntry type="library" exported="" name="weiboSDKCore_3.1.2" level="project" />
+    <orderEntry type="library" exported="" name="imagepipeline-0.8.1" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-23.1.1" level="project" />
+    <orderEntry type="library" exported="" name="universal-image-loader-1.9.5-sources" level="project" />
+    <orderEntry type="library" exported="" name="fresco-0.8.1" level="project" />
+    <orderEntry type="library" exported="" name="open_sdk_r5509_lite" level="project" />
     <orderEntry type="library" exported="" name="analytics-5.6.4" level="project" />
-    <orderEntry type="library" exported="" name="drawee-0.8.1" level="project" />
-    <orderEntry type="library" exported="" name="open_sdk_r5509" level="project" />
     <orderEntry type="library" exported="" name="bolts-android-1.1.4" level="project" />
-    <orderEntry type="library" exported="" name="cardview-v7-23.1.1" level="project" />
-    <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
+    <orderEntry type="library" exported="" name="drawee-0.8.1" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-23.1.1" level="project" />
+    <orderEntry type="library" exported="" name="appcompat-v7-23.1.1" level="project" />
+    <orderEntry type="library" exported="" name="umeng-update-v2.7.0" level="project" />
     <orderEntry type="module" module-name="viewpageindicator" exported="" />
+    <orderEntry type="library" exported="" name="android-android-23" level="project" />
   </component>
 </module>

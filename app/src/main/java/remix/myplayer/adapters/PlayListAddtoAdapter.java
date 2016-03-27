@@ -7,10 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.Iterator;
-import java.util.zip.Inflater;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.PlayListActivity;

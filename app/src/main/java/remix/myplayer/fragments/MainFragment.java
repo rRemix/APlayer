@@ -1,26 +1,19 @@
 package remix.myplayer.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.viewpagerindicator.TabPageIndicator;
-
 import remix.myplayer.R;
 import remix.myplayer.adapters.PagerAdapter;
 import remix.myplayer.listeners.TabTextListener;
 import remix.myplayer.listeners.ViewPagerListener;
-import remix.myplayer.services.MusicService;
-import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DBUtil;
 
 /**
  * Created by Remix on 2015/12/5.

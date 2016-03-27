@@ -31,8 +31,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
     private static final boolean DEBUG = true;
 
     private String PATH;
-    private static final String FILE_NAME = "crash";
-
     //log文件的后缀名
     private static final String FILE_NAME_SUFFIX = ".txt";
 
@@ -90,6 +88,10 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 
     }
 
+
+    /**
+     * 将错误信息保存到SD卡上
+     */
     private void dumpExceptionToSDCard(Throwable ex) throws IOException {
         //如果SD卡不存在或无法使用，则无法把异常信息写入SD卡
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
@@ -155,6 +157,10 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         pw.println(Build.CPU_ABI);
     }
 
+
+    /**
+     * 上传到友盟
+     */
     private void uploadExceptionToServer(Throwable ex) {
         //TODO Upload Exception Message To Your Web Server
         MobclickAgent.reportError(mContext,ex);

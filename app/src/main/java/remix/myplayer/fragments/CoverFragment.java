@@ -1,7 +1,6 @@
 package remix.myplayer.fragments;
 
 import android.content.ContentUris;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,13 +13,12 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 
-
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
-import remix.myplayer.utils.Constants;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.utils.Constants;
 
 /**
  * Created by Remix on 2015/12/2.

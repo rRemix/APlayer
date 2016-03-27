@@ -1,7 +1,6 @@
 package remix.myplayer.services;
 
 import android.app.NotificationManager;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -29,7 +28,6 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.receivers.HeadsetPlugReceiver;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.ServiceManager;
 import remix.myplayer.utils.SharedPrefsUtil;
 
 
@@ -43,7 +41,7 @@ import remix.myplayer.utils.SharedPrefsUtil;
  * 回调相关activity的界面更新
  * 通知栏的控制
  */
-public class MusicService extends Service {
+public class MusicService extends BaseService {
     private final static String TAG = "MusicService";
     public static MusicService mInstance;
     /**
@@ -84,7 +82,7 @@ public class MusicService extends Service {
     /**
      * MediaPlayer 负责歌曲的播放等
      */
-    private static MediaPlayer mPlayer;
+    private static MediaPlayer mMediaPlayer;
 
     /**
      * 最大音量
@@ -174,6 +172,13 @@ public class MusicService extends Service {
 //            mBinder = new PlayerBinder();
         return null;
     }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent,flags,startId);
+//        return START_STICKY;
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -182,8 +187,6 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        //添加到servicemanager
-        ServiceManager.AddService(this);
 
         mContext = getApplicationContext();
         mInstance = this;
@@ -198,33 +201,33 @@ public class MusicService extends Service {
                     //播放 获得焦点
                     case AudioManager.AUDIOFOCUS_GAIN:
                         mAudioFouus = true;
-                        if(mPlayer == null)
+                        if(mMediaPlayer == null)
                             Init();
                         else if(!mIsplay){
 //                            PlayStart();
 //                            mIsplay = true;
                         }
-                        mPlayer.setVolume(1.0f,1.0f);
+                        mMediaPlayer.setVolume(1.0f,1.0f);
                         //如果之前正在播放，则继续播放
                         break;
                     //短暂失去焦点,比如有通知到来,减小音量
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                        if(mIsplay && mPlayer != null) {
+                        if(mIsplay && mMediaPlayer != null) {
 //                            new VolDownThread().start();
-                            mPlayer.setVolume(0.1f,0.1f);
+                            mMediaPlayer.setVolume(0.1f,0.1f);
                         }
                         break;
                     //降低音量
                     case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                        if(mIsplay && mPlayer != null){
+                        if(mIsplay && mMediaPlayer != null){
 //                            new VolDownThread().start();
-                            mPlayer.setVolume(0.1f,0.1f);
+                            mMediaPlayer.setVolume(0.1f,0.1f);
                         }
                         break;
                     //失去焦点, 比如有其他播放器开始播放  暂停
                     case AudioManager.AUDIOFOCUS_LOSS:
                         mAudioFouus = false;
-                        if(mIsplay && mPlayer != null) {
+                        if(mIsplay && mMediaPlayer != null) {
                             AudioHolderActivity.mOperation = Constants.PLAYORPAUSE;
                             Pause();
 //                           UnInit();
@@ -283,37 +286,35 @@ public class MusicService extends Service {
 //        mAudioManager.registerRemoteControlClient(mRemoteCtrlClient);
 
         //初始化Mediaplayer
-        mPlayer = new MediaPlayer();
-        mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mMediaPlayer = new MediaPlayer();
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
-            mPlayer.setDataSource(mInfo != null ? mInfo.getUrl() : "");
+            mMediaPlayer.setDataSource(mInfo != null ? mInfo.getUrl() : "");
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                PlayNextOrPrev(true,true);
+                PlayNextOrPrev(true, true);
                 AudioHolderActivity.mOperation = Constants.NEXT;
                 mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
                 //更新锁屏界面
                 UpdateLockScreen();
                 //更新通知栏
                 sendBroadcast(new Intent(Constants.NOTIFY));
-//                NotifyService.mInstance.UpdateNotify();
-                //更新所有Activity
             }
         });
-        mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 PlayStart();
             }
         });
-        mPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+        mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                Log.d(TAG,"what = " + what + " extar = " + extra);
+                Log.d(TAG, "what = " + what + " extar = " + extra);
                 return true;
             }
         });
@@ -335,9 +336,9 @@ public class MusicService extends Service {
     }
 
     private void UnInit(){
-        if(mPlayer != null)
-            mPlayer.release();
-        mPlayer = null;
+        if(mMediaPlayer != null)
+            mMediaPlayer.release();
+        mMediaPlayer = null;
 //        mAudioManager.unregisterMediaButtonEventReceiver(mMediaPendingIntent);
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
         mMediaSession.release();
@@ -375,7 +376,7 @@ public class MusicService extends Service {
                 mIsplay = true;
                 mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 
-                mPlayer.start();
+                mMediaPlayer.start();
 //                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
 //                if(mCurrentVolume == 0)
 //                    return;
@@ -400,7 +401,7 @@ public class MusicService extends Service {
      * 根据当前播放状态暂停或者继续播放
      */
     private void PlayOrPause() {
-        if(mPlayer.isPlaying()) {
+        if(mMediaPlayer.isPlaying()) {
             Pause();
         }
         else {
@@ -421,7 +422,7 @@ public class MusicService extends Service {
      */
     private void Pause() {
         mIsplay = false;
-        mPlayer.pause();
+        mMediaPlayer.pause();
 //        new Thread(){
 //            //音量逐渐减小后暂停
 //            @Override
@@ -431,7 +432,7 @@ public class MusicService extends Service {
 //                mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 //                mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PAUSED,getCurrentTime()));
 //                if(mCurrentVolume <= 10){
-//                    mPlayer.pause();
+//                    mMediaPlayer.pause();
 //                    return;
 //                }
 //                int sleeptime = 100 / mCurrentVolume;
@@ -445,7 +446,7 @@ public class MusicService extends Service {
 //                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
 //                            AudioManager.FLAG_PLAY_SOUND);
 //                }
-//                mPlayer.pause();
+//                mMediaPlayer.pause();
 //                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume,
 //                        AudioManager.FLAG_PLAY_SOUND);
 //            }
@@ -578,10 +579,10 @@ public class MusicService extends Service {
                 return;
 //            mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING,getCurrentTime()));
             mIsIniting = true;
-            mPlayer.reset();
-            mPlayer.setDataSource(path);
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(path);
 
-            mPlayer.prepareAsync();
+            mMediaPlayer.prepareAsync();
             mFirstFlag = false;
             mIsplay = true;
             mIsIniting = false;
@@ -673,8 +674,8 @@ public class MusicService extends Service {
      */
     //s何止进度
     public static void setProgress(int current) {
-        if(mPlayer != null)
-            mPlayer.seekTo(current);
+        if(mMediaPlayer != null)
+            mMediaPlayer.seekTo(current);
     }
 
     /**
@@ -691,8 +692,8 @@ public class MusicService extends Service {
      * @return
      */
     public static int getCurrentTime() {
-        if(mPlayer != null && !mIsIniting)
-            return mPlayer.getCurrentPosition();
+        if(mMediaPlayer != null && !mIsIniting)
+            return mMediaPlayer.getCurrentPosition();
         return 0;
     }
 

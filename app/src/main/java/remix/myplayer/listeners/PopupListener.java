@@ -12,10 +12,10 @@ import java.util.Iterator;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.PlayListActivity;
-import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DBUtil;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.infos.PlayListItem;
+import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.XmlUtil;
 
 /**

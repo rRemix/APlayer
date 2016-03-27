@@ -7,21 +7,18 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
 import remix.myplayer.R;
-import remix.myplayer.adapters.SearchHisAdapter;
 import remix.myplayer.adapters.SearchResAdapter;
 import remix.myplayer.ui.customviews.SearchView;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.XmlUtil;
 
 /**
  * Created by taeja on 16-1-22.

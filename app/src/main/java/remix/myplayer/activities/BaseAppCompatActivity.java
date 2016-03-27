@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.umeng.analytics.MobclickAgent;
 
-import remix.myplayer.utils.ActivityManager;
+import remix.myplayer.managers.ActivityManager;
 
 /**
  * Created by Remix on 2016/3/16.

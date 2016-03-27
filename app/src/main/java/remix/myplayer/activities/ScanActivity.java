@@ -1,21 +1,15 @@
 package remix.myplayer.activities;
 
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
-import android.view.View;
 
 import java.util.ArrayList;
 
 import remix.myplayer.R;
 import remix.myplayer.ui.customviews.CustomSeekBar;
-
-import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.SharedPrefsUtil;
 

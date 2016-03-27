@@ -3,7 +3,6 @@ package remix.myplayer.adapters;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
@@ -16,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import remix.myplayer.R;

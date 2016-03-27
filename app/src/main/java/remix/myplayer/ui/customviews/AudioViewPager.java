@@ -3,9 +3,6 @@ package remix.myplayer.ui.customviews;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 
 /**
  * Created by taeja on 16-1-25.

@@ -9,7 +9,6 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -20,7 +19,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import remix.myplayer.activities.PlayListActivity;
-import remix.myplayer.activities.SearchActivity;
 import remix.myplayer.infos.PlayListItem;
 
 /**
@@ -29,7 +27,7 @@ import remix.myplayer.infos.PlayListItem;
 
 /**
  * Xml工具类
- * 包括播放列表 正在播放列表 搜素历史
+ * 保存播放列表 正在播放列表 搜素历史
  */
 public class XmlUtil {
     private static final String TAG = "XmlUtil";

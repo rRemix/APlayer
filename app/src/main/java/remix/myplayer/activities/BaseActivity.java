@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 
 import com.umeng.analytics.MobclickAgent;
 
-import remix.myplayer.utils.ActivityManager;
+import remix.myplayer.managers.ActivityManager;
 
 /**
  * Created by Remix on 2016/3/16.

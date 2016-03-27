@@ -18,7 +18,6 @@ import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.ui.customviews.CircleImageView;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 
