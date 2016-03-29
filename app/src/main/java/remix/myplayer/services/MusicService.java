@@ -5,12 +5,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -23,7 +25,10 @@ import java.util.List;
 import java.util.Random;
 
 import remix.myplayer.activities.AudioHolderActivity;
+import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.activities.MainActivity;
+import remix.myplayer.adapters.FolderAdapter;
+import remix.myplayer.fragments.FolderFragment;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.receivers.HeadsetPlugReceiver;
 import remix.myplayer.utils.Constants;
@@ -149,15 +154,7 @@ public class MusicService extends BaseService {
             }
         }
     };
-
-
-    private PlaybackStateCompat getPlaybackStateCompat(int state,int position) {
-        return new PlaybackStateCompat.Builder().setActions(PlaybackStateCompat.ACTION_PLAY
-                | PlaybackStateCompat.ACTION_PLAY_PAUSE   |  PlaybackStateCompat.ACTION_PAUSE
-                | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
-                .setState(state,position,1.0f,SystemClock.elapsedRealtime() + 10000)
-                .build();
-    }
+    private ContentObserver mObserver;
 
     private Context mContext;
 
@@ -258,6 +255,24 @@ public class MusicService extends BaseService {
         registerReceiver(mRecevier,new IntentFilter("remix.music.CTL_ACTION"));
         mHeadSetReceiver = new HeadsetPlugReceiver();
         registerReceiver(mHeadSetReceiver,new IntentFilter(Intent.ACTION_HEADSET_PLUG));
+        //
+        mObserver = new ContentObserver(new Handler(mContext.getMainLooper())) {
+            @Override
+            public void onChange(boolean selfChange) {
+                if(!selfChange){
+                    DBUtil.getAllSongsId();
+                    if(FolderFragment.mInstance != null){
+                        FolderFragment.mInstance.UpdateList();
+                    }
+                    if(ChildHolderActivity.mInstance != null) {
+                        ChildHolderActivity.mInstance.UpdateList();
+                    }
+                }
+            }
+        };
+        getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,true,mObserver);
+
+
 //        mMediaComName = new ComponentName(getPackageName(), LineCtlReceiver.class.getName());
 //        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
 //        mediaButtonIntent.setComponent(mMediaComName);
@@ -344,6 +359,7 @@ public class MusicService extends BaseService {
         mMediaSession.release();
         unregisterReceiver(mRecevier);
         unregisterReceiver(mHeadSetReceiver);
+        getContentResolver().unregisterContentObserver(mObserver);
     }
 
 

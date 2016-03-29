@@ -33,11 +33,15 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
         this.mInflater = mInflater;
         this.mContext = context;
     }
+
+    public void setList(ArrayList<MP3Info> list){
+        mInfoList = list;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
-        if(mInfoList == null)
-            return 0;
-        return mInfoList.size();
+        return mInfoList == null ? 0 : mInfoList.size();
     }
     @Override
     public Object getItem(int position) {

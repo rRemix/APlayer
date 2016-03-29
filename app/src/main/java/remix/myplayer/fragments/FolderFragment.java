@@ -27,14 +27,40 @@ import remix.myplayer.utils.DBUtil;
  */
 public class FolderFragment extends Fragment {
     private ListView mListView;
+    private static boolean mIsRunning = false;
+    public static FolderFragment mInstance;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_folder,null);
         mListView = (ListView)rootView.findViewById(R.id.folder_list);
         mListView.setOnItemClickListener(new ListViewListener());
-        mListView.setAdapter(new FolderAdapter(getActivity(),inflater));
+        mListView.setAdapter(new FolderAdapter(getActivity(), inflater));
         return rootView;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mInstance = this;
+    }
+
+    public void UpdateList() {
+        if(mListView.getAdapter() != null){
+            ((FolderAdapter)(mListView.getAdapter())).notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        mIsRunning = true;
+        super.onResume();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mIsRunning = false;
     }
 
     private class ListViewListener implements AdapterView.OnItemClickListener {

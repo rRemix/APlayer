@@ -94,10 +94,7 @@ public class FolderAdapter extends BaseAdapter {
         return ItemView;
     }
 
-
-
-    class ViewHolder
-    {
+    class ViewHolder {
         public TextView mName;
         public TextView mPath;
         public TextView mCount;

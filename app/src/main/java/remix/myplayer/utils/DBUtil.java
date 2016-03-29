@@ -2,10 +2,12 @@ package remix.myplayer.utils;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 
@@ -49,12 +51,16 @@ public class DBUtil {
      */
     public static Map<String,ArrayList<Long>> mFolderMap = new HashMap<>();
 
-
+    /**
+     * 最近添加列表
+     */
     public static ArrayList<Long> mTodayList = new ArrayList<>();
     public static ArrayList<Long> mWeekList = new ArrayList<>();
 
 
+
     private static Context mContext;
+    private DBUtil(){}
     public static void setContext(Context context){
         mContext = context;
     }
@@ -390,6 +396,8 @@ public class DBUtil {
      * @return 对应所有歌曲信息列表
      */
     public static ArrayList<MP3Info> getMP3ListByIds(ArrayList<Long> ids) {
+        if(ids == null)
+            return null;
         ArrayList<MP3Info> list = new ArrayList<>();
         for (Long id : ids) {
             list.add(getMP3InfoById(id));

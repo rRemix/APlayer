@@ -89,7 +89,7 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
         //艺术家与专辑
         String artist = mCursor.getString(AllSongFragment.mArtistIndex);
         String album = mCursor.getString(AllSongFragment.mAlbumIndex);
-        artist = artist.indexOf("unknown") > 0 ? "未知歌手" : artist;
+        artist = artist.indexOf("unknown") > 0 ? "未知艺术家" : artist;
         album = album.indexOf("unknown") > 0 ? "未知专辑" : album;
         //封面
         holder.mOther.setText(artist + "-" + album);

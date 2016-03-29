@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.ChildHolderAdapter;
@@ -30,6 +31,7 @@ import remix.myplayer.utils.DBUtil;
  */
 public class ChildHolderActivity extends BaseAppCompatActivity implements MusicService.Callback{
     private final static String TAG = "ChildHolderActivity";
+    private static boolean mIsRunning = false;
     private ImageView mBack;
     //获得歌曲信息列表的参数
     private int mId;
@@ -55,6 +57,8 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
 
         }
     };
+    //是否从文件夹打开
+    public static boolean isFromFolder = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +84,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mInfoList.size() == 0)
+                if (mInfoList != null && mInfoList.size() == 0)
                     return;
                 ArrayList<Long> ids = new ArrayList<Long>();
                 for (MP3Info info : mInfoList)
@@ -99,9 +103,17 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         //歌曲数目与标题
         mNum = (TextView)findViewById(R.id.album_holder_item_num);
         mTitle = (TextView)findViewById(R.id.artist_album_title);
-        if(mType != Constants.FOLDER_HOLDER)
-            mTitle.setText(mArg);
-        else
+        if(mType != Constants.FOLDER_HOLDER) {
+            if(mArg.indexOf("unknown") > 0){
+                if(mType == Constants.ARTIST_HOLDER)
+                    mTitle.setText("未知艺术家");
+                else if(mType == Constants.ALBUM_HOLDER){
+                    mTitle.setText("未知专辑");
+                }
+            } else {
+                mTitle.setText(mArg);
+            }
+        } else
             mTitle.setText(mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length()));
         //初始化底部状态栏
         mActionbar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
@@ -111,6 +123,44 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         mActionbar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
 
+    public void UpdateList(){
+//        if(!mIsRunning)
+//            return;
+
+        if(mType != Constants.FOLDER_HOLDER){
+            //非文件夹
+            new UpdateThread().start();
+        } else {
+            //文件夹
+            //首先判断之前的文件夹是否存在，如果不存在了，清除Adapter
+//            Iterator it = DBUtil.mFolderMap.keySet().iterator();
+//            if(it == null)
+//                return;
+//            boolean containkey = false;
+//            while(it.hasNext()){
+//                String temp = it.next().toString();
+//                if(temp != null && temp.indexOf(mArg) > 0){
+//                    containkey = true;
+//                    break;
+//                }
+//            }
+            mArg = getIntent().getStringExtra("Title");
+            if(!DBUtil.mFolderMap.containsKey(mArg)){
+                mAdapter.setList(new ArrayList<MP3Info>());
+                mNum.setText("0首歌曲");
+            } else {
+                new UpdateThread().start();
+            }
+        }
+    }
+
+    class UpdateThread extends Thread{
+        @Override
+        public void run() {
+            mInfoList = getMP3List();
+            mHandler.sendEmptyMessage(0);
+        }
+    }
 
     /**
      * 根据参数(专辑id 歌手id 文件夹名 播放列表名)获得对应的歌曲信息列表
@@ -131,6 +181,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                 break;
             //文件夹名
             case Constants.FOLDER_HOLDER:
+                isFromFolder = true;
                 mInfoList = DBUtil.getMP3ListByIds(DBUtil.mFolderMap.get(mArg));
                 mArg = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
                 break;
@@ -189,10 +240,20 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
     @Override
     protected void onResume() {
         super.onResume();
+        mIsRunning = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mIsRunning = false;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
     }
+
+
+
 }
