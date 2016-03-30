@@ -65,10 +65,10 @@ public class FolderFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mIsRunning = true;
-        if(mNeedRefresh){
-            UpdateAdapter();
-            mNeedRefresh = false;
-        }
+//        if(mNeedRefresh){
+//            UpdateAdapter();
+//            mNeedRefresh = false;
+//        }
     }
 
     @Override

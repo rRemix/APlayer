@@ -478,7 +478,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 mDuration = (int) mInfo.getDuration();
                 mSeekBar.setMax(mDuration);
                 //操作为播放选中歌曲时不更新背景
-                if(mOperation != Constants.PLAYSELECTEDSONG)
+//                if(mOperation != Constants.PLAYSELECTEDSONG)
                     new BlurThread().start();
             } catch (Exception e){
                 e.printStackTrace();

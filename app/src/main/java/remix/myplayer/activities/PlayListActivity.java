@@ -86,76 +86,12 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         initToolbar(mToolBar,"播放列表");
     }
 
-//    private void initToolbar() {
-//        mToolBar = (Toolbar) findViewById(R.id.toolbar);
-//        mToolBar.setTitle("播放列表");
-//        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
-//        setSupportActionBar(mToolBar);
-//        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
-//        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                finish();
-//            }
-//        });
-//        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                switch (item.getItemId()) {
-//                    case R.id.toolbar_search:
-//                        startActivity(new Intent(PlayListActivity.this, SearchActivity.class));
-//                        break;
-//                    case R.id.toolbar_timer:
-//                        startActivity(new Intent(PlayListActivity.this, TimerDialog.class));
-//                        break;
-//                }
-//                return true;
-//            }
-//        });
-//    }
 
     //打开添加播放列表的Dialog
     public void onAdd(View v) {
         startActivity(new Intent(PlayListActivity.this, AddPlayListDialog.class));
 
-//        final View contentView = LayoutInflater.from(this).inflate(R.layout.playlist_add,null);
-//        final PopupWindow window = new PopupWindow(contentView,
-//                DensityUtil.dip2px(getApplicationContext(),254f),
-//                DensityUtil.dip2px(getApplicationContext(),174f),
-//                true);
-//        window.setBackgroundDrawable(getResources().getDrawable(R.drawable.creatlist_bg));
-//        window.setTouchInterceptor(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                return false;
-//            }
-//        });
-//        window.setAnimationStyle(R.style.popwin_anim_style);
-//        window.showAtLocation(v, Gravity.CENTER,0,0);
 //
-//        //修改获得焦点时下划线的颜色
-//        final PagerEditText editText = (PagerEditText)contentView.findViewById(R.id.playlist_add_edit);
-//        editText.getBackground().setColorFilter(getResources().getColor(R.color.intersperse_color), PorterDuff.Mode.SRC_ATOP);
-//        editText.setText("本地歌单" + mPlaylist.size());
-//        contentView.findViewById(R.id.playlist_cancel).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                window.dismiss();
-//            }
-//        });
-//
-//        contentView.findViewById(R.id.playlist_continue).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                String name = ((PagerEditText) contentView.findViewById(R.id.playlist_add_edit)).getText().toString();
-//                if (name != null && !name.equals("")) {
-//                    XmlUtil.addPlaylist(name);
-//                    mAdapter.notifyDataSetChanged();
-//                }
-//                window.dismiss();
-//            }
-//        });
     }
 
     public PlayListAdapter getAdapter()
@@ -198,10 +134,10 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     @Override
     public void onResume() {
         super.onResume();
-        if(mNeedRefresh){
-            UpdateAdapter();
-            mNeedRefresh = false;
-        }
+//        if(mNeedRefresh){
+//            UpdateAdapter();
+//            mNeedRefresh = false;
+//        }
     }
 
     @Override

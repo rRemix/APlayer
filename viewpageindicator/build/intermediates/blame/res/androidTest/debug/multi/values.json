@@ -1,6 +1,6 @@
 [
     {
-        "outputFile": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/res/merged/androidTest/debug/values/values.xml",
+        "outputFile": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
         "map": [
             {
                 "to": {
@@ -11,7 +11,7 @@
                     "endOffset": 95
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 2,
                         "startColumn": 4,
@@ -30,7 +30,7 @@
                     "endOffset": 143
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
@@ -49,7 +49,7 @@
                     "endOffset": 193
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 4,
                         "startColumn": 4,
@@ -68,7 +68,7 @@
                     "endOffset": 243
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 5,
                         "startColumn": 4,
@@ -87,7 +87,7 @@
                     "endOffset": 306
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 6,
                         "startColumn": 4,
@@ -106,7 +106,7 @@
                     "endOffset": 366
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 7,
                         "startColumn": 4,
@@ -125,7 +125,7 @@
                     "endOffset": 427
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 8,
                         "startColumn": 4,
@@ -144,7 +144,7 @@
                     "endOffset": 494
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 9,
                         "startColumn": 4,
@@ -163,7 +163,7 @@
                     "endOffset": 557
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 10,
                         "startColumn": 4,
@@ -182,7 +182,7 @@
                     "endOffset": 629
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 11,
                         "startColumn": 4,
@@ -201,7 +201,7 @@
                     "endOffset": 701
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 12,
                         "startColumn": 4,
@@ -220,7 +220,7 @@
                     "endOffset": 775
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 13,
                         "startColumn": 4,
@@ -239,7 +239,7 @@
                     "endOffset": 849
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 14,
                         "startColumn": 4,
@@ -258,7 +258,7 @@
                     "endOffset": 925
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 15,
                         "startColumn": 4,
@@ -277,7 +277,7 @@
                     "endOffset": 998
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 16,
                         "startColumn": 4,
@@ -296,7 +296,7 @@
                     "endOffset": 1073
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 17,
                         "startColumn": 4,
@@ -315,7 +315,7 @@
                     "endOffset": 1144
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 18,
                         "startColumn": 4,
@@ -334,7 +334,7 @@
                     "endOffset": 1223
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 19,
                         "startColumn": 4,
@@ -353,7 +353,7 @@
                     "endOffset": 1285
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 20,
                         "startColumn": 4,
@@ -372,7 +372,7 @@
                     "endOffset": 1348
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 21,
                         "startColumn": 4,
@@ -391,7 +391,7 @@
                     "endOffset": 1426
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 22,
                         "startColumn": 4,
@@ -410,7 +410,7 @@
                     "endOffset": 1505
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 23,
                         "startColumn": 4,
@@ -429,7 +429,7 @@
                     "endOffset": 1598
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 24,
                         "startColumn": 4,
@@ -448,7 +448,7 @@
                     "endOffset": 1691
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 25,
                         "startColumn": 4,
@@ -467,7 +467,7 @@
                     "endOffset": 1799
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 26,
                         "startColumn": 4,
@@ -486,7 +486,7 @@
                     "endOffset": 1907
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 27,
                         "startColumn": 4,
@@ -505,7 +505,7 @@
                     "endOffset": 4191
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 33,
                         "startColumn": 4,
@@ -524,7 +524,7 @@
                     "endOffset": 4259
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 34,
                         "startColumn": 4,
@@ -543,7 +543,7 @@
                     "endOffset": 4322
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 35,
                         "startColumn": 4,
@@ -562,7 +562,7 @@
                     "endOffset": 4387
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 36,
                         "startColumn": 4,
@@ -581,7 +581,7 @@
                     "endOffset": 4453
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 37,
                         "startColumn": 4,
@@ -600,7 +600,7 @@
                     "endOffset": 4520
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 38,
                         "startColumn": 4,
@@ -619,7 +619,7 @@
                     "endOffset": 4598
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 39,
                         "startColumn": 4,
@@ -638,7 +638,7 @@
                     "endOffset": 4688
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 40,
                         "startColumn": 4,
@@ -657,7 +657,7 @@
                     "endOffset": 4761
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 41,
                         "startColumn": 4,
@@ -676,7 +676,7 @@
                     "endOffset": 4830
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 42,
                         "startColumn": 4,
@@ -695,7 +695,7 @@
                     "endOffset": 4895
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 43,
                         "startColumn": 4,
@@ -714,7 +714,7 @@
                     "endOffset": 4963
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 44,
                         "startColumn": 4,
@@ -733,7 +733,7 @@
                     "endOffset": 5029
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 45,
                         "startColumn": 4,
@@ -752,7 +752,7 @@
                     "endOffset": 5098
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 46,
                         "startColumn": 4,
@@ -771,7 +771,7 @@
                     "endOffset": 5177
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 47,
                         "startColumn": 4,
@@ -790,7 +790,7 @@
                     "endOffset": 5247
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 48,
                         "startColumn": 4,
@@ -809,7 +809,7 @@
                     "endOffset": 5320
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 49,
                         "startColumn": 4,
@@ -828,7 +828,7 @@
                     "endOffset": 5394
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 50,
                         "startColumn": 4,
@@ -848,7 +848,7 @@
                     "endOffset": 5594
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 51,
                         "startColumn": 4,
@@ -869,7 +869,7 @@
                     "endOffset": 5847
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 55,
                         "startColumn": 4,
@@ -890,7 +890,7 @@
                     "endOffset": 5886
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 59,
                         "startColumn": 4,
@@ -911,7 +911,7 @@
                     "endOffset": 6076
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 61,
                         "startColumn": 4,
@@ -932,7 +932,7 @@
                     "endOffset": 6678
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/MyPlayer/viewpageindicator/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\AndroidProject\\MyPlayer\\viewpageindicator\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 65,
                         "startColumn": 4,

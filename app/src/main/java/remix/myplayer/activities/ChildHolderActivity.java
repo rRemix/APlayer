@@ -256,10 +256,10 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
     @Override
     protected void onResume() {
         super.onResume();
-        if(mNeedRefresh){
-            UpdateData();
-            mNeedRefresh = false;
-        }
+//        if(mNeedRefresh){
+//            UpdateData();
+//            mNeedRefresh = false;
+//        }
         mIsRunning = true;
     }
 

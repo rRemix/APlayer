@@ -96,7 +96,7 @@ public class CoverFragment extends Fragment {
             //根据操作是上一首还是下一首播放动画
             if(AudioHolderActivity.mOperation == Constants.PREV)
                 mImage.startAnimation(mRightAnimation);
-            else if (AudioHolderActivity.mOperation == Constants.NEXT)
+            else if (AudioHolderActivity.mOperation == Constants.NEXT || AudioHolderActivity.mOperation == Constants.PLAYSELECTEDSONG)
                 mImage.startAnimation(mLeftAnimation);
         } else {
             //如果不需要动画，直接设置背景

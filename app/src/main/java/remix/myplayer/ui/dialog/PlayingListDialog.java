@@ -85,10 +85,10 @@ public class PlayingListDialog extends BaseActivity {
     @Override
     public void onResume() {
         super.onResume();
-        if(mNeedRefresh){
-            UpdateAdapter();
-            mNeedRefresh = false;
-        }
+//        if(mNeedRefresh){
+//            UpdateAdapter();
+//            mNeedRefresh = false;
+//        }
     }
 
     @Override
