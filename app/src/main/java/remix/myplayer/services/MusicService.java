@@ -11,11 +11,9 @@ import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -27,10 +25,12 @@ import java.util.Random;
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.activities.MainActivity;
-import remix.myplayer.adapters.FolderAdapter;
+import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.fragments.FolderFragment;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.observers.MediaStoreObserver;
 import remix.myplayer.receivers.HeadsetPlugReceiver;
+import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.SharedPrefsUtil;
@@ -154,6 +154,9 @@ public class MusicService extends BaseService {
             }
         }
     };
+
+
+
     private ContentObserver mObserver;
 
     private Context mContext;
@@ -255,21 +258,40 @@ public class MusicService extends BaseService {
         registerReceiver(mRecevier,new IntentFilter("remix.music.CTL_ACTION"));
         mHeadSetReceiver = new HeadsetPlugReceiver();
         registerReceiver(mHeadSetReceiver,new IntentFilter(Intent.ACTION_HEADSET_PLUG));
-        //
-        mObserver = new ContentObserver(new Handler(mContext.getMainLooper())) {
+        //监听媒体库变化
+        mObserver = new MediaStoreObserver(new Handler(){
             @Override
-            public void onChange(boolean selfChange) {
-                if(!selfChange){
-                    DBUtil.getAllSongsId();
+            public void handleMessage(Message msg) {
+                if(msg.what == Constants.UPDATE_FOLDER){
+                    //更新文件夹fragment
                     if(FolderFragment.mInstance != null){
-                        FolderFragment.mInstance.UpdateList();
+//                        FolderFragment.setFresh(true);
+                        FolderFragment.mInstance.UpdateAdapter();
                     }
+                    //更新文件夹详情
                     if(ChildHolderActivity.mInstance != null) {
-                        ChildHolderActivity.mInstance.UpdateList();
+//                        ChildHolderActivity.setFresh(true);
+                        ChildHolderActivity.mInstance.UpdateData();
                     }
                 }
+                //更新正在播放列表
+                if(msg.what == Constants.UPDATE_PLAYINGLIST){
+//                    if(PlayingListDialog.mInstance != null)
+//                        PlayingListDialog.setFresh(true);
+                    if(PlayingListDialog.mInstance != null){
+                        PlayingListDialog.mInstance.UpdateAdapter();
+                    }
+                }
+                //更新播放列表
+                if(msg.what == Constants.UPDATE_PLAYLIST){
+//                    if(PlayListActivity.mInstance != null)
+//                        PlayListActivity.setFresh(true);
+                    if(PlayListActivity.mInstance != null)
+                        PlayListActivity.mInstance.UpdateAdapter();
+                }
+
             }
-        };
+        });
         getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,true,mObserver);
 
 
@@ -522,6 +544,7 @@ public class MusicService extends BaseService {
             if(intent.getExtras().getBoolean("Close")){
                 NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                 manager.cancel(0);
+                Pause();
                 return;
             }
 

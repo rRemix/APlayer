@@ -21,6 +21,7 @@ import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.nostra13.universalimageloader.cache.memory.MemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -205,21 +206,22 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                     @Override
                     public MemoryCacheParams get() {
                         //50M内存缓存
-                        return new MemoryCacheParams(50 * 1024 * 1024, 10, 2048, 5, 1024);
+                        return new MemoryCacheParams(10 * 1024 * 1024, 10, 2048, 5, 1024);
                     }
                 }).build();
         Fresco.initialize(this, config);
+
+
         DisplayImageOptions option = new DisplayImageOptions.Builder()
                 .showImageForEmptyUri(R.drawable.song_artist_empty_bg)
                 .showImageOnFail(R.drawable.song_artist_empty_bg)
-                .resetViewBeforeLoading(false)
-                .cacheOnDisk(true)
+                .resetViewBeforeLoading(true)
                 .cacheInMemory(true)
                 .build();
-
         ImageLoaderConfiguration config1 = new ImageLoaderConfiguration.Builder(this)
-                .diskCacheSize(50 * 1024 * 1024) // 50 Mb sd卡(本地)缓存的最大值
-                .diskCacheFileCount(50)
+                .memoryCacheSize(10 * 1024 * 1024)
+
+
                 .defaultDisplayImageOptions(option)
                 .build();
         ImageLoader.getInstance().init(config1);
@@ -340,7 +342,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         mBottomBar.UpdateBottomStatus(MP3info, isplay);
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         for (Fragment fragment : fragmentList) {
-            if (fragment instanceof AllSongFragment) {
+            if (fragment instanceof AllSongFragment && ((AllSongFragment) fragment).getAdapter() != null) {
                 ((AllSongFragment) fragment).getAdapter().notifyDataSetChanged();
             }
         }

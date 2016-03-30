@@ -26,19 +26,17 @@ import remix.myplayer.utils.XmlUtil;
  * 正在播放列表的适配器
  */
 public class PlayingListAdapter extends BaseAdapter {
-    private LayoutInflater mInflater;
     private Context mContext;
-    private Handler mHandler = new Handler()
-    {
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             notifyDataSetChanged();
         }
     };
-    public PlayingListAdapter(LayoutInflater inflater, Context context) {
+    public PlayingListAdapter(Context context) {
         mContext = context;
-        mInflater = inflater;
     }
+
 
     @Override
     public int getCount() {
@@ -79,9 +77,7 @@ public class PlayingListAdapter extends BaseAdapter {
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    DBUtil.mPlayingList.remove(temp.getId());
                     XmlUtil.deleteSongFromPlayingList(temp.getId());
-//                    XmlUtil.updatePlayingList();
                     if(temp.getId() == MusicService.getCurrentMP3().getId()) {
                         Intent intent = new Intent(Constants.CTL_ACTION);
                         intent.putExtra("Control", Constants.NEXT);
@@ -96,6 +92,8 @@ public class PlayingListAdapter extends BaseAdapter {
         return convertView;
 
     }
+
+
     public static class ViewHolder{
         public final TextView mSong;
         public final TextView mArtist;

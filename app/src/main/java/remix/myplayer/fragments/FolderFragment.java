@@ -29,6 +29,7 @@ public class FolderFragment extends Fragment {
     private ListView mListView;
     private static boolean mIsRunning = false;
     public static FolderFragment mInstance;
+    private static boolean mNeedRefresh = false;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,16 +46,29 @@ public class FolderFragment extends Fragment {
         mInstance = this;
     }
 
-    public void UpdateList() {
+    public static void setFresh(boolean needfresh){
+        mNeedRefresh = needfresh;
+    }
+
+    public void UpdateAdapter() {
         if(mListView.getAdapter() != null){
             ((FolderAdapter)(mListView.getAdapter())).notifyDataSetChanged();
         }
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
     public void onResume() {
-        mIsRunning = true;
         super.onResume();
+        mIsRunning = true;
+        if(mNeedRefresh){
+            UpdateAdapter();
+            mNeedRefresh = false;
+        }
     }
 
     @Override
@@ -62,6 +76,8 @@ public class FolderFragment extends Fragment {
         super.onStop();
         mIsRunning = false;
     }
+
+
 
     private class ListViewListener implements AdapterView.OnItemClickListener {
         @Override

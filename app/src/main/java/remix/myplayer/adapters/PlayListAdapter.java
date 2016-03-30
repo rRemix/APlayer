@@ -67,7 +67,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             holder.mName.setText(name);
 
             //设置专辑封面
-            boolean hasCover = false;
             ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
             if(list != null && list.size() > 0) {
                 for(PlayListItem item : list){
@@ -77,7 +76,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                         if(!file.exists())
                             continue;
                         holder.mImage.setImageURI(Uri.parse(url));
-                        hasCover = true;
                         break;
                     }
                 }
@@ -100,8 +98,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             }
 
             if(holder.mButton != null) {
-                //第一次个列表为收藏列表，不能删除
-                if(position == 0){
+                //最后一个列表为收藏列表，不能删除
+                if(name.equals("我的收藏")){
                     holder.mButton.setImageResource(R.drawable.rcd_icn_love);
                     holder.mButton.setClickable(false);
                     holder.mButton.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));

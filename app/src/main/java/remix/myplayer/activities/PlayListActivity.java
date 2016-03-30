@@ -34,7 +34,7 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     private PlayListAdapter mAdapter;
     public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
     private Toolbar mToolBar;
-
+    private static boolean mNeedRefresh = false;
     static {
         mPlaylist = XmlUtil.getPlayList("playlist.xml");
     }
@@ -180,13 +180,32 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         return true;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    public void UpdateAdapter() {
+        if(mRecycleView.getAdapter() != null){
+            mRecycleView.getAdapter().notifyDataSetChanged();
+        }
+    }
+
+    public static void setFresh(boolean needfresh){
+        mNeedRefresh = needfresh;
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(mNeedRefresh){
+            UpdateAdapter();
+            mNeedRefresh = false;
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 }

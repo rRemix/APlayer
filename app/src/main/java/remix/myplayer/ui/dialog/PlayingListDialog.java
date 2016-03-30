@@ -25,12 +25,17 @@ import remix.myplayer.utils.Constants;
  */
 public class PlayingListDialog extends BaseActivity {
     private ListView mListView;
+    private PlayingListAdapter mAdapter;
+    public static PlayingListDialog mInstance;
+    private static boolean mNeedRefresh = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.popup_playinglist);
+        mInstance = this;
         mListView = (ListView)findViewById(R.id.bottom_actionbar_play_list);
-        mListView.setAdapter(new PlayingListAdapter(getLayoutInflater(), getApplicationContext()));
+        mAdapter = new PlayingListAdapter( getApplicationContext());
+        mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new ListViewListener());
 
         //改变播放列表高度，并置于底部
@@ -46,6 +51,10 @@ public class PlayingListDialog extends BaseActivity {
         w.setGravity(Gravity.BOTTOM);
     }
 
+    public PlayingListAdapter getAdapter(){
+        return mAdapter;
+    }
+
     private class ListViewListener implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -58,13 +67,32 @@ public class PlayingListDialog extends BaseActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    public void UpdateAdapter() {
+        if(mAdapter != null){
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public static void setFresh(boolean needfresh){
+        mNeedRefresh = true;
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(mNeedRefresh){
+            UpdateAdapter();
+            mNeedRefresh = false;
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 }

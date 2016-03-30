@@ -11,7 +11,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.ChildHolderAdapter;
@@ -45,20 +44,34 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
     private BottomActionBarFragment mActionbar;
     private ChildHolderAdapter mAdapter;
     public static ChildHolderActivity mInstance = null;
+    //是否需要更新adapter
+    private static boolean mNeedRefresh = false;
     //更新ListView
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             if(mInfoList == null || mInfoList.size() == 0)
                 return;
-            mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),ChildHolderActivity.this);
-            mListView.setAdapter(mAdapter);
+//            mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),ChildHolderActivity.this);
+//            mAdapter.registerDataSetObserver(new DataSetObserver() {
+//                @Override
+//                public void onChanged() {
+//                    super.onChanged();
+//                }
+//
+//                @Override
+//                public void onInvalidated() {
+//                    super.onInvalidated();
+//                }
+//            });
+//            mListView.setAdapter(mAdapter);
+            mAdapter.setList(mInfoList);
             mNum.setText(mInfoList.size() + "首歌曲");
 
         }
     };
     //是否从文件夹打开
-    public static boolean isFromFolder = false;
+    public static boolean mIsFromFolder = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,14 +94,18 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         }.start();
 
         mListView = (ListView)findViewById(R.id.child_holder_list);
+        mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),ChildHolderActivity.this);
+        mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (mInfoList != null && mInfoList.size() == 0)
                     return;
                 ArrayList<Long> ids = new ArrayList<Long>();
-                for (MP3Info info : mInfoList)
-                    ids.add(info.getId());
+                for (MP3Info info : mInfoList) {
+                    if(info != null && info.getId() > 0)
+                        ids.add(info.getId());
+                }
                 //设置正在播放列表
                 DBUtil.setPlayingList((ArrayList) ids.clone());
 
@@ -123,27 +140,19 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         mActionbar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
 
-    public void UpdateList(){
+    public void UpdateData(){
 //        if(!mIsRunning)
 //            return;
-
-        if(mType != Constants.FOLDER_HOLDER){
-            //非文件夹
-            new UpdateThread().start();
-        } else {
+        if(mType == Constants.PLAYLIST_HOLDER){
+            //播放列表
+            if(!PlayListActivity.getPlayList().containsKey(mArg)){
+                mAdapter.setList(new ArrayList<MP3Info>());
+                mNum.setText("0首歌曲");
+            } else {
+                new UpdateThread().start();
+            }
+        } else if(mType == Constants.FOLDER_HOLDER){
             //文件夹
-            //首先判断之前的文件夹是否存在，如果不存在了，清除Adapter
-//            Iterator it = DBUtil.mFolderMap.keySet().iterator();
-//            if(it == null)
-//                return;
-//            boolean containkey = false;
-//            while(it.hasNext()){
-//                String temp = it.next().toString();
-//                if(temp != null && temp.indexOf(mArg) > 0){
-//                    containkey = true;
-//                    break;
-//                }
-//            }
             mArg = getIntent().getStringExtra("Title");
             if(!DBUtil.mFolderMap.containsKey(mArg)){
                 mAdapter.setList(new ArrayList<MP3Info>());
@@ -151,6 +160,9 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
             } else {
                 new UpdateThread().start();
             }
+        } else {
+            //艺术家或者专辑
+            new UpdateThread().start();
         }
     }
 
@@ -181,7 +193,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                 break;
             //文件夹名
             case Constants.FOLDER_HOLDER:
-                isFromFolder = true;
+                mIsFromFolder = true;
                 mInfoList = DBUtil.getMP3ListByIds(DBUtil.mFolderMap.get(mArg));
                 mArg = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
                 break;
@@ -237,9 +249,17 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         return Constants.CHILDHOLDERACTIVITY;
     }
 
+    public static void setFresh(boolean needfresh){
+        mNeedRefresh = needfresh;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+        if(mNeedRefresh){
+            UpdateData();
+            mNeedRefresh = false;
+        }
         mIsRunning = true;
     }
 

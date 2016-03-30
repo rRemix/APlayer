@@ -33,8 +33,7 @@ public class MP3Info implements Serializable,Cloneable {
         Size = size;
         AlbumArt = albumart;
     }
-    public MP3Info(MP3Info info)
-    {
+    public MP3Info(MP3Info info) {
         this.Id = info.getId();
         this.Displayname = info.getDisplayname();
         this.Album = info.getAlbum();
@@ -46,9 +45,9 @@ public class MP3Info implements Serializable,Cloneable {
         this.Url = info.getUrl();
         this.Size = info.getSize();
     }
+
     @Override
-    public Object clone()
-    {
+    public Object clone() {
         Object o=null;
         try
         {
@@ -62,10 +61,14 @@ public class MP3Info implements Serializable,Cloneable {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        MP3Info temp = (MP3Info)o;
+        return temp.getId() == this.getId();
+    }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return new String("Id = " + Id + " Name = " + Displayname + " Album = " + Album
                 + " Artist = " + Artist + " Duration = " + Duration + " Realtime = " + ReailTime + " Url = " + Url + " Size = " + Size);
     }

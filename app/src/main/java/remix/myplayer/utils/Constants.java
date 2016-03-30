@@ -86,4 +86,9 @@ public class Constants {
     //分享心情还是歌曲
     public final static int SHARESONG = 1;
     public final static int SHARERECORD = 0;
+
+    //更新文件夹与文件夹详情
+    public final static int UPDATE_FOLDER = 0;
+    public final static int UPDATE_PLAYINGLIST = 1;
+    public final static int UPDATE_PLAYLIST = 2;
 }
