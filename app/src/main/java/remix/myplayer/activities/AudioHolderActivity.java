@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
+import android.support.v7.graphics.Palette;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -98,6 +99,8 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     public static int mHeight;
     //高斯模糊后的bitmap
     private Bitmap mNewBitMap;
+    //高斯模糊之前的bitmap
+    private Bitmap mRawBitMap;
     //背景消失与现实的动画
     private AlphaAnimation mAnimIn;
     private AlphaAnimation mAnimOut;
@@ -123,6 +126,25 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
                 if(mFistStart)
                     mFistStart = false;
+                //变化顶部字体颜色
+                if(mTopDetail != null && mTopTitle != null && mRawBitMap != null){
+                    Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
+                        @Override
+                        public void onGenerated(Palette palette) {
+                            Palette.Swatch a = palette.getVibrantSwatch();//有活力
+                            Palette.Swatch b = palette.getDarkVibrantSwatch();//有活力 暗色
+                            Palette.Swatch c = palette.getLightVibrantSwatch();//有活力 亮色
+                            Palette.Swatch d = palette.getMutedSwatch();//柔和
+                            Palette.Swatch e = palette.getDarkMutedSwatch();//柔和 暗色
+                            Palette.Swatch f = palette.getLightMutedSwatch();//柔和 亮色
+
+                            if(d != null){
+                                mTopTitle.setTextColor(d.getBodyTextColor());
+                                mTopDetail.setTextColor(d.getTitleTextColor());
+                            }
+                        }
+                    });
+                }
             }
         }
     };
@@ -253,8 +275,8 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     public void onResume() {
         super.onResume();
         //更新界面
-        if(MusicService.getCurrentMP3() != mInfo && MusicService.getIsplay())
-        UpdateUI(MusicService.getCurrentMP3(),MusicService.getIsplay());
+        if(MusicService.getCurrentMP3() != mInfo)
+            UpdateUI(MusicService.getCurrentMP3(),MusicService.getIsplay());
         mIsRunning = true;
         //更新进度条
         new ProgeressThread().start();
@@ -294,9 +316,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         mGuideList.add((ImageView) findViewById(R.id.guide_03));
     }
 
-    private void initButton() {
-
-    }
 
     private void initSeekBar() {
         if(mInfo == null)
@@ -463,7 +482,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         mIsPlay = isplay;
 
         //当操作不为播放或者暂停且正在运行时，更新界面
-        if(mOperation != Constants.PLAYORPAUSE && mIsRunning) {
+        if(mOperation != Constants.PLAYORPAUSE ) {
             try {
                 //更新顶部信息
                 UpdateTopStatus(mInfo);
@@ -529,9 +548,14 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 float widthscaleFactor = 3.3f;
                 float heightscaleFactor = (float)(widthscaleFactor * (mHeight * 1.0 / mWidth));
 
-                Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
-                if (bkg == null)
-                    bkg = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
+
+//                Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
+//                if (bkg == null)
+//                    bkg = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
+                mRawBitMap = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
+                if(mRawBitMap == null)
+                    mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
+
 
                 mNewBitMap = Bitmap.createBitmap((int) (mWidth / widthscaleFactor), (int) (mHeight / heightscaleFactor ), Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(mNewBitMap);
@@ -539,8 +563,8 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
 //                canvas.scale(scaleFactor,  scaleFactor);
                 Paint paint = new Paint();
                 paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-                paint.setAlpha((int)(255 * 0.3));
-                canvas.drawBitmap(bkg, 0, 0, paint);
+                paint.setAlpha((int)(255 * 0.7));
+                canvas.drawBitmap(mRawBitMap, 0, 0, paint);
                 //保存模糊后的bitmap
                 mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
 

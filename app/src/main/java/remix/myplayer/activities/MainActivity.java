@@ -92,6 +92,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         mIsRunning = false;
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -121,13 +122,15 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         MusicService.addCallback(MainActivity.this);
         //加载主页fragment
         initMainFragment();
+        //初始化toolbar
+        mToolBar = (Toolbar) findViewById(R.id.toolbar);
+        initToolbar();
         //初始化测滑菜单
         initDrawerLayout();
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //初始化toolbar
-        mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        initToolbar();
+
 
         if (DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0){
             SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", -1);
@@ -215,7 +218,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         DisplayImageOptions option = new DisplayImageOptions.Builder()
                 .showImageForEmptyUri(R.drawable.song_artist_empty_bg)
                 .showImageOnFail(R.drawable.song_artist_empty_bg)
-                .resetViewBeforeLoading(true)
+                .resetViewBeforeLoading(false)
                 .cacheInMemory(true)
                 .build();
         ImageLoaderConfiguration config1 = new ImageLoaderConfiguration.Builder(this)
@@ -234,6 +237,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     private void initDrawerLayout() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerMenu = (LinearLayout) findViewById(R.id.slide_menu);
+
         mSlideMenuList = (ListView) mDrawerMenu.findViewById(R.id.slide_menu_list);
         mSlideMenuList.setAdapter(new SlideMenuAdapter(getLayoutInflater()));
         mSlideMenuList.setOnItemClickListener(new SlideMenuListener(this));

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.graphics.Palette;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -64,18 +65,42 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     private ImageView mImageBackground;
     //高斯模糊后的bitmap
     private Bitmap mNewBitMap;
+    //高斯模糊之前的bitmap
+    private Bitmap mRawBitMap;
     private int mWidth;
     private int mHeight;
     //是否添加到收藏列表
     private boolean mIsLove = false;
     //是否正在播放
     private static boolean mIsPlay = false;
+    //是否第一次打开
+    private boolean mIsFirst = true;
     private Handler mBlurHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
 //            mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
             //设置背景
             mImageBackground.setImageBitmap(mNewBitMap);
+
+            //变化字体颜色
+            if(mSong != null && mArtist != null && mRawBitMap != null){
+                Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        Palette.Swatch a = palette.getVibrantSwatch();//有活力
+                        Palette.Swatch b = palette.getDarkVibrantSwatch();//有活力 暗色
+                        Palette.Swatch c = palette.getLightVibrantSwatch();//有活力 亮色
+                        Palette.Swatch d = palette.getMutedSwatch();//柔和
+                        Palette.Swatch e = palette.getDarkMutedSwatch();//柔和 暗色
+                        Palette.Swatch f = palette.getLightMutedSwatch();//柔和 亮色
+
+                        if(d != null){
+                            mSong.setTextColor(d.getBodyTextColor());
+                            mArtist.setTextColor(d.getTitleTextColor());
+                        }
+                    }
+                });
+            }
         }
     };
     @Override
@@ -192,7 +217,8 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
             return;
         //只更新播放按钮
         mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.wy_lock_btn_pause : R.drawable.wy_lock_btn_play));
-        if(AudioHolderActivity.mOperation == Constants.PLAYORPAUSE){
+        if(AudioHolderActivity.mOperation == Constants.PLAYORPAUSE && mIsFirst){
+            mIsFirst = false;
             return;
         }
         //标题
@@ -213,19 +239,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         }
         mLoveButton.setImageResource(mIsLove ? R.drawable.wy_lock_btn_loved : R.drawable.wy_lock_btn_love);
 
-
-        //背景
-//        mImageRequest = ImageRequestBuilder.newBuilderWithSource(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()))
-//                .setPostprocessor(mProcessor)
-//                .build();
-//
-//        PipelineDraweeController controller = (PipelineDraweeController)
-//                Fresco.newDraweeControllerBuilder()
-//                        .setImageRequest(mImageRequest)
-//                        .setOldController(mSimpleImage.getController())
-//                        // other setters as you need
-//                        .build();
-//        mSimpleImage.setController(controller);
         mSimpleImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),mInfo.getAlbumId()));
 
         new BlurThread().start();
@@ -267,9 +280,12 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
                 float widthscaleFactor = 3.3f;
                 float heightscaleFactor = (float) (widthscaleFactor * (mHeight * 1.0 / mWidth));
 
-                Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(), false);
-                if (bkg == null)
-                    bkg = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
+                mRawBitMap = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
+                if(mRawBitMap == null)
+                    mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.artist_empty_bg);
+//                Bitmap bkg = DBUtil.CheckBitmapBySongId((int) mInfo.getId(), false);
+//                if (bkg == null)
+//                    bkg = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
 
                 mNewBitMap = Bitmap.createBitmap((int) (mWidth / widthscaleFactor), (int) (mHeight / heightscaleFactor), Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(mNewBitMap);
@@ -277,8 +293,8 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
 //                canvas.scale(scaleFactor,  scaleFactor);
                 Paint paint = new Paint();
                 paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-                paint.setAlpha((int) (255 * 0.3));
-                canvas.drawBitmap(bkg, 0, 0, paint);
+                paint.setAlpha((int) (255 * 0.5));
+                canvas.drawBitmap(mRawBitMap, 0, 0, paint);
                 mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
             }
 
