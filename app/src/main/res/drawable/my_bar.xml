@@ -3,8 +3,11 @@
     <!-- 轨道背景-->
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="#d1d0ce"/>
+            <solid android:color="#F4F4F4"/>
         </shape>
+        <!--<shape>-->
+            <!--<solid android:color="#d1d0ce"/>-->
+        <!--</shape>-->
     </item>
     <!-- 已完成轨道背景-->
     <item android:id="@android:id/progress">
