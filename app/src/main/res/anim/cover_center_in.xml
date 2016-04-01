@@ -3,6 +3,6 @@
     android:toXScale="1.0"
     android:fromYScale="0.85"
     android:toYScale="1.0"
-    android:duration="150"
+    android:duration="200"
     android:pivotX="50%"
     android:pivotY="50%"/>

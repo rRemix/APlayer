@@ -124,7 +124,6 @@
                android:text="00:00"
                android:layout_marginLeft="4dp"
                style="@style/Playtimetext"/>
-           <!-- 进度条 -->
            <SeekBar
                android:id="@+id/seekbar"
                android:thumb="@drawable/progress_indicator"

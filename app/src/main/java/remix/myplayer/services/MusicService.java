@@ -14,6 +14,7 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -154,7 +155,10 @@ public class MusicService extends BaseService {
             }
         }
     };
-
+    /**
+     * TelePhoneManager
+     */
+    private TelephonyManager mTelePhoneManager;
 
 
     private ContentObserver mObserver;
@@ -168,15 +172,12 @@ public class MusicService extends BaseService {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-//        if(mBinder == null)
-//            mBinder = new PlayerBinder();
         return null;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent,flags,startId);
-//        return START_STICKY;
     }
 
     @Override
@@ -193,47 +194,38 @@ public class MusicService extends BaseService {
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
         mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
             //记录焦点变化之前是否在播放;
-            private boolean mFlag = false;
             @Override
             public void onAudioFocusChange(int focusChange) {
-
-                switch (focusChange){
-                    //播放 获得焦点
-                    case AudioManager.AUDIOFOCUS_GAIN:
-                        mAudioFouus = true;
-                        if(mMediaPlayer == null)
-                            Init();
-                        else if(!mIsplay){
+                //播放 获得焦点
+                if(focusChange == AudioManager.AUDIOFOCUS_GAIN){
+                    mAudioFouus = true;
+                    if(mMediaPlayer == null)
+                        Init();
+                    else if(!mIsplay){
 //                            PlayStart();
 //                            mIsplay = true;
-                        }
-                        mMediaPlayer.setVolume(1.0f,1.0f);
-                        //如果之前正在播放，则继续播放
-                        break;
-                    //短暂失去焦点,比如有通知到来,减小音量
-                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                        if(mIsplay && mMediaPlayer != null) {
-//                            new VolDownThread().start();
-                            mMediaPlayer.setVolume(0.1f,0.1f);
-                        }
-                        break;
-                    //降低音量
-                    case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                        if(mIsplay && mMediaPlayer != null){
-//                            new VolDownThread().start();
-                            mMediaPlayer.setVolume(0.1f,0.1f);
-                        }
-                        break;
-                    //失去焦点, 比如有其他播放器开始播放  暂停
-                    case AudioManager.AUDIOFOCUS_LOSS:
-                        mAudioFouus = false;
-                        if(mIsplay && mMediaPlayer != null) {
+                    }
+                    mMediaPlayer.setVolume(1.0f,1.0f);
+                }
+                //降低音量或者暂停播放
+                if(focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT || focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK){
+                    if(mIsplay && mMediaPlayer != null){
+                        if(mTelePhoneManager.getCallState() != TelephonyManager.CALL_STATE_IDLE){
                             AudioHolderActivity.mOperation = Constants.PLAYORPAUSE;
                             Pause();
-//                           UnInit();
-                        }
-                        break;
+                        } else
+                            mMediaPlayer.setVolume(0.1f,0.1f);
+                    }
                 }
+                //暂停播放
+                if(focusChange == AudioManager.AUDIOFOCUS_LOSS){
+                    mAudioFouus = false;
+                    if(mIsplay && mMediaPlayer != null) {
+                        AudioHolderActivity.mOperation = Constants.PLAYORPAUSE;
+                        Pause();
+                    }
+                }
+                //通知更新ui
                 mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
                 sendBroadcast(new Intent(Constants.NOTIFY));
             }
@@ -258,6 +250,8 @@ public class MusicService extends BaseService {
         registerReceiver(mRecevier,new IntentFilter("remix.music.CTL_ACTION"));
         mHeadSetReceiver = new HeadsetPlugReceiver();
         registerReceiver(mHeadSetReceiver,new IntentFilter(Intent.ACTION_HEADSET_PLUG));
+        //监听通话
+        mTelePhoneManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
         //监听媒体库变化
         mObserver = new MediaStoreObserver(new Handler(){
             @Override

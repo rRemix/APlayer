@@ -11,7 +11,9 @@ import android.widget.TextView;
 
 import java.util.LinkedList;
 
+import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.infos.LrcInfo;
+import remix.myplayer.utils.DensityUtil;
 
 /**
  * Created by Remix on 2015/12/8.
@@ -30,8 +32,6 @@ public class LrcView extends TextView {
     private int mTotalRow;
     //上下了两行文字间隔
     private int mInterval = 50;
-    //控件宽度中心
-    private int mViewWidth;
     //控件宽度
     private int mViewCenterX = 0;
     //控件高度
@@ -40,10 +40,9 @@ public class LrcView extends TextView {
     private int mViewCenterY;
     //辅助滑动类
     private Scroller mScroller;
-    private boolean mFinish = false;
     //高亮与非高亮歌词字体大小
-    private final int mHTextSize = 45;
-    private final int mLTextSize = 30;
+    private int mHTextSize = 45;
+    private int mLTextSize = 30;
     //绘制歌词的垂直中心高度
     private int mCenterY;
     //当前绘制的最小和最大行数
@@ -58,24 +57,22 @@ public class LrcView extends TextView {
         super(context, attrs);
         mInstance = this;
         mPaint = new Paint();
-        mPaint.setColor(Color.BLACK);
-        mPaint.setTextSize(30);
+        mPaint.setColor(Color.GRAY);
+
+        mLTextSize = DensityUtil.dip2px(context,10);
+        mPaint.setTextSize(mLTextSize);
         mPaint.setTextAlign(Paint.Align.CENTER);
         mPaint.setAntiAlias(true);
+//        mPaint.setAlpha(50);
         mHPaint = new Paint();
-        mHPaint.setColor(Color.WHITE);
-        mHPaint.setTextSize(45);
+        mHPaint.setColor(Color.BLACK);
+        mHTextSize = DensityUtil.dip2px(context,15);
+        mHPaint.setTextSize(mHTextSize);
         mHPaint.setTextAlign(Paint.Align.CENTER);
         mHPaint.setAntiAlias(true);
+        mHPaint.setAlpha(255);
 
         mScroller = new Scroller(getContext());
-//        new Timer().schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                if (AudioHolderActivity.mIsRunning)
-//                    postInvalidate();
-//            }
-//        }, 0, 100);
     }
 
     public void UpdateLrc(LinkedList<LrcInfo> list){
@@ -103,9 +100,13 @@ public class LrcView extends TextView {
         mMaxRow = mCurRow + (mTotalRow-1) / 2;
         mMinRow = Math.max(mMinRow, 0); //处理上边界
         mMaxRow = Math.min(mMaxRow, mlrcList.size() - 1); //处理下边界
-        Log.d(TAG,"totalrow:" + mTotalRow);
-        Log.d(TAG,"minrow:" + mMinRow);
-        Log.d(TAG,"maxrow:" + mMaxRow);
+        try {
+            mHPaint.setColor(AudioHolderActivity.mHColor);
+            mPaint.setColor(AudioHolderActivity.mHColor);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
         try {
             for(int i = mMinRow ;i < mMaxRow ;i++){
                 mCenterY = mViewCenterY + i * (mInterval + mLTextSize);
@@ -125,17 +126,27 @@ public class LrcView extends TextView {
     }
 
     public void seekTo(int progress,boolean fromuser){
-        mCurRow = selectIndex(progress);
+
         if(mlrcList == null || mlrcList.size() == 0){
             invalidate();
             return;
         }
+//        if(!fromuser && !AudioHolderActivity.mIsDragSeekBar){
+//            mCurRow = selectIndex(progress);
+//            smoothScrollTo((mInterval + mLTextSize) * mCurRow, 800);
+//            invalidate();
+//        }
+
         if(!fromuser) {
+            mCurRow = selectIndex(progress);
+            Log.d(TAG,"not from user");
             smoothScrollTo((mInterval + mLTextSize) * mCurRow, 800);
+            invalidate();
         } else {
-            scrollTo(getScrollX(), (mInterval + mLTextSize) * mCurRow);
+//            Log.d(TAG,"from user");
+//            scrollTo(getScrollX(), (mInterval + mLTextSize) * mCurRow);
         }
-        invalidate();
+
     }
 
     private void smoothScrollTo(int dstY,int duration){
@@ -176,7 +187,6 @@ public class LrcView extends TextView {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mViewWidth = w;
         mViewCenterX = (int)(w * 0.5);
         mViewHeight = h;
         mViewCenterY = (int)(h * 0.5);
