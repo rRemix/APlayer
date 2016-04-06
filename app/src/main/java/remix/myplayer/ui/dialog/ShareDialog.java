@@ -1,6 +1,7 @@
 package remix.myplayer.ui.dialog;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -40,6 +41,7 @@ import remix.myplayer.R;
 import remix.myplayer.activities.BaseActivity;
 import remix.myplayer.activities.RecordShareActivity;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 
@@ -233,8 +235,12 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         msg.mediaObject = imgObj;
 
         //设置缩略图
-//        Bitmap thumbBmp = Bitmap.createScaledBitmap(RecordShareActivity.getBg(), 150, 150, true);
-//        msg.thumbData = CommonUtil.bmpToByteArray(thumbBmp, true);
+        if(RecordShareActivity.getBg() != null){
+            Bitmap thumbBmp = Bitmap.createScaledBitmap(RecordShareActivity.getBg(), 150, 150, true);
+//            msg.thumbData = CommonUtil.bmpToByteArray(thumbBmp, true);
+            msg.setThumbImage(thumbBmp);
+        }
+
 
         //发送请求
         SendMessageToWX.Req req = new SendMessageToWX.Req();
