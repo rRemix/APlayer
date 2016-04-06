@@ -47,6 +47,8 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     public static LockScreenActivity mInstance;
     //当前播放的歌曲信息
     private MP3Info mInfo;
+    //滑动解锁提示文字
+    private TextView mUnLock;
     //歌曲与艺术家
     private TextView mSong;
     private TextView mArtist;
@@ -93,10 +95,10 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
                         Palette.Swatch d = palette.getMutedSwatch();//柔和
                         Palette.Swatch e = palette.getDarkMutedSwatch();//柔和 暗色
                         Palette.Swatch f = palette.getLightMutedSwatch();//柔和 亮色
-
-                        if(d != null){
-                            mSong.setTextColor(d.getBodyTextColor());
-                            mArtist.setTextColor(d.getTitleTextColor());
+                        if(f != null){
+                            mSong.setTextColor(f.getBodyTextColor());
+                            mArtist.setTextColor(f.getTitleTextColor());
+                            mUnLock.setTextColor(f.getBodyTextColor());
                         }
                     }
                 });
@@ -138,7 +140,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         mSimpleImage = (SimpleDraweeView)findViewById(R.id.lockscreen_image);
         mSong = (TextView)findViewById(R.id.lockscreen_song);
         mArtist = (TextView)findViewById(R.id.lockscreen_artist);
-
+        mUnLock = (TextView)findViewById(R.id.lockscreen_unlock);
 
         mView = getWindow().getDecorView();
         mView.setBackgroundColor(getResources().getColor(R.color.transparent));
