@@ -536,24 +536,13 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                         //修改背景颜色
                         mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{f.getRgb(), Color.WHITE}));
 
-                        mHColor = f.getRgb();
+                        mHColor =  f.getTitleTextColor();
                         mLColor = f.getBodyTextColor();
                         //修改进度条背景颜色
                         LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
                         ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(f.getRgb());
                         mSeekBar.setProgressDrawable(layerDrawable);
 
-//                        int[] mColors = new int[]{f.getRgb(),f.getRgb()};
-//                        GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,new int[]{Color.parseColor("#E0E0E0"),Color.parseColor("#E0E0E0")});
-//                        gradientDrawable.setGradientType(GradientDrawable.LINEAR_GRADIENT);
-//                        gradientDrawable.setBounds(0,16,-696,22);
-//
-//                        ClipDrawable clipDrawable = new ClipDrawable(new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,mColors), Gravity.AXIS_PULL_BEFORE,ClipDrawable.HORIZONTAL);
-//                        clipDrawable.setBounds(0,16,-696,22);
-//
-//                        LayerDrawable layerDrawable = new LayerDrawable(new Drawable[]{gradientDrawable,clipDrawable});
-//                        layerDrawable.setId(0,android.R.id.background);
-//                        layerDrawable.setId(1,android.R.id.progress);
                     }
 
                 }

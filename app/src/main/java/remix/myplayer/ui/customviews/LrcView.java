@@ -63,14 +63,14 @@ public class LrcView extends TextView {
         mPaint.setTextSize(mLTextSize);
         mPaint.setTextAlign(Paint.Align.CENTER);
         mPaint.setAntiAlias(true);
-//        mPaint.setAlpha(50);
+
         mHPaint = new Paint();
         mHPaint.setColor(Color.BLACK);
         mHTextSize = DensityUtil.dip2px(context,15);
         mHPaint.setTextSize(mHTextSize);
         mHPaint.setTextAlign(Paint.Align.CENTER);
         mHPaint.setAntiAlias(true);
-        mHPaint.setAlpha(255);
+        mHPaint.setFakeBoldText(true);
 
         mScroller = new Scroller(getContext());
     }
@@ -139,7 +139,6 @@ public class LrcView extends TextView {
 
         if(!fromuser) {
             mCurRow = selectIndex(progress);
-            Log.d(TAG,"not from user");
             smoothScrollTo((mInterval + mLTextSize) * mCurRow, 800);
             invalidate();
         } else {

@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         android:layout_below="@id/lockscreen_detail_container">
         <ImageButton
             android:layout_width="wrap_content"

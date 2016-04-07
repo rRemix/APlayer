@@ -98,24 +98,27 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             }
 
             if(holder.mButton != null) {
-                //最后一个列表为收藏列表，不能删除
+                //我的收藏列表，不能删除
                 if(name.equals("我的收藏")){
                     holder.mButton.setImageResource(R.drawable.rcd_icn_love);
                     holder.mButton.setClickable(false);
                     holder.mButton.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));
-                    return;
+                } else {
+                    holder.mButton.setImageResource(R.drawable.list_icn_more);
+                    holder.mButton.setClickable(true);
+                    holder.mButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Context wrapper = new ContextThemeWrapper(mContext, R.style.MyPopupMenu);
+                            final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
+                            PlayListActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
+                            popupMenu.setOnMenuItemClickListener(new PopupListener(mContext, position, Constants.PLAYLIST_HOLDER, ""));
+                            popupMenu.setGravity(Gravity.END);
+                            popupMenu.show();
+                        }
+                    });
                 }
-                holder.mButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Context wrapper = new ContextThemeWrapper(mContext, R.style.MyPopupMenu);
-                        final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-                        PlayListActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
-                        popupMenu.setOnMenuItemClickListener(new PopupListener(mContext, position, Constants.PLAYLIST_HOLDER, ""));
-                        popupMenu.setGravity(Gravity.END);
-                        popupMenu.show();
-                    }
-                });
+
             }
         } catch (Exception e){
             e.toString();

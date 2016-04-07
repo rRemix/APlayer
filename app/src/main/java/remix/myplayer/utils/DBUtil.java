@@ -57,8 +57,6 @@ public class DBUtil {
     public static ArrayList<Long> mTodayList = new ArrayList<>();
     public static ArrayList<Long> mWeekList = new ArrayList<>();
 
-
-
     private static Context mContext;
     private DBUtil(){}
     public static void setContext(Context context){
@@ -121,7 +119,7 @@ public class DBUtil {
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(new Date(temp));
                     int between = (int)((today_mill - calendar.getTimeInMillis()) / day_mill);
-                    if(between <= 3 && between >= 0){
+                    if(between <= 7 && between >= 0){
                         mWeekList.add(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
                         if(between == 0){
                             mTodayList.add(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));

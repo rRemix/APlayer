@@ -300,7 +300,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
                 mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
             }
 
-//            Log.d(TAG,"mill: " + (System.currentTimeMillis() - start));
+            Log.d(TAG,"mill: " + (System.currentTimeMillis() - start));
             mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
         }
     }
