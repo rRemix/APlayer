@@ -21,34 +21,90 @@
         android:layout_width="match_parent"
         android:layout_height="90dp"
         android:gravity="center_horizontal">
-        <ImageButton
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/share_qq"
-            android:background="#ffff"
-            android:layout_margin="15dp"
-            android:src="@drawable/bg_btn_qq"/>
-        <ImageButton
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="5dp">
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/share_qq"
+                android:background="#ffff"
+                android:src="@drawable/bg_btn_qq"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/textsize_medium"
+                android:text="QQ"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/share_weibo"
-            android:background="#ffff"
-            android:layout_margin="15dp"
-            android:src="@drawable/bg_btn_weibo"/>
-        <ImageButton
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="5dp">
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/share_weibo"
+                android:background="#ffff"
+                android:src="@drawable/bg_btn_weibo"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/textsize_medium"
+                android:text="微博"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/share_wechat"
-            android:background="#ffff"
-            android:layout_margin="15dp"
-            android:src="@drawable/bg_btn_wechat"/>
-        <ImageButton
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="5dp">
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/share_wechat"
+                android:background="#ffff"
+                android:src="@drawable/bg_btn_wechat"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/textsize_medium"
+                android:text="微信"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/share_circlefriend"
-            android:background="#ffff"
-            android:layout_margin="15dp"
-            android:src="@drawable/bg_btn_circleoffriends"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="5dp">
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/share_circlefriend"
+                android:background="#ffff"
+                android:src="@drawable/bg_btn_circleoffriends"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/textsize_medium"
+                android:text="朋友圈"/>
+        </LinearLayout>
+
     </LinearLayout>
 
     <Button

@@ -34,7 +34,6 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     private PlayListAdapter mAdapter;
     public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
     private Toolbar mToolBar;
-    private static boolean mNeedRefresh = false;
     static {
         mPlaylist = XmlUtil.getPlayList("playlist.xml");
     }
@@ -56,7 +55,6 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         mAdapter.setOnItemClickLitener(new PlayListAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(View view, int position) {
-
                 String name = "";
                 Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
                 for (int i = 0; i <= position; i++) {
@@ -90,8 +88,6 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     //打开添加播放列表的Dialog
     public void onAdd(View v) {
         startActivity(new Intent(PlayListActivity.this, AddPlayListDialog.class));
-
-//
     }
 
     public PlayListAdapter getAdapter()
@@ -122,9 +118,6 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         }
     }
 
-    public static void setFresh(boolean needfresh){
-        mNeedRefresh = needfresh;
-    }
 
     @Override
     public void onPause() {
@@ -134,10 +127,6 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     @Override
     public void onResume() {
         super.onResume();
-//        if(mNeedRefresh){
-//            UpdateAdapter();
-//            mNeedRefresh = false;
-//        }
     }
 
     @Override

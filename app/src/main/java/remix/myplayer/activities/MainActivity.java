@@ -3,6 +3,7 @@ package remix.myplayer.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -21,12 +22,17 @@ import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.nostra13.universalimageloader.cache.disc.DiskCache;
 import com.nostra13.universalimageloader.cache.memory.MemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.utils.IoUtils;
 import com.umeng.analytics.MobclickAgent;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -95,7 +101,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         //检查更新
 //        UmengUpdateAgent.update(this);
 //        MobclickAgent.setDebugMode(true);
@@ -130,7 +135,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //初始化toolbar
-
 
         if (DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0){
             SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", -1);
@@ -208,7 +212,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                 .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {
                     @Override
                     public MemoryCacheParams get() {
-                        //50M内存缓存
+                        //10M内存缓存
                         return new MemoryCacheParams(10 * 1024 * 1024, 10, 2048, 5, 1024);
                     }
                 }).build();
@@ -218,13 +222,13 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         DisplayImageOptions option = new DisplayImageOptions.Builder()
                 .showImageForEmptyUri(R.drawable.song_artist_empty_bg)
                 .showImageOnFail(R.drawable.song_artist_empty_bg)
+                .cacheOnDisk(true)
                 .resetViewBeforeLoading(false)
                 .cacheInMemory(true)
                 .build();
+
         ImageLoaderConfiguration config1 = new ImageLoaderConfiguration.Builder(this)
-                .memoryCacheSize(10 * 1024 * 1024)
-
-
+                .memoryCacheSize(20 * 1024 * 1024)
                 .defaultDisplayImageOptions(option)
                 .build();
         ImageLoader.getInstance().init(config1);

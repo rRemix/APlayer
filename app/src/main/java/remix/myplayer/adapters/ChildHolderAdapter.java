@@ -17,6 +17,7 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.customviews.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
+import remix.myplayer.utils.Constants;
 
 
 /**
@@ -27,11 +28,14 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
     private LayoutInflater mInflater;
     private ColumnView mColumnView;
     private Context mContext;
-
-    public ChildHolderAdapter(ArrayList<MP3Info> mInfoList, LayoutInflater mInflater,Context context) {
+    private int mType;
+    private String mArg;
+    public ChildHolderAdapter(ArrayList<MP3Info> mInfoList, LayoutInflater mInflater,Context context,int type,String arg) {
         this.mInfoList = mInfoList;
         this.mInflater = mInflater;
         this.mContext = context;
+        this.mType = type;
+        this.mArg = arg;
     }
 
     public void setList(ArrayList<MP3Info> list){
@@ -102,6 +106,11 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, OptionDialog.class);
                 intent.putExtra("MP3Info",temp);
+                if(mType == Constants.PLAYLIST_HOLDER){
+                    intent.putExtra("IsDeletePlayList",true);
+                    intent.putExtra("PlayListName",mArg);
+                }
+
                 mContext.startActivity(intent);
             }
         });

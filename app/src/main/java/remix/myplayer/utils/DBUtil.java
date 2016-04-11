@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.adapters.FolderAdapter;
 import remix.myplayer.infos.MP3Info;
@@ -79,8 +80,6 @@ public class DBUtil {
      * @return
      */
     public static ArrayList<Long> getAllSongsId() {
-
-
         //获得今天日期
         Calendar today = Calendar.getInstance();
         today.setTime(new Date());
@@ -425,7 +424,7 @@ public class DBUtil {
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
                     MediaStore.Audio.Media._ID + "=" + id +
                             " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
-            if(cursor == null || cursor.getCount() <= 0)
+            if(cursor == null || cursor.getCount() == 0)
                 return null;
 
             cursor.moveToFirst();
@@ -576,6 +575,29 @@ public class DBUtil {
                 }
             }
         }
+    }
+
+    /**
+     * 根据歌曲id删除某播放列表中歌曲
+     * @param playlist 播放列表名
+     * @param id 需要删除的歌曲id
+     * @return 删除是否成功
+     */
+    public static boolean deleteSongInPlayList(String playlist,long id){
+        boolean ret = false;
+        ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(playlist);
+        if(list != null){
+            for(PlayListItem item : list){
+                if(item.getId() == id){
+                    ret = list.remove(item);
+                    if(ChildHolderActivity.mInstance != null)
+                        ChildHolderActivity.mInstance.UpdateData();
+                    XmlUtil.updatePlaylist();
+                    break;
+                }
+            }
+        }
+       return ret;
     }
 
 

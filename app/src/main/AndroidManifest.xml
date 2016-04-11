@@ -70,7 +70,8 @@
             android:theme="@style/PopupBottomDialog"/>
 
         <activity android:name=".ui.dialog.OptionDialog"
-            android:theme="@style/PopupBottomDialog"/>
+            android:theme="@style/PopupBottomCompactDialog"
+            android:label=""/>
 
         <activity android:name=".ui.dialog.TimerDialog"
             android:theme="@style/PopupCenterDialog"/>

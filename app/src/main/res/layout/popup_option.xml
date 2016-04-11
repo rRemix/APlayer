@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="176dp"
-    android:background="#ffffffff">
+    android:background="#ffffffff"
+    android:layout_gravity="bottom">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -72,8 +73,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="#6d6c69"
-                android:textSize="15dp"
+                android:textColor="#1b1c19"
+                android:textSize="15sp"
                 android:text="铃声"/>
         </LinearLayout>
 
@@ -95,7 +96,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="15sp"
-                android:textColor="#6d6c69"
+                android:textColor="#1b1c19"
                 android:text="分享"/>
         </LinearLayout>
 
@@ -117,7 +118,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="15sp"
-                android:textColor="#6d6c69"
+                android:textColor="#1b1c19"
                 android:text="删除"/>
         </LinearLayout>
 

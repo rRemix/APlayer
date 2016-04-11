@@ -50,28 +50,15 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            if(mInfoList == null || mInfoList.size() == 0)
+            if(mInfoList == null)
                 return;
-//            mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),ChildHolderActivity.this);
-//            mAdapter.registerDataSetObserver(new DataSetObserver() {
-//                @Override
-//                public void onChanged() {
-//                    super.onChanged();
-//                }
-//
-//                @Override
-//                public void onInvalidated() {
-//                    super.onInvalidated();
-//                }
-//            });
-//            mListView.setAdapter(mAdapter);
+
             mAdapter.setList(mInfoList);
             mNum.setText(mInfoList.size() + "首歌曲");
 
         }
     };
-    //是否从文件夹打开
-    public static boolean mIsFromFolder = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +81,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         }.start();
 
         mListView = (ListView)findViewById(R.id.child_holder_list);
-        mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),ChildHolderActivity.this);
+        mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),ChildHolderActivity.this,mType,mArg);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -193,7 +180,6 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                 break;
             //文件夹名
             case Constants.FOLDER_HOLDER:
-                mIsFromFolder = true;
                 mInfoList = DBUtil.getMP3ListByIds(DBUtil.mFolderMap.get(mArg));
                 mArg = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
                 break;
@@ -203,9 +189,15 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                 ArrayList<Long> ids = new ArrayList<>();
                 if(list == null)
                     break;
-                for(PlayListItem item : list)
-                    ids.add(Long.valueOf(item.getId() + ""));
-                mInfoList = DBUtil.getMP3ListByIds(ids);
+                for(PlayListItem item : list) {
+                    MP3Info temp = DBUtil.getMP3InfoById(item.getId());
+                    //该歌曲已经失效
+                    if(temp == null){
+                        DBUtil.deleteSongInPlayList(mArg,item.getId());
+                    } else {
+                        mInfoList.add(temp);
+                    }
+                }
                 break;
         }
         return mInfoList;

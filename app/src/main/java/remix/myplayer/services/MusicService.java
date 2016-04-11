@@ -259,27 +259,21 @@ public class MusicService extends BaseService {
                 if(msg.what == Constants.UPDATE_FOLDER){
                     //更新文件夹fragment
                     if(FolderFragment.mInstance != null){
-//                        FolderFragment.setFresh(true);
                         FolderFragment.mInstance.UpdateAdapter();
                     }
                     //更新文件夹详情
                     if(ChildHolderActivity.mInstance != null) {
-//                        ChildHolderActivity.setFresh(true);
                         ChildHolderActivity.mInstance.UpdateData();
                     }
                 }
                 //更新正在播放列表
                 if(msg.what == Constants.UPDATE_PLAYINGLIST){
-//                    if(PlayingListDialog.mInstance != null)
-//                        PlayingListDialog.setFresh(true);
                     if(PlayingListDialog.mInstance != null){
                         PlayingListDialog.mInstance.UpdateAdapter();
                     }
                 }
                 //更新播放列表
                 if(msg.what == Constants.UPDATE_PLAYLIST){
-//                    if(PlayListActivity.mInstance != null)
-//                        PlayListActivity.setFresh(true);
                     if(PlayListActivity.mInstance != null)
                         PlayListActivity.mInstance.UpdateAdapter();
                 }
