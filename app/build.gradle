@@ -25,12 +25,11 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.facebook.fresco:fresco:0.8.1'
-    compile project(':viewpageindicator')
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     compile files('libs/mta-sdk-1.6.2.jar')
     compile files('libs/open_sdk_r5509.jar')

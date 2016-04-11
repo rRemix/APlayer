@@ -34,6 +34,7 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
     public AllSongAdapter(Context context, int layout, Cursor c, String[] from, int[] to, int flags) {
         super(context, layout, c, from, to, flags);
         mInstance = this;
+        mCursor = c;
         mContext = context;
     }
 

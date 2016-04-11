@@ -11,14 +11,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
 import remix.myplayer.R;
 import remix.myplayer.adapters.AllSongAdapter;
+import remix.myplayer.adapters.TestAdapter;
 import remix.myplayer.listeners.ListViewListener;
+import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
@@ -34,7 +40,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     private LoaderManager mManager;
     private AllSongAdapter mAdapter;
     private Cursor mCursor = null;
-    private ListView mListView = null;
+    private ListView mListView;
     //歌曲名 艺术家 专辑名 专辑id 歌曲id对应的索引
     public static int mDisPlayNameIndex = -1;
     public static int mArtistIndex = -1;
@@ -50,7 +56,6 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         mManager.initLoader(1000, null, this);
     }
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,14 +65,18 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(mAdapter != null)
-            mAdapter.changeCursor(null);
+        if(mCursor != null) {
+            mCursor.close();
+        }
+        if(mAdapter != null){
+            mAdapter.setCursor(null);
+        }
     }
 
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater,container,savedInstanceState);
+        super.onCreateView(inflater, container, savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_allsong,null);
         rootView.findViewById(R.id.play_shuffle).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,6 +88,28 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
                 getActivity().sendBroadcast(intent);
             }
         });
+//        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview);
+//        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+//
+//        mTestAdapter = new TestAdapter(mCursor,getActivity());
+//        mTestAdapter.setOnItemClickLitener(new OnItemClickListener() {
+//            @Override
+//            public void onItemClick(View view, int position) {
+//                DBUtil.setPlayingList((ArrayList<Long>) DBUtil.mAllSongList.clone());
+//                Intent intent = new Intent(Constants.CTL_ACTION);
+//                Bundle arg = new Bundle();
+//                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+//                arg.putInt("Position", position);
+//                intent.putExtras(arg);
+//                getActivity().sendBroadcast(intent);
+//            }
+//
+//            @Override
+//            public void onItemLongClick(View view, int position) {
+//            }
+//        });
+//        mRecyclerView.setAdapter(mTestAdapter);
+
         mListView = (ListView)rootView.findViewById(R.id.list);
         mListView.setOnItemClickListener(new ListViewListener(getActivity()));
         mAdapter = new AllSongAdapter(getActivity(),R.layout.allsong_item,null,new String[]{},new int[]{},0);
@@ -109,6 +140,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         if(mCursor != null) {
             mAdapter.changeCursor(mCursor);
             mAdapter.setCursor(mCursor);
+//            mTestAdapter.setCursor(mCursor);
         }
     }
 
@@ -117,8 +149,6 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         if (mAdapter != null)
             mAdapter.changeCursor(null);
     }
-
-
 
     public AllSongAdapter getAdapter(){
         return mAdapter;
