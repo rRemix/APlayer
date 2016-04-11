@@ -146,6 +146,8 @@ public class SearchLRC {
                     while((startIndex = s.indexOf("[", startIndex + 1)) != -1)
                     {
                         int endIndex = s.indexOf("]", startIndex);
+                        if(endIndex < 0)
+                            continue;
                         Integer time = getMill(s.substring(startIndex, endIndex));
                         String lrc = s.substring(s.lastIndexOf(']') + 1,s.length());
                         if(time != -1 && !lrc.equals(""))
@@ -154,6 +156,7 @@ public class SearchLRC {
                 }
                 br.close();
             } catch (Exception e) {
+                Log.d(TAG,s);
                 e.printStackTrace();
             }
         }

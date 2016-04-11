@@ -2,6 +2,8 @@ package remix.myplayer.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -29,6 +31,12 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     private RecentlyAdapter mAdapter;
     private Toolbar mToolBar;
     private ListView mListView;
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            mListView.setAdapter(mAdapter);
+        }
+    };
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -43,9 +51,14 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     }
 
     private void initListView() {
-        mAdapter = new RecentlyAdapter(this, DBUtil.getMP3ListByIds(DBUtil.mWeekList));
+        new Thread(){
+            @Override
+            public void run() {
+                mAdapter = new RecentlyAdapter(RecetenlyActivity.this, DBUtil.getMP3ListByIds(DBUtil.mWeekList));
+                mHandler.sendEmptyMessage(0);
+            }
+        }.start();
         mListView = (ListView)findViewById(R.id.recently_listview);
-        mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -57,7 +70,6 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
                 DBUtil.setPlayingList(DBUtil.mWeekList);
                 sendBroadcast(intent);
                 view.setSelected(true);
-
             }
         });
 
