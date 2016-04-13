@@ -39,9 +39,9 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:id="@+id/custom_seekbar"
-        app:trackheight="1dp"
+        app:trackheight="2dp"
         app:dotnum="6"
-        app:dotwidth="1dp"
+        app:dotwidth="2dp"
         app:trackcolor="#6c6a6c"
         app:progresscolor="#782899"
         app:thumb="@drawable/bg_thumb"/>

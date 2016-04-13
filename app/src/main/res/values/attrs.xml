@@ -26,4 +26,12 @@
         <attr name="dotwidth" format="dimension|reference"/>
         <attr name="thumb" format="reference"/>
     </declare-styleable>
+
+    <declare-styleable name="EQSeekBar">
+        <attr name="eqtrackwidth" format="dimension|reference"/>
+        <attr name="eqtrackcolor" format="color|reference"/>
+        <attr name="eqprogresscolor" format="color|reference"/>
+        <attr name="eqdotnum" format="integer"/>
+        <attr name="eqthumb" format="reference"/>
+    </declare-styleable>
 </resources>

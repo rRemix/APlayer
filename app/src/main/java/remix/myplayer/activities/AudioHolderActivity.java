@@ -42,6 +42,7 @@ import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.SharedPrefsUtil;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -233,6 +234,11 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
 
         //播放模式
         mPlayModel = (ImageButton)findViewById(R.id.playbar_model);
+        int playmodel = SharedPrefsUtil.getValue(this,"setting", "PlayModel",Constants.PLAY_LOOP);
+        mPlayModel.setBackground(getResources().getDrawable(playmodel == Constants.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
+                playmodel == Constants.PLAY_SHUFFLE ? R.drawable.bg_btn_holder_playmodel_shuffle :
+                        R.drawable.bg_btn_holder_playmodel_repeat));
+
         mPlayModel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -246,6 +252,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 Toast.makeText(AudioHolderActivity.this, msg, Toast.LENGTH_SHORT).show();
             }
         });
+
         mPlayingList = (ImageButton)findViewById(R.id.playbar_playinglist);
         mPlayingList.setOnClickListener(new View.OnClickListener() {
             @Override

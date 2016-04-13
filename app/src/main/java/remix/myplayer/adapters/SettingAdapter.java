@@ -13,7 +13,7 @@ import remix.myplayer.R;
  * Created by taeja on 16-3-7.
  */
 public class SettingAdapter extends BaseAdapter {
-    private final String[] mTitles = new String[]{"扫描文件大小","意见和反馈","关于APlayer","检查更新"};
+    private final String[] mTitles = new String[]{"扫描文件大小","音效设置","意见和反馈","关于APlayer","检查更新"};
     private Context mContext;
 
     public SettingAdapter(Context Context) {
@@ -22,12 +22,12 @@ public class SettingAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mTitles.length;
+        return mTitles == null ? 0 : mTitles.length;
     }
 
     @Override
     public Object getItem(int position) {
-        return mTitles[position];
+        return mTitles == null ? null : mTitles[position];
     }
 
     @Override

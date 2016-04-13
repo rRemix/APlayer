@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import remix.myplayer.R;
 import remix.myplayer.utils.DensityUtil;
+import remix.myplayer.utils.SharedPrefsUtil;
 
 /**
  * Created by Remix on 2016/3/7.
@@ -113,6 +114,9 @@ public class CustomSeekBar extends View {
     private int mThumbCenterX;
     private int mThumbCenterY;
 
+    /**
+     * 当前索引
+     */
     private int mPositon;
     /**
      * 是否初始化完成
@@ -226,11 +230,11 @@ public class CustomSeekBar extends View {
         mProgressColor = typedArray.getColor(R.styleable.CustomSeekBar_progresscolor,Color.parseColor("#782899"));
 
         //小圆点数量与宽度
-        mDotNum = typedArray.getInteger(R.styleable.CustomSeekBar_dotnum,6);
-        mDotWidth = (int)typedArray.getDimension(R.styleable.CustomSeekBar_dotwidth,4);
+        mDotNum = typedArray.getInteger(R.styleable.CustomSeekBar_dotnum, DensityUtil.dip2px(mContext,3));
+        mDotWidth = (int)typedArray.getDimension(R.styleable.CustomSeekBar_dotwidth,DensityUtil.dip2px(mContext,2));
 
         //轨道高度
-        mTrackHeigh = (int)typedArray.getDimension(R.styleable.CustomSeekBar_trackheight,4);
+        mTrackHeigh = (int)typedArray.getDimension(R.styleable.CustomSeekBar_trackheight,DensityUtil.dip2px(mContext,2));
 
         //小圆点画笔
         mDotPaint = new Paint();

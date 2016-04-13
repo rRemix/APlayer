@@ -66,7 +66,7 @@ public class MusicService extends BaseService {
     private static int mPlayModel = Constants.PLAY_LOOP;
 
     /**
-     * 当前是否正在播放那个
+     * 当前是否正在播放
      */
     private static Boolean mIsplay = false;
 
@@ -163,7 +163,7 @@ public class MusicService extends BaseService {
 
     private ContentObserver mObserver;
 
-    private Context mContext;
+    private static Context mContext;
 
     public MusicService(){}
     public MusicService(Context context) {
@@ -239,7 +239,8 @@ public class MusicService extends BaseService {
             mCurrent = Position == -1 ? 0 : Position;
         } else
             mInfo = null;
-
+        //播放模式
+        mPlayModel = SharedPrefsUtil.getValue(this,"setting", "PlayModel",Constants.PLAY_LOOP);
         Init();
 
     }
@@ -594,6 +595,12 @@ public class MusicService extends BaseService {
         }
     }
 
+
+//    private void setPlayModel(int playModel){
+//        mPlayModel = playModel;
+//
+//    }
+
     /**
      * 准备播放
      * @param path 播放歌曲的路径
@@ -672,6 +679,14 @@ public class MusicService extends BaseService {
     }
 
     /**
+     * 获得MediaPlayer
+     * @return
+     */
+    public static MediaPlayer getMediaPlayer(){
+        return mMediaPlayer;
+    }
+
+    /**
      * 获得播放模式
      * @return
      */
@@ -681,10 +696,13 @@ public class MusicService extends BaseService {
 
     /**
      * 设置播放模式
-     * @param PlayModel
+     * @param playModel
      */
-    public static void setPlayModel(int PlayModel) {
-        mPlayModel = PlayModel;
+    public static void setPlayModel(int playModel) {
+        if(playModel <= Constants.PLAY_REPEATONE && playModel >= Constants.PLAY_LOOP){
+            mPlayModel = playModel;
+            SharedPrefsUtil.putValue(mContext,"setting", "PlayModel",mPlayModel);
+        }
     }
 
     /**

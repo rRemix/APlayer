@@ -91,7 +91,8 @@
         <activity android:name=".activities.ScanActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
 
-
+        <activity android:name=".activities.EQActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity android:name=".ui.dialog.ShareDialog"
             android:theme="@style/PopupBottomDialog"

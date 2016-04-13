@@ -45,15 +45,19 @@ public class SettingActivity extends ToolbarActivity {
                         startActivity(new Intent(SettingActivity.this,ScanActivity.class));
                         break;
                     case 1:
+                        //音效设置
+                        startActivity(new Intent(SettingActivity.this,EQActivity.class));
+                        break;
+                    case 2:
                         //意见与反馈
                         startActivity(new Intent(SettingActivity.this,FeedBakActivity.class));
                         break;
-                    case 2:
+                    case 3:
                         //关于我们
                         startActivity(new Intent(SettingActivity.this,AboutActivity.class));
                         break;
                         //检查更新
-                    case 3:
+                    case 4:
                         UmengUpdateAgent.forceUpdate(SettingActivity.this);
                 }
             }

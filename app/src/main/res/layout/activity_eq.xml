@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <SeekBar
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_100"
+        android:layout_marginTop="20dp"
+        android:max="3000"
+        android:tag="100"/>
+    <SeekBar
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_500"
+        android:layout_marginTop="20dp"
+        android:max="3000"
+        android:tag="500"/>
+    <SeekBar
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_1k"
+        android:layout_marginTop="20dp"
+        android:max="3000"
+        android:tag="1000"/>
+    <SeekBar
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_4k"
+        android:layout_marginTop="20dp"
+        android:max="3000"
+        android:tag="4000"/>
+    <SeekBar
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekbar_16k"
+        android:layout_marginTop="20dp"
+        android:max="3000"
+        android:tag="16000"/>
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="20dp"
+       android:orientation="horizontal">
+       <Button
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:onClick="onPop"
+           android:text="流行"
+           android:tag="Pop"/>
+       <Button
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:onClick="onRock"
+           android:text="摇滚"
+           android:tag="Rock"/>
+       <Button
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:onClick="onClassical"
+           android:text="古典"
+           android:tag="Classical"/>
+       <Button
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:onClick="onBass"
+           android:text="重低音"
+           android:tag="Heavy Metal"/>
+
+   </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:id="@+id/text"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <remix.myplayer.ui.customviews.EQSeekBar
+            android:layout_width="20dp"
+            android:layout_height="180dp"
+            android:background="#000"
+            app:eqthumb="@drawable/bg_thumb"
+            app:eqtrackwidth="2dp"
+            app:eqtrackcolor="#6c6a6c"
+            app:eqprogresscolor="#782899"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"/>
+
+        <remix.myplayer.ui.customviews.EQSeekBar
+            android:layout_width="20dp"
+            android:layout_height="180dp"
+            android:background="#000"
+            app:eqthumb="@drawable/bg_thumb"
+            app:eqtrackwidth="2dp"
+            app:eqtrackcolor="#6c6a6c"
+            app:eqprogresscolor="#782899"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"/>
+
+        <remix.myplayer.ui.customviews.EQSeekBar
+            android:layout_width="20dp"
+            android:layout_height="180dp"
+            android:background="#000"
+            app:eqthumb="@drawable/bg_thumb"
+            app:eqtrackwidth="2dp"
+            app:eqtrackcolor="#6c6a6c"
+            app:eqprogresscolor="#782899"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"/>
+
+        <remix.myplayer.ui.customviews.EQSeekBar
+            android:layout_width="20dp"
+            android:layout_height="180dp"
+            android:background="#000"
+            app:eqthumb="@drawable/bg_thumb"
+            app:eqtrackwidth="2dp"
+            app:eqtrackcolor="#6c6a6c"
+            app:eqprogresscolor="#782899"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"/>
+
+        <remix.myplayer.ui.customviews.EQSeekBar
+            android:layout_width="20dp"
+            android:layout_height="180dp"
+            android:background="#000"
+            app:eqthumb="@drawable/bg_thumb"
+            app:eqtrackwidth="2dp"
+            app:eqtrackcolor="#6c6a6c"
+            app:eqprogresscolor="#782899"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"/>
+    </LinearLayout>
+
+
+</LinearLayout>

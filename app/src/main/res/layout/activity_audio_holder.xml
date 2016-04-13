@@ -128,7 +128,7 @@
                android:id="@+id/seekbar"
                android:thumb="@drawable/progress_indicator"
                android:maxHeight="2dp"
-               android:progressDrawable="@drawable/my_bar"
+               android:progressDrawable="@drawable/bg_progress"
                android:layout_width="0dp"
                android:layout_weight="6"
                android:layout_height="wrap_content" />
