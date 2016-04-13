@@ -34,13 +34,25 @@ public class EQSeekBar extends View {
     private int mViewWidth;
     private int mViewHeight;
 
+
+
     /**
-     * 底部提示字体
+     * 底部提示字体画笔
      */
     private Paint mTipTextPaint;
 
     /**
-     * 顶部提示字体
+     * 底部提示字体大小
+     */
+    private int mTipTextSize = 12;
+
+    /**
+     * 顶部提示字体大小
+     */
+    private int mFreTextSize = 12;
+
+    /**
+     * 顶部提示字体画笔
      */
     private Paint mFreTextPaint;
 
@@ -98,8 +110,8 @@ public class EQSeekBar extends View {
     /**
      * Thumb的高度与宽度
      */
-    private int mThumbWidth = 0;
-    private int mThumbHeight = 0;
+    private int mThumbWidth = 50;
+    private int mThumbHeight = 50;
 
     /**
      * ThumbDrawable 以及两个状态
@@ -128,8 +140,7 @@ public class EQSeekBar extends View {
      * 底部提示文字
      *
      */
-    private String[] mTexts = new String[]{"100","500","1K","4k","16K"};
-
+    private String mFreText = "";
 
 
     public EQSeekBar(Context context) {
@@ -170,7 +181,7 @@ public class EQSeekBar extends View {
 
         //轨道颜色与已完成轨道的颜色
         mTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqtrackcolor, Color.parseColor("#6c6a6c"));
-        mProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqprogresscolor,Color.parseColor("#782899"));
+        mProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqprogresscolor, Color.parseColor("#782899"));
 
         //间隔点数量
         mDotNum = typedArray.getInteger(R.styleable.EQSeekBar_eqdotnum,29);
@@ -179,19 +190,21 @@ public class EQSeekBar extends View {
         mTrackWidth = (int)typedArray.getDimension(R.styleable.EQSeekBar_eqtrackwidth, DensityUtil.dip2px(mContext,3));
 
         //顶部提示文字画笔
+        mFreTextSize = DensityUtil.dip2px(getContext(),13);
         mFreTextPaint = new Paint();
         mFreTextPaint.setAntiAlias(true);
         mFreTextPaint.setColor(Color.parseColor("#ffffffff"));
         mFreTextPaint.setStyle(Paint.Style.STROKE);
-        mFreTextPaint.setTextSize(DensityUtil.dip2px(getContext(),13));
+        mFreTextPaint.setTextSize(mFreTextSize);
         mFreTextPaint.setTextAlign(Paint.Align.CENTER);
 
         //底部提示文字画笔
+        mTipTextSize = DensityUtil.dip2px(getContext(),14);
         mTipTextPaint = new Paint();
         mTipTextPaint.setAntiAlias(true);
         mTipTextPaint.setColor(Color.parseColor("#ffffffff"));
         mTipTextPaint.setStyle(Paint.Style.STROKE);
-        mTipTextPaint.setTextSize(DensityUtil.dip2px(getContext(),14));
+        mTipTextPaint.setTextSize(DensityUtil.dip2px(getContext(),mTipTextSize));
         mTipTextPaint.setTextAlign(Paint.Align.CENTER);
 
         //整个轨道的画笔
@@ -215,16 +228,16 @@ public class EQSeekBar extends View {
     @Override
     protected synchronized void onDraw(Canvas canvas) {
         //整个轨道
-        canvas.drawLine((mViewWidth - mTrackWidth) / 2 ,mThumbHeight,(mViewWidth - mTrackWidth) / 2 ,mThumbHeight + mTrackHeigh,mTrackPaint);
+        canvas.drawLine((mViewWidth - mTrackWidth) / 2, mThumbHeight, (mViewWidth - mTrackWidth) / 2, mThumbHeight + mTrackHeigh, mTrackPaint);
         //已完成轨道
-//        canvas.drawLine(mThumbWidth,mTrackCenterY,mThumbCenterX,mTrackCenterY,mProgressPaint);
-//        //小圆点与底部文字
-//        for(int i = 0 ; i < mDotNum ;i++){
-//            canvas.drawCircle(mDotPosition.get(i),mTrackCenterY,mDotWidth,mDotPaint);
-//            canvas.drawText(mTexts[i],mDotPosition.get(i),mThumbHeight * 2,mTextPaint);
-//        }
+        canvas.drawLine((mViewWidth - mTrackWidth) / 2, mThumbHeight, (mViewWidth - mTrackWidth) / 2, mThumbHeight + mThumbCenterY, mProgressPaint);
+//        //顶部与底部文字
+
+        canvas.drawText("+15",mViewWidth / 2, mTipTextSize ,mFreTextPaint);
+        canvas.drawText("16K", mViewWidth / 2, mFreTextSize +  mThumbHeight + mTrackHeigh, mFreTextPaint);
+
         //thumb
-        mThumbDrawable.setBounds(mThumbCenterX - mThumbWidth / 2,0,mThumbCenterX + mThumbWidth / 2,mThumbHeight);
+        mThumbDrawable.setBounds(mThumbCenterX - mThumbWidth / 2, 0, mThumbCenterX + mThumbWidth / 2, mThumbHeight);
         mThumbDrawable.draw(canvas);
 
     }
@@ -241,7 +254,7 @@ public class EQSeekBar extends View {
         if((mViewWidth = getMeasuredWidth()) > 0 && (mViewHeight = getMeasuredHeight()) > 0){
             int paddingtop = getPaddingTop();
             int paddingbottom = getPaddingBottom();
-            mTrackHeigh = mViewHeight -paddingtop - paddingbottom;
+            mTrackHeigh = mViewHeight - paddingtop - paddingbottom - mThumbHeight * 2;
             //计算轨道宽度 两个小圆点之间的距离
             mDotBetween = mTrackHeigh / (mDotNum - 1);
             mDotPosition.clear();
@@ -252,5 +265,9 @@ public class EQSeekBar extends View {
             mThumbCenterY = mDotPosition.get(mPositon);
             mInit = true;
         }
+    }
+
+    public void setOnSeekBarChangeListener(OnSeekBarChangeListener l){
+        mOnSeekBarChangeListener = l;
     }
 }

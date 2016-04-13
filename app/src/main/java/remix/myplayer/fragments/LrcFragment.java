@@ -34,11 +34,11 @@ public class LrcFragment extends Fragment {
     private LrcView mLrcView;
     //歌词列表
     private LinkedList<LrcInfo> mLrcList;
-    private Handler mHandler = new Handler()
-    {
+    private Handler mHandler = new Handler() {
         @Override
-        public void handleMessage(Message msg)
-        {
+        public void handleMessage(Message msg) {
+            if(mLrcView == null)
+                return;
             if(msg.what == UPDATE_LRC) {
                 //更新歌词
                 if(mLrcList != null && mLrcView != null) {
