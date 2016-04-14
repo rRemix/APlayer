@@ -166,9 +166,16 @@ public class CustomSeekBar extends View {
         Log.d(TAG,"EventX:" + event.getX());
         Log.d(TAG,"EventY:" + event.getY());
         int eventX = (int)event.getX();
-        if(eventX > mDotPosition.get(mDotPosition.size() - 1) || eventX < mThumbWidth)
-            return true;
         boolean isUp = event.getAction() == MotionEvent.ACTION_UP ;
+
+        //设置thumb状态
+        mThumbDrawable.setState(isUp ? mThumbNormal : mThumbPressed);
+
+        if(eventX > mDotPosition.get(mDotPosition.size() - 1) || eventX < mThumbWidth) {
+            invalidate();
+            return true;
+        }
+
         if(isUp){
             //寻找与当前触摸点最近的值
             int temp = Integer.MAX_VALUE;
@@ -184,8 +191,7 @@ public class CustomSeekBar extends View {
         } else {
             mThumbCenterX = eventX;
         }
-        //设置thumb状态
-        mThumbDrawable.setState(isUp ? mThumbNormal : mThumbPressed);
+
         invalidate();
         return true;
     }

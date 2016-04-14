@@ -64,7 +64,7 @@
             android:textOff=""
             android:id="@+id/popup_timer_switch"
             android:thumb="@drawable/timer_btn_normal_btn"
-            android:track="@drawable/timer_btn_normal_locus"
+            android:track="@drawable/timer_btn_normal_focus"
             />
     </LinearLayout>
 

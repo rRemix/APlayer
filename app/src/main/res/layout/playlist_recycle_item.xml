@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:layout_width="164dp"
+    android:layout_width="match_parent"
     android:layout_height="196dp"
     android:paddingTop="8dp"
     android:paddingLeft="8dp"
     android:paddingRight="8dp"
-    android:background="#000000">
+    android:background="@color/transparent">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/background_color_2">
         <com.facebook.drawee.view.SimpleDraweeView
-            android:layout_width="164dp"
+            android:layout_width="match_parent"
             android:layout_height="164dp"
             android:id="@+id/recycleview_simpleiview"
             fresco:fadeDuration="300"
-            fresco:actualImageScaleType="focusCrop"
+            fresco:actualImageScaleType="center"
+            fresco:placeholderImageScaleType="center"
             fresco:placeholderImage="@drawable/playlist_empty_bg"
-            fresco:placeholderImageScaleType="fitCenter"
-            android:layout_alignParentTop="true" />
+            fresco:roundedCornerRadius="1dp"
+            android:layout_alignParentTop="true"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -50,4 +51,4 @@
     </RelativeLayout>
 
 
-</RelativeLayout>
+</FrameLayout>

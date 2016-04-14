@@ -2,6 +2,7 @@ package remix.myplayer.adapters;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -67,19 +68,20 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             holder.mName.setText(name);
 
             //设置专辑封面
-            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
-            if(list != null && list.size() > 0) {
-                for(PlayListItem item : list){
-                    String url = DBUtil.getImageUrl(item.getAlbumId() + "",Constants.URL_ALBUM);
-                    if(url != null && !url.equals("")) {
-                        File file = new File(url);
-                        if(!file.exists())
-                            continue;
-                        holder.mImage.setImageURI(Uri.parse(url));
-                        break;
-                    }
-                }
-            }
+            new AsynLoadImage(holder.mImage).execute(name);
+//            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
+//            if(list != null && list.size() > 0) {
+//                for(PlayListItem item : list){
+//                    String url = DBUtil.getImageUrl(item.getAlbumId() + "",Constants.URL_ALBUM);
+//                    if(url != null && !url.equals("")) {
+//                        File file = new File(url);
+//                        if(!file.exists())
+//                            continue;
+//                        holder.mImage.setImageURI(Uri.parse(url));
+//                        break;
+//                    }
+//                }
+//            }
 
             if(mOnItemClickLitener != null) {
                 holder.mImage.setOnClickListener(new View.OnClickListener() {
@@ -140,6 +142,37 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             mName = (TextView) itemView.findViewById(R.id.playlist_item_name);
             mImage = (SimpleDraweeView)itemView.findViewById(R.id.recycleview_simpleiview);
             mButton = (ImageView)itemView.findViewById(R.id.recycleview_button);
+        }
+    }
+
+    class AsynLoadImage extends AsyncTask<String,Integer,String> {
+        private final SimpleDraweeView mImage;
+        public AsynLoadImage(SimpleDraweeView imageView)
+        {
+            mImage = imageView;
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(params[0]);
+            String url = null;
+            if(list != null && list.size() > 0) {
+                for(PlayListItem item : list){
+                    url = DBUtil.getImageUrl(item.getAlbumId() + "",Constants.URL_ALBUM);
+                    if(url != null && !url.equals("")) {
+                        File file = new File(url);
+                        if(file.exists()) {
+                            break;
+                        }
+                    }
+                }
+            }
+            return url;
+        }
+        @Override
+        protected void onPostExecute(String url) {
+            Uri uri = Uri.parse("file:///" + url);
+            if(mImage != null)
+                mImage.setImageURI(uri);
         }
     }
 

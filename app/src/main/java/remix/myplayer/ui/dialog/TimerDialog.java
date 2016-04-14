@@ -112,7 +112,7 @@ public class TimerDialog extends BaseActivity {
                 Toggle();
             } else {
                 mSwitch.setThumbResource(R.drawable.timer_btn_seleted_btn);
-                mSwitch.setTrackResource(R.drawable.timer_btn_seleted_locus);
+                mSwitch.setTrackResource(R.drawable.timer_btn_seleted_focus);
             }
         }
         mSwitch.setChecked(hasdefault);
@@ -124,7 +124,7 @@ public class TimerDialog extends BaseActivity {
                     if (mTime > 0) {
                         Toast.makeText(TimerDialog.this, "设置成功", Toast.LENGTH_SHORT).show();
                         mSwitch.setThumbResource(R.drawable.timer_btn_seleted_btn);
-                        mSwitch.setTrackResource(R.drawable.timer_btn_seleted_locus);
+                        mSwitch.setTrackResource(R.drawable.timer_btn_seleted_focus);
                         SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerDefault", true);
                         SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerNum", (int) mTime);
                     } else {
@@ -134,7 +134,7 @@ public class TimerDialog extends BaseActivity {
                 } else {
                     Toast.makeText(TimerDialog.this, "取消成功", Toast.LENGTH_SHORT).show();
                     mSwitch.setThumbResource(R.drawable.timer_btn_normal_btn);
-                    mSwitch.setTrackResource(R.drawable.timer_btn_normal_locus);
+                    mSwitch.setTrackResource(R.drawable.timer_btn_normal_focus);
                     SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerDefault", false);
                     SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerNum", -1);
                 }

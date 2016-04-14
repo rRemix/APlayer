@@ -69,7 +69,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
         @Override
         protected void onPostExecute(Object url) {
             Uri uri = Uri.parse("file:///" + (String)url);
-            if(url != null && mImage != null);{
+            if(mImage != null);{
                 mImage.setImageURI(uri);
             }
         }

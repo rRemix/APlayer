@@ -8,11 +8,13 @@ import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -57,18 +59,22 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
     //<Params, Progress, Result>
     class AsynLoadImage extends AsyncTask<String,Integer,String> {
         private final SimpleDraweeView mImage;
+        private String mArtist = "";
         public AsynLoadImage(SimpleDraweeView imageView)
         {
             mImage = imageView;
         }
         @Override
         protected String doInBackground(String... params) {
+            mArtist = params[1];
             return DBUtil.getImageUrl(params[0], Constants.URL_ARTIST);
+
         }
         @Override
         protected void onPostExecute(String url) {
+            Log.d("ArtistAdapter","url:" + url + " artist:" + mArtist);
             Uri uri = Uri.parse("file:///" + url);
-            if(url != null && mImage != null)
+            if(mImage != null)
                 mImage.setImageURI(uri);
         }
     }
@@ -88,7 +94,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
             holder.mText1.setText(artist);
             //设置封面
             AsynLoadImage task = new AsynLoadImage(holder.mImage);
-            task.execute(mCursor.getString(ArtistFragment.mArtistIdIndex));
+            task.execute(mCursor.getString(ArtistFragment.mArtistIdIndex),artist);
 
 //            Uri uri = Uri.parse("content://media/external/audio/media/" + mCursor.getString(ArtistFragment.mArtistIndex) + "/albumart");
 //            holder.mImage.setImageURI(uri);

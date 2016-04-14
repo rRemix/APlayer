@@ -486,8 +486,7 @@ public class MusicService extends BaseService {
      * @param position 播放索引
      */
     private void PlaySelectSong(int position){
-        if(mCurrent == position && mIsplay)
-            return;
+       
         if((mCurrent = position) == -1 || (mCurrent > DBUtil.mPlayingList.size()))
             return;
 

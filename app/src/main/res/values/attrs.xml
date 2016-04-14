@@ -29,6 +29,8 @@
 
     <declare-styleable name="EQSeekBar">
         <attr name="eqtrackwidth" format="dimension|reference"/>
+        <attr name="eqenabletrackcolor" format="color|reference"/>
+        <attr name="eqenableprogresscolor" format="color|reference"/>
         <attr name="eqtrackcolor" format="color|reference"/>
         <attr name="eqprogresscolor" format="color|reference"/>
         <attr name="eqdotnum" format="integer"/>
