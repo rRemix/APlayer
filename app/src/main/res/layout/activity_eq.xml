@@ -5,20 +5,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.SwitchCompat
-        android:background="@color/transparent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textOn=""
-        android:textOff=""
-        android:id="@+id/eq_switch"
-        android:thumb="@drawable/timer_btn_normal_btn"
-        android:track="@drawable/timer_btn_normal_focus" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="是否开启音效设置"/>
+        <android.support.v7.widget.SwitchCompat
+            android:background="@color/transparent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn=""
+            android:textOff=""
+            android:id="@+id/eq_switch"
+            android:thumb="@drawable/timer_btn_normal_btn"
+            android:track="@drawable/timer_btn_normal_focus" />
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:orientation="horizontal">
         <Button
             android:layout_width="wrap_content"
@@ -42,20 +54,46 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onBass"
-            android:text="重低音"
+            android:text="重金属"
             android:tag="Heavy Metal"/>
 
     </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:id="@+id/text"/>
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="重低音"/>
+        <SeekBar
+            android:id="@+id/bass"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:max="1000"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="环绕音效"/>
+        <SeekBar
+            android:id="@+id/virtualizer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:max="1000"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="40dp"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal">
         <remix.myplayer.ui.customviews.EQSeekBar
             android:id="@+id/EQSeekbar1"
@@ -123,7 +161,5 @@
             android:layout_marginRight="20dp"
             android:layout_marginLeft="20dp"/>
     </LinearLayout>
-
-
 
 </LinearLayout>

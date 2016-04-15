@@ -8,6 +8,7 @@ import android.widget.Toast;
 import remix.myplayer.R;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.Global;
 
 /**
  * Created by Remix on 2016/3/23.
@@ -21,6 +22,10 @@ public class HeadsetPlugReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if(intent.hasExtra("state")){
+            Global.setHeadsetOn(intent.getIntExtra("state", -1) == 1);
+            Intent eqintent = new Intent(Constants.EQENABLE_ACTION);
+            eqintent.putExtra("IsHeadsetOn",Global.getHeadsetOn());
+            context.sendBroadcast(eqintent);
             if(intent.getIntExtra("state", -1) == 0 && MusicService.getIsplay()){
                 Intent intent1 = new Intent(Constants.CTL_ACTION);
                 intent1.putExtra("Control",Constants.PAUSE);

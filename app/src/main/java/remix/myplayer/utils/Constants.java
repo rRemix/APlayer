@@ -20,6 +20,7 @@ public class Constants {
     public final static int ARTIST_HOLDER = 2;
     public final static int FOLDER_HOLDER = 3;
 
+    public final static String EQENABLE_ACTION = "remix.music.EQENABLE_ACTION";
     public final static String CTL_ACTION = "remix.music.CTL_ACTION";
     public final static String UPDATE_ACTION = "remix.music.UPDATE_ACTION";
     public final static String CONTROL_TIMER = "remix.music.CONTROL_TIMER";
@@ -91,4 +92,5 @@ public class Constants {
     public final static int UPDATE_FOLDER = 0;
     public final static int UPDATE_PLAYINGLIST = 1;
     public final static int UPDATE_PLAYLIST = 2;
+
 }

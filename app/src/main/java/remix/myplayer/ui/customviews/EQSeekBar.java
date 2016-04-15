@@ -267,9 +267,9 @@ public class EQSeekBar extends View {
     @Override
     protected synchronized void onDraw(Canvas canvas) {
         //整个轨道
-        canvas.drawLine((mViewWidth - 0) / 2 , mThumbHeight, (mViewWidth - 0) / 2, mThumbHeight + mTrackHeigh, mTrackPaint);
+        canvas.drawLine(mViewWidth / 2 , mThumbHeight, mViewWidth/ 2, mThumbHeight + mTrackHeigh, mTrackPaint);
         //已完成轨道
-        canvas.drawLine((mViewWidth - 0) / 2, mThumbHeight, (mViewWidth - 0) / 2, mThumbCenterY, mProgressPaint);
+        canvas.drawLine(mViewWidth / 2, mThumbHeight, mViewWidth / 2, mThumbCenterY, mProgressPaint);
 
 //      //顶部与底部文字
         canvas.drawText(mDBText,mViewWidth / 2, mTipTextSize ,mFreTextPaint);
