@@ -17,6 +17,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.Random;
 
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.activities.ChildHolderActivity;
+import remix.myplayer.activities.EQActivity;
 import remix.myplayer.activities.MainActivity;
 import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.fragments.FolderFragment;
@@ -34,6 +36,7 @@ import remix.myplayer.receivers.HeadsetPlugReceiver;
 import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 import remix.myplayer.utils.SharedPrefsUtil;
 
 
@@ -113,7 +116,7 @@ public class MusicService extends BaseService {
     /**
      * 播放控制的Receiver
      */
-    private PlayerReceiver mRecevier;
+    private ControlReceiver mRecevier;
 
 
     /**
@@ -124,6 +127,8 @@ public class MusicService extends BaseService {
     /**
      * 监听AudioFocus的改变
      */
+
+
     private AudioManager.OnAudioFocusChangeListener mAudioFocusListener;
 
     /**
@@ -141,8 +146,7 @@ public class MusicService extends BaseService {
      */
     private static Handler mUpdateUIHandler = new Handler() {
         @Override
-        public void handleMessage(Message msg)
-        {
+        public void handleMessage(Message msg) {
             if(msg.what == Constants.UPDATE_INFORMATION) {
                 try {
                     for (int i = 0; i < mCallBacklist.size(); i++) {
@@ -192,6 +196,7 @@ public class MusicService extends BaseService {
         mContext = getApplicationContext();
         mInstance = this;
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
+        Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
         mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
             //记录焦点变化之前是否在播放;
             @Override
@@ -247,10 +252,11 @@ public class MusicService extends BaseService {
 
     private void Init() {
         //初始化两个Receiver
-        mRecevier = new PlayerReceiver();
+        mRecevier = new ControlReceiver();
         registerReceiver(mRecevier,new IntentFilter("remix.music.CTL_ACTION"));
         mHeadSetReceiver = new HeadsetPlugReceiver();
         registerReceiver(mHeadSetReceiver,new IntentFilter(Intent.ACTION_HEADSET_PLUG));
+
         //监听通话
         mTelePhoneManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
         //监听媒体库变化
@@ -262,10 +268,10 @@ public class MusicService extends BaseService {
                     if(FolderFragment.mInstance != null){
                         FolderFragment.mInstance.UpdateAdapter();
                     }
-                    //更新文件夹详情
-                    if(ChildHolderActivity.mInstance != null) {
-                        ChildHolderActivity.mInstance.UpdateData();
-                    }
+//                    //更新文件夹详情
+//                    if(ChildHolderActivity.mInstance != null) {
+//                        ChildHolderActivity.mInstance.UpdateData();
+//                    }
                 }
                 //更新正在播放列表
                 if(msg.what == Constants.UPDATE_PLAYINGLIST){
@@ -273,43 +279,27 @@ public class MusicService extends BaseService {
                         PlayingListDialog.mInstance.UpdateAdapter();
                     }
                 }
-                //更新播放列表
-                if(msg.what == Constants.UPDATE_PLAYLIST){
-                    if(PlayListActivity.mInstance != null)
-                        PlayListActivity.mInstance.UpdateAdapter();
-                }
+//                //更新播放列表
+//                if(msg.what == Constants.UPDATE_PLAYLIST){
+//                    if(PlayListActivity.mInstance != null)
+//                        PlayListActivity.mInstance.UpdateAdapter();
+//                }
 
             }
         });
         getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,true,mObserver);
 
 
-//        mMediaComName = new ComponentName(getPackageName(), LineCtlReceiver.class.getName());
-//        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-//        mediaButtonIntent.setComponent(mMediaComName);
-//        mMediaPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, mediaButtonIntent,0);
-
         //初始化MediaSesson 用于监听线控操作
         mMediaSession = new MediaSessionCompat(getApplicationContext(),"session");
 
         mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
                 | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-//        mMediaSession.setPlaybackState(mNotPlaybackState);
+
         UpdateLockScreen();
         mMediaSession.setCallback(new SessionCallBack());
         mMediaSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
         mMediaSession.setActive(true);
-
-
-//        mRemoteCtrlClient = new RemoteControlClient(mMediaPendingIntent);
-//        int flags = RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
-//                | RemoteControlClient.FLAG_KEY_MEDIA_NEXT
-//                | RemoteControlClient.FLAG_KEY_MEDIA_PLAY
-//                | RemoteControlClient.FLAG_KEY_MEDIA_PAUSE
-//                | RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE
-//                | RemoteControlClient.FLAG_KEY_MEDIA_STOP;
-//        mRemoteCtrlClient.setTransportControlFlags(flags);
-//        mAudioManager.registerRemoteControlClient(mRemoteCtrlClient);
 
         //初始化Mediaplayer
         mMediaPlayer = new MediaPlayer();
@@ -344,6 +334,9 @@ public class MusicService extends BaseService {
                 return true;
             }
         });
+
+        //初始化音效设置
+        EQActivity.Init();
     }
 
     private void UpdateLockScreen() {
@@ -420,7 +413,6 @@ public class MusicService extends BaseService {
 //                }
             }
         }.start();
-
     }
 
 
@@ -489,12 +481,16 @@ public class MusicService extends BaseService {
        
         if((mCurrent = position) == -1 || (mCurrent > DBUtil.mPlayingList.size()))
             return;
-
         mId = DBUtil.mPlayingList.get(mCurrent);
+        MP3Info temp = mInfo;
         mInfo = DBUtil.getMP3InfoById(mId);
-        mIsplay = true;
-        if(mInfo == null)
+        if(mInfo == null) {
+            mInfo = temp;
+            Toast.makeText(mContext,"歌曲已失效",Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        mIsplay = true;
         PrepareAndPlay(mInfo.getUrl());
     }
 
@@ -526,7 +522,7 @@ public class MusicService extends BaseService {
      * 接受控制命令
      * 包括暂停、播放、上下首、播放模式
      */
-    public class PlayerReceiver extends BroadcastReceiver {
+    public class ControlReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getExtras().getBoolean("Close")){
@@ -644,29 +640,32 @@ public class MusicService extends BaseService {
     public void PlayNextOrPrev(boolean IsNext,boolean NeedPlay){
         if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return;
-        mIsplay = true;
+
         if(mPlayModel == Constants.PLAY_SHUFFLE) {
             mCurrent = getShuffle();
             mId = DBUtil.mPlayingList.get(mCurrent);
-            mInfo = DBUtil.getMP3InfoById(mId);
         }
         else if(mPlayModel == Constants.PLAY_LOOP) {
             if(IsNext) {
                 if ((++mCurrent) > DBUtil.mPlayingList.size() - 1)
                     mCurrent = 0;
                 mId = DBUtil.mPlayingList.get(mCurrent);
-                mInfo = DBUtil.getMP3InfoById(mId);
             }
             else {
                 if ((--mCurrent) < 0)
                     mCurrent = DBUtil.mPlayingList.size() - 1;
                 mId = DBUtil.mPlayingList.get(mCurrent);
-                mInfo = DBUtil.getMP3InfoById(mId);
             }
         }
-        else {
 
+        MP3Info temp = mInfo;
+        mInfo = DBUtil.getMP3InfoById(mId);
+        if(mInfo == null) {
+            mInfo = temp;
+            Toast.makeText(mContext,"歌曲已失效",Toast.LENGTH_SHORT).show();
+            return;
         }
+        mIsplay = true;
         if(NeedPlay)
             PrepareAndPlay(mInfo.getUrl());
 

@@ -150,17 +150,22 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             XmlUtil.addPlaylist("我的收藏");
         }
         //如果是第一次启动软件,将第一首歌曲设置为正在播放
-        if (isFirst || position < 0) {
-            mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)), MusicService.getIsplay());
-            SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", 0);
-        } else {
-            if(position == DBUtil.mPlayingList.size()){
-                position = DBUtil.mPlayingList.size() - 1;
-                if(position >= 0)
-                    SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", position);
+        try {
+            if (isFirst || position < 0) {
+                mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)), MusicService.getIsplay());
+                SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", 0);
+            } else {
+                if(position >= DBUtil.mPlayingList.size()){
+                    position = DBUtil.mPlayingList.size() - 1;
+                    if(position >= 0)
+                        SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", position);
+                }
+                mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(position)), MusicService.getIsplay());
             }
-            mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(position)), MusicService.getIsplay());
+        } catch (Exception e){
+            e.printStackTrace();
         }
+
 
     }
 

@@ -37,7 +37,6 @@ public class MediaStoreObserver extends ContentObserver {
             DBUtil.mAllSongList = DBUtil.getAllSongsId();
 
             mHandler.sendEmptyMessage(Constants.UPDATE_FOLDER);
-
             //检查正在播放列表中是否有歌曲删除
             new Thread(){
                 @Override
@@ -64,38 +63,36 @@ public class MediaStoreObserver extends ContentObserver {
             }.start();
 
             //检查播放列表中是否有歌曲删除
-            new Thread(){
-                @Override
-                public void run() {
-                    try {
-                        Iterator it = PlayListActivity.getPlayList().keySet().iterator();
-                        ArrayList<PlayListItem> list = new ArrayList<>();
-
-                        boolean needupdate = false;
-                        while (it.hasNext()){
-                            list = PlayListActivity.getPlayList().get(it.next());
-                            if(list != null){
-                                for(int i = list.size() - 1 ; i >= 0  ; i--){
-                                    MP3Info temp = DBUtil.getMP3InfoById(list.get(i).getId());
-                                    if(temp == null || temp.equals(new MP3Info())){
-                                        list.remove(i);
-                                        needupdate = true;
-                                    }
-                                }
-                            }
-                        }
-                        if(needupdate){
-                            XmlUtil.updatePlaylist();
-                           mHandler.sendEmptyMessage(Constants.UPDATE_PLAYLIST);
-                        }
-
-                    } catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-
-
+//            new Thread(){
+//                @Override
+//                public void run() {
+//                    try {
+//                        Iterator it = PlayListActivity.getPlayList().keySet().iterator();
+//                        ArrayList<PlayListItem> list = new ArrayList<>();
+//
+//                        boolean needupdate = false;
+//                        while (it.hasNext()){
+//                            list = PlayListActivity.getPlayList().get(it.next());
+//                            if(list != null){
+//                                for(int i = list.size() - 1 ; i >= 0  ; i--){
+//                                    MP3Info temp = DBUtil.getMP3InfoById(list.get(i).getId());
+//                                    if(temp == null || temp.equals(new MP3Info())){
+//                                        list.remove(i);
+//                                        needupdate = true;
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        if(needupdate){
+//                            XmlUtil.updatePlaylist();
+//                            mHandler.sendEmptyMessage(Constants.UPDATE_PLAYLIST);
+//                        }
+//
+//                    } catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }.start();
         }
     }
 

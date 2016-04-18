@@ -110,7 +110,6 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
                     intent.putExtra("IsDeletePlayList",true);
                     intent.putExtra("PlayListName",mArg);
                 }
-
                 mContext.startActivity(intent);
             }
         });

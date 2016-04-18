@@ -52,7 +52,6 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         public void handleMessage(Message msg) {
             if(mInfoList == null)
                 return;
-
             mAdapter.setList(mInfoList);
             mNum.setText(mInfoList.size() + "首歌曲");
 
@@ -190,13 +189,16 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                 if(list == null)
                     break;
                 for(PlayListItem item : list) {
-                    MP3Info temp = DBUtil.getMP3InfoById(item.getId());
-                    //该歌曲已经失效
-                    if(temp == null){
-                        DBUtil.deleteSongInPlayList(mArg,item.getId());
-                    } else {
-                        mInfoList.add(temp);
-                    }
+                    MP3Info temp = new MP3Info(item.getId(),item.getSongame(),"",item.getAlbumId(),
+                            item.getArtist(),0,"","",0,"");
+                    mInfoList.add(temp);
+//                    MP3Info temp = DBUtil.getMP3InfoById(item.getId());
+//                    //该歌曲已经失效
+//                    if(temp == null){
+//                        DBUtil.deleteSongInPlayList(mArg,item.getId());
+//                    } else {
+//                        mInfoList.add(temp);
+//                    }
                 }
                 break;
         }

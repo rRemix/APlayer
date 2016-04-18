@@ -64,7 +64,7 @@ public class XmlUtil {
                             tag = parser.getName();
                         if(tag != null && parser.getName().equals("song")) {
                             item = new PlayListItem(parser.getAttributeValue(0),Integer.parseInt(parser.getAttributeValue(1)),
-                                    Integer.parseInt(parser.getAttributeValue(2)));
+                                    Integer.parseInt(parser.getAttributeValue(2)),parser.getAttributeValue(3));
                             Log.d("XmlUtil",item.toString());
                         }
                         break;
@@ -198,10 +198,10 @@ public class XmlUtil {
      * @param id 歌曲id
      * @param album_id 专辑id
      */
-    public static void addSongToPlayList(String name, String song, int id, int album_id) {
+    public static void addSongToPlayList(String name, String song, int id, int album_id,String artist) {
         if(!name.equals("") && !song.equals("")) {
             ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
-            list.add(new PlayListItem(song,id,album_id));
+            list.add(new PlayListItem(song,id,album_id,artist));
             updatePlaylist();
         }
     }
@@ -231,6 +231,7 @@ public class XmlUtil {
                     parser.attribute(null,"name",list.get(i).getSongame());
                     parser.attribute(null,"id",String.valueOf(list.get(i).getId()));
                     parser.attribute(null,"albumid",String.valueOf(list.get(i).getAlbumId()));
+                    parser.attribute(null,"artist",list.get(i).getArtist());
                     parser.endTag(null,"song");
                 }
                 parser.endTag(null,key);

@@ -11,11 +11,21 @@ public class PlayListItem {
     private String mSongName;
     private int mId;
     private int mAlbumId;
-    public PlayListItem(){}
-    public PlayListItem(String SongName, int Id,int AlbumId) {
+    private String mArtist;
+    private PlayListItem(){}
+    public PlayListItem(String SongName, int Id,int AlbumId,String Artist) {
         this.mSongName = SongName;
         this.mId = Id;
         this.mAlbumId = AlbumId;
+        this.mArtist = Artist;
+    }
+
+    public String getArtist() {
+        return mArtist;
+    }
+
+    public void setArtist(String SongName) {
+        this.mArtist = SongName;
     }
 
     public String getSongame() {

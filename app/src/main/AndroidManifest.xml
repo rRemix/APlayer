@@ -185,9 +185,14 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".receivers.EQReceiver">
+            <intent-filter>
+                <action android:name="remix.music.SOUNDEFFECT_ACTION"/>
+            </intent-filter>
+        </receiver>
+
         <service android:name=".services.MusicService"/>
         <service android:name=".services.TimerService"/>
-
 
     </application>
 

@@ -111,8 +111,8 @@
     <orderEntry type="library" exported="" name="1_universal-image-loader-1.9.5" level="project" />
     <orderEntry type="library" exported="" name="drawee-0.8.1" level="project" />
     <orderEntry type="library" exported="" name="open_sdk_r5509" level="project" />
-    <orderEntry type="library" exported="" name="bolts-android-1.1.4" level="project" />
     <orderEntry type="library" exported="" name="analytics-5.6.7" level="project" />
+    <orderEntry type="library" exported="" name="bolts-android-1.1.4" level="project" />
     <orderEntry type="library" exported="" name="cardview-v7-23.1.1" level="project" />
     <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
   </component>

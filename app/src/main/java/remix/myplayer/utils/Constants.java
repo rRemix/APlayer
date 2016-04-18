@@ -20,12 +20,14 @@ public class Constants {
     public final static int ARTIST_HOLDER = 2;
     public final static int FOLDER_HOLDER = 3;
 
-    public final static String EQENABLE_ACTION = "remix.music.EQENABLE_ACTION";
     public final static String CTL_ACTION = "remix.music.CTL_ACTION";
     public final static String UPDATE_ACTION = "remix.music.UPDATE_ACTION";
     public final static String CONTROL_TIMER = "remix.music.CONTROL_TIMER";
     public final static String NOTIFY = "remix.music.NOTIFY";
     public final static String EXIT = "remix.music.EXIT";
+    public final static String SOUNDEFFECT_ACTION = "remix.music.SOUNDEFFECT_ACTION";
+
+
     //控制命令
     public final static int PLAYSELECTEDSONG = 0;
     public final static int PREV = 1;

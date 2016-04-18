@@ -16,7 +16,9 @@ import remix.myplayer.R;
 import remix.myplayer.activities.BaseActivity;
 import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.adapters.PlayListAddtoAdapter;
+import remix.myplayer.infos.MP3Info;
 import remix.myplayer.infos.PlayListItem;
+import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.XmlUtil;
 
 /**
@@ -32,14 +34,16 @@ public class AddtoPlayListDialog extends BaseActivity {
     private String mSongName;
     private int mId;
     private int mAlbumId;
+    private String mArtist;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playlist_addto);
 
-        mSongName = getIntent().getExtras().getString("SongName");
         mId = (int)getIntent().getExtras().getLong("Id");
+        mSongName = getIntent().getExtras().getString("SongName");
         mAlbumId = (int)getIntent().getExtras().getLong("AlbumId");
+        mArtist = getIntent().getExtras().getString("Artist");
         //改变高度，并置于底部
         Window w = getWindow();
         WindowManager wm = getWindowManager();
@@ -71,7 +75,7 @@ public class AddtoPlayListDialog extends BaseActivity {
                         if(isExist){
                             Toast.makeText(AddtoPlayListDialog.this,"该歌曲已经存在", Toast.LENGTH_SHORT).show();
                         } else {
-                            XmlUtil.addSongToPlayList(playlist, mSongName,mId,mAlbumId);
+                            XmlUtil.addSongToPlayList(playlist, mSongName,mId,mAlbumId,mArtist);
                             Toast.makeText(AddtoPlayListDialog.this,"添加成功", Toast.LENGTH_SHORT).show();
                         }
                     }

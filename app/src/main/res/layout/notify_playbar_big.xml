@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:orientation="horizontal"
+    android:id="@+id/notify_container"
     android:background="#000000">
     <ImageView
         android:id="@+id/notify_image"
@@ -41,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
-                android:layout_marginRight="15dp"
+                android:layout_marginRight="12dp"
                 android:src="@drawable/notify_btn_close_white"/>
         </RelativeLayout>
         <!--歌手与专辑-->

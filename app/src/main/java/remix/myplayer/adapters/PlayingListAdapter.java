@@ -68,7 +68,7 @@ public class PlayingListAdapter extends BaseAdapter {
         if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
             return convertView;
 
-        final MP3Info temp = new MP3Info(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(position)));
+        final MP3Info temp = DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(position));
         if(temp != null) {
             //设置歌曲与艺术家
             holder.mSong.setText(temp.getDisplayname());

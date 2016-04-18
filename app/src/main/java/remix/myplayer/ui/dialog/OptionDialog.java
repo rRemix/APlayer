@@ -62,7 +62,6 @@ public class OptionDialog extends BaseAppCompatActivity {
     private boolean mIsDeletePlayList = false;
     //播放列表名字
     private String mPlayListName;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //去掉标题
@@ -109,6 +108,7 @@ public class OptionDialog extends BaseAppCompatActivity {
                 arg.putString("SongName",mInfo.getDisplayname());
                 arg.putLong("Id",mInfo.getId());
                 arg.putLong("AlbumId",mInfo.getAlbumId());
+                arg.putString("Artist",mInfo.getArtist());
                 intent.putExtras(arg);
                 startActivity(intent);
                 finish();

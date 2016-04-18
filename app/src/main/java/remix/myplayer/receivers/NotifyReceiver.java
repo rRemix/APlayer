@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.widget.LinearLayout;
 import android.widget.RemoteViews;
+import android.widget.RemoteViewsService;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
@@ -17,6 +19,7 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.SharedPrefsUtil;
 
 /**
  * Created by taeja on 16-2-4.
@@ -40,6 +43,8 @@ public class NotifyReceiver extends BroadcastReceiver {
         boolean isBig = context.getResources().getDisplayMetrics().widthPixels >= 1000;
 
         mRemoteView = new RemoteViews(context.getPackageName(), isBig ? R.layout.notify_playbar_big : R.layout.notify_playbar);
+//        boolean isSystemColor = SharedPrefsUtil.getValue(context,"setting","IsSystemColor",true);
+//        mRemoteView.setImageViewResource(R.id.notify_container,isSystemColor ? R.drawable.notifbar_btn_stop : R.drawable.notifbar_btn_stop);
 
         if(frommainactivity && !MusicService.getIsplay())
             return;
@@ -93,7 +98,7 @@ public class NotifyReceiver extends BroadcastReceiver {
                     .setContentText("")
                     .setContentTitle("")
                     .setWhen(System.currentTimeMillis())
-                    .setPriority(Notification.PRIORITY_DEFAULT)
+                    .setPriority(Notification.PRIORITY_HIGH)
                     .setOngoing(true)
                     .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setSmallIcon(R.drawable.notifbar_icon);

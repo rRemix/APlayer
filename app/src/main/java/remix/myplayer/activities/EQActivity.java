@@ -1,9 +1,5 @@
 package remix.myplayer.activities;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
@@ -23,9 +19,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import remix.myplayer.R;
+import remix.myplayer.application.Application;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.customviews.EQSeekBar;
-import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.Global;
 import remix.myplayer.utils.SharedPrefsUtil;
 
@@ -34,27 +30,29 @@ import remix.myplayer.utils.SharedPrefsUtil;
  */
 public class EQActivity extends BaseAppCompatActivity {
     private final static String TAG = "EQActivity";
-    private Equalizer mEqualizer;
+    private static Equalizer mEqualizer;
 //    private ArrayList<Short> mPreSettings = new ArrayList<>();
-    private short mBandNumber;
-    private short mMaxEQLevel;
-    private short mMinEQLevel;
-    private ArrayList<Integer> mCenterFres = new ArrayList<>();
-    private HashMap<String,Short> mPreSettings = new HashMap<>();
+    public static EQActivity mInstance;
+    private static short mBandNumber = -1;
+    private static short mMaxEQLevel = -1;
+    private static short mMinEQLevel = -1;
+    private static ArrayList<Integer> mCenterFres = new ArrayList<>();
+    private static HashMap<String,Short> mPreSettings = new HashMap<>();
     private ArrayList<EQSeekBar> mEQSeekBars = new ArrayList<>();
     private TextView mText;
-    private ArrayList<Short> mBandLevels = new ArrayList<>();
+    private static ArrayList<Short> mBandLevels = new ArrayList<>();
     private SwitchCompat mSwitch;
-    private ArrayList<Short> mBandFrequencys = new ArrayList<>();
-    private boolean mEnable = false;
-    private boolean mInitialEnable = false;
-    private BassBoost mBassBoost;
-    private Virtualizer mVirtualizer;
+    private static ArrayList<Short> mBandFrequencys = new ArrayList<>();
+    private static boolean mEnable = false;
+    private static boolean mInitialEnable = false;
+    private static BassBoost mBassBoost;
+    private static Virtualizer mVirtualizer;
     private SeekBar mSeekbar1;
     private SeekBar mSeekbar2;
-    private short mBassBoostLevel;
-    private short mVirtualizeLevel;
-    private EnableReceiver mEnableReceiver;
+    private static short mBassBoostLevel;
+    private static short mVirtualizeLevel;
+    private static boolean mIsRunning;
+//    private EQReceiver mEQReceiver;
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -62,17 +60,101 @@ public class EQActivity extends BaseAppCompatActivity {
                 int temp = mBandFrequencys.get(i);
                 setSeekBarProgress(mEQSeekBars.get(i),temp);
                 mEQSeekBars.get(i).setEnabled(mEnable);
-                if (mEnable){
-                    mEqualizer.setBandLevel((short)i,(short)temp);
-                }
+
             }
         }
     };
 
+    public static void Init(){
+        new Thread(){
+            @Override
+            public void run() {
+                int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
+                Log.d(TAG,"AudioSessionId:" + AudioSessionId);
+                if(AudioSessionId  == 0) {
+                    return;
+                }
+                //是否启用音效设置
+                mEnable = SharedPrefsUtil.getValue(Application.getContext(),"setting","EnableEQ",false) & Global.getHeadsetOn();
+                mInitialEnable = SharedPrefsUtil.getValue(Application.getContext(),"setting","InitialEnableEQ",false);
+
+                //EQ
+                mEqualizer = new Equalizer(0, AudioSessionId);
+                mEqualizer.setEnabled(mEnable);
+                //重低音
+                mBassBoost = new BassBoost(0,AudioSessionId);
+                mBassBoost.setEnabled(mEnable);
+                mBassBoostLevel = (short)SharedPrefsUtil.getValue(Application.getContext(),"setting","BassBoostLevel",0);
+                if(mEnable && mBassBoost.getStrengthSupported()){
+                    mBassBoost.setStrength(mBassBoostLevel);
+                }
+                //环绕音效
+                mVirtualizer = new Virtualizer(0,AudioSessionId);
+                mVirtualizeLevel = (short)SharedPrefsUtil.getValue(Application.getContext(),"setting","VirtualizeLevel",0);
+                mVirtualizer.setEnabled(mEnable);
+                if(mEnable && mVirtualizer.getStrengthSupported()){
+                    mVirtualizer.setStrength(mVirtualizeLevel);
+                }
+
+                //得到当前Equalizer引擎所支持的控制频率的标签数目。
+                mBandNumber = mEqualizer.getNumberOfBands();
+
+                //得到之前存储的每个频率的db值
+                for(short i = 0 ; i < mBandNumber; i++){
+                    short temp = (short)(SharedPrefsUtil.getValue(Application.getContext(),"setting","Band" + i,0));
+                    mBandFrequencys.add(temp);
+                    if (mEnable){
+                        mEqualizer.setBandLevel(i,temp);
+                    }
+                }
+
+
+                //得到的最小频率
+                mMinEQLevel = mEqualizer.getBandLevelRange()[0];
+                //得到的最大频率
+                mMaxEQLevel = mEqualizer.getBandLevelRange()[1];
+                for (short i = 0; i < mBandNumber; i++) {
+                    //通过标签可以顺次的获得所有支持的频率的名字比如 60Hz 230Hz
+                    mCenterFres.add(mEqualizer.getCenterFreq(i) / 1000);
+                }
+
+                //获得所有预设的音效
+                for(short i = 0 ; i < mEqualizer.getNumberOfPresets() ; i++){
+                    mPreSettings.put(mEqualizer.getPresetName(i),i);
+                }
+
+                //获得所有频率值
+                short temp = (short) ((mMaxEQLevel - mMinEQLevel) / 30);
+                for(short i = 0 ; i < 31; i++){
+                    mBandLevels.add((short)(1500 - (i * temp)));
+                }
+
+            }
+        }.start();
+
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mEnableReceiver);
+//        unregisterReceiver(mEQReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mIsRunning = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mIsRunning = false;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -80,42 +162,17 @@ public class EQActivity extends BaseAppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eq);
 
-        int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
-        Log.d(TAG,"AudioSessionId:" + AudioSessionId);
-        if(AudioSessionId  == 0) {
-            return;
-        }
+        mInstance = this;
 
-        mEnableReceiver = new EnableReceiver();
-        registerReceiver(mEnableReceiver,new IntentFilter(Constants.EQENABLE_ACTION));
-
-        //是否启用音效设置
-        mEnable = SharedPrefsUtil.getValue(this,"setting","EnableEQ",false) & Global.getHeadsetOn();
-        mInitialEnable = mEnable;
-        //EQ
-        mEqualizer = new Equalizer(0, AudioSessionId);
-        mEqualizer.setEnabled(mEnable);
-        //重低音
-        mBassBoost = new BassBoost(0,AudioSessionId);
-        mBassBoost.setEnabled(mEnable);
-        mBassBoostLevel = (short)SharedPrefsUtil.getValue(this,"setting","BassBoostLevel",0);
-        if(mEnable && mBassBoost.getStrengthSupported()){
-            mBassBoost.setStrength(mBassBoostLevel);
-        }
-        //环绕音效
-        mVirtualizer = new Virtualizer(0,AudioSessionId);
-        mVirtualizeLevel = (short)SharedPrefsUtil.getValue(this,"setting","VirtualizeLevel",0);
-        mVirtualizer.setEnabled(mEnable);
-        if(mEnable && mVirtualizer.getStrengthSupported()){
-            mVirtualizer.setStrength(mVirtualizeLevel);
-        }
+//        mEQReceiver = new EQReceiver();
+//        registerReceiver(mEQReceiver,new IntentFilter(Constants.EQENABLE_ACTION));
 
         mSeekbar1 = (SeekBar)findViewById(R.id.bass);
         mSeekbar1.setProgress(mBassBoostLevel);
         mSeekbar1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(mBassBoost.getStrengthSupported() && progress > 0 && progress < 1000){
+                if(mBassBoost.getStrengthSupported() && progress >= 0 && progress <= 1000){
                     mBassBoost.setStrength((short)progress);
                     mBassBoostLevel = (short)progress;
                     SharedPrefsUtil.putValue(EQActivity.this,"setting","BassBoostLevel",progress);
@@ -139,52 +196,22 @@ public class EQActivity extends BaseAppCompatActivity {
         mSeekbar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(mVirtualizer.getStrengthSupported() && progress > 0 && progress < 1000){
+                if(mVirtualizer.getStrengthSupported() && progress >= 0 && progress <= 1000){
                     mVirtualizer.setStrength((short)progress);
                     mVirtualizeLevel = (short)progress;
                     SharedPrefsUtil.putValue(EQActivity.this,"setting","VirtualizeLevel",progress);
                 }
             }
-
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
 
             }
-
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
             }
         });
 
-        //得到当前Equalizer引擎所支持的控制频率的标签数目。
-        mBandNumber = mEqualizer.getNumberOfBands();
-
-
-        //得到之前存储的每个频率的db值
-        for(int i = 0 ; i < mBandNumber; i++){
-            mBandFrequencys.add((short)(SharedPrefsUtil.getValue(this,"setting","Band" + i,0)));
-        }
-
-        //得到的最小频率
-        mMinEQLevel = mEqualizer.getBandLevelRange()[0];
-        //得到的最大频率
-        mMaxEQLevel = mEqualizer.getBandLevelRange()[1];
-        for (short i = 0; i < mBandNumber; i++) {
-            //通过标签可以顺次的获得所有支持的频率的名字比如 60Hz 230Hz
-            mCenterFres.add(mEqualizer.getCenterFreq(i) / 1000);
-        }
-
-        //获得所有预设的音效
-        for(short i = 0 ; i < mEqualizer.getNumberOfPresets() ; i++){
-            mPreSettings.put(mEqualizer.getPresetName(i),i);
-        }
-
-        //获得所有频率值
-        short temp = (short) ((mMaxEQLevel - mMinEQLevel) / 30);
-        for(short i = 0 ; i < 31; i++){
-            mBandLevels.add((short)(1500 - (i * temp)));
-        }
 
         mText = (TextView)findViewById(R.id.text);
 
@@ -196,11 +223,17 @@ public class EQActivity extends BaseAppCompatActivity {
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(!Global.getHeadsetOn() && isChecked){
+                if(isChecked == mEnable)
+                    return;
+
+                if(!Global.getHeadsetOn()){
                     Toast.makeText(EQActivity.this,"请插入耳机",Toast.LENGTH_SHORT).show();
                     mSwitch.setChecked(false);
                     return;
                 }
+                mInitialEnable = isChecked;
+                SharedPrefsUtil.putValue(EQActivity.this,"setting","InitialEnableEQ",mInitialEnable);
+                mEnable = isChecked;
                 UpdateEnable(isChecked);
             }
         });
@@ -238,13 +271,20 @@ public class EQActivity extends BaseAppCompatActivity {
 
     }
 
-    private void UpdateEnable(boolean enable) {
-
-        mSwitch.setChecked(enable);
-        mSwitch.setThumbResource(enable ? R.drawable.timer_btn_seleted_btn : R.drawable.timer_btn_normal_btn);
-        mSwitch.setTrackResource(enable ? R.drawable.timer_btn_seleted_focus : R.drawable.timer_btn_normal_focus);
+    public void UpdateEnable(boolean enable) {
         mEnable = enable;
         SharedPrefsUtil.putValue(EQActivity.this,"setting","EnableEQ",enable);
+
+        if(mSwitch != null) {
+            mSwitch.setChecked(enable);
+            mSwitch.setThumbResource(enable ? R.drawable.timer_btn_seleted_btn : R.drawable.timer_btn_normal_btn);
+            mSwitch.setTrackResource(enable ? R.drawable.timer_btn_seleted_focus : R.drawable.timer_btn_normal_focus);
+        }
+        if(mSeekbar2 != null && mSeekbar1 != null) {
+            mSeekbar1.setEnabled(mEnable);
+            mSeekbar2.setEnabled(mEnable);
+        }
+
 
         mBassBoost.setEnabled(mEnable);
         if(mBassBoost.getStrengthSupported()){
@@ -263,8 +303,6 @@ public class EQActivity extends BaseAppCompatActivity {
             mEqualizer.setBandLevel((short)i,enable ? mBandFrequencys.get(i) : 0);
         }
 
-        mSeekbar1.setEnabled(mEnable);
-        mSeekbar2.setEnabled(mEnable);
     }
 
 
@@ -301,8 +339,6 @@ public class EQActivity extends BaseAppCompatActivity {
             } catch (Exception e){
                 e.printStackTrace();
             }
-
-
         }
         @Override
         public void onStartTrackingTouch(EQSeekBar seekBar) {
@@ -327,7 +363,7 @@ public class EQActivity extends BaseAppCompatActivity {
                 for(short i = 0 ; i < mEqualizer.getNumberOfBands(); i++){
                     int temp = mEqualizer.getBandLevel(i);
                     if(temp >= mMinEQLevel && temp <= mMaxEQLevel) {
-                        //db值存储到sp
+                        //db值存储到SP
                         SharedPrefsUtil.putValue(EQActivity.this,"setting","Band" + i,temp);
                         setSeekBarProgress(mEQSeekBars.get(i),temp);
                     }
@@ -364,14 +400,33 @@ public class EQActivity extends BaseAppCompatActivity {
         setPreset(v);
     }
 
-    
-    class EnableReceiver extends BroadcastReceiver{
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals(Constants.EQENABLE_ACTION)){
-                mInitialEnable = mEnable;
-                UpdateEnable(intent.getExtras().getBoolean("IsHeadsetOn") && mInitialEnable);
-            }
-        }
+
+
+//    class EQReceiver extends BroadcastReceiver{
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            if(intent.getAction().equals(Constants.EQENABLE_ACTION)){
+//                boolean isheadsetOn = intent.getExtras().getBoolean("IsHeadsetOn");
+//                mEnable =  isheadsetOn & mInitialEnable;
+//                UpdateEnable(mEnable);
+//            }
+//        }
+//    }
+
+    public static boolean getInitialEnable(){
+        return mInitialEnable;
     }
+
+    public static boolean getEnable(){
+        return mEnable;
+    }
+
+    public static void setInitialEnable(boolean enable){
+        mInitialEnable = enable;
+    }
+
+    public static void setEnable(boolean enable){
+        mEnable = enable;
+    }
+
 }

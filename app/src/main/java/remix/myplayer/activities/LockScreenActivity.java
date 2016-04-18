@@ -257,9 +257,9 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         if(mInfo == null)
             return;
         if(!mIsLove){
-            XmlUtil.addSongToPlayList("我的收藏",mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId());
+            XmlUtil.addSongToPlayList("我的收藏",mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId(),mInfo.getArtist());
         } else {
-            XmlUtil.deleteSongFromPlayList("我的收藏",new PlayListItem(mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId()));
+            XmlUtil.deleteSongFromPlayList("我的收藏",new PlayListItem(mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId(),mInfo.getArtist()));
         }
         mIsLove = !mIsLove;
         mLoveButton.setImageResource(mIsLove ? R.drawable.wy_lock_btn_loved : R.drawable.wy_lock_btn_love);
