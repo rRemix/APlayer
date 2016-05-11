@@ -14,6 +14,9 @@ import remix.myplayer.ui.dialog.TimerDialog;
  * Created by taeja on 16-3-15.
  */
 public class ToolbarActivity extends BaseAppCompatActivity {
+    protected <T extends View> T findView(int id){
+        return (T)findViewById(id);
+    }
 
     protected void initToolbar(Toolbar toolbar,String title){
         toolbar.setTitle(title);

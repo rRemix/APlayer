@@ -210,25 +210,24 @@ public class EQSeekBar extends View {
 
 
         //使能状态轨道颜色与已完成轨道的颜色
-        mEnableTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqenabletrackcolor, Color.parseColor("#6c6a6c"));
+        mEnableTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqenabletrackcolor, Color.parseColor("#ffffff"));
         mEnableProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqenableprogresscolor, Color.parseColor("#782899"));
 
         //非使能状态轨道颜色与已完成轨道的颜色
-        mTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqtrackcolor,Color.parseColor("#6c6a6c"));
-        mProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqprogresscolor, Color.parseColor("#FFC125"));
+        mTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqtrackcolor,Color.parseColor("#ffffff"));
+        mProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqprogresscolor, Color.parseColor("#782899"));
 
         //间隔点数量
         mDotNum = typedArray.getInteger(R.styleable.EQSeekBar_eqdotnum,31);
 
         //轨道宽度
-        mTrackWidth = (int)typedArray.getDimension(R.styleable.EQSeekBar_eqtrackwidth, DensityUtil.dip2px(mContext,4));
+        mTrackWidth = (int)typedArray.getDimension(R.styleable.EQSeekBar_eqtrackwidth, DensityUtil.dip2px(mContext,2));
 
         //顶部提示文字画笔
         mFreTextSize = DensityUtil.dip2px(getContext(),13);
         mFreTextPaint = new Paint();
         mFreTextPaint.setAntiAlias(true);
-//        mFreTextPaint.setColor(Color.parseColor("#ffffffff"));
-        mFreTextPaint.setColor(Color.parseColor("#1b1c19"));
+        mFreTextPaint.setColor(Color.parseColor("#ffffffff"));
         mFreTextPaint.setStyle(Paint.Style.STROKE);
         mFreTextPaint.setTextSize(mFreTextSize);
         mFreTextPaint.setTextAlign(Paint.Align.CENTER);
@@ -237,8 +236,7 @@ public class EQSeekBar extends View {
         mTipTextSize = DensityUtil.dip2px(getContext(),14);
         mTipTextPaint = new Paint();
         mTipTextPaint.setAntiAlias(true);
-//        mTipTextPaint.setColor(Color.parseColor("#ffffffff"));
-        mTipTextPaint.setColor(Color.parseColor("#1b1c19"));
+        mTipTextPaint.setColor(Color.parseColor("#ffffffff"));
         mTipTextPaint.setStyle(Paint.Style.STROKE);
         mTipTextPaint.setTextSize(DensityUtil.dip2px(getContext(),mTipTextSize));
         mTipTextPaint.setTextAlign(Paint.Align.CENTER);
@@ -318,7 +316,7 @@ public class EQSeekBar extends View {
         if(mDB > 0)
             mDBText = "+" + mDB;
         else if(mDB < 0)
-            mDBText = "-" + mDB;
+            mDBText = mDB + "";
         else
             mDBText = "0";
 
@@ -410,6 +408,7 @@ public class EQSeekBar extends View {
             invalidate();
         }
     }
+
 
     @Override
     public void setEnabled(boolean enabled) {

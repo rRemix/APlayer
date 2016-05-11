@@ -1,6 +1,5 @@
 package remix.myplayer.activities;
 
-import android.graphics.Color;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.Virtualizer;
@@ -8,11 +7,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.SwitchCompat;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.SeekBar;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -22,16 +22,16 @@ import remix.myplayer.R;
 import remix.myplayer.application.Application;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.customviews.EQSeekBar;
+import remix.myplayer.utils.DensityUtil;
 import remix.myplayer.utils.Global;
 import remix.myplayer.utils.SharedPrefsUtil;
 
 /**
  * Created by taeja on 16-4-13.
  */
-public class EQActivity extends BaseAppCompatActivity {
+public class EQActivity extends ToolbarActivity {
     private final static String TAG = "EQActivity";
     private static Equalizer mEqualizer;
-//    private ArrayList<Short> mPreSettings = new ArrayList<>();
     public static EQActivity mInstance;
     private static short mBandNumber = -1;
     private static short mMaxEQLevel = -1;
@@ -39,7 +39,6 @@ public class EQActivity extends BaseAppCompatActivity {
     private static ArrayList<Integer> mCenterFres = new ArrayList<>();
     private static HashMap<String,Short> mPreSettings = new HashMap<>();
     private ArrayList<EQSeekBar> mEQSeekBars = new ArrayList<>();
-    private TextView mText;
     private static ArrayList<Short> mBandLevels = new ArrayList<>();
     private SwitchCompat mSwitch;
     private static ArrayList<Short> mBandFrequencys = new ArrayList<>();
@@ -47,12 +46,12 @@ public class EQActivity extends BaseAppCompatActivity {
     private static boolean mInitialEnable = false;
     private static BassBoost mBassBoost;
     private static Virtualizer mVirtualizer;
-    private SeekBar mSeekbar1;
-    private SeekBar mSeekbar2;
+
+    private Toolbar mToolBar;
     private static short mBassBoostLevel;
     private static short mVirtualizeLevel;
     private static boolean mIsRunning;
-//    private EQReceiver mEQReceiver;
+
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -60,7 +59,6 @@ public class EQActivity extends BaseAppCompatActivity {
                 int temp = mBandFrequencys.get(i);
                 setSeekBarProgress(mEQSeekBars.get(i),temp);
                 mEQSeekBars.get(i).setEnabled(mEnable);
-
             }
         }
     };
@@ -72,6 +70,7 @@ public class EQActivity extends BaseAppCompatActivity {
                 int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
                 Log.d(TAG,"AudioSessionId:" + AudioSessionId);
                 if(AudioSessionId  == 0) {
+                    Toast.makeText(Application.getContext(),"均衡器初始化失败",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 //是否启用音效设置
@@ -81,20 +80,20 @@ public class EQActivity extends BaseAppCompatActivity {
                 //EQ
                 mEqualizer = new Equalizer(0, AudioSessionId);
                 mEqualizer.setEnabled(mEnable);
-                //重低音
-                mBassBoost = new BassBoost(0,AudioSessionId);
-                mBassBoost.setEnabled(mEnable);
-                mBassBoostLevel = (short)SharedPrefsUtil.getValue(Application.getContext(),"setting","BassBoostLevel",0);
-                if(mEnable && mBassBoost.getStrengthSupported()){
-                    mBassBoost.setStrength(mBassBoostLevel);
-                }
-                //环绕音效
-                mVirtualizer = new Virtualizer(0,AudioSessionId);
-                mVirtualizeLevel = (short)SharedPrefsUtil.getValue(Application.getContext(),"setting","VirtualizeLevel",0);
-                mVirtualizer.setEnabled(mEnable);
-                if(mEnable && mVirtualizer.getStrengthSupported()){
-                    mVirtualizer.setStrength(mVirtualizeLevel);
-                }
+//                //重低音
+//                mBassBoost = new BassBoost(0,AudioSessionId);
+//                mBassBoost.setEnabled(mEnable);
+//                mBassBoostLevel = (short)SharedPrefsUtil.getValue(Application.getContext(),"setting","BassBoostLevel",0);
+//                if(mEnable && mBassBoost.getStrengthSupported()){
+//                    mBassBoost.setStrength(mBassBoostLevel);
+//                }
+//                //环绕音效
+//                mVirtualizer = new Virtualizer(0,AudioSessionId);
+//                mVirtualizeLevel = (short)SharedPrefsUtil.getValue(Application.getContext(),"setting","VirtualizeLevel",0);
+//                mVirtualizer.setEnabled(mEnable);
+//                if(mEnable && mVirtualizer.getStrengthSupported()){
+//                    mVirtualizer.setStrength(mVirtualizeLevel);
+//                }
 
                 //得到当前Equalizer引擎所支持的控制频率的标签数目。
                 mBandNumber = mEqualizer.getNumberOfBands();
@@ -107,7 +106,6 @@ public class EQActivity extends BaseAppCompatActivity {
                         mEqualizer.setBandLevel(i,temp);
                     }
                 }
-
 
                 //得到的最小频率
                 mMinEQLevel = mEqualizer.getBandLevelRange()[0];
@@ -164,56 +162,8 @@ public class EQActivity extends BaseAppCompatActivity {
 
         mInstance = this;
 
-//        mEQReceiver = new EQReceiver();
-//        registerReceiver(mEQReceiver,new IntentFilter(Constants.EQENABLE_ACTION));
-
-        mSeekbar1 = (SeekBar)findViewById(R.id.bass);
-        mSeekbar1.setProgress(mBassBoostLevel);
-        mSeekbar1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(mBassBoost.getStrengthSupported() && progress >= 0 && progress <= 1000){
-                    mBassBoost.setStrength((short)progress);
-                    mBassBoostLevel = (short)progress;
-                    SharedPrefsUtil.putValue(EQActivity.this,"setting","BassBoostLevel",progress);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-
-        mSeekbar2 = (SeekBar)findViewById(R.id.virtualizer);
-        mSeekbar2.setProgress(mVirtualizeLevel);
-        mSeekbar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(mVirtualizer.getStrengthSupported() && progress >= 0 && progress <= 1000){
-                    mVirtualizer.setStrength((short)progress);
-                    mVirtualizeLevel = (short)progress;
-                    SharedPrefsUtil.putValue(EQActivity.this,"setting","VirtualizeLevel",progress);
-                }
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-
-        mText = (TextView)findViewById(R.id.text);
+        mToolBar = (Toolbar)findViewById(R.id.toolbar);
+        initToolbar(mToolBar,"使用均衡器");
 
         //初始化switch
         mSwitch = (SwitchCompat)findViewById(R.id.eq_switch);
@@ -240,22 +190,40 @@ public class EQActivity extends BaseAppCompatActivity {
 
 
         //初始化EqSeekbar
-        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar1));
-        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar2));
-        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar3));
-        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar4));
-        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar5));
+//        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar1));
+//        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar2));
+//        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar3));
+//        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar4));
+//        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar5));
 
-        for(int i = 0 ; i < mEQSeekBars.size() ;i++){
-            EQSeekBar eqSeekBar = mEQSeekBars.get(i);
+        LinearLayout EQContainer = (LinearLayout)findViewById(R.id.eq_container);
+
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams( DensityUtil.dip2px(this,30),ViewGroup.LayoutParams.MATCH_PARENT);
+        lp.setMargins(DensityUtil.dip2px(this,20),0,DensityUtil.dip2px(this,20),0);
+        for(int i = 0 ; i < mBandNumber ;i++){
+            EQSeekBar eqSeekBar = new EQSeekBar(this);
+            eqSeekBar.setLayoutParams(lp);
+
             eqSeekBar.setOnSeekBarChangeListener(new EQSeekbarOnChangeListener());
             eqSeekBar.setMax(mMaxEQLevel - mMinEQLevel);
             eqSeekBar.setTag(mCenterFres.get(i));
             int fre_temp = mCenterFres.get(i);
             String hz = fre_temp > 1000 ?  fre_temp / 1000 + "K" : fre_temp + "";
             eqSeekBar.setFreText(hz);
-
+            mEQSeekBars.add(eqSeekBar);
+            EQContainer.addView(eqSeekBar);
         }
+
+//        for(int i = 0 ; i < mEQSeekBars.size() ;i++){
+//            EQSeekBar eqSeekBar = mEQSeekBars.get(i);
+//            eqSeekBar.setOnSeekBarChangeListener(new EQSeekbarOnChangeListener());
+//            eqSeekBar.setMax(mMaxEQLevel - mMinEQLevel);
+//            eqSeekBar.setTag(mCenterFres.get(i));
+//            int fre_temp = mCenterFres.get(i);
+//            String hz = fre_temp > 1000 ?  fre_temp / 1000 + "K" : fre_temp + "";
+//            eqSeekBar.setFreText(hz);
+//        }
 
         new Thread(){
             @Override
@@ -280,38 +248,21 @@ public class EQActivity extends BaseAppCompatActivity {
             mSwitch.setThumbResource(enable ? R.drawable.timer_btn_seleted_btn : R.drawable.timer_btn_normal_btn);
             mSwitch.setTrackResource(enable ? R.drawable.timer_btn_seleted_focus : R.drawable.timer_btn_normal_focus);
         }
-        if(mSeekbar2 != null && mSeekbar1 != null) {
-            mSeekbar1.setEnabled(mEnable);
-            mSeekbar2.setEnabled(mEnable);
-        }
-
-
-        mBassBoost.setEnabled(mEnable);
-        if(mBassBoost.getStrengthSupported()){
-            mBassBoost.setStrength(mEnable ? mBassBoostLevel : 0);
-        }
-
-        mVirtualizer.setEnabled(mEnable);
-        if(mVirtualizer.getStrengthSupported()){
-            mVirtualizer.setStrength(mEnable ? mVirtualizeLevel : 0);
-        }
+//        mBassBoost.setEnabled(mEnable);
+//        if(mBassBoost.getStrengthSupported()){
+//            mBassBoost.setStrength(mEnable ? mBassBoostLevel : 0);
+//        }
+//
+//        mVirtualizer.setEnabled(mEnable);
+//        if(mVirtualizer.getStrengthSupported()){
+//            mVirtualizer.setStrength(mEnable ? mVirtualizeLevel : 0);
+//        }
 
         mEqualizer.setEnabled(mEnable);
         for(int i = 0 ; i < mEQSeekBars.size() ;i++){
             mEQSeekBars.get(i).setEnabled(enable);
-            mEQSeekBars.get(i).setProgressColor(enable ?  Color.parseColor("#782899") :Color.parseColor("#FFC125"));
             mEqualizer.setBandLevel((short)i,enable ? mBandFrequencys.get(i) : 0);
         }
-
-    }
-
-
-    private void UpdateText(){
-        StringBuilder stringBuilder = new StringBuilder();
-        for (short i = 0; i < mEqualizer.getNumberOfBands(); i++) {
-            stringBuilder.append((mEqualizer.getCenterFreq(i) / 1000) + "Hz:  " + mEqualizer.getBandLevel(i) + " ");
-        }
-        mText.setText(stringBuilder.toString());
     }
 
     class EQSeekbarOnChangeListener implements EQSeekBar.OnSeekBarChangeListener{
@@ -335,7 +286,6 @@ public class EQActivity extends BaseAppCompatActivity {
                         break;
                     }
                 }
-                UpdateText();
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -349,32 +299,6 @@ public class EQActivity extends BaseAppCompatActivity {
     }
 
 
-    private void setPreset(View v) {
-        if(!mEnable)
-            return;
-        String tag = v.getTag().toString();
-        try {
-            if(tag != null && !tag.equals("")) {
-                short preset = mPreSettings.get(tag);
-                if (preset >= 0 && preset < mPreSettings.size())
-                    //应用预设音效
-                    mEqualizer.usePreset(preset);
-                //设置每个频率的DB值
-                for(short i = 0 ; i < mEqualizer.getNumberOfBands(); i++){
-                    int temp = mEqualizer.getBandLevel(i);
-                    if(temp >= mMinEQLevel && temp <= mMaxEQLevel) {
-                        //db值存储到SP
-                        SharedPrefsUtil.putValue(EQActivity.this,"setting","Band" + i,temp);
-                        setSeekBarProgress(mEQSeekBars.get(i),temp);
-                    }
-                }
-            }
-            UpdateText();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
     private void setSeekBarProgress(EQSeekBar seekBar,int frequency){
         if(frequency <= mBandLevels.get(mBandLevels.size() / 2))
             frequency = mMaxEQLevel - frequency;
@@ -383,50 +307,73 @@ public class EQActivity extends BaseAppCompatActivity {
         seekBar.setProgress(frequency);
     }
 
-    public void onRock(View v){
-        setPreset(v);
+    //重置音效设置
+    public void onReset(View v){
+        if(!Global.getHeadsetOn()){
+            Toast.makeText(EQActivity.this,"请插入耳机",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mInitialEnable = true;
+        SharedPrefsUtil.putValue(EQActivity.this,"setting","InitialEnableEQ",mInitialEnable);
+        UpdateEnable(true);
+        for(short i = 0 ; i < mEQSeekBars.size() ;i++){
+            //设置db值
+            mEqualizer.setBandLevel(i,(short) 0);
+            //db值存储到sp
+            SharedPrefsUtil.putValue(EQActivity.this,"setting","Band" + i,(short)0 );
+            //设置seekbar进度
+            setSeekBarProgress(mEQSeekBars.get(i),0);
+        }
     }
-
-
-    public void onPop(View v){
-        setPreset(v);
-    }
-
-    public void onClassical(View v){
-        setPreset(v);
-    }
-
-    public void onBass(View v){
-        setPreset(v);
-    }
-
-
-
-//    class EQReceiver extends BroadcastReceiver{
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            if(intent.getAction().equals(Constants.EQENABLE_ACTION)){
-//                boolean isheadsetOn = intent.getExtras().getBoolean("IsHeadsetOn");
-//                mEnable =  isheadsetOn & mInitialEnable;
-//                UpdateEnable(mEnable);
-//            }
-//        }
-//    }
 
     public static boolean getInitialEnable(){
         return mInitialEnable;
     }
 
-    public static boolean getEnable(){
-        return mEnable;
-    }
-
-    public static void setInitialEnable(boolean enable){
-        mInitialEnable = enable;
-    }
-
     public static void setEnable(boolean enable){
         mEnable = enable;
     }
+
+//    private void setPreset(View v) {
+//        if(!mEnable)
+//            return;
+//        String tag = v.getTag().toString();
+//        try {
+//            if(tag != null && !tag.equals("")) {
+//                short preset = mPreSettings.get(tag);
+//                if (preset >= 0 && preset < mPreSettings.size())
+//                    //应用预设音效
+//                    mEqualizer.usePreset(preset);
+//                //设置每个频率的DB值
+//                for(short i = 0 ; i < mEqualizer.getNumberOfBands(); i++){
+//                    int temp = mEqualizer.getBandLevel(i);
+//                    if(temp >= mMinEQLevel && temp <= mMaxEQLevel) {
+//                        //db值存储到SP
+//                        SharedPrefsUtil.putValue(EQActivity.this,"setting","Band" + i,temp);
+//                        setSeekBarProgress(mEQSeekBars.get(i),temp);
+//                    }
+//                }
+//            }
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        }
+//    }
+
+//    public void onRock(View v){
+//        setPreset(v);
+//    }
+//
+//
+//    public void onPop(View v){
+//        setPreset(v);
+//    }
+//
+//    public void onClassical(View v){
+//        setPreset(v);
+//    }
+//
+//    public void onBass(View v){
+//        setPreset(v);
+//    }
 
 }

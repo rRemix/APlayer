@@ -1,165 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_color_3">
 
-
-    <LinearLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="是否开启音效设置"/>
-        <android.support.v7.widget.SwitchCompat
-            android:background="@color/transparent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textOn=""
-            android:textOff=""
-            android:id="@+id/eq_switch"
-            android:thumb="@drawable/timer_btn_normal_btn"
-            android:track="@drawable/timer_btn_normal_focus" />
-    </LinearLayout>
-
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:orientation="horizontal">
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onPop"
-            android:text="流行"
-            android:tag="Pop"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onRock"
-            android:text="摇滚"
-            android:tag="Rock"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onClassical"
-            android:text="古典"
-            android:tag="Classical"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onBass"
-            android:text="重金属"
-            android:tag="Heavy Metal"/>
-
-    </LinearLayout>
-
-    <TextView
+        android:layout_height="?attr/actionBarSize">
+    <android.support.v7.widget.SwitchCompat
+        android:background="@color/transparent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/text"/>
+        android:textOn=""
+        android:textOff=""
+        android:id="@+id/eq_switch"
+        android:thumb="@drawable/timer_btn_normal_btn"
+        android:track="@drawable/timer_btn_normal_focus"
+        android:layout_gravity="right"
+        android:layout_marginRight="16dp"/>
+    </android.support.v7.widget.Toolbar>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="重低音"/>
-        <SeekBar
-            android:id="@+id/bass"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:max="1000"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="环绕音效"/>
-        <SeekBar
-            android:id="@+id/virtualizer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:max="1000"/>
-    </LinearLayout>
+        android:layout_height="16dp"
+        android:background="@color/background_color_interval"/>
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="5dp"-->
+        <!--android:orientation="horizontal">-->
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="onPop"-->
+            <!--android:text="流行"-->
+            <!--android:textColor="@color/text_color_white"-->
+            <!--android:tag="Pop"/>-->
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="onRock"-->
+            <!--android:text="摇滚"-->
+            <!--android:textColor="@color/text_color_white"-->
+            <!--android:tag="Rock"/>-->
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="onClassical"-->
+            <!--android:text="古典"-->
+            <!--android:textColor="@color/text_color_white"-->
+            <!--android:tag="Classical"/>-->
+        <!--<Button-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="onBass"-->
+            <!--android:text="重金属"-->
+            <!--android:textColor="@color/text_color_white"-->
+            <!--android:tag="Heavy Metal"/>-->
+
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal">-->
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="重低音"-->
+            <!--android:textColor="@color/text_color_white"/>-->
+        <!--<SeekBar-->
+            <!--android:id="@+id/bass"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:max="1000"/>-->
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="环绕音效"/>-->
+        <!--<SeekBar-->
+            <!--android:id="@+id/virtualizer"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:max="1000"/>-->
+    <!--</LinearLayout>-->
 
     <LinearLayout
+        android:id="@+id/eq_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
+        android:layout_height="0dp"
+        android:layout_weight="9"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:orientation="horizontal">
-        <remix.myplayer.ui.customviews.EQSeekBar
-            android:id="@+id/EQSeekbar1"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            app:eqthumb="@drawable/bg_thumb"
-            app:eqtrackwidth="2dp"
-            app:eqenabletrackcolor="#6c6a6c"
-            app:eqenableprogresscolor="#782899"
-            app:eqtrackcolor="#6c6a6c"
-            app:eqprogresscolor="#FFC125"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"/>
 
-        <remix.myplayer.ui.customviews.EQSeekBar
-            android:id="@+id/EQSeekbar2"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            app:eqthumb="@drawable/bg_thumb"
-            app:eqtrackwidth="2dp"
-            app:eqenabletrackcolor="#6c6a6c"
-            app:eqenableprogresscolor="#782899"
-            app:eqtrackcolor="#6c6a6c"
-            app:eqprogresscolor="#FFC125"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"/>
-
-        <remix.myplayer.ui.customviews.EQSeekBar
-            android:id="@+id/EQSeekbar3"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            app:eqthumb="@drawable/bg_thumb"
-            app:eqtrackwidth="2dp"
-            app:eqenabletrackcolor="#6c6a6c"
-            app:eqenableprogresscolor="#782899"
-            app:eqtrackcolor="#6c6a6c"
-            app:eqprogresscolor="#FFC125"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"/>
-
-        <remix.myplayer.ui.customviews.EQSeekBar
-            android:id="@+id/EQSeekbar4"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            app:eqthumb="@drawable/bg_thumb"
-            app:eqtrackwidth="2dp"
-            app:eqenabletrackcolor="#6c6a6c"
-            app:eqenableprogresscolor="#782899"
-            app:eqtrackcolor="#6c6a6c"
-            app:eqprogresscolor="#FFC125"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"/>
-
-        <remix.myplayer.ui.customviews.EQSeekBar
-            android:background="#000"
-            android:id="@+id/EQSeekbar5"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            app:eqthumb="@drawable/bg_thumb"
-            app:eqtrackwidth="2dp"
-            app:eqenabletrackcolor="#6c6a6c"
-            app:eqenableprogresscolor="#782899"
-            app:eqtrackcolor="#6c6a6c"
-            app:eqprogresscolor="#FFC125"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"/>
     </LinearLayout>
 
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:onClick="onReset"
+        android:layout_marginBottom="20dp"
+        android:layout_gravity="center"
+        android:text="重置"
+        android:textColor="@color/text_color_white"
+        android:textSize="@dimen/textsize_large"
+        android:background="@drawable/bg_btn_corner"/>
 </LinearLayout>

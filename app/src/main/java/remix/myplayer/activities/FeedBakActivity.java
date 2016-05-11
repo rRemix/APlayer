@@ -32,7 +32,7 @@ public class FeedBakActivity extends ToolbarActivity {
     }
 
     public void onSubmit(View v){
-        Intent data=new Intent(Intent.ACTION_SENDTO);
+        Intent data = new Intent(Intent.ACTION_SENDTO);
         data.setData(Uri.parse("mailto:568920427@qq.com"));
         data.putExtra(Intent.EXTRA_SUBJECT, "APlayer意见与反馈");
         data.putExtra(Intent.EXTRA_TEXT, mEditText.getText().toString());
