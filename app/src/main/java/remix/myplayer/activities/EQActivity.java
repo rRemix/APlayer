@@ -188,16 +188,7 @@ public class EQActivity extends ToolbarActivity {
             }
         });
 
-
-        //初始化EqSeekbar
-//        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar1));
-//        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar2));
-//        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar3));
-//        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar4));
-//        mEQSeekBars.add((EQSeekBar)findViewById(R.id.EQSeekbar5));
-
         LinearLayout EQContainer = (LinearLayout)findViewById(R.id.eq_container);
-
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams( DensityUtil.dip2px(this,30),ViewGroup.LayoutParams.MATCH_PARENT);
         lp.setMargins(DensityUtil.dip2px(this,20),0,DensityUtil.dip2px(this,20),0);
@@ -215,15 +206,6 @@ public class EQActivity extends ToolbarActivity {
             EQContainer.addView(eqSeekBar);
         }
 
-//        for(int i = 0 ; i < mEQSeekBars.size() ;i++){
-//            EQSeekBar eqSeekBar = mEQSeekBars.get(i);
-//            eqSeekBar.setOnSeekBarChangeListener(new EQSeekbarOnChangeListener());
-//            eqSeekBar.setMax(mMaxEQLevel - mMinEQLevel);
-//            eqSeekBar.setTag(mCenterFres.get(i));
-//            int fre_temp = mCenterFres.get(i);
-//            String hz = fre_temp > 1000 ?  fre_temp / 1000 + "K" : fre_temp + "";
-//            eqSeekBar.setFreText(hz);
-//        }
 
         new Thread(){
             @Override
@@ -316,6 +298,8 @@ public class EQActivity extends ToolbarActivity {
         mInitialEnable = true;
         SharedPrefsUtil.putValue(EQActivity.this,"setting","InitialEnableEQ",mInitialEnable);
         UpdateEnable(true);
+        if(mBandFrequencys != null)
+            mBandFrequencys.clear();
         for(short i = 0 ; i < mEQSeekBars.size() ;i++){
             //设置db值
             mEqualizer.setBandLevel(i,(short) 0);
@@ -323,6 +307,8 @@ public class EQActivity extends ToolbarActivity {
             SharedPrefsUtil.putValue(EQActivity.this,"setting","Band" + i,(short)0 );
             //设置seekbar进度
             setSeekBarProgress(mEQSeekBars.get(i),0);
+            //存储每个频率的db值到内存
+            mBandFrequencys.add((short)0);
         }
     }
 
