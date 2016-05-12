@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -22,21 +23,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.sina.weibo.sdk.api.share.Base;
-
-import java.util.ArrayList;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.BaseActivity;
 import remix.myplayer.activities.BaseAppCompatActivity;
-import remix.myplayer.activities.ChildHolderActivity;
-import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.infos.MP3Info;
-import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.ui.customviews.CircleImageView;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.DensityUtil;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -140,45 +133,63 @@ public class OptionDialog extends BaseAppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    String title = mIsDeletePlayList ? "确认从播放列表移除?" : "确认删除?";
-                    new AlertDialog.Builder(OptionDialog.this)
-                            .setTitle(title)
-                            .setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    String result = "";
-                                    if(!mIsDeletePlayList){
-                                        result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE) == true ? "删除成功" : "删除失败";
-                                    } else {
-                                        result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ? "删除成功" : "删除失败";
-                                    }
-                                    Toast.makeText(OptionDialog.this,result,Toast.LENGTH_SHORT).show();
-                                    finish();
-                                }
-                            })
-                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    finish();
-                                }
-                            }).create().show();
+                    String title = mIsDeletePlayList ? "确认从播放列表移除?" : "确认从曲库删除?";
+
+//                    AlertDialog alertDialog = new AlertDialog.Builder(OptionDialog.this)
+//                            .setTitle(title)
+//                            .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    String result = "";
+//                                    if(!mIsDeletePlayList){
+//                                        result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE) == true ? "删除成功" : "删除失败";
+//                                    } else {
+//                                        result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ? "删除成功" : "删除失败";
+//                                    }
+//                                    Toast.makeText(OptionDialog.this,result,Toast.LENGTH_SHORT).show();
+//                                    finish();
+//                                }
+//                            })
+//                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                }
+//                            }).create();
+//                    alertDialog.show();
+
+
+                    View delete = LayoutInflater.from(OptionDialog.this).inflate(R.layout.popup_delete,null);
+                    ((TextView)delete.findViewById(R.id.delete_title)).setText(title);
+                    delete.findViewById(R.id.delete_cancel).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            finish();
+                        }
+                    });
+                    delete.findViewById(R.id.delete_confirm).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String result = "";
+                            if(!mIsDeletePlayList){
+                                result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE) == true ? "删除成功" : "删除失败";
+                            } else {
+                                result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ? "删除成功" : "删除失败";
+                            }
+                            Toast.makeText(OptionDialog.this,result,Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    });
+
+                    AlertDialog alertDialog = new AlertDialog.Builder(OptionDialog.this).setView(delete).create();
+                    alertDialog.show();
+
                 } catch (Exception e){
                     e.printStackTrace();
                 }
 
-//                String result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE) == true ? "删除成功" : "删除失败";
-//                Toast.makeText(OptionDialog.this,result,Toast.LENGTH_SHORT).show();
-//                finish();
-
-
             }
         });
-//        mCancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                finish();
-//            }
-//        });
+
     }
 
 

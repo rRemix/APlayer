@@ -9,9 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.widget.LinearLayout;
 import android.widget.RemoteViews;
-import android.widget.RemoteViewsService;
 
 import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
@@ -43,17 +41,23 @@ public class NotifyReceiver extends BroadcastReceiver {
         boolean isBig = context.getResources().getDisplayMetrics().widthPixels >= 1000;
 
         mRemoteView = new RemoteViews(context.getPackageName(), isBig ? R.layout.notify_playbar_big : R.layout.notify_playbar);
-//        boolean isSystemColor = SharedPrefsUtil.getValue(context,"setting","IsSystemColor",true);
-//        mRemoteView.setImageViewResource(R.id.notify_container,isSystemColor ? R.drawable.notifbar_btn_stop : R.drawable.notifbar_btn_stop);
 
         if(frommainactivity && !MusicService.getIsplay())
             return;
         
         if((MusicService.getCurrentMP3() != null)) {
+            boolean isSystemColor = SharedPrefsUtil.getValue(context,"setting","IsSystemColor",true);
+
             MP3Info temp = MusicService.getCurrentMP3();
             //设置歌手，歌曲名
             mRemoteView.setTextViewText(R.id.notify_song, temp.getDisplayname());
-            mRemoteView.setTextViewText(R.id.notify_artist_album, temp.getArtist() + "-" + temp.getAlbum());
+            mRemoteView.setTextColor( R.id.notify_song,isSystemColor ?
+                    context.getResources().getColor(R.color.text_color_white)
+                    : context.getResources().getColor(R.color.text_color_black));
+            mRemoteView.setTextViewText(R.id.notify_artist_album, temp.getArtist() + " - " + temp.getAlbum());
+
+            //背景
+            mRemoteView.setImageViewResource(R.id.notify_bg,isSystemColor ? R.drawable.bg_system : R.drawable.bg_white);
 
             //设置封面
             Bitmap bitmap = DBUtil.CheckBitmapBySongId((int) temp.getId(), true);
@@ -63,9 +67,9 @@ public class NotifyReceiver extends BroadcastReceiver {
                 mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.default_recommend);
             //设置播放按钮
             if(!mIsplay){
-                mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notifbar_btn_play);
+                mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notify_play);
             }else{
-                mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notifbar_btn_stop);
+                mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notify_pause);
             }
 
             //添加Action

@@ -1,94 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-    android:orientation="horizontal"
-    android:id="@+id/notify_container"
-    android:background="#000000">
+    android:orientation="horizontal">
+
     <ImageView
-        android:id="@+id/notify_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginLeft="5dp"
-        android:layout_centerVertical="true"
-        android:src="@drawable/default_recommend"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/notify_bg"
+        android:scaleType="fitXY"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingLeft="10dp"
-        android:gravity="center_vertical">
-        <!--歌曲名与关闭按钮-->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="10dp">
-            <TextView
-                android:id="@+id/notify_song"
-                android:text="歌曲名"
-                android:layout_width="190dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:lines="1"
-                android:ellipsize="end"
-                android:textColor="@color/text_color_white"
-                android:textSize="@dimen/textsize_large"/>
-            <ImageButton
-                android:id="@+id/notify_close"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/transparent"
-                android:layout_marginRight="12dp"
-                android:src="@drawable/notify_btn_close_white"/>
-        </RelativeLayout>
-        <!--歌手与专辑-->
+        android:orientation="horizontal"
+        android:id="@+id/notify_container">
+        <ImageView
+            android:id="@+id/notify_image"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:src="@drawable/default_recommend"/>
 
-        <TextView
-            android:id="@+id/notify_artist_album"
-            android:text="歌手名"
-            android:layout_width="190dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="10dp"
-            android:lines="1"
-            android:ellipsize="end"
-            android:textSize="@dimen/textsize_medium"
-            android:textColor="@color/text_color_gray"/>
-
-        <!--三个控制按钮-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center">
-            <ImageButton
-                android:id="@+id/notify_prev"
-                android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:gravity="center_vertical">
+            <!--歌曲名与关闭按钮-->
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/transparent"
-                android:src="@drawable/notifbar_btn_normal_prev" />
-            <ImageButton
-                android:id="@+id/notify_play"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/transparent"
-                android:src="@drawable/notifbar_btn_play"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"/>
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp">
+                <TextView
+                    android:id="@+id/notify_song"
+                    android:text="歌曲名"
+                    android:layout_width="190dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:lines="1"
+                    android:ellipsize="end"
+                    android:textColor="@color/text_color_white"
+                    android:textSize="@dimen/textsize_large"/>
+                <ImageButton
+                    android:id="@+id/notify_close"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:layout_marginRight="12dp"
+                    android:src="@drawable/notify_btn_close_white"/>
+            </RelativeLayout>
+            <!--歌手与专辑-->
 
-            <ImageButton
-                android:id="@+id/notify_next"
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/notify_artist_album"
+                android:text="歌手名"
+                android:layout_width="190dp"
                 android:layout_height="wrap_content"
-                android:background="@color/transparent"
-                android:src="@drawable/notifbar_btn_normal_next"/>
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="10dp"
+                android:lines="1"
+                android:ellipsize="end"
+                android:textSize="@dimen/textsize_medium"
+                android:textColor="@color/text_color_gray"/>
+
+            <!--三个控制按钮-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/notify_prev"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@color/transparent"
+                    android:src="@drawable/notify_prev" />
+                <ImageButton
+                    android:id="@+id/notify_play"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:src="@drawable/notify_play"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="25dp"/>
+
+                <ImageButton
+                    android:id="@+id/notify_next"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@color/transparent"
+                    android:src="@drawable/notify_next"/>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
-
-</LinearLayout>
+</FrameLayout>
