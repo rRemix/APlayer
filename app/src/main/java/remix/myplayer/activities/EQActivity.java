@@ -163,7 +163,7 @@ public class EQActivity extends ToolbarActivity {
         mInstance = this;
 
         mToolBar = (Toolbar)findViewById(R.id.toolbar);
-        initToolbar(mToolBar,"使用均衡器");
+        initToolbar(mToolBar,getString(R.string.use_eq));
 
         //初始化switch
         mSwitch = (SwitchCompat)findViewById(R.id.eq_switch);
@@ -177,7 +177,7 @@ public class EQActivity extends ToolbarActivity {
                     return;
 
                 if(!Global.getHeadsetOn()){
-                    Toast.makeText(EQActivity.this,"请插入耳机",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EQActivity.this,getString(R.string.plz_earphone),Toast.LENGTH_SHORT).show();
                     mSwitch.setChecked(false);
                     return;
                 }
@@ -292,7 +292,7 @@ public class EQActivity extends ToolbarActivity {
     //重置音效设置
     public void onReset(View v){
         if(!Global.getHeadsetOn()){
-            Toast.makeText(EQActivity.this,"请插入耳机",Toast.LENGTH_SHORT).show();
+            Toast.makeText(EQActivity.this,getString(R.string.plz_earphone),Toast.LENGTH_SHORT).show();
             return;
         }
         mInitialEnable = true;

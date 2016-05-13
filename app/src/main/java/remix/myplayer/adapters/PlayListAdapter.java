@@ -101,7 +101,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
 
             if(holder.mButton != null) {
                 //我的收藏列表，不能删除
-                if(name.equals("我的收藏")){
+                if(name.equals(mContext.getString(R.string.my_favorite))){
                     holder.mButton.setImageResource(R.drawable.rcd_icn_love);
                     holder.mButton.setClickable(false);
                     holder.mButton.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));

@@ -37,6 +37,7 @@ public class SettingActivity extends ToolbarActivity {
     private Toolbar mToolBar;
     private ImageView mSystem;
     private ImageView mWhite;
+    private AlertDialog mAlertDialog;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,8 +73,8 @@ public class SettingActivity extends ToolbarActivity {
                             notifycolor.findViewById(R.id.notifycolor_system).setOnClickListener(listener);
                             notifycolor.findViewById(R.id.notifycolor_white).setOnClickListener(listener);
 
-                            AlertDialog alertDialog = new AlertDialog.Builder(SettingActivity.this).setView(notifycolor).create();
-                            alertDialog.show();
+                            mAlertDialog = new AlertDialog.Builder(SettingActivity.this).setView(notifycolor).create();
+                            mAlertDialog.show();
                         } catch (Exception e){
                             e.printStackTrace();
                         }
@@ -109,6 +110,9 @@ public class SettingActivity extends ToolbarActivity {
             SharedPrefsUtil.putValue(SettingActivity.this,"setting","IsSystemColor",isSystem);
             //更新通知栏
             sendBroadcast(new Intent(Constants.NOTIFY));
+            if(mAlertDialog != null && mAlertDialog.isShowing()){
+                mAlertDialog.dismiss();
+            }
         }
     }
 

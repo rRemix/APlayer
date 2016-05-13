@@ -70,7 +70,7 @@
                 android:layout_marginLeft="12dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="来自APlayer播放器"
+                android:text="@string/from_aplayer"
                 android:layout_gravity="center_vertical"
                 android:textColor="#a09f9d"
                 android:textSize="@dimen/textsize_medium"/>

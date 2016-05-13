@@ -314,7 +314,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     private class BaseUiListener implements IUiListener {
         @Override
         public void onComplete(Object o) {
-            Toast.makeText(ShareDialog.this,"分享成功",Toast.LENGTH_SHORT).show();
+            Toast.makeText(ShareDialog.this,getString(R.string.share_success),Toast.LENGTH_SHORT).show();
 //            if(RecordShareActivity.mInstance != null){
 //                RecordShareActivity.mInstance.finish();
 //            }
@@ -323,7 +323,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
 
         @Override
         public void onError(UiError uiError) {
-            Toast.makeText(ShareDialog.this,"分享失败",Toast.LENGTH_SHORT).show();
+            Toast.makeText(ShareDialog.this,getString(R.string.share_error),Toast.LENGTH_SHORT).show();
 //            if(RecordShareActivity.mInstance != null){
 //                RecordShareActivity.mInstance.finish();
 //            }
@@ -331,7 +331,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         }
         @Override
         public void onCancel() {
-            Toast.makeText(ShareDialog.this,"分享取消",Toast.LENGTH_SHORT).show();
+            Toast.makeText(ShareDialog.this,getString(R.string.share_cancel),Toast.LENGTH_SHORT).show();
 //            if(RecordShareActivity.mInstance != null){
 //                RecordShareActivity.mInstance.finish();
 //            }

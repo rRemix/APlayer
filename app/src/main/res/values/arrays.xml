@@ -12,4 +12,6 @@
         <item>@integer/Refush</item>
         <item>@integer/Exit</item>
     </integer-array>
+
+    <integer name="ActivityAnimDuration">350</integer>
 </resources>

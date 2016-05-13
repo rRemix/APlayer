@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/textsize_small"
                 android:textColor="@color/text_color_white"
-                android:text="APlayer V1.1.0"
+                android:text="@string/version"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"/>
             <ImageView

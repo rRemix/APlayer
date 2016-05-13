@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import remix.myplayer.R;
 import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.activities.EQActivity;
@@ -486,7 +487,7 @@ public class MusicService extends BaseService {
         mInfo = DBUtil.getMP3InfoById(mId);
         if(mInfo == null) {
             mInfo = temp;
-            Toast.makeText(mContext,"歌曲已失效",Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,getString(R.string.song_lose_effect),Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -525,14 +526,19 @@ public class MusicService extends BaseService {
     public class ControlReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            int Control = intent.getIntExtra("Control",-1);
+            //保存控制命令,用于播放界面判断动画
+            AudioHolderActivity.mOperation = Control;
+
+            //先判断是否是关闭通知栏
             if(intent.getExtras().getBoolean("Close")){
                 NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                 manager.cancel(0);
                 Pause();
+                Update(Control);
                 return;
             }
 
-            int Control = intent.getIntExtra("Control",-1);
             switch (Control) {
                 //播放listview选中的歌曲
                 case Constants.PLAYSELECTEDSONG:
@@ -574,27 +580,28 @@ public class MusicService extends BaseService {
                     mPlayModel = Constants.PLAY_REPEATONE;
                 default:break;
             }
-            //保存控制命令,用于播放界面判断动画
-            AudioHolderActivity.mOperation = Control;
 
-            if(Control != Constants.PLAY_LOOP &&
-                    Control != Constants.PLAY_SHUFFLE &&
-                    Control != Constants.PLAY_REPEATONE) {
-                //更新相关activity
-                mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
-                //更新锁屏界面
-                UpdateLockScreen();
-                //更新通知栏
-                sendBroadcast(new Intent(Constants.NOTIFY));
-            }
+            Update(Control);
+
         }
     }
 
-
-//    private void setPlayModel(int playModel){
-//        mPlayModel = playModel;
-//
-//    }
+    /**
+     * 更新
+     * @param control
+     */
+    private void Update(int control){
+        if(control != Constants.PLAY_LOOP &&
+                control != Constants.PLAY_SHUFFLE &&
+                control != Constants.PLAY_REPEATONE) {
+            //更新相关activity
+            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
+            //更新锁屏界面
+            UpdateLockScreen();
+            //更新通知栏
+            sendBroadcast(new Intent(Constants.NOTIFY));
+        }
+    }
 
     /**
      * 准备播放
@@ -662,7 +669,7 @@ public class MusicService extends BaseService {
         mInfo = DBUtil.getMP3InfoById(mId);
         if(mInfo == null) {
             mInfo = temp;
-            Toast.makeText(mContext,"歌曲已失效",Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext,getString(R.string.song_lose_effect),Toast.LENGTH_SHORT).show();
             return;
         }
         mIsplay = true;

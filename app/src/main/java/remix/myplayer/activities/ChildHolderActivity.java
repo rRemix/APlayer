@@ -109,9 +109,9 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         if(mType != Constants.FOLDER_HOLDER) {
             if(mArg.indexOf("unknown") > 0){
                 if(mType == Constants.ARTIST_HOLDER)
-                    mTitle.setText("未知艺术家");
+                    mTitle.setText(getString(R.string.unknow_artist));
                 else if(mType == Constants.ALBUM_HOLDER){
-                    mTitle.setText("未知专辑");
+                    mTitle.setText(getString(R.string.unknow_album));
                 }
             } else {
                 mTitle.setText(mArg);

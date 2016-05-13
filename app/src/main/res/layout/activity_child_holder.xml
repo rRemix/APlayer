@@ -50,7 +50,7 @@
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="随机播放全部"
+            android:text="@string/play_random"
             android:layout_marginLeft="72dp"/>
     </RelativeLayout>
 

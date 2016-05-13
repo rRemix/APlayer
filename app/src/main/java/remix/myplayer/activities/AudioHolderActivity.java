@@ -248,7 +248,8 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 mPlayModel.setBackground(getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
                         currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.bg_btn_holder_playmodel_shuffle :
                                 R.drawable.bg_btn_holder_playmodel_repeat));
-                String msg = currentmodel == Constants.PLAY_LOOP ? "顺序播放" : currentmodel == Constants.PLAY_SHUFFLE ? "随机播放" : "单曲播放";
+                String msg = currentmodel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
+                        currentmodel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
                 Toast.makeText(AudioHolderActivity.this, msg, Toast.LENGTH_SHORT).show();
             }
         });
@@ -368,7 +369,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         String album =  mp3Info.getAlbum() == null ? "" : mp3Info.getAlbum();
 
         if(title.equals(""))
-            mTopTitle.setText("未知歌曲");
+            mTopTitle.setText(getString(R.string.unknow_song));
         else
             mTopTitle.setText(title);
         if(artist.equals(""))

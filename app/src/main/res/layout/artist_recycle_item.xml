@@ -38,12 +38,12 @@
                 android:textSize="@dimen/textsize_medium"/>
             <ImageButton
                 android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_height="match_parent"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:id="@+id/recycleview_button"
                 android:src="@drawable/list_icn_more"
-                android:background="@drawable/bg_btn_gray_selector"/>
+                android:background="?android:attr/selectableItemBackground"/>
             <!--android:background="@drawable/list_icn_more" />-->
         </RelativeLayout>
     </RelativeLayout>

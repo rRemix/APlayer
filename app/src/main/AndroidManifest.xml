@@ -28,13 +28,12 @@
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/ActivityStyle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
 
         <activity android:name=".activities.AudioHolderActivity"
             android:theme="@style/AudioHolderStyle"
@@ -45,23 +44,41 @@
         </activity>
 
 
-        <activity android:name=".activities.SearchActivity"/>
+        <activity android:name=".activities.SearchActivity"
+            android:theme="@style/ActivityStyle"/>
 
         <activity android:name=".activities.PlayListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/ActivityStyle">
         </activity>
+
+        <activity android:name=".activities.ChildHolderActivity"
+            android:theme="@style/ActivityStyle"/>
+
+        <activity android:name=".activities.RecordShareActivity"/>
+
+        <activity android:name=".activities.AboutActivity"
+            android:theme="@style/ActivityStyle"/>
+
+        <activity android:name=".activities.RecetenlyActivity"
+            android:theme="@style/ActivityStyle"/>
+
+        <activity android:name=".activities.SettingActivity"
+            android:theme="@style/ActivityStyle"/>
+
+        <activity android:name=".activities.FeedBakActivity"
+            android:theme="@style/ActivityStyle"/>
+
+        <activity android:name=".activities.ScanActivity"
+            android:theme="@style/ActivityStyle"/>
+
+        <activity android:name=".activities.EQActivity"
+            android:theme="@style/ActivityStyle"/>
 
         <activity android:name=".activities.LockScreenActivity"
             android:theme="@style/LockScreenDialog"
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleInstance"/>
-
-        <activity android:name=".activities.ChildHolderActivity"/>
-
-        <activity android:name=".activities.RecordShareActivity"/>
-
-        <activity android:name=".activities.AboutActivity"/>
 
         <activity android:name=".ui.dialog.AddtoPlayListDialog"
             android:theme="@style/PopupBottomDialog"/>
@@ -79,20 +96,6 @@
         <activity android:name=".ui.dialog.AddPlayListDialog"
             android:theme="@style/PopupCenterDialog"/>
 
-        <activity android:name=".activities.RecetenlyActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
-        <activity android:name=".activities.SettingActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
-        <activity android:name=".activities.FeedBakActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
-        <activity android:name=".activities.ScanActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
-        <activity android:name=".activities.EQActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity android:name=".ui.dialog.ShareDialog"
             android:theme="@style/PopupBottomDialog"

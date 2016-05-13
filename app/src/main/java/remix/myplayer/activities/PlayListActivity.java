@@ -62,7 +62,7 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
                     name = it.next().toString();
                 }
                 if(mPlaylist.get(name).size() == 0) {
-                    Toast.makeText(PlayListActivity.this, "该列表为空", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PlayListActivity.this, getString(R.string.list_isempty), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Intent intent = new Intent(PlayListActivity.this, ChildHolderActivity.class);
@@ -81,7 +81,7 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 
         //初始化tooblar
         mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        initToolbar(mToolBar,"播放列表");
+        initToolbar(mToolBar,getString(R.string.playlist));
     }
 
 

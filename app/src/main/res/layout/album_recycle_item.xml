@@ -57,12 +57,12 @@
             </LinearLayout>
             <ImageButton
                 android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_height="match_parent"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:id="@+id/recycleview_button"
                 android:src="@drawable/list_icn_more"
-                android:background="@drawable/bg_btn_gray_selector"/>
+                android:background="?android:attr/selectableItemBackground"/>
         </RelativeLayout>
     </RelativeLayout>
 

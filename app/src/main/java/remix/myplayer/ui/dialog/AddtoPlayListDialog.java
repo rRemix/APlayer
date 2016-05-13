@@ -73,14 +73,14 @@ public class AddtoPlayListDialog extends BaseActivity {
                             }
                         }
                         if(isExist){
-                            Toast.makeText(AddtoPlayListDialog.this,"该歌曲已经存在", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddtoPlayListDialog.this,getString(R.string.song_already_exist), Toast.LENGTH_SHORT).show();
                         } else {
                             XmlUtil.addSongToPlayList(playlist, mSongName,mId,mAlbumId,mArtist);
-                            Toast.makeText(AddtoPlayListDialog.this,"添加成功", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddtoPlayListDialog.this,getString(R.string.add_success), Toast.LENGTH_SHORT).show();
                         }
                     }
                     else
-                        Toast.makeText(AddtoPlayListDialog.this,"添加失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddtoPlayListDialog.this,getString(R.string.add_error), Toast.LENGTH_SHORT).show();
                     finish();
                 } catch (Exception e){
                     e.printStackTrace();

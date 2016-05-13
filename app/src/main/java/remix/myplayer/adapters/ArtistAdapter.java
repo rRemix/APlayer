@@ -90,7 +90,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
         if(mCursor.moveToPosition(position)) {
             //设置歌手名
             String artist = mCursor.getString(ArtistFragment.mArtistIndex);
-            artist = artist.indexOf("unknown") > 0 ? "未知歌手" : artist;
+            artist = artist.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_artist) : artist;
             holder.mText1.setText(artist);
             //设置封面
             AsynLoadImage task = new AsynLoadImage(holder.mImage);

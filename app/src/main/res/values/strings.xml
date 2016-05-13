@@ -2,7 +2,6 @@
     <string name="app_name">APlayer</string>
     <string name="action_settings">Settings</string>
 
-    <!-- Tabs -->
     <string name="tab_song">歌曲</string>
     <string name="tab_album">专辑</string>
     <string name="tab_artist">艺术家</string>
@@ -10,4 +9,49 @@
     <string name="tab_folder">文件夹</string>
     <string name="drawerlayout_open">打开</string>
     <string name="drawerlayout_close">关闭</string>
+
+    <string name="from_aplayer">来自APlayer播放器</string>
+    <string name="version">APlaer V1.1.0</string>
+    <string name="about">关于APlayer</string>
+    <string name="model_random">随机播放</string>
+    <string name="model_repeat">单曲播放</string>
+    <string name="model_normal">顺序播放</string>
+    <string name="unknow_song">未知歌曲</string>
+    <string name="unknow_artist">未知艺术家</string>
+    <string name="unknow_album">未知专辑</string>
+    <string name="eq_initial_failed">均衡器初始化失败</string>
+    <string name="use_eq">使用均衡器</string>
+    <string name="plz_earphone">请插入耳机</string>
+    <string name="back">返回</string>
+    <string name="feedback">APlayer意见与反馈</string>
+    <string name="my_favorite">我的收藏</string>
+    <string name="list_isempty">该列表为空</string>
+    <string name="playlist">播放列表</string>
+    <string name="recently">最近添加</string>
+    <string name="no_song">暂无歌曲</string>
+    <string name="share_error">分享失败</string>
+    <string name="share_success">分享成功</string>
+    <string name="share_cancel">分享取消</string>
+    <string name="plz_input_sharecontent">请输入分享内容</string>
+    <string name="song_lose_effect"></string>
+    <string name="song_already_exist">该歌曲已经存在</string>
+    <string name="add_success">添加成功</string>
+    <string name="add_error">添加失败</string>
+    <string name="confirm_delete_playlist">确认从该播放列表移除?</string>
+    <string name="confirm_delete_song">确认从曲库删除?</string>
+    <string name="delete_success">删除成功</string>
+    <string name="delete_error">删除失败</string>
+    <string name="set_ringtone_success">设置铃声成功</string>
+    <string name="set_ringtone_error">设置铃声失败</string>
+    <string name="set_success">设置成功</string>
+    <string name="plz_set_correct_time">请设置正确的时间</string>
+    <string name="cancel_success">取消成功</string>
+    <string name="play_random">随机播放全部</string>
+    <string name="unlock">右滑解锁</string>
+    <string name="scan_tip">大于此设置数值的音频文件就会出现在歌曲库里</string>
+    <string name="search_song_artist_album">搜索歌曲 艺人 专辑</string>
+    <string name="no_search_result">无搜索结果</string>
+    <string name="create_playlist">创建播放列表</string>
+    <string name="use_system_color">使用系统底色</string>
+    <string name="use_white_color">使用白色底色</string>
 </resources>

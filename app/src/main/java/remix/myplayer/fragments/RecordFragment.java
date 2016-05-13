@@ -61,7 +61,7 @@ public class RecordFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 if (mEdit.getText().toString().equals("")) {
-                    Toast.makeText(getContext(), "请输入分享内容", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.plz_input_sharecontent), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Intent intent = new Intent(getActivity(), RecordShareActivity.class);

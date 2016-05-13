@@ -74,7 +74,7 @@ public class RecordShareActivity extends BaseAppCompatActivity {
                     break;
                 //处理错误
                 case ERROR:
-                    Toast.makeText(RecordShareActivity.this,"分享失败",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RecordShareActivity.this,getString(R.string.share_error),Toast.LENGTH_SHORT).show();
                     break;
             }
         }

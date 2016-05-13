@@ -133,7 +133,7 @@ public class OptionDialog extends BaseAppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    String title = mIsDeletePlayList ? "确认从播放列表移除?" : "确认从曲库删除?";
+                    String title = mIsDeletePlayList ? getString(R.string.confirm_delete_playlist) :getString(R.string.confirm_delete_song);
 
 //                    AlertDialog alertDialog = new AlertDialog.Builder(OptionDialog.this)
 //                            .setTitle(title)
@@ -171,9 +171,11 @@ public class OptionDialog extends BaseAppCompatActivity {
                         public void onClick(View v) {
                             String result = "";
                             if(!mIsDeletePlayList){
-                                result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE) == true ? "删除成功" : "删除失败";
+                                result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE) == true ? getString(R.string.delete_success) :
+                                        getString(R.string.delete_error);
                             } else {
-                                result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ? "删除成功" : "删除失败";
+                                result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ? getString(R.string.delete_success):
+                                        getString(R.string.delete_error);
                             }
                             Toast.makeText(OptionDialog.this,result,Toast.LENGTH_SHORT).show();
                             finish();
@@ -203,10 +205,10 @@ public class OptionDialog extends BaseAppCompatActivity {
         if(getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cv, MediaStore.MediaColumns.DATA + "=?", new String[]{path}) > 0) {
             Uri newUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, Id);
             RingtoneManager.setActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE, newUri);
-            Toast.makeText( getApplicationContext (),"设置铃声成功!", Toast.LENGTH_SHORT ).show();
+            Toast.makeText( getApplicationContext (),getString(R.string.set_ringtone_success), Toast.LENGTH_SHORT ).show();
         }
         else
-            Toast.makeText( getApplicationContext (),"设置铃声失败!", Toast.LENGTH_SHORT ).show();
+            Toast.makeText( getApplicationContext (),getString(R.string.set_ringtone_error), Toast.LENGTH_SHORT ).show();
     }
 
     @Override

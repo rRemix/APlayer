@@ -42,7 +42,7 @@ public class NotifyReceiver extends BroadcastReceiver {
 
         mRemoteView = new RemoteViews(context.getPackageName(), isBig ? R.layout.notify_playbar_big : R.layout.notify_playbar);
 
-        if(frommainactivity && !MusicService.getIsplay())
+        if(!MusicService.getIsplay())
             return;
         
         if((MusicService.getCurrentMP3() != null)) {

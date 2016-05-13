@@ -3,7 +3,6 @@ package remix.myplayer.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -22,17 +21,11 @@ import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.nostra13.universalimageloader.cache.disc.DiskCache;
-import com.nostra13.universalimageloader.cache.memory.MemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.utils.IoUtils;
 import com.umeng.analytics.MobclickAgent;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -147,7 +140,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
         //第一次启动添加我的收藏列表
         if (isFirst) {
-            XmlUtil.addPlaylist("我的收藏");
+            XmlUtil.addPlaylist(getString(R.string.my_favorite));
         }
         //如果是第一次启动软件,将第一首歌曲设置为正在播放
         try {

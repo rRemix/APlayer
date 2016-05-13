@@ -84,14 +84,14 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
                 mColumnView.stopAnim();
             }
         }
-        name = name.indexOf("unknown") > 0 ? "未知歌曲" : name;
+        name = name.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_song) : name;
         holder.mName.setText(name);
 
         //艺术家与专辑
         String artist = mCursor.getString(AllSongFragment.mArtistIndex);
         String album = mCursor.getString(AllSongFragment.mAlbumIndex);
-        artist = artist.indexOf("unknown") > 0 ? "未知艺术家" : artist;
-        album = album.indexOf("unknown") > 0 ? "未知专辑" : album;
+        artist = artist.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_artist) : artist;
+        album = album.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_album) : album;
         //封面
         holder.mOther.setText(artist + "-" + album);
         ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mCursor.getString(AllSongFragment.mAlbumIdIndex),

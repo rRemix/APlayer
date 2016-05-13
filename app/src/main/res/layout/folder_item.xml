@@ -38,11 +38,10 @@
         android:layout_marginRight="18dp"
         android:id="@+id/folder_button"
         android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_height="match_parent"
         android:layout_centerVertical="true"
-        android:scaleType="center"
         android:src="@drawable/list_icn_more"
-        android:background="@drawable/bg_btn_gray_selector"/>
+        android:background="?android:attr/selectableItemBackground"/>
     <TextView
         android:layout_centerVertical="true"
         android:layout_width="wrap_content"

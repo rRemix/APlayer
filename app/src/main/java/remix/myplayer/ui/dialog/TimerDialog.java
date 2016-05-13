@@ -122,17 +122,17 @@ public class TimerDialog extends BaseActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     if (mTime > 0) {
-                        Toast.makeText(TimerDialog.this, "设置成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TimerDialog.this, getString(R.string.set_success), Toast.LENGTH_SHORT).show();
                         mSwitch.setThumbResource(R.drawable.timer_btn_seleted_btn);
                         mSwitch.setTrackResource(R.drawable.timer_btn_seleted_focus);
                         SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerDefault", true);
                         SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerNum", (int) mTime);
                     } else {
-                        Toast.makeText(TimerDialog.this, "请设置正确的时间", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TimerDialog.this, getString(R.string.plz_set_correct_time), Toast.LENGTH_SHORT).show();
                         mSwitch.setChecked(false);
                     }
                 } else {
-                    Toast.makeText(TimerDialog.this, "取消成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TimerDialog.this, getString(R.string.cancel_success), Toast.LENGTH_SHORT).show();
                     mSwitch.setThumbResource(R.drawable.timer_btn_normal_btn);
                     mSwitch.setTrackResource(R.drawable.timer_btn_normal_focus);
                     SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerDefault", false);
@@ -165,7 +165,7 @@ public class TimerDialog extends BaseActivity {
      */
     private void Toggle(){
         if(mTime <= 0 && !misTiming) {
-            Toast.makeText(TimerDialog.this, "请设置正确的时间", Toast.LENGTH_SHORT).show();
+            Toast.makeText(TimerDialog.this, getString(R.string.plz_set_correct_time), Toast.LENGTH_SHORT).show();
             return;
         }
         String msg = misTiming == true ? "取消定时关闭" : "将在" + mTime + "分钟后关闭";
@@ -199,11 +199,16 @@ public class TimerDialog extends BaseActivity {
         misRun = false;
     }
 
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(0, R.anim.popup_out);
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//    }
+//
+//    @Override
+//    public void finish() {
+//        super.finish();
+//        overridePendingTransition(0, R.anim.popup_out);
+//    }
 
     /**
      * 根据开始计时的时间，每隔一秒重新计算并通过handler更新界面

@@ -24,7 +24,7 @@
             android:layout_centerVertical="true"
             android:layout_margin="12dp"
             android:gravity="left|center_vertical"
-            android:text="使用系统底色"
+            android:text="@string/use_system_color"
             android:textColor="@color/text_color_black"
             android:textSize="@dimen/textsize_large"
             android:background="@color/transparent" />
@@ -53,7 +53,7 @@
             android:layout_centerVertical="true"
             android:layout_margin="12dp"
             android:gravity="left|center_vertical"
-            android:text="使用白色底色"
+            android:text="@string/use_white_color"
             android:textColor="@color/text_color_black"
             android:textSize="@dimen/textsize_large"
             android:background="@color/transparent" />

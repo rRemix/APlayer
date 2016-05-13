@@ -87,8 +87,8 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
             //获得并设置专辑与艺术家
             String artist = mCursor.getString(AlbumFragment.mArtistIndex);
             String album = mCursor.getString(AlbumFragment.mAlbumIndex);
-            artist = artist.indexOf("unknown") > 0 ? "未知艺术家" : artist;
-            album = album.indexOf("unknown") > 0 ? "未知专辑" : album;
+            artist = artist.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_artist) : artist;
+            album = album.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_album) : album;
             holder.mText1.setText(album);
             holder.mText2.setText(artist);
 

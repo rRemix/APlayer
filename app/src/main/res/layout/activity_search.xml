@@ -34,7 +34,7 @@
                 android:textColor="@color/text_color_white"
                 android:lines="1"
                 android:ellipsize="end"
-                android:hint="搜索歌曲 艺人 专辑"
+                android:hint="@string/search_song_artist_album"
                 android:drawableLeft="@drawable/desk2_search"
                 android:paddingLeft="8dp"
                 android:imeOptions="actionSearch"
@@ -90,7 +90,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="30dp"
                 android:gravity="center"
-                android:text="无搜索结果"
+                android:text="@string/no_search_result"
                 android:textSize="22sp"
                 android:textColor="@color/text_color_white"/>
         </FrameLayout>

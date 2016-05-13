@@ -33,8 +33,10 @@
         <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
         <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
     </style>
+
     <style name="AudioHolderStyle" parent="AppTheme.NoActionBar.Translucent">
         <!--<item name="android:windowAnimationStyle">@style/Audio_style</item>-->
+
     </style>
 
     <style name="CustomTabLayout" parent="Widget.Design.TabLayout">
@@ -123,6 +125,7 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
     </style>
 
     <style name="PopupBottomCompactDialog" parent="@style/Theme.AppCompat">
@@ -134,7 +137,7 @@
         <item name="android:label"></item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item>
-
+        <item name="android:windowCloseOnTouchOutside">true</item>
     </style>
 
     <!--锁屏-->
@@ -156,6 +159,7 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
     </style>
 
     <style name="OptionDialog" parent="@android:style/Theme.Dialog" >
@@ -170,7 +174,7 @@
     </style>
 
     <!--菜单风格-->
-    <style name="MyPopupMenu" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="MyPopupMenu" parent="@android:style/Animation">
         <item name="android:popupBackground">@drawable/pop_bg</item>
         <item name="android:disabledAlpha">0.5</item>
     </style>
@@ -178,7 +182,18 @@
     <!--popup_style-->
     <style name="popwin_anim_style">
         <item name="android:windowEnterAnimation">@anim/popup_in</item>
-        <!--<item name="android:windowExitAnimation">@anim/popup_out</item>-->
+        <item name="android:windowExitAnimation">@anim/popup_out</item>
     </style>
 
+    <style name="ActivityAnim">
+        <item name="android:activityOpenExitAnimation">@anim/slide_left_out</item>
+        <item name="android:activityOpenEnterAnimation">@anim/slide_left_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_right_out</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_right_in</item>
+    </style>
+
+    <style name="ActivityStyle" parent="@style/AppTheme.NoActionBar">
+        <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
+
+    </style>
 </resources>

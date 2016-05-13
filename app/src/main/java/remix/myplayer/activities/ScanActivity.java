@@ -41,7 +41,7 @@ public class ScanActivity extends ToolbarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
         mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        initToolbar(mToolBar,"返回");
+        initToolbar(mToolBar,getString(R.string.back));
         initSeekbar();
     }
 

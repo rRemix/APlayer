@@ -23,7 +23,7 @@
         android:layout_marginLeft="18dp"
         android:textSize="@dimen/textsize_medium"
         android:textColor="#e3e3e3"
-        android:text="大于此设置数值的音频文件就会出现在歌曲库里"/>
+        android:text="@string/scan_tip"/>
 
     <ImageView
         android:layout_width="wrap_content"

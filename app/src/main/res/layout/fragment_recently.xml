@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/dayweek_text"
         android:textSize="@dimen/textsize_huge"
-        android:text="暂无歌曲"
+        android:text="@string/no_song"
         android:layout_gravity="center"
         android:visibility="gone"/>
 </FrameLayout>

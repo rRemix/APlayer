@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.RecentlyAdapter;
@@ -47,7 +48,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         initListView();
 
         mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        initToolbar(mToolBar,"最近添加");
+        initToolbar(mToolBar,getString(R.string.recently));
     }
 
     private void initListView() {
@@ -77,6 +78,10 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
 
     //随机播放
     public void onPlayShuffle(View v){
+        if(DBUtil.mWeekList == null || DBUtil.mWeekList.size() == 0){
+            Toast.makeText(RecetenlyActivity.this,getString(R.string.no_song),Toast.LENGTH_SHORT).show();
+            return;
+        }
         MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control", Constants.NEXT);

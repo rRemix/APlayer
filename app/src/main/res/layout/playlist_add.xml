@@ -11,7 +11,7 @@
         android:layout_marginTop="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="创建播放列表"/>
+        android:text="@string/create_playlist"/>
     <EditText
         android:id="@+id/playlist_add_edit"
         android:layout_width="match_parent"

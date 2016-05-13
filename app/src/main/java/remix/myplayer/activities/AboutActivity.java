@@ -16,7 +16,7 @@ public class AboutActivity extends ToolbarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        initToolbar(mToolBar, "关于APlayer");
+        initToolbar(mToolBar, getString(R.string.about));
     }
 
     @Override
