@@ -45,6 +45,7 @@ import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.ErrUtil;
+import remix.myplayer.utils.Global;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.XmlUtil;
 
@@ -129,7 +130,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //初始化toolbar
 
-        if (DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0){
+        if (Global.mPlayingList == null || Global.mPlayingList.size() == 0){
             SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", -1);
             return;
         }
@@ -145,15 +146,15 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         //如果是第一次启动软件,将第一首歌曲设置为正在播放
         try {
             if (isFirst || position < 0) {
-                mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(0)), MusicService.getIsplay());
+                mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(Global.mPlayingList.get(0)), MusicService.getIsplay());
                 SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", 0);
             } else {
-                if(position >= DBUtil.mPlayingList.size()){
-                    position = DBUtil.mPlayingList.size() - 1;
+                if(position >= Global.mPlayingList.size()){
+                    position = Global.mPlayingList.size() - 1;
                     if(position >= 0)
                         SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", position);
                 }
-                mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(position)), MusicService.getIsplay());
+                mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(Global.mPlayingList.get(position)), MusicService.getIsplay());
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -297,7 +298,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         });
         new Thread(task, "getInfo").start();
         try {
-            DBUtil.mAllSongList = task.get();
+            Global.mAllSongList = task.get();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -311,9 +312,9 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         });
         new Thread(task1, "getPlayingList").start();
         try {
-            DBUtil.mPlayingList = task1.get();
-            if (DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
-                DBUtil.mPlayingList = (ArrayList<Long>) task.get().clone();
+            Global.mPlayingList = task1.get();
+            if (Global.mPlayingList == null || Global.mPlayingList.size() == 0)
+                Global.mPlayingList = (ArrayList<Long>) task.get().clone();
         } catch (Exception e) {
             e.printStackTrace();
         }

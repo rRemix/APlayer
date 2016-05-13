@@ -42,6 +42,7 @@ import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 import remix.myplayer.utils.SharedPrefsUtil;
 
 /**
@@ -54,8 +55,6 @@ import remix.myplayer.utils.SharedPrefsUtil;
 public class AudioHolderActivity extends BaseAppCompatActivity implements MusicService.Callback{
     private static final String TAG = "AudioHolderActivity";
     public static AudioHolderActivity mInstance = null;
-    //记录操作
-    public static int mOperation = -1;
     //是否正在运行
     public static boolean mIsRunning;
     //上次选中的Fragment
@@ -476,7 +475,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         mIsPlay = isplay;
 
         //当操作不为播放或者暂停且正在运行时，更新界面
-        if(mOperation != Constants.PLAYORPAUSE ) {
+        if(Global.getOperation() != Constants.PLAYORPAUSE ) {
             try {
                 //更新顶部信息
                 UpdateTopStatus(mInfo);

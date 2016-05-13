@@ -16,7 +16,7 @@ import remix.myplayer.R;
 import remix.myplayer.activities.MainActivity;
 import remix.myplayer.listeners.PopupListener;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 
 /**
  * Created by Remix on 2015/12/5.
@@ -39,9 +39,9 @@ public class FolderAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if(DBUtil.mFolderMap == null)
+        if(Global.mFolderMap == null)
             return 0;
-        return DBUtil.mFolderMap.size();
+        return Global.mFolderMap.size();
     }
 
     @Override
@@ -62,10 +62,10 @@ public class FolderAdapter extends BaseAdapter {
         TextView mPathView = (TextView)ItemView.findViewById(R.id.folder_path);
         final ImageView button = (ImageView)ItemView.findViewById(R.id.folder_button);
 
-        if(DBUtil.mFolderMap == null || DBUtil.mFolderMap.size() < 0)
+        if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
             return ItemView;
         //根据当前索引 获得对应的歌曲列表
-        Iterator it = DBUtil.mFolderMap.keySet().iterator();
+        Iterator it = Global.mFolderMap.keySet().iterator();
         String temp = null;
         for(int i = 0 ; i <= position ; i++)
             temp = it.next().toString();
@@ -73,7 +73,7 @@ public class FolderAdapter extends BaseAdapter {
         if(temp != null){
             mNameView.setText(temp.substring(temp.lastIndexOf("/")+ 1,temp.length()));
             mPathView.setText(temp);
-            mNumView.setText(DBUtil.mFolderMap.get(temp).size()+ "首");
+            mNumView.setText(Global.mFolderMap.get(temp).size()+ "首");
         }
         //popupmenu
         final String full_path = temp;

@@ -4,15 +4,10 @@ import android.database.ContentObserver;
 import android.os.Handler;
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
-import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.infos.MP3Info;
-import remix.myplayer.infos.PlayListItem;
-import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 import remix.myplayer.utils.XmlUtil;
 
 /**
@@ -34,7 +29,7 @@ public class MediaStoreObserver extends ContentObserver {
     public void onChange(boolean selfChange) {
         Log.d("ThreadId","id in observer: " + Thread.currentThread().getId());
         if(!selfChange){
-            DBUtil.mAllSongList = DBUtil.getAllSongsId();
+            Global.mAllSongList = DBUtil.getAllSongsId();
 
             mHandler.sendEmptyMessage(Constants.UPDATE_FOLDER);
             //检查正在播放列表中是否有歌曲删除
@@ -43,11 +38,11 @@ public class MediaStoreObserver extends ContentObserver {
                 public void run() {
                     try {
                         boolean needupdate = false;
-                        if(DBUtil.mPlayingList != null){
-                            for(int i = DBUtil.mPlayingList.size() - 1; i >= 0 ;i--){
-                                MP3Info temp = DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(i));
+                        if(Global.mPlayingList != null){
+                            for(int i = Global.mPlayingList.size() - 1; i >= 0 ; i--){
+                                MP3Info temp = DBUtil.getMP3InfoById(Global.mPlayingList.get(i));
                                 if(temp == null) {
-                                    DBUtil.mPlayingList.remove(i);
+                                    Global.mPlayingList.remove(i);
                                     needupdate = true;
                                 }
                             }

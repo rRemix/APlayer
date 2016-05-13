@@ -18,7 +18,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapters.SearchResAdapter;
 import remix.myplayer.ui.customviews.SearchView;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 
 /**
  * Created by taeja on 16-1-22.
@@ -182,7 +182,7 @@ public class SearchActivity extends BaseAppCompatActivity {
                         mCursor.moveToPosition(i);
                         list.add(mCursor.getLong(mIdIndex));
                     }
-                    DBUtil.setPlayingList(list);
+                    Global.setPlayingList(list);
                 }
             }
         }

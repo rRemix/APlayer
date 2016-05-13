@@ -18,6 +18,7 @@ import remix.myplayer.adapters.RecentlyAdapter;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 
 /**
  * Created by taeja on 16-3-4.
@@ -32,7 +33,7 @@ public class RecentlyFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mType = getArguments().getInt("Type");
-        mInfoList = DBUtil.getMP3ListByIds(DBUtil.mWeekList);
+        mInfoList = DBUtil.getMP3ListByIds(Global.mWeekList);
     }
 
     @Nullable
@@ -59,7 +60,7 @@ public class RecentlyFragment extends Fragment {
                 intent.putExtras(arg);
                 getActivity().sendBroadcast(intent);
                 view.setSelected(true);
-                DBUtil.setPlayingList(mType == Constants.DAY ? DBUtil.mTodayList : DBUtil.mWeekList);
+                Global.setPlayingList(mType == Constants.DAY ? Global.mTodayList : Global.mWeekList);
             }
         });
 

@@ -2,12 +2,10 @@ package remix.myplayer.utils;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 
@@ -16,13 +14,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.activities.PlayListActivity;
-import remix.myplayer.adapters.FolderAdapter;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.infos.PlayListItem;
 
@@ -36,41 +31,10 @@ import remix.myplayer.infos.PlayListItem;
  */
 public class DBUtil {
     private static final String TAG = "DBUtil";
-    /**
-     * 所有歌曲id
-     */
-    public static ArrayList<Long> mAllSongList = new ArrayList<>();
-
-    /**
-     * 正在播放歌曲id
-     */
-    public static ArrayList<Long> mPlayingList = new ArrayList<>();
-
-
-    /**
-     * 文件夹名与对应的所有歌曲id
-     */
-    public static Map<String,ArrayList<Long>> mFolderMap = new HashMap<>();
-
-    /**
-     * 最近添加列表
-     */
-    public static ArrayList<Long> mTodayList = new ArrayList<>();
-    public static ArrayList<Long> mWeekList = new ArrayList<>();
-
     private static Context mContext;
     private DBUtil(){}
     public static void setContext(Context context){
         mContext = context;
-    }
-
-    /**
-     * 更新内存与本地的正在播放列表
-     * @param list
-     */
-    public static void setPlayingList(ArrayList<Long> list) {
-        mPlayingList = list;
-        XmlUtil.updatePlayingList();
     }
 
     /**
@@ -110,7 +74,7 @@ public class DBUtil {
         try {
             if(cursor != null) {
 
-                DBUtil.mFolderMap.clear();
+                Global.mFolderMap.clear();
                 while (cursor.moveToNext()) {
                     //计算歌曲添加时间
                     //如果满足条件添加到最近添加
@@ -119,9 +83,9 @@ public class DBUtil {
                     calendar.setTime(new Date(temp));
                     int between = (int)((today_mill - calendar.getTimeInMillis()) / day_mill);
                     if(between <= 7 && between >= 0){
-                        mWeekList.add(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
+                        Global.mWeekList.add(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
                         if(between == 0){
-                            mTodayList.add(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
+                            Global.mTodayList.add(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
                         }
                     }
 
@@ -152,11 +116,11 @@ public class DBUtil {
      * @return 该文件夹对应的所有歌曲id
      */
     public static ArrayList<Long> getIdsByFolderName(String foldername,int position){
-        Iterator it = DBUtil.mFolderMap.keySet().iterator();
+        Iterator it = Global.mFolderMap.keySet().iterator();
         String full_path = null;
         for(int i = 0 ; i <= position ; i++)
             full_path = it.next().toString();
-        return DBUtil.mFolderMap.get(full_path);
+        return Global.mFolderMap.get(full_path);
     }
 
 
@@ -167,12 +131,12 @@ public class DBUtil {
      */
     public static void SortWithFolder(long id,String fullpath) {
         String dirpath = fullpath.substring(0, fullpath.lastIndexOf("/"));
-        if (!mFolderMap.containsKey(dirpath)) {
+        if (!Global.mFolderMap.containsKey(dirpath)) {
             ArrayList<Long> list = new ArrayList<>();
             list.add(id);
-            mFolderMap.put(dirpath, list);
+            Global.mFolderMap.put(dirpath, list);
         } else {
-            ArrayList<Long> list = mFolderMap.get(dirpath);
+            ArrayList<Long> list = Global.mFolderMap.get(dirpath);
             list.add(id);
         }
     }
@@ -450,7 +414,7 @@ public class DBUtil {
         String where = null;
         String[] arg = null;
         //删除文件夹时歌曲列表
-        ArrayList<Long> list = DBUtil.mFolderMap.get(data);
+        ArrayList<Long> list = Global.mFolderMap.get(data);
         int ret = 0;
         boolean ret2 = false;
 
@@ -528,7 +492,7 @@ public class DBUtil {
         }else {
             //如果是文件夹
             //根据文件夹名获得对应所有歌曲列表,再根据每首歌曲id来删除
-            list = DBUtil.mFolderMap.get(data);
+            list = Global.mFolderMap.get(data);
             if (list == null)
                 return false;
             where = MediaStore.Audio.Media._ID + "=?";

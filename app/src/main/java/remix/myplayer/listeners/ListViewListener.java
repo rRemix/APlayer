@@ -9,7 +9,7 @@ import android.widget.AdapterView;
 import java.util.ArrayList;
 
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -26,7 +26,7 @@ public class ListViewListener implements AdapterView.OnItemClickListener {
     }
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        DBUtil.setPlayingList((ArrayList<Long>) DBUtil.mAllSongList.clone());
+        Global.setPlayingList((ArrayList<Long>) Global.mAllSongList.clone());
         Intent intent = new Intent(Constants.CTL_ACTION);
         Bundle arg = new Bundle();
         arg.putInt("Control", Constants.PLAYSELECTEDSONG);

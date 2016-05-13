@@ -16,9 +16,9 @@ import android.view.animation.TranslateAnimation;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.AudioHolderActivity;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.utils.Constants;
+import remix.myplayer.utils.Global;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -94,9 +94,10 @@ public class CoverFragment extends Fragment {
 
         if(withAnim){
             //根据操作是上一首还是下一首播放动画
-            if(AudioHolderActivity.mOperation == Constants.PREV)
+            int operation = Global.getOperation();
+            if(operation == Constants.PREV)
                 mImage.startAnimation(mRightAnimation);
-            else if (AudioHolderActivity.mOperation == Constants.NEXT || AudioHolderActivity.mOperation == Constants.PLAYSELECTEDSONG)
+            else if (operation == Constants.NEXT || operation == Constants.PLAYSELECTEDSONG)
                 mImage.startAnimation(mLeftAnimation);
         } else {
             //如果不需要动画，直接设置背景

@@ -25,11 +25,8 @@ import java.util.List;
 import java.util.Random;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.AudioHolderActivity;
-import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.activities.EQActivity;
 import remix.myplayer.activities.MainActivity;
-import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.fragments.FolderFragment;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.observers.MediaStoreObserver;
@@ -200,34 +197,37 @@ public class MusicService extends BaseService {
         Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
         mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
             //记录焦点变化之前是否在播放;
+            private boolean mNeedContinue = false;
             @Override
             public void onAudioFocusChange(int focusChange) {
-                //播放 获得焦点
+                //获得audiofocus
                 if(focusChange == AudioManager.AUDIOFOCUS_GAIN){
                     mAudioFouus = true;
                     if(mMediaPlayer == null)
                         Init();
-                    else if(!mIsplay){
-//                            PlayStart();
-//                            mIsplay = true;
+                    else if(mNeedContinue){
+                        PlayStart();
+                        mNeedContinue = false;
+                        Global.setOperation(Constants.PLAYORPAUSE);
                     }
                     mMediaPlayer.setVolume(1.0f,1.0f);
                 }
-                //降低音量或者暂停播放
-                if(focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT || focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK){
+
+                //暂停播放
+                if(focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
+                        focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK){
+                    mNeedContinue = true;
                     if(mIsplay && mMediaPlayer != null){
-                        if(mTelePhoneManager.getCallState() != TelephonyManager.CALL_STATE_IDLE){
-                            AudioHolderActivity.mOperation = Constants.PLAYORPAUSE;
-                            Pause();
-                        } else
-                            mMediaPlayer.setVolume(0.1f,0.1f);
+                        Global.setOperation(Constants.PLAYORPAUSE);
+                        Pause();
                     }
                 }
-                //暂停播放
+
+                //失去audiofocus 暂停播放
                 if(focusChange == AudioManager.AUDIOFOCUS_LOSS){
                     mAudioFouus = false;
                     if(mIsplay && mMediaPlayer != null) {
-                        AudioHolderActivity.mOperation = Constants.PLAYORPAUSE;
+                        Global.setOperation(Constants.PLAYORPAUSE);
                         Pause();
                     }
                 }
@@ -239,8 +239,8 @@ public class MusicService extends BaseService {
 
         //获得上次退出时正在播放的歌曲
         int Position = SharedPrefsUtil.getValue(getApplicationContext(),"setting","Pos",-1);
-        if(DBUtil.mPlayingList != null && DBUtil.mPlayingList.size() > 0) {
-            mId = Position == -1 ? DBUtil.mPlayingList.get(0) : DBUtil.mPlayingList.get(Position);
+        if(Global.mPlayingList != null && Global.mPlayingList.size() > 0) {
+            mId = Position == -1 ? Global.mPlayingList.get(0) : Global.mPlayingList.get(Position);
             mInfo = DBUtil.getMP3InfoById(mId);
             mCurrent = Position == -1 ? 0 : Position;
         } else
@@ -314,7 +314,7 @@ public class MusicService extends BaseService {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 PlayNextOrPrev(true, true);
-                AudioHolderActivity.mOperation = Constants.NEXT;
+                Global.setOperation(Constants.NEXT);
                 mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
                 //更新锁屏界面
                 UpdateLockScreen();
@@ -390,7 +390,7 @@ public class MusicService extends BaseService {
             @Override
             //音量逐渐增大
             public void run(){
-                mAudioFouus =  mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
+                mAudioFouus = mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
                                               AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
                 if(!mAudioFouus)
                     return;
@@ -480,9 +480,9 @@ public class MusicService extends BaseService {
      */
     private void PlaySelectSong(int position){
        
-        if((mCurrent = position) == -1 || (mCurrent > DBUtil.mPlayingList.size()))
+        if((mCurrent = position) == -1 || (mCurrent > Global.mPlayingList.size()))
             return;
-        mId = DBUtil.mPlayingList.get(mCurrent);
+        mId = Global.mPlayingList.get(mCurrent);
         MP3Info temp = mInfo;
         mInfo = DBUtil.getMP3InfoById(mId);
         if(mInfo == null) {
@@ -528,12 +528,12 @@ public class MusicService extends BaseService {
         public void onReceive(Context context, Intent intent) {
             int Control = intent.getIntExtra("Control",-1);
             //保存控制命令,用于播放界面判断动画
-            AudioHolderActivity.mOperation = Control;
-
+            Global.setOperation(Control);
             //先判断是否是关闭通知栏
             if(intent.getExtras().getBoolean("Close")){
                 NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                 manager.cancel(0);
+                Global.setNotifyShowing(false);
                 Pause();
                 Update(Control);
                 return;
@@ -554,7 +554,7 @@ public class MusicService extends BaseService {
                     break;
                 //暂停或者继续播放
                 case Constants.PLAYORPAUSE:
-                    if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
+                    if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
                         return;
                     mIsplay = !mIsplay;
                     PlayOrPause();
@@ -580,9 +580,7 @@ public class MusicService extends BaseService {
                     mPlayModel = Constants.PLAY_REPEATONE;
                 default:break;
             }
-
             Update(Control);
-
         }
     }
 
@@ -634,9 +632,9 @@ public class MusicService extends BaseService {
      * @return 随机索引
      */
     private static int getShuffle(){
-        if(DBUtil.mPlayingList.size() == 1)
+        if(Global.mPlayingList.size() == 1)
             return 0;
-        return new Random().nextInt(DBUtil.mPlayingList.size() - 1);
+        return new Random().nextInt(Global.mPlayingList.size() - 1);
     }
 
     /**
@@ -645,23 +643,23 @@ public class MusicService extends BaseService {
      * @param NeedPlay 是否需要播放
      */
     public void PlayNextOrPrev(boolean IsNext,boolean NeedPlay){
-        if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
+        if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
             return;
 
         if(mPlayModel == Constants.PLAY_SHUFFLE) {
             mCurrent = getShuffle();
-            mId = DBUtil.mPlayingList.get(mCurrent);
+            mId = Global.mPlayingList.get(mCurrent);
         }
         else if(mPlayModel == Constants.PLAY_LOOP) {
             if(IsNext) {
-                if ((++mCurrent) > DBUtil.mPlayingList.size() - 1)
+                if ((++mCurrent) > Global.mPlayingList.size() - 1)
                     mCurrent = 0;
-                mId = DBUtil.mPlayingList.get(mCurrent);
+                mId = Global.mPlayingList.get(mCurrent);
             }
             else {
                 if ((--mCurrent) < 0)
-                    mCurrent = DBUtil.mPlayingList.size() - 1;
-                mId = DBUtil.mPlayingList.get(mCurrent);
+                    mCurrent = Global.mPlayingList.size() - 1;
+                mId = Global.mPlayingList.get(mCurrent);
             }
         }
 

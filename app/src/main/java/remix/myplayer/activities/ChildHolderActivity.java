@@ -20,6 +20,7 @@ import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -93,7 +94,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                         ids.add(info.getId());
                 }
                 //设置正在播放列表
-                DBUtil.setPlayingList((ArrayList) ids.clone());
+                Global.setPlayingList((ArrayList) ids.clone());
 
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 Bundle arg = new Bundle();
@@ -120,7 +121,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
             mTitle.setText(mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length()));
         //初始化底部状态栏
         mActionbar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
+        if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
             return;
 
         mActionbar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
@@ -140,7 +141,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         } else if(mType == Constants.FOLDER_HOLDER){
             //文件夹
             mArg = getIntent().getStringExtra("Title");
-            if(!DBUtil.mFolderMap.containsKey(mArg)){
+            if(!Global.mFolderMap.containsKey(mArg)){
                 mAdapter.setList(new ArrayList<MP3Info>());
                 mNum.setText("0首歌曲");
             } else {
@@ -179,7 +180,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                 break;
             //文件夹名
             case Constants.FOLDER_HOLDER:
-                mInfoList = DBUtil.getMP3ListByIds(DBUtil.mFolderMap.get(mArg));
+                mInfoList = DBUtil.getMP3ListByIds(Global.mFolderMap.get(mArg));
                 mArg = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
                 break;
             //播放列表名
@@ -219,7 +220,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         ArrayList<Long> ids = new ArrayList<Long>();
         for (MP3Info info : mInfoList)
             ids.add(info.getId());
-        DBUtil.setPlayingList((ArrayList) ids.clone());
+        Global.setPlayingList((ArrayList) ids.clone());
         sendBroadcast(intent);
     }
 

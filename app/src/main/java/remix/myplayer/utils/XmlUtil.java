@@ -262,8 +262,8 @@ public class XmlUtil {
      * @param id 需要删除的歌曲id
      */
     public static void deleteSongFromPlayingList(long id) {
-        if(id > 0 && DBUtil.mPlayingList.contains(id)) {
-            DBUtil.mPlayingList.remove(id);
+        if(id > 0 && Global.mPlayingList.contains(id)) {
+            Global.mPlayingList.remove(id);
             updatePlayingList();
         }
     }
@@ -274,7 +274,7 @@ public class XmlUtil {
      */
     public static void addSongToPlayingList(long id) {
         if(id > 0) {
-            DBUtil.mPlayingList.add(id);
+            Global.mPlayingList.add(id);
             updatePlayingList();
         }
     }
@@ -291,10 +291,10 @@ public class XmlUtil {
             serializer.setOutput(fos,"utf-8");
             serializer.startDocument("utf-8",true);
             serializer.startTag(null,"playinglist");
-            for(int i = 0; i < DBUtil.mPlayingList.size(); i++)
+            for(int i = 0; i < Global.mPlayingList.size(); i++)
             {
                 serializer.startTag(null,"song");
-                serializer.attribute(null,"id", DBUtil.mPlayingList.get(i).toString());
+                serializer.attribute(null,"id", Global.mPlayingList.get(i).toString());
                 serializer.endTag(null,"song");
             }
             serializer.endTag(null,"playinglist");

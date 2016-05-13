@@ -38,14 +38,14 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@color/background_color_interval"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:onClick="onPlayShuffle">
         <ImageButton
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_btn_common_play_shuffle"
-            android:layout_marginLeft="16dp"
-            android:onClick="onPlayShuffle"/>
+            android:layout_marginLeft="16dp" />
         <TextView
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"

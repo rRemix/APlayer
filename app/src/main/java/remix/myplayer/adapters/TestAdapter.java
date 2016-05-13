@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,6 +23,7 @@ import remix.myplayer.ui.customviews.CircleImageView;
 import remix.myplayer.ui.customviews.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 
 /**
  * Created by Remix on 2016/4/11.
@@ -95,7 +95,7 @@ public class TestAdapter extends RecyclerView.Adapter<TestAdapter.ViewHolder>{
             holder.mItemButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    MP3Info temp = DBUtil.getMP3InfoById(DBUtil.mAllSongList.get(position));
+                    MP3Info temp = DBUtil.getMP3InfoById(Global.mAllSongList.get(position));
                     Intent intent = new Intent(mContext, OptionDialog.class);
                     intent.putExtra("MP3Info",temp);
                     mContext.startActivity(intent);

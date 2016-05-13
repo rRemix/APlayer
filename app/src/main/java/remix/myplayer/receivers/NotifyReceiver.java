@@ -17,6 +17,7 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 import remix.myplayer.utils.SharedPrefsUtil;
 
 /**
@@ -37,12 +38,14 @@ public class NotifyReceiver extends BroadcastReceiver {
     }
 
     private void UpdateNotify(Context context,boolean frommainactivity) {
-        mIsplay = MusicService.getIsplay();
         boolean isBig = context.getResources().getDisplayMetrics().widthPixels >= 1000;
 
         mRemoteView = new RemoteViews(context.getPackageName(), isBig ? R.layout.notify_playbar_big : R.layout.notify_playbar);
 
-        if(!MusicService.getIsplay())
+        mIsplay = MusicService.getIsplay();
+//        if(frommainactivity && !mIsplay)
+//            return;
+        if(!Global.getNotifyShowing() && !mIsplay)
             return;
         
         if((MusicService.getCurrentMP3() != null)) {
@@ -131,6 +134,7 @@ public class NotifyReceiver extends BroadcastReceiver {
 
             mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(0, mNotify);
+            Global.setNotifyShowing(true);
         }
 
     }

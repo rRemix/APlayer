@@ -16,6 +16,7 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 import remix.myplayer.utils.XmlUtil;
 
 /**
@@ -40,12 +41,12 @@ public class PlayingListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return DBUtil.mPlayingList != null ? DBUtil.mPlayingList.size() : 0;
+        return Global.mPlayingList != null ? Global.mPlayingList.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return DBUtil.mPlayingList != null ? DBUtil.mPlayingList.get(position) : null;
+        return Global.mPlayingList != null ? Global.mPlayingList.get(position) : null;
     }
 
     @Override
@@ -65,10 +66,10 @@ public class PlayingListAdapter extends BaseAdapter {
             holder = (ViewHolder)convertView.getTag();
 
 
-        if(DBUtil.mPlayingList == null || DBUtil.mPlayingList.size() == 0)
+        if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
             return convertView;
 
-        final MP3Info temp = DBUtil.getMP3InfoById(DBUtil.mPlayingList.get(position));
+        final MP3Info temp = DBUtil.getMP3InfoById(Global.mPlayingList.get(position));
         if(temp != null) {
             //设置歌曲与艺术家
             holder.mSong.setText(temp.getDisplayname());

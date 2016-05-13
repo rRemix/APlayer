@@ -19,6 +19,7 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 
 /**
  * Created by taeja on 16-3-4.
@@ -55,7 +56,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         new Thread(){
             @Override
             public void run() {
-                mAdapter = new RecentlyAdapter(RecetenlyActivity.this, DBUtil.getMP3ListByIds(DBUtil.mWeekList));
+                mAdapter = new RecentlyAdapter(RecetenlyActivity.this, DBUtil.getMP3ListByIds(Global.mWeekList));
                 mHandler.sendEmptyMessage(0);
             }
         }.start();
@@ -68,7 +69,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
                 arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                 arg.putInt("Position", position);
                 intent.putExtras(arg);
-                DBUtil.setPlayingList(DBUtil.mWeekList);
+                Global.setPlayingList(Global.mWeekList);
                 sendBroadcast(intent);
                 view.setSelected(true);
             }
@@ -78,14 +79,14 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
 
     //随机播放
     public void onPlayShuffle(View v){
-        if(DBUtil.mWeekList == null || DBUtil.mWeekList.size() == 0){
+        if(Global.mWeekList == null || Global.mWeekList.size() == 0){
             Toast.makeText(RecetenlyActivity.this,getString(R.string.no_song),Toast.LENGTH_SHORT).show();
             return;
         }
         MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control", Constants.NEXT);
-        DBUtil.setPlayingList(DBUtil.mWeekList);
+        Global.setPlayingList(Global.mWeekList);
         sendBroadcast(intent);
     }
 

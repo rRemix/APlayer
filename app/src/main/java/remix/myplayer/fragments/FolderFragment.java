@@ -16,7 +16,7 @@ import remix.myplayer.R;
 import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.adapters.FolderAdapter;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 
 /**
  * Created by Remix on 2015/12/5.
@@ -85,9 +85,9 @@ public class FolderFragment extends Fragment {
             Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
             intent.putExtra("Id", position);
             intent.putExtra("Type", Constants.FOLDER_HOLDER);
-            if(DBUtil.mFolderMap == null || DBUtil.mFolderMap.size() < 0)
+            if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
                 return;
-            Iterator it = DBUtil.mFolderMap.keySet().iterator();
+            Iterator it = Global.mFolderMap.keySet().iterator();
             String full_path = null;
             for(int i = 0 ; i <= position ; i++)
                 full_path = it.next().toString();

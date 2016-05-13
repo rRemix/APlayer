@@ -11,23 +11,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-
 import remix.myplayer.R;
 import remix.myplayer.adapters.AllSongAdapter;
-import remix.myplayer.adapters.TestAdapter;
 import remix.myplayer.listeners.ListViewListener;
-import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -84,7 +78,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
                 MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 intent.putExtra("Control", Constants.NEXT);
-                DBUtil.setPlayingList(DBUtil.mAllSongList);
+                Global.setPlayingList(Global.mAllSongList);
                 getActivity().sendBroadcast(intent);
             }
         });

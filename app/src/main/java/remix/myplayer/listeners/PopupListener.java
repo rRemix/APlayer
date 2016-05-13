@@ -16,6 +16,7 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 import remix.myplayer.utils.XmlUtil;
 
 /**
@@ -65,7 +66,7 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
         switch (item.getItemId()) {
             //播放
             case R.id.menu_play:
-                DBUtil.setPlayingList((ArrayList) ids.clone());
+                Global.setPlayingList((ArrayList) ids.clone());
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 Bundle arg = new Bundle();
                 arg.putInt("Control", Constants.PLAYSELECTEDSONG);
@@ -75,8 +76,8 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
                 break;
             //添加到播放列表
             case R.id.menu_add:
-                DBUtil.mPlayingList.addAll(ids);
-                DBUtil.setPlayingList(DBUtil.mPlayingList);
+                Global.mPlayingList.addAll(ids);
+                Global.setPlayingList(Global.mPlayingList);
                 break;
             //删除
             case R.id.menu_delete:

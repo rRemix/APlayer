@@ -31,6 +31,7 @@ import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.Global;
 import remix.myplayer.utils.XmlUtil;
 
 /**
@@ -219,7 +220,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
             return;
         //只更新播放按钮
         mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.wy_lock_btn_pause : R.drawable.wy_lock_btn_play));
-        if(AudioHolderActivity.mOperation == Constants.PLAYORPAUSE && mIsFirst){
+        if(Global.getOperation() == Constants.PLAYORPAUSE && mIsFirst){
             mIsFirst = false;
             return;
         }
