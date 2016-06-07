@@ -25,6 +25,8 @@
     <color name="background_color_2">#2a282b</color>
     <!-- 背景色3-->
     <color name="background_color_3">#1d1a1d</color>
+    <!--statusbar color-->
+    <color name="statusbar_color">#1d1a1d</color>
     <!-- 间隔色-->
     <color name="background_color_interval">#e2e1e2</color>
 

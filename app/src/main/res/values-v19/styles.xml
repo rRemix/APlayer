@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<style name="AppTheme" parent="@style/BaseTheme">-->
+        <!--<item name="android:windowTranslucentStatus">true</item>-->
+        <!--<item name="colorPrimary">#242428</item>-->
+        <!--<item name="colorPrimaryDark">#232023</item>-->
+        <!--<item name="colorAccent">#FF4081</item>-->
+        <!--<item name="android:fitsSystemWindows">true</item>-->
+    <!--</style>-->
+</resources>

@@ -1,15 +1,11 @@
 <resources>
-    <style name="AppTheme1" parent="android:Theme.Holo.Light">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar"/>
+
+    <style name="AppTheme" parent="BaseTheme">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">#242428</item>
+        <item name="colorPrimaryDark">#232023</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
@@ -109,7 +105,7 @@
         <item name="android:textColor">#1b1c19</item>
         <item name="android:layout_centerVertical">true</item>
     </style>
-    
+
     <!-- 播放列表对话框的风格 -->
     <style name="AnimBottom" parent="@android:style/Animation">
         <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>

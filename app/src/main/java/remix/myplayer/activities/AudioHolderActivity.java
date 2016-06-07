@@ -231,10 +231,10 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         mPlayBarPlay.setOnClickListener(mListener);
         mPlayBarNext.setOnClickListener(mListener);
 
-        //播放模式
+        //初始化播放模式
         mPlayModel = (ImageButton)findViewById(R.id.playbar_model);
         int playmodel = SharedPrefsUtil.getValue(this,"setting", "PlayModel",Constants.PLAY_LOOP);
-        mPlayModel.setBackground(getResources().getDrawable(playmodel == Constants.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
+        mPlayModel.setImageDrawable(getResources().getDrawable(playmodel == Constants.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
                 playmodel == Constants.PLAY_SHUFFLE ? R.drawable.bg_btn_holder_playmodel_shuffle :
                         R.drawable.bg_btn_holder_playmodel_repeat));
 
@@ -244,7 +244,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 int currentmodel = MusicService.getPlayModel();
                 currentmodel = (currentmodel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentmodel);
                 MusicService.setPlayModel(currentmodel);
-                mPlayModel.setBackground(getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
+                mPlayModel.setImageDrawable(getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
                         currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.bg_btn_holder_playmodel_shuffle :
                                 R.drawable.bg_btn_holder_playmodel_repeat));
                 String msg = currentmodel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
@@ -295,6 +295,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         mHide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mFromBack = true;
                 finish();
             }
         });
@@ -561,10 +562,12 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     class BitmapThread extends Thread{
         @Override
         public void run() {
-            mRawBitMap = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
-            if(mRawBitMap == null)
-                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
-            mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
+            if(mInfo != null){
+                mRawBitMap = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
+                if(mRawBitMap == null)
+                    mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
+                mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
+            }
         }
     }
 
