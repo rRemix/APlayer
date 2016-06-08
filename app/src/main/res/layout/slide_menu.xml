@@ -4,7 +4,8 @@
     android:orientation="vertical"
     android:background="@drawable/drawer_bg"
     android:id="@+id/slide_menu"
-    android:layout_gravity="left|start">
+    android:layout_gravity="left|start"
+    android:fitsSystemWindows="true">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"

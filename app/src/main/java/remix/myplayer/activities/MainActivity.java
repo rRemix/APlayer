@@ -93,6 +93,21 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             PermissionUtil.RequestPermission(this,Manifest.permission.WRITE_SETTINGS);
         }
 
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+//                Toast.makeText(this,"应用需要必要的运行权限",Toast.LENGTH_SHORT);
+//
+//            }
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONCODE);
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.READ_CONTACTS)) {
+//                Toast.makeText(this,"应用需要必要的运行权限",Toast.LENGTH_SHORT);
+//
+//            } else {
+//                ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSIONCODE);
+//            }
+//        }
         //更新UI
         UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
@@ -149,16 +164,15 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         initDrawerLayout();
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        //初始化toolbar
+
+        boolean isFirst = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "First", true);
+        int position = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "Pos", -1);
+        SharedPrefsUtil.putValue(getApplicationContext(), "setting", "First", false);
 
         if (Global.mPlayingList == null || Global.mPlayingList.size() == 0){
             SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", -1);
             return;
         }
-
-        boolean isFirst = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "First", true);
-        int position = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "Pos", -1);
-        SharedPrefsUtil.putValue(getApplicationContext(), "setting", "First", false);
 
         //第一次启动添加我的收藏列表
         if (isFirst) {
@@ -180,7 +194,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         } catch (Exception e){
             e.printStackTrace();
         }
-
 
     }
 

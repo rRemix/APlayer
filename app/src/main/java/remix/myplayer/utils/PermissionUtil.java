@@ -60,11 +60,44 @@ public class PermissionUtil {
         if (!hasPermission(permission)) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                 Toast.makeText(activity,"应用需要必要的运行权限",Toast.LENGTH_SHORT);
+//                showMessageOKCancel(activity,"应用需要必要的运行权限",new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        ActivityCompat.requestPermissions(activity,new String[] {Manifest.permission.WRITE_CONTACTS}, PERMISSIONCODE);
+//                    }
+//                });
+//                return;
             }
             ActivityCompat.requestPermissions(activity, new String[]{permission}, PERMISSIONCODE);
-
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                    Manifest.permission.READ_CONTACTS)) {
+//                Toast.makeText(this,"应用需要必要的运行权限",Toast.LENGTH_SHORT);
+//
+//            } else {
+//                ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSIONCODE);
+//            }
         }
     }
 
+    /**
+     * 弹出一个对话框让用户授权
+     */
+    private static void showMessageOKCancel(Context context,String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(context)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
 
+//    /**
+//     * 更新是否拥有权限
+//     */
+//    public static boolean hasPermission(){
+//        return mHasPermission;
+//    }
+//    public static void updatePermission(boolean has){
+//        mHasPermission = has;
+//    }
 }

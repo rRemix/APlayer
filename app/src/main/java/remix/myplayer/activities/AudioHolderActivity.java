@@ -154,8 +154,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         super.onCreate(savedInstanceState);
         mInstance = this;
         setContentView(R.layout.activity_audio_holder);
-        //沉浸式状态栏
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+//        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         mFromMainActivity =  getIntent().getBooleanExtra("FromMainActivity",false);

@@ -4,8 +4,8 @@
 
     <style name="AppTheme" parent="BaseTheme">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">#242428</item>
-        <item name="colorPrimaryDark">#232023</item>
+        <item name="colorPrimary">#1d1a1d</item>
+        <item name="colorPrimaryDark">#1d1a1d</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
@@ -32,7 +32,6 @@
 
     <style name="AudioHolderStyle" parent="AppTheme.NoActionBar.Translucent">
         <!--<item name="android:windowAnimationStyle">@style/Audio_style</item>-->
-
     </style>
 
     <style name="CustomTabLayout" parent="Widget.Design.TabLayout">

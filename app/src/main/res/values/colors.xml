@@ -55,4 +55,5 @@
     <color name="cursor_color_gray">#484746</color>
     <!--光标颜色(紫)-->
     <color name="cursor_color_purple">#782899</color>
+
 </resources>
