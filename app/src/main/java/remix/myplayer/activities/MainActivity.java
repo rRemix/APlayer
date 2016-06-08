@@ -92,7 +92,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             PermissionUtil.RequestPermission(this, Manifest.permission.READ_PHONE_STATE);
             PermissionUtil.RequestPermission(this,Manifest.permission.WRITE_SETTINGS);
         }
-        
+
         //更新UI
         UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
