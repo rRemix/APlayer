@@ -11,4 +11,5 @@
     <dimen name="textsize_small">12sp</dimen>
     <dimen name="allsong_item_height">72dp</dimen>
     <dimen name="item_text_width">230dp</dimen>
+    <dimen name="interval_white_height">12dp</dimen>
 </resources>

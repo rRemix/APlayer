@@ -12,6 +12,7 @@ import java.util.Map;
  * 一些全局变量
  */
 public class Global {
+
     /**
      * 操作类型
      */
@@ -71,4 +72,7 @@ public class Global {
         mPlayingList = list;
         XmlUtil.updatePlayingList();
     }
+
+
+
 }

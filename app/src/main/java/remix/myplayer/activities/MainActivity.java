@@ -5,6 +5,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -52,6 +53,7 @@ import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.ErrUtil;
 import remix.myplayer.utils.Global;
+import remix.myplayer.utils.PermissionUtil;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.XmlUtil;
 
@@ -75,32 +77,22 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     private static boolean mIsRunning = false;
     //是否第一次启动
     private static boolean mIsFirst = true;
+
+    private static final int PERMISSIONCODE = 100;
+    private static final String[] PERMISSIONS = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.READ_PHONE_STATE};
     @Override
     protected void onResume() {
         super.onResume();
         mIsRunning = true;
         //请求权限
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.READ_CONTACTS)) {
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-                Toast.makeText(this,"应用需要必要的运行权限",Toast.LENGTH_SHORT);
-
-            } else {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        100);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
+        if(Build.VERSION.SDK_INT >= 23) {
+            PermissionUtil.RequestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+            PermissionUtil.RequestPermission(this, Manifest.permission.READ_PHONE_STATE);
+            PermissionUtil.RequestPermission(this,Manifest.permission.WRITE_SETTINGS);
         }
+        
         //更新UI
         UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
@@ -231,6 +223,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     private void initUtil() {
         //初始化工具类
+        PermissionUtil.setContext(getApplicationContext());
         XmlUtil.setContext(getApplicationContext());
         DBUtil.setContext(getApplicationContext());
         CommonUtil.setContext(getApplicationContext());
@@ -391,7 +384,15 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSIONCODE: {
+                boolean haspermission = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+//                PermissionUtil.updatePermission(haspermission);
+                break;
+            }
+
+            default:break;
+        }
     }
 }
 

@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
     <!--normal-->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -13,8 +14,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.GET_TASKS" />
-    <!--special-->
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+
+
 
     <application
         android:allowBackup="true"
@@ -25,6 +26,11 @@
         android:name=".application.Application">
         <meta-data android:value="56d6563367e58e6aa70005af" android:name="UMENG_APPKEY"/>
         <meta-data android:value="Umeng" android:name="UMENG_CHANNEL"/>
+
+        <activity android:name=".activities.SplashActivity"
+            android:theme="@style/ActivityStyle">
+
+        </activity>
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
