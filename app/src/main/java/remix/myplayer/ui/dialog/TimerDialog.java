@@ -198,16 +198,17 @@ public class TimerDialog extends BaseActivity {
         misRun = false;
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//    }
-//
-//    @Override
-//    public void finish() {
-//        super.finish();
-//        overridePendingTransition(0, R.anim.popup_out);
-//    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        overridePendingTransition(R.anim.popup_in,0);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, R.anim.popup_out);
+    }
 
     /**
      * 根据开始计时的时间，每隔一秒重新计算并通过handler更新界面
