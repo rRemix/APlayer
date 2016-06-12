@@ -33,12 +33,15 @@
     <string name="share_success">分享成功</string>
     <string name="share_cancel">分享取消</string>
     <string name="plz_input_sharecontent">请输入分享内容</string>
+    <string name="confirm">确认</string>
+    <string name="cancel">取消</string>
     <string name="song_lose_effect"></string>
     <string name="song_already_exist">该歌曲已经存在</string>
     <string name="add_success">添加成功</string>
     <string name="add_error">添加失败</string>
     <string name="confirm_delete_playlist">确认从该播放列表移除?</string>
     <string name="confirm_delete_song">确认从曲库删除?</string>
+    <string name="confirm_delelte">确认删除</string>
     <string name="delete_success">删除成功</string>
     <string name="delete_error">删除失败</string>
     <string name="set_ringtone_success">设置铃声成功</string>
@@ -54,4 +57,5 @@
     <string name="create_playlist">创建播放列表</string>
     <string name="use_system_color">使用系统底色</string>
     <string name="use_white_color">使用白色底色</string>
+
 </resources>

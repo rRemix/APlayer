@@ -3,41 +3,37 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/white">
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/delete_title"
         android:textColor="#000"
-        android:text="确认删除"
+        android:text="@string/confirm_delelte"
         android:textSize="20sp"
         android:layout_margin="12dp"/>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white">
+        android:layout_height="wrap_content">
         <Button
-            android:background="@color/transparent"
+            android:background="?android:attr/selectableItemBackground"
             android:layout_alignParentRight="true"
-            android:layout_width="40dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:layout_marginLeft="0dp"
+            android:layout_marginTop="8dp"
             android:id="@+id/delete_confirm"
             android:textColor="@color/text_color_black"
             android:textSize="@dimen/textsize_large"
-            android:text="确认"/>
+            android:text="@string/confirm"/>
         <Button
-            android:background="@color/transparent"
+            android:background="?android:attr/selectableItemBackground"
             android:layout_toLeftOf="@id/delete_confirm"
-            android:layout_width="40dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:layout_marginRight="0dp"
             android:id="@+id/delete_cancel"
             android:textColor="@color/text_color_black"
             android:textSize="@dimen/textsize_large"
-            android:text="取消"/>
+            android:text="@string/cancel"/>
 
     </RelativeLayout>
 </LinearLayout>

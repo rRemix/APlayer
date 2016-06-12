@@ -67,7 +67,6 @@ public class TimerDialog extends BaseActivity {
         final DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-
         w.setAttributes(lp);
         w.setGravity(Gravity.CENTER);
 

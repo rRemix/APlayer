@@ -87,11 +87,11 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         super.onResume();
         mIsRunning = true;
         //请求权限
-        if(Build.VERSION.SDK_INT >= 23) {
-            PermissionUtil.RequestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-            PermissionUtil.RequestPermission(this, Manifest.permission.READ_PHONE_STATE);
-            PermissionUtil.RequestPermission(this,Manifest.permission.WRITE_SETTINGS);
-        }
+//        if(Build.VERSION.SDK_INT >= 23) {
+//            PermissionUtil.RequestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+//            PermissionUtil.RequestPermission(this, Manifest.permission.READ_PHONE_STATE);
+//            PermissionUtil.RequestPermission(this,Manifest.permission.WRITE_SETTINGS);
+//        }
 
 //        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 //            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -395,17 +395,16 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         return Constants.MAINACTIVITY;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONCODE: {
-                boolean haspermission = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
-//                PermissionUtil.updatePermission(haspermission);
-                break;
-            }
-
-            default:break;
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        switch (requestCode) {
+//            case PERMISSIONCODE: {
+//                boolean haspermission = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+//                break;
+//            }
+//
+//            default:break;
+//        }
+//    }
 }
 

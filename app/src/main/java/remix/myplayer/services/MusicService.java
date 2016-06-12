@@ -480,7 +480,7 @@ public class MusicService extends BaseService {
      */
     private void PlaySelectSong(int position){
        
-        if((mCurrent = position) == -1 || (mCurrent > Global.mPlayingList.size()))
+        if((mCurrent = position) == -1 || (mCurrent > Global.mPlayingList.size() - 1))
             return;
         mId = Global.mPlayingList.get(mCurrent);
         MP3Info temp = mInfo;

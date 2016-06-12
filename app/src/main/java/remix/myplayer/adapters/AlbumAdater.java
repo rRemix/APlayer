@@ -22,6 +22,7 @@ import remix.myplayer.activities.MainActivity;
 import remix.myplayer.fragments.AlbumFragment;
 import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.listeners.PopupListener;
+import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 
@@ -84,13 +85,18 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         if(mCursor.moveToPosition(position)) {
-            //获得并设置专辑与艺术家
-            String artist = mCursor.getString(AlbumFragment.mArtistIndex);
-            String album = mCursor.getString(AlbumFragment.mAlbumIndex);
-            artist = artist.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_artist) : artist;
-            album = album.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_album) : album;
-            holder.mText1.setText(album);
-            holder.mText2.setText(artist);
+            try {
+                //获得并设置专辑与艺术家
+                String artist = CommonUtil.processInfo(mCursor.getString(AlbumFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
+                String album = CommonUtil.processInfo(mCursor.getString(AlbumFragment.mAlbumIndex),CommonUtil.ALBUMTYPE);
+//            artist = artist.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_artist) : artist;
+//            album = album.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_album) : album;
+                holder.mText1.setText(album);
+                holder.mText2.setText(artist);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+
 
             //设置封面
             holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
@@ -110,15 +116,13 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
                     @Override
                     public void onClick(View v) {
                         Context wrapper = new ContextThemeWrapper(mContext,R.style.MyPopupMenu);
-                        final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-                        MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
-
+                        final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
+                        popupMenu.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
                         mCursor.moveToPosition(position);
                         popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
                                 mCursor.getInt(AlbumFragment.mAlbumIdIndex),
                                 Constants.ALBUM_HOLDER,
                                 mCursor.getString(AlbumFragment.mAlbumIdIndex)));
-                        popupMenu.setGravity(Gravity.END);
                         popupMenu.show();
                     }
                 });

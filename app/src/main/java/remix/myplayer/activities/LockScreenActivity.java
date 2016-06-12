@@ -1,5 +1,6 @@
 package remix.myplayer.activities;
 
+import android.app.Activity;
 import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -43,7 +44,7 @@ import remix.myplayer.utils.XmlUtil;
  * 实际为将手机解锁并对Activity进行处理，使其看起来像锁屏界面
  */
 
-public class LockScreenActivity extends BaseActivity implements MusicService.Callback{
+public class LockScreenActivity extends Activity implements MusicService.Callback{
     private final static String TAG = "LockScreenActivity";
     public static LockScreenActivity mInstance;
     //当前播放的歌曲信息
@@ -121,10 +122,11 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         MusicService.addCallback(this);
         //解锁屏幕并全屏
         WindowManager.LayoutParams attr = getWindow().getAttributes();
-//        attr.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        attr.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
         attr.flags |= WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
         attr.flags |= WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
         //初始化按钮
         mPrevButton = (ImageButton)findViewById(R.id.playbar_prev);
         mNextBUtton = (ImageButton)findViewById(R.id.playbar_next);
@@ -296,7 +298,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
 //                canvas.scale(scaleFactor,  scaleFactor);
                 Paint paint = new Paint();
                 paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-                paint.setAlpha((int) (255 * 0.5));
+                paint.setAlpha((int) (255 * 0.75));
                 canvas.drawBitmap(mRawBitMap, 0, 0, paint);
                 mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
             }

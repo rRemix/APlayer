@@ -81,7 +81,7 @@
             android:theme="@style/ActivityStyle"/>
 
         <activity android:name=".activities.LockScreenActivity"
-            android:theme="@style/LockScreenDialog"
+            android:theme="@style/LockScreenActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleInstance"/>

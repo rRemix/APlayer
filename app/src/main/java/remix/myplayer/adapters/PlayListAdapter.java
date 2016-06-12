@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import remix.myplayer.R;
+import remix.myplayer.activities.MainActivity;
 import remix.myplayer.activities.PlayListActivity;
 import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.listeners.PopupListener;
@@ -111,11 +112,10 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                     holder.mButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Context wrapper = new ContextThemeWrapper(mContext, R.style.MyPopupMenu);
-                            final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-                            PlayListActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
+                            Context wrapper = new ContextThemeWrapper(MainActivity.mInstance, R.style.MyPopupMenu);
+                            final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
+                            popupMenu.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
                             popupMenu.setOnMenuItemClickListener(new PopupListener(mContext, position, Constants.PLAYLIST_HOLDER, ""));
-                            popupMenu.setGravity(Gravity.END);
                             popupMenu.show();
                         }
                     });

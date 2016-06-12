@@ -17,6 +17,7 @@ import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.customviews.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
+import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 
 
@@ -97,7 +98,7 @@ public class ChildHolderAdapter extends BaseAdapter implements ImpAdapter{
         }
 
         //设置标题
-        holder.mTitle.setText(temp.getDisplayname());
+        holder.mTitle.setText(CommonUtil.processInfo(temp.getDisplayname(),CommonUtil.SONGTYPE));
 
         //选项dialog
         final ImageView mItemButton = (ImageView)convertView.findViewById(R.id.song_item_button);

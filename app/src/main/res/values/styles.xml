@@ -111,9 +111,21 @@
         <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
     </style>
 
-    <!--底部弹出-->
-    <style name="PopupBottomDialog" parent="@android:style/Theme.Dialog" >
+    <!--底部弹出 parent="@android:style/Theme.Dialog"-->
+    <style name="PopupBottomDialog" parent="@style/AppTheme" >
         <item name="android:windowAnimationStyle">@style/AnimBottom</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+    </style>
+
+    <!--中心消失-->
+    <style name="PopupCenterDialog" parent="@style/AppTheme" >
+        <item name="android:windowAnimationStyle">@style/popwin_anim_style</item>
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowIsTranslucent">true</item>
@@ -129,32 +141,19 @@
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="android:label"></item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:windowCloseOnTouchOutside">true</item>
     </style>
 
     <!--锁屏-->
-    <style name="LockScreenDialog" parent="AppTheme.NoActionBar.Translucent">
+    <style name="LockScreenActivity" parent="AppTheme.NoActionBar.Translucent">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item>
-    </style>
-
-    <!--中心消失-->
-    <style name="PopupCenterDialog" parent="@style/AppTheme" >
-        <item name="android:windowAnimationStyle">@style/popwin_anim_style</item>
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:windowCloseOnTouchOutside">true</item>
     </style>
 
     <style name="OptionDialog" parent="@android:style/Theme.Dialog" >
@@ -189,6 +188,5 @@
 
     <style name="ActivityStyle" parent="@style/AppTheme.NoActionBar">
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
-
     </style>
 </resources>

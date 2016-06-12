@@ -15,7 +15,8 @@
     <RelativeLayout
         android:id="@+id/notifycolor_system"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground">
         <TextView
             android:id="@+id/popup_notify_system"
             android:layout_width="wrap_content"
@@ -44,7 +45,8 @@
         android:id="@+id/notifycolor_white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="?android:attr/selectableItemBackground">
         <TextView
             android:id="@+id/popup_notify_white"
             android:layout_width="wrap_content"

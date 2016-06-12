@@ -8,6 +8,8 @@ import android.net.NetworkInfo;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
+import remix.myplayer.R;
+
 /**
  * Created by Remix on 2015/11/30.
  */
@@ -273,15 +275,12 @@ public class CommonUtil {
         int minute = (int)duration / 1000 / 60;
         int second = ((int)duration - minute * 60000) / 1000;
         //如果分钟数小于10
-        if(minute < 10)
-        {
+        if(minute < 10) {
             if(second < 10)
                 return "0" + minute + ":0" + second;
             else
                 return "0" + minute + ":" + second;
-        }
-        else
-        {
+        } else {
             if(second < 10)
                 return minute + ":0" + second;
             else
@@ -294,8 +293,7 @@ public class CommonUtil {
      * @return
      */
     public static boolean isNetWorkConnected() {
-        if(mContext != null)
-        {
+        if(mContext != null) {
             ConnectivityManager mConnectivityManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo mNetWorkInfo = mConnectivityManager.getActiveNetworkInfo();
             if(mNetWorkInfo != null)
@@ -316,4 +314,28 @@ public class CommonUtil {
         return false;
     }
 
+    /**
+     * 处理歌曲名、歌手名或者专辑名
+     * @param origin 原始数据
+     * @param type 处理类型 0:歌曲名 1:歌手名 2:专辑名
+     * @return
+     */
+    public static final int SONGTYPE = 0;
+    public static final int ARTISTTYPE = 1;
+    public static final int ALBUMTYPE = 2;
+    public static String processInfo(String origin,int type){
+        if(type == SONGTYPE){
+            if(origin == null || origin.equals("") || origin.contains("unknown") ){
+                return mContext.getString(R.string.unknow_song);
+            } else {
+                return origin.lastIndexOf(".") > 0 ? origin.substring(0, origin.lastIndexOf(".")) : origin;
+            }
+        } else{
+            if(origin == null || origin.equals("") || origin.contains("unknown") ){
+                return mContext.getString(type == ARTISTTYPE ? R.string.unknow_artist : R.string.unknow_album);
+            } else {
+                return origin;
+            }
+        }
+    }
 }

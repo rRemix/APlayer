@@ -6,15 +6,6 @@
     android:layout_height="match_parent"
     android:id="@+id/audio_holder_container">
 
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/audio_holder_background"
-
-        fresco:failureImage="@drawable/no_art_normal"
-        fresco:failureImageScaleType="centerCrop"
-        android:visibility="gone"/>
-
    <LinearLayout
        android:layout_width="match_parent"
        android:layout_height="match_parent"
@@ -23,14 +14,12 @@
            android:layout_width="match_parent"
            android:id="@+id/blur_container"
            android:layout_height="0dp"
-           android:layout_weight="7"
-           android:layout_marginTop="15dp">
+           android:layout_weight="7">
            <!-- 顶部自定义actionbar、-->
            <RelativeLayout
                android:layout_width="match_parent"
                android:layout_height="60dp"
-               android:id="@+id/top_actionbar"
-               android:layout_marginTop="10dp">
+               android:id="@+id/top_actionbar">
                <ImageButton
                    style="@style/TopImageButton"
                    android:layout_centerVertical="true"

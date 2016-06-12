@@ -1,5 +1,6 @@
 package remix.myplayer.adapters;
 
+import android.app.VoiceInteractor;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import remix.myplayer.R;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
+import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.Global;
@@ -72,8 +74,8 @@ public class PlayingListAdapter extends BaseAdapter {
         final MP3Info temp = DBUtil.getMP3InfoById(Global.mPlayingList.get(position));
         if(temp != null) {
             //设置歌曲与艺术家
-            holder.mSong.setText(temp.getDisplayname());
-            holder.mArtist.setText(temp.getArtist());
+            holder.mSong.setText(CommonUtil.processInfo(temp.getDisplayname(),CommonUtil.SONGTYPE));
+            holder.mArtist.setText(CommonUtil.processInfo(temp.getArtist(),CommonUtil.ARTISTTYPE));
             //删除按钮
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override

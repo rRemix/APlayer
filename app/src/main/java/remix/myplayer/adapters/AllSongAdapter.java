@@ -20,6 +20,7 @@ import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.customviews.CircleImageView;
 import remix.myplayer.ui.customviews.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
+import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.Global;
 
@@ -59,9 +60,7 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
 
         if(!mCursor.moveToPosition(position))
             return convertView;
-        //设置歌曲名
-        String name = mCursor.getString(AllSongFragment.mDisPlayNameIndex);
-        name = name.substring(0, name.lastIndexOf("."));
+
         //获得当前播放的歌曲
         final MP3Info currentMP3 = MusicService.getCurrentMP3();
         //判断该歌曲是否是正在播放的歌曲
@@ -71,10 +70,10 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
             holder.mName.setTextColor(flag ? Color.parseColor("#782899") : Color.parseColor("#ffffffff"));
             mColumnView = (ColumnView)convertView.findViewById(R.id.columnview);
             mColumnView.setVisibility(flag ? View.VISIBLE : View.GONE);
-            if(flag){
-                Log.d("AllSongAdapter","song:" + name);
-                Log.d("AllSongAdapter","isplay:" + MusicService.getIsplay());
-            }
+//            if(flag){
+//                Log.d("AllSongAdapter","song:" + name);
+//                Log.d("AllSongAdapter","isplay:" + MusicService.getIsplay());
+//            }
             //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
             if(MusicService.getIsplay() && !mColumnView.getStatus() && flag){
                 mColumnView.startAnim();
@@ -85,16 +84,22 @@ public class AllSongAdapter extends SimpleCursorAdapter implements ImpAdapter{
                 mColumnView.stopAnim();
             }
         }
-        name = name.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_song) : name;
-        holder.mName.setText(name);
 
-        //艺术家与专辑
-        String artist = mCursor.getString(AllSongFragment.mArtistIndex);
-        String album = mCursor.getString(AllSongFragment.mAlbumIndex);
-        artist = artist.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_artist) : artist;
-        album = album.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_album) : album;
-        //封面
-        holder.mOther.setText(artist + "-" + album);
+        try {
+            //设置歌曲名
+            String name = CommonUtil.processInfo(mCursor.getString(AllSongFragment.mDisPlayNameIndex),CommonUtil.SONGTYPE);
+            holder.mName.setText(name);
+
+            //艺术家与专辑
+            String artist = CommonUtil.processInfo(mCursor.getString(AllSongFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
+            String album = CommonUtil.processInfo(mCursor.getString(AllSongFragment.mAlbumIndex),CommonUtil.ALBUMTYPE);
+            //封面
+            holder.mOther.setText(artist + "-" + album);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+
         ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mCursor.getString(AllSongFragment.mAlbumIdIndex),
                 holder.mImage);
         //选项Dialog

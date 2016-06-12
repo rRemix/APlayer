@@ -20,6 +20,7 @@ import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.customviews.CircleImageView;
 import remix.myplayer.ui.customviews.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
+import remix.myplayer.utils.CommonUtil;
 
 /**
  * Created by taeja on 16-3-4.
@@ -87,13 +88,19 @@ public class RecentlyAdapter extends BaseAdapter {
                 mColumnView.stopAnim();
             }
         }
-        //设置歌曲名
-        holder.mName.setText(temp.getDisplayname());
 
-        String artist = temp.getArtist();
-        String album = temp.getAlbum();
-        //设置艺术家与专辑名
-        holder.mOther.setText(artist + "-" + album);
+        try {
+            //设置歌曲名
+            holder.mName.setText( temp.getDisplayname() != null ? temp.getDisplayname() : mContext.getString(R.string.unknow_song));
+            String artist = CommonUtil.processInfo(temp.getArtist(),CommonUtil.ARTISTTYPE);
+            String album = CommonUtil.processInfo(temp.getAlbum(),CommonUtil.ALBUMTYPE);
+            //设置艺术家与专辑名
+            holder.mOther.setText(artist + "-" + album);
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
         //设置封面
         ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + temp.getAlbumId(),
                 holder.mImage);

@@ -63,6 +63,11 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
             for(PlayListItem tmp : PlayListActivity.getPlayList().get(name))
                 ids.add((long)tmp.getId());
         }
+
+        if(ids == null || ids.size() == 0){
+            Toast.makeText(mContext,mContext.getString(R.string.list_isempty),Toast.LENGTH_SHORT).show();
+            return true;
+        }
         switch (item.getItemId()) {
             //播放
             case R.id.menu_play:

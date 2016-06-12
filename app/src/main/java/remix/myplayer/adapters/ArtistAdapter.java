@@ -24,6 +24,7 @@ import remix.myplayer.activities.MainActivity;
 import remix.myplayer.fragments.ArtistFragment;
 import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.listeners.PopupListener;
+import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 
@@ -88,13 +89,16 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         if(mCursor.moveToPosition(position)) {
-            //设置歌手名
-            String artist = mCursor.getString(ArtistFragment.mArtistIndex);
-            artist = artist.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_artist) : artist;
-            holder.mText1.setText(artist);
-            //设置封面
-            AsynLoadImage task = new AsynLoadImage(holder.mImage);
-            task.execute(mCursor.getString(ArtistFragment.mArtistIdIndex),artist);
+            try {
+                //设置歌手名
+                String artist = CommonUtil.processInfo(mCursor.getString(ArtistFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
+                holder.mText1.setText(artist);
+                //设置封面
+                AsynLoadImage task = new AsynLoadImage(holder.mImage);
+                task.execute(mCursor.getString(ArtistFragment.mArtistIdIndex),artist);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
 
 //            Uri uri = Uri.parse("content://media/external/audio/media/" + mCursor.getString(ArtistFragment.mArtistIndex) + "/albumart");
 //            holder.mImage.setImageURI(uri);
