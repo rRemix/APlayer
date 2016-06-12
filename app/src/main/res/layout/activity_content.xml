@@ -10,10 +10,7 @@
         android:orientation="vertical"
         android:id="@+id/layout_main">
         <!-- 主内容-->
-        <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
-            android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-            android:background="@color/background_color_3">
-        </android.support.v7.widget.Toolbar>
+        <include layout="@layout/toolbar"/>
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"

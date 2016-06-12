@@ -8,7 +8,11 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize">
+        android:layout_height="wrap_content"
+        android:background="@color/background_color_3"
+        android:paddingTop="@dimen/toolbar_padding_top"
+        android:fitsSystemWindows="true">
+
     <android.support.v7.widget.SwitchCompat
         android:background="@color/transparent"
         android:layout_width="wrap_content"

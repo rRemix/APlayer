@@ -4,7 +4,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/audio_holder_container">
+    android:id="@+id/audio_holder_container"
+    android:paddingTop="@dimen/activity_padding_top">
 
    <LinearLayout
        android:layout_width="match_parent"
@@ -179,10 +180,4 @@
                android:layout_marginRight="20dp"/>
        </RelativeLayout>
    </LinearLayout>
-
-
-
-
-
-
 </FrameLayout>

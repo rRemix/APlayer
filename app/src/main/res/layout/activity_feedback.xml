@@ -5,10 +5,7 @@
     android:background="@color/background_color_3"
     android:gravity="center_horizontal">
 
-    <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize">
-    </android.support.v7.widget.Toolbar>
+    <include layout="@layout/toolbar"/>
 
     <LinearLayout
         android:layout_width="match_parent"
