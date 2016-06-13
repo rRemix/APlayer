@@ -56,6 +56,6 @@
     <string name="no_search_result">无搜索结果</string>
     <string name="create_playlist">创建播放列表</string>
     <string name="use_system_color">使用系统底色</string>
-    <string name="use_white_color">使用白色底色</string>
+    <string name="use_black_color">使用黑色底色</string>
 
 </resources>

@@ -70,23 +70,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/playbar_prev"
-            android:background="@drawable/wy_lock_btn_prev"/>
+            android:background="@drawable/lock_btn_prev"/>
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/playbar_play"
-            android:background="@drawable/wy_lock_btn_play"/>
+            android:background="@drawable/lock_btn_play"/>
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/playbar_next"
-            android:background="@drawable/wy_lock_btn_next"/>
+            android:background="@drawable/lock_btn_next"/>
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/lockscreen_love"
             android:onClick="onLove"
-            android:background="@drawable/wy_lock_btn_love"/>
+            android:background="@drawable/lock_btn_love"/>
     </LinearLayout>
 
     <TextView

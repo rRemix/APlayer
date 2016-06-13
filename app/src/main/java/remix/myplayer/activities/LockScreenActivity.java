@@ -221,14 +221,20 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         if(!mIsRunning )
             return;
         //只更新播放按钮
-        mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.wy_lock_btn_pause : R.drawable.wy_lock_btn_play));
+        if(mPlayButton != null){
+            mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.lock_btn_pause : R.drawable.lock_btn_play));
+        }
         if(Global.getOperation() == Constants.PLAYORPAUSE && mIsFirst){
             mIsFirst = false;
             return;
         }
         //标题
-        mSong.setText(mInfo.getDisplayname());
-        mArtist.setText(mInfo.getArtist());
+        if(mSong != null) {
+            mSong.setText(mInfo.getDisplayname());
+        }
+        if(mArtist != null) {
+            mArtist.setText(mInfo.getArtist());
+        }
         //判断是否收藏
         mIsLove = false;
         try {
@@ -242,9 +248,13 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
             Log.d(TAG,"list error:" + e.toString());
             e.printStackTrace();
         }
-        mLoveButton.setImageResource(mIsLove ? R.drawable.wy_lock_btn_loved : R.drawable.wy_lock_btn_love);
+        if(mLoveButton != null) {
+            mLoveButton.setImageResource(mIsLove ? R.drawable.lock_btn_loved : R.drawable.lock_btn_love);
+        }
 
-        mSimpleImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),mInfo.getAlbumId()));
+        if(mSimpleImage != null) {
+            mSimpleImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
+        }
 
         new BlurThread().start();
     }
@@ -265,7 +275,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
             XmlUtil.deleteSongFromPlayList(getString(R.string.my_favorite),new PlayListItem(mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId(),mInfo.getArtist()));
         }
         mIsLove = !mIsLove;
-        mLoveButton.setImageResource(mIsLove ? R.drawable.wy_lock_btn_loved : R.drawable.wy_lock_btn_love);
+        mLoveButton.setImageResource(mIsLove ? R.drawable.lock_btn_loved : R.drawable.lock_btn_love);
     }
 
 

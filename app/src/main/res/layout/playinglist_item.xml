@@ -30,8 +30,9 @@
     </LinearLayout>
     <ImageView
         android:layout_marginLeft="16dp"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_marginRight="8dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:id="@+id/playlist_item_button"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"

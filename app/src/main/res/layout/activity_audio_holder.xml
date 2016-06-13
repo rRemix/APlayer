@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/audio_holder_container"
-    android:paddingTop="@dimen/activity_padding_top">
+    android:fitsSystemWindows="true">
 
    <LinearLayout
        android:layout_width="match_parent"
@@ -24,7 +23,7 @@
                <ImageButton
                    style="@style/TopImageButton"
                    android:layout_centerVertical="true"
-                   android:background="?android:attr/selectableItemBackground"
+                   android:background="@color/transparent"
                    android:src="@drawable/play_btn_back"
                    android:id="@+id/top_hide"
                    android:layout_alignParentLeft="true"/>
@@ -140,9 +139,10 @@
                android:layout_height="40dp"
                android:id="@+id/playbar_model"
                android:layout_alignParentLeft="true"
-               android:background="?android:attr/selectableItemBackground"
+               android:src="@drawable/bg_btn_holder_playmodel_normal"
+               android:background="@color/transparent"
                android:layout_centerVertical="true"
-               android:layout_marginLeft="20dp"/>
+               android:layout_marginLeft="24dp"/>
            <ImageButton
                android:id="@+id/playbar_play"
                android:layout_width="60dp"
@@ -150,7 +150,7 @@
                android:scaleType="center"
                android:layout_centerInParent="true"
                android:src="@drawable/bg_btn_holder_play"
-               android:background="?android:attr/selectableItemBackground"/>
+               android:background="@color/transparent"/>
            <ImageButton
                android:id="@+id/playbar_prev"
                android:layout_toLeftOf="@id/playbar_play"
@@ -159,7 +159,7 @@
                android:layout_marginRight="16dp"
                android:layout_centerVertical="true"
                android:src="@drawable/bg_btn_holder_prev"
-               android:background="?android:attr/selectableItemBackground"/>
+               android:background="@color/transparent"/>
            <ImageButton
                android:id="@+id/playbar_next"
                android:layout_width="60dp"
@@ -168,7 +168,7 @@
                android:layout_marginLeft="16dp"
                android:layout_centerVertical="true"
                android:src="@drawable/bg_btn_holder_next"
-               android:background="?android:attr/selectableItemBackground"/>
+               android:background="@color/transparent"/>
            <ImageButton
                android:layout_width="40dp"
                android:layout_height="40dp"
@@ -176,8 +176,10 @@
                android:layout_alignParentRight="true"
                android:layout_centerVertical="true"
                android:src="@drawable/bg_btn_holder_playlist"
-               android:background="?android:attr/selectableItemBackground"
-               android:layout_marginRight="20dp"/>
+               android:background="@color/transparent"
+               android:layout_marginRight="24dp"/>
        </RelativeLayout>
    </LinearLayout>
+
+
 </FrameLayout>

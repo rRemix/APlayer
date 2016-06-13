@@ -40,6 +40,8 @@
     <color name="drawer_list_color">#1d1a1d</color>
     <!-- 白色字体-->
     <color name="text_color_white">#ffffff</color>
+    <!--白色字体1-->
+    <color name="text_color_white_1">#f2f2f2</color>
     <!-- 灰色字体 -->
     <color name="text_color_gray">#6c6a6c</color>
     <!--专辑与艺术家灰色字体-->

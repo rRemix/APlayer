@@ -55,12 +55,13 @@ public class NotifyReceiver extends BroadcastReceiver {
             //设置歌手，歌曲名
             mRemoteView.setTextViewText(R.id.notify_song, temp.getDisplayname());
             mRemoteView.setTextColor( R.id.notify_song,isSystemColor ?
-                    context.getResources().getColor(R.color.text_color_white)
-                    : context.getResources().getColor(R.color.text_color_black));
+                    context.getResources().getColor(R.color.text_color_white_1)
+                    : context.getResources().getColor(R.color.text_color_white));
+
             mRemoteView.setTextViewText(R.id.notify_artist_album, temp.getArtist() + " - " + temp.getAlbum());
 
             //背景
-            mRemoteView.setImageViewResource(R.id.notify_bg,isSystemColor ? R.drawable.bg_system : R.drawable.bg_white);
+            mRemoteView.setImageViewResource(R.id.notify_bg,isSystemColor ? R.drawable.bg_system : R.drawable.bg_black);
 
             //设置封面
             Bitmap bitmap = DBUtil.CheckBitmapBySongId((int) temp.getId(), true);
@@ -107,7 +108,6 @@ public class NotifyReceiver extends BroadcastReceiver {
                     .setWhen(System.currentTimeMillis())
                     .setPriority(Notification.PRIORITY_HIGH)
                     .setOngoing(true)
-                    .setVisibility(Notification.VISIBILITY_PUBLIC)
                     .setSmallIcon(R.drawable.notifbar_icon);
 
             //点击通知栏打开播放界面

@@ -51,7 +51,7 @@ public class EQActivity extends ToolbarActivity {
     private static short mBassBoostLevel;
     private static short mVirtualizeLevel;
     private static boolean mIsRunning;
-
+    private static boolean mHasInitial = false;
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -126,8 +126,10 @@ public class EQActivity extends ToolbarActivity {
                 for(short i = 0 ; i < 31; i++){
                     mBandLevels.add((short)(1500 - (i * temp)));
                 }
-
+                //初始化完成
+                mHasInitial = false;
             }
+
         }.start();
 
     }
@@ -157,6 +159,11 @@ public class EQActivity extends ToolbarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if(!mHasInitial){
+            Toast.makeText(this,getString(R.string.eq_initial_failed),Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eq);
 
