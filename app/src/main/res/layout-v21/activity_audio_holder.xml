@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -135,49 +134,55 @@
             android:layout_height="0dp"
             android:layout_weight="1.5"
             android:layout_marginBottom="10dp">
-            <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:id="@+id/playbar_model"
-                android:layout_alignParentLeft="true"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="20dp"/>
-            <ImageButton
-                android:id="@+id/playbar_play"
-                android:layout_width="60dp"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:scaleType="center"
-                android:layout_centerInParent="true"
-                android:src="@drawable/bg_btn_holder_play"
-                android:background="?android:attr/selectableItemBackgroundBorderless"/>
-            <ImageButton
-                android:id="@+id/playbar_prev"
-                android:layout_toLeftOf="@id/playbar_play"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginRight="16dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/bg_btn_holder_prev"
-                android:background="?android:attr/selectableItemBackgroundBorderless"/>
-            <ImageButton
-                android:id="@+id/playbar_next"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_toRightOf="@id/playbar_play"
-                android:layout_marginLeft="16dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/bg_btn_holder_next"
-                android:background="?android:attr/selectableItemBackgroundBorderless"/>
-            <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:id="@+id/playbar_playinglist"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/bg_btn_holder_playlist"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:layout_marginRight="20dp"/>
+                android:background="@color/transparent">
+                <ImageButton
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/playbar_model"
+                    android:layout_alignParentLeft="true"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"/>
+                <ImageButton
+                    android:id="@+id/playbar_play"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:scaleType="center"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/bg_btn_holder_play"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"/>
+                <ImageButton
+                    android:id="@+id/playbar_prev"
+                    android:layout_toLeftOf="@id/playbar_play"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/bg_btn_holder_prev"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"/>
+                <ImageButton
+                    android:id="@+id/playbar_next"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_toRightOf="@id/playbar_play"
+                    android:layout_marginLeft="16dp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/bg_btn_holder_next"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"/>
+                <ImageButton
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/playbar_playinglist"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/bg_btn_holder_playlist"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:layout_marginRight="16dp"/>
+            </RelativeLayout>
         </RelativeLayout>
     </LinearLayout>
 

@@ -481,7 +481,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         mIsPlay = isplay;
 
         //当操作不为播放或者暂停且正在运行时，更新界面
-        if(Global.getOperation() != Constants.PLAYORPAUSE ) {
+        if(Global.getOperation() != Constants.PLAYORPAUSE && mInfo != null ) {
             try {
                 //更新顶部信息
                 UpdateTopStatus(mInfo);

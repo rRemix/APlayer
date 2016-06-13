@@ -135,14 +135,14 @@
            android:layout_weight="1.5"
            android:layout_marginBottom="10dp">
            <ImageButton
-               android:layout_width="40dp"
-               android:layout_height="40dp"
+               android:layout_width="50dp"
+               android:layout_height="50dp"
                android:id="@+id/playbar_model"
                android:layout_alignParentLeft="true"
                android:src="@drawable/bg_btn_holder_playmodel_normal"
                android:background="@color/transparent"
                android:layout_centerVertical="true"
-               android:layout_marginLeft="24dp"/>
+               android:layout_marginLeft="16dp"/>
            <ImageButton
                android:id="@+id/playbar_play"
                android:layout_width="60dp"
@@ -170,14 +170,14 @@
                android:src="@drawable/bg_btn_holder_next"
                android:background="@color/transparent"/>
            <ImageButton
-               android:layout_width="40dp"
-               android:layout_height="40dp"
+               android:layout_width="50dp"
+               android:layout_height="50dp"
                android:id="@+id/playbar_playinglist"
                android:layout_alignParentRight="true"
                android:layout_centerVertical="true"
                android:src="@drawable/bg_btn_holder_playlist"
                android:background="@color/transparent"
-               android:layout_marginRight="24dp"/>
+               android:layout_marginRight="16dp"/>
        </RelativeLayout>
    </LinearLayout>
 

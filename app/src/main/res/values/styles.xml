@@ -79,9 +79,9 @@
 
     <!-- 顶部两个按钮 -->
     <style name="TopImageButton">
-        <item name="android:layout_width">30dp</item>
-        <item name="android:layout_height">30dp</item>
-        <item name="android:layout_marginLeft">19dp</item>
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_marginLeft">16dp</item>
     </style>
 
     <!-- 播放时间 -->
