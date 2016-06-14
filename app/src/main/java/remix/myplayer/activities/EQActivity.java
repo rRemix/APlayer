@@ -127,7 +127,7 @@ public class EQActivity extends ToolbarActivity {
                     mBandLevels.add((short)(1500 - (i * temp)));
                 }
                 //初始化完成
-                mHasInitial = false;
+                mHasInitial = true;
             }
 
         }.start();

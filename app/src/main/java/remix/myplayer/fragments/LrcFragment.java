@@ -16,7 +16,7 @@ import remix.myplayer.infos.LrcInfo;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.ui.customviews.LrcView;
 import remix.myplayer.utils.CommonUtil;
-import remix.myplayer.utils.SearchLRC;
+import remix.myplayer.utils.lrc.SearchLRC;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -26,10 +26,11 @@ import remix.myplayer.utils.SearchLRC;
  * 歌词界面Fragment
  */
 public class LrcFragment extends Fragment {
-    //是否找到歌词的三种状态
+    //是否找到歌词的几种状态
     private static int UPDATE_LRC = 1;
     private static int NO_LRC = 2;
     private static int NO_NETWORK = 3;
+    private static int SEARCHING = 4;
     private MP3Info mInfo;
     private LrcView mLrcView;
     //歌词列表
@@ -39,9 +40,11 @@ public class LrcFragment extends Fragment {
         public void handleMessage(Message msg) {
             if(mLrcView == null)
                 return;
+            //是否正在搜索
+            mLrcView.setIsSearching(msg.what == SEARCHING);
             if(msg.what == UPDATE_LRC) {
                 //更新歌词
-                if(mLrcList != null && mLrcView != null) {
+                if(mLrcList != null) {
                     mLrcView.UpdateLrc(mLrcList);
                 }
             } else if (msg.what == NO_LRC) {
@@ -83,7 +86,7 @@ public class LrcFragment extends Fragment {
                 mHandler.sendEmptyMessage(NO_NETWORK);
                 return;
             }
-
+            mHandler.sendEmptyMessage(SEARCHING);
             mLrcList = new SearchLRC(mName,mArtist).getLrc();
             if(mLrcList == null) {
                 mHandler.sendEmptyMessage(NO_LRC);

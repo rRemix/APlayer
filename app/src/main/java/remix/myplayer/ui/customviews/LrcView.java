@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.Scroller;
 import android.widget.TextView;
 
@@ -48,6 +47,8 @@ public class LrcView extends TextView {
     //当前绘制的最小和最大行数
     private int mMinRow;
     private int mMaxRow;
+    //是否正在搜索歌词
+    private boolean mIsSearching = false;
     public LrcView(Context context) {
         super(context);
         mInstance = this;
@@ -84,6 +85,11 @@ public class LrcView extends TextView {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        if(mIsSearching){
+            scrollTo(0,0);
+            canvas.drawText("正在搜索歌词", mViewCenterX, getHeight() / 2, mPaint);
+            return;
+        }
         if(mlrcList == null){
             scrollTo(0,0);
             canvas.drawText("暂无歌词", mViewCenterX, getHeight() / 2, mPaint);
@@ -189,5 +195,9 @@ public class LrcView extends TextView {
         mViewCenterX = (int)(w * 0.5);
         mViewHeight = h;
         mViewCenterY = (int)(h * 0.5);
+    }
+
+    public void setIsSearching(boolean searching){
+        mIsSearching = searching;
     }
 }

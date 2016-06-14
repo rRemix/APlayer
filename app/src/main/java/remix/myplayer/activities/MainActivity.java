@@ -32,6 +32,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.umeng.analytics.MobclickAgent;
+import com.umeng.update.UmengUpdateAgent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,7 @@ import remix.myplayer.utils.Global;
 import remix.myplayer.utils.PermissionUtil;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.XmlUtil;
+import remix.myplayer.utils.lrc.LrcCache;
 
 
 /**
@@ -132,7 +134,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //检查更新
-//        UmengUpdateAgent.update(this);
+        UmengUpdateAgent.update(this);
 //        MobclickAgent.setDebugMode(true);
         MobclickAgent.setCatchUncaughtExceptions(true);
         initUtil();
@@ -241,6 +243,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         DBUtil.setContext(getApplicationContext());
         CommonUtil.setContext(getApplicationContext());
         ErrUtil.setContext(getApplicationContext());
+        LrcCache.init(getApplicationContext());
 
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
                 .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {
