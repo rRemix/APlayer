@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/allsong_item_height"
+    android:id="@+id/songlist_item"
+    android:background="?android:attr/selectableItemBackground">
+    <remix.myplayer.ui.customviews.CircleImageView
+        android:layout_alignParentLeft="true"
+        android:id="@+id/song_head_image"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="16dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"/>
+    <!--歌曲名、歌手、专辑-->
+    <LinearLayout
+        android:layout_width="180dp"
+        android:layout_height="@dimen/allsong_item_height"
+        android:layout_toRightOf="@id/song_head_image"
+        android:layout_marginLeft="16dp"
+        android:orientation="vertical"
+        android:id="@+id/allsong_text_container">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:ellipsize="end"
+            android:textSize="@dimen/textsize_medium"
+            android:textColor="@color/text_color_white"
+            android:id="@+id/displayname"
+            android:layout_marginTop="16dp"
+            android:text="歌曲名" />
+        <TextView
+            android:id="@+id/detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:ellipsize="end"
+            android:textSize="@dimen/textsize_small"
+            android:textColor="@color/text_color_gray"
+            android:text="歌手与专辑"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+    <!--结尾处按钮-->
+    <ImageView
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"
+        android:id="@+id/allsong_item_button"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:scaleType="center"
+        android:src="@drawable/list_icn_more"
+        android:background="?android:attr/selectableItemBackground"/>
+
+    <remix.myplayer.ui.customviews.ColumnView
+        android:layout_centerVertical="true"
+        android:layout_width="18dp"
+        android:layout_height="16dp"
+        app:columnwidth="2dp"
+        app:columncolor="#782899"
+        app:columnnum="4"
+        android:id="@+id/columnview"
+        android:layout_toRightOf="@id/allsong_text_container"
+        android:layout_marginLeft="16dp" />
+
+</RelativeLayout>

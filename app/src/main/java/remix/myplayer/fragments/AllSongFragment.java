@@ -4,6 +4,8 @@ package remix.myplayer.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -11,15 +13,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+
+import java.util.ArrayList;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.AllSongAdapter;
-import remix.myplayer.listeners.ListViewListener;
+import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.services.MusicService;
+import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.Global;
 
@@ -32,9 +39,7 @@ import remix.myplayer.utils.Global;
  */
 public class AllSongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private LoaderManager mManager;
-    private AllSongAdapter mAdapter;
     private Cursor mCursor = null;
-    private ListView mListView;
     //歌曲名 艺术家 专辑名 专辑id 歌曲id对应的索引
     public static int mDisPlayNameIndex = -1;
     public static int mArtistIndex = -1;
@@ -42,7 +47,8 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     public static int mAlbumIdIndex = -1;
     public static int mSongId = -1;
     public static AllSongFragment mInstance = null;
-
+    private RecyclerView mRecyclerView;
+    private AllSongAdapter mAdapter;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -82,42 +88,39 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
                 getActivity().sendBroadcast(intent);
             }
         });
-//        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview);
-//        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-//
-//        mTestAdapter = new TestAdapter(mCursor,getActivity());
-//        mTestAdapter.setOnItemClickLitener(new OnItemClickListener() {
-//            @Override
-//            public void onItemClick(View view, int position) {
-//                DBUtil.setPlayingList((ArrayList<Long>) DBUtil.mAllSongList.clone());
-//                Intent intent = new Intent(Constants.CTL_ACTION);
-//                Bundle arg = new Bundle();
-//                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-//                arg.putInt("Position", position);
-//                intent.putExtras(arg);
-//                getActivity().sendBroadcast(intent);
-//            }
-//
-//            @Override
-//            public void onItemLongClick(View view, int position) {
-//            }
-//        });
-//        mRecyclerView.setAdapter(mTestAdapter);
+        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.addItemDecoration(new RecyclerItemDecoration(getContext(),RecyclerItemDecoration.VERTICAL_LIST));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mListView = (ListView)rootView.findViewById(R.id.list);
-        mListView.setOnItemClickListener(new ListViewListener(getActivity()));
-        mAdapter = new AllSongAdapter(getActivity(),R.layout.allsong_item,null,new String[]{},new int[]{},0);
-        mListView.setAdapter(mAdapter);
+        mAdapter = new AllSongAdapter(mCursor,getActivity());
+        mAdapter.setOnItemClickLitener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Global.setPlayingList(Global.mAllSongList);
+                Intent intent = new Intent(Constants.CTL_ACTION);
+                Bundle arg = new Bundle();
+                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                arg.putInt("Position", position);
+                intent.putExtras(arg);
+                getActivity().sendBroadcast(intent);
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+            }
+        });
+        mRecyclerView.setAdapter(mAdapter);
+
         return rootView;
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         //查询所有歌曲
-        CursorLoader loader = new CursorLoader(getActivity(),
+        return  new CursorLoader(getActivity(),
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null,MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-        return  loader;
     }
 
     @Override
@@ -132,16 +135,14 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         mSongId = data.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
         mAlbumIdIndex = data.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
         if(mCursor != null) {
-            mAdapter.changeCursor(mCursor);
             mAdapter.setCursor(mCursor);
-//            mTestAdapter.setCursor(mCursor);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        if (mAdapter != null)
-            mAdapter.changeCursor(null);
+        if(mAdapter != null)
+            mAdapter.setCursor(null);
     }
 
     public AllSongAdapter getAdapter(){

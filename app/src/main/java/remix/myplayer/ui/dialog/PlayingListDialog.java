@@ -12,8 +12,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.BaseActivity;
+import remix.myplayer.ui.activities.BaseActivity;
 import remix.myplayer.adapters.PlayingListAdapter;
+import remix.myplayer.inject.ViewInject;
 import remix.myplayer.utils.Constants;
 
 /**
@@ -24,16 +25,21 @@ import remix.myplayer.utils.Constants;
  * 正在播放列表Dialog
  */
 public class PlayingListDialog extends BaseActivity {
+    @ViewInject(R.id.bottom_actionbar_play_list)
     private ListView mListView;
     private PlayingListAdapter mAdapter;
     public static PlayingListDialog mInstance;
     private static boolean mNeedRefresh = false;
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.popup_playinglist;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.popup_playinglist);
         mInstance = this;
-        mListView = (ListView)findViewById(R.id.bottom_actionbar_play_list);
         mAdapter = new PlayingListAdapter( getApplicationContext());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new ListViewListener());

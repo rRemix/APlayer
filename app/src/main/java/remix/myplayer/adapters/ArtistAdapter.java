@@ -14,13 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.MainActivity;
+import remix.myplayer.ui.activities.MainActivity;
 import remix.myplayer.fragments.ArtistFragment;
 import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.listeners.PopupListener;
@@ -82,8 +81,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ViewHolder holder = new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.artist_recycle_item, null, false));
-        return holder;
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.artist_recycle_item, null, false));
     }
 
     @Override

@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import java.util.LinkedList;
 
-import remix.myplayer.activities.AudioHolderActivity;
+import remix.myplayer.ui.activities.AudioHolderActivity;
 import remix.myplayer.infos.LrcInfo;
 import remix.myplayer.utils.DensityUtil;
 

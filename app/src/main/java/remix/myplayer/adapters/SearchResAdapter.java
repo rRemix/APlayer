@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.SearchActivity;
+import remix.myplayer.ui.activities.SearchActivity;
 
 /**
  * Created by Remix on 2016/1/23.

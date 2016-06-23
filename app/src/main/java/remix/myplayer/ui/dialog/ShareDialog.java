@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -38,10 +37,10 @@ import com.tencent.tauth.UiError;
 import java.net.URLEncoder;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.BaseActivity;
-import remix.myplayer.activities.RecordShareActivity;
+import remix.myplayer.ui.activities.BaseActivity;
+import remix.myplayer.ui.activities.RecordShareActivity;
 import remix.myplayer.infos.MP3Info;
-import remix.myplayer.utils.CommonUtil;
+import remix.myplayer.inject.ViewInject;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 
@@ -55,12 +54,19 @@ import remix.myplayer.utils.DBUtil;
 public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     public static ShareDialog mInstance;
     //四个分享按钮
+    @ViewInject(R.id.share_qq)
     private ImageView mQQ;
+    @ViewInject(R.id.share_weibo)
     private ImageView mWeibo;
+    @ViewInject(R.id.share_wechat)
     private ImageView mWechat;
+    @ViewInject(R.id.share_circlefriend)
     private ImageView mCircleFrient;
-    private MP3Info mInfo;
+    //取消按钮
+    @ViewInject(R.id.popup_share_cancel)
     private Button mCancel;
+
+    private MP3Info mInfo;
     //Api
     private Tencent mTencentApi;
     private IWeiboShareAPI mWeiboApi;
@@ -69,11 +75,16 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     private String mImageUrl;
     //分享心情还是歌曲
     private int mType;
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.popup_share;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mInstance = this;
-        setContentView(R.layout.popup_share);
 
         mInfo = (MP3Info)getIntent().getExtras().getSerializable("MP3Info");
         mType = (int)getIntent().getExtras().getInt("Type");
@@ -108,7 +119,6 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         }
 
 
-        mQQ = (ImageButton)findViewById(R.id.share_qq);
         mQQ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -119,7 +129,6 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
 
             }
         });
-        mWeibo = (ImageButton)findViewById(R.id.share_weibo);
         mWeibo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,13 +146,10 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         });
 
         WeChatClickListener listener = new WeChatClickListener();
-        mWechat = (ImageButton)findViewById(R.id.share_wechat);
         mWechat.setOnClickListener(listener);
 
-        mCircleFrient = (ImageButton)findViewById(R.id.share_circlefriend);
         mCircleFrient.setOnClickListener(listener);
 
-        mCancel = (Button)findViewById(R.id.popup_share_cancel);
         mCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

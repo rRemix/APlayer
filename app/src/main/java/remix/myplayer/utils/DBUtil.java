@@ -16,8 +16,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 
-import remix.myplayer.activities.ChildHolderActivity;
-import remix.myplayer.activities.PlayListActivity;
+import remix.myplayer.ui.activities.ChildHolderActivity;
+import remix.myplayer.ui.activities.PlayListActivity;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.infos.PlayListItem;
 

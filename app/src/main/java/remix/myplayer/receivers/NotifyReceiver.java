@@ -12,7 +12,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.AudioHolderActivity;
+import remix.myplayer.ui.activities.AudioHolderActivity;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.utils.Constants;

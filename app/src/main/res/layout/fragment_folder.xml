@@ -6,6 +6,11 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/interval_white_height"
         android:background="@color/background_color_interval"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

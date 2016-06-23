@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.MainActivity;
+import remix.myplayer.ui.activities.MainActivity;
 
 /**
  * Created by taeja on 16-6-8.

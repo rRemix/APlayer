@@ -3,28 +3,38 @@ package remix.myplayer.adapters;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.ParcelFileDescriptor;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectStreamException;
+import java.net.URI;
+
 import remix.myplayer.R;
-import remix.myplayer.activities.MainActivity;
 import remix.myplayer.fragments.AlbumFragment;
 import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.listeners.PopupListener;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.thumb.SearchCover;
 
 /**
  * Created by Remix on 2015/12/20.
@@ -53,33 +63,31 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
 
 
     //<Params, Progress, Result>
-    class AsynLoadImage extends AsyncTask<Integer,Integer,Object> {
-//        private final WeakReference mImageView;
-//        private final ImageView mImage;
+    class AsynLoadImage extends AsyncTask<Object,Integer,String> {
         private final SimpleDraweeView mImage;
         public AsynLoadImage(SimpleDraweeView imageView) {
-//            mImageView = new WeakReference(imageView);
             mImage = imageView;
         }
         @Override
-        protected Object doInBackground(Integer... params) {
-//            return CommonUtil.CheckBitmapByAlbumId(params[0],true);
-            return DBUtil.getImageUrl(String.valueOf(params[0]),Constants.URL_ALBUM);
-//            return DBUtil.CheckUrlByAlbumId(params[0]);
+        protected String doInBackground(Object... params) {
+            if(CommonUtil.isAlbumThumbExistInDB((Uri) params[0])){
+                return params[0].toString();
+            } else {
+                return CommonUtil.getCoverInCache((long)params[1]);
+            }
+//            return new SearchCover("海阔天空","Beyond",SearchCover.COVER).getImgUrl();
         }
         @Override
-        protected void onPostExecute(Object url) {
-            Uri uri = Uri.parse("file:///" + (String)url);
-            if(mImage != null);{
-                mImage.setImageURI(uri);
+        protected void onPostExecute(String uri) {
+            if(mImage != null && uri != null);{
+                mImage.setImageURI(Uri.parse(uri));
             }
         }
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ViewHolder holder = new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.album_recycle_item, null, false));
-        return holder;
+        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.album_recycle_item, null, false));
     }
 
     @Override
@@ -89,18 +97,21 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
                 //获得并设置专辑与艺术家
                 String artist = CommonUtil.processInfo(mCursor.getString(AlbumFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
                 String album = CommonUtil.processInfo(mCursor.getString(AlbumFragment.mAlbumIndex),CommonUtil.ALBUMTYPE);
-//            artist = artist.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_artist) : artist;
-//            album = album.indexOf("unknown") > 0 ? mContext.getString(R.string.unknow_album) : album;
+
                 holder.mText1.setText(album);
                 holder.mText2.setText(artist);
             } catch (Exception e){
                 e.printStackTrace();
             }
 
-
             //设置封面
+            long albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
+//            new AsynLoadImage(holder.mImage).execute(0L);
+
+//            new AsynLoadImage(holder.mImage).execute(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumid), albumid);
+//            holder.mImage.setImageURI(Uri.parse(new SearchCover("海阔天空","Beyond",SearchCover.COVER).getImgUrl()));
             holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
-            //
+
             if(mOnItemClickLitener != null) {
                 holder.mImage.setOnClickListener(new View.OnClickListener() {
                     @Override

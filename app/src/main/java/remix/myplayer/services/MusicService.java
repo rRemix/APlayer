@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Random;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.EQActivity;
-import remix.myplayer.activities.MainActivity;
+import remix.myplayer.ui.activities.EQActivity;
+import remix.myplayer.ui.activities.MainActivity;
 import remix.myplayer.fragments.FolderFragment;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.observers.MediaStoreObserver;

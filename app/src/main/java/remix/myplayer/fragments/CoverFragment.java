@@ -3,6 +3,9 @@ package remix.myplayer.fragments;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -15,10 +18,14 @@ import android.view.animation.TranslateAnimation;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import java.io.File;
+
 import remix.myplayer.R;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.Global;
+import remix.myplayer.utils.thumb.SearchCover;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -34,6 +41,16 @@ public class CoverFragment extends Fragment {
     private TranslateAnimation mLeftAnimation;
     private ScaleAnimation mScaleAnimation;
     private TranslateAnimation mRightAnimation;
+    private static final int COVERINDB = 0;
+    private static final int COVERINCACHE =1;
+    private static final int NOCOVER = 2;
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            mImage.setImageURI((Uri)msg.obj);
+        }
+    };
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,11 +75,8 @@ public class CoverFragment extends Fragment {
                 @Override
                 public void onAnimationEnd(Animation animation) {
                     //当消失的动画播放完毕后，设置新的封面背景，并播放中心放大的动画
+//                    setImage();
                     mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
-//                    if(mNewBitmap != null)
-//                        mImage.setImageBitmap(mNewBitmap);
-//                    else
-//                        mImage.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.no_art_normal));
                     mImage.startAnimation(mScaleAnimation);
                 }
 
@@ -101,7 +115,50 @@ public class CoverFragment extends Fragment {
                 mImage.startAnimation(mLeftAnimation);
         } else {
             //如果不需要动画，直接设置背景
+//            setImage();
             mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
         }
     }
+
+    /**
+     * 判断该专辑id在本地数据库是否有封面
+     * 没有则查找缓存目录是否有下载
+     * 没有则下载
+     */
+    private void setImage(){
+        try {
+            final Message msg = new Message();
+            Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId());
+
+            boolean exist = CommonUtil.isAlbumThumbExistInDB(uri);
+            if(false){
+                mImage.setImageURI(uri);
+            } else {
+                //查找缓存目录是否有，没有则去下载
+                mImage.setImageURI(Uri.parse(new SearchCover(mInfo.getDisplayname(),mInfo.getArtist(),SearchCover.COVER).getImgUrl()));
+//                String coverCahcePath = CommonUtil.getCoverInCache(mInfo.getAlbumId());
+//                if(coverCahcePath != null && !coverCahcePath.equals("")){
+////                    msg.obj = Uri.parse("file://" + coverCahcePath);
+////                    mHandler.sendMessage(msg);
+//                    mImage.setImageURI(Uri.parse("file://" + coverCahcePath));
+//                    return;
+//                }
+//                //下载
+//                new Thread(){
+//                    @Override
+//                    public void run() {
+//                        String coverPath = CommonUtil.downAlbumCover(mInfo.getDisplayname(),mInfo.getArtist(),mInfo.getAlbumId());
+//                        msg.obj = Uri.parse("file://" + coverPath);
+//                        mHandler.sendMessage(msg);
+//                    }
+//                }.start();
+
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+    }
+
 }

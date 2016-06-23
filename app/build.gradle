@@ -8,9 +8,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 5
-        versionName "1.1.1"
-
+        versionCode 6
+        versionName "1.1.2"
     }
     buildTypes {
         release {
@@ -25,18 +24,16 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.facebook.fresco:fresco:0.8.1'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     compile files('libs/weiboSDKCore_3.1.2.jar')
-    compile 'com.android.support:cardview-v7:23.1.1'
     compile files('libs/libammsdk.jar')
     compile files('libs/universal-image-loader-1.9.5.jar')
-    compile files('libs/universal-image-loader-1.9.5-javadoc.jar')
-    compile files('libs/universal-image-loader-1.9.5-sources.jar')
     compile 'com.umeng.analytics:analytics:latest.integration'
     compile 'com.android.support:palette-v7:23.1.1'
+    compile project(':StackBlur')
 }

@@ -35,7 +35,7 @@
     <string name="plz_input_sharecontent">请输入分享内容</string>
     <string name="confirm">确认</string>
     <string name="cancel">取消</string>
-    <string name="song_lose_effect"></string>
+    <string name="song_lose_effect">该歌曲已经失效</string>
     <string name="song_already_exist">该歌曲已经存在</string>
     <string name="add_success">添加成功</string>
     <string name="add_error">添加失败</string>

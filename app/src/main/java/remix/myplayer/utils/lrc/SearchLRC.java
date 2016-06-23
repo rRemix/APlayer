@@ -2,7 +2,6 @@ package remix.myplayer.utils.lrc;
 
 import android.util.Log;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -10,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -19,6 +17,9 @@ import java.util.LinkedList;
 import java.util.TreeMap;
 
 import remix.myplayer.infos.LrcInfo;
+import remix.myplayer.utils.CommonUtil;
+import remix.myplayer.utils.DiskCache;
+import remix.myplayer.utils.DiskLruCache;
 
 /**
  * Created by Remix on 2015/12/7.
@@ -51,49 +52,13 @@ public class SearchLRC {
      * @return 歌词id
      */
     public String getLrcUrl(){
-        URL lrcIdUrl = null;
         try {
-            lrcIdUrl = new URL("http://geci.me/api/lyric/" + mSongName + "/" + mArtistName);
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
-        BufferedReader br = null;
-        String s = new String();
-        StringBuffer strBuffer = new StringBuffer();
-        try {
-            HttpURLConnection httpConn = (HttpURLConnection) lrcIdUrl.openConnection();
-            httpConn.connect();
-            InputStreamReader inReader = new InputStreamReader(httpConn.getInputStream());
-            br = new BufferedReader(inReader);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            if(br == null)
-                return "";
-            while((s = br.readLine()) != null){
-                strBuffer.append(s);
-            }
-            JSONObject lrcid = new JSONObject(strBuffer.toString());
+            JSONObject lrcid = CommonUtil.getSongJsonObject(mSongName,mArtistName);
             if(lrcid != null && lrcid.getInt("count") > 0 && lrcid.getInt("code") == 0){
                 return lrcid.getJSONArray("result").getJSONObject(0).getString("lrc");
             }
-        }
-        catch (IOException e) {
+        } catch (Exception e){
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if(br != null) {
-                    Log.d(TAG,"StringBuffer:" + strBuffer);
-                    br.close();
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
         }
         return "";
     }
@@ -108,7 +73,7 @@ public class SearchLRC {
 
         //先判断该歌曲是否有缓存，没有才去下载
         try {
-            DiskLruCache.Snapshot snapShot = LrcCache.getDiskCache().get(LrcCache.hashKeyForDisk(mSongName + "/" + mArtistName));
+            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(CommonUtil.hashKeyForDisk(mSongName + "/" + mArtistName));
             if(snapShot != null && (br = new BufferedReader(new InputStreamReader(snapShot.getInputStream(0)))) != null ){
                 return parseLrc(br,false);
             }
@@ -171,7 +136,7 @@ public class SearchLRC {
 
         try {
             if (needcache) {
-                editor = LrcCache.getDiskCache().edit(LrcCache.hashKeyForDisk(mSongName + "/" + mArtistName));
+                editor = DiskCache.getLrcDiskCache().edit(CommonUtil.hashKeyForDisk(mSongName + "/" + mArtistName));
                 lrcCachaStream = editor.newOutputStream(0);
             }
             while ((s = br.readLine()) != null) {
@@ -196,7 +161,7 @@ public class SearchLRC {
             if (needcache) {
                 lrcCachaStream.flush();
                 editor.commit();
-                LrcCache.getDiskCache().flush();
+                DiskCache.getLrcDiskCache().flush();
             }
 
         } catch (Exception e) {

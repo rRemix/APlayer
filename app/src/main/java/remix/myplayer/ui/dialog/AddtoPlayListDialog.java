@@ -13,12 +13,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.BaseActivity;
-import remix.myplayer.activities.PlayListActivity;
+import remix.myplayer.ui.activities.BaseActivity;
+import remix.myplayer.ui.activities.PlayListActivity;
 import remix.myplayer.adapters.PlayListAddtoAdapter;
-import remix.myplayer.infos.MP3Info;
 import remix.myplayer.infos.PlayListItem;
-import remix.myplayer.utils.DBUtil;
+import remix.myplayer.inject.ViewInject;
 import remix.myplayer.utils.XmlUtil;
 
 /**
@@ -29,16 +28,22 @@ import remix.myplayer.utils.XmlUtil;
  * 将歌曲添加到播放列表的对话框
  */
 public class AddtoPlayListDialog extends BaseActivity {
+    @ViewInject(R.id.playlist_addto_list)
     private ListView mList;
     private PlayListAddtoAdapter mAdapter;
     private String mSongName;
     private int mId;
     private int mAlbumId;
     private String mArtist;
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.playlist_addto;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.playlist_addto);
 
         mId = (int)getIntent().getExtras().getLong("Id");
         mSongName = getIntent().getExtras().getString("SongName");
@@ -56,7 +61,6 @@ public class AddtoPlayListDialog extends BaseActivity {
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
 
-        mList = (ListView)findViewById(R.id.playlist_addto_list);
         mAdapter = new PlayListAddtoAdapter(getApplicationContext());
         mList.setAdapter(mAdapter);
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {

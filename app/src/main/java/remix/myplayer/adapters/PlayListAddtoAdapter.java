@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.Iterator;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.PlayListActivity;
+import remix.myplayer.ui.activities.PlayListActivity;
 
 /**
  * Created by taeja on 16-2-1.

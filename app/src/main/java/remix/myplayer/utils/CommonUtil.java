@@ -4,11 +4,32 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.Environment;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
+import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import remix.myplayer.R;
+import remix.myplayer.utils.thumb.SearchCover;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -49,8 +70,22 @@ public class CommonUtil {
         return result;
     }
 
-    //高斯模糊
+    public static Bitmap doBlur(Bitmap sentBitmap,int radius){
+        Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
 
+        final RenderScript rs = RenderScript.create(mContext);
+        final Allocation input = Allocation.createFromBitmap(rs, sentBitmap, Allocation.MipmapControl.MIPMAP_NONE,
+                Allocation.USAGE_SCRIPT);
+        final Allocation output = Allocation.createTyped(rs, input.getType());
+        final ScriptIntrinsicBlur script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
+        script.setRadius(radius /* e.g. 3.f */);
+        script.setInput(input);
+        script.forEach(output);
+        output.copyTo(bitmap);
+        return bitmap;
+    }
+
+    //高斯模糊
     /**
      *
      * @param sentBitmap 需要模糊的bitmap
@@ -337,5 +372,225 @@ public class CommonUtil {
                 return origin;
             }
         }
+    }
+
+    /**
+     * 返回哈夕值
+     * @param key
+     * @return
+     */
+    public static String hashKeyForDisk(String key) {
+        String cacheKey;
+        try {
+            final MessageDigest mDigest = MessageDigest.getInstance("MD5");
+            mDigest.update(key.getBytes());
+            cacheKey = bytesToHexString(mDigest.digest());
+        } catch (NoSuchAlgorithmException e) {
+            cacheKey = String.valueOf(key.hashCode());
+        }
+        return cacheKey;
+    }
+
+    public static String bytesToHexString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < bytes.length; i++) {
+            String hex = Integer.toHexString(0xFF & bytes[i]);
+            if (hex.length() == 1) {
+                sb.append('0');
+            }
+            sb.append(hex);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 根据专辑id返回封面的url
+     * @param albumId
+     * @return
+     */
+    public static JSONObject getCoverJsonObject(int albumId){
+        BufferedReader br = null;
+        StringBuffer strBuffer = new StringBuffer();
+        String s;
+        try {
+            URL albumUrl = new URL("http://geci.me/api/cover/"  + albumId);
+            HttpURLConnection httpURLConnection = (HttpURLConnection)albumUrl.openConnection();
+            httpURLConnection.connect();;
+            InputStreamReader inReader = new InputStreamReader(httpURLConnection.getInputStream());
+            br = new BufferedReader(inReader);
+            if(br == null)
+                return null;
+            while((s = br.readLine()) != null){
+                strBuffer.append(s);
+            }
+            return new JSONObject(strBuffer.toString());
+
+        }  catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            try {
+                if(br != null) {
+                    br.close();
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 根据歌曲名和歌手请求歌曲信息
+     * @param songname
+     * @param artistname
+     * @return
+     */
+    public static JSONObject getSongJsonObject(String songname, String artistname){
+        URL lrcIdUrl = null;
+        try {
+            lrcIdUrl = new URL("http://geci.me/api/lyric/" + songname + "/" + artistname);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+
+        BufferedReader br = null;
+        String s;
+        StringBuilder strBuffer = new StringBuilder();
+        try {
+            HttpURLConnection httpConn = (HttpURLConnection) lrcIdUrl.openConnection();
+            httpConn.connect();
+            InputStreamReader inReader = new InputStreamReader(httpConn.getInputStream());
+            br = new BufferedReader(inReader);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            if(br == null)
+                return null;
+            while((s = br.readLine()) != null){
+                strBuffer.append(s);
+            }
+            return new JSONObject(strBuffer.toString());
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(br != null) {
+                    br.close();
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 判断某个专辑在本地数据库是否有封面
+     * @param uri
+     * @return
+     */
+    public static boolean isAlbumThumbExistInDB(Uri uri){
+        boolean exist = false;
+        InputStream stream = null;
+        try {
+            stream = mContext.getContentResolver().openInputStream(uri);
+            exist = true;
+        } catch (Exception e) {
+            exist = false;
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return exist;
+    }
+
+    /**
+     * 下载专辑封面并根据专辑id保存
+     * @param songname
+     * @param artist
+     * @param albumid
+     */
+    public static String downAlbumCover(String songname,String artist,long albumid){
+        String urlstr = new SearchCover(songname,artist,SearchCover.COVER).getImgUrl();
+        URL url = null;
+        BufferedReader br = null;
+        StringBuffer strBuffer = new StringBuffer();
+        FileOutputStream fos = null;
+        InputStream in = null;
+        String s;
+        File img = null;
+        try {
+            url = new URL(urlstr);
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.connect();
+            in = httpURLConnection.getInputStream();
+
+            if(in == null || !Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+                return "";
+
+            File dir = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/cache/cover");
+            if(!dir.exists())
+                dir.mkdir();
+            img = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/cache/cover/" + albumid  + ".jpg");
+            fos = new FileOutputStream(img);
+
+            byte[] bs = new byte[1024];
+            int len = 0;
+            // 开始读取
+            while ((len = in.read(bs)) != -1) {
+                fos.write(bs);
+            }
+            if(fos != null)
+                fos.flush();
+
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            try {
+                if(fos != null)
+                    fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if(in != null)
+                    in.close();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        return img == null ? "" : img.getAbsolutePath();
+    }
+
+    public static String getCoverInCache(long albumId){
+        File coverCacheDir = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/cache/cover");
+        if(coverCacheDir.isDirectory()){
+            File files[] = coverCacheDir.listFiles();
+            if(files != null){
+                for (File f : files){
+                    if(f.getName().equals(albumId + "")){
+                        return f.getAbsolutePath();
+                    }
+                }
+            }
+        }
+        return "";
     }
 }

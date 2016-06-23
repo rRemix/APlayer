@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import remix.myplayer.activities.PlayListActivity;
+import remix.myplayer.ui.activities.PlayListActivity;
 import remix.myplayer.infos.PlayListItem;
 
 /**

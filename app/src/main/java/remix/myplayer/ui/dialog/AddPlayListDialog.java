@@ -8,8 +8,9 @@ import android.view.WindowManager;
 import android.widget.EditText;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.BaseActivity;
-import remix.myplayer.activities.PlayListActivity;
+import remix.myplayer.ui.activities.BaseActivity;
+import remix.myplayer.ui.activities.PlayListActivity;
+import remix.myplayer.inject.ViewInject;
 import remix.myplayer.utils.XmlUtil;
 
 /**
@@ -21,18 +22,23 @@ import remix.myplayer.utils.XmlUtil;
  */
 
 public class AddPlayListDialog extends BaseActivity {
+    @ViewInject(R.id.playlist_add_edit)
     private EditText mEdit;
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.playlist_add;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.playlist_add);
 
         WindowManager.LayoutParams lp = getWindow().getAttributes();
 
         getWindow().setAttributes(lp);
         getWindow().setGravity(Gravity.CENTER);
 
-        mEdit = (EditText)findViewById(R.id.playlist_add_edit);
         mEdit.getBackground().setColorFilter(getResources().getColor(R.color.intersperse_color), PorterDuff.Mode.SRC_ATOP);
         mEdit.setText("本地歌单" + PlayListActivity.getPlayList().size());
     }

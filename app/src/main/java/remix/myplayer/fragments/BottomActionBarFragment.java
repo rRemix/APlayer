@@ -12,7 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.AudioHolderActivity;
+import remix.myplayer.ui.activities.AudioHolderActivity;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.listeners.CtrlButtonListener;
 import remix.myplayer.services.MusicService;

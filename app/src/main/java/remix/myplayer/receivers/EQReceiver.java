@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import remix.myplayer.activities.EQActivity;
+import remix.myplayer.ui.activities.EQActivity;
 import remix.myplayer.utils.Constants;
 
 /**

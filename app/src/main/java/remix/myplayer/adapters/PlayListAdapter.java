@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.MainActivity;
-import remix.myplayer.activities.PlayListActivity;
+import remix.myplayer.ui.activities.MainActivity;
+import remix.myplayer.ui.activities.PlayListActivity;
 import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.listeners.PopupListener;
 import remix.myplayer.utils.Constants;

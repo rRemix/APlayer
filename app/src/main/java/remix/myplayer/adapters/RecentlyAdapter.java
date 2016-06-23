@@ -59,7 +59,7 @@ public class RecentlyAdapter extends BaseAdapter {
         ViewHolder holder;
         //检查缓存
         if(convertView == null) {
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.allsong_item,null);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.allsong_recycle_item,null);
             holder = new ViewHolder();
             holder.mImage = (CircleImageView)convertView.findViewById(R.id.song_head_image);
             holder.mName = (TextView)convertView.findViewById(R.id.displayname);

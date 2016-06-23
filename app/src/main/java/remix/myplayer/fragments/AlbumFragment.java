@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.ChildHolderActivity;
+import remix.myplayer.ui.activities.ChildHolderActivity;
 import remix.myplayer.adapters.AlbumAdater;
 import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.utils.Constants;
@@ -79,18 +79,16 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         //根据专辑id 创建Loader
-        CursorLoader loader = new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ARTIST},
-                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
-                null,
-                null);
-
 //        CursorLoader loader = new CursorLoader(getActivity(), MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
 //                new String[]{BaseColumns._ID,MediaStore.Audio.AlbumColumns.ALBUM,
 //                        MediaStore.Audio.AlbumColumns.ARTIST,
 //                        MediaStore.Audio.AlbumColumns.ALBUM_ART,
 //                        MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS}, null,null,null);
-        return loader;
+        return  new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ARTIST},
+                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
+                null,
+                null);
     }
 
     @Override

@@ -2,7 +2,6 @@ package remix.myplayer.ui.dialog;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -17,7 +16,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,8 +23,9 @@ import android.widget.Toast;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.BaseAppCompatActivity;
+import remix.myplayer.ui.activities.BaseAppCompatActivity;
 import remix.myplayer.infos.MP3Info;
+import remix.myplayer.inject.ViewInject;
 import remix.myplayer.ui.customviews.CircleImageView;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
@@ -40,27 +39,39 @@ import remix.myplayer.utils.DBUtil;
  */
 public class OptionDialog extends BaseAppCompatActivity {
     //添加 设置铃声 分享 删除按钮
+    @ViewInject(R.id.popup_add)
     private ImageView mAdd;
+    @ViewInject(R.id.popup_ring)
     private ImageView mRing;
+    @ViewInject(R.id.popup_share)
     private ImageView mShare;
+    @ViewInject(R.id.popup_delete)
     private ImageView mDelete;
     private Button mCancel;
     //标题
+    @ViewInject(R.id.popup_title)
     private TextView mTitle;
+    //专辑封面
+    @ViewInject(R.id.popup_image)
+    private CircleImageView mCircleView;
+
     //当前正在播放的歌曲
     private MP3Info mInfo = null;
-    //专辑封面
-    private CircleImageView mCircleView;
     //是否是删除播放列表中歌曲
     private boolean mIsDeletePlayList = false;
     //播放列表名字
     private String mPlayListName;
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.popup_option;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //去掉标题
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.popup_option);
 
         mInfo = (MP3Info)getIntent().getExtras().getSerializable("MP3Info");
         if(mInfo == null)
@@ -70,9 +81,7 @@ public class OptionDialog extends BaseAppCompatActivity {
         }
 
         //设置歌曲名与封面
-        mTitle = (TextView)findViewById(R.id.popup_title);
         mTitle.setText(mInfo.getDisplayname() + "-" + mInfo.getArtist());
-        mCircleView = (CircleImageView)findViewById(R.id.popup_image);
         ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mInfo.getAlbumId(),
                 mCircleView);
 
@@ -87,10 +96,6 @@ public class OptionDialog extends BaseAppCompatActivity {
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
 
-        mAdd = (ImageButton)findViewById(R.id.popup_add);
-        mRing= (ImageButton)findViewById(R.id.popup_ring);
-        mShare = (ImageButton)findViewById(R.id.popup_share);
-        mDelete= (ImageButton)findViewById(R.id.popup_delete);
 //        mCancel= (Button)findViewById(R.id.popup_cancel);
         //添加到播放列表
         mAdd.setOnClickListener(new View.OnClickListener() {
@@ -142,7 +147,7 @@ public class OptionDialog extends BaseAppCompatActivity {
 //                                public void onClick(DialogInterface dialog, int which) {
 //                                    String result = "";
 //                                    if(!mIsDeletePlayList){
-//                                        result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE) == true ? "删除成功" : "删除失败";
+//                                        result = DBUtil.deleteSong(mInfo.getImgUrl(), Constants.DELETE_SINGLE) == true ? "删除成功" : "删除失败";
 //                                    } else {
 //                                        result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ? "删除成功" : "删除失败";
 //                                    }

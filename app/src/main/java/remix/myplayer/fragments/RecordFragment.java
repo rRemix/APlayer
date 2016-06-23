@@ -1,29 +1,20 @@
 package remix.myplayer.fragments;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.RecordShareActivity;
+import remix.myplayer.ui.activities.RecordShareActivity;
 import remix.myplayer.services.MusicService;
-import remix.myplayer.utils.DensityUtil;
 
 /**
  * Created by Remix on 2015/12/28.

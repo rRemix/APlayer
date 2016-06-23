@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.ChildHolderActivity;
+import remix.myplayer.ui.activities.ChildHolderActivity;
 import remix.myplayer.adapters.ArtistAdapter;
 import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.utils.Constants;
@@ -80,15 +80,13 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     }
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        CursorLoader loader = new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+//        CursorLoader loader = new CursorLoader(getActivity(),MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
+//                new String[]{BaseColumns._ID,MediaStore.Audio.ArtistColumns.ARTIST},null,null,null);
+        return new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 new String[]{"distinct " + MediaStore.Audio.Media.ARTIST_ID,MediaStore.Audio.Media.ARTIST},
                 MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
                 null,
                 null);
-//
-//        CursorLoader loader = new CursorLoader(getActivity(),MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
-//                new String[]{BaseColumns._ID,MediaStore.Audio.ArtistColumns.ARTIST},null,null,null);
-        return loader;
     }
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {

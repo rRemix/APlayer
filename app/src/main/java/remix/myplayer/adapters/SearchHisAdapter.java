@@ -10,7 +10,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.MainActivity;
+import remix.myplayer.ui.activities.MainActivity;
 import remix.myplayer.utils.Constants;
 
 /**

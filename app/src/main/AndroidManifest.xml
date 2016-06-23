@@ -27,12 +27,12 @@
         <meta-data android:value="56d6563367e58e6aa70005af" android:name="UMENG_APPKEY"/>
         <meta-data android:value="Umeng" android:name="UMENG_CHANNEL"/>
 
-        <activity android:name=".activities.SplashActivity"
+        <activity android:name=".ui.activities.SplashActivity"
             android:theme="@style/ActivityStyle">
 
         </activity>
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/ActivityStyle">
             <intent-filter>
@@ -41,46 +41,46 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activities.AudioHolderActivity"
+        <activity android:name=".ui.activities.AudioHolderActivity"
             android:theme="@style/AudioHolderStyle"
-            android:parentActivityName=".activities.MainActivity">
+            android:parentActivityName=".ui.activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity"/>
+                android:value=".ui.activities.MainActivity"/>
         </activity>
 
 
-        <activity android:name=".activities.SearchActivity"
+        <activity android:name=".ui.activities.SearchActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".activities.PlayListActivity"
+        <activity android:name=".ui.activities.PlayListActivity"
             android:theme="@style/ActivityStyle">
         </activity>
 
-        <activity android:name=".activities.ChildHolderActivity"
+        <activity android:name=".ui.activities.ChildHolderActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".activities.RecordShareActivity"/>
+        <activity android:name=".ui.activities.RecordShareActivity"/>
 
-        <activity android:name=".activities.AboutActivity"
+        <activity android:name=".ui.activities.AboutActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".activities.RecetenlyActivity"
+        <activity android:name=".ui.activities.RecetenlyActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".activities.SettingActivity"
+        <activity android:name=".ui.activities.SettingActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".activities.FeedBakActivity"
+        <activity android:name=".ui.activities.FeedBakActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".activities.ScanActivity"
+        <activity android:name=".ui.activities.ScanActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".activities.EQActivity"
+        <activity android:name=".ui.activities.EQActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".activities.LockScreenActivity"
+        <activity android:name=".ui.activities.LockScreenActivity"
             android:theme="@style/LockScreenActivity"
             android:excludeFromRecents="true"
             android:exported="false"

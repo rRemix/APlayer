@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.PlayListActivity;
+import remix.myplayer.ui.activities.PlayListActivity;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.utils.Constants;

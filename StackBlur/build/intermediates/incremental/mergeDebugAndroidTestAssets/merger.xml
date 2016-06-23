@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="debug"><source path="/home/taeja/AndroidProject/APlayer/StackBlur/build/intermediates/bundles/debug/assets"><file name="ic_launcher.png" path="/home/taeja/AndroidProject/APlayer/StackBlur/build/intermediates/bundles/debug/assets/ic_launcher.png"/></source></dataSet><dataSet config="main"><source path="/home/taeja/AndroidProject/APlayer/StackBlur/src/androidTest/assets"/></dataSet></merger>

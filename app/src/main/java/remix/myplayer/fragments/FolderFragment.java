@@ -4,17 +4,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import java.util.Iterator;
 
 import remix.myplayer.R;
-import remix.myplayer.activities.ChildHolderActivity;
 import remix.myplayer.adapters.FolderAdapter;
+import remix.myplayer.listeners.OnItemClickListener;
+import remix.myplayer.ui.RecyclerItemDecoration;
+import remix.myplayer.ui.activities.ChildHolderActivity;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.Global;
 
@@ -26,17 +29,43 @@ import remix.myplayer.utils.Global;
  * 文件夹Fragment
  */
 public class FolderFragment extends Fragment {
-    private ListView mListView;
     private static boolean mIsRunning = false;
     public static FolderFragment mInstance;
-    private static boolean mNeedRefresh = false;
+    private RecyclerView mRecyclerView;
+    private FolderAdapter mAdapter;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_folder,null);
-        mListView = (ListView)rootView.findViewById(R.id.folder_list);
-        mListView.setOnItemClickListener(new ListViewListener());
-        mListView.setAdapter(new FolderAdapter(getActivity(), inflater));
+
+        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.addItemDecoration(new RecyclerItemDecoration(getContext(),RecyclerItemDecoration.VERTICAL_LIST));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mAdapter = new FolderAdapter(getContext());
+        mAdapter.setOnItemClickLitener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
+                intent.putExtra("Id", position);
+                intent.putExtra("Type", Constants.FOLDER_HOLDER);
+                if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
+                    return;
+                Iterator it = Global.mFolderMap.keySet().iterator();
+                String full_path = null;
+                for(int i = 0 ; i <= position ; i++)
+                    full_path = it.next().toString();
+                intent.putExtra("Title", full_path);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        });
+        mRecyclerView.setAdapter(mAdapter);
+
         return rootView;
     }
 
@@ -46,13 +75,10 @@ public class FolderFragment extends Fragment {
         mInstance = this;
     }
 
-    public static void setFresh(boolean needfresh){
-        mNeedRefresh = needfresh;
-    }
 
     public void UpdateAdapter() {
-        if(mListView.getAdapter() != null){
-            ((FolderAdapter)(mListView.getAdapter())).notifyDataSetChanged();
+        if(mRecyclerView != null && mRecyclerView.getAdapter() != null){
+            mRecyclerView.getAdapter().notifyDataSetChanged();
         }
     }
 
@@ -65,10 +91,6 @@ public class FolderFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mIsRunning = true;
-//        if(mNeedRefresh){
-//            UpdateAdapter();
-//            mNeedRefresh = false;
-//        }
     }
 
     @Override
@@ -78,22 +100,4 @@ public class FolderFragment extends Fragment {
     }
 
 
-
-    private class ListViewListener implements AdapterView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
-            intent.putExtra("Id", position);
-            intent.putExtra("Type", Constants.FOLDER_HOLDER);
-            if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
-                return;
-            Iterator it = Global.mFolderMap.keySet().iterator();
-            String full_path = null;
-            for(int i = 0 ; i <= position ; i++)
-                full_path = it.next().toString();
-            intent.putExtra("Title", full_path);
-            startActivity(intent);
-
-        }
-    }
 }
