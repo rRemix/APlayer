@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="72dp"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:background="?android:attr/selectableItemBackground">
     <LinearLayout
         android:layout_width="@dimen/item_text_width"
         android:layout_height="match_parent"
@@ -35,7 +36,7 @@
     </LinearLayout>
 
     <!--结尾处按钮-->
-    <ImageView
+    <ImageButton
         android:layout_alignParentRight="true"
         android:layout_marginRight="18dp"
         android:id="@+id/song_item_button"
@@ -44,7 +45,7 @@
         android:layout_centerVertical="true"
         android:scaleType="center"
         android:src="@drawable/list_icn_more"
-        android:background="?android:attr/selectableItemBackground"/>
+        android:background="@drawable/bg_common_ripple"/>
 
     <remix.myplayer.ui.customviews.ColumnView
         android:layout_toLeftOf="@id/song_item_button"

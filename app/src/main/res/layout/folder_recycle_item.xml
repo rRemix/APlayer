@@ -34,7 +34,7 @@
             android:text="路径"
             android:textColor="@color/text_color_gray"/>
     </LinearLayout>
-    <ImageView
+    <ImageButton
         android:layout_alignParentRight="true"
         android:layout_marginRight="18dp"
         android:id="@+id/folder_button"
@@ -42,7 +42,7 @@
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:src="@drawable/list_icn_more"
-        android:background="?android:attr/selectableItemBackground"/>
+        android:background="@drawable/bg_common_ripple"/>
     <TextView
         android:layout_centerVertical="true"
         android:layout_width="wrap_content"

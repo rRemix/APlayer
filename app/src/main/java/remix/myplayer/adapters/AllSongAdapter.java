@@ -2,17 +2,24 @@ package remix.myplayer.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RippleDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import java.io.ObjectStreamException;
+import java.lang.reflect.Field;
 
 import remix.myplayer.R;
 import remix.myplayer.fragments.AllSongFragment;
@@ -93,6 +100,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
 
             ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mCursor.getString(AllSongFragment.mAlbumIdIndex),
                     holder.mImage);
+
             //选项Dialog
             if(holder.mItemButton != null) {
                 holder.mItemButton.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +113,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
                     }
                 });
             }
+
             //
             if(mOnItemClickLitener != null && holder.mRootView != null) {
                 holder.mRootView.setOnClickListener(new View.OnClickListener() {
@@ -129,7 +138,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
         public TextView mOther;
         public CircleImageView mImage;
         public ColumnView mColumnView;
-        public ImageView mItemButton;
+        public ImageButton mItemButton;
         public View mRootView;
         public ViewHolder(View itemView) {
             super(itemView);
@@ -138,7 +147,8 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.ViewHold
             mName = (TextView)itemView.findViewById(R.id.displayname);
             mOther = (TextView)itemView.findViewById(R.id.detail);
             mColumnView = (ColumnView)itemView.findViewById(R.id.columnview);
-            mItemButton = (ImageView)itemView.findViewById(R.id.allsong_item_button);
+            mItemButton = (ImageButton)itemView.findViewById(R.id.allsong_item_button);
+
         }
     }
 }

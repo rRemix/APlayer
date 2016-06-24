@@ -32,6 +32,11 @@ public class RecyclerItemDecoration extends RecyclerView.ItemDecoration {
         setOrientation(orientation);
     }
 
+    public RecyclerItemDecoration(Context context,int orientation,Drawable divider){
+        this(context,orientation);
+        mDivider = divider;
+    }
+
     public void setOrientation(int orientation) {
         if (orientation != HORIZONTAL_LIST && orientation != VERTICAL_LIST) {
             throw new IllegalArgumentException("invalid orientation");

@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,7 +20,9 @@ import remix.myplayer.fragments.BottomActionBarFragment;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.infos.PlayListItem;
 import remix.myplayer.inject.ViewInject;
+import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.services.MusicService;
+import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.Global;
@@ -47,8 +51,11 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
     private TextView mNum;
     @ViewInject(R.id.artist_album_title)
     private TextView mTitle;
+    @ViewInject(R.id.child_holder_recyclerView)
+    private RecyclerView mRecyclerView;
 
     private BottomActionBarFragment mActionbar;
+    private ChildHolderAdapter mTestAdapter;
     private ChildHolderAdapter mAdapter;
     public static ChildHolderActivity mInstance = null;
     //是否需要更新adapter
@@ -61,7 +68,6 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                 return;
             mAdapter.setList(mInfoList);
             mNum.setText(mInfoList.size() + "首歌曲");
-
         }
     };
 
@@ -90,11 +96,10 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
             }
         }.start();
 
-        mAdapter = new ChildHolderAdapter(mInfoList, getLayoutInflater(),ChildHolderActivity.this,mType,mArg);
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mAdapter = new ChildHolderAdapter(this,mType,mArg);
+        mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(View view, int position) {
                 if (mInfoList != null && mInfoList.size() == 0)
                     return;
                 ArrayList<Long> ids = new ArrayList<Long>();
@@ -112,10 +117,20 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                 intent.putExtras(arg);
                 sendBroadcast(intent);
             }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
         });
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addItemDecoration(new RecyclerItemDecoration(this,RecyclerItemDecoration.VERTICAL_LIST,getResources().getDrawable(R.drawable.divider)));
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
         //歌曲数目与标题
         if(mType != Constants.FOLDER_HOLDER) {
-            if(mArg.indexOf("unknown") > 0){
+            if(mArg.contains("unknown")){
                 if(mType == Constants.ARTIST_HOLDER)
                     mTitle.setText(getString(R.string.unknow_artist));
                 else if(mType == Constants.ALBUM_HOLDER){
@@ -275,7 +290,6 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
     protected void onPause() {
         super.onPause();
     }
-
 
 
 }

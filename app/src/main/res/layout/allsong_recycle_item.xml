@@ -43,16 +43,15 @@
             android:layout_marginTop="4dp"/>
     </LinearLayout>
     <!--结尾处按钮-->
-    <ImageView
+    <ImageButton
         android:layout_alignParentRight="true"
         android:layout_marginRight="16dp"
         android:id="@+id/allsong_item_button"
         android:layout_width="60dp"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
-        android:scaleType="center"
         android:src="@drawable/list_icn_more"
-        android:background="?android:attr/selectableItemBackground"/>
+        android:background="@drawable/bg_common_ripple"/>
 
     <remix.myplayer.ui.customviews.ColumnView
         android:layout_centerVertical="true"

@@ -7,6 +7,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -93,14 +95,14 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ViewHolder
         public TextView mName;
         public TextView mPath;
         public TextView mCount;
-        public ImageView mButton;
+        public ImageButton mButton;
         public ViewHolder(View itemView) {
             super(itemView);
             mRootView = itemView;
             mName = (TextView)itemView.findViewById(R.id.folder_name);
             mCount = (TextView)itemView.findViewById(R.id.folder_num);
             mPath = (TextView)itemView.findViewById(R.id.folder_path);
-            mButton = (ImageView)itemView.findViewById(R.id.folder_button);
+            mButton = (ImageButton)itemView.findViewById(R.id.folder_button);
         }
     }
 }
