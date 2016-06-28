@@ -36,4 +36,10 @@
         <attr name="eqdotnum" format="integer"/>
         <attr name="eqthumb" format="reference"/>
     </declare-styleable>
+
+    <attr name="custom_background_color_main" format="color|reference"/>
+    <attr name="custom_background_color_1" format="color|reference"/>
+    <attr name="custom_background_color_2" format="color|reference"/>
+    <attr name="custom_background_color_3" format="color|reference"/>
+
 </resources>

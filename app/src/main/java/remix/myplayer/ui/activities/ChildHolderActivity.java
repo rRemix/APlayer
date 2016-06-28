@@ -44,8 +44,6 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
     private String mArg;
     private ArrayList<MP3Info> mInfoList;
 
-    @ViewInject(R.id.child_holder_list)
-    private ListView mListView;
     //歌曲数目与标题
     @ViewInject(R.id.album_holder_item_num)
     private TextView mNum;
@@ -212,7 +210,7 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
                 if(list == null)
                     break;
                 for(PlayListItem item : list) {
-                    MP3Info temp = new MP3Info(item.getId(),item.getSongame(),"",item.getAlbumId(),
+                    MP3Info temp = new MP3Info("",item.getId(),item.getSongame(),item.getSongame(),"",item.getAlbumId(),
                             item.getArtist(),0,"","",0,"");
                     mInfoList.add(temp);
 //                    MP3Info temp = DBUtil.getMP3InfoById(item.getId());

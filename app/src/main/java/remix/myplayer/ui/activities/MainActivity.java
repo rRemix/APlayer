@@ -32,7 +32,6 @@ import com.facebook.imagepipeline.cache.CacheKeyFactory;
 import com.facebook.imagepipeline.cache.DefaultCacheKeyFactory;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.facebook.imagepipeline.core.ImagePipelineFactory;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -43,8 +42,6 @@ import com.umeng.update.UmengUpdateAgent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.SlideMenuAdapter;
@@ -60,13 +57,12 @@ import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
+import remix.myplayer.utils.DiskCache;
 import remix.myplayer.utils.ErrUtil;
 import remix.myplayer.utils.Global;
 import remix.myplayer.utils.PermissionUtil;
 import remix.myplayer.utils.SharedPrefsUtil;
 import remix.myplayer.utils.XmlUtil;
-import remix.myplayer.utils.DiskCache;
-
 
 /**
  *
@@ -86,6 +82,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     private LinearLayout mDrawerMenu;
     @ViewInject(R.id.drawer_exit)
     private ImageButton mSlideMenuExit;
+//    @ViewInject(R.id.navigation_view)
+//    private NavigationView mNavigationView;
 
     private ActionBarDrawerToggle mDrawerToggle;
     //是否正在运行
@@ -194,6 +192,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 //            }
 //        }.start();
 
+
         //检查更新
         UmengUpdateAgent.update(this);
 //        MobclickAgent.setDebugMode(true);
@@ -284,6 +283,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                 return true;
             }
         });
+
     }
 
     @Override
@@ -396,6 +396,37 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     }
 
     private void initDrawerLayout() {
+//        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,mToolBar,R.string.drawerlayout_open,R.string.drawerlayout_close);
+//        mDrawerToggle.syncState();
+//        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+//        mNavigationView.setItemIconTintList(null);
+//        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(MenuItem item) {
+//                switch (item.getItemId()) {
+//                    case R.id.item_recently:
+//                        //最近添加
+//                        startActivity(new Intent(MainActivity.this, RecetenlyActivity.class));
+//                        break;
+//                    case R.id.item_playlist:
+//                        startActivity(new Intent(MainActivity.this, PlayListActivity.class));
+//                        break;
+//                    case R.id.item_allsong:
+//                        mDrawerLayout.closeDrawer(mDrawerMenu);
+//                        MainFragment.mInstance.getViewPager().setCurrentItem(0);
+//                        break;
+//                    case R.id.item_setting:
+//                        //设置
+//                        startActivity(new Intent(MainActivity.this, SettingActivity.class));
+//                        break;
+//                    default:
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
+
         mSlideMenuList = (ListView) mDrawerMenu.findViewById(R.id.slide_menu_list);
         mSlideMenuList.setAdapter(new SlideMenuAdapter(getLayoutInflater()));
         mSlideMenuList.setOnItemClickListener(new SlideMenuListener(this));
@@ -443,35 +474,46 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     //读取sd卡歌曲信息
     public static void loadsongs() {
-        //读取所有歌曲信息
-        FutureTask<ArrayList<Long>> task = new FutureTask<ArrayList<Long>>(new Callable<ArrayList<Long>>() {
+        new Thread(){
             @Override
-            public ArrayList<Long> call() throws Exception {
-                return DBUtil.getAllSongsId();
+            public void run() {
+                //读取sd卡歌曲id
+                Global.mAllSongList = DBUtil.getAllSongsId();
+                //读取正在播放列表
+                Global.mPlayingList = XmlUtil.getPlayingList();
+                if (Global.mPlayingList == null || Global.mPlayingList.size() == 0)
+                    Global.mPlayingList = (ArrayList<Long>) Global.mAllSongList.clone();
             }
-        });
-        new Thread(task, "getInfo").start();
-        try {
-            Global.mAllSongList = task.get();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        }.start();
 
-        //读取正在播放列表信息
-        FutureTask<ArrayList<Long>> task1 = new FutureTask<ArrayList<Long>>(new Callable<ArrayList<Long>>() {
-            @Override
-            public ArrayList<Long> call() throws Exception {
-                return XmlUtil.getPlayingList();
-            }
-        });
-        new Thread(task1, "getPlayingList").start();
-        try {
-            Global.mPlayingList = task1.get();
-            if (Global.mPlayingList == null || Global.mPlayingList.size() == 0)
-                Global.mPlayingList = (ArrayList<Long>) task.get().clone();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        FutureTask<ArrayList<Long>> task = new FutureTask<ArrayList<Long>>(new Callable<ArrayList<Long>>() {
+//            @Override
+//            public ArrayList<Long> call() throws Exception {
+//                return DBUtil.getAllSongsId();
+//            }
+//        });
+//        new Thread(task, "getInfo").start();
+//        try {
+//            Global.mAllSongList = task.get();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        //读取正在播放列表信息
+//        FutureTask<ArrayList<Long>> task1 = new FutureTask<ArrayList<Long>>(new Callable<ArrayList<Long>>() {
+//            @Override
+//            public ArrayList<Long> call() throws Exception {
+//                return XmlUtil.getPlayingList();
+//            }
+//        });
+//        new Thread(task1, "getPlayingList").start();
+//        try {
+//            Global.mPlayingList = task1.get();
+//            if (Global.mPlayingList == null || Global.mPlayingList.size() == 0)
+//                Global.mPlayingList = (ArrayList<Long>) task.get().clone();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     //隐藏侧滑菜单
@@ -484,6 +526,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(mDrawerMenu))
             mDrawerLayout.closeDrawer(mDrawerMenu);
+//        if(mDrawerLayout.isDrawerOpen(mNavigationView))
+//            mDrawerLayout.closeDrawer(mNavigationView);
         else {
             Intent home = new Intent(Intent.ACTION_MAIN);
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

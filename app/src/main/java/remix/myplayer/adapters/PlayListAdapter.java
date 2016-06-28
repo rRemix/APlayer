@@ -34,7 +34,7 @@ import remix.myplayer.utils.DBUtil;
 /**
  * 播放列表的适配器
  */
-public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHolder> {
+public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayListHolder> {
     private Context mContext;
     public PlayListAdapter(Context context) {
         this.mContext = context;
@@ -50,15 +50,15 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        ViewHolder holder = new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.playlist_recycle_item, null, false));
-        return holder;
+    public PlayListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new PlayListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.playlist_recycle_item, null, false));
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final PlayListHolder holder, final int position) {
         try {
             //根据当前索引，获得歌曲列表
+            Object o = PlayListActivity.getPlayList();
             Iterator it = PlayListActivity.getPlayList().keySet().iterator();
             String name = "";
             for(int i = 0 ; i<= position ;i++) {
@@ -89,13 +89,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
                     @Override
                     public void onClick(View v) {
                         mOnItemClickLitener.onItemClick(holder.mImage,position);
-                    }
-                });
-                holder.mImage.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        mOnItemClickLitener.onItemLongClick(holder.mImage,position);
-                        return true;
                     }
                 });
             }
@@ -133,11 +126,11 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         return PlayListActivity.getPlayList() == null ? 0 : PlayListActivity.getPlayList().size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class PlayListHolder extends RecyclerView.ViewHolder {
         public final TextView mName;
         public final SimpleDraweeView mImage;
         public final ImageView mButton;
-        public ViewHolder(View itemView) {
+        public PlayListHolder(View itemView) {
             super(itemView);
             mName = (TextView) itemView.findViewById(R.id.playlist_item_name);
             mImage = (SimpleDraweeView)itemView.findViewById(R.id.recycleview_simpleiview);

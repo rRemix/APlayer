@@ -2,6 +2,7 @@
     <!-- Base application theme. -->
     <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar"/>
 
+
     <style name="AppTheme" parent="BaseTheme">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">#1d1a1d</item>
@@ -188,5 +189,9 @@
 
     <style name="ActivityStyle" parent="@style/AppTheme.NoActionBar">
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
+    </style>
+
+    <style name="DayTheme" >
+        <item name="custom_background_color_main">@color/background_color_main</item>
     </style>
 </resources>

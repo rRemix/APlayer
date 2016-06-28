@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -28,5 +29,16 @@
     </LinearLayout>
 
     <!--测滑菜单-->
-     <include layout="@layout/slide_menu"/>
+    <include layout="@layout/slide_menu"/>
+    <!--<android.support.design.widget.NavigationView-->
+        <!--android:background="@color/background_color_3"-->
+        <!--android:id="@+id/navigation_view"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_gravity="start"-->
+        <!--app:headerLayout="@layout/navigation_header"-->
+        <!--app:menu="@menu/drawer_menu"-->
+        <!--android:fitsSystemWindows="true"/>-->
+
+
 </android.support.v4.widget.DrawerLayout>

@@ -1,6 +1,7 @@
 package remix.myplayer.infos;
 
 import java.io.Serializable;
+import java.util.Timer;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -11,6 +12,7 @@ import java.io.Serializable;
  */
 public class MP3Info implements Serializable,Cloneable {
     private long Id;
+    private String Title;
     private String Displayname;
     private String Album;
     private long AlbumId;
@@ -20,9 +22,12 @@ public class MP3Info implements Serializable,Cloneable {
     private String ReailTime;
     private String Url;
     private long Size;
+    private String FirstLetter;
     public MP3Info(){};
-    public MP3Info(long id, String displayname, String album,long albumid, String artist, long duration,String reailTime, String url, long size,String albumart) {
+    public MP3Info(String firstLetter, long id, String displayname, String title,String album,long albumid, String artist, long duration,String reailTime, String url, long size,String albumart) {
+        FirstLetter = firstLetter;
         Id = id;
+        Title = title;
         Displayname = displayname;
         Album = album;
         AlbumId = albumid;
@@ -34,7 +39,9 @@ public class MP3Info implements Serializable,Cloneable {
         AlbumArt = albumart;
     }
     public MP3Info(MP3Info info) {
+        this.FirstLetter = info.getFirstLetter();
         this.Id = info.getId();
+        this.Title = info.getTitle();
         this.Displayname = info.getDisplayname();
         this.Album = info.getAlbum();
         this.AlbumId = info.getAlbumId();
@@ -49,12 +56,9 @@ public class MP3Info implements Serializable,Cloneable {
     @Override
     public Object clone() {
         Object o=null;
-        try
-        {
+        try {
             o = (MP3Info)super.clone();//Object 中的clone()识别出你要复制的是哪一个对象。
-        }
-        catch(CloneNotSupportedException e)
-        {
+        } catch(CloneNotSupportedException e) {
             System.out.println(e.toString());
         }
         return o;
@@ -71,6 +75,22 @@ public class MP3Info implements Serializable,Cloneable {
     public String toString() {
         return new String("Id = " + Id + " Name = " + Displayname + " Album = " + Album
                 + " Artist = " + Artist + " Duration = " + Duration + " Realtime = " + ReailTime + " Url = " + Url + " Size = " + Size);
+    }
+
+    public void setFirstLetter(String firstLetter){
+        FirstLetter = firstLetter;
+    }
+
+    public String getFirstLetter(){
+        return FirstLetter;
+    }
+
+    public void setTitle(String title){
+        Title = title;
+    }
+
+    public String getTitle(){
+        return Title;
     }
 
     public long getAlbumId(){return AlbumId;}

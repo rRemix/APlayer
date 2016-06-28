@@ -2,6 +2,11 @@
     <string name="app_name">APlayer</string>
     <string name="action_settings">Settings</string>
 
+    <string name="drawer_recently">最近添加</string>
+    <string name="drawer_playlist">播放列表</string>
+    <string name="drawer_allsong">全部歌曲</string>
+    <string name="drawer_setting">设置</string>
+
     <string name="tab_song">歌曲</string>
     <string name="tab_album">专辑</string>
     <string name="tab_artist">艺术家</string>

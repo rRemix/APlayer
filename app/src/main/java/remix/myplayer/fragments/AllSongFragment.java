@@ -4,9 +4,9 @@ package remix.myplayer.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,19 +16,23 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import remix.myplayer.R;
 import remix.myplayer.adapters.AllSongAdapter;
+import remix.myplayer.infos.MP3Info;
 import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.services.MusicService;
 import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.Global;
+import remix.myplayer.utils.sort.Compator;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -42,6 +46,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     private Cursor mCursor = null;
     //歌曲名 艺术家 专辑名 专辑id 歌曲id对应的索引
     public static int mDisPlayNameIndex = -1;
+    public static int mTitleIndex = -1;
     public static int mArtistIndex = -1;
     public static int mAlbumIndex = -1;
     public static int mAlbumIdIndex = -1;
@@ -49,6 +54,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     public static AllSongFragment mInstance = null;
     private RecyclerView mRecyclerView;
     private AllSongAdapter mAdapter;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -93,7 +99,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         mRecyclerView.addItemDecoration(new RecyclerItemDecoration(getContext(),RecyclerItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mAdapter = new AllSongAdapter(mCursor,getActivity());
+        mAdapter = new AllSongAdapter(getActivity(),AllSongAdapter.ALLSONG);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -124,11 +130,11 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(data == null)
-            return;
+    public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
+
         //保存查询结果，并设置查询索引
         mCursor = data;
+        mTitleIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
         mDisPlayNameIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
         mArtistIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
         mAlbumIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM);
@@ -137,6 +143,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         if(mCursor != null) {
             mAdapter.setCursor(mCursor);
         }
+
     }
 
     @Override

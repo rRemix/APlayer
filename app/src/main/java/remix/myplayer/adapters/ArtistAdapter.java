@@ -34,7 +34,7 @@ import remix.myplayer.utils.DBUtil;
 /**
  * 艺术家界面的适配器
  */
-public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder>{
+public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHolder>{
     private Cursor mCursor;
     private Context mContext;
     private Bitmap mDefaultBmp;
@@ -80,12 +80,12 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.artist_recycle_item, null, false));
+    public ArtistHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new ArtistHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.artist_recycle_item, null, false));
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ArtistHolder holder, final int position) {
         if(mCursor.moveToPosition(position)) {
             try {
                 //设置歌手名
@@ -139,11 +139,11 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ViewHolder
         return 0;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ArtistHolder extends RecyclerView.ViewHolder {
         public final TextView mText1;
         public final SimpleDraweeView mImage;
         public final ImageButton mButton;
-        public ViewHolder(View v) {
+        public ArtistHolder(View v) {
             super(v);
             mText1 = (TextView)v.findViewById(R.id.recycleview_text1);
             mImage = (SimpleDraweeView)v.findViewById(R.id.recycleview_simpleiview);

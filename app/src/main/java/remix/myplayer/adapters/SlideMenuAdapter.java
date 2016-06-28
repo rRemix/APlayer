@@ -18,7 +18,7 @@ import remix.myplayer.R;
  */
 public class SlideMenuAdapter extends BaseAdapter {
     private int draws[] = new int[]{R.drawable.drawer_icon_recently,R.drawable.drawer_icon_list,
-            R.drawable.drawer_icon_musicbox,R.drawable.drawer_icon_set};
+            R.drawable.drawer_icon_musicbox,R.drawable.drawer_icon_setting};
     private String strings[] = new String[]{"最近添加","播放列表","全部歌曲","设置"};
     private LayoutInflater mInflater;
 

@@ -26,12 +26,9 @@
             android:layout_marginLeft="72dp"/>
     </RelativeLayout>
 
-    <ListView
-        android:id="@+id/recently_listview"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@drawable/divider"
-        android:dividerHeight="1px"
-        android:background="@color/background_color_3"/>
+        android:layout_height="match_parent"/>
 
 </LinearLayout>

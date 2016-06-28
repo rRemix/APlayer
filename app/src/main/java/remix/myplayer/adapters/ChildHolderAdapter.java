@@ -79,7 +79,7 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
         }
 
         //设置标题
-        holder.mTitle.setText(CommonUtil.processInfo(temp.getDisplayname(),CommonUtil.SONGTYPE));
+        holder.mTitle.setText(CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE));
 
         if(holder.mButton != null) {
             holder.mButton.setOnClickListener(new View.OnClickListener() {

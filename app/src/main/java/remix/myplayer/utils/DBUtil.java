@@ -331,26 +331,19 @@ public class DBUtil {
         if(cursor == null || cursor.getColumnCount() <= 0)
             return null;
 
-        long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-        String name = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
-        name = name.substring(0, name.lastIndexOf("."));
-        if(name.indexOf("unknown") > 0)
-            name = "未知歌曲";
-
-        String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-        if(artist.indexOf("unknown") > 0)
-            artist = "未知歌手";
-
-        String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
-        if(album.indexOf("unknown") > 0)
-            album = "未知专辑";
-
-        long albumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
         long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-        String realtime = CommonUtil.getTime(duration);
-        String url = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-        long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
-        return new MP3Info(id, name, album, albumId,artist, duration, realtime, url, size, null);
+        return new MP3Info("",
+                cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)),
+                CommonUtil.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),CommonUtil.SONGTYPE),
+                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)),
+                CommonUtil.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)),CommonUtil.ALBUMTYPE),
+                cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
+                CommonUtil.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),CommonUtil.ARTISTTYPE),
+                duration,
+                CommonUtil.getTime(duration),
+                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)),
+                cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE)),
+                null);
     }
 
 

@@ -3,29 +3,19 @@ package remix.myplayer.adapters;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.ParcelFileDescriptor;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectStreamException;
-import java.net.URI;
 
 import remix.myplayer.R;
 import remix.myplayer.fragments.AlbumFragment;
@@ -33,8 +23,6 @@ import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.listeners.PopupListener;
 import remix.myplayer.utils.CommonUtil;
 import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DBUtil;
-import remix.myplayer.utils.thumb.SearchCover;
 
 /**
  * Created by Remix on 2015/12/20.
@@ -43,7 +31,7 @@ import remix.myplayer.utils.thumb.SearchCover;
 /**
  * 专辑界面的适配器
  */
-public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
+public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  {
     private Cursor mCursor;
     private Context mContext;
     private OnItemClickListener mOnItemClickLitener;
@@ -86,12 +74,12 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.album_recycle_item, null, false));
+    public AlbumHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new AlbumHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.album_recycle_item, null, false));
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final AlbumHolder holder, final int position) {
         if(mCursor.moveToPosition(position)) {
             try {
                 //获得并设置专辑与艺术家
@@ -145,12 +133,12 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.ViewHolder>  {
         return mCursor != null ? mCursor.getCount() : 0;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class AlbumHolder extends RecyclerView.ViewHolder {
         public final TextView mText1;
         public final TextView mText2;
         public final ImageButton mButton;
         public final SimpleDraweeView mImage;
-        public ViewHolder(View v) {
+        public AlbumHolder(View v) {
             super(v);
             mText1 = (TextView)v.findViewById(R.id.recycleview_text1);
             mText2 = (TextView)v.findViewById(R.id.recycleview_text2);

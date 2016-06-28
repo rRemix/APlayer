@@ -5,19 +5,26 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import remix.myplayer.R;
+import remix.myplayer.adapters.AllSongAdapter;
 import remix.myplayer.adapters.RecentlyAdapter;
 import remix.myplayer.infos.MP3Info;
 import remix.myplayer.inject.ViewInject;
+import remix.myplayer.listeners.OnItemClickListener;
 import remix.myplayer.services.MusicService;
+import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.utils.Constants;
 import remix.myplayer.utils.DBUtil;
 import remix.myplayer.utils.Global;
@@ -31,15 +38,17 @@ import remix.myplayer.utils.Global;
  * 目前为最近7天添加
  */
 public class RecetenlyActivity extends ToolbarActivity implements MusicService.Callback{
-    private RecentlyAdapter mAdapter;
+    private ArrayList<MP3Info> mInfoList;
+    private AllSongAdapter mAdapter;
     @ViewInject(R.id.toolbar)
     private Toolbar mToolBar;
-    @ViewInject(R.id.recently_listview)
-    private ListView mListView;
+    @ViewInject(R.id.recyclerview)
+    private RecyclerView mRecyclerView;
+
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            mListView.setAdapter(mAdapter);
+           mAdapter.setInfoList(mInfoList);
         }
     };
 
@@ -54,22 +63,15 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         MusicService.addCallback(RecetenlyActivity.this);
-        initListView();
 
-        initToolbar(mToolBar,getString(R.string.recently));
-    }
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.addItemDecoration(new RecyclerItemDecoration(this,RecyclerItemDecoration.VERTICAL_LIST,getResources().getDrawable(R.drawable.divider)));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-    private void initListView() {
-        new Thread(){
+        mAdapter = new AllSongAdapter(RecetenlyActivity.this,AllSongAdapter.RECENTLY);
+        mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
-            public void run() {
-                mAdapter = new RecentlyAdapter(RecetenlyActivity.this, DBUtil.getMP3ListByIds(Global.mWeekList));
-                mHandler.sendEmptyMessage(0);
-            }
-        }.start();
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(View view, int position) {
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 Bundle arg = new Bundle();
                 arg.putInt("Control", Constants.PLAYSELECTEDSONG);
@@ -77,10 +79,22 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
                 intent.putExtras(arg);
                 Global.setPlayingList(Global.mWeekList);
                 sendBroadcast(intent);
-                view.setSelected(true);
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
             }
         });
+        mRecyclerView.setAdapter(mAdapter);
 
+        initToolbar(mToolBar,getString(R.string.recently));
+        new Thread(){
+            @Override
+            public void run() {
+                mInfoList = DBUtil.getMP3ListByIds(Global.mWeekList);
+                mHandler.sendEmptyMessage(0);
+            }
+        }.start();
     }
 
     //随机播放
@@ -95,34 +109,6 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         Global.setPlayingList(Global.mWeekList);
         sendBroadcast(intent);
     }
-
-//    private void initToolbar() {
-//        mToolBar = (Toolbar) findViewById(R.id.toolbar);
-//        mToolBar.setTitle("最近添加");
-//        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
-//        setSupportActionBar(mToolBar);
-//        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
-//        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                finish();
-//            }
-//        });
-//        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                switch (item.getItemId()) {
-//                    case R.id.toolbar_search:
-//                        startActivity(new Intent(RecetenlyActivity.this, SearchActivity.class));
-//                        break;
-//                    case R.id.toolbar_timer:
-//                        startActivity(new Intent(RecetenlyActivity.this, TimerDialog.class));
-//                        break;
-//                }
-//                return true;
-//            }
-//        });
-//    }
 
 
     @Override

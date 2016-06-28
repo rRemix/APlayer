@@ -7,9 +7,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.Iterator;
@@ -24,7 +22,7 @@ import remix.myplayer.utils.Global;
 /**
  * Created by taeja on 16-6-23.
  */
-public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ViewHolder> {
+public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHolder> {
     private Context mContext;
     private OnItemClickListener mOnItemClickLitener;
 
@@ -37,12 +35,12 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ViewHolder
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(mContext).inflate(R.layout.folder_recycle_item,null,false));
+    public FolderHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new FolderHolder(LayoutInflater.from(mContext).inflate(R.layout.folder_recycle_item,null,false));
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final FolderHolder holder, final int position) {
         if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
             return ;
         //根据当前索引 获得对应的歌曲列表
@@ -90,13 +88,13 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ViewHolder
         return Global.mFolderMap == null ? 0 : Global.mFolderMap.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class FolderHolder extends RecyclerView.ViewHolder{
         public View mRootView;
         public TextView mName;
         public TextView mPath;
         public TextView mCount;
         public ImageButton mButton;
-        public ViewHolder(View itemView) {
+        public FolderHolder(View itemView) {
             super(itemView);
             mRootView = itemView;
             mName = (TextView)itemView.findViewById(R.id.folder_name);

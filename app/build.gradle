@@ -28,6 +28,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
+    compile 'com.android.support:cardview-v7:23.1.1'
     compile 'com.facebook.fresco:fresco:0.8.1'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     compile files('libs/weiboSDKCore_3.1.2.jar')
