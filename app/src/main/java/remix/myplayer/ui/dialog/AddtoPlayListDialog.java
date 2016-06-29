@@ -13,12 +13,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import remix.myplayer.R;
-import remix.myplayer.ui.activities.BaseActivity;
-import remix.myplayer.ui.activities.PlayListActivity;
-import remix.myplayer.adapters.PlayListAddtoAdapter;
-import remix.myplayer.infos.PlayListItem;
+import remix.myplayer.ui.activity.BaseActivity;
+import remix.myplayer.ui.activity.PlayListActivity;
+import remix.myplayer.adapter.PlayListAddtoAdapter;
+import remix.myplayer.model.PlayListItem;
 import remix.myplayer.inject.ViewInject;
-import remix.myplayer.utils.XmlUtil;
+import remix.myplayer.util.XmlUtil;
 
 /**
  * Created by taeja on 16-2-1.

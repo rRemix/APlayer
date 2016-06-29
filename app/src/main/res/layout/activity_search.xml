@@ -5,7 +5,7 @@
     android:background="@color/background_color_3"
     android:fitsSystemWindows="true">
 
-    <remix.myplayer.ui.customviews.SearchView
+    <remix.myplayer.ui.customview.SearchView
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal"
@@ -60,7 +60,7 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="10dp"
             android:gravity="center_vertical" />
-    </remix.myplayer.ui.customviews.SearchView>
+    </remix.myplayer.ui.customview.SearchView>
 
     <!--搜索历史与搜索结果-->
     <FrameLayout

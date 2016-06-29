@@ -23,12 +23,12 @@ import android.widget.Toast;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import remix.myplayer.R;
-import remix.myplayer.ui.activities.BaseAppCompatActivity;
-import remix.myplayer.infos.MP3Info;
+import remix.myplayer.model.MP3Item;
+import remix.myplayer.ui.activity.BaseAppCompatActivity;
 import remix.myplayer.inject.ViewInject;
-import remix.myplayer.ui.customviews.CircleImageView;
-import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DBUtil;
+import remix.myplayer.ui.customview.CircleImageView;
+import remix.myplayer.util.Constants;
+import remix.myplayer.util.DBUtil;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -56,7 +56,7 @@ public class OptionDialog extends BaseAppCompatActivity {
     private CircleImageView mCircleView;
 
     //当前正在播放的歌曲
-    private MP3Info mInfo = null;
+    private MP3Item mInfo = null;
     //是否是删除播放列表中歌曲
     private boolean mIsDeletePlayList = false;
     //播放列表名字
@@ -73,7 +73,7 @@ public class OptionDialog extends BaseAppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
-        mInfo = (MP3Info)getIntent().getExtras().getSerializable("MP3Info");
+        mInfo = (MP3Item)getIntent().getExtras().getSerializable("MP3Item");
         if(mInfo == null)
             return;
         if(mIsDeletePlayList = getIntent().getExtras().getBoolean("IsDeletePlayList", false)){
@@ -126,7 +126,7 @@ public class OptionDialog extends BaseAppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(OptionDialog.this,ShareDialog.class);
                 Bundle arg = new Bundle();
-                arg.putSerializable("MP3Info",mInfo);
+                arg.putSerializable("MP3Item",mInfo);
                 arg.putInt("Type",Constants.SHARESONG);
                 intent.putExtras(arg);
                 startActivity(intent);

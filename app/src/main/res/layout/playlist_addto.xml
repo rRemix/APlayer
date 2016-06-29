@@ -24,7 +24,6 @@
         android:layout_marginTop="1dp"
         android:layout_below="@id/playlist_addto_text"
         android:id="@+id/playlist_addto_list"
-
         android:dividerHeight="1dp"
         android:divider="#E6E6E6"/>
     <Button

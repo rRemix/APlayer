@@ -8,10 +8,10 @@ import android.view.WindowManager;
 import android.widget.EditText;
 
 import remix.myplayer.R;
-import remix.myplayer.ui.activities.BaseActivity;
-import remix.myplayer.ui.activities.PlayListActivity;
+import remix.myplayer.ui.activity.BaseActivity;
+import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.inject.ViewInject;
-import remix.myplayer.utils.XmlUtil;
+import remix.myplayer.util.XmlUtil;
 
 /**
  * Created by taeja on 16-3-17.

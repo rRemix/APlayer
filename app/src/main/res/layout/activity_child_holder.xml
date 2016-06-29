@@ -92,7 +92,7 @@
             android:textSize="@dimen/textsize_small"
             android:text=""
             android:layout_gravity="center_horizontal"/>
-        <fragment android:name="remix.myplayer.fragments.BottomActionBarFragment"
+        <fragment android:name="remix.myplayer.fragment.BottomActionBarFragment"
             android:id="@+id/bottom_actionbar_new"
             android:layout_width="match_parent"
             android:layout_height="72dp" />

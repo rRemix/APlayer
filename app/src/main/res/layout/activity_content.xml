@@ -21,7 +21,7 @@
             android:layout_gravity="top">
         </FrameLayout>
         <!-- 底部自定义ationbar -->
-        <fragment android:name="remix.myplayer.fragments.BottomActionBarFragment"
+        <fragment android:name="remix.myplayer.fragment.BottomActionBarFragment"
             android:id="@+id/bottom_actionbar_new"
             android:layout_width="match_parent"
             android:layout_height="0dp"

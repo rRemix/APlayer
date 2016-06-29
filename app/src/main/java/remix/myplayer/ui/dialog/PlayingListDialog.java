@@ -12,10 +12,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import remix.myplayer.R;
-import remix.myplayer.ui.activities.BaseActivity;
-import remix.myplayer.adapters.PlayingListAdapter;
+import remix.myplayer.ui.activity.BaseActivity;
+import remix.myplayer.adapter.PlayingListAdapter;
 import remix.myplayer.inject.ViewInject;
-import remix.myplayer.utils.Constants;
+import remix.myplayer.util.Constants;
 
 /**
  * Created by Remix on 2015/12/6.

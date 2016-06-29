@@ -17,13 +17,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import remix.myplayer.R;
-import remix.myplayer.ui.activities.BaseActivity;
-import remix.myplayer.ui.activities.MainActivity;
+import remix.myplayer.ui.activity.BaseActivity;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.inject.ViewInject;
-import remix.myplayer.services.TimerService;
-import remix.myplayer.ui.customviews.CircleSeekBar;
-import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.SharedPrefsUtil;
+import remix.myplayer.service.TimerService;
+import remix.myplayer.ui.customview.CircleSeekBar;
+import remix.myplayer.util.Constants;
+import remix.myplayer.util.SharedPrefsUtil;
 
 /**
  * Created by taeja on 16-1-15.

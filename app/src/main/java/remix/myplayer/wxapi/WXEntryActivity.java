@@ -13,7 +13,7 @@ import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 
 import remix.myplayer.ui.dialog.ShareDialog;
-import remix.myplayer.utils.Constants;
+import remix.myplayer.util.Constants;
 
 
 /**

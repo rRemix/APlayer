@@ -37,12 +37,12 @@ import com.tencent.tauth.UiError;
 import java.net.URLEncoder;
 
 import remix.myplayer.R;
-import remix.myplayer.ui.activities.BaseActivity;
-import remix.myplayer.ui.activities.RecordShareActivity;
-import remix.myplayer.infos.MP3Info;
+import remix.myplayer.ui.activity.BaseActivity;
+import remix.myplayer.ui.activity.RecordShareActivity;
+import remix.myplayer.model.MP3Item;
 import remix.myplayer.inject.ViewInject;
-import remix.myplayer.utils.Constants;
-import remix.myplayer.utils.DBUtil;
+import remix.myplayer.util.Constants;
+import remix.myplayer.util.DBUtil;
 
 /**
  * Created by Remix on 2015/12/9.
@@ -66,7 +66,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     @ViewInject(R.id.popup_share_cancel)
     private Button mCancel;
 
-    private MP3Info mInfo;
+    private MP3Item mInfo;
     //Api
     private Tencent mTencentApi;
     private IWeiboShareAPI mWeiboApi;
@@ -86,7 +86,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         super.onCreate(savedInstanceState);
         mInstance = this;
 
-        mInfo = (MP3Info)getIntent().getExtras().getSerializable("MP3Info");
+        mInfo = (MP3Item)getIntent().getExtras().getSerializable("MP3Item");
         mType = (int)getIntent().getExtras().getInt("Type");
         mImageUrl = getIntent().getExtras().getString("Url");
         if(mInfo == null)

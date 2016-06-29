@@ -2,8 +2,6 @@ package remix.myplayer;
 
 import android.test.InstrumentationTestCase;
 
-import remix.myplayer.utils.ImageUtil;
-
 /**
  * Created by Remix on 2015/12/7.
  */

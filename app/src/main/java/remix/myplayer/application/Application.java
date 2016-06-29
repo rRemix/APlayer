@@ -2,7 +2,7 @@ package remix.myplayer.application;
 
 import android.content.Context;
 
-import remix.myplayer.utils.CrashHandler;
+import remix.myplayer.util.CrashHandler;
 
 /**
  * Created by taeja on 16-3-16.

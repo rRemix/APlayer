@@ -30,7 +30,7 @@
         android:layout_marginTop="22dp"
         android:src="@drawable/set_scanning_divder"/>
 
-    <remix.myplayer.ui.customviews.CustomSeekBar
+    <remix.myplayer.ui.customview.ScanSizeSeekBar
         android:layout_marginTop="32dp"
         android:layout_marginLeft="32dp"
         android:layout_marginRight="32dp"

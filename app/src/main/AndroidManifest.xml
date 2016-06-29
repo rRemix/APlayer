@@ -27,12 +27,12 @@
         <meta-data android:value="56d6563367e58e6aa70005af" android:name="UMENG_APPKEY"/>
         <meta-data android:value="Umeng" android:name="UMENG_CHANNEL"/>
 
-        <activity android:name=".ui.activities.SplashActivity"
+        <activity android:name=".ui.activity.SplashActivity"
             android:theme="@style/ActivityStyle">
 
         </activity>
         <activity
-            android:name=".ui.activities.MainActivity"
+            android:name=".ui.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/ActivityStyle">
             <intent-filter>
@@ -41,46 +41,46 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.activities.AudioHolderActivity"
+        <activity android:name=".ui.activity.AudioHolderActivity"
             android:theme="@style/AudioHolderStyle"
-            android:parentActivityName=".ui.activities.MainActivity">
+            android:parentActivityName=".ui.activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.MainActivity"/>
+                android:value=".ui.activity.MainActivity"/>
         </activity>
 
 
-        <activity android:name=".ui.activities.SearchActivity"
+        <activity android:name=".ui.activity.SearchActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".ui.activities.PlayListActivity"
+        <activity android:name=".ui.activity.PlayListActivity"
             android:theme="@style/ActivityStyle">
         </activity>
 
-        <activity android:name=".ui.activities.ChildHolderActivity"
+        <activity android:name=".ui.activity.ChildHolderActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".ui.activities.RecordShareActivity"/>
+        <activity android:name=".ui.activity.RecordShareActivity"/>
 
-        <activity android:name=".ui.activities.AboutActivity"
+        <activity android:name=".ui.activity.AboutActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".ui.activities.RecetenlyActivity"
+        <activity android:name=".ui.activity.RecetenlyActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".ui.activities.SettingActivity"
+        <activity android:name=".ui.activity.SettingActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".ui.activities.FeedBakActivity"
+        <activity android:name=".ui.activity.FeedBakActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".ui.activities.ScanActivity"
+        <activity android:name=".ui.activity.ScanActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".ui.activities.EQActivity"
+        <activity android:name=".ui.activity.EQActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".ui.activities.LockScreenActivity"
+        <activity android:name=".ui.activity.LockScreenActivity"
             android:theme="@style/LockScreenActivity"
             android:excludeFromRecents="true"
             android:exported="false"
@@ -176,32 +176,32 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
-        <receiver android:name=".receivers.LineCtlReceiver">
+        <receiver android:name=".receiver.LineCtlReceiver">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receivers.NotifyReceiver">
+        <receiver android:name=".receiver.NotifyReceiver">
             <intent-filter>
                 <action android:name="remix.music.NOTIFY"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receivers.ExitReceiver">
+        <receiver android:name=".receiver.ExitReceiver">
             <intent-filter>
                 <action android:name="remix.music.EXIT"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receivers.EQReceiver">
+        <receiver android:name=".receiver.EQReceiver">
             <intent-filter>
                 <action android:name="remix.music.SOUNDEFFECT_ACTION"/>
             </intent-filter>
         </receiver>
 
-        <service android:name=".services.MusicService"/>
-        <service android:name=".services.TimerService"/>
+        <service android:name=".service.MusicService"/>
+        <service android:name=".service.TimerService"/>
 
     </application>
 
