@@ -55,7 +55,7 @@ public class IndexView extends View {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean dispatchTouchEvent(MotionEvent event) {
         int temp = Integer.MAX_VALUE;
         for(int i = 0 ; i < mPosList.size() ;i++){
             if(Math.abs(mPosList.get(i) - event.getY()) < temp){
@@ -64,9 +64,22 @@ public class IndexView extends View {
             }
         }
         seekTo();
-
-        return super.onTouchEvent(event);
+        return true;
     }
+
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        int temp = Integer.MAX_VALUE;
+//        for(int i = 0 ; i < mPosList.size() ;i++){
+//            if(Math.abs(mPosList.get(i) - event.getY()) < temp){
+//                mLetter = (char)(i + 'A');
+//                temp = Math.abs((int)(mPosList.get(i) - event.getY()));
+//            }
+//        }
+//        seekTo();
+//
+//        return true;
+//    }
 
     public void seekTo(){
         if(mListener != null){

@@ -120,7 +120,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.AllSongH
             e.printStackTrace();
         }
 
-        if(mType == ALLSONG){
+        if(mType == ALLSONG && Global.mIndexOpen){
             //根据position获取分类的首字母的char ascii值
             int section = getSectionForPosition(position);
             //如果当前位置等于该分类首字母的Char的位置 ，则认为是第一次出现

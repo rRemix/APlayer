@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/allsong_item_height"
+    android:layout_height="wrap_content"
     android:id="@+id/songlist_item"
     android:background="?android:attr/selectableItemBackground">
 
@@ -23,7 +23,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/allsong_item_height"
         android:layout_below="@id/song_index_letter">
         <remix.myplayer.ui.customview.CircleImageView
             android:layout_alignParentLeft="true"

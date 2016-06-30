@@ -14,6 +14,11 @@ import java.util.Map;
 public class Global {
 
     /**
+     * 是否开启字母索引
+     */
+    public static boolean mIndexOpen = false;
+
+    /**
      * 操作类型
      */
     public static int mOperation = -1;

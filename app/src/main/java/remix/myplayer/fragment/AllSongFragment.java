@@ -23,15 +23,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import remix.myplayer.R;
 import remix.myplayer.adapter.AllSongAdapter;
 import remix.myplayer.listener.OnItemClickListener;
+import remix.myplayer.listener.TabTextListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.ui.customview.IndexView;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.sort.Compator;
 
@@ -108,7 +111,6 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         mRecyclerView.addItemDecoration(new RecyclerItemDecoration(getContext(),RecyclerItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-
         mAdapter = new AllSongAdapter(getActivity(),AllSongAdapter.ALLSONG);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
@@ -120,7 +122,6 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
                 arg.putInt("Position", position);
                 intent.putExtras(arg);
                 getActivity().sendBroadcast(intent);
-                mRecyclerView.scrollBy(0,1000);
             }
 
             @Override
@@ -130,17 +131,35 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         mRecyclerView.setAdapter(mAdapter);
 
         mIndexView = (IndexView)rootView.findViewById(R.id.song_index_view);
+        mIndexView.setVisibility(Global.mIndexOpen ? View.VISIBLE : View.GONE);
         mIndexView.setPositionChangedListener(new IndexView.OnLetterChangedListener() {
             @Override
             public void onLetterChanged(char c) {
                 if(mAdapter != null && mRecyclerView != null){
                     int pos = mAdapter.getPositionForSection(c);
-                    mRecyclerView.smoothScrollToPosition(pos);
+                    int i = 0;
+                    for(; i < 26 ;i++){
+                        int posforsec = mAdapter.getPositionForSection('A' + i);
+                        if(posforsec >= pos)
+                            break;
+                    }
+
+                    int dy = pos * DensityUtil.dip2px(getContext(),72) /*+ i * DensityUtil.dip2px(getContext(),20)*/;
+                    int scrolly = getScollYDistance();
+                    mRecyclerView.scrollBy(0,dy - scrolly);
                     Toast.makeText(getActivity(),String.valueOf(c),Toast.LENGTH_SHORT).show();
                 }
             }
         });
         return rootView;
+    }
+
+    public int getScollYDistance() {
+        LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+        int position = layoutManager.findFirstVisibleItemPosition();
+        View firstVisiableChildView = layoutManager.findViewByPosition(position);
+        int itemHeight = firstVisiableChildView.getHeight();
+        return (position) * itemHeight - firstVisiableChildView.getTop();
     }
 
     @Override
@@ -155,12 +174,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
         //保存查询结果，并设置查询索引
         mCursor = data;
-        mCursor.registerContentObserver(new ContentObserver(mHandler) {
-            @Override
-            public void onChange(boolean selfChange) {
-                super.onChange(selfChange);
-            }
-        });
+
 
         mTitleIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
         mDisPlayNameIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
@@ -187,13 +201,12 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         public void run() {
             long start = System.currentTimeMillis();
             ArrayList<String> list = new ArrayList<String>();
-            while (mCursor.moveToNext()) {
-                if(mCursor.getString(mTitleIndex).contains("(s)")){
-                    Log.d("AllSongFragment","(s)aint");
+            if(Global.mIndexOpen){
+                while (mCursor.moveToNext()) {
+                    String firstLetter = Compator.getFirstLetter(mCursor.getString(mTitleIndex));
+                    Log.d("AllSongFragment","\nTitle:" + mCursor.getString(mTitleIndex) + " \nFirstLetter:" + firstLetter);
+                    list.add(firstLetter);
                 }
-                Log.d("AllSongFragment","Title:" + mCursor.getString(mTitleIndex));
-                String firstLetter = Compator.getFirstLetter(mCursor.getString(mTitleIndex));
-                list.add(firstLetter);
             }
             Message msg = new Message();
             msg.obj = list;
@@ -202,4 +215,5 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
             Log.d("ALlSongFragment","CostTime:" + (System.currentTimeMillis() - start));
         }
     }
+
 }
