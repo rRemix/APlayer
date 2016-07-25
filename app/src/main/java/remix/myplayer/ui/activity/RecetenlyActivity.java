@@ -17,7 +17,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import remix.myplayer.R;
-import remix.myplayer.adapter.AllSongAdapter;
+import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.inject.ViewInject;
 import remix.myplayer.listener.OnItemClickListener;
@@ -37,7 +37,7 @@ import remix.myplayer.util.Global;
  */
 public class RecetenlyActivity extends ToolbarActivity implements MusicService.Callback{
     private ArrayList<MP3Item> mInfoList;
-    private AllSongAdapter mAdapter;
+    private SongAdapter mAdapter;
     @ViewInject(R.id.toolbar)
     private Toolbar mToolBar;
     @ViewInject(R.id.recyclerview)
@@ -66,7 +66,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         mRecyclerView.addItemDecoration(new RecyclerItemDecoration(this,RecyclerItemDecoration.VERTICAL_LIST,getResources().getDrawable(R.drawable.divider)));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mAdapter = new AllSongAdapter(RecetenlyActivity.this,AllSongAdapter.RECENTLY);
+        mAdapter = new SongAdapter(RecetenlyActivity.this, SongAdapter.RECENTLY);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {

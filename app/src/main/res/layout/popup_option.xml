@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="176dp"
     android:background="#ffffffff"
     android:layout_gravity="bottom">
@@ -9,12 +11,21 @@
         android:layout_height="56dp"
         android:orientation="horizontal"
         android:gravity="center_vertical">
-        <remix.myplayer.ui.customview.CircleImageView
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/popup_image"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp" />
+            android:layout_marginRight="16dp"
+            fresco:actualImageScaleType="centerCrop"
+            fresco:placeholderImageScaleType="centerCrop"
+            fresco:placeholderImage="@drawable/song_artist_empty_bg"
+            fresco:failureImage="@drawable/song_artist_empty_bg"
+            fresco:failureImageScaleType="centerCrop"
+            fresco:roundAsCircle="true"
+            fresco:roundingBorderWidth="1px"
+            fresco:roundingBorderColor="#ffffffff"
+            android:layout_centerVertical="true" />
         <TextView
             android:layout_width="240dp"
             android:layout_height="wrap_content"

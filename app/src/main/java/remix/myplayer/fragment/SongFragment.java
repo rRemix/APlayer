@@ -3,7 +3,6 @@ package remix.myplayer.fragment;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,13 +22,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import remix.myplayer.R;
-import remix.myplayer.adapter.AllSongAdapter;
+import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.listener.OnItemClickListener;
-import remix.myplayer.listener.TabTextListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.ui.customview.IndexView;
@@ -45,7 +42,7 @@ import remix.myplayer.util.sort.Compator;
 /**
  * 全部歌曲的Fragment
  */
-public class AllSongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private LoaderManager mManager;
     private Cursor mCursor = null;
     //歌曲名 艺术家 专辑名 专辑id 歌曲id对应的索引
@@ -55,9 +52,9 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
     public static int mAlbumIndex = -1;
     public static int mAlbumIdIndex = -1;
     public static int mSongId = -1;
-    public static AllSongFragment mInstance = null;
+    public static SongFragment mInstance = null;
     private RecyclerView mRecyclerView;
-    private AllSongAdapter mAdapter;
+    private SongAdapter mAdapter;
     private IndexView mIndexView;
     private Handler mHandler = new Handler(){
         @Override
@@ -111,7 +108,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
         mRecyclerView.addItemDecoration(new RecyclerItemDecoration(getContext(),RecyclerItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mAdapter = new AllSongAdapter(getActivity(),AllSongAdapter.ALLSONG);
+        mAdapter = new SongAdapter(getActivity(), SongAdapter.ALLSONG);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -192,9 +189,10 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
             mAdapter.setCursor(null);
     }
 
-    public AllSongAdapter getAdapter(){
+    public SongAdapter getAdapter(){
         return mAdapter;
     }
+
 
     class IndexThread extends Thread{
         @Override
@@ -204,7 +202,7 @@ public class AllSongFragment extends Fragment implements LoaderManager.LoaderCal
             if(Global.mIndexOpen){
                 while (mCursor.moveToNext()) {
                     String firstLetter = Compator.getFirstLetter(mCursor.getString(mTitleIndex));
-                    Log.d("AllSongFragment","\nTitle:" + mCursor.getString(mTitleIndex) + " \nFirstLetter:" + firstLetter);
+                    Log.d("SongFragment","\nTitle:" + mCursor.getString(mTitleIndex) + " \nFirstLetter:" + firstLetter);
                     list.add(firstLetter);
                 }
             }

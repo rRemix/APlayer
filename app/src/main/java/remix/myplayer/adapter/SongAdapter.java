@@ -1,9 +1,11 @@
 package remix.myplayer.adapter;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,23 +14,21 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.ArrayList;
 
 import remix.myplayer.R;
-import remix.myplayer.application.Application;
-import remix.myplayer.fragment.AllSongFragment;
-import remix.myplayer.model.MP3Item;
+import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
-import remix.myplayer.model.SortModel;
+import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.customview.CircleImageView;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.DBUtil;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 
 /**
@@ -38,7 +38,7 @@ import remix.myplayer.util.Global;
 /**
  * Created by Remix on 2016/4/11.
  */
-public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.AllSongHolder>{
+public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>{
     private Cursor mCursor;
     private Context mContext;
     private OnItemClickListener mOnItemClickLitener;
@@ -47,8 +47,9 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.AllSongH
     private int mType;
     public static final int ALLSONG = 0;
     public static final int RECENTLY = 1;
+    private static int mCurrentAnimPosition = 0;//当前播放高亮动画的索引
 
-    public AllSongAdapter(Context context,int type) {
+    public SongAdapter(Context context, int type) {
         this.mContext = context;
         this.mType = type;
     }
@@ -73,11 +74,12 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.AllSongH
 
     @Override
     public AllSongHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new AllSongHolder(LayoutInflater.from(mContext).inflate(R.layout.allsong_recycle_item,null,false));
+        return new AllSongHolder(LayoutInflater.from(mContext).inflate(R.layout.song_recycle_item,null,false));
     }
 
     @Override
     public void onBindViewHolder(final AllSongHolder holder, final int position) {
+
         final boolean allsong = mType == ALLSONG;
         final MP3Item temp = mInfoList != null ? mInfoList.get(position) : new MP3Item();
         if(allsong && (mCursor == null || !mCursor.moveToPosition(position))){
@@ -89,10 +91,11 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.AllSongH
         //判断该歌曲是否是正在播放的歌曲
         //如果是,高亮该歌曲，并显示动画
         if(currentMP3 != null){
-            boolean highlight = (allsong ? mCursor.getInt(AllSongFragment.mSongId) : temp.getId()) == MusicService.getCurrentMP3().getId();
+            boolean highlight = (allsong ? mCursor.getInt(SongFragment.mSongId) : temp.getId()) == MusicService.getCurrentMP3().getId();
             holder.mName.setTextColor(highlight ? Color.parseColor("#782899") : Color.parseColor("#ffffffff"));
             holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.GONE);
-
+            if(highlight)
+                mCurrentAnimPosition = position;
             //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
             if(MusicService.getIsplay() && !holder.mColumnView.getStatus() && highlight){
                 holder.mColumnView.startAnim();
@@ -105,16 +108,14 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.AllSongH
 
         try {
             //设置歌曲名
-            String name = CommonUtil.processInfo(allsong ? mCursor.getString(AllSongFragment.mTitleIndex) :temp.getTitle(),CommonUtil.SONGTYPE);
+            String name = CommonUtil.processInfo(allsong ? mCursor.getString(SongFragment.mTitleIndex) :temp.getTitle(),CommonUtil.SONGTYPE);
             holder.mName.setText(name);
 
             //艺术家与专辑
-            String artist = CommonUtil.processInfo(allsong ? mCursor.getString(AllSongFragment.mArtistIndex) : temp.getArtist(),CommonUtil.ARTISTTYPE);
-            String album = CommonUtil.processInfo(allsong ? mCursor.getString(AllSongFragment.mAlbumIndex) : temp.getAlbum(),CommonUtil.ALBUMTYPE);
+            String artist = CommonUtil.processInfo(allsong ? mCursor.getString(SongFragment.mArtistIndex) : temp.getArtist(),CommonUtil.ARTISTTYPE);
+            String album = CommonUtil.processInfo(allsong ? mCursor.getString(SongFragment.mAlbumIndex) : temp.getAlbum(),CommonUtil.ALBUMTYPE);
             //封面
             holder.mOther.setText(artist + "-" + album);
-
-
 
         } catch (Exception e){
             e.printStackTrace();
@@ -132,9 +133,14 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.AllSongH
             }
         }
 
-        ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" +
-                        (allsong ? mCursor.getString(AllSongFragment.mAlbumIdIndex) : temp.getAlbumId()),
-                holder.mImage);
+        DraweeController controller = Fresco.newDraweeControllerBuilder()
+                .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
+                        allsong ? mCursor.getInt(SongFragment.mAlbumIdIndex) : temp.getAlbumId()))
+                .setOldController(holder.mImage.getController())
+                .setAutoPlayAnimations(false)
+
+                .build();
+        holder.mImage.setController(controller);
 
         //选项Dialog
         if(holder.mItemButton != null) {
@@ -190,8 +196,10 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.AllSongH
     @Override
     public int getItemCount() {
         if(mType == ALLSONG) {
-            if(mCursor != null && mCursor.isClosed())
-                Log.d("AllSongFragment", "CursorIsClosed");
+            if(mCursor != null && mCursor.isClosed()) {
+                Log.d("SongFragment", "CursorIsClosed");
+                return 0;
+            }
             return mCursor != null ? mCursor.getCount() : 0;
         }
         else
@@ -201,7 +209,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.AllSongH
     public static class AllSongHolder extends RecyclerView.ViewHolder{
         public TextView mName;
         public TextView mOther;
-        public CircleImageView mImage;
+        public SimpleDraweeView mImage;
         public ColumnView mColumnView;
         public ImageButton mItemButton;
         public TextView mIndex;
@@ -209,7 +217,7 @@ public class AllSongAdapter extends RecyclerView.Adapter<AllSongAdapter.AllSongH
         public AllSongHolder(View itemView) {
             super(itemView);
             mRootView = itemView;
-            mImage = (CircleImageView)itemView.findViewById(R.id.song_head_image);
+            mImage = (SimpleDraweeView)itemView.findViewById(R.id.song_head_image);
             mName = (TextView)itemView.findViewById(R.id.song_title);
             mOther = (TextView)itemView.findViewById(R.id.song_other);
             mColumnView = (ColumnView)itemView.findViewById(R.id.song_columnview);

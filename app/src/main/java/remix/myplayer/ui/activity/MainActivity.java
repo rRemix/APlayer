@@ -4,14 +4,11 @@ package remix.myplayer.ui.activity;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,36 +18,25 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import com.facebook.cache.common.CacheEventListener;
-import com.facebook.cache.common.CacheKey;
-import com.facebook.cache.disk.DiskCacheConfig;
-import com.facebook.common.disk.NoOpDiskTrimmableRegistry;
 import com.facebook.common.internal.Supplier;
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.cache.CacheKeyFactory;
-import com.facebook.imagepipeline.cache.DefaultCacheKeyFactory;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.update.UmengUpdateAgent;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import remix.myplayer.R;
 import remix.myplayer.adapter.SlideMenuAdapter;
-import remix.myplayer.fragment.AllSongFragment;
+import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.fragment.MainFragment;
-import remix.myplayer.model.MP3Item;
 import remix.myplayer.inject.ViewInject;
 import remix.myplayer.listener.LockScreenListener;
+import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.ui.dialog.TimerDialog;
@@ -149,49 +135,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        final String SONGINFO_BASE_URL = "http://qqmusic.qq.com/fcgi-bin/qm_getLyricId.fcg";
-//        new Thread(){
-//            @Override
-//            public void run() {
-//                BufferedReader br = null;
-//                StringBuilder sb = new StringBuilder();
-//                StringBuilder result = new StringBuilder();
-//                String s;
-//                try {
-//                    sb.append(SONGINFO_BASE_URL);
-//                    sb.append("?");
-//                    sb.append("name=" + URLEncoder.encode("安静", "gbk"));
-//                    sb.append("&");
-//                    sb.append("singer=" + URLEncoder.encode("周杰伦", "gbk"));
-//                    sb.append("&");
-//                    sb.append("from=qqplayer");
-//                    HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(sb.toString()).openConnection();
-//                    httpURLConnection.connect();
-//                    InputStreamReader inReader = new InputStreamReader(httpURLConnection.getInputStream());
-//                    br = new BufferedReader(inReader);
-//                    while((s = br.readLine()) != null){
-//                        result.append(s);
-//                    }
-//                    Log.d(TAG,"result:" + result.toString());
-//
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                } catch (MalformedURLException e) {
-//                    e.printStackTrace();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                Log.d(TAG,"result:" + sb.toString());
-//            }
-//        }.start();
-
-//        new Thread(){
-//            @Override
-//            public void run() {
-//                String coverPath = CommonUtil.downAlbumCover("海阔天空","Beyond",123465);
-//            }
-//        }.start();
-
 
         //检查更新
         UmengUpdateAgent.update(this);
@@ -303,92 +246,16 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         ErrUtil.setContext(getApplicationContext());
         DiskCache.init(getApplicationContext());
 
-
-        DiskCacheConfig diskCacheConfig  = DiskCacheConfig.newBuilder()
-                .setBaseDirectoryPath(new File(Environment.getExternalStorageDirectory() + "/Android/data/" + getPackageName() + "/cache"))
-                .setBaseDirectoryName("fresco")
-                    .setDiskTrimmableRegistry(NoOpDiskTrimmableRegistry.getInstance())
-                    .setMaxCacheSize(50 * ByteConstants.MB)
-                    .setMaxCacheSizeOnLowDiskSpace(20 * ByteConstants.MB)
-                    .setMaxCacheSizeOnVeryLowDiskSpace(10 * ByteConstants.MB)
-                .setCacheEventListener(new CacheEventListener() {
-                    @Override
-                    public void onHit() {
-                        Log.d(TAG,"hit");
-                    }
-
-                    @Override
-                    public void onMiss() {
-                        Log.d(TAG,"miss");
-                    }
-
-                    @Override
-                    public void onWriteAttempt() {
-                        Log.d(TAG,"appempt");
-                    }
-
-                    @Override
-                    public void onReadException() {
-                        Log.d(TAG,"readException");
-                    }
-
-                    @Override
-                    public void onWriteException() {
-                        Log.d(TAG,"writeException");
-                    }
-
-                    @Override
-                    public void onEviction(EvictionReason evictionReason, int itemCount, long itemSize) {
-                        Log.d(TAG,"onEviction");
-                    }
-                })
-                .build();
-
+        final int MAX_HEAP_SIZE = (int) Runtime.getRuntime().maxMemory();//分配的可用内存
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
-//                .setMainDiskCacheConfig(diskCacheConfig)
-                .setCacheKeyFactory(new CacheKeyFactory() {
-                    @Override
-                    public CacheKey getBitmapCacheKey(ImageRequest request) {
-                        return DefaultCacheKeyFactory.getInstance().getBitmapCacheKey(request);
-                    }
-
-                    @Override
-                    public CacheKey getPostprocessedBitmapCacheKey(ImageRequest request) {
-                        return DefaultCacheKeyFactory.getInstance().getPostprocessedBitmapCacheKey(request);
-                    }
-
-                    @Override
-                    public CacheKey getEncodedCacheKey(ImageRequest request) {
-                        return DefaultCacheKeyFactory.getInstance().getEncodedCacheKey(request);
-                    }
-
-                    @Override
-                    public Uri getCacheKeySourceUri(Uri sourceUri) {
-                        return DefaultCacheKeyFactory.getInstance().getCacheKeySourceUri(sourceUri);
-                    }
-                })
                 .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {
                     @Override
                     public MemoryCacheParams get() {
                         //20M内存缓存
-                        return new MemoryCacheParams(20 * ByteConstants.MB, 10, 2048, 10, 1024);
+                        return new MemoryCacheParams(MAX_HEAP_SIZE / 8, Integer.MAX_VALUE, MAX_HEAP_SIZE / 8, Integer.MAX_VALUE, Integer.MAX_VALUE);
                     }
                 }).build();
         Fresco.initialize(this,config);
-
-        DisplayImageOptions option = new DisplayImageOptions.Builder()
-                .showImageForEmptyUri(R.drawable.song_artist_empty_bg)
-                .showImageOnFail(R.drawable.song_artist_empty_bg)
-                .cacheOnDisk(true)
-                .resetViewBeforeLoading(false)
-                .cacheInMemory(true)
-                .build();
-
-        ImageLoaderConfiguration config1 = new ImageLoaderConfiguration.Builder(this)
-                .memoryCacheSize(20 * ByteConstants.MB)
-                .defaultDisplayImageOptions(option)
-                .build();
-        ImageLoader.getInstance().init(config1);
     }
 
     private void initMainFragment() {
@@ -440,7 +307,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     }
 
-
     class SlideMenuListener implements AdapterView.OnItemClickListener {
         private Context mContext;
 
@@ -486,34 +352,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             }
         }.start();
 
-//        FutureTask<ArrayList<Long>> task = new FutureTask<ArrayList<Long>>(new Callable<ArrayList<Long>>() {
-//            @Override
-//            public ArrayList<Long> call() throws Exception {
-//                return DBUtil.getAllSongsId();
-//            }
-//        });
-//        new Thread(task, "getInfo").start();
-//        try {
-//            Global.mAllSongList = task.get();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        //读取正在播放列表信息
-//        FutureTask<ArrayList<Long>> task1 = new FutureTask<ArrayList<Long>>(new Callable<ArrayList<Long>>() {
-//            @Override
-//            public ArrayList<Long> call() throws Exception {
-//                return XmlUtil.getPlayingList();
-//            }
-//        });
-//        new Thread(task1, "getPlayingList").start();
-//        try {
-//            Global.mPlayingList = task1.get();
-//            if (Global.mPlayingList == null || Global.mPlayingList.size() == 0)
-//                Global.mPlayingList = (ArrayList<Long>) task.get().clone();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
     }
 
     //隐藏侧滑菜单
@@ -547,8 +385,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         mBottomBar.UpdateBottomStatus(MP3Item, isplay);
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         for (Fragment fragment : fragmentList) {
-            if (fragment instanceof AllSongFragment && ((AllSongFragment) fragment).getAdapter() != null) {
-                ((AllSongFragment) fragment).getAdapter().notifyDataSetChanged();
+            if (fragment instanceof SongFragment && ((SongFragment) fragment).getAdapter() != null) {
+                ((SongFragment) fragment).getAdapter().notifyDataSetChanged();
             }
         }
     }

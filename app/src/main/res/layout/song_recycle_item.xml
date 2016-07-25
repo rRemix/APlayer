@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -25,13 +26,20 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/allsong_item_height"
         android:layout_below="@id/song_index_letter">
-        <remix.myplayer.ui.customview.CircleImageView
-            android:layout_alignParentLeft="true"
-            android:id="@+id/song_head_image"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="16dp"
+        <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="40dp"
-            android:layout_height="40dp"/>
+            android:layout_height="40dp"
+            android:id="@+id/song_head_image"
+            fresco:actualImageScaleType="centerCrop"
+            fresco:placeholderImageScaleType="centerCrop"
+            fresco:placeholderImage="@drawable/song_artist_empty_bg"
+            fresco:failureImage="@drawable/song_artist_empty_bg"
+            fresco:failureImageScaleType="centerCrop"
+            fresco:roundAsCircle="true"
+            fresco:roundingBorderWidth="1px"
+            fresco:roundingBorderColor="@color/background_color_main"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"/>
         <!--歌曲名、歌手、专辑-->
         <LinearLayout
             android:layout_width="180dp"

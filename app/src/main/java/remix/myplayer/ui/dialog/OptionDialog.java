@@ -20,12 +20,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import remix.myplayer.R;
+import remix.myplayer.inject.ViewInject;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.ui.activity.BaseAppCompatActivity;
-import remix.myplayer.inject.ViewInject;
 import remix.myplayer.ui.customview.CircleImageView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -53,7 +54,7 @@ public class OptionDialog extends BaseAppCompatActivity {
     private TextView mTitle;
     //专辑封面
     @ViewInject(R.id.popup_image)
-    private CircleImageView mCircleView;
+    private SimpleDraweeView mDraweeView;
 
     //当前正在播放的歌曲
     private MP3Item mInfo = null;
@@ -82,8 +83,7 @@ public class OptionDialog extends BaseAppCompatActivity {
 
         //设置歌曲名与封面
         mTitle.setText(mInfo.getDisplayname() + "-" + mInfo.getArtist());
-        ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + mInfo.getAlbumId(),
-                mCircleView);
+        mDraweeView.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId()));
 
         //置于底部
         Window w = getWindow();

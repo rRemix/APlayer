@@ -1,6 +1,10 @@
 [
     {
-        "merged": "/home/taeja/AndroidProject/APlayer/StackBlur/build/intermediates/res/merged/androidTest/debug/raw/blur.bc",
-        "source": "/home/taeja/AndroidProject/APlayer/StackBlur/build/intermediates/bundles/debug/res/raw/blur.bc"
+        "merged": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\raw\\blur.bc",
+        "source": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\raw\\blur.bc"
+    },
+    {
+        "merged": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\raw\\blur.bc",
+        "source": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\raw\\blur.bc"
     }
 ]

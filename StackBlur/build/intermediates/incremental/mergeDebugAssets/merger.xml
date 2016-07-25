@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="/home/taeja/AndroidProject/APlayer/StackBlur/assets"><file name="ic_launcher.png" path="/home/taeja/AndroidProject/APlayer/StackBlur/assets/ic_launcher.png"/></source></dataSet><dataSet config="debug"><source path="/home/taeja/AndroidProject/APlayer/StackBlur/build-types/debug/assets"/></dataSet></merger>
+<merger version="3"><dataSet config="main"><source path="D:\AndroidProject\APlayer\StackBlur\assets"><file name="ic_launcher.png" path="D:\AndroidProject\APlayer\StackBlur\assets\ic_launcher.png"/></source></dataSet><dataSet config="debug"><source path="D:\AndroidProject\APlayer\StackBlur\build-types\debug\assets"/></dataSet></merger>

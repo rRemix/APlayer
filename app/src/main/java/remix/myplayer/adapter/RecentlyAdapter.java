@@ -10,8 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.util.ArrayList;
 
 import remix.myplayer.R;
@@ -59,7 +57,7 @@ public class RecentlyAdapter extends BaseAdapter {
         RecentlyHolder holder;
         //检查缓存
         if(convertView == null) {
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.allsong_recycle_item,null);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.song_recycle_item,null);
             holder = new RecentlyHolder();
             holder.mImage = (CircleImageView)convertView.findViewById(R.id.song_head_image);
             holder.mName = (TextView)convertView.findViewById(R.id.song_title);
@@ -102,8 +100,8 @@ public class RecentlyAdapter extends BaseAdapter {
         }
 
         //设置封面
-        ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + temp.getAlbumId(),
-                holder.mImage);
+//        ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + temp.getAlbumId(),
+//                holder.mImage);
         //选项Dialog
         final ImageView mItemButton = (ImageView)convertView.findViewById(R.id.song_button);
         mItemButton.setOnClickListener(new View.OnClickListener() {

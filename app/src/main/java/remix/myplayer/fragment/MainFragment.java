@@ -58,7 +58,7 @@ public class MainFragment extends Fragment {
                 getActivity().getResources().getString(R.string.tab_album),
                 getActivity().getResources().getString(R.string.tab_artist),
                 getActivity().getResources().getString(R.string.tab_folder)});
-        mAdapter.AddFragment(new AllSongFragment());
+        mAdapter.AddFragment(new SongFragment());
         mAdapter.AddFragment(new AlbumFragment());
         mAdapter.AddFragment(new ArtistFragment());
         mAdapter.AddFragment(new FolderFragment());

@@ -1,6 +1,6 @@
 [
     {
-        "outputFile": "/home/taeja/AndroidProject/APlayer/StackBlur/build/intermediates/res/merged/androidTest/debug/values/values.xml",
+        "outputFile": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
         "map": [
             {
                 "to": {
@@ -11,7 +11,7 @@
                     "endOffset": 108
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/APlayer/StackBlur/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 2,
                         "startColumn": 4,
@@ -30,7 +30,7 @@
                     "endOffset": 164
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/APlayer/StackBlur/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 3,
                         "startColumn": 4,
@@ -49,7 +49,7 @@
                     "endOffset": 217
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/APlayer/StackBlur/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 4,
                         "startColumn": 4,
@@ -68,7 +68,7 @@
                     "endOffset": 264
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/APlayer/StackBlur/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 5,
                         "startColumn": 4,
@@ -87,7 +87,7 @@
                     "endOffset": 317
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/APlayer/StackBlur/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 6,
                         "startColumn": 4,
@@ -107,7 +107,7 @@
                     "endOffset": 608
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/APlayer/StackBlur/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 7,
                         "startColumn": 4,
@@ -128,7 +128,149 @@
                     "endOffset": 768
                 },
                 "from": {
-                    "file": "/home/taeja/AndroidProject/APlayer/StackBlur/build/intermediates/bundles/debug/res/values/values.xml",
+                    "file": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 14,
+                        "startColumn": 4,
+                        "startOffset": 613,
+                        "endLine": 16,
+                        "endColumn": 12,
+                        "endOffset": 768
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "outputFile": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 57,
+                    "endOffset": 108
+                },
+                "from": {
+                    "file": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 57,
+                        "endOffset": 108
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 113,
+                    "endColumn": 55,
+                    "endOffset": 164
+                },
+                "from": {
+                    "file": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 113,
+                        "endColumn": 55,
+                        "endOffset": 164
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 169,
+                    "endColumn": 52,
+                    "endOffset": 217
+                },
+                "from": {
+                    "file": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 169,
+                        "endColumn": 52,
+                        "endOffset": 217
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 222,
+                    "endColumn": 46,
+                    "endOffset": 264
+                },
+                "from": {
+                    "file": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 222,
+                        "endColumn": 46,
+                        "endOffset": 264
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 269,
+                    "endColumn": 52,
+                    "endOffset": 317
+                },
+                "from": {
+                    "file": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 269,
+                        "endColumn": 52,
+                        "endOffset": 317
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 7,
+                    "startColumn": 4,
+                    "startOffset": 322,
+                    "endLine": 13,
+                    "endColumn": 12,
+                    "endOffset": 608
+                },
+                "from": {
+                    "file": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 4,
+                        "startOffset": 322,
+                        "endLine": 13,
+                        "endColumn": 12,
+                        "endOffset": 608
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 14,
+                    "startColumn": 4,
+                    "startOffset": 613,
+                    "endLine": 16,
+                    "endColumn": 12,
+                    "endOffset": 768
+                },
+                "from": {
+                    "file": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\values\\values.xml",
                     "position": {
                         "startLine": 14,
                         "startColumn": 4,
