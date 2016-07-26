@@ -21,7 +21,7 @@
             android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:id="@+id/folder_name"
-            android:textSize="@dimen/textsize_small"
+            android:textSize="@dimen/s12_size"
             android:textColor="@color/text_color_white"
             android:text="文件夹名"/>
         <TextView
@@ -51,7 +51,7 @@
         android:layout_marginRight="18dp"
         android:layout_toLeftOf="@id/folder_button"
         android:id="@+id/folder_num"
-        android:textSize="@dimen/textsize_small"
+        android:textSize="@dimen/s12_size"
         android:text="__首"
         android:textColor="@color/text_color_white"/>
 </RelativeLayout>

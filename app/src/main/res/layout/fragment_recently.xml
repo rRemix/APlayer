@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/dayweek_text"
-        android:textSize="@dimen/textsize_huge"
+        android:textSize="@dimen/s18_size"
         android:text="@string/no_song"
         android:layout_gravity="center"
         android:visibility="gone"/>

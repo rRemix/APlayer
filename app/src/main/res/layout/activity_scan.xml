@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="22dp"
         android:layout_marginLeft="18dp"
-        android:textSize="@dimen/textsize_medium"
+        android:textSize="@dimen/s14_size"
         android:textColor="#e3e3e3"
         android:text="@string/scan_tip"/>
 

@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/search_name"
             android:textColor="@color/text_color_white"
-            android:textSize="@dimen/textsize_medium"
+            android:textSize="@dimen/s14_size"
             android:text="歌曲名"
             android:layout_marginBottom="5dp"
             android:lines="1"
@@ -37,7 +37,7 @@
             android:layout_width="210dp"
             android:layout_height="wrap_content"
             android:textColor="@color/text_color_gray"
-            android:textSize="@dimen/textsize_small"
+            android:textSize="@dimen/s12_size"
             android:text="歌手与专辑"
             android:lines="1"
             android:ellipsize="end"/>

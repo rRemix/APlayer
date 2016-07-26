@@ -42,7 +42,7 @@
         <item name="tabSelectedTextColor">@color/text_allsong_sel</item>
     </style>
     <style name="CustomTabTextAppearance" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">@dimen/textsize_large</item>
+        <item name="android:textSize">@dimen/s16_size</item>
         <item name="android:textColor">@color/text_allsong_unsel</item>
         <item name="textAllCaps">true</item>
     </style>
@@ -193,5 +193,10 @@
 
     <style name="DayTheme" >
         <item name="custom_background_color_main">@color/background_color_main</item>
+    </style>
+
+    <!--侧滑菜单文字-->
+    <style name="Drawer_text_style">
+        <item name="android:textSize">@dimen/s16_size</item>
     </style>
 </resources>

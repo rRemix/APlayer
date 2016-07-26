@@ -2,10 +2,13 @@ package remix.myplayer.ui.activity;
 
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -13,13 +16,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.facebook.common.internal.Supplier;
-import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
@@ -30,10 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import remix.myplayer.R;
-import remix.myplayer.adapter.SlideMenuAdapter;
-import remix.myplayer.fragment.SongFragment;
+import remix.myplayer.adapter.PagerAdapter;
+import remix.myplayer.fragment.AlbumFragment;
+import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
-import remix.myplayer.fragment.MainFragment;
+import remix.myplayer.fragment.FolderFragment;
+import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.inject.ViewInject;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.model.MP3Item;
@@ -57,21 +60,22 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     public static MainActivity mInstance = null;
     private BottomActionBarFragment mBottomBar;
     private final static String TAG = "MainActivity";
-    //测滑的Listview
-    private ListView mSlideMenuList;
+
     @ViewInject(R.id.toolbar)
     private Toolbar mToolBar;
     //测滑
     @ViewInject(R.id.drawer_layout)
     private DrawerLayout mDrawerLayout;
-    @ViewInject(R.id.slide_menu)
-    private LinearLayout mDrawerMenu;
-    @ViewInject(R.id.drawer_exit)
-    private ImageButton mSlideMenuExit;
-//    @ViewInject(R.id.navigation_view)
-//    private NavigationView mNavigationView;
 
-    private ActionBarDrawerToggle mDrawerToggle;
+    @ViewInject(R.id.navigation_view)
+    private NavigationView mNavigationView;
+
+    @ViewInject(R.id.ViewPager)
+    private ViewPager mViewPager;
+    @ViewInject(R.id.tabs)
+    private TabLayout mTablayout;
+    private PagerAdapter mAdapter;
+
     //是否正在运行
     private static boolean mIsRunning = false;
     //是否第一次启动
@@ -85,28 +89,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     protected void onResume() {
         super.onResume();
         mIsRunning = true;
-        //请求权限
-//        if(Build.VERSION.SDK_INT >= 23) {
-//            PermissionUtil.RequestPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-//            PermissionUtil.RequestPermission(this, Manifest.permission.READ_PHONE_STATE);
-//            PermissionUtil.RequestPermission(this,Manifest.permission.WRITE_SETTINGS);
-//        }
-
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-//                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
-//                Toast.makeText(this,"应用需要必要的运行权限",Toast.LENGTH_SHORT);
-//
-//            }
-//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONCODE);
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-//                    Manifest.permission.READ_CONTACTS)) {
-//                Toast.makeText(this,"应用需要必要的运行权限",Toast.LENGTH_SHORT);
-//
-//            } else {
-//                ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSIONCODE);
-//            }
-//        }
         //更新UI
         UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
@@ -159,10 +141,11 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         }
         //播放的service
         MusicService.addCallback(MainActivity.this);
-        //加载主页fragment
-        initMainFragment();
+
         //初始化toolbar
         initToolbar();
+        initPager();
+        initTab();
         //初始化测滑菜单
         initDrawerLayout();
         //初始化底部状态栏
@@ -209,7 +192,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mDrawerLayout.openDrawer(mDrawerMenu);
+//                mDrawerLayout.openDrawer(mDrawerMenu);
+                mDrawerLayout.openDrawer(mNavigationView);
             }
         });
         mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -226,6 +210,47 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                 return true;
             }
         });
+
+    }
+
+
+    public PagerAdapter getAdapter()
+    {
+        return mAdapter;
+    }
+    public ViewPager getViewPager(){
+        return mViewPager;
+    }
+    //初始化ViewPager
+    private void initPager() {
+        mAdapter = new PagerAdapter(getSupportFragmentManager());
+        mAdapter.setTitles(new String[]{getResources().getString(R.string.tab_song),
+                getResources().getString(R.string.tab_album),
+                getResources().getString(R.string.tab_artist),
+                getResources().getString(R.string.tab_folder)});
+        mAdapter.AddFragment(new SongFragment());
+        mAdapter.AddFragment(new AlbumFragment());
+        mAdapter.AddFragment(new ArtistFragment());
+        mAdapter.AddFragment(new FolderFragment());
+
+        mViewPager.setAdapter(mAdapter);
+        mViewPager.setCurrentItem(0);
+
+    }
+
+    //初始化custontab
+    private void initTab() {
+        //添加tab选项卡
+        mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_song)));
+        mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_album)));
+        mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_artist)));
+        mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_folder)));
+        //给Tabs设置适配器
+        mTablayout.setTabsFromPagerAdapter(mAdapter);
+        //viewpager与tablayout关联
+        mTablayout.setupWithViewPager(mViewPager);
+        //设置tab模式，当前为系统默认模式
+        mTablayout.setTabMode(TabLayout.MODE_FIXED);
 
     }
 
@@ -258,84 +283,42 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         Fresco.initialize(this,config);
     }
 
-    private void initMainFragment() {
-        getSupportFragmentManager().beginTransaction().add(R.id.main_fragment_container, new MainFragment(), "MainFragment").addToBackStack(null).commit();
-    }
 
     private void initDrawerLayout() {
-//        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout,mToolBar,R.string.drawerlayout_open,R.string.drawerlayout_close);
-//        mDrawerToggle.syncState();
-//        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-//        mNavigationView.setItemIconTintList(null);
-//        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-//            @Override
-//            public boolean onNavigationItemSelected(MenuItem item) {
-//                switch (item.getItemId()) {
-//                    case R.id.item_recently:
-//                        //最近添加
-//                        startActivity(new Intent(MainActivity.this, RecetenlyActivity.class));
-//                        break;
-//                    case R.id.item_playlist:
-//                        startActivity(new Intent(MainActivity.this, PlayListActivity.class));
-//                        break;
-//                    case R.id.item_allsong:
-//                        mDrawerLayout.closeDrawer(mDrawerMenu);
-//                        MainFragment.mInstance.getViewPager().setCurrentItem(0);
-//                        break;
-//                    case R.id.item_setting:
-//                        //设置
-//                        startActivity(new Intent(MainActivity.this, SettingActivity.class));
-//                        break;
-//                    default:
-//                        break;
-//                }
-//                return true;
-//            }
-//        });
-
-        mSlideMenuList = (ListView) mDrawerMenu.findViewById(R.id.slide_menu_list);
-        mSlideMenuList.setAdapter(new SlideMenuAdapter(getLayoutInflater()));
-        mSlideMenuList.setOnItemClickListener(new SlideMenuListener(this));
-
-        mSlideMenuExit.setOnClickListener(new View.OnClickListener() {
+        mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
+        ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed},{}},
+                new int[]{getResources().getColor(R.color.progress_complete),getResources().getColor(R.color.drawer_text_color)});
+        mNavigationView.setItemIconTintList(colorStateList);
+        mNavigationView.setItemTextColor(colorStateList);
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                sendBroadcast(new Intent(Constants.EXIT));
+            public boolean onNavigationItemSelected(MenuItem item) {
+                item.setChecked(true);
+                switch (item.getItemId()) {
+                    case R.id.item_recently:
+                        //最近添加
+                        startActivity(new Intent(MainActivity.this, RecetenlyActivity.class));
+                        break;
+                    case R.id.item_playlist:
+                        startActivity(new Intent(MainActivity.this, PlayListActivity.class));
+                        break;
+                    case R.id.item_allsong:
+                        mDrawerLayout.closeDrawer(mNavigationView);
+                        break;
+                    case R.id.item_setting:
+                        //设置
+                        startActivity(new Intent(MainActivity.this, SettingActivity.class));
+                        break;
+                    case R.id.item_exit:
+                        sendBroadcast(new Intent(Constants.EXIT));
+                        break;
+                    default:
+                        break;
+                }
+                return true;
             }
         });
 
-    }
-
-    class SlideMenuListener implements AdapterView.OnItemClickListener {
-        private Context mContext;
-
-        public SlideMenuListener(Context mContext) {
-            this.mContext = mContext;
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            switch (view.getId()) {
-                case 0:
-                    //最近添加
-                    startActivity(new Intent(MainActivity.this, RecetenlyActivity.class));
-                    break;
-                case 1:
-                    startActivity(new Intent(MainActivity.this, PlayListActivity.class));
-                    break;
-                case 2:
-                    mDrawerLayout.closeDrawer(mDrawerMenu);
-                    MainFragment.mInstance.getViewPager().setCurrentItem(0);
-                    break;
-                case 3:
-                    //设置
-                    startActivity(new Intent(MainActivity.this, SettingActivity.class));
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 
     //读取sd卡歌曲信息
@@ -356,16 +339,14 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     //隐藏侧滑菜单
     public void HideDrawer() {
-        if (mDrawerLayout.isDrawerOpen(mDrawerMenu))
-            mDrawerLayout.closeDrawer(mDrawerMenu);
+        if (mDrawerLayout.isDrawerOpen(mNavigationView))
+            mDrawerLayout.closeDrawer(mNavigationView);
     }
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(mDrawerMenu))
-            mDrawerLayout.closeDrawer(mDrawerMenu);
-//        if(mDrawerLayout.isDrawerOpen(mNavigationView))
-//            mDrawerLayout.closeDrawer(mNavigationView);
+        if (mDrawerLayout.isDrawerOpen(mNavigationView))
+            mDrawerLayout.closeDrawer(mNavigationView);
         else {
             Intent home = new Intent(Intent.ACTION_MAIN);
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -382,6 +363,11 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
         if(!mIsRunning)
             return;
+        if(mNavigationView != null){
+            for(int i = 0 ; i < mNavigationView.getHeaderCount() ;i++){
+                Object o = mNavigationView.getHeaderView(i);
+            }
+        }
         mBottomBar.UpdateBottomStatus(MP3Item, isplay);
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         for (Fragment fragment : fragmentList) {

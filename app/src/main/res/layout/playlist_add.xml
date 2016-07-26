@@ -7,7 +7,7 @@
     <TextView
         android:layout_gravity="center"
         android:textColor="#1b1c19"
-        android:textSize="@dimen/textsize_large"
+        android:textSize="@dimen/s16_size"
         android:layout_marginTop="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:id="@+id/playlist_cancel"
-            android:textSize="@dimen/textsize_large"
+            android:textSize="@dimen/s16_size"
             android:layout_marginRight="24dp"
             android:text="取消"
             android:onClick="onCancel"/>
@@ -42,7 +42,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:id="@+id/playlist_continue"
-            android:textSize="@dimen/textsize_large"
+            android:textSize="@dimen/s16_size"
             android:textColor="@color/progress_complete"
             android:layout_marginRight="16dp"
             android:text="继续"

@@ -27,7 +27,7 @@
             android:gravity="left|center_vertical"
             android:text="@string/use_system_color"
             android:textColor="@color/text_color_black"
-            android:textSize="@dimen/textsize_large"
+            android:textSize="@dimen/s16_size"
             android:background="@color/transparent" />
         <ImageView
             android:id="@+id/popup_notify_image_system"
@@ -57,7 +57,7 @@
             android:gravity="left|center_vertical"
             android:text="@string/use_black_color"
             android:textColor="@color/text_color_black"
-            android:textSize="@dimen/textsize_large"
+            android:textSize="@dimen/s16_size"
             android:background="@color/transparent" />
         <ImageView
             android:id="@+id/popup_notify_image_black"

@@ -34,7 +34,7 @@
         android:onClick="onCancel"
         android:layout_gravity="center_horizontal"
         android:text="取消"
-        android:textSize="@dimen/textsize_huge"
+        android:textSize="@dimen/s18_size"
         android:textColor="@color/translucence"
         android:background="@drawable/bg_boder"
         android:layout_alignParentBottom="true"

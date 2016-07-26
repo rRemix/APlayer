@@ -32,7 +32,7 @@
             android:id="@+id/popup_title"
             android:lines="1"
             android:ellipsize="end"
-            android:textSize="@dimen/textsize_large"
+            android:textSize="@dimen/s16_size"
             android:textColor="#1b1c19"
             android:text="歌曲名-歌手"/>
     </LinearLayout>

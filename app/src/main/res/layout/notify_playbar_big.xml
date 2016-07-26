@@ -43,7 +43,7 @@
                     android:lines="1"
                     android:ellipsize="end"
                     android:textColor="@color/text_color_white"
-                    android:textSize="@dimen/textsize_large"/>
+                    android:textSize="@dimen/s16_size"/>
                 <ImageButton
                     android:id="@+id/notify_close"
                     android:layout_centerVertical="true"
@@ -66,7 +66,7 @@
                 android:layout_marginBottom="10dp"
                 android:lines="1"
                 android:ellipsize="end"
-                android:textSize="@dimen/textsize_medium"
+                android:textSize="@dimen/s14_size"
                 android:textColor="@color/text_color_gray"/>
 
             <!--三个控制按钮-->

@@ -31,7 +31,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:textColor="@color/text_color_white"
-                android:textSize="@dimen/textsize_huge"
+                android:textSize="@dimen/s18_size"
                 android:id="@+id/bottom_title"
                 android:text="歌曲名"/>
             <TextView
@@ -40,7 +40,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:id="@+id/bottom_artist"
-                android:textSize="@dimen/textsize_medium"
+                android:textSize="@dimen/s14_size"
                 android:textColor="@color/text_color_gray"
                 android:text="歌手"/>
         </LinearLayout>

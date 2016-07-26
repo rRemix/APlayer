@@ -113,7 +113,7 @@
             android:layout_marginLeft="16dp"
             android:gravity="center"
             android:padding="2dp"
-            android:textSize="@dimen/textsize_large"
+            android:textSize="@dimen/s16_size"
             android:text="开始计时"
             android:textColor="@drawable/timer_toggle_text_color_"/>
         <TextView
@@ -125,7 +125,7 @@
             android:gravity="center"
             android:padding="2dp"
             android:textColor="@drawable/timer_exit_text_color"
-            android:textSize="@dimen/textsize_large"
+            android:textSize="@dimen/s16_size"
             android:text="取消"/>
     </RelativeLayout>
 </LinearLayout>

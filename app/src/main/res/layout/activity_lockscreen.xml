@@ -45,7 +45,7 @@
             android:lines="1"
             android:ellipsize="end"
             android:layout_marginTop="12dp"
-            android:textSize="@dimen/textsize_huge"
+            android:textSize="@dimen/s18_size"
             android:textColor="@color/text_color_black"
             android:text="歌曲"/>
         <TextView
@@ -56,7 +56,7 @@
             android:lines="1"
             android:ellipsize="end"
             android:layout_marginTop="12dp"
-            android:textSize="@dimen/textsize_large"
+            android:textSize="@dimen/s16_size"
             android:textColor="@color/text_color_gray_1"
             android:text="歌手"/>
     </LinearLayout>
@@ -95,7 +95,7 @@
         android:id="@+id/lockscreen_unlock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/textsize_huge"
+        android:textSize="@dimen/s18_size"
         android:textColor="@color/text_color_gray"
         android:text="@string/unlock"
         android:layout_alignParentBottom="true"

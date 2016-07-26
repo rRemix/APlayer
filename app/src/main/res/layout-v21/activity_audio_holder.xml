@@ -40,7 +40,7 @@
                         android:lines="1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="@dimen/textsize_large"
+                        android:textSize="@dimen/s16_size"
                         android:textColor="#1b1c19"
                         android:gravity="center"/>
                     <TextView
@@ -53,7 +53,7 @@
                         android:gravity="center"
                         android:layout_below="@id/top_title"
                         android:textColor="#4D4D4D"
-                        android:textSize="@dimen/textsize_medium"/>
+                        android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
             </RelativeLayout>
             <LinearLayout

@@ -38,7 +38,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/textsize_medium"
+                android:textSize="@dimen/s14_size"
                 android:text="QQ"/>
         </LinearLayout>
 
@@ -59,7 +59,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/textsize_medium"
+                android:textSize="@dimen/s14_size"
                 android:text="微博"/>
         </LinearLayout>
 
@@ -80,7 +80,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/textsize_medium"
+                android:textSize="@dimen/s14_size"
                 android:text="微信"/>
         </LinearLayout>
 
@@ -101,7 +101,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/textsize_medium"
+                android:textSize="@dimen/s14_size"
                 android:text="朋友圈"/>
         </LinearLayout>
 
@@ -115,7 +115,7 @@
         android:id="@+id/popup_share_cancel"
         android:layout_gravity="center_horizontal"
         android:text="取消"
-        android:textSize="@dimen/textsize_huge"
+        android:textSize="@dimen/s18_size"
         android:textColor="@color/translucence"
         android:background="@drawable/bg_boder"/>
 </LinearLayout>

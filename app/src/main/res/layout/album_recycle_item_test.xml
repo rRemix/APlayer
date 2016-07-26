@@ -43,7 +43,7 @@
                     android:singleLine="true"
                     android:ellipsize="end"
                     android:textColor="@color/text_color_white"
-                    android:textSize="@dimen/textsize_medium"/>
+                    android:textSize="@dimen/s14_size"/>
                 <TextView
                     android:layout_marginTop="2dp"
                     android:layout_gravity="center_vertical"
@@ -55,7 +55,7 @@
                     android:layout_below="@id/recycleview_text1"
                     android:text="歌手名"
                     android:textColor="@color/text_color_gray"
-                    android:textSize="@dimen/textsize_small"/>
+                    android:textSize="@dimen/s12_size"/>
             </LinearLayout>
             <ImageButton
                 android:layout_width="40dp"

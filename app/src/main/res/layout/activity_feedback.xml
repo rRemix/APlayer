@@ -16,7 +16,7 @@
         android:id="@+id/feedback_edittext"
         android:background="@drawable/set_submit_input_bg"
         android:gravity="left|top"
-        android:textSize="@dimen/textsize_large"
+        android:textSize="@dimen/s16_size"
         android:textColor="@color/drawer_list_color"
         android:textCursorDrawable="@drawable/bg_cursor_gray"
         android:layout_width="352dp"

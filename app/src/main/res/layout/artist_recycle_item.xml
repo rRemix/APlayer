@@ -35,7 +35,7 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:textColor="@color/text_color_white"
-                android:textSize="@dimen/textsize_medium"/>
+                android:textSize="@dimen/s14_size"/>
             <ImageButton
                 android:layout_width="30dp"
                 android:layout_height="match_parent"

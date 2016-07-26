@@ -5,3 +5,17 @@
 /build
 /captures
 
+StackBlur/build/generated/res/resValues/
+StackBlur/build/generated/res/rs/androidTest/
+StackBlur/build/generated/source/aidl/
+StackBlur/build/generated/source/rs/androidTest/
+StackBlur/build/intermediates/bundles/debug/aidl/
+StackBlur/build/intermediates/bundles/release/aidl/
+StackBlur/build/intermediates/dependency-cache/
+StackBlur/build/intermediates/jniLibs/
+StackBlur/build/intermediates/lint/
+StackBlur/build/intermediates/manifest/tmp/
+StackBlur/build/intermediates/rs/androidTest/
+StackBlur/build/intermediates/sourceFolderJavaResources/debug/com/
+StackBlur/build/intermediates/sourceFolderJavaResources/release/com/
+StackBlur/build/tmp/

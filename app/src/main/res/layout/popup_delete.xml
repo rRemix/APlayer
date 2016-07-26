@@ -22,7 +22,7 @@
             android:layout_marginTop="8dp"
             android:id="@+id/delete_confirm"
             android:textColor="@color/text_color_black"
-            android:textSize="@dimen/textsize_large"
+            android:textSize="@dimen/s16_size"
             android:text="@string/confirm"/>
         <Button
             android:background="?android:attr/selectableItemBackground"
@@ -32,7 +32,7 @@
             android:layout_margin="8dp"
             android:id="@+id/delete_cancel"
             android:textColor="@color/text_color_black"
-            android:textSize="@dimen/textsize_large"
+            android:textSize="@dimen/s16_size"
             android:text="@string/cancel"/>
 
     </RelativeLayout>

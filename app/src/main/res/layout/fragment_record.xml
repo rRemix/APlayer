@@ -15,7 +15,7 @@
             android:maxLength="140"
             android:gravity="left"
             android:textColor="#50452f"
-            android:textSize="@dimen/textsize_medium"
+            android:textSize="@dimen/s14_size"
             android:hint="写点什么吧"
             android:padding="15dp"
             android:textCursorDrawable="@drawable/bg_cursor_gray"
@@ -31,7 +31,7 @@
             android:id="@+id/sharebtn"
             android:text="以海报分享"
             android:textColor="#b5a979"
-            android:textSize="@dimen/textsize_large"/>
+            android:textSize="@dimen/s16_size"/>
     </FrameLayout>
 
 
