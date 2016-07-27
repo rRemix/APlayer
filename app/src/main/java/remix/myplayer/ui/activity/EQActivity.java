@@ -18,6 +18,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.application.Application;
 import remix.myplayer.inject.ViewInject;
@@ -42,10 +44,10 @@ public class EQActivity extends ToolbarActivity {
     private ArrayList<EQSeekBar> mEQSeekBars = new ArrayList<>();
     private static ArrayList<Short> mBandLevels = new ArrayList<>();
 
-    @ViewInject(R.id.eq_switch)
-    private SwitchCompat mSwitch;
-    @ViewInject(R.id.toolbar)
-    private Toolbar mToolBar;
+    @BindView(R.id.eq_switch)
+    SwitchCompat mSwitch;
+    @BindView(R.id.toolbar)
+    Toolbar mToolBar;
 
     private static ArrayList<Short> mBandFrequencys = new ArrayList<>();
     private static boolean mEnable = false;
@@ -158,15 +160,6 @@ public class EQActivity extends ToolbarActivity {
         mIsRunning = false;
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public int getLayoutId() {
-        return R.layout.activity_eq;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,6 +169,8 @@ public class EQActivity extends ToolbarActivity {
         }
 
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_eq);
+        ButterKnife.bind(this);
 
         mInstance = this;
 

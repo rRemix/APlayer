@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
@@ -58,10 +60,7 @@ public class RecentlyAdapter extends BaseAdapter {
         //检查缓存
         if(convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.song_recycle_item,null);
-            holder = new RecentlyHolder();
-            holder.mImage = (CircleImageView)convertView.findViewById(R.id.song_head_image);
-            holder.mName = (TextView)convertView.findViewById(R.id.song_title);
-            holder.mOther = (TextView)convertView.findViewById(R.id.song_other);
+            holder = new RecentlyHolder(convertView);
             convertView.setTag(holder);
         } else
             holder = (RecentlyHolder)convertView.getTag();
@@ -116,8 +115,14 @@ public class RecentlyAdapter extends BaseAdapter {
     }
 
     public static class RecentlyHolder {
+        @BindView(R.id.song_title)
         public TextView mName;
+        @BindView(R.id.song_other)
         public TextView mOther;
+        @BindView(R.id.song_head_image)
         public CircleImageView mImage;
+        public RecentlyHolder(View itemView){
+            ButterKnife.bind(this,itemView);
+        }
     }
 }

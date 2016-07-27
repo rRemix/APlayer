@@ -8,8 +8,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.inject.ViewInject;
 
 /**
  * Created by taeja on 16-3-7.
@@ -20,21 +21,18 @@ import remix.myplayer.inject.ViewInject;
  * 将用户的反馈通过邮箱发送
  */
 public class FeedBakActivity extends ToolbarActivity {
-    @ViewInject(R.id.toolbar)
-    private Toolbar mToolBar;
-    @ViewInject(R.id.feedback_edittext)
-    private EditText mEditText;
+    @BindView(R.id.toolbar)
+    Toolbar mToolBar;
+    @BindView(R.id.feedback_edittext)
+    EditText mEditText;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.activity_feedback);
+        ButterKnife.bind(this);
         initToolbar(mToolBar,getString(R.string.back));
     }
 
-    @Override
-    public int getLayoutId() {
-        return R.layout.activity_feedback;
-    }
 
     public void onSubmit(View v){
         Intent data = new Intent(Intent.ACTION_SENDTO);
@@ -44,15 +42,6 @@ public class FeedBakActivity extends ToolbarActivity {
         startActivity(data);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 //    private void initToolbar() {
 //        mToolBar = (Toolbar) findViewById(R.id.toolbar);
 //        mToolBar.setTitle("返回");

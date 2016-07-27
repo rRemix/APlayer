@@ -16,6 +16,8 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.ui.activity.MainActivity;
@@ -35,19 +37,19 @@ import remix.myplayer.util.SharedPrefsUtil;
 public class TimerDialog extends BaseActivity {
 
     //剩余时间
-    @ViewInject(R.id.close_time)
-    private TextView mText;
+    @BindView(R.id.close_time)
+    TextView mText;
     //设置或取下默认
-    @ViewInject(R.id.popup_timer_switch)
-    private SwitchCompat mSwitch;
+    @BindView(R.id.popup_timer_switch)
+    SwitchCompat mSwitch;
     //圆形seekbar
-    @ViewInject(R.id.close_seekbar)
-    private CircleSeekBar mSeekbar;
+    @BindView(R.id.close_seekbar)
+    CircleSeekBar mSeekbar;
     //开始或取消计时
-    @ViewInject(R.id.close_toggle)
-    private TextView mToggle;
-    @ViewInject(R.id.close_stop)
-    private TextView mCancel;
+    @BindView(R.id.close_toggle)
+    TextView mToggle;
+    @BindView(R.id.close_stop)
+    TextView mCancel;
 
     //是否正在计时
     public static boolean misTiming = false;
@@ -65,13 +67,10 @@ public class TimerDialog extends BaseActivity {
     };
 
     @Override
-    public int getLayoutId() {
-        return R.layout.popup_timer;
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.popup_timer);
+        ButterKnife.bind(this);
 
         //居中显示
         Window w = getWindow();

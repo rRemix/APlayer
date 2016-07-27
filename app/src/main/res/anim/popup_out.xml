@@ -5,5 +5,5 @@
         android:duration="250"
         android:pivotX="50%" android:pivotY="50%"/>
     <alpha android:fromAlpha="1.0" android:toAlpha="0"
-        android:duration="250"/>
+        android:duration="500"/>
 </set>

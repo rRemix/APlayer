@@ -12,7 +12,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
 import remix.myplayer.R;
+import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.service.MusicService;
@@ -109,17 +111,17 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
         return mInfoList == null ? 0 : mInfoList.size();
     }
 
-    public static class ViewHoler extends RecyclerView.ViewHolder{
+    public static class ViewHoler extends BaseViewHolder {
+        @BindView(R.id.album_holder_item_title)
         public TextView mTitle;
+        @BindView(R.id.song_item_button)
         public ImageButton mButton;
+        @BindView(R.id.song_columnview)
         public ColumnView mColumnView;
         public View mRootView;
         public ViewHoler(View itemView) {
             super(itemView);
             mRootView = itemView;
-            mTitle = (TextView)itemView.findViewById(R.id.album_holder_item_title);
-            mButton = (ImageButton)itemView.findViewById(R.id.song_item_button);
-            mColumnView = (ColumnView)itemView.findViewById(R.id.song_columnview);
         }
     }
 }

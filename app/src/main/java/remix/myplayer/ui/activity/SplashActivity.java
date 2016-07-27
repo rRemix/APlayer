@@ -5,28 +5,28 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SplashAdapter;
 import remix.myplayer.fragment.SplashFragment;
-import remix.myplayer.inject.ViewInject;
 import remix.myplayer.util.SharedPrefsUtil;
 
 /**
  * Created by taeja on 16-6-8.
  */
 public class SplashActivity extends BaseAppCompatActivity {
-    @ViewInject(R.id.viewPager)
-    private ViewPager mViewPager;
-    private SplashAdapter mAdapter;
+    @BindView(R.id.viewPager)
+    ViewPager mViewPager;
 
-    @Override
-    public int getLayoutId() {
-        return R.layout.activity_splash;
-    }
+    private SplashAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash);
+        ButterKnife.bind(this);
+
 
         boolean isFirst = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "First", true);
         if(!isFirst){
@@ -70,12 +70,4 @@ public class SplashActivity extends BaseAppCompatActivity {
         super.onDestroy();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 }

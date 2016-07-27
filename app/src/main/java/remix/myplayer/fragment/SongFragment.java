@@ -20,18 +20,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.RecyclerItemDecoration;
-import remix.myplayer.ui.customview.IndexView;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.sort.Compator;
 
@@ -42,7 +41,7 @@ import remix.myplayer.util.sort.Compator;
 /**
  * 全部歌曲的Fragment
  */
-public class SongFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class SongFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private LoaderManager mManager;
     private Cursor mCursor = null;
     //歌曲名 艺术家 专辑名 专辑id 歌曲id对应的索引
@@ -53,9 +52,10 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     public static int mAlbumIdIndex = -1;
     public static int mSongId = -1;
     public static SongFragment mInstance = null;
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.recyclerview)
+    RecyclerView mRecyclerView;
     private SongAdapter mAdapter;
-    private IndexView mIndexView;
+
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -92,7 +92,8 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        final View rootView = inflater.inflate(R.layout.fragment_allsong,null);
+        final View rootView = inflater.inflate(R.layout.fragment_song,null);
+        mUnBinder = ButterKnife.bind(this,rootView);
         rootView.findViewById(R.id.play_shuffle).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,7 +104,7 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
                 getActivity().sendBroadcast(intent);
             }
         });
-        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview);
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.addItemDecoration(new RecyclerItemDecoration(getContext(),RecyclerItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -127,27 +128,27 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
         });
         mRecyclerView.setAdapter(mAdapter);
 
-        mIndexView = (IndexView)rootView.findViewById(R.id.song_index_view);
-        mIndexView.setVisibility(Global.mIndexOpen ? View.VISIBLE : View.GONE);
-        mIndexView.setPositionChangedListener(new IndexView.OnLetterChangedListener() {
-            @Override
-            public void onLetterChanged(char c) {
-                if(mAdapter != null && mRecyclerView != null){
-                    int pos = mAdapter.getPositionForSection(c);
-                    int i = 0;
-                    for(; i < 26 ;i++){
-                        int posforsec = mAdapter.getPositionForSection('A' + i);
-                        if(posforsec >= pos)
-                            break;
-                    }
-
-                    int dy = pos * DensityUtil.dip2px(getContext(),72) /*+ i * DensityUtil.dip2px(getContext(),20)*/;
-                    int scrolly = getScollYDistance();
-                    mRecyclerView.scrollBy(0,dy - scrolly);
-                    Toast.makeText(getActivity(),String.valueOf(c),Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+//        mIndexView = (IndexView)rootView.findViewById(R.id.song_index_view);
+//        mIndexView.setVisibility(Global.mIndexOpen ? View.VISIBLE : View.GONE);
+//        mIndexView.setPositionChangedListener(new IndexView.OnLetterChangedListener() {
+//            @Override
+//            public void onLetterChanged(char c) {
+//                if(mAdapter != null && mRecyclerView != null){
+//                    int pos = mAdapter.getPositionForSection(c);
+//                    int i = 0;
+//                    for(; i < 26 ;i++){
+//                        int posforsec = mAdapter.getPositionForSection('A' + i);
+//                        if(posforsec >= pos)
+//                            break;
+//                    }
+//
+//                    int dy = pos * DensityUtil.dip2px(getContext(),72) /*+ i * DensityUtil.dip2px(getContext(),20)*/;
+//                    int scrolly = getScollYDistance();
+//                    mRecyclerView.scrollBy(0,dy - scrolly);
+//                    Toast.makeText(getActivity(),String.valueOf(c),Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
         return rootView;
     }
 
@@ -171,16 +172,14 @@ public class SongFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
         //保存查询结果，并设置查询索引
         mCursor = data;
-
-
         mTitleIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
         mDisPlayNameIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
         mArtistIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
         mAlbumIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM);
         mSongId = data.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
         mAlbumIdIndex = data.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-
-        new IndexThread().start();
+        mAdapter.setCursor(mCursor);
+//        new IndexThread().start();
     }
 
     @Override

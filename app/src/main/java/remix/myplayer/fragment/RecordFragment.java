@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.activity.RecordShareActivity;
 import remix.myplayer.service.MusicService;
@@ -23,14 +25,16 @@ import remix.myplayer.service.MusicService;
 /**
  * 心情记录的Fragment
  */
-public class RecordFragment extends Fragment{
-    private EditText mEdit;
+public class RecordFragment extends BaseFragment{
+    @BindView(R.id.edit_record)
+    EditText mEdit;
     private static String mRecord = "";
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_record,null);
-        mEdit = (EditText)rootView.findViewById(R.id.edit_record);
+        mUnBinder = ButterKnife.bind(this,rootView);
+
 //        if(mRecord != null && !mRecord.equals("")){
 //            mEdit.setText(mRecord);
 //        }

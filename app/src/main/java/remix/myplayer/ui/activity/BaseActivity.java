@@ -27,17 +27,12 @@ public abstract class BaseActivity extends Activity {
         return (T)findViewById(id);
     }
 
-    /**
-     * 返回activity加载的layoutId
-     * @return
-     */
-    public abstract int getLayoutId();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(getLayoutId());
-        autoInjectView();
+
         //静止横屏
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //将该activity添加到ActivityManager,用于退出程序时关闭
@@ -58,27 +53,6 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
-    /**
-     * 解析注解
-     */
-    public void autoInjectView(){
-        try {
-            Class<?> clazz = this.getClass();
-            Field[] fields = clazz.getDeclaredFields();
-            for(Field field : fields){
-                if(field.isAnnotationPresent(ViewInject.class)){
-                    ViewInject inject = field.getAnnotation(ViewInject.class);
-                    int id = inject.value();
-                    if(id > 0){
-                        field.setAccessible(true);
-                        field.set(this,this.findViewById(id));
-                    }
-                }
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     protected void onDestroy() {

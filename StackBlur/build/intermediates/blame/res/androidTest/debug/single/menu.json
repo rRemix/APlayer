@@ -1,10 +1,10 @@
 [
     {
-        "merged": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\menu\\main.xml",
-        "source": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\menu\\main.xml"
-    },
-    {
         "merged": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\menu\\main.xml",
         "source": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\menu\\main.xml"
+    },
+    {
+        "merged": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\menu\\main.xml",
+        "source": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\menu\\main.xml"
     }
 ]

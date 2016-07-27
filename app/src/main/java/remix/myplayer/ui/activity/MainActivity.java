@@ -10,15 +10,11 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 
 import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -30,6 +26,9 @@ import com.umeng.update.UmengUpdateAgent;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnItemSelected;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.fragment.AlbumFragment;
@@ -37,7 +36,6 @@ import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.fragment.FolderFragment;
 import remix.myplayer.fragment.SongFragment;
-import remix.myplayer.inject.ViewInject;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
@@ -58,22 +56,19 @@ import remix.myplayer.util.XmlUtil;
  */
 public class MainActivity extends BaseAppCompatActivity implements MusicService.Callback {
     public static MainActivity mInstance = null;
+    @BindView(R.id.toolbar)
+    Toolbar mToolBar;
+    @BindView(R.id.tabs)
+    TabLayout mTablayout;
+    @BindView(R.id.ViewPager)
+    android.support.v4.view.ViewPager mViewPager;
+    @BindView(R.id.navigation_view)
+    NavigationView mNavigationView;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
     private BottomActionBarFragment mBottomBar;
     private final static String TAG = "MainActivity";
 
-    @ViewInject(R.id.toolbar)
-    private Toolbar mToolBar;
-    //测滑
-    @ViewInject(R.id.drawer_layout)
-    private DrawerLayout mDrawerLayout;
-
-    @ViewInject(R.id.navigation_view)
-    private NavigationView mNavigationView;
-
-    @ViewInject(R.id.ViewPager)
-    private ViewPager mViewPager;
-    @ViewInject(R.id.tabs)
-    private TabLayout mTablayout;
     private PagerAdapter mAdapter;
 
     //是否正在运行
@@ -85,17 +80,13 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     private static final String[] PERMISSIONS = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE};
+
     @Override
     protected void onResume() {
         super.onResume();
         mIsRunning = true;
         //更新UI
         UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     @Override
@@ -109,15 +100,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         mIsRunning = false;
     }
 
-
-    @Override
-    public int getLayoutId() {
-        return R.layout.activity_content;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         //检查更新
         UmengUpdateAgent.update(this);
 //        MobclickAgent.setDebugMode(true);
@@ -126,6 +110,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         mInstance = this;
 
         if (mIsFirst) {
@@ -148,6 +134,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         initTab();
         //初始化测滑菜单
         initDrawerLayout();
+
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
 
@@ -155,7 +142,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         int position = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "Pos", -1);
         SharedPrefsUtil.putValue(getApplicationContext(), "setting", "First", false);
 
-        if (Global.mPlayingList == null || Global.mPlayingList.size() == 0){
+        if (Global.mPlayingList == null || Global.mPlayingList.size() == 0) {
             SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", -1);
             return;
         }
@@ -170,14 +157,14 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                 mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(Global.mPlayingList.get(0)), MusicService.getIsplay());
                 SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", 0);
             } else {
-                if(position >= Global.mPlayingList.size()){
+                if (position >= Global.mPlayingList.size()) {
                     position = Global.mPlayingList.size() - 1;
-                    if(position >= 0)
+                    if (position >= 0)
                         SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", position);
                 }
                 mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(Global.mPlayingList.get(position)), MusicService.getIsplay());
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -214,13 +201,14 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     }
 
 
-    public PagerAdapter getAdapter()
-    {
+    public PagerAdapter getAdapter() {
         return mAdapter;
     }
-    public ViewPager getViewPager(){
+
+    public ViewPager getViewPager() {
         return mViewPager;
     }
+
     //初始化ViewPager
     private void initPager() {
         mAdapter = new PagerAdapter(getSupportFragmentManager());
@@ -261,7 +249,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         return true;
     }
 
-
     private void initUtil() {
         //初始化工具类
         PermissionUtil.setContext(getApplicationContext());
@@ -280,14 +267,14 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                         return new MemoryCacheParams(MAX_HEAP_SIZE / 8, Integer.MAX_VALUE, MAX_HEAP_SIZE / 8, Integer.MAX_VALUE, Integer.MAX_VALUE);
                     }
                 }).build();
-        Fresco.initialize(this,config);
+        Fresco.initialize(this, config);
     }
 
 
     private void initDrawerLayout() {
         mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
-        ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed},{}},
-                new int[]{getResources().getColor(R.color.progress_complete),getResources().getColor(R.color.drawer_text_color)});
+        ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed}, {}},
+                new int[]{getResources().getColor(R.color.progress_complete), getResources().getColor(R.color.drawer_text_color)});
         mNavigationView.setItemIconTintList(colorStateList);
         mNavigationView.setItemTextColor(colorStateList);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -321,9 +308,10 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     }
 
+
     //读取sd卡歌曲信息
     public static void loadsongs() {
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 //读取sd卡歌曲id
@@ -353,7 +341,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             home.addCategory(Intent.CATEGORY_HOME);
             startActivity(home);
             Intent intent = new Intent(Constants.NOTIFY);
-            intent.putExtra("FromMainActivity",true);
+            intent.putExtra("FromMainActivity", true);
             sendBroadcast(intent);
         }
     }
@@ -361,10 +349,10 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     //更新界面
     @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
-        if(!mIsRunning)
+        if (!mIsRunning)
             return;
-        if(mNavigationView != null){
-            for(int i = 0 ; i < mNavigationView.getHeaderCount() ;i++){
+        if (mNavigationView != null) {
+            for (int i = 0; i < mNavigationView.getHeaderCount(); i++) {
                 Object o = mNavigationView.getHeaderView(i);
             }
         }

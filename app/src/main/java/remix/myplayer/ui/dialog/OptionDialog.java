@@ -23,6 +23,8 @@ import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.inject.ViewInject;
 import remix.myplayer.model.MP3Item;
@@ -40,21 +42,21 @@ import remix.myplayer.util.DBUtil;
  */
 public class OptionDialog extends BaseAppCompatActivity {
     //添加 设置铃声 分享 删除按钮
-    @ViewInject(R.id.popup_add)
-    private ImageView mAdd;
-    @ViewInject(R.id.popup_ring)
-    private ImageView mRing;
-    @ViewInject(R.id.popup_share)
-    private ImageView mShare;
-    @ViewInject(R.id.popup_delete)
-    private ImageView mDelete;
-    private Button mCancel;
+    @BindView(R.id.popup_add)
+    ImageView mAdd;
+    @BindView(R.id.popup_ring)
+    ImageView mRing;
+    @BindView(R.id.popup_share)
+    ImageView mShare;
+    @BindView(R.id.popup_delete)
+    ImageView mDelete;
+
     //标题
-    @ViewInject(R.id.popup_title)
-    private TextView mTitle;
+    @BindView(R.id.popup_title)
+    TextView mTitle;
     //专辑封面
-    @ViewInject(R.id.popup_image)
-    private SimpleDraweeView mDraweeView;
+    @BindView(R.id.popup_image)
+    SimpleDraweeView mDraweeView;
 
     //当前正在播放的歌曲
     private MP3Item mInfo = null;
@@ -64,15 +66,12 @@ public class OptionDialog extends BaseAppCompatActivity {
     private String mPlayListName;
 
     @Override
-    public int getLayoutId() {
-        return R.layout.popup_option;
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         //去掉标题
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.popup_option);
+        ButterKnife.bind(this);
 
         mInfo = (MP3Item)getIntent().getExtras().getSerializable("MP3Item");
         if(mInfo == null)

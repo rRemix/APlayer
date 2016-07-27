@@ -11,6 +11,8 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.adapter.PlayingListAdapter;
@@ -25,20 +27,19 @@ import remix.myplayer.util.Constants;
  * 正在播放列表Dialog
  */
 public class PlayingListDialog extends BaseActivity {
-    @ViewInject(R.id.bottom_actionbar_play_list)
-    private ListView mListView;
+    @BindView(R.id.bottom_actionbar_play_list)
+    ListView mListView;
     private PlayingListAdapter mAdapter;
     public static PlayingListDialog mInstance;
     private static boolean mNeedRefresh = false;
 
-    @Override
-    public int getLayoutId() {
-        return R.layout.popup_playinglist;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.popup_playinglist);
+        ButterKnife.bind(this);
+
         mInstance = this;
         mAdapter = new PlayingListAdapter( getApplicationContext());
         mListView.setAdapter(mAdapter);

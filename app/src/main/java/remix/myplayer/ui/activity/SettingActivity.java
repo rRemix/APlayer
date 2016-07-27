@@ -14,6 +14,8 @@ import android.widget.ListView;
 
 import com.umeng.update.UmengUpdateAgent;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SettingAdapter;
 import remix.myplayer.inject.ViewInject;
@@ -29,23 +31,22 @@ import remix.myplayer.util.SharedPrefsUtil;
  * 设置界面，目前包括扫描文件、意见与反馈、关于我们、检查更新
  */
 public class SettingActivity extends ToolbarActivity {
-    @ViewInject(R.id.setting_list)
-    private ListView mListView;
-    @ViewInject(R.id.toolbar)
-    private Toolbar mToolBar;
+    @BindView(R.id.setting_list)
+    ListView mListView;
+    @BindView(R.id.toolbar)
+    Toolbar mToolBar;
 
     private ImageView mSystem;
     private ImageView mBlack;
     private AlertDialog mAlertDialog;
 
-    @Override
-    public int getLayoutId() {
-        return R.layout.activity_setting;
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_setting);
+        ButterKnife.bind(this);
+
         //初始化listview
         mListView.setAdapter(new SettingAdapter(this));
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -125,16 +126,5 @@ public class SettingActivity extends ToolbarActivity {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
 
 }

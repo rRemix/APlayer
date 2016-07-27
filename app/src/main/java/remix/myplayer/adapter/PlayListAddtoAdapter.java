@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import java.util.Iterator;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.activity.PlayListActivity;
 
@@ -47,8 +49,7 @@ public class PlayListAddtoAdapter extends BaseAdapter{
         //检查缓存
         if(convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.playlist_addto_item,null);
-            holder = new PlayListAddToHolder();
-            holder.mText = (TextView)convertView.findViewById(R.id.playlist_addto_text);
+            holder = new PlayListAddToHolder(convertView);
             convertView.setTag(holder);
         }
         else
@@ -67,6 +68,10 @@ public class PlayListAddtoAdapter extends BaseAdapter{
     }
 
     public static class PlayListAddToHolder {
-        private TextView mText;
+        @BindView(R.id.playlist_addto_text)
+        public TextView mText;
+        public PlayListAddToHolder(View itemView){
+            ButterKnife.bind(this,itemView);
+        }
     }
 }

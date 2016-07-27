@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.inject.ViewInject;
@@ -37,17 +39,17 @@ import remix.myplayer.util.Constants;
  */
 public class RecordShareActivity extends BaseAppCompatActivity {
     public static RecordShareActivity mInstance;
-    @ViewInject(R.id.recordshare_image)
-    private ImageView mImage;
+    @BindView(R.id.recordshare_image)
+    ImageView mImage;
     //歌曲名与分享内容
-    @ViewInject(R.id.recordshare_name)
-    private TextView mSong;
-    @ViewInject(R.id.recordshare_content)
-    private TextView mContent;
+    @BindView(R.id.recordshare_name)
+    TextView mSong;
+    @BindView(R.id.recordshare_content)
+    TextView mContent;
     //保存截屏
     private static Bitmap mBackgroudCache;
-    @ViewInject(R.id.recordshare_container)
-    private RelativeLayout mContainer;
+    @BindView(R.id.recordshare_container)
+    RelativeLayout mContainer;
 
     //当前正在播放的歌曲
     private MP3Item mInfo;
@@ -88,14 +90,12 @@ public class RecordShareActivity extends BaseAppCompatActivity {
     };
 
     @Override
-    public int getLayoutId() {
-        return R.layout.activity_recordshare;
-    }
-
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_recordshare);
+        ButterKnife.bind(this);
+
         mInstance = this;
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -171,13 +171,4 @@ public class RecordShareActivity extends BaseAppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 }

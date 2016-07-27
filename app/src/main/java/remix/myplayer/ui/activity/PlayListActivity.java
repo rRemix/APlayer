@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.model.MP3Item;
@@ -31,10 +33,10 @@ import remix.myplayer.util.XmlUtil;
 public class PlayListActivity extends ToolbarActivity implements MusicService.Callback{
     private static final String TAG = "PlayListActivity";
     public static PlayListActivity mInstance = null;
-    @ViewInject(R.id.toolbar)
-    private Toolbar mToolBar;
-    @ViewInject(R.id.playlist_recycleview)
-    private RecyclerView mRecycleView;
+    @BindView(R.id.toolbar)
+    Toolbar mToolBar;
+    @BindView(R.id.playlist_recycleview)
+    RecyclerView mRecycleView;
 
     private PlayListAdapter mAdapter;
     public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
@@ -47,14 +49,12 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         return mPlaylist;
     }
 
-    @Override
-    public int getLayoutId() {
-        return R.layout.activity_playlist;
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_playlist);
+        ButterKnife.bind(this);
         MusicService.addCallback(PlayListActivity.this);
 
         mInstance = this;
@@ -126,15 +126,6 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     }
 
 
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
 
     @Override
     public void onStop() {

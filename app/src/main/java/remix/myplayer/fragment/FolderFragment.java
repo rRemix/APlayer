@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 
 import java.util.Iterator;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.FolderAdapter;
 import remix.myplayer.listener.OnItemClickListener;
@@ -28,17 +30,19 @@ import remix.myplayer.util.Global;
 /**
  * 文件夹Fragment
  */
-public class FolderFragment extends Fragment {
+public class FolderFragment extends BaseFragment {
     private static boolean mIsRunning = false;
     public static FolderFragment mInstance;
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.recyclerview)
+    RecyclerView mRecyclerView;
+
     private FolderAdapter mAdapter;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_folder,null);
+        mUnBinder = ButterKnife.bind(this,rootView);
 
-        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.addItemDecoration(new RecyclerItemDecoration(getContext(),RecyclerItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());

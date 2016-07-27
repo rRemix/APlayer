@@ -17,6 +17,8 @@ import android.view.animation.TranslateAnimation;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
@@ -32,8 +34,9 @@ import remix.myplayer.util.thumb.SearchCover;
  * 专辑封面Fragment
  *
  */
-public class CoverFragment extends Fragment {
-    private SimpleDraweeView mImage;
+public class CoverFragment extends BaseFragment {
+    @BindView(R.id.cover_image)
+    SimpleDraweeView mImage;
     private MP3Item mInfo;
     private TranslateAnimation mLeftAnimation;
     private ScaleAnimation mScaleAnimation;
@@ -53,7 +56,8 @@ public class CoverFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mInfo = (MP3Item)getArguments().getSerializable("MP3Item");
         View rootView = inflater.inflate(R.layout.fragment_cover,container,false);
-        mImage = (SimpleDraweeView)rootView.findViewById(R.id.cover_image);
+        mUnBinder = ButterKnife.bind(this,rootView);
+
         if(mInfo != null)
             mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
 

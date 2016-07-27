@@ -16,8 +16,7 @@ import remix.myplayer.util.Constants;
  */
 public class CtrlButtonListener implements View.OnClickListener {
     private Context context;
-    public CtrlButtonListener(Context context)
-    {
+    public CtrlButtonListener(Context context) {
         this.context = context;
     }
     @Override

@@ -36,11 +36,12 @@ import com.tencent.tauth.UiError;
 
 import java.net.URLEncoder;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.ui.activity.RecordShareActivity;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.inject.ViewInject;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 
@@ -54,17 +55,17 @@ import remix.myplayer.util.DBUtil;
 public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     public static ShareDialog mInstance;
     //四个分享按钮
-    @ViewInject(R.id.share_qq)
-    private ImageView mQQ;
-    @ViewInject(R.id.share_weibo)
-    private ImageView mWeibo;
-    @ViewInject(R.id.share_wechat)
-    private ImageView mWechat;
-    @ViewInject(R.id.share_circlefriend)
-    private ImageView mCircleFrient;
+    @BindView(R.id.share_qq)
+    ImageView mQQ;
+    @BindView(R.id.share_weibo)
+    ImageView mWeibo;
+    @BindView(R.id.share_wechat)
+    ImageView mWechat;
+    @BindView(R.id.share_circlefriend)
+    ImageView mCircleFrient;
     //取消按钮
-    @ViewInject(R.id.popup_share_cancel)
-    private Button mCancel;
+    @BindView(R.id.popup_share_cancel)
+    Button mCancel;
 
     private MP3Item mInfo;
     //Api
@@ -76,14 +77,12 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     //分享心情还是歌曲
     private int mType;
 
-    @Override
-    public int getLayoutId() {
-        return R.layout.popup_share;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.popup_share);
+        ButterKnife.bind(this);
         mInstance = this;
 
         mInfo = (MP3Item)getIntent().getExtras().getSerializable("MP3Item");
@@ -169,7 +168,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     //分享歌曲到qq
     private void shareSongtoQQ() {
         Bundle bundle = new Bundle();
-        String album_url = DBUtil.CheckUrlByAlbumId(mInfo.getAlbumId());
+        String album_url = DBUtil.getAlbumUrlByAlbumId(mInfo.getAlbumId());
         bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
         bundle.putString(QQShare.SHARE_TO_QQ_TITLE, mInfo.getDisplayname());
         bundle.putString(QQShare.SHARE_TO_QQ_SUMMARY, mInfo.getArtist());

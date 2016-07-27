@@ -17,7 +17,9 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import butterknife.BindView;
 import remix.myplayer.R;
+import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.listener.PopupListener;
@@ -133,18 +135,17 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
         return mCursor != null ? mCursor.getCount() : 0;
     }
 
-    public static class AlbumHolder extends RecyclerView.ViewHolder {
-        public final TextView mText1;
-        public final TextView mText2;
-        public final ImageButton mButton;
-        public final SimpleDraweeView mImage;
+    public static class AlbumHolder extends BaseViewHolder {
+        @BindView(R.id.recycleview_text1)
+        public TextView mText1;
+        @BindView(R.id.recycleview_text2)
+        public TextView mText2;
+        @BindView(R.id.recycleview_button)
+        public ImageButton mButton;
+        @BindView(R.id.recycleview_simpleiview)
+        public SimpleDraweeView mImage;
         public AlbumHolder(View v) {
             super(v);
-            mText1 = (TextView)v.findViewById(R.id.recycleview_text1);
-            mText2 = (TextView)v.findViewById(R.id.recycleview_text2);
-            mImage = (SimpleDraweeView)v.findViewById(R.id.recycleview_simpleiview);
-
-            mButton = (ImageButton)v.findViewById(R.id.recycleview_button);
         }
 
     }

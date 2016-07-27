@@ -214,7 +214,7 @@ public class DBUtil {
                 selectionArg = null;
         }
         try {
-            String album_art = null;
+            String album_art = "";
             cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,new String[]{MediaStore.Audio.Albums.ALBUM_ART},
                     selection,selectionArg,null);
             if(cursor != null && cursor.moveToFirst()) {
@@ -225,8 +225,7 @@ public class DBUtil {
         }
         catch (Exception e){
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             if(cursor != null)
                 cursor.close();
         }
@@ -239,7 +238,7 @@ public class DBUtil {
      * @param Id 专辑id
      * @return 专辑url
      */
-    public static String CheckUrlByAlbumId(long Id) {
+    public static String getAlbumUrlByAlbumId(long Id) {
         ContentResolver resolver = mContext.getContentResolver();
         String url = null;
         Cursor cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{"album_art"},
@@ -287,7 +286,7 @@ public class DBUtil {
      * @param isthumb 是否是缩略图
      * @return 专辑图片的bitmap
      */
-    public static Bitmap CheckBitmapBySongId(int id,boolean isthumb) {
+    public static Bitmap getAlbumBitmapBySongId(int id, boolean isthumb) {
         ParcelFileDescriptor pfd = null;
         try {
             Uri uri = Uri.parse("content://media/external/audio/media/" + id + "/albumart");

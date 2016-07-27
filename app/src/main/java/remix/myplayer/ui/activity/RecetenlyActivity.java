@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.model.MP3Item;
@@ -38,10 +39,10 @@ import remix.myplayer.util.Global;
 public class RecetenlyActivity extends ToolbarActivity implements MusicService.Callback{
     private ArrayList<MP3Item> mInfoList;
     private SongAdapter mAdapter;
-    @ViewInject(R.id.toolbar)
-    private Toolbar mToolBar;
-    @ViewInject(R.id.recyclerview)
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.toolbar)
+    Toolbar mToolBar;
+    @BindView(R.id.recyclerview)
+    RecyclerView mRecyclerView;
 
     private Handler mHandler = new Handler(){
         @Override
@@ -51,17 +52,13 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     };
 
     @Override
-    public int getLayoutId() {
-        return R.layout.activity_recently;
-    }
-
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
-        MusicService.addCallback(RecetenlyActivity.this);
+        setContentView(R.layout.activity_recently);
 
+        MusicService.addCallback(RecetenlyActivity.this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.addItemDecoration(new RecyclerItemDecoration(this,RecyclerItemDecoration.VERTICAL_LIST,getResources().getDrawable(R.drawable.divider)));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -131,13 +128,4 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         return true;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 }

@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.adapter.ArtistAdapter;
@@ -29,7 +31,8 @@ import remix.myplayer.util.Constants;
 /**
  * 艺术家Fragment
  */
-public class ArtistFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class ArtistFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+    @BindView(R.id.artist_recycleview)
     RecyclerView mRecycleView;
     Cursor mCursor = null;
     //艺术家与艺术家id的索引
@@ -54,7 +57,8 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_artist,null);
-        mRecycleView = (RecyclerView)rootView.findViewById(R.id.artist_recycleview);
+        mUnBinder = ButterKnife.bind(this,rootView);
+
         mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         mAdapter = new ArtistAdapter(mCursor,getActivity());
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {

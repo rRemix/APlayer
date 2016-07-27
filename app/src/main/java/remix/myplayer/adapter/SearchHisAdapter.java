@@ -9,6 +9,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
@@ -45,9 +47,7 @@ public class SearchHisAdapter extends BaseAdapter {
         SearchHisHolder holder = null;
         if(convertView == null){
             convertView = LayoutInflater.from(MainActivity.mInstance.getApplicationContext()).inflate(R.layout.search_history_item,null);
-            holder = new SearchHisHolder();
-            holder.mSearchKey = (TextView)convertView.findViewById(R.id.search_history_item_text);
-            holder.mDelete = (ImageButton)convertView.findViewById(R.id.search_history_item_delete);
+            holder = new SearchHisHolder(convertView);
             convertView.setTag(holder);
         }
         else
@@ -67,8 +67,13 @@ public class SearchHisAdapter extends BaseAdapter {
         return convertView;
     }
 
-    class SearchHisHolder {
+    public static class SearchHisHolder {
+        @BindView(R.id.search_history_item_text)
         public TextView mSearchKey;
+        @BindView(R.id.search_history_item_delete)
         public ImageButton mDelete;
+        public SearchHisHolder(View itemView){
+            ButterKnife.bind(this,itemView);
+        }
     }
 }

@@ -12,12 +12,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.ui.activity.BaseActivity;
-import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.adapter.PlayListAddtoAdapter;
 import remix.myplayer.model.PlayListItem;
-import remix.myplayer.inject.ViewInject;
+import remix.myplayer.ui.activity.BaseActivity;
+import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -28,22 +29,21 @@ import remix.myplayer.util.XmlUtil;
  * 将歌曲添加到播放列表的对话框
  */
 public class AddtoPlayListDialog extends BaseActivity {
-    @ViewInject(R.id.playlist_addto_list)
-    private ListView mList;
+    @BindView(R.id.playlist_addto_list)
+    ListView mList;
+
     private PlayListAddtoAdapter mAdapter;
     private String mSongName;
     private int mId;
     private int mAlbumId;
     private String mArtist;
 
-    @Override
-    public int getLayoutId() {
-        return R.layout.playlist_addto;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.playlist_addto);
+        ButterKnife.bind(this);
 
         mId = (int)getIntent().getExtras().getLong("Id");
         mSongName = getIntent().getExtras().getString("SongName");

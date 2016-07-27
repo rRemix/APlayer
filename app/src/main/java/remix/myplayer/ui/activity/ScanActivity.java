@@ -8,8 +8,9 @@ import android.support.v7.widget.Toolbar;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.inject.ViewInject;
 import remix.myplayer.ui.customview.ScanSizeSeekBar;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SharedPrefsUtil;
@@ -18,10 +19,10 @@ import remix.myplayer.util.SharedPrefsUtil;
  * Created by taeja on 16-3-7.
  */
 public class ScanActivity extends ToolbarActivity {
-    @ViewInject(R.id.toolbar)
-    private Toolbar mToolBar;
-    @ViewInject(R.id.custom_seekbar)
-    private ScanSizeSeekBar mScanSizeSeekbar;
+    @BindView(R.id.toolbar)
+    Toolbar mToolBar;
+    @BindView(R.id.custom_seekbar)
+    ScanSizeSeekBar mScanSizeSeekbar;
     private int mPosition;
     public static ArrayList<Integer> mSizeList = new ArrayList<>();
     //几种扫描代写哦啊
@@ -41,13 +42,10 @@ public class ScanActivity extends ToolbarActivity {
     };
 
     @Override
-    public int getLayoutId() {
-        return R.layout.activity_scan;
-    }
-
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_scan);
+        ButterKnife.bind(this);
         initToolbar(mToolBar,getString(R.string.back));
         initSeekbar();
     }
@@ -89,13 +87,4 @@ public class ScanActivity extends ToolbarActivity {
         }.start();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 }

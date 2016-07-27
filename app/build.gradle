@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 23
@@ -25,18 +26,18 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile files('libs/weiboSDKCore_3.1.2.jar')
+    compile files('libs/libammsdk.jar')
     testCompile 'junit:junit:4.12'
+    compile project(':StackBlur')
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:cardview-v7:23.1.1'
     compile 'com.facebook.fresco:fresco:0.8.1'
-    compile files('libs/weiboSDKCore_3.1.2.jar')
-    compile files('libs/libammsdk.jar')
     compile 'com.umeng.analytics:analytics:latest.integration'
     compile 'com.android.support:palette-v7:23.1.1'
-    compile project(':StackBlur')
     compile 'com.github.promeg:tinypinyin:1.0.0'
-    compile('com.mikepenz:materialdrawer:5.3.6@aar') {
-        transitive = true
-    }
+    compile 'com.jakewharton:butterknife:7.0.0'
+    compile 'com.jakewharton:butterknife:8.2.1'
+    apt 'com.jakewharton:butterknife-compiler:8.2.1'
 }

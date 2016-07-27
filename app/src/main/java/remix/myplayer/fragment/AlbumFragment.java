@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -16,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.adapter.AlbumAdater;
@@ -29,7 +30,8 @@ import remix.myplayer.util.Constants;
 /**
  * 专辑Fragment
  */
-public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    @BindView(R.id.album_recycleview)
     RecyclerView mRecycleView;
     Cursor mCursor = null;
     //专辑名 专辑id 艺术家对应的索引
@@ -51,7 +53,8 @@ public class AlbumFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_album,null);
-        mRecycleView = (RecyclerView)rootView.findViewById(R.id.album_recycleview);
+        mUnBinder = ButterKnife.bind(this,rootView);
+
         mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         mAdapter = new AlbumAdater(mCursor,getActivity());
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {

@@ -1,10 +1,10 @@
 [
     {
-        "merged": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-mdpi-v4\\ic_launcher.png",
-        "source": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\drawable-mdpi-v4\\ic_launcher.png"
-    },
-    {
         "merged": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-mdpi-v4\\ic_launcher.png",
         "source": "D:\\home\\taeja\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\drawable-mdpi-v4\\ic_launcher.png"
+    },
+    {
+        "merged": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\drawable-mdpi-v4\\ic_launcher.png",
+        "source": "D:\\AndroidProject\\APlayer\\StackBlur\\build\\intermediates\\bundles\\debug\\res\\drawable-mdpi-v4\\ic_launcher.png"
     }
 ]

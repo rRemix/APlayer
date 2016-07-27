@@ -7,10 +7,11 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.ui.activity.PlayListActivity;
-import remix.myplayer.inject.ViewInject;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -22,17 +23,14 @@ import remix.myplayer.util.XmlUtil;
  */
 
 public class AddPlayListDialog extends BaseActivity {
-    @ViewInject(R.id.playlist_add_edit)
-    private EditText mEdit;
-
-    @Override
-    public int getLayoutId() {
-        return R.layout.playlist_add;
-    }
+    @BindView(R.id.playlist_add_edit)
+    EditText mEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.playlist_add);
+        ButterKnife.bind(this);
 
         WindowManager.LayoutParams lp = getWindow().getAttributes();
 

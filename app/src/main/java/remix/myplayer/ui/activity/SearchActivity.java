@@ -14,6 +14,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SearchResAdapter;
 import remix.myplayer.inject.ViewInject;
@@ -44,27 +46,25 @@ public class SearchActivity extends BaseAppCompatActivity {
     private static final String SDROOT = "/sdcard/";
 
     //搜索结果的listview
-    @ViewInject(R.id.search_result_native)
-    private ListView mSearchResList = null;
-    @ViewInject(R.id.search_view)
-    private SearchView mSearchView = null;
+    @BindView(R.id.search_result_native)
+    ListView mSearchResList = null;
+    @BindView(R.id.search_view)
+    SearchView mSearchView = null;
     //背景
-    @ViewInject(R.id.search_logo)
-    private ImageView mSearchLogo;
+    @BindView(R.id.search_logo)
+    ImageView mSearchLogo;
     //无搜索结果
-    @ViewInject(R.id.search_result_blank)
-    private TextView mSearchResBlank;
-    @ViewInject(R.id.search_result_container)
-    private FrameLayout mSearchResContainer;
+    @BindView(R.id.search_result_blank)
+    TextView mSearchResBlank;
+    @BindView(R.id.search_result_container)
+    FrameLayout mSearchResContainer;
 
-    @Override
-    public int getLayoutId() {
-        return R.layout.activity_search;
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_search);
+        ButterKnife.bind(this);
         mInstance = this;
 
         mSearchView.addSearchListener(new SearchView.SearchListener() {
@@ -161,16 +161,6 @@ public class SearchActivity extends BaseAppCompatActivity {
             mSearchResContainer.setVisibility(View.GONE);
             mSearchLogo.setVisibility(View.VISIBLE);
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     class ListViewListener implements AdapterView.OnItemClickListener {

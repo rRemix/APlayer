@@ -121,24 +121,23 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
             e.printStackTrace();
         }
 
-        if(mType == ALLSONG && Global.mIndexOpen){
-            //根据position获取分类的首字母的char ascii值
-            int section = getSectionForPosition(position);
-            //如果当前位置等于该分类首字母的Char的位置 ，则认为是第一次出现
-            if(position == getPositionForSection(section)){
-                holder.mIndex.setVisibility(View.VISIBLE);
-                holder.mIndex.setText(mSortList.get(position));
-            }else{
-                holder.mIndex.setVisibility(View.GONE);
-            }
-        }
+//        if(mType == ALLSONG && Global.mIndexOpen){
+//            //根据position获取分类的首字母的char ascii值
+//            int section = getSectionForPosition(position);
+//            //如果当前位置等于该分类首字母的Char的位置 ，则认为是第一次出现
+//            if(position == getPositionForSection(section)){
+//                holder.mIndex.setVisibility(View.VISIBLE);
+//                holder.mIndex.setText(mSortList.get(position));
+//            }else{
+//                holder.mIndex.setVisibility(View.GONE);
+//            }
+//        }
 
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
                         allsong ? mCursor.getInt(SongFragment.mAlbumIdIndex) : temp.getAlbumId()))
                 .setOldController(holder.mImage.getController())
                 .setAutoPlayAnimations(false)
-
                 .build();
         holder.mImage.setController(controller);
 

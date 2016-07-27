@@ -12,7 +12,9 @@ import android.widget.TextView;
 
 import java.util.Iterator;
 
+import butterknife.BindView;
 import remix.myplayer.R;
+import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.listener.PopupListener;
 import remix.myplayer.ui.activity.MainActivity;
@@ -88,19 +90,19 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
         return Global.mFolderMap == null ? 0 : Global.mFolderMap.size();
     }
 
-    public static class FolderHolder extends RecyclerView.ViewHolder{
+    public static class FolderHolder extends BaseViewHolder {
         public View mRootView;
+        @BindView(R.id.folder_name)
         public TextView mName;
+        @BindView(R.id.folder_path)
         public TextView mPath;
+        @BindView(R.id.folder_num)
         public TextView mCount;
+        @BindView(R.id.folder_button)
         public ImageButton mButton;
         public FolderHolder(View itemView) {
             super(itemView);
             mRootView = itemView;
-            mName = (TextView)itemView.findViewById(R.id.folder_name);
-            mCount = (TextView)itemView.findViewById(R.id.folder_num);
-            mPath = (TextView)itemView.findViewById(R.id.folder_path);
-            mButton = (ImageButton)itemView.findViewById(R.id.folder_button);
         }
     }
 }

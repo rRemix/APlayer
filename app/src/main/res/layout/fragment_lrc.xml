@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:gravity="center">
     <remix.myplayer.ui.customview.LrcView
-        android:id="@+id/lrc_text"
+        android:id="@+id/lrc_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"

@@ -23,6 +23,8 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
@@ -48,24 +50,34 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
     //当前播放的歌曲信息
     private MP3Item mInfo;
     //滑动解锁提示文字
-    private TextView mUnLock;
+    @BindView(R.id.lockscreen_unlock)
+    TextView mUnLock;
     //歌曲与艺术家
-    private TextView mSong;
-    private TextView mArtist;
+    @BindView(R.id.lockscreen_song)
+    TextView mSong;
+    @BindView(R.id.lockscreen_artist)
+    TextView mArtist;
     //控制按钮
-    private ImageButton mPrevButton;
-    private ImageButton mNextBUtton;
-    private ImageButton mPlayButton;
-    private ImageButton mLoveButton;
+    @BindView(R.id.playbar_prev)
+    ImageButton mPrevButton;
+    @BindView(R.id.playbar_next)
+    ImageButton mNextButton;
+    @BindView(R.id.playbar_play)
+    ImageButton mPlayButton;
+    @BindView(R.id.lockscreen_love)
+    ImageButton mLoveButton;
+    @BindView(R.id.lockscreen_image)
+    SimpleDraweeView mSimpleImage;
+    //背景
+    @BindView(R.id.lockscreen_background)
+    ImageView mImageBackground;
 
     //DecorView, 跟随手指滑动
     private View mView;
     //是否正在运行
     private static boolean mIsRunning = false;
 
-    private SimpleDraweeView mSimpleImage;
-    //背景
-    private ImageView mImageBackground;
+
     //高斯模糊后的bitmap
     private Bitmap mNewBitMap;
     //高斯模糊之前的bitmap
@@ -85,7 +97,6 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
             //设置背景
 //            mImageBackground.setImageBitmap(mNewBitMap);
             mImageBackground.setImageBitmap(mNewBitMap);
-
 
 //            mImageBackground.setImageBitmap(mRawBitMap);
 //            mBlurringView.invalidate();
@@ -115,6 +126,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lockscreen);
+        ButterKnife.bind(this);
 
         mInstance = this;
         if((mInfo = MusicService.getCurrentMP3()) == null)
@@ -132,18 +144,13 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
         //初始化按钮
-        mPrevButton = (ImageButton)findViewById(R.id.playbar_prev);
-        mNextBUtton = (ImageButton)findViewById(R.id.playbar_next);
-        mPlayButton = (ImageButton)findViewById(R.id.playbar_play);
-        mLoveButton = (ImageButton)findViewById(R.id.lockscreen_love);
 
         CtrlButtonListener listener = new CtrlButtonListener(this);
         mPrevButton.setOnClickListener(listener);
-        mNextBUtton.setOnClickListener(listener);
+        mNextButton.setOnClickListener(listener);
         mPlayButton.setOnClickListener(listener);
 
         //初始化控件
-        mImageBackground = (ImageView)findViewById(R.id.lockscreen_background);
         mImageBackground.setAlpha(0.75f);
         try {
 //            mBlurringView = (BlurringView)findViewById(R.id.lockscreen_blur_background);
@@ -154,11 +161,6 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
             e.printStackTrace();
         }
 
-
-        mSimpleImage = (SimpleDraweeView)findViewById(R.id.lockscreen_image);
-        mSong = (TextView)findViewById(R.id.lockscreen_song);
-        mArtist = (TextView)findViewById(R.id.lockscreen_artist);
-        mUnLock = (TextView)findViewById(R.id.lockscreen_unlock);
 
         mView = getWindow().getDecorView();
         mView.setBackgroundColor(getResources().getColor(R.color.transparent));
@@ -218,10 +220,6 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         super.onDestroy();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -310,7 +308,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
                 float widthscaleFactor = 3.3f;
                 float heightscaleFactor = (float) (widthscaleFactor * (mHeight * 1.0 / mWidth));
 
-                mRawBitMap = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
+                mRawBitMap = DBUtil.getAlbumBitmapBySongId((int) mInfo.getId(),false);
                 if(mRawBitMap == null)
                     mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.artist_empty_bg);
 

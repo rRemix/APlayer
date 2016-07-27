@@ -11,6 +11,8 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.activity.AudioHolderActivity;
 import remix.myplayer.model.MP3Item;
@@ -24,14 +26,20 @@ import remix.myplayer.service.MusicService;
 /**
  * 底部控制的Fragment
  */
-public class BottomActionBarFragment extends Fragment{
+public class BottomActionBarFragment extends BaseFragment{
     //播放与下一首按钮
-    private ImageButton mPlayButton;
-    private ImageButton mNextButton;
+    @BindView(R.id.playbar_play)
+    ImageButton mPlayButton;
+    @BindView(R.id.playbar_next)
+    ImageButton mNextButton;
     //歌曲名艺术家
-    private TextView mTitle;
-    private TextView mArtist;
-    private RelativeLayout mBottomActionBar;
+    @BindView(R.id.bottom_title)
+    TextView mTitle;
+    @BindView(R.id.bottom_artist)
+    TextView mArtist;
+    @BindView(R.id.bottom_action_bar)
+    RelativeLayout mBottomActionBar;
+
     public static BottomActionBarFragment mInstance;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,6 +54,8 @@ public class BottomActionBarFragment extends Fragment{
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.bottom_actionbar,container);
+        mUnBinder = ButterKnife.bind(this,rootView);
+
         mBottomActionBar = (RelativeLayout)rootView.findViewById(R.id.bottom_action_bar);
         //点击打开播放界面
         mBottomActionBar.setOnClickListener(new View.OnClickListener() {
@@ -60,15 +70,10 @@ public class BottomActionBarFragment extends Fragment{
                 getContext().startActivity(intent);
             }
         });
-        //初始化底部三个按钮
-        mPlayButton = (ImageButton)rootView.findViewById(R.id.playbar_play);
-        mNextButton = (ImageButton)rootView.findViewById(R.id.playbar_next);
         CtrlButtonListener listener = new CtrlButtonListener(getContext());
         mPlayButton.setOnClickListener(listener);
         mNextButton.setOnClickListener(listener);
-        //初始化底部标题与歌手
-        mTitle = (TextView)rootView.findViewById(R.id.bottom_title);
-        mArtist = (TextView)rootView.findViewById(R.id.bottom_artist);
+
         return rootView;
     }
     //更新界面

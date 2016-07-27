@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ChildHolderAdapter;
 import remix.myplayer.fragment.BottomActionBarFragment;
@@ -44,15 +46,15 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
     private ArrayList<MP3Item> mInfoList;
 
     //歌曲数目与标题
-    @ViewInject(R.id.album_holder_item_num)
-    private TextView mNum;
-    @ViewInject(R.id.artist_album_title)
-    private TextView mTitle;
-    @ViewInject(R.id.child_holder_recyclerView)
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.album_holder_item_num)
+    TextView mNum;
+    @BindView(R.id.artist_album_title)
+    TextView mTitle;
+    @BindView(R.id.child_holder_recyclerView)
+    RecyclerView mRecyclerView;
 
     private BottomActionBarFragment mActionbar;
-    private ChildHolderAdapter mTestAdapter;
+
     private ChildHolderAdapter mAdapter;
     public static ChildHolderActivity mInstance = null;
     //是否需要更新adapter
@@ -68,14 +70,12 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         }
     };
 
-    @Override
-    public int getLayoutId() {
-        return R.layout.activity_child_holder;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_child_holder);
+        ButterKnife.bind(this);
 
         mInstance = this;
         MusicService.addCallback(ChildHolderActivity.this);
@@ -282,11 +282,5 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         super.onStop();
         mIsRunning = false;
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
 
 }

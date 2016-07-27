@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.RecentlyAdapter;
 import remix.myplayer.model.MP3Item;
@@ -23,12 +25,16 @@ import remix.myplayer.util.Global;
 /**
  * Created by taeja on 16-3-4.
  */
-public class RecentlyFragment extends Fragment {
+public class RecentlyFragment extends BaseFragment {
     private ArrayList<MP3Item> mInfoList = new ArrayList<>();
     private int mType;
-    private ListView mListView;
+    @BindView(R.id.dayweek_list)
+    ListView mListView;
+    @BindView(R.id.dayweek_text)
+    TextView mTextTip;
+
     private RecentlyAdapter mAdapter;
-    private TextView mTextTip;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,8 +46,8 @@ public class RecentlyFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_recently,null);
-        mTextTip = (TextView)rootView.findViewById(R.id.dayweek_text);
-        mListView = (ListView)rootView.findViewById(R.id.dayweek_list);
+        mUnBinder = ButterKnife.bind(this,rootView);
+
         if(mInfoList == null || mInfoList.size() == 0){
             mListView.setVisibility(View.GONE);
             mTextTip.setVisibility(View.VISIBLE);

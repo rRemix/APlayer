@@ -14,7 +14,7 @@ import remix.myplayer.ui.dialog.TimerDialog;
 /**
  * Created by taeja on 16-3-15.
  */
-public abstract class ToolbarActivity extends BaseAppCompatActivity {
+public class ToolbarActivity extends BaseAppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,8 +24,6 @@ public abstract class ToolbarActivity extends BaseAppCompatActivity {
         return (T)findViewById(id);
     }
 
-    @Override
-    public abstract int getLayoutId();
 
     protected void initToolbar(Toolbar toolbar,String title){
         toolbar.setTitle(title);

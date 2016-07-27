@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.activity.SearchActivity;
 
@@ -37,10 +39,7 @@ public class SearchResAdapter extends SimpleCursorAdapter {
         SerchResHolder holder;
         if(convertView == null) {
             convertView = super.getView(position,convertView,parent);
-            holder = new SerchResHolder();
-            holder.mImage = (SimpleDraweeView)convertView.findViewById(R.id.search_image);
-            holder.mName = (TextView)convertView.findViewById(R.id.search_name);
-            holder.mOther = (TextView)convertView.findViewById(R.id.search_detail);
+            holder = new SerchResHolder(convertView);
             convertView.setTag(holder);
         } else
             holder = (SerchResHolder)convertView.getTag();
@@ -61,8 +60,14 @@ public class SearchResAdapter extends SimpleCursorAdapter {
     }
 
     public static class SerchResHolder {
+        @BindView(R.id.search_image)
         public SimpleDraweeView mImage;
+        @BindView(R.id.search_name)
         public TextView mName;
+        @BindView(R.id.search_detail)
         public TextView mOther;
+        public SerchResHolder(View itemView){
+            ButterKnife.bind(this,itemView);
+        }
     }
 }

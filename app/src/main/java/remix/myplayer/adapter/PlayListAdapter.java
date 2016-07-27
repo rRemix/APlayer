@@ -19,7 +19,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import butterknife.BindView;
 import remix.myplayer.R;
+import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.model.PlayListItem;
@@ -126,15 +128,16 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         return PlayListActivity.getPlayList() == null ? 0 : PlayListActivity.getPlayList().size();
     }
 
-    public static class PlayListHolder extends RecyclerView.ViewHolder {
-        public final TextView mName;
-        public final SimpleDraweeView mImage;
-        public final ImageView mButton;
+    public static class PlayListHolder extends BaseViewHolder {
+        @BindView(R.id.playlist_item_name)
+        public TextView mName;
+        @BindView(R.id.recycleview_simpleiview)
+        public SimpleDraweeView mImage;
+        @BindView(R.id.recycleview_button)
+        public ImageView mButton;
         public PlayListHolder(View itemView) {
             super(itemView);
-            mName = (TextView) itemView.findViewById(R.id.playlist_item_name);
-            mImage = (SimpleDraweeView)itemView.findViewById(R.id.recycleview_simpleiview);
-            mButton = (ImageView)itemView.findViewById(R.id.recycleview_button);
+
         }
     }
 

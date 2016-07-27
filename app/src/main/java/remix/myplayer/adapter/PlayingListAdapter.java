@@ -11,6 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
@@ -97,13 +99,14 @@ public class PlayingListAdapter extends BaseAdapter {
 
 
     public static class PlayListHolder {
-        public final TextView mSong;
-        public final TextView mArtist;
-        public final ImageView mButton;
+        @BindView(R.id.playlist_item_name)
+        public TextView mSong;
+        @BindView(R.id.playlist_item_artist)
+        public TextView mArtist;
+        @BindView(R.id.playlist_item_button)
+        public ImageView mButton;
         public PlayListHolder(View v) {
-            mSong = (TextView)v.findViewById(R.id.playlist_item_name);
-            mArtist = (TextView)v.findViewById(R.id.playlist_item_artist);
-            mButton = (ImageView) v.findViewById(R.id.playlist_item_button);
+            ButterKnife.bind(this,v);
         }
 
     }

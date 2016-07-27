@@ -28,13 +28,14 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.fragment.CoverFragment;
 import remix.myplayer.fragment.LrcFragment;
 import remix.myplayer.fragment.RecordFragment;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.inject.ViewInject;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.customview.AudioViewPager;
@@ -67,38 +68,37 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     //拖动进度条与更新进度条的互斥量
     public static boolean mIsDragSeekBar = false;
     //顶部信息
-    @ViewInject(R.id.top_title)
-    private TextView mTopTitle;
-    @ViewInject(R.id.top_detail)
-    private TextView mTopDetail;
+    @BindView(R.id.top_title)
+    TextView mTopTitle;
+    @BindView(R.id.top_detail)
+    TextView mTopDetail;
     //隐藏按钮
-    @ViewInject(R.id.top_hide)
-    private ImageButton mHide;
+    @BindView(R.id.top_hide)
+    ImageButton mHide;
     //播放控制
-    @ViewInject(R.id.playbar_prev)
-    private ImageButton mPlayBarPrev;
-    @ViewInject(R.id.playbar_play)
-    private ImageButton mPlayBarPlay;
-    @ViewInject(R.id.playbar_next)
-    private ImageButton mPlayBarNext;
-    @ViewInject(R.id.playbar_model)
-    private ImageButton mPlayModel;
-    @ViewInject(R.id.playbar_playinglist)
-    private ImageButton mPlayingList;
+    @BindView(R.id.playbar_prev)
+    ImageButton mPlayBarPrev;
+    @BindView(R.id.playbar_play)
+    ImageButton mPlayBarPlay;
+    @BindView(R.id.playbar_next)
+    ImageButton mPlayBarNext;
+    @BindView(R.id.playbar_model)
+    ImageButton mPlayModel;
+    @BindView(R.id.playbar_playinglist)
+    ImageButton mPlayingList;
     //已播放时间和剩余播放时间
-    @ViewInject(R.id.text_hasplay)
-    private TextView mHasPlay;
-    @ViewInject(R.id.text_remain)
-    private TextView mRemainPlay;
+    @BindView(R.id.text_hasplay)
+    TextView mHasPlay;
+    @BindView(R.id.text_remain)
+    TextView mRemainPlay;
     //进度条
-    @ViewInject(R.id.seekbar)
-    private SeekBar mSeekBar;
+    @BindView(R.id.seekbar)
+    SeekBar mSeekBar;
     //背景
-    @ViewInject(R.id.audio_holder_container)
-    private FrameLayout mContainer;
-    @ViewInject(R.id.holder_pager)
-    private AudioViewPager mPager;
-
+    @BindView(R.id.audio_holder_container)
+    FrameLayout mContainer;
+    @BindView(R.id.holder_pager)
+    AudioViewPager mPager;
 
     //Viewpager
     private PagerAdapter mAdapter;
@@ -168,14 +168,12 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         }
     };
 
-    @Override
-    public int getLayoutId() {
-        return R.layout.activity_audio_holder;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_audio_holder);
+        ButterKnife.bind(this);
         mInstance = this;
 //        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
@@ -292,10 +290,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         new ProgeressThread().start();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 
     @Override
     protected void onStop() {
@@ -372,8 +366,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
             }
         });
     }
-
-
 
     //更新顶部信息
     public void UpdateTopStatus(MP3Item mp3Item) {
@@ -575,7 +567,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         @Override
         public void run() {
             if(mInfo != null){
-                mRawBitMap = DBUtil.CheckBitmapBySongId((int) mInfo.getId(),false);
+                mRawBitMap = DBUtil.getAlbumBitmapBySongId((int) mInfo.getId(),false);
                 if(mRawBitMap == null)
                     mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
                 mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
