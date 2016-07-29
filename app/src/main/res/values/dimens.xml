@@ -19,7 +19,7 @@
 
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="slidingmenu_offset">100dp</dimen>
-    <dimen name="tab_height">30dp</dimen>
+    <dimen name="tab_height">40dp</dimen>
     <dimen name="d2_size">2dp</dimen>
     <dimen name="d4_size">4dp</dimen>
     <dimen name="d6_size">6dp</dimen>

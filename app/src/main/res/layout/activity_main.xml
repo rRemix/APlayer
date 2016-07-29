@@ -12,27 +12,36 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:id="@+id/layout_main">
-        <!-- 主内容-->
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary" />
-
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabs"
-            android:background="@color/colorPrimary"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/tab_height"
-            style="@style/CustomTabLayout" />
-
-        <!--中间四个fragment-->
-        <android.support.v4.view.ViewPager
+        <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="6"
-            android:id="@+id/ViewPager"
-            android:background="@android:color/white"/>
+            android:layout_weight="8">
+            <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/material_brown_primary"
+                    app:layout_scrollFlags="scroll|enterAlways"/>
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/tabs"
+                    android:background="@color/material_brown_primary"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/tab_height"
+                    style="@style/CustomTabLayout" />
+            </android.support.design.widget.AppBarLayout>
+
+            <!--中间四个fragment-->
+            <android.support.v4.view.ViewPager
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:id="@+id/ViewPager"
+                android:background="@android:color/white"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        </android.support.design.widget.CoordinatorLayout>
 
         <!-- 底部自定义ationbar -->
         <fragment android:name="remix.myplayer.fragment.BottomActionBarFragment"
@@ -41,6 +50,7 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
     </LinearLayout>
+
 
     <!--测滑菜单-->
     <!--<include layout="@layout/slide_menu"/>-->

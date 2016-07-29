@@ -28,7 +28,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnItemSelected;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.fragment.AlbumFragment;
@@ -82,7 +81,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     private static final String[] PERMISSIONS = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE};
-    private int mAlpha = StatusBarUtil.DEFAULT_STATUS_BAR_ALPHA;
+    private int mAlpha = StatusBarUtil.DEFAULT_STATUS_BAR_ALPHA / 2;
 
     @Override
     protected void onResume() {
@@ -182,12 +181,17 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 //
 //        overridePendingTransition(0, 0);
 //        startActivity(intent);
-        StatusBarUtil.DEFAULT_STATUS_BAR_COLOR = R.color.material_indigo_primary_dark;
-        StatusBarUtil.DEFAULT_TOOLBAR_COLOR = R.color.material_indigo_primary;
+        StatusBarUtil.DEFAULT_STATUS_BAR_COLOR = R.color.material_pink_primary_dark;
+        StatusBarUtil.DEFAULT_TOOLBAR_COLOR = R.color.material_pink_primary;
+
+        if(mDrawerLayout != null)
+            StatusBarUtil.setColorForDrawerLayout(this,
+                    (DrawerLayout) findViewById(R.id.drawer_layout),
+                    ColorUtil.darkenColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR)), mAlpha);
+        if(mTablayout != null)
+            mTablayout.setBackgroundColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR));
         if(mToolBar != null)
             mToolBar.setBackgroundColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR));
-        if(mDrawerLayout != null)
-            StatusBarUtil.setColorForDrawerLayout(this, (DrawerLayout) findViewById(R.id.drawer_layout), getResources().getColor(StatusBarUtil.DEFAULT_STATUS_BAR_COLOR), mAlpha);
 
     }
 

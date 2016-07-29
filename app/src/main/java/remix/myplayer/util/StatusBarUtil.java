@@ -19,7 +19,7 @@ import remix.myplayer.ui.customview.StatusBarView;
  */
 public class StatusBarUtil {
 
-    public static int DEFAULT_STATUS_BAR_ALPHA = 56;
+    public static int DEFAULT_STATUS_BAR_ALPHA = 112;
     public static int DEFAULT_STATUS_BAR_COLOR = R.color.material_brown_primary_dark;
     public static int DEFAULT_TOOLBAR_COLOR = R.color.material_brown_primary;
     /**
