@@ -303,9 +303,9 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
 
     private void initDrawerLayout() {
-        mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
+//        mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
         ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed}, {}},
-                new int[]{getResources().getColor(R.color.progress_complete), getResources().getColor(R.color.drawer_text_color)});
+                new int[]{getResources().getColor(R.color.progress_complete), getResources().getColor(R.color.black_737373)});
         mNavigationView.setItemIconTintList(colorStateList);
         mNavigationView.setItemTextColor(colorStateList);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {

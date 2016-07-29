@@ -58,6 +58,9 @@
     <!--光标颜色(紫)-->
     <color name="cursor_color_purple">#782899</color>
 
+
+
+    <color name="black_737373">#737373</color>
     <color name="material_purple_primary">#9c27b0</color>
     <color name="material_purple_primary_dark">#7b1fa2</color>
 
