@@ -1,13 +1,14 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar"/>
+    <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+
+    </style>
 
 
     <style name="AppTheme" parent="BaseTheme">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">#1d1a1d</item>
-        <item name="colorPrimaryDark">#1d1a1d</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/material_brown_primary</item>
+        <item name="colorPrimaryDark">@color/material_brown_primary_dark</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -36,14 +37,14 @@
     </style>
 
     <style name="CustomTabLayout" parent="Widget.Design.TabLayout">
-        <item name="tabIndicatorColor">@color/text_allsong_sel</item>
+        <item name="tabIndicatorColor">@color/text_color_white</item>
         <item name="tabIndicatorHeight">3dp</item>
         <item name="tabTextAppearance">@style/CustomTabTextAppearance</item>
-        <item name="tabSelectedTextColor">@color/text_allsong_sel</item>
+        <item name="tabSelectedTextColor">@color/text_color_white</item>
     </style>
     <style name="CustomTabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">@dimen/s16_size</item>
-        <item name="android:textColor">@color/text_allsong_unsel</item>
+        <item name="android:textColor">@color/text_color_white_1</item>
         <item name="textAllCaps">true</item>
     </style>
 

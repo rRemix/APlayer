@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -32,7 +31,6 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.sort.Compator;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -56,13 +54,6 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     RecyclerView mRecyclerView;
     private SongAdapter mAdapter;
 
-    private Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            mAdapter.setSortList((ArrayList<String>) msg.obj);
-            mAdapter.setCursor(mCursor);
-        }
-    };
 
     @Override
     public void onAttach(Context context) {
@@ -128,36 +119,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         });
         mRecyclerView.setAdapter(mAdapter);
 
-//        mIndexView = (IndexView)rootView.findViewById(R.id.song_index_view);
-//        mIndexView.setVisibility(Global.mIndexOpen ? View.VISIBLE : View.GONE);
-//        mIndexView.setPositionChangedListener(new IndexView.OnLetterChangedListener() {
-//            @Override
-//            public void onLetterChanged(char c) {
-//                if(mAdapter != null && mRecyclerView != null){
-//                    int pos = mAdapter.getPositionForSection(c);
-//                    int i = 0;
-//                    for(; i < 26 ;i++){
-//                        int posforsec = mAdapter.getPositionForSection('A' + i);
-//                        if(posforsec >= pos)
-//                            break;
-//                    }
-//
-//                    int dy = pos * DensityUtil.dip2px(getContext(),72) /*+ i * DensityUtil.dip2px(getContext(),20)*/;
-//                    int scrolly = getScollYDistance();
-//                    mRecyclerView.scrollBy(0,dy - scrolly);
-//                    Toast.makeText(getActivity(),String.valueOf(c),Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
         return rootView;
-    }
-
-    public int getScollYDistance() {
-        LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-        int position = layoutManager.findFirstVisibleItemPosition();
-        View firstVisiableChildView = layoutManager.findViewByPosition(position);
-        int itemHeight = firstVisiableChildView.getHeight();
-        return (position) * itemHeight - firstVisiableChildView.getTop();
     }
 
     @Override
@@ -193,24 +155,24 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     }
 
 
-    class IndexThread extends Thread{
-        @Override
-        public void run() {
-            long start = System.currentTimeMillis();
-            ArrayList<String> list = new ArrayList<String>();
-            if(Global.mIndexOpen){
-                while (mCursor.moveToNext()) {
-                    String firstLetter = Compator.getFirstLetter(mCursor.getString(mTitleIndex));
-                    Log.d("SongFragment","\nTitle:" + mCursor.getString(mTitleIndex) + " \nFirstLetter:" + firstLetter);
-                    list.add(firstLetter);
-                }
-            }
-            Message msg = new Message();
-            msg.obj = list;
-            mHandler.sendMessage(msg);
-
-            Log.d("ALlSongFragment","CostTime:" + (System.currentTimeMillis() - start));
-        }
-    }
+//    class IndexThread extends Thread{
+//        @Override
+//        public void run() {
+//            long start = System.currentTimeMillis();
+//            ArrayList<String> list = new ArrayList<String>();
+//            if(Global.mIndexOpen){
+//                while (mCursor.moveToNext()) {
+//                    String firstLetter = Compator.getFirstLetter(mCursor.getString(mTitleIndex));
+//                    Log.d("SongFragment","\nTitle:" + mCursor.getString(mTitleIndex) + " \nFirstLetter:" + firstLetter);
+//                    list.add(firstLetter);
+//                }
+//            }
+//            Message msg = new Message();
+//            msg.obj = list;
+//            mHandler.sendMessage(msg);
+//
+//            Log.d("ALlSongFragment","CostTime:" + (System.currentTimeMillis() - start));
+//        }
+//    }
 
 }

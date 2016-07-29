@@ -1,20 +1,15 @@
 package remix.myplayer.ui.activity;
 
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.umeng.analytics.MobclickAgent;
 
-import java.lang.reflect.Field;
-
-import remix.myplayer.inject.ViewInject;
+import remix.myplayer.R;
 import remix.myplayer.manager.ActivityManager;
+import remix.myplayer.util.StatusBarUtil;
 
 /**
  * Created by Remix on 2016/3/16.
@@ -35,21 +30,18 @@ public class BaseAppCompatActivity extends AppCompatActivity {
         //将该activity添加到ActivityManager,用于退出程序时关闭
         ActivityManager.AddActivity(this);
 
-        //4.4 全透明状态栏
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        }
-        //5.0 全透明实现
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(Color.TRANSPARENT);
-        }
     }
 
+
+    @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+        setStatusBar();
+    }
+
+    protected void setStatusBar() {
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.colorPrimary));
+    }
 
     @Override
     protected void onDestroy() {

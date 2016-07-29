@@ -36,8 +36,7 @@ dependencies {
     compile 'com.facebook.fresco:fresco:0.8.1'
     compile 'com.umeng.analytics:analytics:latest.integration'
     compile 'com.android.support:palette-v7:23.1.1'
-    compile 'com.github.promeg:tinypinyin:1.0.0'
-    compile 'com.jakewharton:butterknife:7.0.0'
     compile 'com.jakewharton:butterknife:8.2.1'
     apt 'com.jakewharton:butterknife-compiler:8.2.1'
+
 }

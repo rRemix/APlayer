@@ -60,11 +60,6 @@ public abstract class BaseActivity extends Activity {
         ActivityManager.RemoveActivity(this);
     }
 
-    @Nullable
-    @Override
-    public CharSequence onCreateDescription() {
-        return super.onCreateDescription();
-    }
 
     @Override
     protected void onResume() {

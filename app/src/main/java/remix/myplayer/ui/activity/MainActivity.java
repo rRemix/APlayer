@@ -41,6 +41,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.ui.dialog.TimerDialog;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -49,6 +50,7 @@ import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.SharedPrefsUtil;
+import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -80,6 +82,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     private static final String[] PERMISSIONS = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE};
+    private int mAlpha = StatusBarUtil.DEFAULT_STATUS_BAR_ALPHA;
 
     @Override
     protected void onResume() {
@@ -111,6 +114,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         ButterKnife.bind(this);
         mInstance = this;
 
@@ -170,12 +174,35 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     }
 
+    public void reload() {
+//        Intent intent = getIntent();
+//        overridePendingTransition(0, 0);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//        finish();
+//
+//        overridePendingTransition(0, 0);
+//        startActivity(intent);
+        StatusBarUtil.DEFAULT_STATUS_BAR_COLOR = R.color.material_indigo_primary_dark;
+        StatusBarUtil.DEFAULT_TOOLBAR_COLOR = R.color.material_indigo_primary;
+        if(mToolBar != null)
+            mToolBar.setBackgroundColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR));
+        if(mDrawerLayout != null)
+            StatusBarUtil.setColorForDrawerLayout(this, (DrawerLayout) findViewById(R.id.drawer_layout), getResources().getColor(StatusBarUtil.DEFAULT_STATUS_BAR_COLOR), mAlpha);
+
+    }
+
+    @Override
+    protected void setStatusBar() {
+        StatusBarUtil.setColorForDrawerLayout(this, (DrawerLayout) findViewById(R.id.drawer_layout), getResources().getColor(StatusBarUtil.DEFAULT_STATUS_BAR_COLOR), mAlpha);
+    }
+
     private void initToolbar() {
         mToolBar.setTitle("");
 
         setSupportActionBar(mToolBar);
         mToolBar.setNavigationIcon(R.drawable.actionbar_menu);
-        mToolBar.setLogo(R.drawable.allsong_icon_musicbox);
+        mToolBar.setBackgroundColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR));
+//        mToolBar.setLogo(R.drawable.allsong_icon_musicbox);
         mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -284,7 +311,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                 switch (item.getItemId()) {
                     case R.id.item_recently:
                         //最近添加
-                        startActivity(new Intent(MainActivity.this, RecetenlyActivity.class));
+//                        startActivity(new Intent(MainActivity.this, RecetenlyActivity.class));
+                        reload();
                         break;
                     case R.id.item_playlist:
                         startActivity(new Intent(MainActivity.this, PlayListActivity.class));

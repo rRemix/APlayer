@@ -121,18 +121,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
             e.printStackTrace();
         }
 
-//        if(mType == ALLSONG && Global.mIndexOpen){
-//            //根据position获取分类的首字母的char ascii值
-//            int section = getSectionForPosition(position);
-//            //如果当前位置等于该分类首字母的Char的位置 ，则认为是第一次出现
-//            if(position == getPositionForSection(section)){
-//                holder.mIndex.setVisibility(View.VISIBLE);
-//                holder.mIndex.setText(mSortList.get(position));
-//            }else{
-//                holder.mIndex.setVisibility(View.GONE);
-//            }
-//        }
-
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
                         allsong ? mCursor.getInt(SongFragment.mAlbumIdIndex) : temp.getAlbumId()))
@@ -166,30 +154,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
             });
         }
 
-    }
-
-    /**
-     * 根据RecyclerView的当前位置获取分类的首字母的char ascii值
-     */
-    public int getSectionForPosition(int position) {
-        return mSortList != null ?  mSortList.get(position).charAt(0) : 0;
-    }
-
-    /**
-     * 根据分类的首字母的Char ascii值获取其第一次出现该首字母的位置
-     */
-    public int getPositionForSection(int section) {
-        if(mSortList == null)
-            return -1;
-        for (int i = 0; i < mSortList.size(); i++) {
-            String sortStr = mSortList.get(i);
-            char firstChar = sortStr.toUpperCase().charAt(0);
-            if (firstChar == section) {
-                return i;
-            }
-        }
-
-        return -1;
     }
 
     @Override
