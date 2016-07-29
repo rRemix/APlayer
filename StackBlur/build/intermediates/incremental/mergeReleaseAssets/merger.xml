@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="D:\AndroidProject\APlayer\StackBlur\assets"><file name="ic_launcher.png" path="D:\AndroidProject\APlayer\StackBlur\assets\ic_launcher.png"/></source><source path="D:\AndroidProject\APlayer\StackBlur\build\generated\assets\shaders\release"/></dataSet><dataSet config="release"><source path="D:\AndroidProject\APlayer\StackBlur\build-types\release\assets"/></dataSet></merger>
