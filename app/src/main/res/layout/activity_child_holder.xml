@@ -27,7 +27,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s18_size"
-            android:textColor="@color/text_color_white"
+            android:textColor="@color/color_white"
             android:layout_marginLeft="8dp"
             android:text=""
             android:lines="1"
@@ -88,7 +88,7 @@
             android:layout_weight="1"
             android:layout_marginTop="10dp"
             android:id="@+id/album_holder_item_num"
-            android:textColor="@color/text_color_white"
+            android:textColor="@color/color_white"
             android:textSize="@dimen/s12_size"
             android:text=""
             android:layout_gravity="center_horizontal"/>

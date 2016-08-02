@@ -39,6 +39,7 @@ import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -71,7 +72,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     private final static String TAG = "MainActivity";
 
     private PagerAdapter mAdapter;
-
+    private static boolean mIsDay = ThemeStore.THEME_MODE == ThemeStore.DAY;
     //是否正在运行
     private static boolean mIsRunning = false;
     //是否第一次启动
@@ -137,7 +138,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         initTab();
         //初始化测滑菜单
         initDrawerLayout();
-
+        //根据主题设置颜色
+        initColor();
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
 
@@ -173,31 +175,41 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     }
 
-    public void reload() {
-//        Intent intent = getIntent();
-//        overridePendingTransition(0, 0);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-//        finish();
-//
-//        overridePendingTransition(0, 0);
-//        startActivity(intent);
-        StatusBarUtil.DEFAULT_STATUS_BAR_COLOR = R.color.material_pink_primary_dark;
-        StatusBarUtil.DEFAULT_TOOLBAR_COLOR = R.color.material_pink_primary;
+    private void initColor() {
+        mViewPager.setBackgroundColor(getResources().getColor(mIsDay ? R.color.color_white : R.color.background_color_main));
+        mToolBar.setBackgroundColor(getResources().getColor(mIsDay ? StatusBarUtil.DEFAULT_TOOLBAR_COLOR : R.color.background_color_3));
+        mTablayout.setBackgroundColor(getResources().getColor(mIsDay ? StatusBarUtil.DEFAULT_TOOLBAR_COLOR : R.color.background_color_3));
+    }
 
-        if(mDrawerLayout != null)
-            StatusBarUtil.setColorForDrawerLayout(this,
-                    (DrawerLayout) findViewById(R.id.drawer_layout),
-                    ColorUtil.darkenColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR)), mAlpha);
-        if(mTablayout != null)
-            mTablayout.setBackgroundColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR));
-        if(mToolBar != null)
-            mToolBar.setBackgroundColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR));
+    public void reload() {
+        ThemeStore.THEME_MODE = ThemeStore.THEME_MODE == ThemeStore.DAY ? ThemeStore.NIGHT : ThemeStore.DAY;
+        mIsDay = ThemeStore.THEME_MODE == ThemeStore.DAY;
+        Intent intent = getIntent();
+        overridePendingTransition(0, 0);
+        finish();
+        overridePendingTransition(0, 0);
+        startActivity(intent);
+
+
+//        StatusBarUtil.DEFAULT_STATUS_BAR_COLOR = R.color.material_pink_primary_dark;
+//        StatusBarUtil.DEFAULT_TOOLBAR_COLOR = R.color.material_pink_primary;
+
+//        if(mDrawerLayout != null)
+//            StatusBarUtil.setColorForDrawerLayout(this,
+//                    (DrawerLayout) findViewById(R.id.drawer_layout),
+//                    ColorUtil.darkenColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR)), mAlpha);
+//        if(mTablayout != null)
+//            mTablayout.setBackgroundColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR));
+//        if(mToolBar != null)
+//            mToolBar.setBackgroundColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR));
 
     }
 
     @Override
     protected void setStatusBar() {
-        StatusBarUtil.setColorForDrawerLayout(this, (DrawerLayout) findViewById(R.id.drawer_layout), getResources().getColor(StatusBarUtil.DEFAULT_STATUS_BAR_COLOR), mAlpha);
+        StatusBarUtil.setColorForDrawerLayout(this,
+                (DrawerLayout) findViewById(R.id.drawer_layout),
+                getResources().getColor(mIsDay ?  StatusBarUtil.DEFAULT_STATUS_BAR_COLOR : R.color.background_color_3), mAlpha);
     }
 
     private void initToolbar() {
@@ -270,7 +282,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         mTablayout.setupWithViewPager(mViewPager);
         //设置tab模式，当前为系统默认模式
         mTablayout.setTabMode(TabLayout.MODE_FIXED);
-
     }
 
     @Override

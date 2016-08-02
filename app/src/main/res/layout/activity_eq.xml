@@ -113,7 +113,7 @@
         android:layout_marginBottom="20dp"
         android:layout_gravity="center"
         android:text="重置"
-        android:textColor="@color/text_color_white"
+        android:textColor="@color/color_white"
         android:textSize="@dimen/s16_size"
         android:background="@drawable/bg_btn_corner"/>
 </LinearLayout>

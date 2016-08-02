@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:id="@+id/delete_confirm"
-            android:textColor="@color/text_color_black"
+            android:textColor="@color/color_black_1b1a1c"
             android:textSize="@dimen/s16_size"
             android:text="@string/confirm"/>
         <Button
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:id="@+id/delete_cancel"
-            android:textColor="@color/text_color_black"
+            android:textColor="@color/color_black_1b1a1c"
             android:textSize="@dimen/s16_size"
             android:text="@string/cancel"/>
 

@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -23,6 +24,7 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.listener.PopupListener;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 
@@ -89,7 +91,11 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 String album = CommonUtil.processInfo(mCursor.getString(AlbumFragment.mAlbumIndex),CommonUtil.ALBUMTYPE);
 
                 holder.mText1.setText(album);
+                holder.mText1.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.color_black_1c1b19 : R.color.color_white));
                 holder.mText2.setText(artist);
+                holder.mText1.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.color_gray_6d6c69 : R.color.color_gray_6c6a6c));
+                //设置背景
+                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.album_bg_day : R.drawable.album_bg);
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -144,6 +150,9 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
         public ImageButton mButton;
         @BindView(R.id.recycleview_simpleiview)
         public SimpleDraweeView mImage;
+        @BindView(R.id.album_item_container)
+        public RelativeLayout mContainer;
+
         public AlbumHolder(View v) {
             super(v);
         }

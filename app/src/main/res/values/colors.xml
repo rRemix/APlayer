@@ -39,15 +39,15 @@
     <!-- 抽屉ListView背景颜色-->
     <color name="drawer_list_color">#1d1a1d</color>
 
-    <color name="text_color_white">#ffffff</color>
+    <color name="color_white">#ffffff</color>
 
-    <color name="text_color_white_1">#f2f2f2</color>
+    <color name="color_white_f2f2f2">#f2f2f2</color>
     <!-- 灰色字体 -->
-    <color name="text_color_gray">#6c6a6c</color>
+    <color name="color_gray_6c6a6c">#6c6a6c</color>
     <!--专辑与艺术家灰色字体-->
-    <color name="text_color_gray_1">#8d8c8e</color>
+    <color name="color_gray_8d8c8e">#8d8c8e</color>
     <!--黑色字体-->
-    <color name="text_color_black">#1b1a1c</color>
+    <color name="color_black_1b1a1c">#1b1a1c</color>
     <!-- 歌曲库标题选中与未选中-->
     <color name="text_allsong_unsel">#666466</color>
     <color name="text_allsong_sel">#ffffffff</color>
@@ -57,10 +57,13 @@
     <color name="cursor_color_gray">#484746</color>
     <!--光标颜色(紫)-->
     <color name="cursor_color_purple">#782899</color>
-
-
+    <color name="color_black_1c1b19">#1c1b19</color>
+    <color name="color_gray_6d6c69">#6d6c69</color>
+    <color name="color_black_5b5a58">#5b5a58</color>
 
     <color name="black_737373">#737373</color>
+
+
     <color name="material_purple_primary">#9c27b0</color>
     <color name="material_purple_primary_dark">#7b1fa2</color>
 

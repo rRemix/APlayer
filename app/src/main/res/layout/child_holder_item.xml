@@ -21,7 +21,7 @@
             android:ellipsize="end"
             android:text="歌曲名"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/text_color_white"/>
+            android:textColor="@color/color_white"/>
         <!--<TextView-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="wrap_content"-->
@@ -44,7 +44,7 @@
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:scaleType="center"
-        android:src="@drawable/list_icn_more"
+        android:src="@drawable/list_icn_more_night"
         android:background="@drawable/bg_common_ripple"/>
 
     <remix.myplayer.ui.customview.ColumnView

@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s18_size"
-            android:textColor="@color/text_color_white"
+            android:textColor="@color/color_white"
             android:text="勇敢踏出第一步"/>
         <ImageView
             android:layout_width="wrap_content"
@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s14_size"
-            android:textColor="@color/text_color_white"
+            android:textColor="@color/color_white"
             android:text="我们的第一个应用"
             android:layout_marginTop="20dp"/>
         <LinearLayout
@@ -54,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/s12_size"
-                android:textColor="@color/text_color_white"
+                android:textColor="@color/color_white"
                 android:text="@string/version"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"/>

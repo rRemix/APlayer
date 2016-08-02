@@ -35,7 +35,7 @@
                     android:layout_marginLeft="18dp"
                     android:id="@+id/recordshare_name"
                     android:textSize="20sp"
-                    android:textColor="@color/text_color_white"
+                    android:textColor="@color/color_white"
                     android:gravity="center_vertical"/>
                 <ImageView
                     android:layout_marginLeft="18dp"
@@ -49,7 +49,7 @@
                     android:layout_height="match_parent"
                     android:id="@+id/recordshare_content"
                     android:textSize="14sp"
-                    android:textColor="@color/text_color_white"/>
+                    android:textColor="@color/color_white"/>
             </LinearLayout>
         </FrameLayout>
 
@@ -99,7 +99,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_color_white"
+                android:textColor="@color/color_white"
                 android:textSize="16sp"
                 android:text="分享"/>
         </LinearLayout>
@@ -125,7 +125,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_color_white"
+                android:textColor="@color/color_white"
                 android:textSize="16sp"
                 android:text="取消"/>
         </LinearLayout>

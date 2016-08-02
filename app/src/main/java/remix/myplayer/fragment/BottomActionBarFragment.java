@@ -1,6 +1,7 @@
 package remix.myplayer.fragment;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.AudioHolderActivity;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.listener.CtrlButtonListener;
@@ -39,6 +41,8 @@ public class BottomActionBarFragment extends BaseFragment{
     TextView mArtist;
     @BindView(R.id.bottom_action_bar)
     RelativeLayout mBottomActionBar;
+    @BindView(R.id.bottom_actionbar_container)
+    RelativeLayout mRootView;
 
     public static BottomActionBarFragment mInstance;
     @Override
@@ -55,6 +59,7 @@ public class BottomActionBarFragment extends BaseFragment{
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.bottom_actionbar,container);
         mUnBinder = ButterKnife.bind(this,rootView);
+
 
         mBottomActionBar = (RelativeLayout)rootView.findViewById(R.id.bottom_action_bar);
         //点击打开播放界面
@@ -79,7 +84,6 @@ public class BottomActionBarFragment extends BaseFragment{
     //更新界面
     public void UpdateBottomStatus(MP3Item mp3Item, boolean isPlaying) {
         if(mp3Item != null) {
-
             mTitle.setText(mp3Item.getDisplayname());
             mArtist.setText(mp3Item.getArtist());
         }

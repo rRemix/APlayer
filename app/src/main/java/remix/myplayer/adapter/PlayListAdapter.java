@@ -102,7 +102,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                     holder.mButton.setClickable(false);
                     holder.mButton.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));
                 } else {
-                    holder.mButton.setImageResource(R.drawable.list_icn_more);
+                    holder.mButton.setImageResource(R.drawable.list_icn_more_night);
                     holder.mButton.setClickable(true);
                     holder.mButton.setOnClickListener(new View.OnClickListener() {
                         @Override

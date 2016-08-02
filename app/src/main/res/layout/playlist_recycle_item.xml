@@ -36,7 +36,7 @@
                 android:id="@+id/playlist_item_name"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:textColor="@color/text_color_white"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/s14_size"/>
             <ImageButton
                 android:layout_width="40dp"
@@ -44,7 +44,7 @@
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:id="@+id/recycleview_button"
-                android:src="@drawable/list_icn_more"
+                android:src="@drawable/list_icn_more_night"
                 android:background="?android:attr/selectableItemBackground"/>
         </RelativeLayout>
     </RelativeLayout>

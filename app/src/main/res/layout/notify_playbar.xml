@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:lines="1"
                 android:ellipsize="end"
-                android:textColor="@color/text_color_white"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/s16_size"
                 android:layout_marginBottom="5dp"/>
             <TextView
@@ -46,7 +46,7 @@
                 android:lines="1"
                 android:ellipsize="end"
                 android:textSize="@dimen/s14_size"
-                android:textColor="@color/text_color_gray"/>
+                android:textColor="@color/color_gray_6c6a6c"/>
         </LinearLayout>
 
 

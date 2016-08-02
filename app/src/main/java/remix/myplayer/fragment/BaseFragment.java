@@ -2,6 +2,7 @@ package remix.myplayer.fragment;
 
 import android.support.v4.app.Fragment;
 
+import butterknife.BindView;
 import butterknife.Unbinder;
 
 /**
@@ -15,7 +16,7 @@ public class BaseFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mUnBinder.unbind();
+//        mUnBinder.unbind();
     }
 
 }

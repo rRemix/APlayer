@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:ellipsize="end"
                 android:lines="1"
-                android:textColor="@color/text_color_white"
+                android:textColor="@color/color_white"
                 android:textSize="@dimen/s18_size"
                 android:id="@+id/bottom_title"
                 android:text="歌曲名"/>
@@ -41,7 +41,7 @@
                 android:lines="1"
                 android:id="@+id/bottom_artist"
                 android:textSize="@dimen/s14_size"
-                android:textColor="@color/text_color_gray"
+                android:textColor="@color/color_gray_6c6a6c"
                 android:text="歌手"/>
         </LinearLayout>
         <!-- 下一首与播放按钮 -->

@@ -46,7 +46,7 @@
             android:ellipsize="end"
             android:layout_marginTop="12dp"
             android:textSize="@dimen/s18_size"
-            android:textColor="@color/text_color_black"
+            android:textColor="@color/color_black_1b1a1c"
             android:text="歌曲"/>
         <TextView
             android:id="@+id/lockscreen_artist"
@@ -57,7 +57,7 @@
             android:ellipsize="end"
             android:layout_marginTop="12dp"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/text_color_gray_1"
+            android:textColor="@color/color_gray_8d8c8e"
             android:text="歌手"/>
     </LinearLayout>
 
@@ -96,7 +96,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/s18_size"
-        android:textColor="@color/text_color_gray"
+        android:textColor="@color/color_gray_6c6a6c"
         android:text="@string/unlock"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"

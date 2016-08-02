@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -23,6 +24,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.listener.OnItemClickListener;
@@ -95,6 +97,9 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 //设置歌手名
                 String artist = CommonUtil.processInfo(mCursor.getString(ArtistFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
                 holder.mText1.setText(artist);
+                holder.mText1.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.color_black_1c1b19 : R.color.color_white));
+                //设置背景
+                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.artist_bg);
                 //设置封面
                 holder.mImage.setImageURI(Uri.EMPTY);
                 AsynLoadImage task = new AsynLoadImage(holder.mImage);
@@ -152,6 +157,9 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
         public SimpleDraweeView mImage;
         @BindView(R.id.recycleview_button)
         public ImageButton mButton;
+        @BindView(R.id.artist_item_container)
+        public RelativeLayout mContainer;
+
         public ArtistHolder(View v) {
             super(v);
         }

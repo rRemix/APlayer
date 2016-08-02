@@ -26,7 +26,7 @@
             android:layout_margin="12dp"
             android:gravity="left|center_vertical"
             android:text="@string/use_system_color"
-            android:textColor="@color/text_color_black"
+            android:textColor="@color/color_black_1b1a1c"
             android:textSize="@dimen/s16_size"
             android:background="@color/transparent" />
         <ImageView
@@ -56,7 +56,7 @@
             android:layout_margin="12dp"
             android:gravity="left|center_vertical"
             android:text="@string/use_black_color"
-            android:textColor="@color/text_color_black"
+            android:textColor="@color/color_black_1b1a1c"
             android:textSize="@dimen/s16_size"
             android:background="@color/transparent" />
         <ImageView
