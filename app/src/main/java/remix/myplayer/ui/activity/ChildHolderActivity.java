@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,7 +36,7 @@ import remix.myplayer.util.Global;
 /**
  * 专辑、艺术家、文件夹、播放列表详情
  */
-public class ChildHolderActivity extends BaseAppCompatActivity implements MusicService.Callback{
+public class ChildHolderActivity extends ToolbarActivity implements MusicService.Callback{
     private final static String TAG = "ChildHolderActivity";
     private static boolean mIsRunning = false;
     private ImageView mBack;
@@ -48,11 +49,14 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
     //歌曲数目与标题
     @BindView(R.id.album_holder_item_num)
     TextView mNum;
-    @BindView(R.id.artist_album_title)
-    TextView mTitle;
+
     @BindView(R.id.child_holder_recyclerView)
     RecyclerView mRecyclerView;
 
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+
+    private String Title;
     private BottomActionBarFragment mActionbar;
 
     private ChildHolderAdapter mAdapter;
@@ -129,15 +133,17 @@ public class ChildHolderActivity extends BaseAppCompatActivity implements MusicS
         if(mType != Constants.FOLDER_HOLDER) {
             if(mArg.contains("unknown")){
                 if(mType == Constants.ARTIST_HOLDER)
-                    mTitle.setText(getString(R.string.unknow_artist));
+                    Title = getString(R.string.unknow_artist);
                 else if(mType == Constants.ALBUM_HOLDER){
-                    mTitle.setText(getString(R.string.unknow_album));
+                    Title = getString(R.string.unknow_album);
                 }
             } else {
-                mTitle.setText(mArg);
+                Title = mArg;
             }
         } else
-            mTitle.setText(mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length()));
+            Title = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
+        //初始化toolbar
+        initToolbar(mToolbar,Title);
         //初始化底部状态栏
         mActionbar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)

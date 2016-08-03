@@ -8,7 +8,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import remix.myplayer.R;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.TimerDialog;
+import remix.myplayer.util.ColorUtil;
 
 
 /**
@@ -28,6 +30,7 @@ public class ToolbarActivity extends BaseAppCompatActivity {
     protected void initToolbar(Toolbar toolbar,String title){
         toolbar.setTitle(title);
         toolbar.setTitleTextColor(Color.parseColor("#ffffffff"));
+        toolbar.setBackgroundColor(ColorUtil.getColor(ThemeStore.TOOLBAR_COLOR));
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.common_btn_back);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

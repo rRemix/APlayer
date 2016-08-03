@@ -32,7 +32,7 @@
                 android:id="@+id/search_text"
                 android:background="@null"
                 android:textSize="@dimen/s14_size"
-                android:textColor="@color/color_white"
+                android:textColor="@color/white"
                 android:lines="1"
                 android:ellipsize="end"
                 android:hint="@string/search_song_artist_album"
@@ -56,7 +56,7 @@
             android:id="@+id/btn_search_go"
             android:text="搜索"
             android:textSize="@dimen/s18_size"
-            android:textColor="@color/color_white"
+            android:textColor="@color/white"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="10dp"
             android:gravity="center_vertical" />
@@ -93,7 +93,7 @@
                 android:gravity="center"
                 android:text="@string/no_search_result"
                 android:textSize="22sp"
-                android:textColor="@color/color_white"/>
+                android:textColor="@color/white"/>
         </FrameLayout>
 
     </FrameLayout>

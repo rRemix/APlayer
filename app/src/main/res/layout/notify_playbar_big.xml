@@ -42,7 +42,7 @@
                     android:layout_alignParentLeft="true"
                     android:lines="1"
                     android:ellipsize="end"
-                    android:textColor="@color/color_white"
+                    android:textColor="@color/white"
                     android:textSize="@dimen/s16_size"/>
                 <ImageButton
                     android:id="@+id/notify_close"
@@ -67,7 +67,7 @@
                 android:lines="1"
                 android:ellipsize="end"
                 android:textSize="@dimen/s14_size"
-                android:textColor="@color/color_gray_6c6a6c"/>
+                android:textColor="@color/gray_6c6a6c"/>
 
             <!--三个控制按钮-->
             <LinearLayout

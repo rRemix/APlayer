@@ -1,86 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color_3">
+    android:orientation="vertical">
 
     <include layout="@layout/toolbar"/>
 
     <LinearLayout
-        android:id="@+id/divider"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/interval_white_height"
-        android:background="@color/background_color_interval"/>
-
-    <LinearLayout
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/aboutus_bg"
-        android:layout_marginTop="28dp">
-        <TextView
-            android:layout_marginTop="28dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/s18_size"
-            android:textColor="@color/color_white"
-            android:text="勇敢踏出第一步"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/divider_about_big"
-            android:layout_marginTop="21dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/s14_size"
-            android:textColor="@color/color_white"
-            android:text="我们的第一个应用"
-            android:layout_marginTop="20dp"/>
+        android:background="?attr/background_color_3">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/interval_white_height"
+            android:background="?attr/interval_color"/>
+
         <LinearLayout
+            android:orientation="vertical"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:orientation="horizontal"
-            android:gravity="center">
-            <ImageView
+            android:background="?attr/bg_aboutus"
+            android:layout_marginTop="28dp">
+            <TextView
+                android:layout_marginTop="28dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/divider_about_small"/>
+                android:textSize="@dimen/s18_size"
+                android:textColor="?attr/text_color_primary"
+                android:text="勇敢踏出第一步"/>
+            <ImageView
+                android:layout_width="@dimen/d30_size"
+                android:layout_height="@dimen/d1_size"
+                android:background="?attr/text_color_primary"
+                android:layout_marginTop="21dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/s12_size"
-                android:textColor="@color/color_white"
-                android:text="@string/version"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"/>
-            <ImageView
+                android:textSize="@dimen/s14_size"
+                android:textColor="?attr/text_color_primary"
+                android:text="我们的第一个应用"
+                android:layout_marginTop="20dp"/>
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/divider_about_small"/>
+                android:layout_marginTop="50dp"
+                android:orientation="horizontal"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="@dimen/d18_size"
+                    android:layout_height="@dimen/d1_size"
+                    android:background="?attr/text_color"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/s12_size"
+                    android:textColor="?attr/text_color"
+                    android:text="@string/version"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"/>
+                <ImageView
+                    android:layout_width="@dimen/d18_size"
+                    android:layout_height="@dimen/d1_size"
+                    android:background="?attr/text_color"/>
+            </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 
+
     <!--<TextView-->
-        <!--android:id="@+id/about_text"-->
-        <!--android:layout_centerInParent="true"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:textColor="@color/text_color_white"-->
-        <!--android:textSize="@dimen/textsize_huge"-->
-        <!--android:text="APlayer V1.0.0"/>-->
+    <!--android:id="@+id/about_text"-->
+    <!--android:layout_centerInParent="true"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textColor="@color/text_color_white"-->
+    <!--android:textSize="@dimen/textsize_huge"-->
+    <!--android:text="APlayer V1.0.0"/>-->
 
     <!--<ImageView-->
-        <!--android:id="@+id/about_icon"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:layout_marginBottom="20dp"-->
-        <!--android:layout_above="@id/about_text"-->
-        <!--android:layout_width="180dp"-->
-        <!--android:layout_height="180dp"-->
-        <!--android:src="@mipmap/sideaplayer_icon"/>-->
-
+    <!--android:id="@+id/about_icon"-->
+    <!--android:layout_centerHorizontal="true"-->
+    <!--android:layout_marginBottom="20dp"-->
+    <!--android:layout_above="@id/about_text"-->
+    <!--android:layout_width="180dp"-->
+    <!--android:layout_height="180dp"-->
+    <!--android:src="@mipmap/sideaplayer_icon"/>-->
 </LinearLayout>

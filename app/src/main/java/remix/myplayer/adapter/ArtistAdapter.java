@@ -2,11 +2,8 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -97,7 +94,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 //设置歌手名
                 String artist = CommonUtil.processInfo(mCursor.getString(ArtistFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
                 holder.mText1.setText(artist);
-                holder.mText1.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.color_black_1c1b19 : R.color.color_white));
+                holder.mText1.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
                 //设置背景
                 holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.artist_bg);
                 //设置封面

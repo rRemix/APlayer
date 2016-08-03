@@ -7,7 +7,7 @@
         android:layout_width="wrap_content"
         android:layout_height="56dp"
         android:textSize="@dimen/s16_size"
-        android:textColor="@color/color_white"
+        android:textColor="@color/white"
         android:layout_marginLeft="16dp"
         android:layout_gravity="center_vertical"
         android:gravity="center_vertical"

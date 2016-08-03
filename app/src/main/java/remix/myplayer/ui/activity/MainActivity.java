@@ -2,6 +2,7 @@ package remix.myplayer.ui.activity;
 
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
@@ -14,7 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 
 import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -45,6 +45,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.Global;
@@ -82,7 +83,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     private static final String[] PERMISSIONS = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE};
-    private int mAlpha = StatusBarUtil.DEFAULT_STATUS_BAR_ALPHA / 2;
+
+    private int mAlpha = ThemeStore.STATUS_BAR_ALPHA / 2;
 
     @Override
     protected void onResume() {
@@ -105,13 +107,13 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         //检查更新
         UmengUpdateAgent.update(this);
 //        MobclickAgent.setDebugMode(true);
         MobclickAgent.setCatchUncaughtExceptions(true);
         initUtil();
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        initTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -152,9 +154,13 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             return;
         }
 
-        //第一次启动添加我的收藏列表
+
         if (isFirst) {
+            //第一次启动添加我的收藏列表
             XmlUtil.addPlaylist(getString(R.string.my_favorite));
+            //保存默认主题设置
+            SharedPrefsUtil.putValue(this,"Setting","ThemeMode",ThemeStore.DAY);
+            SharedPrefsUtil.putValue(this,"Setting","ThemeColor",ThemeStore.THEME_PINK);
         }
         //如果是第一次启动软件,将第一首歌曲设置为正在播放
         try {
@@ -175,33 +181,39 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     }
 
+    private void initTheme() {
+        ThemeStore.THEME_MODE = SharedPrefsUtil.getValue(this,"Theme","ThemeMode",ThemeStore.DAY);
+        ThemeStore.THEME_COLOR = SharedPrefsUtil.getValue(this,"Theme","ThemeColor",ThemeStore.THEME_PINK);
+        mIsDay = ThemeStore.THEME_MODE == ThemeStore.DAY;
+
+        ThemeStore.STATUS_BAR_COLOR = mIsDay ? ThemeStore.getThemeStatusBarColor(ThemeStore.THEME_COLOR) : R.color.night_background_color_3;
+        ThemeStore.TOOLBAR_COLOR = mIsDay ? ThemeStore.getThemeToolBarColor(ThemeStore.THEME_COLOR) : R.color.night_background_color_3;
+    }
+
     private void initColor() {
-        mViewPager.setBackgroundColor(getResources().getColor(mIsDay ? R.color.color_white : R.color.background_color_main));
-        mToolBar.setBackgroundColor(getResources().getColor(mIsDay ? StatusBarUtil.DEFAULT_TOOLBAR_COLOR : R.color.background_color_3));
-        mTablayout.setBackgroundColor(getResources().getColor(mIsDay ? StatusBarUtil.DEFAULT_TOOLBAR_COLOR : R.color.background_color_3));
+        mToolBar.setBackgroundColor(ColorUtil.getColor(ThemeStore.TOOLBAR_COLOR));
+        mTablayout.setBackgroundColor(ColorUtil.getColor(ThemeStore.TOOLBAR_COLOR));
     }
 
     public void reload() {
-        ThemeStore.THEME_MODE = ThemeStore.THEME_MODE == ThemeStore.DAY ? ThemeStore.NIGHT : ThemeStore.DAY;
-        mIsDay = ThemeStore.THEME_MODE == ThemeStore.DAY;
+
         Intent intent = getIntent();
         overridePendingTransition(0, 0);
         finish();
         overridePendingTransition(0, 0);
         startActivity(intent);
 
-
-//        StatusBarUtil.DEFAULT_STATUS_BAR_COLOR = R.color.material_pink_primary_dark;
-//        StatusBarUtil.DEFAULT_TOOLBAR_COLOR = R.color.material_pink_primary;
+//        StatusBarUtil.STATUS_BAR_COLOR = R.color.material_pink_primary_dark;
+//        StatusBarUtil.TOOLBAR_COLOR = R.color.material_pink_primary;
 
 //        if(mDrawerLayout != null)
 //            StatusBarUtil.setColorForDrawerLayout(this,
 //                    (DrawerLayout) findViewById(R.id.drawer_layout),
-//                    ColorUtil.darkenColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR)), mAlpha);
+//                    ColorUtil.darkenColor(getResources().getColor(StatusBarUtil.TOOLBAR_COLOR)), mAlpha);
 //        if(mTablayout != null)
-//            mTablayout.setBackgroundColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR));
+//            mTablayout.setBackgroundColor(getResources().getColor(StatusBarUtil.TOOLBAR_COLOR));
 //        if(mToolBar != null)
-//            mToolBar.setBackgroundColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR));
+//            mToolBar.setBackgroundColor(getResources().getColor(StatusBarUtil.TOOLBAR_COLOR));
 
     }
 
@@ -209,7 +221,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     protected void setStatusBar() {
         StatusBarUtil.setColorForDrawerLayout(this,
                 (DrawerLayout) findViewById(R.id.drawer_layout),
-                getResources().getColor(mIsDay ?  StatusBarUtil.DEFAULT_STATUS_BAR_COLOR : R.color.background_color_3), mAlpha);
+                ColorUtil.getColor(ThemeStore.STATUS_BAR_COLOR),mAlpha);
     }
 
     private void initToolbar() {
@@ -217,7 +229,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
         setSupportActionBar(mToolBar);
         mToolBar.setNavigationIcon(R.drawable.actionbar_menu);
-        mToolBar.setBackgroundColor(getResources().getColor(StatusBarUtil.DEFAULT_TOOLBAR_COLOR));
+        mToolBar.setBackgroundColor(getResources().getColor(ThemeStore.TOOLBAR_COLOR));
 //        mToolBar.setLogo(R.drawable.allsong_icon_musicbox);
         mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -299,7 +311,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         CommonUtil.setContext(getApplicationContext());
         ErrUtil.setContext(getApplicationContext());
         DiskCache.init(getApplicationContext());
-
+        ColorUtil.setContext(getApplicationContext());
         final int MAX_HEAP_SIZE = (int) Runtime.getRuntime().maxMemory();//分配的可用内存
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
                 .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {
@@ -342,6 +354,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                     case R.id.item_exit:
                         sendBroadcast(new Intent(Constants.EXIT));
                         break;
+                    case R.id.item_theme:
+                        startActivityForResult(new Intent(MainActivity.this,ThemeActivity.class),0);
                     default:
                         break;
                 }
@@ -351,6 +365,17 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(data != null && data.getBooleanExtra("needRefresh",false)){
+            Intent intent = getIntent();
+            overridePendingTransition(0, 0);
+            finish();
+            overridePendingTransition(0, 0);
+            startActivity(intent);
+        }
+    }
 
     //读取sd卡歌曲信息
     public static void loadsongs() {

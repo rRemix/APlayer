@@ -1,8 +1,6 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -57,13 +55,13 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
         //设置文件夹名字 路径名 歌曲数量
         if(temp != null){
             holder.mName.setText(temp.substring(temp.lastIndexOf("/")+ 1,temp.length()));
-            holder.mName.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.color_black_1c1b19 : R.color.color_white));
+            holder.mName.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
 
             holder.mPath.setText(temp);
-            holder.mPath.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.color_gray_6d6c69 : R.color.color_gray_6c6a6c));
+            holder.mPath.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6d6c69 : R.color.gray_6c6a6c));
 
             holder.mCount.setText(Global.mFolderMap.get(temp).size()+ "首");
-            holder.mCount.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.color_black_1c1b19 : R.color.color_white));
+            holder.mCount.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
         }
         //根据主题模式 设置图片
         if(holder.mImg != null) {

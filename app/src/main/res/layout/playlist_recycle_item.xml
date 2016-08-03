@@ -36,7 +36,7 @@
                 android:id="@+id/playlist_item_name"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:textColor="@color/color_white"
+                android:textColor="@color/white"
                 android:textSize="@dimen/s14_size"/>
             <ImageButton
                 android:layout_width="40dp"

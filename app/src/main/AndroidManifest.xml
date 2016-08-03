@@ -41,6 +41,7 @@
         </activity>
 
         <activity android:name=".ui.activity.AudioHolderActivity"
+            android:windowSoftInputMode="adjustPan"
             android:theme="@style/AudioHolderStyle"
             android:parentActivityName=".ui.activity.MainActivity">
             <meta-data
@@ -77,6 +78,9 @@
             android:theme="@style/ActivityStyle"/>
 
         <activity android:name=".ui.activity.EQActivity"
+            android:theme="@style/ActivityStyle"/>
+
+        <activity android:name=".ui.activity.ThemeActivity"
             android:theme="@style/ActivityStyle"/>
 
         <activity android:name=".ui.activity.LockScreenActivity"

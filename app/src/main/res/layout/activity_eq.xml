@@ -29,7 +29,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/interval_white_height"
-        android:background="@color/background_color_interval"/>
+        android:background="@color/night_interval_color"/>
 
     <!--<LinearLayout-->
         <!--android:layout_width="match_parent"-->
@@ -113,7 +113,7 @@
         android:layout_marginBottom="20dp"
         android:layout_gravity="center"
         android:text="重置"
-        android:textColor="@color/color_white"
+        android:textColor="@color/white"
         android:textSize="@dimen/s16_size"
         android:background="@drawable/bg_btn_corner"/>
 </LinearLayout>

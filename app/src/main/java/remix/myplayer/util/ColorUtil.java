@@ -1,7 +1,9 @@
 package remix.myplayer.util;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.FloatRange;
 
 /**
@@ -11,6 +13,17 @@ import android.support.annotation.FloatRange;
  * @Date 2016/7/28 10:53
  */
 public class ColorUtil {
+    private static Context mContext;
+    private ColorUtil(){}
+    public static void setContext(Context context){
+        mContext = context;
+    }
+
+    @ColorInt
+    public static int getColor(@ColorRes int colorRes){
+        return mContext.getResources().getColor(colorRes);
+    }
+
     /**
      * 调整颜色透明度
      * @param paramInt

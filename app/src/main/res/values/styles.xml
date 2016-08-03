@@ -37,14 +37,14 @@
     </style>
 
     <style name="CustomTabLayout" parent="Widget.Design.TabLayout">
-        <item name="tabIndicatorColor">@color/color_white</item>
+        <item name="tabIndicatorColor">@color/white</item>
         <item name="tabIndicatorHeight">3dp</item>
         <item name="tabTextAppearance">@style/CustomTabTextAppearance</item>
-        <item name="tabSelectedTextColor">@color/color_white</item>
+        <item name="tabSelectedTextColor">@color/white</item>
     </style>
     <style name="CustomTabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">@dimen/s16_size</item>
-        <item name="android:textColor">@color/color_white_f2f2f2</item>
+        <item name="android:textColor">@color/white_f2f2f2</item>
         <item name="textAllCaps">true</item>
     </style>
 
@@ -192,8 +192,28 @@
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
     </style>
 
-    <style name="DayTheme" >
-        <item name="custom_background_color_main">@color/background_color_main</item>
+    <style name="DayTheme" parent="@style/ActivityStyle">
+        <item name="background_color_main">@color/white</item>
+        <item name="background_color_1">@color/white</item>
+        <item name="background_color_2">@color/white</item>
+        <item name="background_color_3">@color/white</item>
+        <item name="text_color_primary">@color/black_1c1b19</item>
+        <item name="text_color">@color/gray_6d6c69</item>
+        <item name="interval_color">@color/day_interval_color</item>
+        <item name="bg_aboutus">@drawable/bg_aboutus_day</item>
+        <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
+    </style>
+
+    <style name="NightTheme" parent="@style/ActivityStyle">
+        <item name="background_color_main">@color/background_color_main</item>
+        <item name="background_color_1">@color/background_color_1</item>
+        <item name="background_color_2">@color/background_color_2</item>
+        <item name="background_color_3">@color/background_color_3</item>
+        <item name="text_color_primary">@color/white</item>
+        <item name="text_color">@color/gray_6c6a6c</item>
+        <item name="interval_color">@color/night_interval_color</item>
+        <item name="bg_aboutus">@drawable/bg_aboutus_night</item>
+        <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
     </style>
 
     <!--侧滑菜单文字-->

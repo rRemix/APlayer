@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,6 +16,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -38,14 +40,17 @@ import remix.myplayer.fragment.RecordFragment;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.AudioViewPager;
 import remix.myplayer.ui.customview.LrcView;
 import remix.myplayer.ui.dialog.PlayingListDialog;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.SharedPrefsUtil;
+import remix.myplayer.util.StatusBarUtil;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -168,6 +173,14 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         }
     };
 
+    @Override
+    protected void setStatusBar() {
+        StatusBarUtil.setTransparent(this);
+    }
+
+    @Override
+    protected void setUpTheme() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,7 +188,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         setContentView(R.layout.activity_audio_holder);
         ButterKnife.bind(this);
         mInstance = this;
-//        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+
 
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         mFromMainActivity =  getIntent().getBooleanExtra("FromMainActivity",false);

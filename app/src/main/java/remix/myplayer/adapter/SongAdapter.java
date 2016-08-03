@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -21,9 +20,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
 import remix.myplayer.R;
-import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
@@ -115,14 +112,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
             //设置歌曲名
             String name = CommonUtil.processInfo(allsong ? mCursor.getString(SongFragment.mTitleIndex) :temp.getTitle(),CommonUtil.SONGTYPE);
             holder.mName.setText(name);
-            holder.mName.setTextColor(mContext.getResources().getColor(isDay ? R.color.color_black_1c1b19 : R.color.color_white ));
+            holder.mName.setTextColor(mContext.getResources().getColor(isDay ? R.color.black_1c1b19 : R.color.white));
 
             //艺术家与专辑
             String artist = CommonUtil.processInfo(allsong ? mCursor.getString(SongFragment.mArtistIndex) : temp.getArtist(),CommonUtil.ARTISTTYPE);
             String album = CommonUtil.processInfo(allsong ? mCursor.getString(SongFragment.mAlbumIndex) : temp.getAlbum(),CommonUtil.ALBUMTYPE);
             //封面
             holder.mOther.setText(artist + "-" + album);
-            holder.mOther.setTextColor(mContext.getResources().getColor(isDay ? R.color.color_gray_6d6c69 : R.color.color_gray_6c6a6c));
+            holder.mOther.setTextColor(mContext.getResources().getColor(isDay ? R.color.gray_6d6c69 : R.color.gray_6c6a6c));
 
         } catch (Exception e){
             e.printStackTrace();
@@ -176,29 +173,23 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
             return mInfoList != null ? mInfoList.size() : 0;
     }
 
-    public static class AllSongHolder extends BaseViewHolder{
-        @BindView(R.id.song_title)
+    public static class AllSongHolder extends RecyclerView.ViewHolder{
         public TextView mName;
-        @BindView(R.id.song_other)
         public TextView mOther;
-        @BindView(R.id.song_head_image)
         public SimpleDraweeView mImage;
-        @BindView(R.id.song_columnview)
         public ColumnView mColumnView;
-        @BindView(R.id.song_item_button)
         public ImageButton mItemButton;
-        @BindView(R.id.song_index_letter)
         public TextView mIndex;
         public View mRootView;
         public AllSongHolder(View itemView) {
             super(itemView);
             mRootView = itemView;
-//            mImage = (SimpleDraweeView)itemView.findViewById(R.id.song_head_image);
-//            mName = (TextView)itemView.findViewById(R.id.song_title);
-//            mOther = (TextView)itemView.findViewById(R.id.song_other);
-//            mColumnView = (ColumnView)itemView.findViewById(R.id.song_columnview);
-//            mItemButton = (ImageButton)itemView.findViewById(R.id.song_button);
-//            mIndex = (TextView)itemView.findViewById(R.id.song_index_letter);
+            mImage = (SimpleDraweeView)itemView.findViewById(R.id.song_head_image);
+            mName = (TextView)itemView.findViewById(R.id.song_title);
+            mOther = (TextView)itemView.findViewById(R.id.song_other);
+            mColumnView = (ColumnView)itemView.findViewById(R.id.song_columnview);
+            mItemButton = (ImageButton)itemView.findViewById(R.id.song_button);
+            mIndex = (TextView)itemView.findViewById(R.id.song_index_letter);
 
         }
     }

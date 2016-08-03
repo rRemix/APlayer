@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:background="@color/color_gray_8d8c8e"
+        android:background="@color/gray_8d8c8e"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:id="@+id/song_index_letter"
@@ -54,7 +54,7 @@
                 android:lines="1"
                 android:ellipsize="end"
                 android:textSize="@dimen/s14_size"
-                android:textColor="@color/color_white"
+                android:textColor="?attr/text_color_primary"
                 android:id="@+id/song_title"
                 android:layout_marginTop="16dp"
                 android:text="歌曲名" />
@@ -65,7 +65,7 @@
                 android:lines="1"
                 android:ellipsize="end"
                 android:textSize="@dimen/s12_size"
-                android:textColor="@color/color_gray_6c6a6c"
+                android:textColor="?attr/text_color"
                 android:text="歌手与专辑"
                 android:layout_marginTop="4dp"/>
         </LinearLayout>

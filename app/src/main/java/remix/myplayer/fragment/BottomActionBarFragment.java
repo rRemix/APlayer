@@ -1,10 +1,8 @@
 package remix.myplayer.fragment;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,7 +58,6 @@ public class BottomActionBarFragment extends BaseFragment{
         View rootView = inflater.inflate(R.layout.bottom_actionbar,container);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-
         mBottomActionBar = (RelativeLayout)rootView.findViewById(R.id.bottom_action_bar);
         //点击打开播放界面
         mBottomActionBar.setOnClickListener(new View.OnClickListener() {
@@ -83,9 +80,13 @@ public class BottomActionBarFragment extends BaseFragment{
     }
     //更新界面
     public void UpdateBottomStatus(MP3Item mp3Item, boolean isPlaying) {
+        boolean isDay = ThemeStore.THEME_MODE == ThemeStore.DAY;
+
         if(mp3Item != null) {
             mTitle.setText(mp3Item.getDisplayname());
+            mTitle.setTextColor(getResources().getColor(isDay ? R.color.black_1b1c19 : R.color.white));
             mArtist.setText(mp3Item.getArtist());
+            mArtist.setTextColor(getResources().getColor(isDay ? R.color.gray_6d6c69 : R.color.gray_6c6a6c));
         }
         if(isPlaying)
             mPlayButton.setImageResource(R.drawable.bf_btn_stop);

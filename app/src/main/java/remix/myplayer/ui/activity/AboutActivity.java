@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.inject.ViewInject;
 
 /**
  * Created by Remix on 2016/3/26.
@@ -18,6 +18,8 @@ public class AboutActivity extends ToolbarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
+
+        ButterKnife.bind(this);
         initToolbar(mToolBar, getString(R.string.about));
     }
 

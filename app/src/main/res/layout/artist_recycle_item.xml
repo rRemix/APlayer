@@ -35,7 +35,7 @@
                 android:id="@+id/recycleview_text1"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:textColor="@color/color_white"
+                android:textColor="@color/white"
                 android:textSize="@dimen/s14_size"/>
             <ImageButton
                 android:layout_width="30dp"

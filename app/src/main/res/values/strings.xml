@@ -16,7 +16,7 @@
     <string name="drawerlayout_close">关闭</string>
 
     <string name="from_aplayer">来自APlayer播放器</string>
-    <string name="version">APlaer V1.1.1</string>
+    <string name="version">APlaer V1.1.2</string>
     <string name="about">关于APlayer</string>
     <string name="model_random">随机播放</string>
     <string name="model_repeat">单曲播放</string>
