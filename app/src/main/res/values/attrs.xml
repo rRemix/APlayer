@@ -37,15 +37,16 @@
         <attr name="eqthumb" format="reference"/>
     </declare-styleable>
 
+    <attr name="text_color_primary" format="color|reference"/>
+    <attr name="text_color" format="color|reference"/>
     <attr name="background_color_main" format="color|reference"/>
     <attr name="background_color_1" format="color|reference"/>
     <attr name="background_color_2" format="color|reference"/>
     <attr name="background_color_3" format="color|reference"/>
-    <attr name="text_color_primary" format="color|reference"/>
-    <attr name="text_color" format="color|reference"/>
     <attr name="interval_color" format="color|reference"/>
     <attr name="aboutus_background_color" format="color|reference"/>
     <attr name="material_color_primary" format="color|reference"/>
     <attr name="material_color_primary_dark" format="color|reference"/>
     <attr name="bg_aboutus" format="reference"/>
+
 </resources>

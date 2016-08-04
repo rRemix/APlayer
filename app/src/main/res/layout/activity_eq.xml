@@ -3,15 +3,12 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color_3">
+    android:background="?attr/background_color_3">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/background_color_3"
-        android:paddingTop="@dimen/toolbar_padding_top"
-        android:fitsSystemWindows="true">
+        android:layout_height="wrap_content">
 
     <android.support.v7.widget.SwitchCompat
         android:background="@color/transparent"
@@ -29,7 +26,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/interval_white_height"
-        android:background="@color/night_interval_color"/>
+        android:background="?attr/interval_color"/>
 
     <!--<LinearLayout-->
         <!--android:layout_width="match_parent"-->

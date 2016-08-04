@@ -193,28 +193,59 @@
     </style>
 
     <style name="DayTheme" parent="@style/ActivityStyle">
-        <item name="background_color_main">@color/white</item>
-        <item name="background_color_1">@color/white</item>
-        <item name="background_color_2">@color/white</item>
-        <item name="background_color_3">@color/white</item>
-        <item name="text_color_primary">@color/black_1c1b19</item>
-        <item name="text_color">@color/gray_6d6c69</item>
+        <item name="background_color_main">@color/day_background_color_main</item>
+        <item name="background_color_1">@color/day_background_color_1</item>
+        <item name="background_color_2">@color/day_background_color_2</item>
+        <item name="background_color_3">@color/day_background_color_3</item>
+        <item name="text_color_primary">@color/day_textcolor_primary</item>
+        <item name="text_color">@color/day_textcolor</item>
         <item name="interval_color">@color/day_interval_color</item>
         <item name="bg_aboutus">@drawable/bg_aboutus_day</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
+
     </style>
 
+    <!--夜间模式-->
     <style name="NightTheme" parent="@style/ActivityStyle">
-        <item name="background_color_main">@color/background_color_main</item>
-        <item name="background_color_1">@color/background_color_1</item>
-        <item name="background_color_2">@color/background_color_2</item>
-        <item name="background_color_3">@color/background_color_3</item>
-        <item name="text_color_primary">@color/white</item>
-        <item name="text_color">@color/gray_6c6a6c</item>
+        <item name="material_color_primary">@color/night_background_color_3</item>
+        <item name="material_color_primary_dark">@color/night_background_color_3</item>
+        <item name="background_color_main">@color/night_background_color_main</item>
+        <item name="background_color_1">@color/night_background_color_3</item>
+        <item name="background_color_2">@color/night_background_color_2</item>
+        <item name="background_color_3">@color/night_background_color_3</item>
+        <item name="text_color_primary">@color/night_textcolor_primary</item>
+        <item name="text_color">@color/night_textcolor</item>
         <item name="interval_color">@color/night_interval_color</item>
         <item name="bg_aboutus">@drawable/bg_aboutus_night</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
     </style>
+
+    <style name="PurpleTheme" parent="@style/DayTheme">
+        <item name="material_color_primary">@color/material_purple_primary</item>
+        <item name="material_color_primary_dark">@color/material_purple_primary_dark</item>
+    </style>
+
+    <style name="RedTheme" parent="@style/DayTheme">
+        <item name="material_color_primary">@color/material_red_primary</item>
+        <item name="material_color_primary_dark">@color/material_red_primary_dark</item>
+    </style>
+
+    <style name="PinkTheme" parent="@style/DayTheme">
+        <item name="material_color_primary">@color/material_pink_primary</item>
+        <item name="material_color_primary_dark">@color/material_pink_primary_dark</item>
+    </style>
+
+    <style name="BrownTheme" parent="@style/DayTheme">
+        <item name="material_color_primary">@color/material_brown_primary</item>
+        <item name="material_color_primary_dark">@color/material_brown_primary_dark</item>
+    </style>
+
+    <style name="IngidoTheme" parent="@style/DayTheme">
+        <item name="material_color_primary">@color/material_indigo_primary</item>
+        <item name="material_color_primary_dark">@color/material_indigo_primary_dark</item>
+    </style>
+
+
 
     <!--侧滑菜单文字-->
     <style name="Drawer_text_style">

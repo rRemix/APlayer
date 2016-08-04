@@ -53,13 +53,13 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
     private SongAdapter mAdapter;
-
+    private static int LOADER_ID = 1;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         mManager = getLoaderManager();
-        mManager.initLoader(1000, null, this);
+        mManager.initLoader(LOADER_ID++, null, this);
     }
 
     @Override

@@ -15,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Random;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
@@ -40,13 +42,13 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     public static int mArtistIndex = -1;
     private LoaderManager mManager;
     private AlbumAdater mAdapter;
-
+    private static int LOADER_ID = 1;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         //初始化LoaderManager
         mManager = getLoaderManager();
-        mManager.initLoader(1001, null, this);
+        mManager.initLoader(LOADER_ID++, null, this);
     }
 
     @Nullable

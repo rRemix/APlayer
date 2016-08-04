@@ -5,5 +5,5 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
 
-    android:background="@color/material_brown_primary"
+    android:background="?attr/material_color_primary"
     app:layout_scrollFlags="scroll|enterAlways" />

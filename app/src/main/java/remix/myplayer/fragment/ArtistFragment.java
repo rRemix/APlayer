@@ -40,12 +40,12 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     public static int mArtistIndex = -1;
     private LoaderManager mManager;
     private ArtistAdapter mAdapter;
-
+    private static int LOADER_ID = 1;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         mManager = getLoaderManager();
-        mManager.initLoader(1001, null, this);
+        mManager.initLoader(LOADER_ID++, null, this);
     }
 
     @Override

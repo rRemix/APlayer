@@ -27,7 +27,28 @@ public class BaseAppCompatActivity extends AppCompatActivity {
      * 设置主题
      */
     protected void setUpTheme(){
-        setTheme(ThemeStore.isDay() ? R.style.DayTheme : R.style.NightTheme);
+//        setTheme(ThemeStore.isDay() ? R.style.DayTheme : R.style.NightTheme);
+        if(ThemeStore.THEME_MODE == ThemeStore.NIGHT) {
+            setTheme(R.style.NightTheme);
+            return;
+        }
+        switch (ThemeStore.THEME_COLOR){
+            case ThemeStore.THEME_PURPLE:
+                setTheme(R.style.PurpleTheme);
+                break;
+            case ThemeStore.THEME_RED:
+                setTheme(R.style.RedTheme);
+                break;
+            case ThemeStore.THEME_PINK:
+                setTheme(R.style.PinkTheme);
+                break;
+            case ThemeStore.THEME_BROWN:
+                setTheme(R.style.BrownTheme);
+                break;
+            case ThemeStore.THEME_INDIGO:
+                setTheme(R.style.IngidoTheme);
+                break;
+        }
     }
 
     @Override
@@ -47,8 +68,8 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     }
 
     protected void setStatusBar() {
-        StatusBarUtil.setColorNoTranslucent(this, ColorUtil.getColor(ThemeStore.STATUS_BAR_COLOR));
-//        StatusBarUtil.setColor(this, ColorUtil.getColor(ThemeStore.STATUS_BAR_COLOR));
+        StatusBarUtil.setColorNoTranslucent(this, ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
+//        StatusBarUtil.setColor(this, ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY));
     }
 
     @Override

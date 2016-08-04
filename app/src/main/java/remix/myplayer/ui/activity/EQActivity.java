@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity;
 
+import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.Virtualizer;
