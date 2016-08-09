@@ -23,11 +23,11 @@
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/material_brown_primary"
+                    android:background="?attr/material_color_primary"
                     app:layout_scrollFlags="scroll|enterAlways"/>
                 <android.support.design.widget.TabLayout
                     android:id="@+id/tabs"
-                    android:background="@color/material_brown_primary"
+                    android:background="?attr/material_color_primary"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/tab_height"
                     style="@style/CustomTabLayout" />

@@ -224,4 +224,13 @@ public class OptionDialog extends BaseAppCompatActivity {
     protected void onPause() {
         super.onPause();
     }
+
+    @Override
+    protected void setUpTheme() {
+    }
+
+    @Override
+    protected void setStatusBar() {
+    }
+
 }

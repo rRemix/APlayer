@@ -125,20 +125,10 @@
         <item name="android:windowCloseOnTouchOutside">true</item>
     </style>
 
+
     <!--中心消失-->
     <style name="PopupCenterDialog" parent="@style/AppTheme" >
         <!--<item name="android:windowAnimationStyle">@style/popwin_anim_style</item>-->
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:windowCloseOnTouchOutside">true</item>
-    </style>
-
-    <style name="PopupBottomCompactDialog" parent="@style/Theme.AppCompat">
-        <item name="android:windowAnimationStyle">@style/AnimBottom</item>
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowIsTranslucent">true</item>
@@ -152,17 +142,6 @@
     <style name="LockScreenActivity" parent="AppTheme.NoActionBar.Translucent">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">false</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">true</item>
-    </style>
-
-    <style name="OptionDialog" parent="@android:style/Theme.Dialog" >
-        <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
-        <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowIsFloating">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -201,8 +180,9 @@
         <item name="text_color">@color/day_textcolor</item>
         <item name="interval_color">@color/day_interval_color</item>
         <item name="bg_aboutus">@drawable/bg_aboutus_day</item>
+        <item name="scan_track_color">@color/day_scan_track_color</item>
+        <item name="dot_color">@color/day_dot_color</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
-
     </style>
 
     <!--夜间模式-->
@@ -217,6 +197,8 @@
         <item name="text_color">@color/night_textcolor</item>
         <item name="interval_color">@color/night_interval_color</item>
         <item name="bg_aboutus">@drawable/bg_aboutus_night</item>
+        <item name="scan_track_color">@color/night_scan_track_color</item>
+        <item name="dot_color">@color/night_dot_color</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
     </style>
 

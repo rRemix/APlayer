@@ -1,46 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:CustomSeekBar="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background_color_3">
+    android:layout_height="match_parent">
 
     <include layout="@layout/toolbar"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/interval_white_height"
-        android:background="@color/night_interval_color"/>
+        android:background="?attr/interval_color"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="22dp"
-        android:layout_marginLeft="18dp"
-        android:textSize="@dimen/s14_size"
-        android:textColor="#e3e3e3"
-        android:text="@string/scan_tip"/>
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="19dp"
-        android:layout_marginTop="22dp"
-        android:src="@drawable/set_scanning_divder"/>
-
-    <remix.myplayer.ui.customview.ScanSizeSeekBar
-        android:layout_marginTop="32dp"
-        android:layout_marginLeft="32dp"
-        android:layout_marginRight="32dp"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:id="@+id/custom_seekbar"
-        app:trackheight="2dp"
-        app:dotnum="6"
-        app:dotwidth="2dp"
-        app:trackcolor="#6c6a6c"
-        app:progresscolor="#782899"
-        app:thumb="@drawable/bg_thumb"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="?attr/background_color_3">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:layout_marginLeft="18dp"
+            android:textSize="@dimen/s14_size"
+            android:textColor="?attr/text_color_primary"
+            android:text="@string/scan_tip"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="19dp"
+            android:layout_marginTop="22dp"
+            android:src="@drawable/set_scanning_divder"/>
+
+        <remix.myplayer.ui.customview.ScanSizeSeekBar
+            android:layout_marginTop="32dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:id="@+id/custom_seekbar"
+            app:trackheight="2dp"
+            app:dotnum="6"
+            app:dotwidth="2dp"
+            app:trackcolor="?attr/scan_track_color"
+            app:dotcolor="?attr/dot_color"
+            app:progresscolor="@color/purple_782899"
+            app:thumb="@drawable/bg_thumb"/>
+    </LinearLayout>
+
 </LinearLayout>

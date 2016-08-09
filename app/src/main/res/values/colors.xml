@@ -32,7 +32,7 @@
     <!-- 分割线颜色-->
     <color name="list_divider">#373237</color>
     <!-- 点缀色-->
-    <color name="intersperse_color">#782899</color>
+    <color name="intersperse_color">@color/purple_782899</color>
     <!-- 抽屉字体颜色-->
     <color name="drawer_text_color">#929092</color>
     <!-- 抽屉ListView背景颜色-->
@@ -55,14 +55,16 @@
     <!--光标颜色(灰))-->
     <color name="cursor_color_gray">#484746</color>
     <!--光标颜色(紫)-->
-    <color name="cursor_color_purple">#782899</color>
+    <color name="cursor_color_purple">@color/purple_782899</color>
     <color name="black_1c1b19">#1c1b19</color>
     <color name="black_1b1c19">#1b1c19</color>
-    <color name="gray_6d6c69">#6d6c69</color>
     <color name="black_5b5a58">#5b5a58</color>
     <color name="black_737373">#737373</color>
+    <color name="gray_6d6c69">#6d6c69</color>
     <color name="gray_323232">#323232</color>
     <color name="white_f6f6f5">#f6f6f5</color>
+    <color name="purple_782899">#782899</color>
+
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>
     <color name="day_textcolor">@color/gray_6d6c69</color>
@@ -72,6 +74,8 @@
     <color name="day_background_color_3">@color/white</color>
     <color name="day_interval_color">#edeceb</color>
     <color name="day_aboutus_background_color">@color/background_color_3</color>
+    <color name="day_scan_track_color">#edeceb</color>
+    <color name="day_dot_color">@color/black_1c1b19</color>
 
     <color name="night_textcolor_primary">@color/white</color>
     <color name="night_textcolor">@color/gray_6c6a6c</color>
@@ -81,6 +85,11 @@
     <color name="night_background_color_3">@color/background_color_3</color>
     <color name="night_interval_color">#e2e1e2</color>
     <color name="night_aboutus_background_color">#cccccc</color>
+    <color name="night_scan_track_color">@color/gray_6d6c69</color>
+    <color name="night_dot_color">@color/white</color>
+
+    <color name="material_night_primary">@color/background_color_3</color>
+    <color name="material_night_primary_dark">@color/background_color_3</color>
 
     <color name="material_purple_primary">#9c27b0</color>
     <color name="material_purple_primary_dark">#7b1fa2</color>

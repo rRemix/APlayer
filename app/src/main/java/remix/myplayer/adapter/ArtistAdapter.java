@@ -1,7 +1,10 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
@@ -21,11 +24,13 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.listener.PopupListener;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -121,6 +126,9 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
             }
             //popupmenu
             if(holder.mButton != null) {
+                Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more_night);
+                int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+                holder.mButton.setImageDrawable(Theme.TintDrawable(drawable, ColorStateList.valueOf(tintColor)));
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

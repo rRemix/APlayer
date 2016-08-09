@@ -2,7 +2,9 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +20,11 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 
@@ -66,7 +71,9 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
         //如果是,高亮该歌曲，并显示动画
         if(currentMP3 != null){
             boolean flag = temp.getId() == currentMP3.getId();
-            holder.mTitle.setTextColor(flag ? Color.parseColor("#782899") : Color.parseColor("#ffffffff"));
+            holder.mTitle.setTextColor(flag ?
+                    Color.parseColor("#782899") :
+                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
             holder.mColumnView.setVisibility(flag ? View.VISIBLE : View.GONE);
 
             //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
@@ -82,6 +89,10 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
         holder.mTitle.setText(CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE));
 
         if(holder.mButton != null) {
+            //设置按钮着色
+            Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more_night);
+            int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+            holder.mButton.setImageDrawable(Theme.TintDrawable(drawable, ColorStateList.valueOf(tintColor)));
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

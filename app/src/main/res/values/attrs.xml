@@ -25,6 +25,7 @@
         <attr name="dotnum" format="integer"/>
         <attr name="dotwidth" format="dimension|reference"/>
         <attr name="thumb" format="reference"/>
+        <attr name="dotcolor" format="color|reference"/>
     </declare-styleable>
 
     <declare-styleable name="EQSeekBar">
@@ -48,5 +49,7 @@
     <attr name="material_color_primary" format="color|reference"/>
     <attr name="material_color_primary_dark" format="color|reference"/>
     <attr name="bg_aboutus" format="reference"/>
+    <attr name="scan_track_color" format="color|reference"/>
+    <attr name="dot_color" format="color|reference"/>
 
 </resources>

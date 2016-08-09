@@ -65,6 +65,9 @@ public class ThemeStore {
      */
     @ColorRes
     public static int getMaterialPrimaryColor(int themeColor){
+        if(THEME_MODE == NIGHT){
+            return R.color.material_night_primary;
+        }
         int colorRes = -1;
         switch (themeColor){
             case THEME_PURPLE:
@@ -93,6 +96,9 @@ public class ThemeStore {
      */
     @ColorRes
     public static int getMaterialPrimaryDarkColor(int themeColor){
+        if(THEME_MODE == NIGHT){
+            return R.color.material_night_primary_dark;
+        }
         int colorRes = -1;
         switch (themeColor){
             case THEME_PURPLE:

@@ -38,7 +38,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="18dp"
         android:id="@+id/folder_button"
-        android:layout_width="40dp"
+        android:layout_width="60dp"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:src="@drawable/list_icn_more_night"

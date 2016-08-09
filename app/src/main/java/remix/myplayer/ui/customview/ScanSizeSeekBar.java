@@ -14,6 +14,7 @@ import android.view.View;
 import java.util.ArrayList;
 
 import remix.myplayer.R;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 
 /**
@@ -67,6 +68,11 @@ public class ScanSizeSeekBar extends View {
      * 小圆点的画笔
      */
     private Paint mDotPaint;
+
+    /**
+     * 小圆点颜色
+     */
+    private int mDotColor;
 
     /**
      * 轨道的高度与长度
@@ -231,8 +237,8 @@ public class ScanSizeSeekBar extends View {
         mTrackCenterY = mThumbHeight / 2;
 
         //轨道颜色与已完成轨道的颜色
-        mTrackColor = typedArray.getColor(R.styleable.ScanSizeSeekBar_trackcolor,Color.parseColor("#6c6a6c"));
-        mProgressColor = typedArray.getColor(R.styleable.ScanSizeSeekBar_progresscolor,Color.parseColor("#782899"));
+        mTrackColor = typedArray.getColor(R.styleable.ScanSizeSeekBar_trackcolor,ColorUtil.getColor(R.color.day_scan_track_color));
+        mProgressColor = typedArray.getColor(R.styleable.ScanSizeSeekBar_progresscolor,ColorUtil.getColor(R.color.purple_782899));
 
         //小圆点数量与宽度
         mDotNum = typedArray.getInteger(R.styleable.ScanSizeSeekBar_dotnum, DensityUtil.dip2px(mContext,3));
@@ -242,9 +248,10 @@ public class ScanSizeSeekBar extends View {
         mTrackHeigh = (int)typedArray.getDimension(R.styleable.ScanSizeSeekBar_trackheight,DensityUtil.dip2px(mContext,2));
 
         //小圆点画笔
+        mDotColor = typedArray.getColor(R.styleable.ScanSizeSeekBar_dotcolor, ColorUtil.getColor(R.color.day_dot_color));
         mDotPaint = new Paint();
         mDotPaint.setAntiAlias(true);
-        mDotPaint.setColor(Color.parseColor("#ffffffff"));
+        mDotPaint.setColor(mDotColor);
         mDotPaint.setStyle(Paint.Style.FILL);
 
         //提示文字画笔

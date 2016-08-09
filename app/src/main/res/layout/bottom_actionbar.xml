@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="72dp"
     android:background="@drawable/commom_playercontrols_bg"
     android:id="@+id/bottom_actionbar_container">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/gray_323232"/>
     <!-- 底部自定义actionbar -->
     <RelativeLayout
         android:id="@+id/bottom_action_bar"
@@ -30,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:ellipsize="end"
                 android:lines="1"
-                android:textColor="@color/white"
+                android:textColor="?attr/text_color_primary"
                 android:textSize="@dimen/s18_size"
                 android:id="@+id/bottom_title"
                 android:text="歌曲名"/>
@@ -41,7 +46,7 @@
                 android:lines="1"
                 android:id="@+id/bottom_artist"
                 android:textSize="@dimen/s14_size"
-                android:textColor="@color/gray_6c6a6c"
+                android:textColor="?attr/text_color"
                 android:text="歌手"/>
         </LinearLayout>
         <!-- 下一首与播放按钮 -->
@@ -54,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/background_color_3"
-            android:src="@drawable/bf_but_play"/>
+            android:src="@drawable/bf_btn_play"/>
 
         <ImageButton
             android:visibility="gone"
@@ -68,4 +73,4 @@
             android:layout_marginLeft="19dp"
             android:id="@+id/playbar_next"/>
     </RelativeLayout>
-</RelativeLayout>
+</LinearLayout>

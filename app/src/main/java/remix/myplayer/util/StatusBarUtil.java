@@ -373,6 +373,7 @@ public class StatusBarUtil {
      * @return 最终的状态栏颜色
      */
     private static int calculateStatusColor(int color, int alpha) {
+//        return color;
         float a = 1 - alpha / 255f;
         int red = color >> 16 & 0xff;
         int green = color >> 8 & 0xff;

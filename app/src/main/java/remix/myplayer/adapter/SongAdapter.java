@@ -3,8 +3,10 @@ package remix.myplayer.adapter;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -25,9 +27,11 @@ import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
@@ -135,6 +139,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
 
         //选项Dialog
         if(holder.mItemButton != null) {
+            //设置按钮着色
+            Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more_night);
+            int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+            holder.mItemButton.setImageDrawable(Theme.TintDrawable(drawable, ColorStateList.valueOf(tintColor)));
             holder.mItemButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

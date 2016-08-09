@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -197,15 +198,16 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
         mIsDay = ThemeStore.THEME_MODE == ThemeStore.DAY;
 
-        ThemeStore.MATERIAL_COLOR_PRIMARY = mIsDay ? ThemeStore.getMaterialPrimaryColor(ThemeStore.THEME_COLOR) : R.color.night_background_color_3;
-        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = mIsDay ? ThemeStore.getMaterialPrimaryDarkColor(ThemeStore.THEME_COLOR) : R.color.night_background_color_3;
+        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor(ThemeStore.THEME_COLOR);
+        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor(ThemeStore.THEME_COLOR);
+        Log.d(TAG,"primary:" + ThemeStore.MATERIAL_COLOR_PRIMARY + "\r\nprimary dark:" + ThemeStore.MATERIAL_COLOR_PRIMARY_DARK);
 //        int color = ThemeStore.getMaterialPrimaryColor(this);
 //        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryColor(ThemeStore.THEME_COLOR);
     }
 
     private void initColor() {
-        mToolBar.setBackgroundColor(ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
-        mTablayout.setBackgroundColor(ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
+        mToolBar.setBackgroundColor(ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY));
+        mTablayout.setBackgroundColor(ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY));
     }
 
 
@@ -213,7 +215,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     protected void setStatusBar() {
         StatusBarUtil.setColorForDrawerLayout(this,
                 (DrawerLayout) findViewById(R.id.drawer_layout),
-                ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY),mAlpha);
+                ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK),mAlpha);
     }
 
     private void initToolbar() {

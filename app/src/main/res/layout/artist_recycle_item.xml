@@ -44,7 +44,7 @@
                 android:layout_alignParentRight="true"
                 android:id="@+id/recycleview_button"
                 android:src="@drawable/list_icn_more_night"
-                android:background="?android:attr/selectableItemBackground"/>
+                android:background="@drawable/bg_common_ripple"/>
             <!--android:background="@drawable/list_icn_more_night" />-->
         </RelativeLayout>
     </RelativeLayout>

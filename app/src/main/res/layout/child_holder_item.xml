@@ -40,7 +40,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="18dp"
         android:id="@+id/song_item_button"
-        android:layout_width="50dp"
+        android:layout_width="60dp"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:scaleType="center"
