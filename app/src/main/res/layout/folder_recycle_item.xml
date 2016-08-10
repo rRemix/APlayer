@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/folder_name"
             android:textSize="@dimen/s12_size"
-            android:textColor="@color/white"
+            android:textColor="?attr/text_color_primary"
             android:text="文件夹名"/>
         <TextView
             android:layout_width="160dp"
@@ -32,7 +32,7 @@
             android:id="@+id/folder_path"
             android:textSize="10sp"
             android:text="路径"
-            android:textColor="@color/gray_6c6a6c"/>
+            android:textColor="?attr/text_color"/>
     </LinearLayout>
     <ImageButton
         android:layout_alignParentRight="true"
@@ -41,7 +41,7 @@
         android:layout_width="60dp"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
-        android:src="@drawable/list_icn_more_night"
+        android:src="@drawable/list_icn_more"
         android:background="@drawable/bg_common_ripple"/>
     <TextView
         android:layout_centerVertical="true"
@@ -53,5 +53,5 @@
         android:id="@+id/folder_num"
         android:textSize="@dimen/s12_size"
         android:text="__首"
-        android:textColor="@color/white"/>
+        android:textColor="?attr/text_color"/>
 </RelativeLayout>

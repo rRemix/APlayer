@@ -60,13 +60,8 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
         //设置文件夹名字 路径名 歌曲数量
         if(temp != null){
             holder.mName.setText(temp.substring(temp.lastIndexOf("/")+ 1,temp.length()));
-            holder.mName.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
-
             holder.mPath.setText(temp);
-            holder.mPath.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6d6c69 : R.color.gray_6c6a6c));
-
             holder.mCount.setText(Global.mFolderMap.get(temp).size()+ "首");
-            holder.mCount.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
         }
         //根据主题模式 设置图片
         if(holder.mImg != null) {
@@ -75,7 +70,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
 
         final String full_path = temp;
         if(holder.mButton != null) {
-            Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more_night);
+            Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more);
             int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
             holder.mButton.setImageDrawable(Theme.TintDrawable(drawable, ColorStateList.valueOf(tintColor)));
             holder.mButton.setOnClickListener(new View.OnClickListener() {

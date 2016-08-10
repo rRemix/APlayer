@@ -77,7 +77,7 @@
             android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_centerVertical="true"
-            android:src="@drawable/list_icn_more_night"
+            android:src="@drawable/list_icn_more"
             android:background="@drawable/bg_common_ripple"/>
 
         <remix.myplayer.ui.customview.ColumnView

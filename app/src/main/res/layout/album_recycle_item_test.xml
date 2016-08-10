@@ -63,7 +63,7 @@
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:id="@+id/recycleview_button"
-                android:src="@drawable/list_icn_more_night"
+                android:src="@drawable/list_icn_more"
                 android:background="?android:attr/selectableItemBackground"/>
         </RelativeLayout>
     </android.support.v7.widget.CardView>

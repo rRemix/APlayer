@@ -17,6 +17,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.model.MP3Item;
@@ -57,6 +58,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recently);
+        ButterKnife.bind(this);
 
         MusicService.addCallback(RecetenlyActivity.this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));

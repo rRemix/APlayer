@@ -99,9 +99,8 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 //设置歌手名
                 String artist = CommonUtil.processInfo(mCursor.getString(ArtistFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
                 holder.mText1.setText(artist);
-                holder.mText1.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
                 //设置背景
-                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.artist_bg);
+                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.art_bg_night);
                 //设置封面
                 holder.mImage.setImageURI(Uri.EMPTY);
                 AsynLoadImage task = new AsynLoadImage(holder.mImage);
@@ -126,7 +125,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
             }
             //popupmenu
             if(holder.mButton != null) {
-                Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more_night);
+                Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more);
                 int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
                 holder.mButton.setImageDrawable(Theme.TintDrawable(drawable, ColorStateList.valueOf(tintColor)));
                 holder.mButton.setOnClickListener(new View.OnClickListener() {

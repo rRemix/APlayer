@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background_color_3">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <include layout="@layout/toolbar"/>
 
@@ -12,6 +13,7 @@
         android:background="@color/night_interval_color"/>
 
     <FrameLayout
+        android:background="?attr/background_color_3"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <android.support.v7.widget.RecyclerView
@@ -19,14 +21,19 @@
             android:layout_height="match_parent"
             android:id="@+id/playlist_recycleview">
         </android.support.v7.widget.RecyclerView>
-        <ImageButton
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floatbutton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_margin="@dimen/d40_size"
             android:onClick="onAdd"
-            android:layout_margin="40dp"
+            android:clickable="true"
             android:src="@drawable/playlist_fab_btn_add"
-            android:background="@drawable/playlist_fab_btn_bg"
-            android:layout_gravity="bottom|right"/>
+            app:backgroundTint="@color/purple_8e24aa"
+            app:elevation="@dimen/d2_size"
+            app:pressedTranslationZ="@dimen/d4_size"/>
     </FrameLayout>
 
 

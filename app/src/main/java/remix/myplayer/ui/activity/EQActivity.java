@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity;
 
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.Virtualizer;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.SwitchCompat;
+import android.support.v7.widget.TintManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -23,9 +25,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.application.Application;
-import remix.myplayer.inject.ViewInject;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.EQSeekBar;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.SharedPrefsUtil;
@@ -178,6 +182,28 @@ public class EQActivity extends ToolbarActivity {
         initToolbar(mToolBar,getString(R.string.use_eq));
 
         //初始化switch
+//        StateListDrawable stateListDrawable = new StateListDrawable();
+//        final int[][] states = new int[3][];
+//        final int[] colors = new int[3];
+//        int i = 0;
+//        states[i] = new int[] { -android.R.attr.state_enabled };
+//        colors[i] = ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY);
+//        i++;
+//
+//        states[i] = new int[] { android.R.attr.state_checked };
+//        colors[i] = ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY);
+//        i++;
+//
+//        // Default enabled state
+//        states[i] = new int[0];
+//        colors[i] = ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY);
+//
+//        i = 0;
+//        for( ; i < 3 ;i++){
+//            stateListDrawable.addState(states[i], new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, new int[]{colors[i]}));
+//        }
+//        mSwitch.setThumbResource(R.drawable.thumb_test);
+
         mSwitch.setChecked(mEnable);
         mSwitch.setThumbResource(mEnable ? R.drawable.timer_btn_seleted_btn : R.drawable.timer_btn_normal_btn);
         mSwitch.setTrackResource(mEnable ? R.drawable.timer_btn_seleted_focus : R.drawable.timer_btn_normal_focus);

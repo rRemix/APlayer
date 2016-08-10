@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/background_color_main"
     android:fitsSystemWindows="true">
+
     <include layout="@layout/toolbar"/>
 
     <RelativeLayout
@@ -27,14 +27,15 @@
     </RelativeLayout>
 
 
-    <ImageView
-        android:layout_marginLeft="5dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/line"
-        android:scaleType="fitXY"/>
+    <!--<ImageView-->
+        <!--android:layout_marginLeft="5dp"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:src="@drawable/line"-->
+        <!--android:scaleType="fitXY"/>-->
 
     <LinearLayout
+        android:background="?attr/background_color_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">

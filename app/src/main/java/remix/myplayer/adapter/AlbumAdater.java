@@ -96,11 +96,9 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 String album = CommonUtil.processInfo(mCursor.getString(AlbumFragment.mAlbumIndex),CommonUtil.ALBUMTYPE);
 
                 holder.mText1.setText(album);
-                holder.mText1.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
                 holder.mText2.setText(artist);
-                holder.mText1.setTextColor(mContext.getResources().getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6d6c69 : R.color.gray_6c6a6c));
                 //设置背景
-                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.album_bg_day : R.drawable.album_bg);
+                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.album_bg_day : R.drawable.album_bg_night);
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -124,7 +122,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
             }
             //popupmenu
             if(holder.mButton != null) {
-                Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more_night);
+                Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more);
                 int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
                 holder.mButton.setImageDrawable(Theme.TintDrawable(drawable, ColorStateList.valueOf(tintColor)));
                 holder.mButton.setOnClickListener(new View.OnClickListener() {

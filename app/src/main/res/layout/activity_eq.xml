@@ -2,13 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/background_color_3">
+    android:layout_height="match_parent">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="?attr/material_color_primary">
 
     <android.support.v7.widget.SwitchCompat
         android:background="@color/transparent"
@@ -28,89 +28,30 @@
         android:layout_height="@dimen/interval_white_height"
         android:background="?attr/interval_color"/>
 
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="5dp"-->
-        <!--android:orientation="horizontal">-->
-        <!--<Button-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:onClick="onPop"-->
-            <!--android:text="流行"-->
-            <!--android:textColor="@color/text_color_white"-->
-            <!--android:tag="Pop"/>-->
-        <!--<Button-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:onClick="onRock"-->
-            <!--android:text="摇滚"-->
-            <!--android:textColor="@color/text_color_white"-->
-            <!--android:tag="Rock"/>-->
-        <!--<Button-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:onClick="onClassical"-->
-            <!--android:text="古典"-->
-            <!--android:textColor="@color/text_color_white"-->
-            <!--android:tag="Classical"/>-->
-        <!--<Button-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:onClick="onBass"-->
-            <!--android:text="重金属"-->
-            <!--android:textColor="@color/text_color_white"-->
-            <!--android:tag="Heavy Metal"/>-->
-
-    <!--</LinearLayout>-->
-
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="horizontal">-->
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="重低音"-->
-            <!--android:textColor="@color/text_color_white"/>-->
-        <!--<SeekBar-->
-            <!--android:id="@+id/bass"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:max="1000"/>-->
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="环绕音效"/>-->
-        <!--<SeekBar-->
-            <!--android:id="@+id/virtualizer"-->
-            <!--android:layout_width="0dp"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:max="1000"/>-->
-    <!--</LinearLayout>-->
-
     <LinearLayout
-        android:id="@+id/eq_container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="9"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:orientation="horizontal">
-
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="?attr/background_color_3">
+        <LinearLayout
+            android:id="@+id/eq_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="9"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
+        </LinearLayout>
+        <Button
+            android:layout_width="200dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:onClick="onReset"
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="center"
+            android:text="重置"
+            android:textColor="@color/white"
+            android:textSize="@dimen/s16_size"
+            android:background="@drawable/bg_btn_corner"/>
     </LinearLayout>
-
-    <Button
-        android:layout_width="200dp"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:onClick="onReset"
-        android:layout_marginBottom="20dp"
-        android:layout_gravity="center"
-        android:text="重置"
-        android:textColor="@color/white"
-        android:textSize="@dimen/s16_size"
-        android:background="@drawable/bg_btn_corner"/>
 </LinearLayout>

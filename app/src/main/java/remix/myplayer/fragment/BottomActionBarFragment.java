@@ -17,12 +17,12 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
+import remix.myplayer.listener.CtrlButtonListener;
+import remix.myplayer.model.MP3Item;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.AudioHolderActivity;
-import remix.myplayer.model.MP3Item;
-import remix.myplayer.listener.CtrlButtonListener;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.util.ColorUtil;
 
 /**
@@ -68,7 +68,8 @@ public class BottomActionBarFragment extends BaseFragment{
 
         //设置整个背景着色
         Drawable RootDrawable = getResources().getDrawable(R.drawable.commom_playercontrols_bg);
-        Theme.TintDrawable(RootDrawable, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.white : R.color.gray_323232)));
+        Theme.TintDrawable(RootDrawable,
+                ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.day_background_color_3 : R.color.night_background_color_3)));
         rootView.setBackground(RootDrawable);
         //设置向上按钮着色
         Drawable coverDrawable = getResources().getDrawable(R.drawable.home_btn_back);
@@ -104,13 +105,11 @@ public class BottomActionBarFragment extends BaseFragment{
         if(isPlaying) {
             Drawable PauseDrawable = getResources().getDrawable(R.drawable.bf_btn_stop);
             Theme.TintDrawable(PauseDrawable, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white)));
-            mPlayButton.setBackground(PauseDrawable);
-            mPlayButton.setImageResource(R.drawable.bf_btn_stop);
+            mPlayButton.setImageDrawable(PauseDrawable);
         } else {
             Drawable PlayDrawable = getResources().getDrawable(R.drawable.bf_btn_play);
             Theme.TintDrawable(PlayDrawable, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white)));
-            mPlayButton.setBackground(PlayDrawable);
-            mPlayButton.setImageResource(R.drawable.bf_btn_play);
+            mPlayButton.setImageDrawable(PlayDrawable);
         }
     }
 }

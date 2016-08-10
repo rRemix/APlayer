@@ -11,7 +11,7 @@
         android:id="@+id/artist_item_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/artist_bg">
+        android:background="@drawable/art_bg_night">
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="match_parent"
             android:layout_height="164dp"
@@ -35,7 +35,7 @@
                 android:id="@+id/recycleview_text1"
                 android:singleLine="true"
                 android:ellipsize="end"
-                android:textColor="@color/white"
+                android:textColor="?attr/text_color_primary"
                 android:textSize="@dimen/s14_size"/>
             <ImageButton
                 android:layout_width="30dp"
@@ -43,7 +43,7 @@
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:id="@+id/recycleview_button"
-                android:src="@drawable/list_icn_more_night"
+                android:src="@drawable/list_icn_more"
                 android:background="@drawable/bg_common_ripple"/>
             <!--android:background="@drawable/list_icn_more_night" />-->
         </RelativeLayout>

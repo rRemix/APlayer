@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -119,7 +120,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         //检查更新
         UmengUpdateAgent.update(this);
 //        MobclickAgent.setDebugMode(true);
@@ -213,9 +213,9 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     @Override
     protected void setStatusBar() {
-        StatusBarUtil.setColorForDrawerLayout(this,
+        StatusBarUtil.setColorNoTranslucentForDrawerLayout(this,
                 (DrawerLayout) findViewById(R.id.drawer_layout),
-                ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK),mAlpha);
+                ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
     }
 
     private void initToolbar() {

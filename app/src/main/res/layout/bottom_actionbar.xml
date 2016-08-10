@@ -58,7 +58,7 @@
             android:id="@+id/playbar_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/background_color_3"
+            android:background="@color/transparent"
             android:src="@drawable/bf_btn_play"/>
 
         <ImageButton
@@ -66,7 +66,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/bt_lockscreen_next_nor"
-            android:background="@color/background_color_3"
+            android:background="@color/transparent"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/playbar_play"
             android:layout_marginRight="19dp"

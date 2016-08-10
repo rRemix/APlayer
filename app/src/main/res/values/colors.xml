@@ -64,13 +64,14 @@
     <color name="gray_323232">#323232</color>
     <color name="white_f6f6f5">#f6f6f5</color>
     <color name="purple_782899">#782899</color>
+    <color name="purple_8e24aa">#8e24aa</color>
 
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>
     <color name="day_textcolor">@color/gray_6d6c69</color>
     <color name="day_background_color_main">@color/white</color>
     <color name="day_background_color_1">@color/white</color>
-    <color name="day_background_color_2">@color/white</color>
+    <color name="day_background_color_2">#f7f7f6</color>
     <color name="day_background_color_3">@color/white</color>
     <color name="day_interval_color">#edeceb</color>
     <color name="day_aboutus_background_color">@color/background_color_3</color>

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color_3">
+    >
 
     <include layout="@layout/toolbar"/>
 
@@ -28,6 +28,7 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview"
+        android:background="?attr/background_color_3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

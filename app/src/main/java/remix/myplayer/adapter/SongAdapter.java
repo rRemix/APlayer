@@ -140,7 +140,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
         //选项Dialog
         if(holder.mItemButton != null) {
             //设置按钮着色
-            Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more_night);
+            Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more);
             int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
             holder.mItemButton.setImageDrawable(Theme.TintDrawable(drawable, ColorStateList.valueOf(tintColor)));
             holder.mItemButton.setOnClickListener(new View.OnClickListener() {

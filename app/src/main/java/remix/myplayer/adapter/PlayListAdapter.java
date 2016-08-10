@@ -1,6 +1,8 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
@@ -11,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -22,10 +25,13 @@ import java.util.Iterator;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.listener.PopupListener;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 
@@ -69,7 +75,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
             }
             //设置播放列表名字
             holder.mName.setText(name);
-
+            //设置背景
+            holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.art_bg_night);
             //设置专辑封面
             new AsynLoadImage(holder.mImage).execute(name);
 //            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
@@ -96,14 +103,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
             }
 
             if(holder.mButton != null) {
-                //我的收藏列表，不能删除
-                if(name.equals(mContext.getString(R.string.my_favorite))){
-                    holder.mButton.setImageResource(R.drawable.rcd_icn_love);
-                    holder.mButton.setClickable(false);
-                    holder.mButton.setBackgroundColor(mContext.getResources().getColor(R.color.transparent));
-                } else {
-                    holder.mButton.setImageResource(R.drawable.list_icn_more_night);
-                    holder.mButton.setClickable(true);
+                boolean isLove = name.equals(mContext.getString(R.string.my_favorite));
+                Drawable drawable = mContext.getResources().getDrawable(isLove ? R.drawable.playlist_love : R.drawable.list_icn_more);
+                Theme.TintDrawable(drawable, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white)));
+                holder.mButton.setImageDrawable(drawable);
+                holder.mButton.setClickable(!isLove);
+                if(isLove){
                     holder.mButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -115,7 +120,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                         }
                     });
                 }
-
             }
         } catch (Exception e){
             e.toString();
@@ -135,6 +139,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         public SimpleDraweeView mImage;
         @BindView(R.id.recycleview_button)
         public ImageView mButton;
+        @BindView(R.id.playlist_item_container)
+        public RelativeLayout mContainer;
         public PlayListHolder(View itemView) {
             super(itemView);
 

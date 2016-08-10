@@ -3,6 +3,7 @@ package remix.myplayer.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -37,6 +38,8 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     Toolbar mToolBar;
     @BindView(R.id.playlist_recycleview)
     RecyclerView mRecycleView;
+    @BindView(R.id.floatbutton)
+    FloatingActionButton mFloatButton;
 
     private PlayListAdapter mAdapter;
     public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
