@@ -25,7 +25,9 @@
         <attr name="dotnum" format="integer"/>
         <attr name="dotwidth" format="dimension|reference"/>
         <attr name="thumb" format="reference"/>
+        <attr name="thumbpress" format="reference"/>
         <attr name="dotcolor" format="color|reference"/>
+        <attr name="tiptextcolor" format="color|reference"/>
     </declare-styleable>
 
     <declare-styleable name="EQSeekBar">
@@ -36,6 +38,8 @@
         <attr name="eqprogresscolor" format="color|reference"/>
         <attr name="eqdotnum" format="integer"/>
         <attr name="eqthumb" format="reference"/>
+        <attr name="eqenabletextcolor" format="color|reference"/>
+        <attr name="eqtextcolor" format="color|reference"/>
     </declare-styleable>
 
     <attr name="text_color_primary" format="color|reference"/>
@@ -48,8 +52,11 @@
     <attr name="aboutus_background_color" format="color|reference"/>
     <attr name="material_color_primary" format="color|reference"/>
     <attr name="material_color_primary_dark" format="color|reference"/>
+    <attr name="stress_color" format="color|reference"/>
     <attr name="bg_aboutus" format="reference"/>
+    <!--扫描文件大小-->
     <attr name="scan_track_color" format="color|reference"/>
     <attr name="dot_color" format="color|reference"/>
+    <attr name="scan_progress_color" format="color|reference"/>
 
 </resources>

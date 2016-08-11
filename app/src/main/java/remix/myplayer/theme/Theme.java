@@ -5,10 +5,12 @@ import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.StyleRes;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;
 
+import remix.myplayer.R;
 import remix.myplayer.util.ColorUtil;
 
 
@@ -48,6 +50,29 @@ public class Theme {
      */
     public static Drawable TintDrawable(View view,ColorStateList colorStateList){
         return TintDrawable(view.getBackground(),colorStateList);
+    }
+
+    /**
+     * 设置主题
+     */
+    @StyleRes
+    public static int getTheme() {
+        if (ThemeStore.THEME_MODE == ThemeStore.NIGHT) {
+            return R.style.NightTheme;
+        }
+        switch (ThemeStore.THEME_COLOR) {
+            case ThemeStore.THEME_PURPLE:
+                return R.style.PurpleTheme;
+            case ThemeStore.THEME_RED:
+                return R.style.RedTheme;
+            case ThemeStore.THEME_PINK:
+                return R.style.PinkTheme;
+            case ThemeStore.THEME_BROWN:
+                return R.style.BrownTheme;
+            case ThemeStore.THEME_INDIGO:
+                return R.style.IngidoTheme;
+        }
+        return -1;
     }
 
     public static int getThemeAttrColor(Context context, int attr) {

@@ -8,14 +8,17 @@ import android.media.audiofx.Virtualizer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.TintManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -204,9 +207,17 @@ public class EQActivity extends ToolbarActivity {
 //        }
 //        mSwitch.setThumbResource(R.drawable.thumb_test);
 
+        ContextThemeWrapper ctw = new ContextThemeWrapper(this,Theme.getTheme());
+
+        mSwitch = new SwitchCompat(ctw);
+        Toolbar.LayoutParams toolbarLp = new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        toolbarLp.rightMargin = DensityUtil.dip2px(this,16);
+        toolbarLp.gravity = Gravity.END;
+        mSwitch.setLayoutParams(toolbarLp);
+        mToolBar.addView(mSwitch);
+
+
         mSwitch.setChecked(mEnable);
-        mSwitch.setThumbResource(mEnable ? R.drawable.timer_btn_seleted_btn : R.drawable.timer_btn_normal_btn);
-        mSwitch.setTrackResource(mEnable ? R.drawable.timer_btn_seleted_focus : R.drawable.timer_btn_normal_focus);
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -266,8 +277,8 @@ public class EQActivity extends ToolbarActivity {
 
         if(mSwitch != null) {
             mSwitch.setChecked(enable);
-            mSwitch.setThumbResource(enable ? R.drawable.timer_btn_seleted_btn : R.drawable.timer_btn_normal_btn);
-            mSwitch.setTrackResource(enable ? R.drawable.timer_btn_seleted_focus : R.drawable.timer_btn_normal_focus);
+//            mSwitch.setThumbResource(enable ? R.drawable.timer_btn_seleted_btn : R.drawable.timer_btn_normal_btn);
+//            mSwitch.setTrackResource(enable ? R.drawable.timer_btn_seleted_focus : R.drawable.timer_btn_normal_focus);
         }
 //        mBassBoost.setEnabled(mEnable);
 //        if(mBassBoost.getStrengthSupported()){

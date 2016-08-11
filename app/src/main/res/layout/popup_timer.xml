@@ -48,7 +48,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="10dp"
+        android:id="@+id/popup_timer_container">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -57,6 +58,7 @@
             android:text="设为默认"
             android:layout_marginRight="8dp"/>
         <android.support.v7.widget.SwitchCompat
+            android:visibility="gone"
             android:background="@color/transparent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

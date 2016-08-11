@@ -76,7 +76,13 @@
     <color name="day_interval_color">#edeceb</color>
     <color name="day_aboutus_background_color">@color/background_color_3</color>
     <color name="day_scan_track_color">#edeceb</color>
-    <color name="day_dot_color">@color/black_1c1b19</color>
+    <color name="day_dot_color">@color/gray_6d6c69</color>
+    <color name="day_nonenable_track_color">#ececec</color>
+    <color name="day_nonenable_progress_color">#d2d2d2</color>
+    <color name="day_nonenable_thumb_color">#bbbbbb</color>
+    <color name="day_nonenable_text_color">#afafaf</color>
+    <color name="day_enable_track_color">#d8d8d8</color>
+    <color name="day_enable_text_color">#808080</color>
 
     <color name="night_textcolor_primary">@color/white</color>
     <color name="night_textcolor">@color/gray_6c6a6c</color>
@@ -88,9 +94,16 @@
     <color name="night_aboutus_background_color">#cccccc</color>
     <color name="night_scan_track_color">@color/gray_6d6c69</color>
     <color name="night_dot_color">@color/white</color>
+    <color name="night_nonenable_track_color">@color/white</color>
+    <color name="night_nonenable_progress_color">@color/purple_782899</color>
+    <color name="night_nonenable_thumb_color">@color/purple_782899</color>
+    <color name="night_nonenable_text_color">@color/white</color>
+    <color name="night_enable_track_color">@color/white</color>
+    <color name="night_enable_text_color">@color/white</color>
 
     <color name="material_night_primary">@color/background_color_3</color>
     <color name="material_night_primary_dark">@color/background_color_3</color>
+    <color name="material_nigth_stress">@color/purple_782899</color>
 
     <color name="material_purple_primary">#9c27b0</color>
     <color name="material_purple_primary_dark">#7b1fa2</color>

@@ -1,11 +1,13 @@
 package remix.myplayer.ui.customview;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -14,6 +16,9 @@ import android.view.View;
 import java.util.ArrayList;
 
 import remix.myplayer.R;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 
 /**
@@ -73,6 +78,16 @@ public class EQSeekBar extends View {
     private int mTrackColor;
 
     /**
+     * 使能状态下文字颜色
+     */
+
+    private int mEnableTextColor;
+    /**
+     * 非使能状态下文字颜色
+     */
+    private int mTextColor;
+
+    /**
      * 轨道画笔
      */
     private Paint mTrackPaint;
@@ -122,7 +137,7 @@ public class EQSeekBar extends View {
     /**
      * ThumbDrawable 以及两个状态
      */
-    private Drawable mThumbDrawable = null;
+    private StateListDrawable mThumbDrawable = null;
     private int[] mThumbNormal = null;
     private int[] mThumbPressed = null;
 
@@ -173,6 +188,11 @@ public class EQSeekBar extends View {
      */
     private boolean mCanDrag = true;
 
+    /**
+     * 是否使能
+     */
+    private boolean mEnable = false;
+
     public EQSeekBar(Context context) {
         super(context);
         init(context,null);
@@ -194,13 +214,23 @@ public class EQSeekBar extends View {
         mContext = context;
         TypedArray typedArray = mContext.obtainStyledAttributes(attributeSet,R.styleable.EQSeekBar);
         //初始化thumbdrawable及其状态
-        mThumbDrawable = typedArray.getDrawable(R.styleable.EQSeekBar_eqthumb);
-        if(mThumbDrawable == null)
-            mThumbDrawable = getResources().getDrawable(R.drawable.bg_thumb);
+        Drawable thumb = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumb);
+        Drawable thumbPress = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumbpress);
+        if(thumb == null)
+            thumb = getResources().getDrawable(R.drawable.thumb);
+        if(thumbPress == null)
+            thumbPress = getResources().getDrawable(R.drawable.timer_btn_pre_whirling);
+
+        Theme.TintDrawable(thumb, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.material_night_primary)));
+        Theme.TintDrawable(thumbPress,ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899)));
+
         mThumbNormal = new int[]{-android.R.attr.state_focused, -android.R.attr.state_pressed,
                 -android.R.attr.state_selected, -android.R.attr.state_checked};
         mThumbPressed = new int[]{android.R.attr.state_focused, android.R.attr.state_pressed,
                 android.R.attr.state_selected, android.R.attr.state_checked};
+        mThumbDrawable = new StateListDrawable();
+        mThumbDrawable.addState(mThumbNormal,thumb);
+        mThumbDrawable.addState(mThumbPressed,thumbPress);
 
         //计算thumb的大小
         mThumbHeight = mThumbDrawable.getIntrinsicHeight();
@@ -209,13 +239,21 @@ public class EQSeekBar extends View {
         mTrackCenterY = mThumbHeight / 2;
 
 
-        //使能状态轨道颜色与已完成轨道的颜色
-        mEnableTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqenabletrackcolor, Color.parseColor("#ffffff"));
-        mEnableProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqenableprogresscolor, Color.parseColor("#782899"));
+        //使能状态下的颜色
+        mEnableTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqenabletrackcolor,
+                ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_enable_track_color : R.color.night_enable_track_color));
+        mEnableProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqenableprogresscolor,
+                ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor(ThemeStore.THEME_COLOR) : R.color.night_nonenable_progress_color));
+        mEnableTextColor = typedArray.getColor(R.styleable.EQSeekBar_eqtextcolor,
+                ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_enable_text_color : R.color.night_enable_text_color));
 
-        //非使能状态轨道颜色与已完成轨道的颜色
-        mTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqtrackcolor,Color.parseColor("#ffffff"));
-        mProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqprogresscolor, Color.parseColor("#782899"));
+        //非使能状态下的颜色
+        mTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqtrackcolor,
+                ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_nonenable_track_color : R.color.night_nonenable_track_color));
+        mProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqprogresscolor,
+                ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_nonenable_progress_color : R.color.night_nonenable_progress_color));
+        mTextColor = typedArray.getColor(R.styleable.EQSeekBar_eqtextcolor,
+                ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_nonenable_text_color : R.color.night_nonenable_text_color));
 
         //间隔点数量
         mDotNum = typedArray.getInteger(R.styleable.EQSeekBar_eqdotnum,31);
@@ -227,7 +265,7 @@ public class EQSeekBar extends View {
         mFreTextSize = DensityUtil.dip2px(getContext(),13);
         mFreTextPaint = new Paint();
         mFreTextPaint.setAntiAlias(true);
-        mFreTextPaint.setColor(Color.parseColor("#ffffffff"));
+        mFreTextPaint.setColor(mEnable ? mEnableTextColor : mTextColor);
         mFreTextPaint.setStyle(Paint.Style.STROKE);
         mFreTextPaint.setTextSize(mFreTextSize);
         mFreTextPaint.setTextAlign(Paint.Align.CENTER);
@@ -236,7 +274,7 @@ public class EQSeekBar extends View {
         mTipTextSize = DensityUtil.dip2px(getContext(),14);
         mTipTextPaint = new Paint();
         mTipTextPaint.setAntiAlias(true);
-        mTipTextPaint.setColor(Color.parseColor("#ffffffff"));
+        mTipTextPaint.setColor(mEnable ? mEnableTextColor : mTextColor);
         mTipTextPaint.setStyle(Paint.Style.STROKE);
         mTipTextPaint.setTextSize(DensityUtil.dip2px(getContext(),mTipTextSize));
         mTipTextPaint.setTextAlign(Paint.Align.CENTER);
@@ -244,19 +282,20 @@ public class EQSeekBar extends View {
         //整个轨道的画笔
         mTrackPaint = new Paint();
         mTrackPaint.setAntiAlias(true);
-        mTrackPaint.setColor(mEnableTrackColor);
+        mTrackPaint.setColor(mEnable ? mEnableTrackColor : mTrackColor);
         mTrackPaint.setStyle(Paint.Style.STROKE);
         mTrackPaint.setStrokeWidth(mTrackWidth);
 
         //已完成轨道的画笔
         mProgressPaint = new Paint();
         mProgressPaint.setAntiAlias(true);
-        mProgressPaint.setColor(mProgressColor);
+        mProgressPaint.setColor(mEnable ? mEnableProgressColor : mProgressColor);
         mProgressPaint.setStyle(Paint.Style.STROKE);
         mProgressPaint.setStrokeWidth(mTrackWidth);
 
         typedArray.recycle();
     }
+
 
     public void setFreText(String freText){
         mFreText = freText;
@@ -415,6 +454,8 @@ public class EQSeekBar extends View {
         mCanDrag = enabled;
         mProgressPaint.setColor(enabled ? mEnableProgressColor : mProgressColor);
         mTrackPaint.setColor(enabled ? mEnableTrackColor : mTrackColor);
+        mFreTextPaint.setColor(enabled ? mEnableTextColor : mTextColor);
+        mTipTextPaint.setColor(enabled ? mEnableTextColor : mTextColor);
         invalidate();
     }
 

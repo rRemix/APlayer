@@ -45,8 +45,9 @@
             app:dotwidth="2dp"
             app:trackcolor="?attr/scan_track_color"
             app:dotcolor="?attr/dot_color"
-            app:progresscolor="@color/purple_782899"
-            app:thumb="@drawable/bg_thumb"/>
+            app:thumb="@drawable/thumb"
+            app:thumbpress="@drawable/thumb_press"
+            app:tiptextcolor="?attr/text_color_primary"/>
     </LinearLayout>
 
 </LinearLayout>

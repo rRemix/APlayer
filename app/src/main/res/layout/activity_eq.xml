@@ -11,6 +11,7 @@
         android:background="?attr/material_color_primary">
 
     <android.support.v7.widget.SwitchCompat
+        android:visibility="gone"
         android:background="@color/transparent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
