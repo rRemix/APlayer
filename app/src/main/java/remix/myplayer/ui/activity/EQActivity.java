@@ -1,7 +1,5 @@
 package remix.myplayer.ui.activity;
 
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.StateListDrawable;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.Virtualizer;
@@ -10,7 +8,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.TintManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
@@ -18,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -30,7 +26,6 @@ import remix.myplayer.R;
 import remix.myplayer.application.Application;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.EQSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
@@ -253,7 +248,7 @@ public class EQActivity extends ToolbarActivity {
             mEQSeekBars.add(eqSeekBar);
             EQContainer.addView(eqSeekBar);
         }
-
+        mEQSeekBars.get(1).setBackgroundColor(ColorUtil.getColor(R.color.black_1b1a1c));
 
 
         new Thread(){

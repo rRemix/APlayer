@@ -280,7 +280,7 @@ public class EQSeekBar extends View {
         mTipTextPaint.setAntiAlias(true);
         mTipTextPaint.setColor(mEnable ? mEnableTextColor : mTextColor);
         mTipTextPaint.setStyle(Paint.Style.STROKE);
-        mTipTextPaint.setTextSize(DensityUtil.dip2px(getContext(),mTipTextSize));
+        mTipTextPaint.setTextSize(mTipTextSize);
         mTipTextPaint.setTextAlign(Paint.Align.CENTER);
 
         //整个轨道的画笔
@@ -312,13 +312,14 @@ public class EQSeekBar extends View {
     @Override
     protected synchronized void onDraw(Canvas canvas) {
         //整个轨道
-        canvas.drawLine(mViewWidth / 2 , getMaxTextSize() * 2 , mViewWidth / 2, getMaxTextSize() * 2 + mTrackHeigh, mTrackPaint);
+        canvas.drawLine(mViewWidth / 2 , mThumbWidth * 2, mViewWidth / 2, mThumbWidth * 2 + mTrackHeigh, mTrackPaint);
         //已完成轨道
-        canvas.drawLine(mViewWidth / 2, getMaxTextSize() * 2 , mViewWidth / 2, mThumbCenterY, mProgressPaint);
+        canvas.drawLine(mViewWidth / 2, mThumbWidth * 2, mViewWidth / 2, mThumbCenterY, mProgressPaint);
 
 //      //顶部与底部文字
-        canvas.drawText(mDBText,mViewWidth / 2, getMaxTextSize() / 2 ,mFreTextPaint);
-        canvas.drawText(mFreText, mViewWidth / 2,(float) (getMaxTextSize() * 2.5 + mTrackHeigh), mFreTextPaint);
+        int y = mThumbWidth > getMaxTextSize() ? mThumbWidth : getMaxTextSize();
+        canvas.drawText(mDBText,mViewWidth / 2, y ,mFreTextPaint);
+        canvas.drawText(mFreText, mViewWidth / 2, y + mTrackHeigh + mThumbWidth * 2.5f, mTipTextPaint);
 
         //thumb
         mThumbDrawable.setBounds((mViewWidth - mThumbWidth) / 2, mThumbCenterY - mThumbWidth / 2, (mViewWidth - mThumbWidth) / 2 + mThumbWidth , mThumbCenterY + mThumbWidth / 2);
@@ -331,7 +332,7 @@ public class EQSeekBar extends View {
 
         //设置thumb状态
         mThumbDrawable.setState(isUp ? mThumbNormal : mThumbPressed);
-        if(eventY > mDotPosition.get(mDotPosition.size() - 1) || eventY < mThumbHeight){
+        if(eventY > mDotPosition.get(mDotPosition.size() - 1) || eventY < mDotPosition.get(0)){
             invalidate();
             return;
         }
@@ -345,7 +346,6 @@ public class EQSeekBar extends View {
         }
         //寻找与当前触摸点最近的值
         if(isUp){
-
             mThumbCenterY = mDotPosition.get(mPositon);
         } else {
             mThumbCenterY = eventY;
@@ -387,13 +387,13 @@ public class EQSeekBar extends View {
         if((mViewWidth = getMeasuredWidth()) > 0 && (mViewHeight = getMeasuredHeight()) > 0){
             int paddingtop = getPaddingTop();
             int paddingbottom = getPaddingBottom();
-            mTrackHeigh = mViewHeight - paddingtop - paddingbottom - getMaxTextSize() * 4;
+            mTrackHeigh = mViewHeight - paddingtop - paddingbottom - mThumbWidth * 4;
             //计算轨道宽度 两个小圆点之间的距离
             mDotBetween = mTrackHeigh / (mDotNum - 1);
             mDotPosition.clear();
             //设置所有小圆点的坐标
             for(int i = 0 ; i < mDotNum ; i++){
-                mDotPosition.add(mThumbWidth + mDotBetween * i);
+                mDotPosition.add(mThumbWidth * 2 + mDotBetween * i);
             }
             mThumbCenterY = mDotPosition.get(mPositon);
             mInit = true;
