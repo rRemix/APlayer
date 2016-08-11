@@ -1,9 +1,13 @@
 package remix.myplayer.ui.activity;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
@@ -40,6 +44,7 @@ import remix.myplayer.fragment.RecordFragment;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.AudioViewPager;
 import remix.myplayer.ui.customview.LrcView;
@@ -563,11 +568,18 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
 
                         mHColor =  f.getTitleTextColor();
                         mLColor = f.getBodyTextColor();
-                        //修改进度条背景颜色
+
                         LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
+                        //修改track颜色
                         ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(f.getRgb());
+                        //修改progress颜色
+                        (layerDrawable.getDrawable(1)).setColorFilter(ColorUtil.darkenColor(f.getRgb()), PorterDuff.Mode.SRC_IN);
                         mSeekBar.setProgressDrawable(layerDrawable);
 
+                        //修改thumb颜色
+                        Drawable drawable = getResources().getDrawable(R.drawable.thumb);
+                        Theme.TintDrawable(drawable, ColorStateList.valueOf(ColorUtil.darkenColor(f.getRgb())));
+                        mSeekBar.setThumb(drawable);
                     }
 
                 }

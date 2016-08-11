@@ -255,6 +255,7 @@ public class EQActivity extends ToolbarActivity {
         }
 
 
+
         new Thread(){
             @Override
             public void run() {

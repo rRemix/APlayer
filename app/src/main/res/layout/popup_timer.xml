@@ -30,7 +30,7 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             CircleSeekBar:progress_max="60"
-            CircleSeekBar:progress_width="5dp"
+            CircleSeekBar:progress_width="4dp"
             CircleSeekBar:progress_thumb="@drawable/bg_thumb"/>
         <TextView
             android:layout_gravity="center"

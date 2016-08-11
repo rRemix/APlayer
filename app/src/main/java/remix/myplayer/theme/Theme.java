@@ -75,46 +75,4 @@ public class Theme {
         return -1;
     }
 
-    public static int getThemeAttrColor(Context context, int attr) {
-        TypedArray a = context.obtainStyledAttributes(null, new int[]{attr});
-        try {
-            return a.getColor(0, 0);
-        } finally {
-            a.recycle();
-        }
-    }
-
-    static int getThemeAttrColor(Context context, int attr, float alpha) {
-        final int color = getThemeAttrColor(context, attr);
-        final int originalAlpha = Color.alpha(color);
-        return ColorUtils.setAlphaComponent(color, Math.round(originalAlpha * alpha));
-    }
-
-
-    public static ColorStateList getSwitchTrackColorStateList(Context context) {
-        ColorStateList mSwitchTrackStateList = null;
-
-        final int[][] states = new int[3][];
-        final int[] colors = new int[3];
-        int i = 0;
-
-        // Disabled state
-        states[i] = DISABLED_STATE_SET;
-
-        colors[i] = getThemeAttrColor(context, android.R.attr.colorForeground, 0.1f);
-        i++;
-
-        states[i] = CHECKED_STATE_SET;
-        colors[i] = getThemeAttrColor(context, android.support.v7.appcompat.R.attr.colorControlActivated, 0.3f);
-        i++;
-
-        // Default enabled state
-        states[i] = EMPTY_STATE_SET;
-        colors[i] = getThemeAttrColor(context, android.R.attr.colorForeground, 0.3f);
-        i++;
-
-        mSwitchTrackStateList = new ColorStateList(states, colors);
-
-        return mSwitchTrackStateList;
-    }
 }

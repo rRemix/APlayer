@@ -1,17 +1,22 @@
 package remix.myplayer.ui.customview;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 import remix.myplayer.R;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 
 /**
  * Created by taeja on 16-2-15.
@@ -212,20 +217,14 @@ public class CircleSeekBar extends View {
     //初始化
     private void init() {
         TypedArray typedArray = mContext.obtainStyledAttributes(mAttrs, R.styleable.CircleSeekBar);
+//        mThumbDrawable = getResources().getDrawable(R.drawable.thumb);
+        mThumbDrawable = getResources().getDrawable(R.drawable.thumb);
+        Theme.TintDrawable(mThumbDrawable, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899)));
 
-        mThumbDrawable = getResources().getDrawable(R.drawable.bg_thumb);
-        mThumbNormal = new int[]{-android.R.attr.state_focused, -android.R.attr.state_pressed,
-                -android.R.attr.state_selected, -android.R.attr.state_checked};
-        mThumbPressed = new int[]{android.R.attr.state_focused, android.R.attr.state_pressed,
-                android.R.attr.state_selected, android.R.attr.state_checked};
-
-        if(mThumbDrawable != null){
-            int width = mThumbDrawable.getIntrinsicWidth();
-            int height= mThumbDrawable.getIntrinsicHeight();
-        }
         //轨道颜色 宽度 最大值
-        mProgressCorlor = typedArray.getColor(R.styleable.CircleSeekBar_progress_color, Color.parseColor("#8E24AA"));
-        mProgressWidth = (int)typedArray.getDimension(R.styleable.CircleSeekBar_progress_width,15);
+        mProgressCorlor = typedArray.getColor(R.styleable.CircleSeekBar_progress_color,
+                ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899));
+        mProgressWidth = (int)typedArray.getDimension(R.styleable.CircleSeekBar_progress_width,14);
         mProgressMax = typedArray.getInteger(R.styleable.CircleSeekBar_progress_max,60);
         typedArray.recycle();
 

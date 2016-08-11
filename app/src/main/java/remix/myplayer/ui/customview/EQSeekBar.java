@@ -137,7 +137,7 @@ public class EQSeekBar extends View {
     /**
      * ThumbDrawable 以及两个状态
      */
-    private StateListDrawable mThumbDrawable = null;
+    private Drawable mThumbDrawable = null;
     private int[] mThumbNormal = null;
     private int[] mThumbPressed = null;
 
@@ -214,23 +214,27 @@ public class EQSeekBar extends View {
         mContext = context;
         TypedArray typedArray = mContext.obtainStyledAttributes(attributeSet,R.styleable.EQSeekBar);
         //初始化thumbdrawable及其状态
-        Drawable thumb = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumb);
-        Drawable thumbPress = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumbpress);
-        if(thumb == null)
-            thumb = getResources().getDrawable(R.drawable.thumb);
-        if(thumbPress == null)
-            thumbPress = getResources().getDrawable(R.drawable.timer_btn_pre_whirling);
-
-        Theme.TintDrawable(thumb, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.material_night_primary)));
-        Theme.TintDrawable(thumbPress,ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899)));
-
-        mThumbNormal = new int[]{-android.R.attr.state_focused, -android.R.attr.state_pressed,
-                -android.R.attr.state_selected, -android.R.attr.state_checked};
-        mThumbPressed = new int[]{android.R.attr.state_focused, android.R.attr.state_pressed,
-                android.R.attr.state_selected, android.R.attr.state_checked};
-        mThumbDrawable = new StateListDrawable();
-        mThumbDrawable.addState(mThumbNormal,thumb);
-        mThumbDrawable.addState(mThumbPressed,thumbPress);
+        mThumbDrawable = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumb);
+        if(mThumbDrawable == null)
+            mThumbDrawable = getResources().getDrawable(R.drawable.thumb);
+        Theme.TintDrawable(mThumbDrawable,ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899)));
+//        Drawable thumb = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumb);
+//        Drawable thumbPress = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumbpress);
+//        if(thumb == null)
+//            thumb = getResources().getDrawable(R.drawable.thumb);
+//        if(thumbPress == null)
+//            thumbPress = getResources().getDrawable(R.drawable.thumb_press);
+//
+//        Theme.TintDrawable(thumb, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899)));
+//        Theme.TintDrawable(thumbPress,ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899)));
+//
+//        mThumbNormal = new int[]{-android.R.attr.state_focused, -android.R.attr.state_pressed,
+//                -android.R.attr.state_selected, -android.R.attr.state_checked};
+//        mThumbPressed = new int[]{android.R.attr.state_focused, android.R.attr.state_pressed,
+//                android.R.attr.state_selected, android.R.attr.state_checked};
+//        mThumbDrawable = new StateListDrawable();
+//        mThumbDrawable.addState(mThumbNormal,thumb);
+//        mThumbDrawable.addState(mThumbPressed,thumbPress);
 
         //计算thumb的大小
         mThumbHeight = mThumbDrawable.getIntrinsicHeight();
@@ -301,16 +305,20 @@ public class EQSeekBar extends View {
         mFreText = freText;
     }
 
+    private int getMaxTextSize(){
+        return mTipTextSize > mFreTextSize ? mTipTextSize : mFreTextSize;
+    }
+
     @Override
     protected synchronized void onDraw(Canvas canvas) {
         //整个轨道
-        canvas.drawLine(mViewWidth / 2 , mThumbHeight, mViewWidth/ 2, mThumbHeight + mTrackHeigh, mTrackPaint);
+        canvas.drawLine(mViewWidth / 2 , getMaxTextSize() * 2 , mViewWidth / 2, getMaxTextSize() * 2 + mTrackHeigh, mTrackPaint);
         //已完成轨道
-        canvas.drawLine(mViewWidth / 2, mThumbHeight, mViewWidth / 2, mThumbCenterY, mProgressPaint);
+        canvas.drawLine(mViewWidth / 2, getMaxTextSize() * 2 , mViewWidth / 2, mThumbCenterY, mProgressPaint);
 
 //      //顶部与底部文字
-        canvas.drawText(mDBText,mViewWidth / 2, mTipTextSize ,mFreTextPaint);
-        canvas.drawText(mFreText, mViewWidth / 2, mFreTextSize +  mThumbHeight + mTrackHeigh, mFreTextPaint);
+        canvas.drawText(mDBText,mViewWidth / 2, getMaxTextSize() / 2 ,mFreTextPaint);
+        canvas.drawText(mFreText, mViewWidth / 2,(float) (getMaxTextSize() * 2.5 + mTrackHeigh), mFreTextPaint);
 
         //thumb
         mThumbDrawable.setBounds((mViewWidth - mThumbWidth) / 2, mThumbCenterY - mThumbWidth / 2, (mViewWidth - mThumbWidth) / 2 + mThumbWidth , mThumbCenterY + mThumbWidth / 2);
@@ -379,7 +387,7 @@ public class EQSeekBar extends View {
         if((mViewWidth = getMeasuredWidth()) > 0 && (mViewHeight = getMeasuredHeight()) > 0){
             int paddingtop = getPaddingTop();
             int paddingbottom = getPaddingBottom();
-            mTrackHeigh = mViewHeight - paddingtop - paddingbottom - mThumbHeight * 2;
+            mTrackHeigh = mViewHeight - paddingtop - paddingbottom - getMaxTextSize() * 4;
             //计算轨道宽度 两个小圆点之间的距离
             mDotBetween = mTrackHeigh / (mDotNum - 1);
             mDotPosition.clear();
