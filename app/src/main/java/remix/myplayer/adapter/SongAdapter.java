@@ -171,11 +171,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
     @Override
     public int getItemCount() {
         if(mType == ALLSONG) {
-            if(mCursor != null && mCursor.isClosed()) {
-                Log.d("SongFragment", "CursorIsClosed");
-                return 0;
-            }
-            return mCursor != null ? mCursor.getCount() : 0;
+            return mCursor != null && !mCursor.isClosed() ?mCursor.getCount() : 0;
         }
         else
             return mInfoList != null ? mInfoList.size() : 0;

@@ -4,6 +4,7 @@ package remix.myplayer.ui.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -198,8 +199,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
         mIsDay = ThemeStore.THEME_MODE == ThemeStore.DAY;
 
-        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor(ThemeStore.THEME_COLOR);
-        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor(ThemeStore.THEME_COLOR);
+        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor();
+        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor();
         Log.d(TAG,"primary:" + ThemeStore.MATERIAL_COLOR_PRIMARY + "\r\nprimary dark:" + ThemeStore.MATERIAL_COLOR_PRIMARY_DARK);
 //        int color = ThemeStore.getMaterialPrimaryColor(this);
 //        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryColor(ThemeStore.THEME_COLOR);

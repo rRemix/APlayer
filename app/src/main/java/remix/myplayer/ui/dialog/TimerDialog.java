@@ -1,6 +1,10 @@
 package remix.myplayer.ui.dialog;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,11 +29,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.inject.ViewInject;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.ui.customview.CircleSeekBar;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SharedPrefsUtil;
@@ -53,9 +60,9 @@ public class TimerDialog extends BaseActivity {
     CircleSeekBar mSeekbar;
     //开始或取消计时
     @BindView(R.id.close_toggle)
-    TextView mToggle;
+    Button mToggle;
     @BindView(R.id.close_stop)
-    TextView mCancel;
+    Button mCancel;
 
     //是否正在计时
     public static boolean misTiming = false;
@@ -113,11 +120,24 @@ public class TimerDialog extends BaseActivity {
             }
         });
 
+        //初始化switch
         ContextThemeWrapper ctw = new ContextThemeWrapper(this, Theme.getTheme());
-
         mSwitch = new SwitchCompat(ctw);
         ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
 
+        //初始化开始计时按钮
+        int[] state_prs = new int[]{android.R.attr.state_pressed};
+        int[] state_default = new int[]{-android.R.attr.state_focused};
+        int color = ColorUtil.getColor(ThemeStore.isDay()? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899);
+        StateListDrawable bg = new StateListDrawable();
+        bg.addState(state_prs,Theme.getBgCorner(1.0f,4,0,color));
+        bg.addState(state_default,Theme.getBgCorner(0.03f,4,1,color));
+
+        mToggle.setBackground(bg);
+        mToggle.setTextColor(new ColorStateList(new int[][]{state_prs,state_default},
+                new int[]{ColorUtil.getColor(R.color.white),color}));
+
+        //读取保存的配置
         boolean hasdefault = SharedPrefsUtil.getValue(this, "setting", "TimerDefault", false);
         final int time = SharedPrefsUtil.getValue(this,"setting","TimerNum",-1);
 
@@ -128,9 +148,6 @@ public class TimerDialog extends BaseActivity {
             if(!misTiming) {
                 mTime = time;
                 Toggle();
-            } else {
-//                mSwitch.setThumbResource(R.drawable.timer_btn_seleted_btn);
-//                mSwitch.setTrackResource(R.drawable.timer_btn_seleted_focus);
             }
         }
         mSwitch.setChecked(hasdefault);
@@ -140,8 +157,6 @@ public class TimerDialog extends BaseActivity {
                 if (isChecked) {
                     if (mTime > 0) {
                         Toast.makeText(TimerDialog.this, getString(R.string.set_success), Toast.LENGTH_SHORT).show();
-//                        mSwitch.setThumbResource(R.drawable.timer_btn_seleted_btn);
-//                        mSwitch.setTrackResource(R.drawable.timer_btn_seleted_focus);
                         SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerDefault", true);
                         SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerNum", (int) mTime);
                     } else {
@@ -150,8 +165,6 @@ public class TimerDialog extends BaseActivity {
                     }
                 } else {
                     Toast.makeText(TimerDialog.this, getString(R.string.cancel_success), Toast.LENGTH_SHORT).show();
-//                    mSwitch.setThumbResource(R.drawable.timer_btn_normal_btn);
-//                    mSwitch.setTrackResource(R.drawable.timer_btn_normal_focus);
                     SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerDefault", false);
                     SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerNum", -1);
                 }

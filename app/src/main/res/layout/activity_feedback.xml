@@ -28,13 +28,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="23dp"/>
 
-        <ImageButton
+        <Button
             android:layout_width="352dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:id="@+id/feedback_submit"
             android:onClick="onSubmit"
-            android:background="@drawable/bg_btn_feedback_submit"/>
+            android:textColor="@color/white"
+            android:text="提交"/>
     </LinearLayout>
 
 </LinearLayout>

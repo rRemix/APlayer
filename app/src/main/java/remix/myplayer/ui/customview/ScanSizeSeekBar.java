@@ -237,7 +237,7 @@ public class ScanSizeSeekBar extends View {
         if(thumbPress == null)
             thumbPress = getResources().getDrawable(R.drawable.thumb_press);
 
-        Theme.TintDrawable(thumb, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.material_night_primary)));
+        Theme.TintDrawable(thumb, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.md_night_primary)));
         Theme.TintDrawable(thumbPress,ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899)));
 
         mThumbNormal = new int[]{-android.R.attr.state_focused, -android.R.attr.state_pressed,
@@ -259,7 +259,7 @@ public class ScanSizeSeekBar extends View {
         mTrackColor = typedArray.getColor(R.styleable.ScanSizeSeekBar_trackcolor,
                 ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_scan_track_color : R.color.night_scan_track_color));
         mProgressColor = typedArray.getColor(R.styleable.ScanSizeSeekBar_progresscolor,
-                ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor(ThemeStore.THEME_COLOR) : R.color.purple_782899));
+                ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899));
         mTextColor = typedArray.getColor(R.styleable.ScanSizeSeekBar_tiptextcolor,
                 ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
 

@@ -1,17 +1,11 @@
 package remix.myplayer.theme;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
-import android.support.v4.graphics.ColorUtils;
-import android.support.v8.renderscript.Type;
-import android.util.TypedValue;
-import android.view.View;
 
 import remix.myplayer.R;
 import remix.myplayer.application.Application;
-import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SharedPrefsUtil;
 
@@ -40,15 +34,9 @@ public class ThemeStore {
 
 
     public static int STATUS_BAR_ALPHA = 112;
-    public static int MATERIAL_COLOR_PRIMARY = R.color.material_brown_primary_dark;
-    public static int MATERIAL_COLOR_PRIMARY_DARK = R.color.material_brown_primary;
+    public static int MATERIAL_COLOR_PRIMARY = R.color.md_brown_primary_dark;
+    public static int MATERIAL_COLOR_PRIMARY_DARK = R.color.md_brown_primary;
 
-    public static int getMaterialPrimaryColor(Context context){
-        if(context == null)
-            return -1;
-
-        return -1;
-    }
 
     /**
      * 当前是否是白天主题
@@ -60,30 +48,29 @@ public class ThemeStore {
 
     /**
      * 获取主题的materialPrimaryColor
-     * @param themeColor
      * @return
      */
     @ColorRes
-    public static int getMaterialPrimaryColor(int themeColor){
+    public static int getMaterialPrimaryColor(){
         if(THEME_MODE == NIGHT){
-            return R.color.material_night_primary;
+            return R.color.md_night_primary;
         }
         int colorRes = -1;
-        switch (themeColor){
+        switch (THEME_COLOR){
             case THEME_PURPLE:
-                colorRes =  R.color.material_purple_primary;
+                colorRes =  R.color.md_purple_primary;
                 break;
             case THEME_RED:
-                colorRes =  R.color.material_red_primary;
+                colorRes =  R.color.md_red_primary;
                 break;
             case THEME_PINK:
-                colorRes =  R.color.material_pink_primary;
+                colorRes =  R.color.md_pink_primary;
                 break;
             case THEME_BROWN:
-                colorRes =  R.color.material_brown_primary;
+                colorRes =  R.color.md_brown_primary;
                 break;
             case THEME_INDIGO:
-                colorRes =  R.color.material_indigo_primary;
+                colorRes =  R.color.md_indigo_primary;
                 break;
         }
         return colorRes;
@@ -91,30 +78,29 @@ public class ThemeStore {
 
     /**
      * 获取主题的materialPrimaryDarkColor
-     * @param themeColor
      * @return
      */
     @ColorRes
-    public static int getMaterialPrimaryDarkColor(int themeColor){
+    public static int getMaterialPrimaryDarkColor(){
         if(THEME_MODE == NIGHT){
-            return R.color.material_night_primary_dark;
+            return R.color.md_night_primary_dark;
         }
         int colorRes = -1;
-        switch (themeColor){
+        switch (THEME_COLOR){
             case THEME_PURPLE:
-                colorRes =  R.color.material_purple_primary_dark;
+                colorRes =  R.color.md_purple_primary_dark;
                 break;
             case THEME_RED:
-                colorRes =  R.color.material_red_primary_dark;
+                colorRes =  R.color.md_red_primary_dark;
                 break;
             case THEME_PINK:
-                colorRes =  R.color.material_pink_primary_dark;
+                colorRes =  R.color.md_pink_primary_dark;
                 break;
             case THEME_BROWN:
-                colorRes =  R.color.material_brown_primary_dark;
+                colorRes =  R.color.md_brown_primary_dark;
                 break;
             case THEME_INDIGO:
-                colorRes =  R.color.material_indigo_primary_dark;
+                colorRes =  R.color.md_indigo_primary_dark;
                 break;
         }
         return colorRes;

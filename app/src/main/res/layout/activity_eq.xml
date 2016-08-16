@@ -4,25 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/material_color_primary">
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/material_color_primary">
 
-    <android.support.v7.widget.SwitchCompat
-        android:visibility="gone"
-        android:background="@color/transparent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textOn=""
-        android:textOff=""
-        android:id="@+id/eq_switch"
-        android:thumb="@drawable/timer_btn_normal_btn"
-        android:track="@drawable/timer_btn_normal_focus"
-        android:layout_gravity="right"
-        android:layout_marginRight="16dp"/>
-    </android.support.v7.widget.Toolbar>
+            <android.support.v7.widget.SwitchCompat
+                android:visibility="gone"
+                android:background="@color/transparent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn=""
+                android:textOff=""
+                android:id="@+id/eq_switch"
+                android:layout_gravity="right"
+                android:layout_marginRight="16dp"/>
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,21 +41,27 @@
             android:id="@+id/eq_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="9"
+            android:layout_weight="5"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
+            android:gravity="center_horizontal"
             android:orientation="horizontal">
         </LinearLayout>
-        <Button
-            android:layout_width="200dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:onClick="onReset"
-            android:layout_marginBottom="20dp"
-            android:layout_gravity="center"
-            android:text="重置"
-            android:textColor="@color/white"
-            android:textSize="@dimen/s16_size"
-            android:background="@drawable/bg_btn_corner"/>
+            android:gravity="center">
+            <Button
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:onClick="onReset"
+                android:id="@+id/eq_reset"
+                android:layout_gravity="center"
+                android:text="重置"
+                android:textColor="@color/white"
+                android:textSize="@dimen/s16_size" />
+        </LinearLayout>
+
     </LinearLayout>
 </LinearLayout>

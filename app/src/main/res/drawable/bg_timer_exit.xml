@@ -1,5 +1,0 @@
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/timer_btn_prebg_exit" android:state_pressed="true"/>
-    <item android:drawable="@drawable/timer_btnbg_exit" android:state_focused="false" android:state_pressed="false"/>
-    <item android:drawable="@drawable/timer_btnbg_exit" android:state_focused="false"/>
-</selector>

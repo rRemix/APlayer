@@ -7,8 +7,8 @@
 
     <style name="AppTheme" parent="BaseTheme">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/material_brown_primary</item>
-        <item name="colorPrimaryDark">@color/material_brown_primary_dark</item>
+        <item name="colorPrimary">@color/md_brown_primary</item>
+        <item name="colorPrimaryDark">@color/md_brown_primary_dark</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -182,8 +182,8 @@
         <item name="bg_aboutus">@drawable/bg_aboutus_day</item>
         <item name="scan_track_color">@color/day_scan_track_color</item>
         <item name="dot_color">@color/day_dot_color</item>
-
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
+        <item name="colorControlActivated">#f5f5f5</item>
     </style>
 
     <!--夜间模式-->
@@ -205,35 +205,29 @@
     </style>
 
     <style name="PurpleTheme" parent="@style/DayTheme">
-        <item name="material_color_primary">@color/material_purple_primary</item>
-        <item name="material_color_primary_dark">@color/material_purple_primary_dark</item>
-        <item name="colorControlActivated">@color/material_red_primary</item>
+        <item name="material_color_primary">@color/md_purple_primary</item>
+        <item name="material_color_primary_dark">@color/md_purple_primary_dark</item>
     </style>
 
     <style name="RedTheme" parent="@style/DayTheme">
-        <item name="material_color_primary">@color/material_red_primary</item>
-        <item name="material_color_primary_dark">@color/material_red_primary_dark</item>
-        <item name="colorControlActivated">@color/material_pink_primary</item>
+        <item name="material_color_primary">@color/md_red_primary</item>
+        <item name="material_color_primary_dark">@color/md_red_primary_dark</item>
     </style>
 
     <style name="PinkTheme" parent="@style/DayTheme">
-        <item name="material_color_primary">@color/material_pink_primary</item>
-        <item name="material_color_primary_dark">@color/material_pink_primary_dark</item>
-        <item name="colorControlActivated">@color/material_brown_primary</item>
+        <item name="material_color_primary">@color/md_pink_primary</item>
+        <item name="material_color_primary_dark">@color/md_pink_primary_dark</item>
     </style>
 
     <style name="BrownTheme" parent="@style/DayTheme">
-        <item name="material_color_primary">@color/material_brown_primary</item>
-        <item name="material_color_primary_dark">@color/material_brown_primary_dark</item>
-        <item name="colorControlActivated">@color/material_indigo_primary</item>
+        <item name="material_color_primary">@color/md_brown_primary</item>
+        <item name="material_color_primary_dark">@color/md_brown_primary_dark</item>
     </style>
 
     <style name="IngidoTheme" parent="@style/DayTheme">
-        <item name="material_color_primary">@color/material_indigo_primary</item>
-        <item name="material_color_primary_dark">@color/material_indigo_primary_dark</item>
-        <item name="colorControlActivated">@color/material_purple_primary</item>
+        <item name="material_color_primary">@color/md_indigo_primary</item>
+        <item name="material_color_primary_dark">@color/md_indigo_primary_dark</item>
     </style>
-
 
 
     <!--侧滑菜单文字-->

@@ -5,7 +5,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/interval_white_height"
-        android:background="@color/night_interval_color"/>
+        android:background="?attr/interval_color"/>
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

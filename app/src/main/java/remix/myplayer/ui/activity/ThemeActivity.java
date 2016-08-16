@@ -43,8 +43,8 @@ public class ThemeActivity extends BaseAppCompatActivity implements View.OnClick
             case R.id.day:
                 ThemeStore.THEME_MODE = ThemeStore.DAY;
                 ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
-                ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor(ThemeStore.THEME_COLOR);
-                ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor(ThemeStore.THEME_COLOR);
+                ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor();
+                ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor();
                 ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);
                 break;
             case R.id.night:
@@ -61,8 +61,8 @@ public class ThemeActivity extends BaseAppCompatActivity implements View.OnClick
                 if(++ThemeStore.THEME_COLOR > ThemeStore.THEME_INDIGO)
                     ThemeStore.THEME_COLOR = ThemeStore.THEME_PURPLE;
 
-                ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor(ThemeStore.THEME_COLOR);
-                ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor(ThemeStore.THEME_COLOR);
+                ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor();
+                ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor();
 
                 ThemeStore.saveThemeColor(ThemeStore.THEME_COLOR);
                 ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);

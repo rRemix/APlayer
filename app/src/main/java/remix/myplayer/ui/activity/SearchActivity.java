@@ -5,11 +5,12 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,8 +19,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SearchResAdapter;
-import remix.myplayer.inject.ViewInject;
-import remix.myplayer.ui.customview.SearchView;
+import remix.myplayer.listener.OnItemClickListener;
+import remix.myplayer.ui.RecyclerItemDecoration;
+import remix.myplayer.ui.customview.SearchToolBar;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 
@@ -31,7 +33,7 @@ import remix.myplayer.util.Global;
 /**
  * 搜索界面，根据关键字，搜索歌曲名，艺术家，专辑中的记录
  */
-public class SearchActivity extends BaseAppCompatActivity {
+public class SearchActivity extends ToolbarActivity {
     //查询索引
     public static int mIdIndex = -1;
     public static int mDisplayNameIndex = -1;
@@ -43,16 +45,12 @@ public class SearchActivity extends BaseAppCompatActivity {
     //搜索的关键字
     private String mkey = "";
     public static SearchActivity mInstance = null;
-    private static final String SDROOT = "/sdcard/";
 
     //搜索结果的listview
     @BindView(R.id.search_result_native)
-    ListView mSearchResList = null;
+    RecyclerView mSearchResRecyclerView;
     @BindView(R.id.search_view)
-    SearchView mSearchView = null;
-    //背景
-    @BindView(R.id.search_logo)
-    ImageView mSearchLogo;
+    SearchToolBar mSearchToolBar;
     //无搜索结果
     @BindView(R.id.search_result_blank)
     TextView mSearchResBlank;
@@ -65,9 +63,10 @@ public class SearchActivity extends BaseAppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
+        initToolbar(mSearchToolBar,"");
         mInstance = this;
 
-        mSearchView.addSearchListener(new SearchView.SearchListener() {
+        mSearchToolBar.addSearchListener(new SearchToolBar.SearchListener() {
             @Override
             public void onSearch(String key, boolean isclick) {
                 search(key, isclick);
@@ -77,7 +76,7 @@ public class SearchActivity extends BaseAppCompatActivity {
             public void onClear() {
                 //清空搜索结果，并更新界面
                 mCursor = null;
-                mSearchResAdapter.changeCursor(mCursor);
+                mSearchResAdapter.setCursor(mCursor);
                 mkey = "";
                 UpdateUI();
             }
@@ -88,9 +87,33 @@ public class SearchActivity extends BaseAppCompatActivity {
             }
         });
 
-        mSearchResAdapter = new SearchResAdapter(getApplicationContext(), R.layout.search_reulst_item, null, new String[]{}, new int[]{}, 0);
-        mSearchResList.setAdapter(mSearchResAdapter);
-        mSearchResList.setOnItemClickListener(new ListViewListener());
+        mSearchResAdapter = new SearchResAdapter(this);
+        mSearchResAdapter.setOnItemClickLitener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Intent intent = new Intent(Constants.CTL_ACTION);
+                Bundle arg = new Bundle();
+                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                arg.putInt("Position", position);
+                intent.putExtras(arg);
+                getApplicationContext().sendBroadcast(intent);
+                if (mCursor != null && mCursor.getCount() > 0 && mCursor.moveToFirst()) {
+                    ArrayList<Long> list = new ArrayList<>();
+                    for(int i = 0 ; i < mCursor.getCount(); i++) {
+                        mCursor.moveToPosition(i);
+                        list.add(mCursor.getLong(mIdIndex));
+                    }
+                    Global.setPlayingList(list);
+                }
+            }
+            @Override
+            public void onItemLongClick(View view, int position) {
+            }
+        });
+        mSearchResRecyclerView.setAdapter(mSearchResAdapter);
+        mSearchResRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mSearchResRecyclerView.addItemDecoration(new RecyclerItemDecoration(this,RecyclerItemDecoration.VERTICAL_LIST));
+        mSearchResRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         UpdateUI();
     }
@@ -127,10 +150,10 @@ public class SearchActivity extends BaseAppCompatActivity {
             mAlbumIndex = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
             mAlbumIdIndex = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
             mCursor = cursor;
-            mSearchResAdapter.changeCursor(mCursor);
+            mSearchResAdapter.setCursor(mCursor);
         } else {
             mCursor = null;
-            mSearchResAdapter.changeCursor(mCursor);
+            mSearchResAdapter.setCursor(mCursor);
         }
         mSearchResAdapter.setCursor(mCursor);
 
@@ -142,25 +165,16 @@ public class SearchActivity extends BaseAppCompatActivity {
         super.onDestroy();
         if(mCursor != null)
             mCursor.close();
-        mSearchResAdapter.changeCursor(null);
+        mSearchResAdapter.setCursor(null);
     }
 
     /**
      * 更新界面
-     * 如果搜素关键字为空，显示搜索历史或者无搜索历史
-     * 如果关键字不为空，显示搜索结果或者无搜索结果
      */
     private void UpdateUI(){
-        if(!mkey.equals("")){
-            mSearchResContainer.setVisibility(View.VISIBLE);
-            mSearchLogo.setVisibility(View.GONE);
-            boolean flag = mCursor != null && mCursor.getCount() > 0;
-            mSearchResList.setVisibility(flag == true ? View.VISIBLE : View.GONE);
-            mSearchResBlank.setVisibility(flag == true ? View.GONE :View.VISIBLE);
-        }else {
-            mSearchResContainer.setVisibility(View.GONE);
-            mSearchLogo.setVisibility(View.VISIBLE);
-        }
+        boolean flag = mCursor != null && mCursor.getCount() > 0;
+        mSearchResRecyclerView.setVisibility(flag? View.VISIBLE : View.GONE);
+        mSearchResBlank.setVisibility(flag? View.GONE :View.VISIBLE);
     }
 
     class ListViewListener implements AdapterView.OnItemClickListener {

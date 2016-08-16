@@ -1,32 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:id="@+id/songlist_item">
+    android:layout_height="@dimen/item_height"
+    android:id="@+id/reslist_item"
+    android:background="?android:attr/selectableItemBackground">
     <com.facebook.drawee.view.SimpleDraweeView
         android:layout_alignParentLeft="true"
         android:id="@+id/search_image"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="19dp"
+        android:layout_marginLeft="@dimen/d16_size"
+        android:layout_marginRight="@dimen/d16_size"
         android:layout_width="45dp"
         android:layout_height="45dp"
+        fresco:actualImageScaleType="centerCrop"
+        fresco:placeholderImageScaleType="centerCrop"
         fresco:placeholderImage="@drawable/default_album_list"
-        fresco:placeholderImageScaleType="fitCenter"/>
+        fresco:failureImage="@drawable/default_album_list"
+        fresco:failureImageScaleType="centerCrop" />
     <!--歌曲名、歌手、专辑-->
     <LinearLayout
-        android:layout_width="210dp"
-        android:layout_height="match_parent"
+        android:layout_width="180dp"
+        android:layout_height="@dimen/item_height"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="85dp"
         android:gravity="center_vertical"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_toRightOf="@id/search_image">
         <TextView
-            android:layout_width="210dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/search_name"
-            android:textColor="@color/white"
+            android:textColor="?attr/text_color_primary"
             android:textSize="@dimen/s14_size"
             android:text="歌曲名"
             android:layout_marginBottom="5dp"
@@ -34,9 +38,9 @@
             android:ellipsize="end"/>
         <TextView
             android:id="@+id/search_detail"
-            android:layout_width="210dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/gray_6c6a6c"
+            android:textColor="?attr/text_color"
             android:textSize="@dimen/s12_size"
             android:text="歌手与专辑"
             android:lines="1"

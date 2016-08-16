@@ -1,11 +1,16 @@
 package remix.myplayer.ui.customview;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -20,23 +25,21 @@ import remix.myplayer.R;
 /**
  * 自定义搜索控件
  */
-public class SearchView extends LinearLayout {
+public class SearchToolBar extends Toolbar {
     private static final String TAG = "SearchView";
     private Context mContext;
     private EditText mEditText;
-    private ImageButton mButtonBack;
     private ImageButton mButtonClear;
     private SearchListener mSearchListener;
-    private TextView mButtonSearch;
-    public SearchView(Context context) {
+    public SearchToolBar(Context context) {
         super(context);
         mContext = context;
     }
-    public SearchView(Context context, AttributeSet attrs) {
+    public SearchToolBar(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
     }
-    public SearchView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SearchToolBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
     }
@@ -51,44 +54,58 @@ public class SearchView extends LinearLayout {
 //        ArrayAdapter adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_list_item_1, strs);
 //        mEditText.setAdapter(adapter);
 
+//        mEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                if(actionId == EditorInfo.IME_ACTION_SEARCH){
+//                    String key = v.getText().toString();
+//                    if(key != null){
+//                        if(key.toString().equals("")){
+//                            if(mSearchListener != null) {
+//                                mSearchListener.onClear();
+//                                mButtonClear.setVisibility(INVISIBLE);
+//                            }
+//                        }else {
+//                            if (mSearchListener != null) {
+//                                mSearchListener.onSearch(key.toString(),false);
+//                                mButtonClear.setVisibility(VISIBLE);
+//                            }
+//                        }
+//                    }
+//                    return true;
+//                } else {
+//                    return false;
+//                }
+//            }
+//        });
         mEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d(TAG,"onTextChanged --- CharSequence:" + s);
+
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
                 //EditText不为空时显示尾部的删除按钮
                 if(s != null){
                     if(s.toString().equals("")){
                         if(mSearchListener != null) {
                             mSearchListener.onClear();
                             mButtonClear.setVisibility(INVISIBLE);
-                            mButtonSearch.setEnabled(false);
                         }
                     }else {
                         if (mSearchListener != null) {
                             mSearchListener.onSearch(s.toString(),false);
                             mButtonClear.setVisibility(VISIBLE);
-                            mButtonSearch.setEnabled(true);
                         }
                     }
                 }
             }
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
         });
-        mButtonBack = (ImageButton)findViewById(R.id.btn_search_back);
-        mButtonBack.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mSearchListener != null){
-                    mSearchListener.onBack();
-                }
-            }
-        });
-        mButtonClear = (ImageButton)findViewById(R.id.btn_search_clear);
+
+        mButtonClear = (ImageButton)findViewById(R.id.search_clear);
         mButtonClear.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,14 +115,7 @@ public class SearchView extends LinearLayout {
                     mSearchListener.onClear();
             }
         });
-        mButtonSearch = (TextView)findViewById(R.id.btn_search_go);
-        mButtonSearch.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mSearchListener != null)
-                    mSearchListener.onSearch(mEditText.getText().toString(),true);
-            }
-        });
+
     }
 
     @Override

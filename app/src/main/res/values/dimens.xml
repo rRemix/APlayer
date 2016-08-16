@@ -10,7 +10,7 @@
     <dimen name="s12_size">12sp</dimen>
 
 
-    <dimen name="allsong_item_height">72dp</dimen>
+    <dimen name="item_height">72dp</dimen>
     <dimen name="item_text_width">230dp</dimen>
     <dimen name="interval_white_height">12dp</dimen>
 
@@ -36,4 +36,6 @@
     <dimen name="d30_size">30dp</dimen>
     <dimen name="d40_size">40dp</dimen>
     <dimen name="d50_size">50dp</dimen>
+    <dimen name="d90_size">90dp</dimen>
+    <dimen name="d100_size">100dp</dimen>
 </resources>

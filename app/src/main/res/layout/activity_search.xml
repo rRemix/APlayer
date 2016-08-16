@@ -1,101 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background_color_3"
-    android:fitsSystemWindows="true">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <remix.myplayer.ui.customview.SearchView
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:id="@+id/search_view">
-        <ImageButton
-            android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <remix.myplayer.ui.customview.SearchToolBar
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_search_back"
-            android:background="@drawable/common_btn_back"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:onClick="onBack"/>
-        <RelativeLayout
-            android:layout_width="240dp"
-            android:layout_height="match_parent"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/search_bg">
-            <EditText
-                android:layout_width="200dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical|left"
-                android:id="@+id/search_text"
-                android:background="@null"
-                android:textSize="@dimen/s14_size"
-                android:textColor="@color/white"
-                android:lines="1"
-                android:ellipsize="end"
-                android:hint="@string/search_song_artist_album"
-                android:drawableLeft="@drawable/desk2_search"
-                android:paddingLeft="8dp"
-                android:imeOptions="actionSearch"
-                android:textCursorDrawable="@drawable/bg_cursor_gray"/>
-            <ImageButton
+            android:background="?attr/material_color_primary"
+            android:orientation="horizontal"
+            android:id="@+id/search_view">
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
-                android:layout_alignParentRight="true"
-                android:id="@+id/btn_search_clear"
-                android:layout_centerVertical="true"
+                android:layout_gravity="center_vertical|left"
+                android:src="@drawable/act_btn_search"
+                android:background="@color/transparent"
+                android:id="@+id/search_img"
+                android:layout_marginRight="@dimen/d14_size"
+                android:layout_marginLeft="@dimen/d14_size"/>
+            <ImageButton
+                android:src="@drawable/actionbar_delete"
+                android:background="@color/transparent"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:id="@+id/search_clear"
+                android:layout_marginRight="@dimen/d14_size"
+                android:layout_marginLeft="@dimen/d14_size"
                 android:visibility="invisible"
-                android:background="@drawable/actionbar_delete" />
-        </RelativeLayout>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/btn_search_go"
-            android:text="搜索"
-            android:textSize="@dimen/s18_size"
-            android:textColor="@color/white"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="10dp"
-            android:gravity="center_vertical" />
-    </remix.myplayer.ui.customview.SearchView>
+                android:layout_centerVertical="true"
+                android:layout_gravity="center_vertical|right"/>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@id/search_img"
+                android:layout_toLeftOf="@id/search_clear"
+                android:layout_marginLeft="@dimen/d20_size"
+                android:id="@+id/search_text"
+                android:background="@null"
+                android:textSize="@dimen/s16_size"
+                android:textColor="#EAEAEA"
+                android:textColorHint="#EAEAEA"
+                android:singleLine="true"
+                android:hint="@string/search_song_artist_album"
+                android:imeOptions="actionSearch"
+                android:textCursorDrawable="@drawable/bg_cursor_gray"/>
+
+        </remix.myplayer.ui.customview.SearchToolBar>
+    </android.support.design.widget.AppBarLayout>
+
 
     <!--搜索历史与搜索结果-->
     <FrameLayout
+        android:id="@+id/search_result_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/search_logo"
-            android:layout_gravity="center"
-            android:id="@+id/search_logo"
-            android:visibility="visible"/>
-
-        <FrameLayout
-            android:id="@+id/search_result_container"
+        android:layout_height="match_parent"
+        android:background="?attr/background_color_3">
+        <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone">
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/search_result_native"
-                android:divider="@drawable/divider" />
-            <TextView
-                android:id="@+id/search_result_blank"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="30dp"
-                android:gravity="center"
-                android:text="@string/no_search_result"
-                android:textSize="22sp"
-                android:textColor="@color/white"/>
-        </FrameLayout>
-
+            android:id="@+id/search_result_native"
+            android:divider="@drawable/divider" />
+        <TextView
+            android:id="@+id/search_result_blank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/d40_size"
+            android:gravity="center"
+            android:text="@string/no_search_result"
+            android:textSize="@dimen/s16_size"
+            android:textColor="?attr/text_color"/>
     </FrameLayout>
 
 </LinearLayout>

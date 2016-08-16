@@ -1,13 +1,12 @@
 package remix.myplayer.ui.customview;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.StateListDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -247,7 +246,7 @@ public class EQSeekBar extends View {
         mEnableTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqenabletrackcolor,
                 ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_enable_track_color : R.color.night_enable_track_color));
         mEnableProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqenableprogresscolor,
-                ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor(ThemeStore.THEME_COLOR) : R.color.night_nonenable_progress_color));
+                ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.night_nonenable_progress_color));
         mEnableTextColor = typedArray.getColor(R.styleable.EQSeekBar_eqtextcolor,
                 ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_enable_text_color : R.color.night_enable_text_color));
 
@@ -263,7 +262,7 @@ public class EQSeekBar extends View {
         mDotNum = typedArray.getInteger(R.styleable.EQSeekBar_eqdotnum,31);
 
         //轨道宽度
-        mTrackWidth = (int)typedArray.getDimension(R.styleable.EQSeekBar_eqtrackwidth, DensityUtil.dip2px(mContext,2));
+        mTrackWidth = (int)typedArray.getDimension(R.styleable.EQSeekBar_eqtrackwidth, DensityUtil.dip2px(mContext,3));
 
         //顶部提示文字画笔
         mFreTextSize = DensityUtil.dip2px(getContext(),13);
@@ -322,7 +321,10 @@ public class EQSeekBar extends View {
         canvas.drawText(mFreText, mViewWidth / 2, y + mTrackHeigh + mThumbWidth * 2.5f, mTipTextPaint);
 
         //thumb
-        mThumbDrawable.setBounds((mViewWidth - mThumbWidth) / 2, mThumbCenterY - mThumbWidth / 2, (mViewWidth - mThumbWidth) / 2 + mThumbWidth , mThumbCenterY + mThumbWidth / 2);
+        mThumbDrawable.setBounds((mViewWidth - mThumbWidth) / 2,
+                                mThumbCenterY - mThumbWidth / 2,
+                                (mViewWidth - mThumbWidth) / 2 + mThumbWidth ,
+                                mThumbCenterY + mThumbWidth / 2);
         mThumbDrawable.draw(canvas);
     }
 
@@ -337,7 +339,7 @@ public class EQSeekBar extends View {
             return;
         }
 
-        int temp = Integer.MAX_VALUE;
+        float temp = Integer.MAX_VALUE;
         for(int i = 0 ; i < mDotPosition.size() ;i++){
             if(Math.abs(mDotPosition.get(i) - eventY) < temp){
                 mPositon = i;
@@ -346,7 +348,7 @@ public class EQSeekBar extends View {
         }
         //寻找与当前触摸点最近的值
         if(isUp){
-            mThumbCenterY = mDotPosition.get(mPositon);
+            mThumbCenterY = Math.round(mDotPosition.get(mPositon));
         } else {
             mThumbCenterY = eventY;
         }
@@ -389,13 +391,15 @@ public class EQSeekBar extends View {
             int paddingbottom = getPaddingBottom();
             mTrackHeigh = mViewHeight - paddingtop - paddingbottom - mThumbWidth * 4;
             //计算轨道宽度 两个小圆点之间的距离
-            mDotBetween = mTrackHeigh / (mDotNum - 1);
+            double test = mTrackHeigh * 1.0 / (mDotNum - 1);
+            float test1 = mTrackHeigh * 1.0f / (mDotNum - 1);
+            mDotBetween = Math.round(mTrackHeigh * 1.0f / (mDotNum - 1));
             mDotPosition.clear();
             //设置所有小圆点的坐标
             for(int i = 0 ; i < mDotNum ; i++){
                 mDotPosition.add(mThumbWidth * 2 + mDotBetween * i);
             }
-            mThumbCenterY = mDotPosition.get(mPositon);
+            mThumbCenterY = Math.round(mDotPosition.get(mPositon));
             mInit = true;
         }
     }
@@ -417,7 +421,7 @@ public class EQSeekBar extends View {
         if(progress < 0)
             progress = 0;
         mProgress = progress;
-        int eventY = (int)((1.0 * mProgress / mMax) * mTrackHeigh + mThumbHeight);
+        int eventY = (int)((1.0 * mProgress / mMax) * mTrackHeigh + mThumbHeight * 2);
         seekTo(eventY,true);
         //mThumbCenterY
 //        int temp = Integer.MAX_VALUE;

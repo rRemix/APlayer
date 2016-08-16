@@ -114,7 +114,6 @@
                 style="@style/Playtimetext"/>
             <SeekBar
                 android:id="@+id/seekbar"
-                android:thumb="@drawable/progress_indicator"
                 android:maxHeight="2dp"
                 android:progressDrawable="@drawable/bg_progress"
                 android:layout_width="0dp"

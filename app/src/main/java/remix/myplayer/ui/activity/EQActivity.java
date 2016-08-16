@@ -1,5 +1,7 @@
 package remix.myplayer.ui.activity;
 
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.Virtualizer;
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -26,6 +29,7 @@ import remix.myplayer.R;
 import remix.myplayer.application.Application;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.EQSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
@@ -51,6 +55,8 @@ public class EQActivity extends ToolbarActivity {
     SwitchCompat mSwitch;
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
+    @BindView(R.id.eq_reset)
+    Button mReset;
 
     private static ArrayList<Short> mBandFrequencys = new ArrayList<>();
     private static boolean mEnable = false;
@@ -180,37 +186,13 @@ public class EQActivity extends ToolbarActivity {
         initToolbar(mToolBar,getString(R.string.use_eq));
 
         //初始化switch
-//        StateListDrawable stateListDrawable = new StateListDrawable();
-//        final int[][] states = new int[3][];
-//        final int[] colors = new int[3];
-//        int i = 0;
-//        states[i] = new int[] { -android.R.attr.state_enabled };
-//        colors[i] = ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY);
-//        i++;
-//
-//        states[i] = new int[] { android.R.attr.state_checked };
-//        colors[i] = ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY);
-//        i++;
-//
-//        // Default enabled state
-//        states[i] = new int[0];
-//        colors[i] = ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY);
-//
-//        i = 0;
-//        for( ; i < 3 ;i++){
-//            stateListDrawable.addState(states[i], new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, new int[]{colors[i]}));
-//        }
-//        mSwitch.setThumbResource(R.drawable.thumb_test);
-
         ContextThemeWrapper ctw = new ContextThemeWrapper(this,Theme.getTheme());
-
         mSwitch = new SwitchCompat(ctw);
         Toolbar.LayoutParams toolbarLp = new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         toolbarLp.rightMargin = DensityUtil.dip2px(this,16);
         toolbarLp.gravity = Gravity.END;
         mSwitch.setLayoutParams(toolbarLp);
         mToolBar.addView(mSwitch);
-
 
         mSwitch.setChecked(mEnable);
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -231,25 +213,10 @@ public class EQActivity extends ToolbarActivity {
             }
         });
 
-        LinearLayout EQContainer = (LinearLayout)findViewById(R.id.eq_container);
+        //初始化重置按钮背景
+        mReset.setBackground(Theme.getBgCorner(1.0f,5,0,ColorUtil.getColor(ThemeStore.isDay()? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899)));
 
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams( DensityUtil.dip2px(this,30),ViewGroup.LayoutParams.MATCH_PARENT);
-        lp.setMargins(DensityUtil.dip2px(this,20),0,DensityUtil.dip2px(this,20),0);
-        for(int i = 0 ; i < mBandNumber ;i++){
-            EQSeekBar eqSeekBar = new EQSeekBar(this);
-            eqSeekBar.setLayoutParams(lp);
-
-            eqSeekBar.setOnSeekBarChangeListener(new EQSeekbarOnChangeListener());
-            eqSeekBar.setMax(mMaxEQLevel - mMinEQLevel);
-            eqSeekBar.setTag(mCenterFres.get(i));
-            int fre_temp = mCenterFres.get(i);
-            String hz = fre_temp > 1000 ?  fre_temp / 1000 + "K" : fre_temp + "";
-            eqSeekBar.setFreText(hz);
-            mEQSeekBars.add(eqSeekBar);
-            EQContainer.addView(eqSeekBar);
-        }
-        mEQSeekBars.get(1).setBackgroundColor(ColorUtil.getColor(R.color.black_1b1a1c));
-
+        addEQSeekBar();
 
         new Thread(){
             @Override
@@ -265,6 +232,27 @@ public class EQActivity extends ToolbarActivity {
 
     }
 
+    /**
+     * 根据BandNumber数量，添加EQSeekBar
+     */
+    private void addEQSeekBar() {
+        LinearLayout EQContainer = (LinearLayout)findViewById(R.id.eq_container);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams( DensityUtil.dip2px(this,30), ViewGroup.LayoutParams.MATCH_PARENT);
+        lp.setMargins(DensityUtil.dip2px(this,20),0,DensityUtil.dip2px(this,20),0);
+        for(int i = 0 ; i < mBandNumber ;i++){
+            EQSeekBar eqSeekBar = new EQSeekBar(this);
+            eqSeekBar.setLayoutParams(lp);
+
+            eqSeekBar.setOnSeekBarChangeListener(new EQSeekbarOnChangeListener());
+            eqSeekBar.setMax(mMaxEQLevel - mMinEQLevel);
+            eqSeekBar.setTag(mCenterFres.get(i));
+            int fre_temp = mCenterFres.get(i);
+            String hz = fre_temp > 1000 ?  fre_temp / 1000 + "K" : fre_temp + "";
+            eqSeekBar.setFreText(hz);
+            mEQSeekBars.add(eqSeekBar);
+            EQContainer.addView(eqSeekBar);
+        }
+    }
 
 
     public void UpdateEnable(boolean enable) {

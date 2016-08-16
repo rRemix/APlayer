@@ -30,8 +30,7 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             CircleSeekBar:progress_max="60"
-            CircleSeekBar:progress_width="4dp"
-            CircleSeekBar:progress_thumb="@drawable/bg_thumb"/>
+            CircleSeekBar:progress_width="4dp" />
         <TextView
             android:layout_gravity="center"
             android:layout_width="wrap_content"
@@ -64,10 +63,7 @@
             android:layout_height="wrap_content"
             android:textOn=""
             android:textOff=""
-            android:id="@+id/popup_timer_switch"
-            android:thumb="@drawable/timer_btn_normal_btn"
-            android:track="@drawable/timer_btn_normal_focus"
-            />
+            android:id="@+id/popup_timer_switch" />
     </LinearLayout>
 
     <LinearLayout
@@ -105,29 +101,26 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="16dp">
-        <TextView
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_timer_toggle"
             android:id="@+id/close_toggle"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="16dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginRight="@dimen/d20_size"
+            android:layout_marginLeft="@dimen/d16_size"
             android:gravity="center"
             android:padding="2dp"
             android:textSize="@dimen/s16_size"
-            android:text="开始计时"
-            android:textColor="@drawable/timer_toggle_text_color_"/>
-        <TextView
+            android:text="开始计时" />
+        <Button
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/close_stop"
-            android:background="@drawable/bg_timer_exit"
             android:layout_toLeftOf="@id/close_toggle"
             android:gravity="center"
             android:padding="2dp"
-            android:textColor="@drawable/timer_exit_text_color"
             android:textSize="@dimen/s16_size"
-            android:text="取消"/>
+            android:text="关闭"/>
     </RelativeLayout>
 </LinearLayout>

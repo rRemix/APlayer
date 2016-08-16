@@ -52,9 +52,9 @@
     <attr name="aboutus_background_color" format="color|reference"/>
     <attr name="material_color_primary" format="color|reference"/>
     <attr name="material_color_primary_dark" format="color|reference"/>
-    <attr name="stress_color" format="color|reference"/>
+    <attr name="material_color_secondry" format="color|reference"/>
     <attr name="bg_aboutus" format="reference"/>
-    <!--扫描文件大小-->
+    <!--扫描控件相关属性-->
     <attr name="scan_track_color" format="color|reference"/>
     <attr name="dot_color" format="color|reference"/>
     <attr name="scan_progress_color" format="color|reference"/>

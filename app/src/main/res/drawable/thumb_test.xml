@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:drawable="@color/material_indigo_primary"/>
-    <item android:state_checkable="true" android:drawable="@color/material_red_primary"/>
-    <item android:drawable="@color/material_pink_primary"/>
-</selector>
