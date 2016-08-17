@@ -3,11 +3,14 @@ package remix.myplayer.ui.dialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.NinePatchDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.ColorInt;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -120,22 +123,34 @@ public class TimerDialog extends BaseActivity {
             }
         });
 
-        //初始化switch
-        ContextThemeWrapper ctw = new ContextThemeWrapper(this, Theme.getTheme());
-        mSwitch = new SwitchCompat(ctw);
-        ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
-
         //初始化开始计时按钮
         int[] state_prs = new int[]{android.R.attr.state_pressed};
-        int[] state_default = new int[]{-android.R.attr.state_focused};
+        int[] state_non_focus = new int[]{-android.R.attr.state_focused};
         int color = ColorUtil.getColor(ThemeStore.isDay()? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899);
         StateListDrawable bg = new StateListDrawable();
         bg.addState(state_prs,Theme.getBgCorner(1.0f,4,0,color));
-        bg.addState(state_default,Theme.getBgCorner(0.03f,4,1,color));
+        bg.addState(state_non_focus,Theme.getBgCorner(0.01f,4,1,color));
 
         mToggle.setBackground(bg);
-        mToggle.setTextColor(new ColorStateList(new int[][]{state_prs,state_default},
+        mToggle.setTextColor(new ColorStateList(new int[][]{state_prs,state_non_focus},
                 new int[]{ColorUtil.getColor(R.color.white),color}));
+
+        //初始化switch
+        ContextThemeWrapper ctw = new ContextThemeWrapper(this, Theme.getTheme());
+        mSwitch = new SwitchCompat(ctw);
+//        int[] states_check = new int[]{android.R.attr.state_checked};
+//        int[] states_default = new int[]{};
+//        StateListDrawable trackDrawable = new StateListDrawable();
+//        Drawable oriTrackDrawable = getResources().getDrawable(R.drawable.md_track);
+//        trackDrawable.setBounds(oriTrackDrawable.getBounds());
+//        trackDrawable.addState(states_check,Theme.TintDrawable(oriTrackDrawable,ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899),0.3f));
+//        trackDrawable.addState(states_default,getResources().getDrawable(R.drawable.md_track));
+//        mSwitch.setTrackDrawable(trackDrawable);
+
+        ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
+
+//        Theme.TintDrawable(mSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899));
+//        Theme.TintDrawable(mSwitch.getTrackDrawable(), ColorUtil.adjustAlpha(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899),0.7f));
 
         //读取保存的配置
         boolean hasdefault = SharedPrefsUtil.getValue(this, "setting", "TimerDefault", false);

@@ -216,7 +216,7 @@ public class EQSeekBar extends View {
         mThumbDrawable = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumb);
         if(mThumbDrawable == null)
             mThumbDrawable = getResources().getDrawable(R.drawable.thumb);
-        Theme.TintDrawable(mThumbDrawable,ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899)));
+        Theme.TintDrawable(mThumbDrawable,ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899));
 //        Drawable thumb = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumb);
 //        Drawable thumbPress = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumbpress);
 //        if(thumb == null)

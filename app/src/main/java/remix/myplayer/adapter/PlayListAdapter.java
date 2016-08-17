@@ -105,7 +105,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
             if(holder.mButton != null) {
                 boolean isLove = name.equals(mContext.getString(R.string.my_favorite));
                 Drawable drawable = mContext.getResources().getDrawable(isLove ? R.drawable.playlist_love : R.drawable.list_icn_more);
-                Theme.TintDrawable(drawable, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white)));
+                Theme.TintDrawable(drawable, ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
                 holder.mButton.setImageDrawable(drawable);
                 holder.mButton.setClickable(!isLove);
                 if(isLove){

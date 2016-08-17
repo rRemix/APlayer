@@ -20,8 +20,8 @@
                 android:src="@drawable/act_btn_search"
                 android:background="@color/transparent"
                 android:id="@+id/search_img"
-                android:layout_marginRight="@dimen/d14_size"
-                android:layout_marginLeft="@dimen/d14_size"/>
+                android:layout_marginRight="@dimen/d12_size"
+                android:layout_marginLeft="@dimen/d12_size"/>
             <ImageButton
                 android:src="@drawable/actionbar_delete"
                 android:background="@color/transparent"

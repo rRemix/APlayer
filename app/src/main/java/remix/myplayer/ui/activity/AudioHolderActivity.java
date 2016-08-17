@@ -557,29 +557,50 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
             Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
                 @Override
                 public void onGenerated(Palette palette) {
-                    Palette.Swatch f = palette.getLightMutedSwatch();//柔和 亮色
-
-                    if(f != null){
+                    Palette.Swatch swt = palette.getLightMutedSwatch();//柔和 亮色
+                    if(swt == null){
+                        swt = palette.getDarkMutedSwatch();
+                    }
+                    if(swt == null){
+                        swt = palette.getMutedSwatch();
+                    }
+                    if(swt == null){
+                        swt = palette.getLightVibrantSwatch();
+                    }
+                    if(swt == null){
+                        swt = palette.getDarkVibrantSwatch();
+                    }
+                    if(swt == null){
+                        swt = palette.getVibrantSwatch();
+                    }
+                    if(swt != null){
                         //修改顶部字体颜色
-                        mTopTitle.setTextColor(f.getBodyTextColor());
-                        mTopDetail.setTextColor(f.getTitleTextColor());
+                        mTopTitle.setTextColor(swt.getBodyTextColor());
+                        mTopDetail.setTextColor(swt.getTitleTextColor());
                         //修改背景颜色
-                        mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{f.getRgb(), Color.WHITE}));
-
-                        mHColor =  f.getTitleTextColor();
-                        mLColor = f.getBodyTextColor();
+                        int colorFrom = ColorUtil.shiftColor(swt.getRgb(),1.0f);
+                        int colorTo = ColorUtil.adjustAlpha(swt.getRgb(),0.1f);
+                        mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
+                        //锁屏界面字体颜色
+                        mHColor =  swt.getTitleTextColor();
+                        mLColor = swt.getBodyTextColor();
 
                         LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
                         //修改track颜色
-                        ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(f.getRgb());
+                        ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(ColorUtil.adjustAlpha(swt.getRgb(),0.4f));
                         //修改progress颜色
-                        (layerDrawable.getDrawable(1)).setColorFilter(ColorUtil.darkenColor(f.getRgb()), PorterDuff.Mode.SRC_IN);
+                        (layerDrawable.getDrawable(1)).setColorFilter(colorFrom, PorterDuff.Mode.SRC_IN);
                         mSeekBar.setProgressDrawable(layerDrawable);
 
                         //修改thumb颜色
                         Drawable drawable = getResources().getDrawable(R.drawable.thumb);
-                        Theme.TintDrawable(drawable, ColorStateList.valueOf(ColorUtil.darkenColor(f.getRgb())));
+                        Theme.TintDrawable(drawable, swt.getRgb());
                         mSeekBar.setThumb(drawable);
+
+                        //修改顶部按钮颜色
+                        Drawable topDrawable = getResources().getDrawable(R.drawable.play_btn_back);
+                        Theme.TintDrawable(topDrawable,colorFrom);
+                        mHide.setImageDrawable(topDrawable);
                     }
 
                 }

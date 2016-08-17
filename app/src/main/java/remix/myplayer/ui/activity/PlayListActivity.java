@@ -22,7 +22,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
-import remix.myplayer.inject.ViewInject;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.dialog.AddPlayListDialog;
 import remix.myplayer.util.Constants;

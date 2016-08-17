@@ -14,9 +14,8 @@ import android.widget.ListView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.adapter.PlayingListAdapter;
-import remix.myplayer.inject.ViewInject;
+import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.util.Constants;
 
 /**

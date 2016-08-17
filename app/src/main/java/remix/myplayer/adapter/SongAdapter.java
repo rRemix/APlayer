@@ -84,20 +84,30 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
 
     @Override
     public void onBindViewHolder(final AllSongHolder holder, final int position) {
-
         final boolean allsong = mType == ALLSONG;
-        final MP3Item temp = mInfoList != null ? mInfoList.get(position) : new MP3Item();
         if(allsong && (mCursor == null || !mCursor.moveToPosition(position))){
             return;
         }
+        if(!allsong && (mInfoList == null || mInfoList.get(position) == null))
+            return;
+
+        final MP3Item temp = allsong ? new MP3Item(mCursor.getInt(SongFragment.mSongId),
+                mCursor.getString(SongFragment.mDisPlayNameIndex),
+                mCursor.getString(SongFragment.mTitleIndex),
+                mCursor.getString(SongFragment.mAlbumIndex),
+                mCursor.getInt(SongFragment.mAlbumIdIndex),
+                mCursor.getString(SongFragment.mArtistIndex),0,"","",0,"") :
+                mInfoList.get(position);
 
         //获得当前播放的歌曲
         final MP3Item currentMP3 = MusicService.getCurrentMP3();
         //判断该歌曲是否是正在播放的歌曲
         //如果是,高亮该歌曲，并显示动画
         if(currentMP3 != null){
-            boolean highlight = (allsong ? mCursor.getInt(SongFragment.mSongId) : temp.getId()) == MusicService.getCurrentMP3().getId();
-            holder.mName.setTextColor(highlight ? Color.parseColor("#782899") : Color.parseColor("#ffffffff"));
+            boolean highlight = temp.getId() == MusicService.getCurrentMP3().getId();
+            holder.mName.setTextColor(highlight ?
+                    ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899):
+                    ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
             holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.GONE);
             if(highlight)
                 mCurrentAnimPosition = position;
@@ -114,24 +124,21 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
         try {
             boolean isDay = ThemeStore.THEME_MODE == ThemeStore.DAY;
             //设置歌曲名
-            String name = CommonUtil.processInfo(allsong ? mCursor.getString(SongFragment.mTitleIndex) :temp.getTitle(),CommonUtil.SONGTYPE);
+            String name = CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE);
             holder.mName.setText(name);
-            holder.mName.setTextColor(mContext.getResources().getColor(isDay ? R.color.black_1c1b19 : R.color.white));
 
             //艺术家与专辑
-            String artist = CommonUtil.processInfo(allsong ? mCursor.getString(SongFragment.mArtistIndex) : temp.getArtist(),CommonUtil.ARTISTTYPE);
-            String album = CommonUtil.processInfo(allsong ? mCursor.getString(SongFragment.mAlbumIndex) : temp.getAlbum(),CommonUtil.ALBUMTYPE);
+            String artist = CommonUtil.processInfo(temp.getArtist(),CommonUtil.ARTISTTYPE);
+            String album = CommonUtil.processInfo(temp.getAlbum(),CommonUtil.ALBUMTYPE);
             //封面
             holder.mOther.setText(artist + "-" + album);
-            holder.mOther.setTextColor(mContext.getResources().getColor(isDay ? R.color.gray_6d6c69 : R.color.gray_6c6a6c));
 
         } catch (Exception e){
             e.printStackTrace();
         }
 
         DraweeController controller = Fresco.newDraweeControllerBuilder()
-                .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),
-                        allsong ? mCursor.getInt(SongFragment.mAlbumIdIndex) : temp.getAlbumId()))
+                .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()))
                 .setOldController(holder.mImage.getController())
                 .setAutoPlayAnimations(false)
                 .build();
@@ -142,7 +149,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
             //设置按钮着色
             Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more);
             int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
-            holder.mItemButton.setImageDrawable(Theme.TintDrawable(drawable, ColorStateList.valueOf(tintColor)));
+            holder.mItemButton.setImageDrawable(Theme.TintDrawable(drawable,tintColor));
             holder.mItemButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

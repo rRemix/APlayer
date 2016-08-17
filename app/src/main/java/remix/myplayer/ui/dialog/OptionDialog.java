@@ -15,21 +15,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.inject.ViewInject;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.ui.activity.BaseAppCompatActivity;
-import remix.myplayer.ui.customview.CircleImageView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 

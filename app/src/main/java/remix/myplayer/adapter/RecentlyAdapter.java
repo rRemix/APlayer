@@ -17,9 +17,11 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.CircleImageView;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 
 /**
@@ -74,8 +76,11 @@ public class RecentlyAdapter extends BaseAdapter {
         //如果是,高亮该歌曲，并显示动画
         if(currentMP3 != null){
             boolean flag = temp.getId() == currentMP3.getId();
-            holder.mName.setTextColor(flag ? Color.parseColor("#782899") : Color.parseColor("#ffffffff"));
+            holder.mName.setTextColor(flag ?
+                    ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899) :
+                    ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
             mColumnView = (ColumnView)convertView.findViewById(R.id.song_columnview);
+            mColumnView.setColumnColor(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899));
             mColumnView.setVisibility(flag ? View.VISIBLE : View.GONE);
 
             if(MusicService.getIsplay() && !mColumnView.getStatus() && flag){

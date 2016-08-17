@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -18,6 +19,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import remix.myplayer.R;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 
 /**
  * Created by taeja on 16-3-2.
@@ -165,7 +168,8 @@ public class ColumnView extends View {
 
     private void init(AttributeSet attrs){
         TypedArray t = getContext().obtainStyledAttributes(attrs, R.styleable.ColumnView);
-        mColumnColor = t.getColor(R.styleable.ColumnView_columncolor,0xffCD0000);
+//        mColumnColor = t.getColor(R.styleable.ColumnView_columncolor,0xffCD0000);
+        mColumnColor = ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899);
         mColWidth = (int)t.getDimension(R.styleable.ColumnView_columnwidth,80);
         mColNum = t.getInteger(R.styleable.ColumnView_columnnum,4);
         mHeightList = new ArrayList<>(mColNum);
@@ -174,6 +178,11 @@ public class ColumnView extends View {
             mPaint.setColor(mColumnColor);
         }
         t.recycle();
+    }
+
+    public  void setColumnColor(@ColorInt  int color){
+        mColumnColor = color;
+        invalidate();
     }
 
     public int getHeight1() {

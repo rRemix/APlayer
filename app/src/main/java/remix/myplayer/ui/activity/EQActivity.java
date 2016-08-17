@@ -186,7 +186,7 @@ public class EQActivity extends ToolbarActivity {
         initToolbar(mToolBar,getString(R.string.use_eq));
 
         //初始化switch
-        ContextThemeWrapper ctw = new ContextThemeWrapper(this,Theme.getTheme());
+        ContextThemeWrapper ctw = new ContextThemeWrapper(this,R.style.DayTheme);
         mSwitch = new SwitchCompat(ctw);
         Toolbar.LayoutParams toolbarLp = new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         toolbarLp.rightMargin = DensityUtil.dip2px(this,16);
@@ -195,6 +195,8 @@ public class EQActivity extends ToolbarActivity {
         mToolBar.addView(mSwitch);
 
         mSwitch.setChecked(mEnable);
+//        Theme.TintDrawable(mSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899));
+//        Theme.TintDrawable(mSwitch.getTrackDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899));
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

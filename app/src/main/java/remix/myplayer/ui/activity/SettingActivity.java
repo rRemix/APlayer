@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity;
 
 import android.content.Intent;
+import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -18,7 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SettingAdapter;
-import remix.myplayer.inject.ViewInject;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SharedPrefsUtil;
 
@@ -59,7 +60,10 @@ public class SettingActivity extends ToolbarActivity {
                         break;
                     case 1:
                         //音效设置
-                        startActivity(new Intent(SettingActivity.this,EQActivity.class));
+//                        startActivity(new Intent(SettingActivity.this,EQActivity.class));
+                        Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+                        i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
+                        startActivityForResult(i, 0);
                         break;
                     case 2:
                         //通知栏底色

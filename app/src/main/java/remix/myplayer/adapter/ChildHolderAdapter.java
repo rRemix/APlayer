@@ -70,14 +70,14 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
         //判断该歌曲是否是正在播放的歌曲
         //如果是,高亮该歌曲，并显示动画
         if(currentMP3 != null){
-            boolean flag = temp.getId() == currentMP3.getId();
-            holder.mTitle.setTextColor(flag ?
-                    Color.parseColor("#782899") :
-                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-            holder.mColumnView.setVisibility(flag ? View.VISIBLE : View.GONE);
+            boolean highlight = temp.getId() == currentMP3.getId();
+            holder.mTitle.setTextColor(highlight ?
+                    ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899) :
+                    ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+            holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.GONE);
 
             //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
-            if(MusicService.getIsplay() && !holder.mColumnView.getStatus() && flag){
+            if(MusicService.getIsplay() && !holder.mColumnView.getStatus() && highlight){
                 holder.mColumnView.startAnim();
             }
             else if(!MusicService.getIsplay() && holder.mColumnView.getStatus()){
@@ -92,7 +92,7 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
             //设置按钮着色
             Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more);
             int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
-            holder.mButton.setImageDrawable(Theme.TintDrawable(drawable, ColorStateList.valueOf(tintColor)));
+            holder.mButton.setImageDrawable(Theme.TintDrawable(drawable, tintColor));
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

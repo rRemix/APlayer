@@ -219,7 +219,7 @@ public class CircleSeekBar extends View {
         TypedArray typedArray = mContext.obtainStyledAttributes(mAttrs, R.styleable.CircleSeekBar);
 //        mThumbDrawable = getResources().getDrawable(R.drawable.thumb);
         mThumbDrawable = getResources().getDrawable(R.drawable.thumb);
-        Theme.TintDrawable(mThumbDrawable, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899)));
+        Theme.TintDrawable(mThumbDrawable, ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899));
 
         //轨道颜色 宽度 最大值
         mProgressCorlor = typedArray.getColor(R.styleable.CircleSeekBar_progress_color,

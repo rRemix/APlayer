@@ -26,7 +26,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.inject.ViewInject;
 import remix.myplayer.ui.dialog.ShareDialog;
 import remix.myplayer.util.Constants;
 

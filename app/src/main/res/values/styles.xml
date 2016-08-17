@@ -183,7 +183,6 @@
         <item name="scan_track_color">@color/day_scan_track_color</item>
         <item name="dot_color">@color/day_dot_color</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
-        <item name="colorControlActivated">#f5f5f5</item>
     </style>
 
     <!--夜间模式-->
@@ -207,26 +206,31 @@
     <style name="PurpleTheme" parent="@style/DayTheme">
         <item name="material_color_primary">@color/md_purple_primary</item>
         <item name="material_color_primary_dark">@color/md_purple_primary_dark</item>
+        <item name="colorControlActivated">@color/md_purple_primary</item>
     </style>
 
     <style name="RedTheme" parent="@style/DayTheme">
         <item name="material_color_primary">@color/md_red_primary</item>
         <item name="material_color_primary_dark">@color/md_red_primary_dark</item>
+        <item name="colorControlActivated">@color/md_red_primary</item>
     </style>
 
     <style name="PinkTheme" parent="@style/DayTheme">
         <item name="material_color_primary">@color/md_pink_primary</item>
         <item name="material_color_primary_dark">@color/md_pink_primary_dark</item>
+        <item name="colorControlActivated">@color/md_pink_primary</item>
     </style>
 
     <style name="BrownTheme" parent="@style/DayTheme">
         <item name="material_color_primary">@color/md_brown_primary</item>
         <item name="material_color_primary_dark">@color/md_brown_primary_dark</item>
+        <item name="colorControlActivated">@color/md_brown_primary</item>
     </style>
 
     <style name="IngidoTheme" parent="@style/DayTheme">
         <item name="material_color_primary">@color/md_indigo_primary</item>
         <item name="material_color_primary_dark">@color/md_indigo_primary_dark</item>
+        <item name="colorControlActivated">@color/md_indigo_primary</item>
     </style>
 
 

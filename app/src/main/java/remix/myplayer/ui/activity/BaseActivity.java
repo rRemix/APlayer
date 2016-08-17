@@ -5,16 +5,12 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.umeng.analytics.MobclickAgent;
 
-import java.lang.reflect.Field;
-
-import remix.myplayer.inject.ViewInject;
 import remix.myplayer.manager.ActivityManager;
 
 /**

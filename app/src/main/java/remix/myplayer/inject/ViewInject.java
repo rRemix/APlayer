@@ -1,7 +1,5 @@
 package remix.myplayer.inject;
 
-import android.test.suitebuilder.annotation.MediumTest;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

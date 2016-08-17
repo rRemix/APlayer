@@ -4,6 +4,8 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.ColorInt;
+import android.support.annotation.FloatRange;
 import android.support.annotation.StyleRes;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;
@@ -19,35 +21,36 @@ import remix.myplayer.util.ColorUtil;
  * @Date 2016/8/9 14:55
  */
 public class Theme {
-    static final int[] DISABLED_STATE_SET = new int[]{-android.R.attr.state_enabled};
-    static final int[] FOCUSED_STATE_SET = new int[]{android.R.attr.state_focused};
-    static final int[] ACTIVATED_STATE_SET = new int[]{android.R.attr.state_activated};
-    static final int[] PRESSED_STATE_SET = new int[]{android.R.attr.state_pressed};
-    static final int[] CHECKED_STATE_SET = new int[]{android.R.attr.state_checked};
-    static final int[] SELECTED_STATE_SET = new int[]{android.R.attr.state_selected};
-    static final int[] NOT_PRESSED_OR_FOCUSED_STATE_SET = new int[]{
-            -android.R.attr.state_pressed, -android.R.attr.state_focused};
-    static final int[] EMPTY_STATE_SET = new int[0];
     /**
      * 为drawable着色
      * @param oriDrawable
-     * @param colorStateList
+     * @param color
      * @return
      */
-    public static Drawable TintDrawable(Drawable oriDrawable, ColorStateList colorStateList){
+    public static Drawable TintDrawable(Drawable oriDrawable, @ColorInt int color,@FloatRange(from=0.0D, to=1.0D) float alpha){
         final Drawable wrappedDrawable = DrawableCompat.wrap(oriDrawable.mutate());
-        DrawableCompat.setTintList(wrappedDrawable,colorStateList);
+        DrawableCompat.setTintList(wrappedDrawable,ColorStateList.valueOf(ColorUtil.adjustAlpha(color,alpha)));
         return wrappedDrawable;
+    }
+
+    /**
+     * 为drawable着色
+     * @param oriDrawable
+     * @param color
+     * @return
+     */
+    public static Drawable TintDrawable(Drawable oriDrawable, @ColorInt int color){
+        return TintDrawable(oriDrawable,color,1.0f);
     }
 
     /**
      * 为drawale着色
      * @param view
-     * @param colorStateList
+     * @param color
      * @return
      */
-    public static Drawable TintDrawable(View view,ColorStateList colorStateList){
-        return TintDrawable(view.getBackground(),colorStateList);
+    public static Drawable TintDrawable(View view,@ColorInt int color){
+        return TintDrawable(view.getBackground(),color);
     }
 
     /**
@@ -57,7 +60,7 @@ public class Theme {
      * @param stroke
      * @return
      */
-    public static GradientDrawable getMaterialBgCorner(float alpah,float corner,int stroke){
+    public static GradientDrawable getMaterialBgCorner(@FloatRange(from=0.0D, to=1.0D) float alpah, float corner, int stroke){
         return getBgCorner(alpah,corner,stroke,ColorUtil.getColor(ThemeStore.getMaterialPrimaryColor()));
     }
 
@@ -78,9 +81,9 @@ public class Theme {
      * @param color
      * @return
      */
-    public static GradientDrawable getBgCorner(float alpha,float corner,int stroke,int color){
+    public static GradientDrawable getBgCorner(@FloatRange(from=0.0D, to=1.0D)float alpha,float corner,int stroke,@ColorInt int color){
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(ColorUtil.withAlpha(color,alpha));
+        bg.setColor(ColorUtil.adjustAlpha(color,alpha));
         bg.setCornerRadius(corner);
         bg.setStroke(stroke,color);
         bg.setShape(GradientDrawable.RECTANGLE);
