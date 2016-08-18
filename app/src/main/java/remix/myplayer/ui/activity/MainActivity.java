@@ -322,10 +322,10 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     private void initDrawerLayout() {
 //        mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
-        ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed}, {}},
-                new int[]{getResources().getColor(R.color.progress_complete), getResources().getColor(R.color.black_737373)});
-        mNavigationView.setItemIconTintList(colorStateList);
-        mNavigationView.setItemTextColor(colorStateList);
+//        ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed},{android.R.attr.state_checked} ,{}},
+//                new int[]{ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY), ColorUtil.getColor(R.color.black_737373),ColorUtil.getColor(R.color.black_737373)});
+//        mNavigationView.setItemIconTintList(colorStateList);
+//        mNavigationView.setItemTextColor(colorStateList);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -408,15 +408,10 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     //更新界面
     @Override
-    public void UpdateUI(MP3Item MP3Item, boolean isplay) {
+    public void UpdateUI(MP3Item mP3Item, boolean isplay) {
         if (!mIsRunning)
             return;
-        if (mNavigationView != null) {
-            for (int i = 0; i < mNavigationView.getHeaderCount(); i++) {
-                Object o = mNavigationView.getHeaderView(i);
-            }
-        }
-        mBottomBar.UpdateBottomStatus(MP3Item, isplay);
+        mBottomBar.UpdateBottomStatus(mP3Item, isplay);
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         for (Fragment fragment : fragmentList) {
             if (fragment instanceof SongFragment && ((SongFragment) fragment).getAdapter() != null) {

@@ -144,6 +144,7 @@
                     android:id="@+id/playbar_model"
                     android:layout_alignParentLeft="true"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/play_btn_loop"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"/>
                 <ImageButton
@@ -152,7 +153,7 @@
                     android:layout_height="60dp"
                     android:scaleType="center"
                     android:layout_centerInParent="true"
-                    android:src="@drawable/bg_btn_holder_play"
+                    android:src="@drawable/play_btn_play"
                     android:background="?android:attr/selectableItemBackgroundBorderless"/>
                 <ImageButton
                     android:id="@+id/playbar_prev"
@@ -161,7 +162,7 @@
                     android:layout_height="60dp"
                     android:layout_marginRight="16dp"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/bg_btn_holder_prev"
+                    android:src="@drawable/play_btn_pre"
                     android:background="?android:attr/selectableItemBackgroundBorderless"/>
                 <ImageButton
                     android:id="@+id/playbar_next"
@@ -170,7 +171,7 @@
                     android:layout_toRightOf="@id/playbar_play"
                     android:layout_marginLeft="16dp"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/bg_btn_holder_next"
+                    android:src="@drawable/play_btn_next"
                     android:background="?android:attr/selectableItemBackgroundBorderless"/>
                 <ImageButton
                     android:layout_width="50dp"
@@ -178,7 +179,7 @@
                     android:id="@+id/playbar_playinglist"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/bg_btn_holder_playlist"
+                    android:src="@drawable/play_btn_normal_list"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:layout_marginRight="16dp"/>
             </RelativeLayout>

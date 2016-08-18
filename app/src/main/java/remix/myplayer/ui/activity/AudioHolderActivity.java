@@ -77,6 +77,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     private boolean mFistStart = true;
     //拖动进度条与更新进度条的互斥量
     public static boolean mIsDragSeekBar = false;
+    private Palette.Swatch mSwatch = null;
     //顶部信息
     @BindView(R.id.top_title)
     TextView mTopTitle;
@@ -259,17 +260,17 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
 
     private void initControlButton() {
         //前进，播放，后退
-        UpdatePlayButton(mIsPlay);
-        CtrlButtonListener mListener = new CtrlButtonListener(getApplicationContext());
+//        UpdatePlayButton(mIsPlay);
+        CtrlListener mListener = new CtrlListener();
         mPlayBarPrev.setOnClickListener(mListener);
         mPlayBarPlay.setOnClickListener(mListener);
         mPlayBarNext.setOnClickListener(mListener);
 
         //初始化播放模式
         int playmodel = SharedPrefsUtil.getValue(this,"setting", "PlayModel",Constants.PLAY_LOOP);
-        mPlayModel.setImageDrawable(getResources().getDrawable(playmodel == Constants.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
-                playmodel == Constants.PLAY_SHUFFLE ? R.drawable.bg_btn_holder_playmodel_shuffle :
-                        R.drawable.bg_btn_holder_playmodel_repeat));
+        mPlayModel.setImageDrawable(getResources().getDrawable(playmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                playmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+                        R.drawable.play_btn_loop_one));
 
         mPlayModel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -277,9 +278,14 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 int currentmodel = MusicService.getPlayModel();
                 currentmodel = (currentmodel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentmodel);
                 MusicService.setPlayModel(currentmodel);
-                mPlayModel.setImageDrawable(getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
-                        currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.bg_btn_holder_playmodel_shuffle :
-                                R.drawable.bg_btn_holder_playmodel_repeat));
+                Drawable playModelDrawable = getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                        currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+                                R.drawable.play_btn_loop_one);
+
+                mPlayModel.setImageDrawable(mSwatch != null ? Theme.TintDrawable(playModelDrawable,mSwatch.getRgb()) : playModelDrawable);
+//                mPlayModel.setImageDrawable(getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
+//                        currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.bg_btn_holder_playmodel_shuffle :
+//                                R.drawable.bg_btn_holder_playmodel_repeat));
                 String msg = currentmodel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
                         currentmodel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
                 Toast.makeText(AudioHolderActivity.this, msg, Toast.LENGTH_SHORT).show();
@@ -406,10 +412,11 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     }
 
     public void UpdatePlayButton(boolean isPlay) {
-        if(isPlay)
-            mPlayBarPlay.setImageResource(R.drawable.bg_btn_holder_stop);
-        else
-            mPlayBarPlay.setImageResource(R.drawable.bg_btn_holder_play);
+//        if(isPlay)
+//            mPlayBarPlay.setImageResource(R.drawable.bg_btn_holder_stop);
+//        else
+//            mPlayBarPlay.setImageResource(R.drawable.bg_btn_holder_play);
+//        mPlayBarPlay.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop), mSwatch.getRgb()));
     }
 
     private void initTop() {
@@ -503,7 +510,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 //更新顶部信息
                 UpdateTopStatus(mInfo);
                 //更新按钮状态
-                UpdatePlayButton(isplay);
+//                UpdatePlayButton(isplay);
                 //更新歌词
                 ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
 
@@ -514,15 +521,17 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 mSeekBar.setMax(mDuration);
                 //操作为播放选中歌曲时不更新背景
 //                if(mOperation != Constants.PLAYSELECTEDSONG)
-                    new BitmapThread().start();
+                new BitmapThread().start();
             } catch (Exception e){
                 e.printStackTrace();
             }
         }
         //只更新按钮状态
-        else if(mIsRunning)
+        else if(mIsRunning){
             //更新按钮状态
-            UpdatePlayButton(isplay);
+//            UpdatePlayButton(isplay);
+        }
+
 
     }
 
@@ -557,50 +566,63 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
             Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
                 @Override
                 public void onGenerated(Palette palette) {
-                    Palette.Swatch swt = palette.getLightMutedSwatch();//柔和 亮色
-                    if(swt == null){
-                        swt = palette.getDarkMutedSwatch();
-                    }
-                    if(swt == null){
-                        swt = palette.getMutedSwatch();
-                    }
-                    if(swt == null){
-                        swt = palette.getLightVibrantSwatch();
-                    }
-                    if(swt == null){
-                        swt = palette.getDarkVibrantSwatch();
-                    }
-                    if(swt == null){
-                        swt = palette.getVibrantSwatch();
-                    }
-                    if(swt != null){
+                    mSwatch = palette.getMutedSwatch();//柔和 亮色
+                    if(mSwatch == null)
+                        mSwatch = new Palette.Swatch(Color.BLACK,100);
+//                    if(mSwatch == null){
+//                        mSwatch = palette.getDarkMutedSwatch();
+//                    }
+//                    if(mSwatch == null){
+//                        mSwatch = palette.getMutedSwatch();
+//                    }
+//                    if(mSwatch == null){
+//                        mSwatch = palette.getLightVibrantSwatch();
+//                    }
+//                    if(mSwatch == null){
+//                        mSwatch = palette.getDarkVibrantSwatch();
+//                    }
+//                    if(mSwatch == null){
+//                        mSwatch = palette.getVibrantSwatch();
+//                    }
+                    if(mSwatch != null){
                         //修改顶部字体颜色
-                        mTopTitle.setTextColor(swt.getBodyTextColor());
-                        mTopDetail.setTextColor(swt.getTitleTextColor());
+                        mTopTitle.setTextColor(mSwatch.getBodyTextColor());
+                        mTopDetail.setTextColor(mSwatch.getTitleTextColor());
                         //修改背景颜色
-                        int colorFrom = ColorUtil.shiftColor(swt.getRgb(),1.0f);
-                        int colorTo = ColorUtil.adjustAlpha(swt.getRgb(),0.1f);
+                        int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
+                        int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
                         mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
                         //锁屏界面字体颜色
-                        mHColor =  swt.getTitleTextColor();
-                        mLColor = swt.getBodyTextColor();
+                        mHColor =  mSwatch.getTitleTextColor();
+                        mLColor = mSwatch.getBodyTextColor();
 
                         LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
                         //修改track颜色
-                        ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(ColorUtil.adjustAlpha(swt.getRgb(),0.4f));
+                        ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f));
                         //修改progress颜色
-                        (layerDrawable.getDrawable(1)).setColorFilter(colorFrom, PorterDuff.Mode.SRC_IN);
+                        (layerDrawable.getDrawable(1)).setColorFilter(mSwatch.getRgb(), PorterDuff.Mode.SRC_IN);
                         mSeekBar.setProgressDrawable(layerDrawable);
 
                         //修改thumb颜色
                         Drawable drawable = getResources().getDrawable(R.drawable.thumb);
-                        Theme.TintDrawable(drawable, swt.getRgb());
+                        Theme.TintDrawable(drawable, mSwatch.getRgb());
                         mSeekBar.setThumb(drawable);
 
                         //修改顶部按钮颜色
                         Drawable topDrawable = getResources().getDrawable(R.drawable.play_btn_back);
-                        Theme.TintDrawable(topDrawable,colorFrom);
+                        Theme.TintDrawable(topDrawable,mSwatch.getRgb());
                         mHide.setImageDrawable(topDrawable);
+
+                        //修改控制按钮颜色
+                        mPlayBarNext.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.play_btn_next), mSwatch.getRgb()));
+                        mPlayBarPrev.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.play_btn_pre), mSwatch.getRgb()));
+                        int currentmodel = MusicService.getPlayModel();
+                        mPlayBarPlay.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop), mSwatch.getRgb()));
+                        Drawable playModelDrawable = getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                                currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+                                        R.drawable.play_btn_loop_one);
+                        mPlayModel.setImageDrawable(mSwatch != null ? Theme.TintDrawable(playModelDrawable,mSwatch.getRgb()) : playModelDrawable);
+                        mPlayingList.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.play_btn_normal_list), mSwatch.getRgb()));
                     }
 
                 }
@@ -621,4 +643,25 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         }
     }
 
+    class CtrlListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(Constants.CTL_ACTION);
+            switch (v.getId()) {
+                case R.id.playbar_prev:
+                    intent.putExtra("Control", Constants.PREV);
+                    break;
+                case R.id.playbar_next:
+                    intent.putExtra("Control", Constants.NEXT);
+                    break;
+                case R.id.playbar_play:
+                    intent.putExtra("Control", Constants.PLAYORPAUSE);
+                    if(mSwatch != null)
+                        mPlayBarPlay.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop), mSwatch.getRgb()));
+                    break;
+            }
+            sendBroadcast(intent);
+        }
+    }
 }
