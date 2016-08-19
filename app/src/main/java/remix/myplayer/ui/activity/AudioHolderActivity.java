@@ -604,7 +604,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                         mSeekBar.setProgressDrawable(layerDrawable);
 
                         //修改thumb颜色
-                        Drawable drawable = getResources().getDrawable(R.drawable.thumb);
+                        Drawable drawable = mSeekBar.getThumb();
                         Theme.TintDrawable(drawable, mSwatch.getRgb());
                         mSeekBar.setThumb(drawable);
 

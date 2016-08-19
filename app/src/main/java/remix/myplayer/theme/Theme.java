@@ -1,14 +1,17 @@
 package remix.myplayer.theme;
 
 import android.content.res.ColorStateList;
-import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
+import android.support.annotation.NonNull;
 import android.support.annotation.StyleRes;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;
+import android.widget.SeekBar;
 
 import remix.myplayer.R;
 import remix.myplayer.util.ColorUtil;
@@ -113,6 +116,46 @@ public class Theme {
                 return R.style.IngidoTheme;
         }
         return -1;
+    }
+
+    /**
+     * 根据当前主题获得popupmenu风格
+     * @return
+     */
+    @StyleRes
+    public static int getPopupMenuStyle(){
+        return ThemeStore.isDay() ? R.style.PopupMenuDayStyle : R.style.PopupMenuNightStyle;
+    }
+
+    /**
+     * 为seekbar着色
+     * @param seekBar
+     * @param color
+     */
+    public static void setTint(@NonNull SeekBar seekBar, @ColorInt int color) {
+        ColorStateList s1 = ColorStateList.valueOf(color);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            seekBar.setThumbTintList(s1);
+            seekBar.setProgressTintList(s1);
+        } else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1) {
+            Drawable progressDrawable = DrawableCompat.wrap(seekBar.getProgressDrawable());
+            seekBar.setProgressDrawable(progressDrawable);
+            DrawableCompat.setTintList(progressDrawable, s1);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                Drawable thumbDrawable = DrawableCompat.wrap(seekBar.getThumb());
+                DrawableCompat.setTintList(thumbDrawable, s1);
+                seekBar.setThumb(thumbDrawable);
+            }
+        } else {
+            PorterDuff.Mode mode = PorterDuff.Mode.SRC_IN;
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1) {
+                mode = PorterDuff.Mode.MULTIPLY;
+            }
+            if (seekBar.getIndeterminateDrawable() != null)
+                seekBar.getIndeterminateDrawable().setColorFilter(color, mode);
+            if (seekBar.getProgressDrawable() != null)
+                seekBar.getProgressDrawable().setColorFilter(color, mode);
+        }
     }
 
 }

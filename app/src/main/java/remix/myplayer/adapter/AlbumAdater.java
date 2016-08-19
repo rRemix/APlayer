@@ -2,7 +2,6 @@ package remix.myplayer.adapter;
 
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -128,8 +127,9 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Context wrapper = new ContextThemeWrapper(mContext,R.style.MyPopupMenu);
+                        Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
+//                        popupMenu = new PopupMenu(mContext,holder.mButton,Gravity.END)
                         popupMenu.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
                         mCursor.moveToPosition(position);
                         popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,

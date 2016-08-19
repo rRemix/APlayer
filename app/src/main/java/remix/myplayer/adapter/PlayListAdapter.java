@@ -1,7 +1,6 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -112,7 +111,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                     holder.mButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Context wrapper = new ContextThemeWrapper(MainActivity.mInstance, R.style.MyPopupMenu);
+                            Context wrapper = new ContextThemeWrapper(MainActivity.mInstance, R.style.PopupMenuDayStyle);
                             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
                             popupMenu.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
                             popupMenu.setOnMenuItemClickListener(new PopupListener(mContext, position, Constants.PLAYLIST_HOLDER, ""));

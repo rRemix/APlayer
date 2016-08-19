@@ -76,7 +76,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     private final static String TAG = "MainActivity";
 
     private PagerAdapter mAdapter;
-    private static boolean mIsDay = ThemeStore.THEME_MODE == ThemeStore.DAY;
     //是否正在运行
     private static boolean mIsRunning = false;
     //是否第一次启动
@@ -197,7 +196,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     private void initTheme() {
         ThemeStore.THEME_MODE = ThemeStore.loadThemeMode();
         ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
-        mIsDay = ThemeStore.THEME_MODE == ThemeStore.DAY;
 
         ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor();
         ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor();
@@ -283,12 +281,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_album)));
         mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_artist)));
         mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_folder)));
-        //给Tabs设置适配器
-        mTablayout.setTabsFromPagerAdapter(mAdapter);
         //viewpager与tablayout关联
         mTablayout.setupWithViewPager(mViewPager);
-        //设置tab模式，当前为系统默认模式
-        mTablayout.setTabMode(TabLayout.MODE_FIXED);
     }
 
     @Override
