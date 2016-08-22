@@ -3,13 +3,11 @@ package remix.myplayer.adapter;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +15,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -33,8 +33,10 @@ import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.thumb.AsynLoadImage;
 
 /**
  * 全部歌曲和最近添加页面所用adapter
@@ -61,10 +63,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
     public void setOnItemClickLitener(OnItemClickListener l)
     {
         this.mOnItemClickLitener = l;
-    }
-
-    public void setSortList(ArrayList<String> list){
-        this.mSortList = list;
     }
 
     public void setCursor(Cursor mCursor) {
@@ -130,19 +128,20 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
             //艺术家与专辑
             String artist = CommonUtil.processInfo(temp.getArtist(),CommonUtil.ARTISTTYPE);
             String album = CommonUtil.processInfo(temp.getAlbum(),CommonUtil.ALBUMTYPE);
-            //封面
             holder.mOther.setText(artist + "-" + album);
+            //封面
+
+//            new AsynLoadImage(holder.mImage).execute((int)temp.getAlbumId(), Constants.URL_ALBUM,false);
+            DraweeController controller = Fresco.newDraweeControllerBuilder()
+                    .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()))
+                    .setOldController(holder.mImage.getController())
+                    .setAutoPlayAnimations(false)
+                    .build();
+            holder.mImage.setController(controller);
 
         } catch (Exception e){
             e.printStackTrace();
         }
-
-        DraweeController controller = Fresco.newDraweeControllerBuilder()
-                .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()))
-                .setOldController(holder.mImage.getController())
-                .setAutoPlayAnimations(false)
-                .build();
-        holder.mImage.setController(controller);
 
         //选项Dialog
         if(holder.mItemButton != null) {
@@ -201,7 +200,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
             mColumnView = (ColumnView)itemView.findViewById(R.id.song_columnview);
             mItemButton = (ImageButton)itemView.findViewById(R.id.song_button);
             mIndex = (TextView)itemView.findViewById(R.id.song_index_letter);
-
         }
     }
 }

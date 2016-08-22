@@ -9,8 +9,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +60,10 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         mUnBinder = ButterKnife.bind(this,rootView);
 
         mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+//        mRecycleView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
+        mRecycleView.setItemAnimator(new DefaultItemAnimator());
+
+
         mAdapter = new AlbumAdater(mCursor,getActivity());
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override

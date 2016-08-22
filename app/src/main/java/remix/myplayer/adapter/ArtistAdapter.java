@@ -5,11 +5,9 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,16 +21,16 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.theme.Theme;
-import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.listener.PopupListener;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.thumb.AsynLoadImage;
 
 /**
  * Created by Remix on 2015/12/22.
@@ -63,28 +61,6 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
 
 
     //<Params, Progress, Result>
-    class AsynLoadImage extends AsyncTask<String,Integer,String> {
-        private final SimpleDraweeView mImage;
-        private String mArtist = "";
-        public AsynLoadImage(SimpleDraweeView imageView)
-        {
-            mImage = imageView;
-        }
-        @Override
-        protected String doInBackground(String... params) {
-            mArtist = params[1];
-            return DBUtil.getImageUrl(params[0], Constants.URL_ARTIST);
-
-        }
-        @Override
-        protected void onPostExecute(String url) {
-            Log.d("ArtistAdapter","url:" + url + " artist:" + mArtist);
-            Uri uri = Uri.parse("file:///" + url);
-            if(mImage != null) {
-                mImage.setImageURI(uri);
-            }
-        }
-    }
 
     @Override
     public ArtistHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -102,17 +78,11 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.art_bg_night);
                 //设置封面
                 holder.mImage.setImageURI(Uri.EMPTY);
-                AsynLoadImage task = new AsynLoadImage(holder.mImage);
-                task.execute(mCursor.getString(ArtistFragment.mArtistIdIndex),artist);
+                new AsynLoadImage(holder.mImage).execute(mCursor.getInt(ArtistFragment.mArtistIdIndex),Constants.URL_ARTIST,true);
             } catch (Exception e){
                 e.printStackTrace();
             }
 
-//            Uri uri = Uri.parse("content://media/external/audio/media/" + mCursor.getString(ArtistFragment.mArtistIndex) + "/albumart");
-//            holder.mImage.setImageURI(uri);
-//            String path = DBUtil.getImageUrl(mCursor.getString(ArtistFragment.mArtistIdIndex), Constants.URL_ARTIST);
-//            Uri uri = Uri.parse("file:///" + path);
-//            holder.mImage.setImageURI(uri);
             if(mOnItemClickLitener != null) {
                 holder.mImage.setOnClickListener(new View.OnClickListener() {
                     @Override

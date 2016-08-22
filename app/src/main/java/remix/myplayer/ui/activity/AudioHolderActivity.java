@@ -230,6 +230,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
 
+
         mWidth = metrics.widthPixels;
         mHeight = metrics.heightPixels;
         mAnimIn = (AlphaAnimation)AnimationUtils.loadAnimation(this,R.anim.audio_bg_in);
@@ -568,7 +569,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 public void onGenerated(Palette palette) {
                     mSwatch = palette.getMutedSwatch();//柔和 亮色
                     if(mSwatch == null)
-                        mSwatch = new Palette.Swatch(Color.BLACK,100);
+                        mSwatch = new Palette.Swatch(Color.GRAY,100);
 //                    if(mSwatch == null){
 //                        mSwatch = palette.getDarkMutedSwatch();
 //                    }
@@ -604,7 +605,8 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                         mSeekBar.setProgressDrawable(layerDrawable);
 
                         //修改thumb颜色
-                        Drawable drawable = mSeekBar.getThumb();
+//                        Drawable drawable = mSeekBar.getThumb();
+                        Drawable drawable = getResources().getDrawable(R.drawable.thumb);
                         Theme.TintDrawable(drawable, mSwatch.getRgb());
                         mSeekBar.setThumb(drawable);
 

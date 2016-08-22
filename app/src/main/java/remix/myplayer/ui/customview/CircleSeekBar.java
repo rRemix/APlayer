@@ -1,17 +1,16 @@
 package remix.myplayer.ui.customview;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.StateListDrawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
+import android.widget.AbsSeekBar;
+import android.widget.SeekBar;
 
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;
@@ -26,7 +25,7 @@ import remix.myplayer.util.ColorUtil;
  * 圆形seekar
  * 用于定时关闭界面
  */
-public class CircleSeekBar extends View {
+public class CircleSeekBar extends AbsSeekBar {
     /**
      * 圆圈画笔
      */
@@ -69,12 +68,12 @@ public class CircleSeekBar extends View {
     /**
      * 最大进度值
      */
-    private long mProgressMax = 100;
+    private int mProgressMax = 100;
 
     /**
      * 当前进度
      */
-    private long mProgress = 0;
+    private int mProgress = 0;
 
     /**
      * 整个圆所在的长方形
@@ -100,7 +99,7 @@ public class CircleSeekBar extends View {
     /**
      * ThumbDrawable
      */
-    private Drawable mThumbDrawable = null;
+    private Drawable mThumbDrawable;
 
     /**
      * Thumb的两种状态： 按下与普通
@@ -120,20 +119,20 @@ public class CircleSeekBar extends View {
 
 
     public CircleSeekBar(Context context) {
-        super(context);
+        this(context,null,0);
         mContext = context;
         init();
     }
 
     public CircleSeekBar(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs,android.R.attr.seekBarStyle);
         mContext = context;
         mAttrs = attrs;
         init();
     }
 
     public CircleSeekBar(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+        super(context, attrs, android.R.attr.seekBarStyle);
         mContext = context;
         mAttrs = attrs;
         init();
@@ -141,6 +140,8 @@ public class CircleSeekBar extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+//        mThumbDrawable = getThumb();
+//        Theme.TintDrawable(mThumbDrawable, ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899));
         canvas.drawCircle(mCenterX, mCenterY, mRadius, mCirclePaint);
         canvas.drawArc(mRectF, -90, (float) Math.toDegrees(mRad), false, mArcPaint);
         mThumbDrawable.setBounds((int)(mCenterX + mOffsetX - mThumbWidth / 2),
@@ -148,11 +149,7 @@ public class CircleSeekBar extends View {
                 (int)(mCenterX + mOffsetX + mThumbWidth / 2),
                 (int)(mCenterY + mOffsetY + mThumbHeight / 2));
         mThumbDrawable.draw(canvas);
-//        canvas.drawBitmap(mThumbBitmap,
-//                mCenterX + mOffsetX - mThumbWidth / 2,
-//                mCenterY + mOffsetY - mThumbHeight / 2 ,null);
-//        canvas.drawText("60:00min",mCenterX,mBaseLine,mTextPaint);
-        super.onDraw(canvas);
+//        super.onDraw(canvas);
     }
 
 
@@ -216,9 +213,11 @@ public class CircleSeekBar extends View {
 
     //初始化
     private void init() {
-        TypedArray typedArray = mContext.obtainStyledAttributes(mAttrs, R.styleable.CircleSeekBar);
-//        mThumbDrawable = getResources().getDrawable(R.drawable.thumb);
-        mThumbDrawable = getResources().getDrawable(R.drawable.thumb);
+        final TypedArray typedArray = mContext.obtainStyledAttributes(mAttrs, R.styleable.CircleSeekBar);
+//        mThumbDrawable = getThumb();
+        if(mThumbDrawable == null){
+            mThumbDrawable = getResources().getDrawable(R.drawable.thumb);
+        }
         Theme.TintDrawable(mThumbDrawable, ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899));
 
         //轨道颜色 宽度 最大值
@@ -270,14 +269,15 @@ public class CircleSeekBar extends View {
 //        }
     }
 
-    public void setMax(long max) {
+    public void setMax(int max) {
         mProgressMax = max;
     }
 
-    public long getProgress() {
-
+    @Override
+    public synchronized int getProgress() {
         return mProgress;
     }
+
     public void setStart(boolean start) {
         mStart = start;
     }
@@ -286,7 +286,7 @@ public class CircleSeekBar extends View {
      * 设置进度，并根据进度值，计算划过角度，再计算偏移距离
      * @param progress
      */
-    public void setProgress(long progress) {
+    public void setProgress(int progress) {
         if(progress >= mProgressMax)
             progress = mProgressMax;
         if(progress <= 0)

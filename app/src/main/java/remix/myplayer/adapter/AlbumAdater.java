@@ -1,12 +1,10 @@
 package remix.myplayer.adapter;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +29,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.thumb.AsynLoadImage;
 
 /**
  * Created by Remix on 2015/12/20.
@@ -52,33 +51,9 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
     {
         this.mOnItemClickLitener = l;
     }
-    public void setCursor(Cursor mCursor) {
-        this.mCursor = mCursor;
+    public void setCursor(Cursor cursor) {
+        mCursor = cursor;
         notifyDataSetChanged();
-    }
-
-
-    //<Params, Progress, Result>
-    class AsynLoadImage extends AsyncTask<Object,Integer,String> {
-        private final SimpleDraweeView mImage;
-        public AsynLoadImage(SimpleDraweeView imageView) {
-            mImage = imageView;
-        }
-        @Override
-        protected String doInBackground(Object... params) {
-            if(CommonUtil.isAlbumThumbExistInDB((Uri) params[0])){
-                return params[0].toString();
-            } else {
-                return CommonUtil.getCoverInCache((long)params[1]);
-            }
-//            return new SearchCover("海阔天空","Beyond",SearchCover.COVER).getImgUrl();
-        }
-        @Override
-        protected void onPostExecute(String uri) {
-            if(mImage != null && uri != null);{
-                mImage.setImageURI(Uri.parse(uri));
-            }
-        }
     }
 
     @Override
@@ -98,17 +73,14 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 holder.mText2.setText(artist);
                 //设置背景
                 holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.album_bg_day : R.drawable.album_bg_night);
+                //设置封面
+                long albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
+                holder.mImage.setImageURI(Uri.EMPTY);
+                new AsynLoadImage(holder.mImage).execute((int)albumid,Constants.URL_ALBUM,true);
+//            holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
             } catch (Exception e){
                 e.printStackTrace();
             }
-
-            //设置封面
-            long albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
-//            new AsynLoadImage(holder.mImage).execute(0L);
-
-//            new AsynLoadImage(holder.mImage).execute(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumid), albumid);
-//            holder.mImage.setImageURI(Uri.parse(new SearchCover("海阔天空","Beyond",SearchCover.COVER).getImgUrl()));
-            holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
 
             if(mOnItemClickLitener != null) {
                 holder.mImage.setOnClickListener(new View.OnClickListener() {

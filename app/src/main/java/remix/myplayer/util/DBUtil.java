@@ -3,6 +3,7 @@ package remix.myplayer.util;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.CursorWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -66,14 +67,7 @@ public class DBUtil {
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
-        try {
             if(cursor != null) {
-
                 Global.mFolderMap.clear();
                 while (cursor.moveToNext()) {
                     //计算歌曲添加时间
@@ -96,13 +90,11 @@ public class DBUtil {
                     String full_path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                     SortWithFolder(id,full_path);
                 }
-                cursor.close();
-
             }
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
         } finally {
-            if(cursor != null)
+            if(cursor != null && !cursor.isClosed())
                 cursor.close();
         }
 
@@ -167,17 +159,15 @@ public class DBUtil {
                 while (cursor.moveToNext()) {
                     mp3Infolist.add(getMP3Info(cursor));
                 }
-                cursor.close();
-                return mp3Infolist;
             }
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            if(cursor != null)
+            if(cursor != null && !cursor.isClosed())
                 cursor.close();
         }
 
-        return null;
+        return mp3Infolist;
     }
 
 
@@ -213,23 +203,20 @@ public class DBUtil {
                 selection = MediaStore.Audio.Albums._ID + "=" + arg;
                 selectionArg = null;
         }
+        String album_art = "";
         try {
-            String album_art = "";
             cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,new String[]{MediaStore.Audio.Albums.ALBUM_ART},
                     selection,selectionArg,null);
             if(cursor != null && cursor.moveToFirst()) {
                 album_art = cursor.getString(0);
-                cursor.close();
             }
-            return album_art;
-        }
-        catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
         } finally {
-            if(cursor != null)
+            if(cursor != null && !cursor.isClosed())
                 cursor.close();
         }
-        return null;
+        return album_art;
 
     }
 
@@ -239,15 +226,22 @@ public class DBUtil {
      * @return 专辑url
      */
     public static String getAlbumUrlByAlbumId(long Id) {
-        ContentResolver resolver = mContext.getContentResolver();
-        String url = null;
-        Cursor cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{"album_art"},
-                MediaStore.Audio.Albums._ID + "=" + Id,
-                null, null);
-        if(cursor != null && cursor.getCount() > 0) {
-            cursor.moveToNext();
-            url = cursor.getString(0);
-            cursor.close();
+        Cursor cursor = null;
+        String url = "";
+        try {
+            ContentResolver resolver = mContext.getContentResolver();
+            cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{"album_art"},
+                    MediaStore.Audio.Albums._ID + "=" + Id,
+                    null, null);
+            if(cursor != null && cursor.getCount() > 0) {
+                cursor.moveToNext();
+                url = cursor.getString(0);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(cursor != null && cursor.isClosed())
+                cursor.close();
         }
 
         return url;
@@ -386,7 +380,7 @@ public class DBUtil {
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            if(cursor != null)
+            if(cursor != null && !cursor.isClosed())
                 cursor.close();
         }
 
@@ -452,7 +446,7 @@ public class DBUtil {
             }catch (Exception e){
                 e.printStackTrace();
             }finally {
-                if(cursor != null)
+                if(cursor != null && !cursor.isClosed())
                     cursor.close();
             }
 
@@ -471,7 +465,7 @@ public class DBUtil {
             }catch (Exception e){
                 e.printStackTrace();
             }finally {
-                if(cursor != null)
+                if(cursor != null && cursor.isClosed())
                     cursor.close();
             }
 
@@ -503,8 +497,7 @@ public class DBUtil {
 //            XmlUtil.updatePlayingList();
 //            XmlUtil.updatePlaylist();
         }
-        if(cursor != null)
-            cursor.close();
+
         return ret > 0 && ret2;
     }
 

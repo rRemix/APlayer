@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,11 +12,19 @@ import android.os.Message;
 import android.support.v7.graphics.Palette;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.enrique.stackblur.StackBlurManager;
@@ -49,9 +58,9 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
     public static LockScreenActivity mInstance;
     //当前播放的歌曲信息
     private MP3Item mInfo;
-    //滑动解锁提示文字
-    @BindView(R.id.lockscreen_unlock)
-    TextView mUnLock;
+    //底部滑动提示图片容器
+    @BindView(R.id.lockscreen_arrow_container)
+    LinearLayout mArrowContainer;
     //歌曲与艺术家
     @BindView(R.id.lockscreen_song)
     TextView mSong;
@@ -115,7 +124,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
                             Log.d(TAG,"mill: population --" + e.getPopulation());
                             mSong.setTextColor(e.getBodyTextColor());
                             mArtist.setTextColor(e.getTitleTextColor());
-                            mUnLock.setTextColor(e.getTitleTextColor());
+
                         }
                     }
                 });
@@ -156,11 +165,11 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
 //            mBlurringView = (BlurringView)findViewById(R.id.lockscreen_blur_background);
 //            mBlurringView.setBlurredView(mImageBackground);
 //            mBlurringView.setOverlayColor(Color.parseColor("#004D4D4D"));
-
         } catch (Exception e){
             e.printStackTrace();
         }
 
+        mArrowContainer.startAnimation(AnimationUtils.loadAnimation(this,R.anim.arrow_left_to_right));
 
         mView = getWindow().getDecorView();
         mView.setBackgroundColor(getResources().getColor(R.color.transparent));
