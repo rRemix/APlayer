@@ -87,10 +87,12 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             Manifest.permission.READ_PHONE_STATE};
 
     private int mAlpha = ThemeStore.STATUS_BAR_ALPHA / 2;
+    private final int RECREATE = 0;
     private Handler mRecreateHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            recreate();
+            if(msg.what == RECREATE)
+                recreate();
         }
     };
 
@@ -337,7 +339,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                         break;
                     case R.id.item_setting:
                         //设置
-                        startActivity(new Intent(MainActivity.this, SettingActivity.class));
+                        startActivity(new Intent(MainActivity.this,SettingActivity.class));
                         break;
                     case R.id.item_exit:
                         sendBroadcast(new Intent(Constants.EXIT));
@@ -359,7 +361,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null && data.getBooleanExtra("needRefresh",false)){
-            mRecreateHandler.sendEmptyMessage(0);
+            mRecreateHandler.sendEmptyMessage(RECREATE);
         }
     }
 

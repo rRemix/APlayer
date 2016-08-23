@@ -34,19 +34,19 @@ public class BaseAppCompatActivity extends AppCompatActivity {
         }
         switch (ThemeStore.THEME_COLOR){
             case ThemeStore.THEME_PURPLE:
-                setTheme(R.style.PurpleTheme);
+                setTheme(R.style.DayTheme_Purple);
                 break;
             case ThemeStore.THEME_RED:
-                setTheme(R.style.RedTheme);
+                setTheme(R.style.DayTheme_Red);
                 break;
             case ThemeStore.THEME_PINK:
-                setTheme(R.style.PinkTheme);
+                setTheme(R.style.DayTheme_Pink);
                 break;
             case ThemeStore.THEME_BROWN:
-                setTheme(R.style.BrownTheme);
+                setTheme(R.style.DayTheme_Brown);
                 break;
             case ThemeStore.THEME_INDIGO:
-                setTheme(R.style.IngidoTheme);
+                setTheme(R.style.DayTheme_Ingido);
                 break;
         }
     }

@@ -2,15 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white">
+    android:background="?attr/background_color_3">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="通知栏底色"
         android:textSize="20sp"
-        android:textColor="#000"
-        android:layout_margin="12dp"/>
+        android:textColor="?attr/text_color_primary"
+        android:layout_margin="@dimen/d12_size"/>
 
     <RelativeLayout
         android:id="@+id/notifycolor_system"
@@ -23,10 +23,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_margin="12dp"
+            android:layout_margin="@dimen/d12_size"
             android:gravity="left|center_vertical"
             android:text="@string/use_system_color"
-            android:textColor="@color/black_1b1a1c"
+            android:textColor="?attr/text_color_primary"
             android:textSize="@dimen/s16_size"
             android:background="@color/transparent" />
         <ImageView
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="@dimen/d8_size"
             android:src="@drawable/notify_choose"/>
     </RelativeLayout>
 
@@ -53,10 +53,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_margin="12dp"
+            android:layout_margin="@dimen/d12_size"
             android:gravity="left|center_vertical"
             android:text="@string/use_black_color"
-            android:textColor="@color/black_1b1a1c"
+            android:textColor="?attr/text_color_primary"
             android:textSize="@dimen/s16_size"
             android:background="@color/transparent" />
         <ImageView
@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="8dp"
+            android:layout_marginRight="@dimen/d8_size"
             android:src="@drawable/notify_choose"/>
     </RelativeLayout>
 </LinearLayout>

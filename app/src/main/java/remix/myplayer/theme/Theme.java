@@ -105,15 +105,15 @@ public class Theme {
         }
         switch (ThemeStore.THEME_COLOR) {
             case ThemeStore.THEME_PURPLE:
-                return R.style.PurpleTheme;
+                return R.style.DayTheme_Purple;
             case ThemeStore.THEME_RED:
-                return R.style.RedTheme;
+                return R.style.DayTheme_Red;
             case ThemeStore.THEME_PINK:
-                return R.style.PinkTheme;
+                return R.style.DayTheme_Pink;
             case ThemeStore.THEME_BROWN:
-                return R.style.BrownTheme;
+                return R.style.DayTheme_Brown;
             case ThemeStore.THEME_INDIGO:
-                return R.style.IngidoTheme;
+                return R.style.DayTheme_Ingido;
         }
         return -1;
     }

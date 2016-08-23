@@ -3,109 +3,103 @@ package remix.myplayer.ui.activity;
 import android.content.Intent;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
 
 import com.umeng.update.UmengUpdateAgent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.adapter.SettingAdapter;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SharedPrefsUtil;
 
-
 /**
- * Created by taeja on 16-3-7.
- */
-
-/**
- * 设置界面，目前包括扫描文件、意见与反馈、关于我们、检查更新
+ * @ClassName
+ * @Description
+ * @Author Xiaoborui
+ * @Date 2016/8/23 13:51
  */
 public class SettingActivity extends ToolbarActivity {
-    @BindView(R.id.setting_list)
-    ListView mListView;
     @BindView(R.id.toolbar)
-    Toolbar mToolBar;
+    Toolbar mToolbar;
+    @BindView(R.id.setting_mode_switch)
+    SwitchCompat mModeSwitch;
+
 
     private ImageView mSystem;
     private ImageView mBlack;
     private AlertDialog mAlertDialog;
 
-
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
+        initToolbar(mToolbar,"设置");
 
-        //初始化listview
-        mListView.setAdapter(new SettingAdapter(this));
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch (position){
-                    case 0:
-                        //扫描大小
-                        startActivity(new Intent(SettingActivity.this,ScanActivity.class));
-                        break;
-                    case 1:
-                        //音效设置
-//                        startActivity(new Intent(SettingActivity.this,EQActivity.class));
-                        Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-                        i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
-                        startActivityForResult(i, 0);
-                        break;
-                    case 2:
-                        //通知栏底色
-                        try {
-                            View notifycolor = LayoutInflater.from(SettingActivity.this).inflate(R.layout.popup_notifycolor,null);
-                            boolean isSystem = SharedPrefsUtil.getValue(SettingActivity.this,"setting","IsSystemColor",true);
-                            mSystem = (ImageView)notifycolor.findViewById(R.id.popup_notify_image_system);
-                            mBlack = (ImageView)notifycolor.findViewById(R.id.popup_notify_image_black);
-                            if(mSystem != null)
-                                mSystem.setVisibility(isSystem ? View.VISIBLE : View.INVISIBLE);
-                            if(mBlack != null)
-                                mBlack.setVisibility(isSystem ? View.INVISIBLE : View.VISIBLE);
 
-                            ColorListener listener = new ColorListener();
-                            notifycolor.findViewById(R.id.notifycolor_system).setOnClickListener(listener);
-                            notifycolor.findViewById(R.id.notifycolor_black).setOnClickListener(listener);
-
-                            mAlertDialog = new AlertDialog.Builder(SettingActivity.this).setView(notifycolor).create();
-                            mAlertDialog.show();
-                        } catch (Exception e){
-                            e.printStackTrace();
-                        }
-                        break;
-                    case 3:
-                        //意见与反馈
-                        startActivity(new Intent(SettingActivity.this,FeedBakActivity.class));
-                        break;
-                    case 4:
-                        //关于我们
-                        startActivity(new Intent(SettingActivity.this,AboutActivity.class));
-                        break;
-                    case 5:
-                        //检查更新
-                        UmengUpdateAgent.forceUpdate(SettingActivity.this);
-                }
-            }
-        });
-
-        //初始化tooblar
-        initToolbar(mToolBar,"设置");
     }
 
+    @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_container,
+                R.id.setting_feedback_container,R.id.setting_about_container,R.id.setting_update_container,
+                R.id.setting_eq_container})
+    public void onClick(View v){
+        switch (v.getId()){
+            case R.id.setting_filter_container:
+                //文件过滤
+                startActivity(new Intent(SettingActivity.this,ScanActivity.class));
+                break;
+            case R.id.setting_color_container:
+                //选择主色调
+                break;
+            case R.id.setting_notify_container:
+                //通知栏底色
+                try {
+                    View notifycolor = LayoutInflater.from(SettingActivity.this).inflate(R.layout.popup_notifycolor,null);
+                    boolean isSystem = SharedPrefsUtil.getValue(SettingActivity.this,"setting","IsSystemColor",true);
+                    mSystem = (ImageView)notifycolor.findViewById(R.id.popup_notify_image_system);
+                    mBlack = (ImageView)notifycolor.findViewById(R.id.popup_notify_image_black);
+                    if(mSystem != null)
+                        mSystem.setVisibility(isSystem ? View.VISIBLE : View.INVISIBLE);
+                    if(mBlack != null)
+                        mBlack.setVisibility(isSystem ? View.INVISIBLE : View.VISIBLE);
+
+                    ColorListener listener = new ColorListener();
+                    notifycolor.findViewById(R.id.notifycolor_system).setOnClickListener(listener);
+                    notifycolor.findViewById(R.id.notifycolor_black).setOnClickListener(listener);
+
+                    mAlertDialog = new AlertDialog.Builder(SettingActivity.this).setView(notifycolor).create();
+                    mAlertDialog.show();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                break;
+            case R.id.setting_eq_container:
+                //音效设置
+                Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+                i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
+                startActivityForResult(i, 0);
+                break;
+            case R.id.setting_feedback_container:
+                //意见与反馈
+                startActivity(new Intent(SettingActivity.this,FeedBakActivity.class));
+                break;
+            case R.id.setting_about_container:
+                //关于我们
+                startActivity(new Intent(SettingActivity.this,AboutActivity.class));
+                break;
+            case R.id.setting_update_container:
+                //检查更新
+                UmengUpdateAgent.forceUpdate(SettingActivity.this);
+        }
+    }
 
     class ColorListener implements View.OnClickListener{
         @Override
@@ -123,12 +117,4 @@ public class SettingActivity extends ToolbarActivity {
             }
         }
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-        return true;
-    }
-
 }

@@ -31,11 +31,9 @@ public class ThemeStore {
     /** 当前主题颜色 */
     public static int THEME_COLOR = THEME_PINK;
 
-
-
     public static int STATUS_BAR_ALPHA = 112;
-    public static int MATERIAL_COLOR_PRIMARY = R.color.md_brown_primary;
-    public static int MATERIAL_COLOR_PRIMARY_DARK = R.color.md_brown_primary_dark;
+    public static int MATERIAL_COLOR_PRIMARY = R.color.transparent;
+    public static int MATERIAL_COLOR_PRIMARY_DARK = R.color.transparent;
 
 
     /**

@@ -210,6 +210,7 @@
     <style name="NightTheme" parent="@style/ActivityStyle">
         <item name="material_color_primary">@color/night_background_color_3</item>
         <item name="material_color_primary_dark">@color/night_background_color_3</item>
+        <item name="material_color_secondry">@color/purple_782899</item>
         <item name="colorControlActivated">@color/purple_782899</item>
         <item name="background_color_main">@color/night_background_color_main</item>
         <item name="background_color_1">@color/night_background_color_3</item>
@@ -225,32 +226,37 @@
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
     </style>
 
-    <style name="PurpleTheme" parent="@style/DayTheme">
+    <style name="DayTheme.Purple" parent="@style/DayTheme">
         <item name="material_color_primary">@color/md_purple_primary</item>
+        <item name="material_color_secondry">@color/md_purple_primary</item>
         <item name="material_color_primary_dark">@color/md_purple_primary_dark</item>
         <item name="colorControlActivated">@color/md_purple_primary</item>
     </style>
 
-    <style name="RedTheme" parent="@style/DayTheme">
+    <style name="DayTheme.Red" parent="@style/DayTheme">
         <item name="material_color_primary">@color/md_red_primary</item>
+        <item name="material_color_secondry">@color/md_red_primary</item>
         <item name="material_color_primary_dark">@color/md_red_primary_dark</item>
         <item name="colorControlActivated">@color/md_red_primary</item>
     </style>
 
-    <style name="PinkTheme" parent="@style/DayTheme">
+    <style name="DayTheme.Pink" parent="@style/DayTheme">
         <item name="material_color_primary">@color/md_pink_primary</item>
+        <item name="material_color_secondry">@color/md_pink_primary</item>
         <item name="material_color_primary_dark">@color/md_pink_primary_dark</item>
         <item name="colorControlActivated">@color/md_pink_primary</item>
     </style>
 
-    <style name="BrownTheme" parent="@style/DayTheme">
+    <style name="DayTheme.Brown" parent="@style/DayTheme">
         <item name="material_color_primary">@color/md_brown_primary</item>
+        <item name="material_color_secondry">@color/md_brown_primary</item>
         <item name="material_color_primary_dark">@color/md_brown_primary_dark</item>
         <item name="colorControlActivated">@color/md_brown_primary</item>
     </style>
 
-    <style name="IngidoTheme" parent="@style/DayTheme">
+    <style name="DayTheme.Ingido" parent="@style/DayTheme">
         <item name="material_color_primary">@color/md_indigo_primary</item>
+        <item name="material_color_secondry">@color/md_indigo_primary</item>
         <item name="material_color_primary_dark">@color/md_indigo_primary_dark</item>
         <item name="colorControlActivated">@color/md_indigo_primary</item>
     </style>

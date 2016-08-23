@@ -68,9 +68,6 @@
         <activity android:name=".ui.activity.RecetenlyActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".ui.activity.SettingActivity"
-            android:theme="@style/ActivityStyle"/>
-
         <activity android:name=".ui.activity.FeedBakActivity"
             android:theme="@style/ActivityStyle"/>
 
@@ -78,6 +75,9 @@
             android:theme="@style/ActivityStyle"/>
 
         <activity android:name=".ui.activity.EQActivity"
+            android:theme="@style/ActivityStyle"/>
+
+        <activity android:name=".ui.activity.SettingActivity"
             android:theme="@style/ActivityStyle"/>
 
         <activity android:name=".ui.activity.ThemeActivity"
