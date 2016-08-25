@@ -21,12 +21,24 @@
                android:layout_height="60dp"
                android:id="@+id/top_actionbar">
                <ImageButton
-                   style="@style/TopImageButton"
+                   android:layout_width="@dimen/d40_size"
+                   android:layout_height="@dimen/d40_size"
+                   android:layout_marginLeft="@dimen/d16_size"
                    android:layout_centerVertical="true"
                    android:background="@color/transparent"
                    android:src="@drawable/play_btn_back"
                    android:id="@+id/top_hide"
                    android:layout_alignParentLeft="true"/>
+
+               <ImageButton
+                   android:layout_width="@dimen/d40_size"
+                   android:layout_height="@dimen/d40_size"
+                   android:layout_marginRight="@dimen/d16_size"
+                   android:layout_centerVertical="true"
+                   android:background="@color/transparent"
+                   android:src="@drawable/list_icn_more"
+                   android:id="@+id/top_more"
+                   android:layout_alignParentRight="true"/>
                <LinearLayout
                    android:layout_centerInParent="true"
                    android:layout_width="240dp"

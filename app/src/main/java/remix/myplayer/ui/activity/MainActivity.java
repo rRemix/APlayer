@@ -3,8 +3,6 @@ package remix.myplayer.ui.activity;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -360,8 +358,17 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(data != null && data.getBooleanExtra("needRefresh",false)){
-            mRecreateHandler.sendEmptyMessage(RECREATE);
+        if(data != null){
+            if(data.getBooleanExtra("needRefresh",false)) {
+                mRecreateHandler.sendEmptyMessage(RECREATE);
+                return;
+            }
+            if(requestCode == Constants.SELECL_ALBUM_IMAGE){
+                Toast.makeText(this,data.getData().toString(),Toast.LENGTH_SHORT).show();
+            }
+            if(requestCode == Constants.SELECT_ARTIST_IMAGE){
+                
+            }
         }
     }
 

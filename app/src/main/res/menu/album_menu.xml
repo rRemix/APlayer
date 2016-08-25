@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:enabled="true">
+        <item android:title="播放"
+            android:id="@+id/menu_play"/>
+        <item android:title="加入播放队列"
+            android:id="@+id/menu_add"/>
+        <item android:title="设置专辑封面"
+            android:id="@+id/menu_album_thumb"/>
+        <item android:title="删除"
+            android:id="@+id/menu_delete"/>
+    </group>
+</menu>

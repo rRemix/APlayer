@@ -102,7 +102,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
 //                        popupMenu = new PopupMenu(mContext,holder.mButton,Gravity.END)
-                        popupMenu.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
+                        popupMenu.getMenuInflater().inflate(R.menu.album_menu, popupMenu.getMenu());
                         mCursor.moveToPosition(position);
                         popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
                                 mCursor.getInt(AlbumFragment.mAlbumIdIndex),

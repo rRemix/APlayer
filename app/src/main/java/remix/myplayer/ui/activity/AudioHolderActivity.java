@@ -1,26 +1,26 @@
 package remix.myplayer.ui.activity;
 
+import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
+import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.PopupMenu;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -42,10 +42,8 @@ import remix.myplayer.fragment.CoverFragment;
 import remix.myplayer.fragment.LrcFragment;
 import remix.myplayer.fragment.RecordFragment;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.AudioViewPager;
 import remix.myplayer.ui.customview.LrcView;
 import remix.myplayer.ui.dialog.PlayingListDialog;
@@ -85,7 +83,10 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     TextView mTopDetail;
     //隐藏按钮
     @BindView(R.id.top_hide)
-    ImageButton mHide;
+    ImageButton mTopHide;
+    //选项按钮
+    @BindView(R.id.top_more)
+    ImageButton mTopMore;
     //播放控制
     @BindView(R.id.playbar_prev)
     ImageButton mPlayBarPrev;
@@ -178,6 +179,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 mSeekBar.setProgress(mCurrentTime);
         }
     };
+
 
     @Override
     protected void setStatusBar() {
@@ -329,11 +331,21 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
 
 
     private void initTopButton(){
-        mHide.setOnClickListener(new View.OnClickListener() {
+        mTopHide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mFromBack = true;
                 finish();
+            }
+        });
+        mTopMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context wrapper = new ContextThemeWrapper(AudioHolderActivity.this,R.style.PopupMenuDayStyle);
+                final PopupMenu popupMenu = new PopupMenu(wrapper,v, Gravity.TOP);
+                popupMenu.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(null);
+                popupMenu.show();
             }
         });
     }
@@ -570,21 +582,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                     mSwatch = palette.getMutedSwatch();//柔和 亮色
                     if(mSwatch == null)
                         mSwatch = new Palette.Swatch(Color.GRAY,100);
-//                    if(mSwatch == null){
-//                        mSwatch = palette.getDarkMutedSwatch();
-//                    }
-//                    if(mSwatch == null){
-//                        mSwatch = palette.getMutedSwatch();
-//                    }
-//                    if(mSwatch == null){
-//                        mSwatch = palette.getLightVibrantSwatch();
-//                    }
-//                    if(mSwatch == null){
-//                        mSwatch = palette.getDarkVibrantSwatch();
-//                    }
-//                    if(mSwatch == null){
-//                        mSwatch = palette.getVibrantSwatch();
-//                    }
                     if(mSwatch != null){
                         //修改顶部字体颜色
                         mTopTitle.setTextColor(mSwatch.getBodyTextColor());
@@ -592,6 +589,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                         //修改背景颜色
                         int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
                         int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
+                        int colorDraken = ColorUtil.shiftColor(mSwatch.getRgb(),0.8f);
                         mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
                         //锁屏界面字体颜色
                         mHColor =  mSwatch.getTitleTextColor();
@@ -601,23 +599,26 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                         //修改track颜色
                         ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f));
                         //修改progress颜色
-                        (layerDrawable.getDrawable(1)).setColorFilter(mSwatch.getRgb(), PorterDuff.Mode.SRC_IN);
+                        (layerDrawable.getDrawable(1)).setColorFilter(colorDraken, PorterDuff.Mode.SRC_IN);
                         mSeekBar.setProgressDrawable(layerDrawable);
 
                         //修改thumb颜色
 //                        Drawable drawable = mSeekBar.getThumb();
                         Drawable drawable = getResources().getDrawable(R.drawable.thumb);
-                        Theme.TintDrawable(drawable, mSwatch.getRgb());
+                        Theme.TintDrawable(drawable,colorDraken);
                         mSeekBar.setThumb(drawable);
 
                         //修改顶部按钮颜色
-                        Drawable topDrawable = getResources().getDrawable(R.drawable.play_btn_back);
-                        Theme.TintDrawable(topDrawable,mSwatch.getRgb());
-                        mHide.setImageDrawable(topDrawable);
+                        Drawable topHideDrawable = getResources().getDrawable(R.drawable.play_btn_back);
+                        Drawable topMoreDrawable =  getResources().getDrawable(R.drawable.list_icn_more);
+                        Theme.TintDrawable(topHideDrawable,colorDraken);
+                        Theme.TintDrawable(topMoreDrawable,colorDraken);
+                        mTopHide.setImageDrawable(topHideDrawable);
+                        mTopMore.setImageDrawable(topMoreDrawable);
 
                         //修改控制按钮颜色
-                        mPlayBarNext.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.play_btn_next), mSwatch.getRgb()));
-                        mPlayBarPrev.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.play_btn_pre), mSwatch.getRgb()));
+                        mPlayBarNext.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.play_btn_next),colorDraken));
+                        mPlayBarPrev.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.play_btn_pre),colorDraken));
                         int currentmodel = MusicService.getPlayModel();
                         mPlayBarPlay.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop), mSwatch.getRgb()));
                         Drawable playModelDrawable = getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :

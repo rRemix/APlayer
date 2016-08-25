@@ -109,7 +109,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
 
     @Override
     public void onDestroy() {
-        super.onDestroyView();
+        super.onDestroy();
         if(mCursor != null)
             mCursor.close();
     }

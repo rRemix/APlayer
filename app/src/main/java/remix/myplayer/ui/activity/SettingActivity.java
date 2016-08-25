@@ -17,6 +17,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SharedPrefsUtil;
 
@@ -66,6 +69,8 @@ public class SettingActivity extends ToolbarActivity {
                     boolean isSystem = SharedPrefsUtil.getValue(SettingActivity.this,"setting","IsSystemColor",true);
                     mSystem = (ImageView)notifycolor.findViewById(R.id.popup_notify_image_system);
                     mBlack = (ImageView)notifycolor.findViewById(R.id.popup_notify_image_black);
+                    Theme.TintDrawable(mSystem.getDrawable(), ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+                    Theme.TintDrawable(mBlack.getDrawable(), ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
                     if(mSystem != null)
                         mSystem.setVisibility(isSystem ? View.VISIBLE : View.INVISIBLE);
                     if(mBlack != null)

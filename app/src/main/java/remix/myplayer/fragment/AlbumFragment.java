@@ -120,10 +120,17 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
             mAdapter.setCursor(null);
     }
 
+
+
     @Override
     public void onDestroy() {
-        super.onDestroyView();
+        super.onDestroy();
         if(mCursor != null)
             mCursor.close();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

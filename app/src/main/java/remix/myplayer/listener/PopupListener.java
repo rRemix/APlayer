@@ -1,8 +1,10 @@
 package remix.myplayer.listener;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -96,6 +98,14 @@ public class PopupListener implements PopupMenu.OnMenuItemClickListener {
                         XmlUtil.updatePlaylist();
                     }
                 }
+                break;
+            //设置专辑封面
+            case R.id.menu_album_thumb:
+                Intent getImageIntent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                getImageIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
+                /* 取得相片后返回本画面 */
+                if(mContext instanceof Activity)
+                    ((Activity)mContext).startActivityForResult(getImageIntent, Constants.SELECL_ALBUM_IMAGE);
                 break;
             default:
                 Toast.makeText(mContext, "Click " + item.getTitle(), Toast.LENGTH_SHORT).show();
