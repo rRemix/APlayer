@@ -15,10 +15,6 @@
         android:gravity="center_horizontal"
         android:background="?attr/background_color_3">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/interval_white_height"
-            android:background="?attr/interval_color"/>
 
         <LinearLayout
             android:orientation="vertical"

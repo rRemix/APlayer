@@ -505,18 +505,12 @@ public class MusicService extends BaseService {
     }
     //添加Activity到回调接口
     public static void addCallback(Callback callback) {
-        if(mCallBacklist.size() == 0)
-            mCallBacklist.add(callback);
-        else {
-            for(int i = 0 ; i < mCallBacklist.size() ;i++){
-               if(callback.getType() == mCallBacklist.get(i).getType()){
-                   mCallBacklist.remove(i);
-                   mCallBacklist.add(callback);
-                   break;
-               }
+        for(int i = mCallBacklist.size() - 1 ; i >= 0 ; i--){
+            if(callback.getType() == mCallBacklist.get(i).getType()){
+                mCallBacklist.remove(i);
             }
-            mCallBacklist.add(callback);
         }
+        mCallBacklist.add(callback);
     }
 
     /**

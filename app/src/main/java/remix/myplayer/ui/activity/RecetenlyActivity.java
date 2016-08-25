@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -39,6 +40,8 @@ import remix.myplayer.util.Global;
 public class RecetenlyActivity extends ToolbarActivity implements MusicService.Callback{
     private ArrayList<MP3Item> mInfoList;
     private SongAdapter mAdapter;
+    @BindView(R.id.recently_shuffle)
+    RelativeLayout mShuffle;
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
     @BindView(R.id.recyclerview)
@@ -48,6 +51,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         @Override
         public void handleMessage(Message msg) {
            mAdapter.setInfoList(mInfoList);
+            mShuffle.setVisibility(mInfoList == null || mInfoList.size() == 0 ? View.GONE : View.VISIBLE);
         }
     };
 

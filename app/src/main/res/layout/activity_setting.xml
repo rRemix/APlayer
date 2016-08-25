@@ -5,11 +5,6 @@
 
     <include layout="@layout/toolbar"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/interval_white_height"
-        android:background="?attr/interval_color"/>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
