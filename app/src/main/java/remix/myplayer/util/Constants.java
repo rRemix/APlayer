@@ -97,7 +97,7 @@ public class Constants {
     public final static int UPDATE_PLAYLIST = 2;
 
     //专辑封面选择
-    public final static int SELECL_ALBUM_IMAGE = 10;
+    public final static int SELECL_ALBUM_IMAGE = 1000;
     //艺术家封面选择
-    public final static int SELECT_ARTIST_IMAGE = 11;
+    public final static int SELECT_ARTIST_IMAGE = 1001;
 }

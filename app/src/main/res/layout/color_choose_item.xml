@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/color_choose_item"
+    android:background="?android:attr/selectableItemBackground">
+    <FrameLayout
+        android:id="@+id/color_choose_item_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/d10_size"
+        android:layout_centerHorizontal="true">
+        <ImageView
+            android:id="@+id/color_choose_item_src"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bg_circle"
+            android:layout_gravity="center"/>
+        <ImageView
+            android:id="@+id/color_choose_item_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/gou"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+    <TextView
+        android:id="@+id/color_choose_item_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="红色"
+        android:textSize="@dimen/s14_size"
+        android:textColor="@color/gray_6c6a6c"
+        android:layout_marginBottom="@dimen/d10_size"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/color_choose_item_container"/>
+</RelativeLayout>

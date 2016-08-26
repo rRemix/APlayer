@@ -29,7 +29,7 @@ public class AddPlayListDialog extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.playlist_add);
+        setContentView(R.layout.dialog_playlist_add);
         ButterKnife.bind(this);
 
         WindowManager.LayoutParams lp = getWindow().getAttributes();

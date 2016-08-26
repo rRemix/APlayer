@@ -7,9 +7,9 @@
 
     <style name="AppTheme" parent="BaseTheme">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/md_brown_primary</item>
-        <item name="colorPrimaryDark">@color/md_brown_primary_dark</item>
-        <item name="android:popupBackground">@color/md_indigo_primary</item>
+        <item name="colorPrimary">@color/transparent</item>
+        <item name="colorPrimaryDark">@color/transparent</item>
+        <item name="android:textColorHighlight">@color/md_brown_primary</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -196,6 +196,7 @@
         <item name="dot_color">@color/day_dot_color</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Light</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
+
     </style>
 
     <!--夜间模式-->

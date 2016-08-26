@@ -36,7 +36,7 @@ public class ToolbarActivity extends BaseAppCompatActivity {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onClickNavigation();
             }
         });
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -53,6 +53,10 @@ public class ToolbarActivity extends BaseAppCompatActivity {
                 return true;
             }
         });
+    }
+
+    protected void onClickNavigation(){
+        finish();
     }
 
     @Override

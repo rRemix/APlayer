@@ -7,11 +7,10 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v7.app.AlertDialog;
+import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -19,12 +18,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.BaseAppCompatActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -66,7 +69,7 @@ public class OptionDialog extends BaseAppCompatActivity {
         //去掉标题
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.popup_option);
+        setContentView(R.layout.dialog_option);
         ButterKnife.bind(this);
 
         mInfo = (MP3Item)getIntent().getExtras().getSerializable("MP3Item");
@@ -134,56 +137,62 @@ public class OptionDialog extends BaseAppCompatActivity {
             public void onClick(View v) {
                 try {
                     String title = mIsDeletePlayList ? getString(R.string.confirm_delete_playlist) :getString(R.string.confirm_delete_song);
+                    new MaterialDialog.Builder(OptionDialog.this)
+                            .content(title)
+                            .positiveText(R.string.confirm)
+                            .negativeText(R.string.cancel)
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    String result = "";
+                                    if(!mIsDeletePlayList){
+                                        result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE)? getString(R.string.delete_success) :
+                                                getString(R.string.delete_error);
+                                    } else {
+                                        result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ? getString(R.string.delete_success):
+                                                getString(R.string.delete_error);
+                                    }
+                                    Toast.makeText(OptionDialog.this,result,Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+                            })
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                }
+                            })
+                            .backgroundColor(ThemeStore.getBackgroundColor3())
+                            .positiveColor(ThemeStore.getTextColorPrimary())
+                            .negativeColor(ThemeStore.getTextColorPrimary())
+                            .contentColor(ThemeStore.getTextColorPrimary())
+                            .show();
 
-//                    AlertDialog alertDialog = new AlertDialog.Builder(OptionDialog.this)
-//                            .setTitle(title)
-//                            .setPositiveButton("确认", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    String result = "";
-//                                    if(!mIsDeletePlayList){
-//                                        result = DBUtil.deleteSong(mInfo.getImgUrl(), Constants.DELETE_SINGLE) == true ? "删除成功" : "删除失败";
-//                                    } else {
-//                                        result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ? "删除成功" : "删除失败";
-//                                    }
-//                                    Toast.makeText(OptionDialog.this,result,Toast.LENGTH_SHORT).show();
-//                                    finish();
-//                                }
-//                            })
-//                            .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                }
-//                            }).create();
+//                    View delete = LayoutInflater.from(OptionDialog.this).inflate(R.layout.dialog_delete,null);
+//                    ((TextView)delete.findViewById(R.id.delete_title)).setText(title);
+//                    delete.findViewById(R.id.delete_cancel).setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            finish();
+//                        }
+//                    });
+//                    delete.findViewById(R.id.delete_confirm).setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            String result = "";
+//                            if(!mIsDeletePlayList){
+//                                result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE) ? getString(R.string.delete_success) :
+//                                        getString(R.string.delete_error);
+//                            } else {
+//                                result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ? getString(R.string.delete_success):
+//                                        getString(R.string.delete_error);
+//                            }
+//                            Toast.makeText(OptionDialog.this,result,Toast.LENGTH_SHORT).show();
+//                            finish();
+//                        }
+//                    });
+//
+//                    AlertDialog alertDialog = new AlertDialog.Builder(OptionDialog.this).setView(delete).create();
 //                    alertDialog.show();
-
-
-                    View delete = LayoutInflater.from(OptionDialog.this).inflate(R.layout.popup_delete,null);
-                    ((TextView)delete.findViewById(R.id.delete_title)).setText(title);
-                    delete.findViewById(R.id.delete_cancel).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            finish();
-                        }
-                    });
-                    delete.findViewById(R.id.delete_confirm).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            String result = "";
-                            if(!mIsDeletePlayList){
-                                result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE) == true ? getString(R.string.delete_success) :
-                                        getString(R.string.delete_error);
-                            } else {
-                                result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ? getString(R.string.delete_success):
-                                        getString(R.string.delete_error);
-                            }
-                            Toast.makeText(OptionDialog.this,result,Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                    });
-
-                    AlertDialog alertDialog = new AlertDialog.Builder(OptionDialog.this).setView(delete).create();
-                    alertDialog.show();
 
                 } catch (Exception e){
                     e.printStackTrace();
@@ -212,13 +221,15 @@ public class OptionDialog extends BaseAppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
+        overridePendingTransition(R.anim.slide_bottom_in,0);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, R.anim.slide_bottom_out);
     }
 
     @Override

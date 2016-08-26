@@ -42,7 +42,7 @@ public class AddtoPlayListDialog extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.playlist_addto);
+        setContentView(R.layout.dialog_playlist_addto);
         ButterKnife.bind(this);
 
         mId = (int)getIntent().getExtras().getLong("Id");
@@ -99,12 +99,14 @@ public class AddtoPlayListDialog extends BaseActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
+        overridePendingTransition(R.anim.slide_bottom_in,0);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, R.anim.slide_bottom_out);
     }
 }

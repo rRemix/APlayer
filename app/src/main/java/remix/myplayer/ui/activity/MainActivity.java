@@ -3,6 +3,7 @@ package remix.myplayer.ui.activity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -93,6 +94,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                 recreate();
         }
     };
+    //更新主题
+    private int UPDATE_THEME = 1;
 
     @Override
     protected void onResume() {
@@ -316,10 +319,10 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     private void initDrawerLayout() {
 //        mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
-//        ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed},{android.R.attr.state_checked} ,{}},
-//                new int[]{ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY), ColorUtil.getColor(R.color.black_737373),ColorUtil.getColor(R.color.black_737373)});
-//        mNavigationView.setItemIconTintList(colorStateList);
-//        mNavigationView.setItemTextColor(colorStateList);
+        ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed},{android.R.attr.state_checked} ,{}},
+                new int[]{ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY), ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY),ColorUtil.getColor(R.color.black_737373)});
+        mNavigationView.setItemIconTintList(colorStateList);
+        mNavigationView.setItemTextColor(colorStateList);
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -337,15 +340,12 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                         break;
                     case R.id.item_setting:
                         //设置
-                        startActivity(new Intent(MainActivity.this,SettingActivity.class));
+                        startActivityForResult(new Intent(MainActivity.this,SettingActivity.class),UPDATE_THEME);
+//                        startActivityForResult(new Intent(MainActivity.this,ThemeActivity.class),UPDATE_THEME);
                         break;
                     case R.id.item_exit:
                         sendBroadcast(new Intent(Constants.EXIT));
                         break;
-                    case R.id.item_theme:
-//                        startActivity(new Intent(MainActivity.this,ThemeActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-//                        finish();
-                        startActivityForResult(new Intent(MainActivity.this,ThemeActivity.class),0);
                     default:
                         break;
                 }
@@ -359,8 +359,9 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null){
-            if(data.getBooleanExtra("needRefresh",false)) {
+            if(requestCode == UPDATE_THEME && data.getBooleanExtra("needRefresh",false)) {
                 mRecreateHandler.sendEmptyMessage(RECREATE);
+//                recreate();
                 return;
             }
             if(requestCode == Constants.SELECL_ALBUM_IMAGE){

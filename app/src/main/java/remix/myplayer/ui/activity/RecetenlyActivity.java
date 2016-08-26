@@ -50,7 +50,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-           mAdapter.setInfoList(mInfoList);
+            mAdapter.setInfoList(mInfoList);
             mShuffle.setVisibility(mInfoList == null || mInfoList.size() == 0 ? View.GONE : View.VISIBLE);
         }
     };

@@ -105,6 +105,9 @@
         <activity android:name=".ui.dialog.AddPlayListDialog"
             android:theme="@style/PopupCenterDialog"/>
 
+        <activity android:name=".ui.dialog.ChooseColorDialog"
+            android:theme="@style/PopupCenterDialog"/>
+
         <activity android:name=".ui.dialog.ShareDialog"
             android:theme="@style/PopupBottomDialog"
             android:configChanges="keyboardHidden|orientation"

@@ -110,10 +110,11 @@
                             android:textColor="?attr/text_color"
                             android:textSize="@dimen/s14_size"/>
                     </LinearLayout>
-                    <View
-                        android:layout_width="@dimen/d10_size"
-                        android:layout_height="@dimen/d10_size"
-                        android:background="?attr/material_color_primary"
+                    <ImageView
+                        android:id="@+id/setting_color_src"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/bg_circle_small"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
                         android:layout_marginRight="@dimen/d14_size"/>

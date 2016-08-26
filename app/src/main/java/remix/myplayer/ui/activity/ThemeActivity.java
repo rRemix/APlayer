@@ -10,8 +10,8 @@ import remix.myplayer.R;
 import remix.myplayer.theme.ThemeStore;
 
 /**
- * @ClassName
- * @Description
+ * @ClassName ThemeActivity
+ * @Description 主题设置测试界面
  * @Author Xiaoborui
  * @Date 2016/8/3 16:59
  */
@@ -50,8 +50,8 @@ public class ThemeActivity extends BaseAppCompatActivity implements View.OnClick
             case R.id.night:
                 ThemeStore.THEME_MODE = ThemeStore.NIGHT;
                 ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
-                ThemeStore.MATERIAL_COLOR_PRIMARY = R.color.night_background_color_3;
-                ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = R.color.night_background_color_3;
+                ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor();
+                ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor();
                 ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);
                 break;
             case R.id.change:

@@ -36,7 +36,7 @@ public class PlayingListDialog extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.popup_playinglist);
+        setContentView(R.layout.dialog_playinglist);
         ButterKnife.bind(this);
 
         mInstance = this;
@@ -84,21 +84,14 @@ public class PlayingListDialog extends BaseActivity {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    protected void onStart() {
+        super.onStart();
+        overridePendingTransition(R.anim.slide_bottom_in,0);
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-//        if(mNeedRefresh){
-//            UpdateAdapter();
-//            mNeedRefresh = false;
-//        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, R.anim.slide_bottom_out);
     }
 }

@@ -81,7 +81,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.popup_share);
+        setContentView(R.layout.dialog_share);
         ButterKnife.bind(this);
         mInstance = this;
 

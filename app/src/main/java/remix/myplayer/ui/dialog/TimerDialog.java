@@ -76,7 +76,7 @@ public class TimerDialog extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.popup_timer);
+        setContentView(R.layout.dialog_timer);
         ButterKnife.bind(this);
 
         //居中显示
