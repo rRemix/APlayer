@@ -29,7 +29,7 @@
             android:layout_marginTop="22dp"
             android:src="@drawable/set_scanning_divder"/>
 
-        <remix.myplayer.ui.customview.ScanSizeSeekBar
+        <remix.myplayer.ui.customview.FilterSizeSeekBar
             android:layout_marginTop="32dp"
             android:layout_marginLeft="32dp"
             android:layout_marginRight="32dp"
@@ -39,10 +39,8 @@
             app:trackheight="2dp"
             app:dotnum="6"
             app:dotwidth="2dp"
-            app:trackcolor="?attr/scan_track_color"
-            app:dotcolor="?attr/dot_color"
             app:thumb="@drawable/thumb"
-            app:thumbpress="@drawable/thumb_press"
+            app:thumbpress="@drawable/thumb"
             app:tiptextcolor="?attr/text_color_primary"/>
     </LinearLayout>
 

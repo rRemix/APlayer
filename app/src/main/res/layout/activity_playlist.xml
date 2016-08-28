@@ -7,10 +7,6 @@
 
     <include layout="@layout/toolbar"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/interval_white_height"
-        android:background="@color/night_interval_color"/>
 
     <FrameLayout
         android:background="?attr/background_color_3"

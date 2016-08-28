@@ -19,7 +19,7 @@
             android:id="@+id/notify_image"
             android:layout_width="64dp"
             android:layout_height="match_parent"
-            android:src="@drawable/default_recommend"/>
+            android:src="@drawable/song_artist_empty_bg"/>
 
         <LinearLayout
             android:id="@+id/notify_info_container"

@@ -9,7 +9,6 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/transparent</item>
         <item name="colorPrimaryDark">@color/transparent</item>
-        <item name="android:textColorHighlight">@color/md_brown_primary</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -192,8 +191,6 @@
         <item name="text_color_primary">@color/day_textcolor_primary</item>
         <item name="text_color">@color/day_textcolor</item>
         <item name="bg_aboutus">@drawable/bg_aboutus_day</item>
-        <item name="scan_track_color">@color/day_scan_track_color</item>
-        <item name="dot_color">@color/day_dot_color</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Light</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
 
@@ -205,6 +202,7 @@
         <item name="material_color_primary_dark">@color/night_background_color_3</item>
         <item name="material_color_secondry">@color/purple_782899</item>
         <item name="colorControlActivated">@color/purple_782899</item>
+        <item name="colorAccent">@color/purple_782899</item>
         <item name="background_color_main">@color/night_background_color_main</item>
         <item name="background_color_1">@color/night_background_color_3</item>
         <item name="background_color_2">@color/night_background_color_2</item>
@@ -212,8 +210,6 @@
         <item name="text_color_primary">@color/night_textcolor_primary</item>
         <item name="text_color">@color/night_textcolor</item>
         <item name="bg_aboutus">@drawable/bg_aboutus_night</item>
-        <item name="scan_track_color">@color/night_scan_track_color</item>
-        <item name="dot_color">@color/night_dot_color</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Dark</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
     </style>
@@ -223,6 +219,7 @@
         <item name="material_color_secondry">@color/md_purple_primary</item>
         <item name="material_color_primary_dark">@color/md_purple_primary_dark</item>
         <item name="colorControlActivated">@color/md_purple_primary</item>
+        <item name="colorAccent">@color/md_purple_primary</item>
     </style>
 
     <style name="DayTheme.Red" parent="@style/DayTheme">
@@ -230,6 +227,7 @@
         <item name="material_color_secondry">@color/md_red_primary</item>
         <item name="material_color_primary_dark">@color/md_red_primary_dark</item>
         <item name="colorControlActivated">@color/md_red_primary</item>
+        <item name="colorAccent">@color/md_red_primary</item>
     </style>
 
     <style name="DayTheme.Pink" parent="@style/DayTheme">
@@ -237,6 +235,7 @@
         <item name="material_color_secondry">@color/md_pink_primary</item>
         <item name="material_color_primary_dark">@color/md_pink_primary_dark</item>
         <item name="colorControlActivated">@color/md_pink_primary</item>
+        <item name="colorAccent">@color/md_pink_primary</item>
     </style>
 
     <style name="DayTheme.Brown" parent="@style/DayTheme">
@@ -244,6 +243,7 @@
         <item name="material_color_secondry">@color/md_brown_primary</item>
         <item name="material_color_primary_dark">@color/md_brown_primary_dark</item>
         <item name="colorControlActivated">@color/md_brown_primary</item>
+        <item name="colorAccent">@color/md_brown_primary</item>
     </style>
 
     <style name="DayTheme.Ingido" parent="@style/DayTheme">
@@ -251,6 +251,7 @@
         <item name="material_color_secondry">@color/md_indigo_primary</item>
         <item name="material_color_primary_dark">@color/md_indigo_primary_dark</item>
         <item name="colorControlActivated">@color/md_indigo_primary</item>
+        <item name="colorAccent">@color/md_indigo_primary</item>
     </style>
 
 

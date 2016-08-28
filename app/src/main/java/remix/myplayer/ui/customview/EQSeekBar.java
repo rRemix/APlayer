@@ -1,8 +1,6 @@
 package remix.myplayer.ui.customview;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -213,7 +211,7 @@ public class EQSeekBar extends View {
         mContext = context;
         TypedArray typedArray = mContext.obtainStyledAttributes(attributeSet,R.styleable.EQSeekBar);
         //初始化thumbdrawable及其状态
-        mThumbDrawable = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumb);
+        mThumbDrawable = typedArray.getDrawable(R.styleable.FilterSizeSeekBar_thumb);
         if(mThumbDrawable == null)
             mThumbDrawable = getResources().getDrawable(R.drawable.thumb);
         Theme.TintDrawable(mThumbDrawable,ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899));

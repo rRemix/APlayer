@@ -28,6 +28,7 @@ import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.ui.activity.BaseAppCompatActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -39,7 +40,7 @@ import remix.myplayer.util.DBUtil;
 /**
  * 歌曲的选项对话框
  */
-public class OptionDialog extends BaseAppCompatActivity {
+public class OptionDialog extends BaseActivity {
     //添加 设置铃声 分享 删除按钮
     @BindView(R.id.popup_add)
     ImageView mAdd;
@@ -166,44 +167,20 @@ public class OptionDialog extends BaseAppCompatActivity {
                             .negativeColor(ThemeStore.getTextColorPrimary())
                             .contentColor(ThemeStore.getTextColorPrimary())
                             .show();
-
-//                    View delete = LayoutInflater.from(OptionDialog.this).inflate(R.layout.dialog_delete,null);
-//                    ((TextView)delete.findViewById(R.id.delete_title)).setText(title);
-//                    delete.findViewById(R.id.delete_cancel).setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            finish();
-//                        }
-//                    });
-//                    delete.findViewById(R.id.delete_confirm).setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            String result = "";
-//                            if(!mIsDeletePlayList){
-//                                result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE) ? getString(R.string.delete_success) :
-//                                        getString(R.string.delete_error);
-//                            } else {
-//                                result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ? getString(R.string.delete_success):
-//                                        getString(R.string.delete_error);
-//                            }
-//                            Toast.makeText(OptionDialog.this,result,Toast.LENGTH_SHORT).show();
-//                            finish();
-//                        }
-//                    });
-//
-//                    AlertDialog alertDialog = new AlertDialog.Builder(OptionDialog.this).setView(delete).create();
-//                    alertDialog.show();
-
                 } catch (Exception e){
                     e.printStackTrace();
                 }
 
             }
         });
-
     }
 
 
+    /**
+     * 设置铃声
+     * @param path
+     * @param Id
+     */
     private void setRing(String path, int Id) {
         ContentValues cv = new ContentValues();
         cv.put(MediaStore.Audio.Media.IS_RINGTONE, true);
@@ -232,12 +209,5 @@ public class OptionDialog extends BaseAppCompatActivity {
         overridePendingTransition(0, R.anim.slide_bottom_out);
     }
 
-    @Override
-    protected void setUpTheme() {
-    }
-
-    @Override
-    protected void setStatusBar() {
-    }
 
 }

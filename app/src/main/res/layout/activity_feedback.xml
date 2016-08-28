@@ -18,7 +18,7 @@
             android:gravity="left|top"
             android:textSize="@dimen/s16_size"
             android:textColor="@color/drawer_list_color"
-            android:textCursorDrawable="@drawable/bg_cursor_gray"
+            android:textCursorDrawable="@null"
             android:layout_width="352dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="23dp"/>

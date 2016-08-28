@@ -1,5 +1,6 @@
 package remix.myplayer.theme;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -11,7 +12,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StyleRes;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.TextView;
+
+import java.lang.reflect.Field;
 
 import remix.myplayer.R;
 import remix.myplayer.util.ColorUtil;
@@ -155,6 +160,58 @@ public class Theme {
                 seekBar.getIndeterminateDrawable().setColorFilter(color, mode);
             if (seekBar.getProgressDrawable() != null)
                 seekBar.getProgressDrawable().setColorFilter(color, mode);
+        }
+    }
+
+    /**
+     * 修改edittext光标颜色
+     * @param editText
+     * @param color
+     */
+    public static void setTinit(EditText editText, int color,boolean underline) {
+        try {
+            final Field drawableResField = TextView.class.getDeclaredField("mCursorDrawableRes");
+            drawableResField.setAccessible(true);
+            final Drawable drawable = getDrawable(editText.getContext(), drawableResField.getInt(editText));
+            if (drawable == null) {
+                return;
+            }
+            drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+            final Object drawableFieldOwner;
+            final Class<?> drawableFieldClass;
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                drawableFieldOwner = editText;
+                drawableFieldClass = TextView.class;
+            } else {
+                final Field editorField = TextView.class.getDeclaredField("mEditor");
+                editorField.setAccessible(true);
+                drawableFieldOwner = editorField.get(editText);
+                drawableFieldClass = drawableFieldOwner.getClass();
+            }
+            final Field drawableField = drawableFieldClass.getDeclaredField("mCursorDrawable");
+            drawableField.setAccessible(true);
+            drawableField.set(drawableFieldOwner, new Drawable[] {drawable, drawable});
+
+            if(underline){
+                editText.getBackground().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    /**
+     * 修改edittext光标与下划线颜色
+     * @param context
+     * @param id
+     * @return
+     */
+
+
+    public static Drawable getDrawable(Context context, int id) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            return context.getResources().getDrawable(id);
+        } else {
+            return context.getDrawable(id);
         }
     }
 

@@ -20,8 +20,7 @@
         android:layout_marginRight="2dp"
         android:layout_marginTop="18dp"
         android:lines="1"
-        android:ellipsize="end"
-        android:textCursorDrawable="@drawable/bg_cursor_purple"/>
+        android:ellipsize="end" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -43,7 +42,6 @@
             android:layout_gravity="center_vertical"
             android:id="@+id/playlist_continue"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/progress_complete"
             android:layout_marginRight="16dp"
             android:text="继续"
             android:onClick="onAdd"/>

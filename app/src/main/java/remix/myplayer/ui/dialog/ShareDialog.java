@@ -176,7 +176,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         bundle.putString(QQShare.SHARE_TO_QQ_TARGET_URL, "http://music.baidu.com/" + "search?key=" + URLEncoder.encode(mInfo.getDisplayname()));
 //        if (album_url != null && !album_url.equals(""))
 //            bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, album_url);
-        bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, album_url != null ? album_url : Uri.parse("res://remix.myplayer/" + R.drawable.default_recommend).toString());
+        bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, album_url != null ? album_url : Uri.parse("res://remix.myplayer/" + R.drawable.song_artist_empty_bg).toString());
         bundle.putString(QQShare.SHARE_TO_QQ_APP_NAME, getResources().getString(R.string.app_name));
         mTencentApi.shareToQQ(ShareDialog.this, bundle, mQQListener);
     }

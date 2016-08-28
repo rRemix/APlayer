@@ -136,6 +136,14 @@ public class ThemeStore {
         return SharedPrefsUtil.getValue(Application.getContext(),"Theme","ThemeMode",DAY);
     }
 
+    /**
+     * 获得强调色
+     * @return
+     */
+    @ColorInt
+    public static int getStressColor(){
+        return ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899);
+    }
 
     @ColorInt
     public static int getTextColorPrimary(){

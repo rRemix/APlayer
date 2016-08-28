@@ -1,7 +1,6 @@
 package remix.myplayer.ui.customview;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -27,7 +26,7 @@ import remix.myplayer.util.DensityUtil;
 /**
  * 设置扫描文件大小的seekbar
  */
-public class ScanSizeSeekBar extends View {
+public class FilterSizeSeekBar extends View {
     private OnSeekBarChangeListener mOnSeekBarChangeListener;
     private static final String TAG = "CustomSeekBar";
     private Context mContext;
@@ -140,19 +139,19 @@ public class ScanSizeSeekBar extends View {
      * 扫描大小设置常量
      */
     private String[] mTexts = new String[]{"0","300k","500K","800k","1MB","2MB"};
-    public ScanSizeSeekBar(Context context) {
+    public FilterSizeSeekBar(Context context) {
         super(context);
         mContext = context;
         init(null);
     }
 
-    public ScanSizeSeekBar(Context context, AttributeSet attrs) {
+    public FilterSizeSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
         init(attrs);
     }
 
-    public ScanSizeSeekBar(Context context, AttributeSet attrs, int defStyleAttr) {
+    public FilterSizeSeekBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
         init(attrs);
@@ -228,16 +227,16 @@ public class ScanSizeSeekBar extends View {
 
     private void init(AttributeSet attrs){
         mInit = false;
-        TypedArray typedArray = mContext.obtainStyledAttributes(attrs, R.styleable.ScanSizeSeekBar);
+        TypedArray typedArray = mContext.obtainStyledAttributes(attrs, R.styleable.FilterSizeSeekBar);
         //初始化thumbdrawable及其状态
-        Drawable thumb = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumb);
-        Drawable thumbPress = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumbpress);
+        Drawable thumb = typedArray.getDrawable(R.styleable.FilterSizeSeekBar_thumb);
+        Drawable thumbPress = typedArray.getDrawable(R.styleable.FilterSizeSeekBar_thumbpress);
         if(thumb == null)
             thumb = getResources().getDrawable(R.drawable.thumb);
         if(thumbPress == null)
-            thumbPress = getResources().getDrawable(R.drawable.thumb_press);
+            thumbPress = getResources().getDrawable(R.drawable.thumb);
 
-        Theme.TintDrawable(thumb,ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.md_night_primary));
+        Theme.TintDrawable(thumb,ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899));
         Theme.TintDrawable(thumbPress,ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899));
 
         mThumbNormal = new int[]{-android.R.attr.state_focused, -android.R.attr.state_pressed,
@@ -256,22 +255,19 @@ public class ScanSizeSeekBar extends View {
         mTrackCenterY = mThumbHeight / 2;
 
         //轨道 已完成轨道 文字颜色
-        mTrackColor = typedArray.getColor(R.styleable.ScanSizeSeekBar_trackcolor,
-                ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_scan_track_color : R.color.night_scan_track_color));
-        mProgressColor = typedArray.getColor(R.styleable.ScanSizeSeekBar_progresscolor,
-                ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899));
-        mTextColor = typedArray.getColor(R.styleable.ScanSizeSeekBar_tiptextcolor,
-                ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+        mTrackColor = ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_scan_track_color : R.color.night_scan_track_color);
+        mProgressColor = ThemeStore.getStressColor();
+        mTextColor = ThemeStore.getTextColorPrimary();
 
         //小圆点数量与宽度
-        mDotNum = typedArray.getInteger(R.styleable.ScanSizeSeekBar_dotnum, DensityUtil.dip2px(mContext,3));
-        mDotWidth = (int)typedArray.getDimension(R.styleable.ScanSizeSeekBar_dotwidth,DensityUtil.dip2px(mContext,2));
+        mDotNum = typedArray.getInteger(R.styleable.FilterSizeSeekBar_dotnum, DensityUtil.dip2px(mContext,3));
+        mDotWidth = (int)typedArray.getDimension(R.styleable.FilterSizeSeekBar_dotwidth,DensityUtil.dip2px(mContext,2));
 
         //轨道高度
-        mTrackHeigh = (int)typedArray.getDimension(R.styleable.ScanSizeSeekBar_trackheight,DensityUtil.dip2px(mContext,2));
+        mTrackHeigh = (int)typedArray.getDimension(R.styleable.FilterSizeSeekBar_trackheight,DensityUtil.dip2px(mContext,2));
 
         //小圆点画笔
-        mDotColor = typedArray.getColor(R.styleable.ScanSizeSeekBar_dotcolor, ColorUtil.getColor(R.color.day_dot_color));
+        mDotColor = ColorUtil.shiftColor(ThemeStore.getStressColor(),0.8f);
         mDotPaint = new Paint();
         mDotPaint.setAntiAlias(true);
         mDotPaint.setColor(mDotColor);
@@ -316,9 +312,9 @@ public class ScanSizeSeekBar extends View {
         invalidate();
     }
     public interface OnSeekBarChangeListener {
-        void onProgressChanged(ScanSizeSeekBar seekBar, int position, boolean fromUser);
-        void onStartTrackingTouch(ScanSizeSeekBar seekBar);
-        void onStopTrackingTouch(ScanSizeSeekBar seekBar);
+        void onProgressChanged(FilterSizeSeekBar seekBar, int position, boolean fromUser);
+        void onStartTrackingTouch(FilterSizeSeekBar seekBar);
+        void onStopTrackingTouch(FilterSizeSeekBar seekBar);
     }
 
     public void setOnSeekBarChangeListener(OnSeekBarChangeListener l) {

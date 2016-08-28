@@ -18,7 +18,7 @@
             android:textSize="@dimen/s14_size"
             android:hint="写点什么吧"
             android:padding="15dp"
-            android:textCursorDrawable="@drawable/bg_cursor_gray"
+            android:textCursorDrawable="@null"
             android:background="@null"/>
 
         <remix.myplayer.ui.customview.PagerButton

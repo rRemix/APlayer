@@ -20,7 +20,7 @@
             android:layout_width="100dp"
             android:layout_height="match_parent"
             android:layout_centerVertical="true"
-            android:src="@drawable/default_recommend"/>
+            android:src="@drawable/song_artist_empty_bg"/>
 
         <LinearLayout
             android:layout_width="match_parent"

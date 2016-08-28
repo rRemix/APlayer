@@ -6,12 +6,16 @@ import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
 
@@ -24,12 +28,12 @@ import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.util.ColorUtil;
 
 /**
- * @ClassName ChooseColorDialog
+ * @ClassName ColorChooseDialog
  * @Description 主题颜色选择
  * @Author Xiaoborui
  * @Date 2016/8/26 11:14
  */
-public class ChooseColorDialog extends BaseActivity{
+public class ColorChooseDialog extends BaseActivity{
     @BindView(R.id.color_container)
     LinearLayout mColorContainer;
     private final int[] mColors = new int[]{R.color.md_purple_primary,R.color.md_red_primary,
@@ -90,24 +94,35 @@ public class ChooseColorDialog extends BaseActivity{
         public void onClick(View v) {
 
             if(!ThemeStore.isDay()){
-                AlertDialog alertDialog = new AlertDialog.Builder(ChooseColorDialog.this).
-                        setMessage("是否更改主题?")
-                        .setPositiveButton("是", new DialogInterface.OnClickListener() {
+                new MaterialDialog.Builder(ColorChooseDialog.this)
+                        .content("当前为夜间模式，是否切换主题颜色?")
+                        .backgroundColor(ThemeStore.getBackgroundColor3())
+                        .positiveColor(ThemeStore.getTextColorPrimary())
+                        .negativeColor(ThemeStore.getTextColorPrimary())
+                        .contentColor(ThemeStore.getTextColorPrimary())
+                        .positiveText("是")
+                        .negativeText("否")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                changeThemeColor(true);
                             }
                         })
-                        .setNegativeButton("否", new DialogInterface.OnClickListener() {
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
                             }
-                        }).create();
-                alertDialog.show();
+                        }).show();
+            } else {
+                changeThemeColor(false);
             }
+        }
+
+        private void changeThemeColor(boolean isfromNight) {
             Intent intent = new Intent();
             intent.putExtra("needRefresh",true);
+            intent.putExtra("fromColorChoose",isfromNight);
             setResult(Activity.RESULT_OK,intent);
             ThemeStore.THEME_MODE = ThemeStore.DAY;
             ThemeStore.THEME_COLOR = mThemeColor;

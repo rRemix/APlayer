@@ -10,8 +10,11 @@ import android.widget.EditText;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.ui.activity.PlayListActivity;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -37,7 +40,9 @@ public class AddPlayListDialog extends BaseActivity {
         getWindow().setAttributes(lp);
         getWindow().setGravity(Gravity.CENTER);
 
-        mEdit.getBackground().setColorFilter(getResources().getColor(R.color.intersperse_color), PorterDuff.Mode.SRC_ATOP);
+        //修改下划线颜色
+        //修改光标颜色
+        Theme.setTinit(mEdit,ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY),true);
         mEdit.setText("本地歌单" + PlayListActivity.getPlayList().size());
     }
 

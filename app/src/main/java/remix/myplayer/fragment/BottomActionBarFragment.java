@@ -36,8 +36,6 @@ public class BottomActionBarFragment extends BaseFragment{
     //播放与下一首按钮
     @BindView(R.id.playbar_play)
     ImageButton mPlayButton;
-    @BindView(R.id.playbar_next)
-    ImageButton mNextButton;
     //歌曲名艺术家
     @BindView(R.id.bottom_title)
     TextView mTitle;
@@ -90,7 +88,6 @@ public class BottomActionBarFragment extends BaseFragment{
         });
         CtrlButtonListener listener = new CtrlButtonListener(getContext());
         mPlayButton.setOnClickListener(listener);
-        mNextButton.setOnClickListener(listener);
 
         return rootView;
     }

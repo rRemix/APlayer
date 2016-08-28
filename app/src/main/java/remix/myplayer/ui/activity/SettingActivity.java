@@ -1,19 +1,27 @@
 package remix.myplayer.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.RadioButton;
+import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.umeng.update.UmengUpdateAgent;
@@ -23,8 +31,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.dialog.ChooseColorDialog;
+import remix.myplayer.ui.dialog.ColorChooseDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SharedPrefsUtil;
@@ -43,11 +52,10 @@ public class SettingActivity extends ToolbarActivity {
     @BindView(R.id.setting_color_src)
     ImageView mColorSrc;
 
-    private ImageView mSystem;
-    private ImageView mBlack;
-    private AlertDialog mAlertDialog;
-
+    //是否需要刷新
     private boolean mNeedRefresh = false;
+    //是否从主题颜色选择对话框返回
+    private boolean mFromColorChoose = false;
     private final int RECREATE = 100;
     private Handler mRecreateHandler = new Handler(){
         @Override
@@ -65,20 +73,39 @@ public class SettingActivity extends ToolbarActivity {
         ButterKnife.bind(this);
         initToolbar(mToolbar,"设置");
 
+        //读取重启aitivity之前的数据
+        if(savedInstanceState != null){
+            mNeedRefresh = savedInstanceState.getBoolean("needRefresh");
+            mFromColorChoose = savedInstanceState.getBoolean("fromColorChoose");
+        }
+
+
         mModeSwitch.setChecked(!ThemeStore.isDay());
         mModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setNightMode(isChecked);
+                if(!mFromColorChoose) {
+                    setNightMode(isChecked);
+                }
+                 else {
+                    mFromColorChoose = false;
+                }
             }
         });
-        ((GradientDrawable)mColorSrc.getDrawable()).setColor(
-                ThemeStore.isDay() ? ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY) : ColorUtil.getColor(R.color.purple_782899));
 
-        //读取重启aitivity之前的数据
-        if(savedInstanceState != null){
-            mNeedRefresh = savedInstanceState.getBoolean("needRefresh");
-        }
+
+        //初始化颜色
+        final int color = ThemeStore.isDay() ? ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY) : ColorUtil.getColor(R.color.purple_782899);
+        ((GradientDrawable)mColorSrc.getDrawable()).setColor(color);
+        ButterKnife.apply( new ImageView[]{findView(R.id.setting_eq_arrow),findView(R.id.setting_feedback_arrow),
+                findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow)}, new ButterKnife.Action<ImageView>(){
+            @Override
+            public void apply(@NonNull ImageView view, int index) {
+                Drawable imgDrawable = view.getBackground();
+                Theme.TintDrawable(imgDrawable,color);
+                view.setImageDrawable(imgDrawable);
+            }
+        });
 
     }
 
@@ -88,7 +115,8 @@ public class SettingActivity extends ToolbarActivity {
         ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor();
         ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor();
         ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);
-        recreate();
+        mNeedRefresh = true;
+        mRecreateHandler.sendEmptyMessage(RECREATE);
     }
 
     @Override
@@ -97,7 +125,6 @@ public class SettingActivity extends ToolbarActivity {
         intent.putExtra("needRefresh",mNeedRefresh);
         setResult(Activity.RESULT_OK,intent);
         finish();
-
     }
 
     @Override
@@ -116,7 +143,7 @@ public class SettingActivity extends ToolbarActivity {
                 break;
             //选择主色调
             case R.id.setting_color_container:
-                startActivityForResult(new Intent(SettingActivity.this, ChooseColorDialog.class),0);
+                startActivityForResult(new Intent(SettingActivity.this, ColorChooseDialog.class),0);
                 break;
             //通知栏底色
             case R.id.setting_notify_container:
@@ -124,10 +151,12 @@ public class SettingActivity extends ToolbarActivity {
                     new MaterialDialog.Builder(this)
                             .title("通知栏底色")
                             .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
-                            .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
+                            .itemsCallbackSingleChoice(SharedPrefsUtil.getValue(SettingActivity.this,"setting","IsSystemColor",true) ? 0 : 1,
+                                    new MaterialDialog.ListCallbackSingleChoice() {
                                 @Override
                                 public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                                     SharedPrefsUtil.putValue(SettingActivity.this,"setting","IsSystemColor",which == 0);
+                                    sendBroadcast(new Intent(Constants.NOTIFY));
                                     return true;
                                 }
                             })
@@ -137,23 +166,6 @@ public class SettingActivity extends ToolbarActivity {
                             .titleColorAttr(R.attr.text_color_primary)
                             .itemsColorAttr(R.attr.text_color_primary)
                             .show();
-//                    View notifycolor = LayoutInflater.from(SettingActivity.this).inflate(R.layout.dialog_notifycolor,null);
-//                    boolean isSystem = SharedPrefsUtil.getValue(SettingActivity.this,"setting","IsSystemColor",true);
-//                    mSystem = (ImageView)notifycolor.findViewById(R.id.popup_notify_image_system);
-//                    mBlack = (ImageView)notifycolor.findViewById(R.id.popup_notify_image_black);
-//                    Theme.TintDrawable(mSystem.getDrawable(), ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-//                    Theme.TintDrawable(mBlack.getDrawable(), ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-//                    if(mSystem != null)
-//                        mSystem.setVisibility(isSystem ? View.VISIBLE : View.INVISIBLE);
-//                    if(mBlack != null)
-//                        mBlack.setVisibility(isSystem ? View.INVISIBLE : View.VISIBLE);
-//
-//                    ColorListener listener = new ColorListener();
-//                    notifycolor.findViewById(R.id.notifycolor_system).setOnClickListener(listener);
-//                    notifycolor.findViewById(R.id.notifycolor_black).setOnClickListener(listener);
-//
-//                    mAlertDialog = new AlertDialog.Builder(SettingActivity.this).setView(notifycolor).create();
-//                    mAlertDialog.show();
                 } catch (Exception e){
                     e.printStackTrace();
                 }
@@ -186,34 +198,23 @@ public class SettingActivity extends ToolbarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("needRefresh",mNeedRefresh);
+        outState.putBoolean("fromColorChoose",mFromColorChoose);
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 0 && data != null){
             mNeedRefresh = data.getBooleanExtra("needRefresh",false);
+            mFromColorChoose = data.getBooleanExtra("fromColorChoose",false);
             if(mNeedRefresh){
                 mRecreateHandler.sendEmptyMessage(RECREATE);
+                if(mFromColorChoose)
+                    mModeSwitch.setChecked(false);
             }
 
         }
     }
 
-    class ColorListener implements View.OnClickListener{
-        @Override
-        public void onClick(View v) {
-            boolean isSystem = v.getId() == R.id.notifycolor_system;
-            if(mSystem != null)
-                mSystem.setVisibility(isSystem ? View.VISIBLE : View.INVISIBLE);
-            if(mBlack != null)
-                mBlack.setVisibility(isSystem ? View.INVISIBLE : View.VISIBLE);
-            SharedPrefsUtil.putValue(SettingActivity.this,"setting","IsSystemColor",isSystem);
-            //更新通知栏
-            sendBroadcast(new Intent(Constants.NOTIFY));
-            if(mAlertDialog != null && mAlertDialog.isShowing()){
-                mAlertDialog.dismiss();
-            }
-        }
-    }
 }

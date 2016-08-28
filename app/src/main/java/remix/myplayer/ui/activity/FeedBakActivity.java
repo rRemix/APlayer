@@ -40,6 +40,7 @@ public class FeedBakActivity extends ToolbarActivity {
         setContentView(R.layout.activity_feedback);
         ButterKnife.bind(this);
         initToolbar(mToolBar,getString(R.string.back));
+
         mSubmit.setBackground(Theme.getBgCorner(1.0f,5,0,ColorUtil.getColor(ThemeStore.isDay()? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899)));
     }
 

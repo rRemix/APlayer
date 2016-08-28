@@ -15,8 +15,8 @@
         android:layout_height="45dp"
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImageScaleType="centerCrop"
-        fresco:placeholderImage="@drawable/default_album_list"
-        fresco:failureImage="@drawable/default_album_list"
+        fresco:placeholderImage="@drawable/song_artist_empty_bg"
+        fresco:failureImage="@drawable/song_artist_empty_bg"
         fresco:failureImageScaleType="centerCrop" />
     <!--歌曲名、歌手、专辑-->
     <LinearLayout

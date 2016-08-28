@@ -76,7 +76,6 @@
     <color name="day_interval_color">#edeceb</color>
     <color name="day_aboutus_background_color">@color/background_color_3</color>
     <color name="day_scan_track_color">#edeceb</color>
-    <color name="day_dot_color">@color/gray_6d6c69</color>
     <color name="day_nonenable_track_color">#ececec</color>
     <color name="day_nonenable_progress_color">#d2d2d2</color>
     <color name="day_nonenable_thumb_color">#bbbbbb</color>
