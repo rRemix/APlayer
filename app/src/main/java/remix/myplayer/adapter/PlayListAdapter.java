@@ -29,7 +29,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.model.PlayListItem;
-import remix.myplayer.listener.PopupListener;
+import remix.myplayer.listener.AlbumArtistFolderListener;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -114,7 +114,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                             Context wrapper = new ContextThemeWrapper(MainActivity.mInstance, R.style.PopupMenuDayStyle);
                             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
                             popupMenu.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
-                            popupMenu.setOnMenuItemClickListener(new PopupListener(mContext, position, Constants.PLAYLIST_HOLDER, ""));
+                            popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext, position, Constants.PLAYLIST_HOLDER, ""));
                             popupMenu.show();
                         }
                     });

@@ -109,7 +109,7 @@ public class RecordShareActivity extends BaseAppCompatActivity {
         mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
         //设置歌曲名与分享内容
         mContent.setText(getIntent().getExtras().getString("Content"));
-        mSong.setText(" " + mInfo.getDisplayname() + " ");
+        mSong.setText(" " + mInfo.getTitle() + " ");
     }
 
     public static Bitmap getBg(){

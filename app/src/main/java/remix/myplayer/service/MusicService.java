@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.media.AudioManager;
+import android.media.MediaExtractor;
+import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.IBinder;
@@ -86,6 +88,10 @@ public class MusicService extends BaseService {
      */
     private static MP3Item mInfo = null;
 
+    /**
+     * MediaExtractor 获得码率等信息
+     */
+    private static MediaExtractor mMediaExtractor;
     /**
      * MediaPlayer 负责歌曲的播放等
      */
@@ -189,6 +195,7 @@ public class MusicService extends BaseService {
     }
     @Override
     public void onCreate() {
+
         super.onCreate();
 
         mContext = getApplicationContext();
@@ -335,6 +342,8 @@ public class MusicService extends BaseService {
                 return true;
             }
         });
+        //初始化MediaExtractor
+        mMediaExtractor = new MediaExtractor();
 
         //初始化音效设置
         EQActivity.Init();
@@ -726,6 +735,29 @@ public class MusicService extends BaseService {
      */
     public static MP3Item getCurrentMP3() {
         return mInfo;
+    }
+
+    public static MediaFormat getMediaFormat(){
+        if(mInfo == null)
+            return null;
+        try {
+            mMediaExtractor.setDataSource(mInfo.getUrl());// the adresss location of the sound on sdcard.
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return mMediaExtractor.getTrackFormat(0);
+
+    }
+
+    /**
+     * 获得歌曲码率信息
+     * @return type 0:码率 1:采样率 2:
+     */
+    public static int getRateInfo(int type){
+        MediaFormat mf = getMediaFormat();
+        return mf != null ? (type == 0 ? mf.getInteger(MediaFormat.KEY_BIT_RATE) : mf.getInteger(MediaFormat.KEY_SAMPLE_RATE)) : 0;
     }
 
 

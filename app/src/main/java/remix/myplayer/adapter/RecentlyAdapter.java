@@ -93,7 +93,7 @@ public class RecentlyAdapter extends BaseAdapter {
 
         try {
             //设置歌曲名
-            holder.mName.setText( temp.getDisplayname() != null ? temp.getDisplayname() : mContext.getString(R.string.unknow_song));
+            holder.mName.setText( temp.getTitle() != null ? temp.getTitle() : mContext.getString(R.string.unknow_song));
             String artist = CommonUtil.processInfo(temp.getArtist(),CommonUtil.ARTISTTYPE);
             String album = CommonUtil.processInfo(temp.getAlbum(),CommonUtil.ALBUMTYPE);
             //设置艺术家与专辑名

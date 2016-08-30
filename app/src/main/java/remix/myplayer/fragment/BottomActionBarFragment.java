@@ -94,7 +94,7 @@ public class BottomActionBarFragment extends BaseFragment{
     //更新界面
     public void UpdateBottomStatus(MP3Item mp3Item, boolean isPlaying) {
         if(mp3Item != null) {
-            mTitle.setText(mp3Item.getDisplayname());
+            mTitle.setText(mp3Item.getTitle());
             mArtist.setText(mp3Item.getArtist());
         }
         //设置按钮着色

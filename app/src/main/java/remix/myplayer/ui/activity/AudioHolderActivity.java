@@ -41,6 +41,7 @@ import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.fragment.CoverFragment;
 import remix.myplayer.fragment.LrcFragment;
 import remix.myplayer.fragment.RecordFragment;
+import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -197,7 +198,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         ButterKnife.bind(this);
         mInstance = this;
 
-
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         mFromMainActivity =  getIntent().getBooleanExtra("FromMainActivity",false);
         //获是否正在播放和正在播放的歌曲
@@ -343,8 +343,8 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
             public void onClick(View v) {
                 Context wrapper = new ContextThemeWrapper(AudioHolderActivity.this,R.style.PopupMenuDayStyle);
                 final PopupMenu popupMenu = new PopupMenu(wrapper,v, Gravity.TOP);
-                popupMenu.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(null);
+                popupMenu.getMenuInflater().inflate(R.menu.audio_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(new AudioPopupListener(AudioHolderActivity.this,mInfo));
                 popupMenu.show();
             }
         });
@@ -408,7 +408,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     public void UpdateTopStatus(MP3Item mp3Item) {
         if(mp3Item == null)
             return;
-        String title = mp3Item.getDisplayname() == null ? "" : mp3Item.getDisplayname();
+        String title = mp3Item.getTitle() == null ? "" : mp3Item.getTitle();
         String artist =  mp3Item.getArtist() == null ? "" : mp3Item.getArtist();
         String album =  mp3Item.getAlbum() == null ? "" : mp3Item.getAlbum();
 

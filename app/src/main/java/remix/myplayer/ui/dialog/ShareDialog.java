@@ -170,10 +170,10 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         Bundle bundle = new Bundle();
         String album_url = DBUtil.getAlbumUrlByAlbumId(mInfo.getAlbumId());
         bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
-        bundle.putString(QQShare.SHARE_TO_QQ_TITLE, mInfo.getDisplayname());
+        bundle.putString(QQShare.SHARE_TO_QQ_TITLE, mInfo.getTitle());
         bundle.putString(QQShare.SHARE_TO_QQ_SUMMARY, mInfo.getArtist());
 
-        bundle.putString(QQShare.SHARE_TO_QQ_TARGET_URL, "http://music.baidu.com/" + "search?key=" + URLEncoder.encode(mInfo.getDisplayname()));
+        bundle.putString(QQShare.SHARE_TO_QQ_TARGET_URL, "http://music.baidu.com/" + "search?key=" + URLEncoder.encode(mInfo.getTitle()));
 //        if (album_url != null && !album_url.equals(""))
 //            bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, album_url);
         bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, album_url != null ? album_url : Uri.parse("res://remix.myplayer/" + R.drawable.song_artist_empty_bg).toString());
@@ -185,7 +185,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     private void shareSongtoWeibo() {
         TextObject textObject = new TextObject();
         textObject.text = "推荐一首好歌：" + mInfo.getArtist() +
-                "的《" + mInfo.getDisplayname() + "》，" + " 来自@" + getResources().getString(R.string.app_name) + "安卓客户端";
+                "的《" + mInfo.getTitle() + "》，" + " 来自@" + getResources().getString(R.string.app_name) + "安卓客户端";
         WeiboMultiMessage msg = new WeiboMultiMessage();
         msg.textObject  = textObject;
         SendMultiMessageToWeiboRequest request = new SendMultiMessageToWeiboRequest();
@@ -259,12 +259,12 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     private void shareSongtoWechat(View v) {
         WXTextObject textObject = new WXTextObject();
         textObject.text = "推荐一首好歌：" + mInfo.getArtist() +
-                "的《" + mInfo.getDisplayname() + "》";
+                "的《" + mInfo.getTitle() + "》";
 
         WXMediaMessage msg = new WXMediaMessage();
         msg.mediaObject = textObject;
         msg.description = "推荐一首好歌：" + mInfo.getArtist() +
-                "的《" + mInfo.getDisplayname() + "》";
+                "的《" + mInfo.getTitle() + "》";
         SendMessageToWX.Req req = new SendMessageToWX.Req();
         req.scene = v.getId() == R.id.share_wechat ? SendMessageToWX.Req.WXSceneSession : SendMessageToWX.Req.WXSceneTimeline;
         req.transaction = buildTransaction("text"); // transaction字段用于唯一标识一个请求
@@ -345,12 +345,14 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
+        overridePendingTransition(R.anim.slide_bottom_in,0);
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, R.anim.slide_bottom_out);
     }
 }

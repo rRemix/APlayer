@@ -24,13 +24,13 @@ import remix.myplayer.util.XmlUtil;
 /**
  * Created by taeja on 16-1-25.
  */
-public class PopupListener implements PopupMenu.OnMenuItemClickListener {
+public class AlbumArtistFolderListener implements PopupMenu.OnMenuItemClickListener {
     private Context mContext;
     private int mId;
     //0:专辑 1:歌手 2:文件夹 3:播放列表
     private int mType;
     private String mKey;
-    public PopupListener(Context Context,int id,int type,String key) {
+    public AlbumArtistFolderListener(Context Context, int id, int type, String key) {
         this.mContext = Context;
         this.mId = id;
         this.mType = type;

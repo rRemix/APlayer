@@ -81,7 +81,7 @@ public class OptionDialog extends BaseActivity {
         }
 
         //设置歌曲名与封面
-        mTitle.setText(mInfo.getDisplayname() + "-" + mInfo.getArtist());
+        mTitle.setText(mInfo.getTitle() + "-" + mInfo.getArtist());
         mDraweeView.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId()));
 
         //置于底部
@@ -102,7 +102,7 @@ public class OptionDialog extends BaseActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(OptionDialog.this,AddtoPlayListDialog.class);
                 Bundle arg = new Bundle();
-                arg.putString("SongName",mInfo.getDisplayname());
+                arg.putString("SongName",mInfo.getTitle());
                 arg.putLong("Id",mInfo.getId());
                 arg.putLong("AlbumId",mInfo.getAlbumId());
                 arg.putString("Artist",mInfo.getArtist());

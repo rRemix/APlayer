@@ -75,7 +75,7 @@ public class PlayingListAdapter extends BaseAdapter {
         final MP3Item temp = DBUtil.getMP3InfoById(Global.mPlayingList.get(position));
         if(temp != null) {
             //设置歌曲与艺术家
-            holder.mSong.setText(CommonUtil.processInfo(temp.getDisplayname(),CommonUtil.SONGTYPE));
+            holder.mSong.setText(CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE));
             holder.mArtist.setText(CommonUtil.processInfo(temp.getArtist(),CommonUtil.ARTISTTYPE));
             //删除按钮
             holder.mButton.setOnClickListener(new View.OnClickListener() {

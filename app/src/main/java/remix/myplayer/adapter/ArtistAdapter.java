@@ -23,7 +23,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.listener.OnItemClickListener;
-import remix.myplayer.listener.PopupListener;
+import remix.myplayer.listener.AlbumArtistFolderListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.MainActivity;
@@ -104,7 +104,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                         MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
                         mCursor.moveToPosition(position);
-                        popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
+                        popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext,
                                 mCursor.getInt(ArtistFragment.mArtistIdIndex),
                                 Constants.ARTIST_HOLDER,
                                 mCursor.getString(ArtistFragment.mArtistIdIndex)));

@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:enabled="true">
-        <item android:title="播放"
-            android:id="@+id/menu_play"/>
-        <item android:title="加入播放队列"
-            android:id="@+id/menu_add"/>
+        <item android:title="音乐标签编辑"
+            android:id="@+id/menu_edit"/>
+        <item android:title="详情"
+            android:id="@+id/menu_detail"/>
+        <item android:title="睡眠定时"
+            android:id="@+id/menu_timer"/>
+        <item android:title="均衡器"
+            android:id="@+id/menu_eq"/>
         <item android:title="删除"
             android:id="@+id/menu_delete"/>
     </group>

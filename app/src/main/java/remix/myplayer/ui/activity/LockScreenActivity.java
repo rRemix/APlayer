@@ -252,7 +252,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         }
         //标题
         if(mSong != null) {
-            mSong.setText(mInfo.getDisplayname());
+            mSong.setText(mInfo.getTitle());
         }
         if(mArtist != null) {
             mArtist.setText(mInfo.getArtist());
@@ -292,9 +292,9 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         if(mInfo == null)
             return;
         if(!mIsLove){
-            XmlUtil.addSongToPlayList(getString(R.string.my_favorite),mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId(),mInfo.getArtist());
+            XmlUtil.addSongToPlayList(getString(R.string.my_favorite),mInfo.getTitle(),(int)mInfo.getId(),(int)mInfo.getAlbumId(),mInfo.getArtist());
         } else {
-            XmlUtil.deleteSongFromPlayList(getString(R.string.my_favorite),new PlayListItem(mInfo.getDisplayname(),(int)mInfo.getId(),(int)mInfo.getAlbumId(),mInfo.getArtist()));
+            XmlUtil.deleteSongFromPlayList(getString(R.string.my_favorite),new PlayListItem(mInfo.getTitle(),(int)mInfo.getId(),(int)mInfo.getAlbumId(),mInfo.getArtist()));
         }
         mIsLove = !mIsLove;
         mLoveButton.setImageResource(mIsLove ? R.drawable.lock_btn_loved : R.drawable.lock_btn_love);

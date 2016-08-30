@@ -74,7 +74,7 @@ public class LrcFragment extends BaseFragment {
     public void UpdateLrc(MP3Item mp3Item) {
         if(mp3Item == null)
             return;
-        new DownloadThread(mp3Item.getDisplayname(), mp3Item.getArtist()).start();
+        new DownloadThread(mp3Item.getTitle(), mp3Item.getArtist()).start();
     }
 
     class DownloadThread extends Thread {

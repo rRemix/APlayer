@@ -1,7 +1,6 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.PopupMenu;
@@ -20,7 +19,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.listener.OnItemClickListener;
-import remix.myplayer.listener.PopupListener;
+import remix.myplayer.listener.AlbumArtistFolderListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.MainActivity;
@@ -78,7 +77,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
                 public void onClick(View v) {
                     final PopupMenu popupMenu = new PopupMenu(mContext, v);
                     MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
-                    popupMenu.setOnMenuItemClickListener(new PopupListener(mContext,
+                    popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext,
                             position,
                             Constants.FOLDER_HOLDER,
                             full_path));

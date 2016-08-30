@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -62,7 +63,6 @@ public class DBUtil {
         }
 
         try{
-//            new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA,MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ARTIST},
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
@@ -86,6 +86,7 @@ public class DBUtil {
                     long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
                     mAllSongList.add(id);
 
+
                     //根据歌曲路径对歌曲按文件夹分类
                     String full_path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                     SortWithFolder(id,full_path);
@@ -97,6 +98,21 @@ public class DBUtil {
             if(cursor != null && !cursor.isClosed())
                 cursor.close();
         }
+
+        try {
+            cursor = resolver.query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,null, null,null,null);
+            if(cursor != null){
+                while (cursor.moveToNext()){
+                    for(int i = 0 ; i < cursor.getColumnCount();i++){
+                        Log.d("SongInfo","name:" + cursor.getColumnName(i) + " value:" + cursor.getString(i));
+                    }
+                }
+
+            }
+        } catch (Exception e){
+            e.toString();
+        }
+
 
         return mAllSongList;
     }

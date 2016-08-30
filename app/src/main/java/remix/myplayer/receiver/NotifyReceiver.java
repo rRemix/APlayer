@@ -53,7 +53,7 @@ public class NotifyReceiver extends BroadcastReceiver {
 
             MP3Item temp = MusicService.getCurrentMP3();
             //设置歌手，歌曲名
-            mRemoteView.setTextViewText(R.id.notify_song, temp.getDisplayname());
+            mRemoteView.setTextViewText(R.id.notify_song, temp.getTitle());
             mRemoteView.setTextColor( R.id.notify_song,isSystemColor ?
                     context.getResources().getColor(R.color.white_f2f2f2)
                     : context.getResources().getColor(R.color.white));
