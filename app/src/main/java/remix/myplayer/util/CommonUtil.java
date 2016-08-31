@@ -373,7 +373,7 @@ public class CommonUtil {
     }
 
     /**
-     * 返回哈夕值
+     * 返回关键词的MD值
      * @param key
      * @return
      */

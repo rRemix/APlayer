@@ -104,7 +104,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         }
     };
     //更新主题
-    private int UPDATE_THEME = 1;
+    private final int UPDATE_THEME = 1;
 
     @Override
     protected void onResume() {
@@ -368,59 +368,55 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null){
-            //重启activity
-            if(requestCode == UPDATE_THEME && data.getBooleanExtra("needRefresh",false)) {
-                mRecreateHandler.sendEmptyMessage(RECREATE);
-                return;
+            boolean isAlbum = Global.mAlbunOrArtist == Constants.ALBUM_HOLDER;
+            String errorTxt = isAlbum ? "设置专辑封面失败" : "设置艺术家封面失败";
+            int id = Global.mAlbumArtistID; //专辑或艺术家封面
+            String name = Global.mAlbumArtistName;
+            switch (requestCode){
+                //重启activity
+                case UPDATE_THEME:
+                    if(data.getBooleanExtra("needRefresh",false))
+                        mRecreateHandler.sendEmptyMessage(RECREATE);
+                    break;
+                //图片选择
+                case Crop.REQUEST_PICK:
+                    if(resultCode == RESULT_OK){
+                        File cacheDir = DiskCache.getDiskCacheDir(this,"thumbnail/" + (isAlbum ? "album" : "artist"));
+                        if(!cacheDir.exists()){
+                            if(!cacheDir.mkdir()){
+                                Toast.makeText(this,errorTxt,Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+                        Uri destination = Uri.fromFile(new File(cacheDir, CommonUtil.hashKeyForDisk((id * 255 ) + "")));
+                        Crop.of(data.getData(), destination).asSquare().start(this);
+                    } else {
+                        Toast.makeText(this,errorTxt,Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                //图片裁剪
+                case Crop.REQUEST_CROP:
+                    //裁剪后的图片路径
+                    String path = Crop.getOutput(data).getEncodedPath();
+                    if(TextUtils.isEmpty(path) || id == -1){
+                        Toast.makeText(MainActivity.this, errorTxt, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    //刷新
+                    for(Fragment temp : getSupportFragmentManager().getFragments()){
+                        if(temp instanceof AlbumFragment){
+                            AlbumFragment albumFragment = (AlbumFragment)temp;
+                            if(albumFragment.getAdapter() != null)
+                                albumFragment.getAdapter().notifyDataSetChanged();
+                        }
+                        if(temp instanceof ArtistFragment){
+                            ArtistFragment albumFragment = (ArtistFragment)temp;
+                            if(albumFragment.getAdapter() != null)
+                                albumFragment.getAdapter().notifyDataSetChanged();
+                        }
+                    }
+                    break;
             }
-            //选择图片进行裁减
-            if (requestCode == Crop.REQUEST_PICK && resultCode == RESULT_OK) {
-                int id = data.getIntExtra("ID",-1);
-                File cacheDir = DiskCache.getDiskCacheDir(this,"crop");
-                if(!cacheDir.exists()){
-                    cacheDir.mkdir();
-                }
-                Uri destination = Uri.fromFile(new File(cacheDir, "cropped.jpg"));
-                Crop.of(data.getData(), destination).asSquare().start(this);
-            }
-            //设置专辑或艺术家封面
-            if (requestCode == Crop.REQUEST_CROP) {
-//                int id = data.getIntExtra("ID",-1);
-                Uri outPut = Crop.getOutput(data);
-                Object scheme = outPut.getScheme();
-                String path = outPut.getEncodedPath();
-
-                Log.d(TAG," scheme:" + scheme);
-                int updateRow = -1;
-                int id = Global.mAlbumArtistID;
-                String errorTxt = requestCode == Constants.SELECL_ALBUM_IMAGE ? "设置专辑封面失败" : "设置艺术家封面失败";
-                if(outPut == null || TextUtils.isEmpty(outPut.getPath()) || id == -1){
-                    Toast.makeText(MainActivity.this, errorTxt, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                try {
-                    Uri o1 = MediaStore.Audio.Albums.getContentUri("album_art");
-                    Uri o2 = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-                    Uri o3= MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                    Uri uri = MediaStore.Audio.Media.getContentUriForPath(path);
-                    Uri uriNew = MediaStore.Audio.Media.getContentUri("album_art");
-                    ContentValues cv = new ContentValues();
-                    cv.put(MediaStore.Audio.Albums.ALBUM_ART,path);
-
-                    updateRow = getContentResolver().update(
-                            o3,
-                            cv,
-                            MediaStore.Audio.Albums.ALBUM_ID + "=" + id,
-                            null);
-
-                } catch (Exception e){
-                    e.printStackTrace();
-                } finally {
-                    Toast.makeText(this,updateRow > 0 ? "设置成功" : errorTxt,Toast.LENGTH_SHORT).show();
-                }
-
-            }
-
         }
     }
 

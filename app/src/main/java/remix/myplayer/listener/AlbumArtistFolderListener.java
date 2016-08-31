@@ -27,6 +27,7 @@ import remix.myplayer.util.XmlUtil;
  */
 public class AlbumArtistFolderListener implements PopupMenu.OnMenuItemClickListener {
     private Context mContext;
+    //专辑id 艺术家id 歌曲id 文件夹position
     private int mId;
     //0:专辑 1:歌手 2:文件夹 3:播放列表
     private int mType;
@@ -51,7 +52,6 @@ public class AlbumArtistFolderListener implements PopupMenu.OnMenuItemClickListe
         }
         //文件夹
         else if(mType == Constants.FOLDER_HOLDER) {
-//            list = DBUtil.getMP3ListByFolder(DBUtil.mFolderList.get(mId));
             list = DBUtil.getMP3ListByIds(DBUtil.getIdsByFolderName(mKey,mId));
             for(MP3Item info : list)
                 ids.add(info.getId());
@@ -89,8 +89,11 @@ public class AlbumArtistFolderListener implements PopupMenu.OnMenuItemClickListe
                 break;
             //删除
             case R.id.menu_delete:
-                if(mType != Constants.PLAYLIST_HOLDER)
-                    DBUtil.deleteSong(mKey,mType);
+                if(mType != Constants.PLAYLIST_HOLDER) {
+                    DBUtil.deleteSong(
+                            mType == Constants.ALBUM_HOLDER || mType == Constants.ARTIST_HOLDER ? mId  + "" : mKey ,
+                            mType);
+                }
                 else {
                     if(name != null && !name.equals("")) {
                         PlayListActivity.getPlayList().remove(name);
@@ -103,6 +106,8 @@ public class AlbumArtistFolderListener implements PopupMenu.OnMenuItemClickListe
             //设置专辑封面
             case R.id.menu_album_thumb:
                 Global.mAlbumArtistID = mId;
+                Global.mAlbunOrArtist = mType;
+                Global.mAlbumArtistName = mKey;
                 Intent ori = ((Activity)mContext).getIntent();
                 ori.putExtra("ID",mId);
                 ((Activity)mContext).setIntent(ori);

@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +25,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.listener.AlbumArtistFolderListener;
@@ -107,13 +105,13 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                 Theme.TintDrawable(drawable, ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
                 holder.mButton.setImageDrawable(drawable);
                 holder.mButton.setClickable(!isLove);
-                if(isLove){
+                if(!isLove){
                     holder.mButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Context wrapper = new ContextThemeWrapper(MainActivity.mInstance, R.style.PopupMenuDayStyle);
-                            final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
-                            popupMenu.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
+                            Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
+                            final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
+                            popupMenu.getMenuInflater().inflate(R.menu.playlist_menu, popupMenu.getMenu());
                             popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext, position, Constants.PLAYLIST_HOLDER, ""));
                             popupMenu.show();
                         }
@@ -123,7 +121,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         } catch (Exception e){
             e.toString();
         }
-
     }
 
     @Override

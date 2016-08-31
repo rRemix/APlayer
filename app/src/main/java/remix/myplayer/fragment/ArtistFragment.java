@@ -107,6 +107,10 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         mAdapter.setCursor(data);
     }
 
+    public ArtistAdapter getAdapter(){
+        return mAdapter;
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();

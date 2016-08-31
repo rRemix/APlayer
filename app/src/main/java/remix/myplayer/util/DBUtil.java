@@ -11,6 +11,7 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -189,13 +190,22 @@ public class DBUtil {
 
     /**
      * 根据参数和类型获得专辑封面
-     * @param arg 参数,包括歌曲id、歌手id、歌曲名、专辑id
+     * @param id 参数,包括歌曲id、歌手id、歌曲名、专辑id
      * @param type 查询类型
      * @return 专辑url
      */
-    public static String getImageUrl(String arg,int type) {
-        if(arg == null || arg.equals(""))
+    public static String getImageUrl(String id,int type) {
+        if(id == null || id.equals(""))
             return null;
+        //如果是专辑或者艺术家，先查找本地缓存
+        if(type == Constants.URL_ALBUM || type == Constants.URL_ARTIST){
+            boolean isAlbum = type == Constants.URL_ALBUM;
+            File img = isAlbum ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + "")) :
+                                 new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + ""));
+            if(img.exists()){
+                return img.getAbsolutePath();
+            }
+        }
 
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
@@ -204,19 +214,19 @@ public class DBUtil {
 
         switch (type) {
             case Constants.URL_ARTIST:
-                selection = MediaStore.Audio.Media.ARTIST_ID + "=" + arg;
+                selection = MediaStore.Audio.Media.ARTIST_ID + "=" + id;
                 selectionArg = null;
                 break;
             case Constants.URL_SONGID:
-                selection = MediaStore.Audio.Media._ID + "=" + arg;
+                selection = MediaStore.Audio.Media._ID + "=" + id;
                 selectionArg = null;
                 break;
             case Constants.URL_NAME:
                 selection = MediaStore.Audio.Media.TITLE + "=?";
-                selectionArg = new String[]{arg};
+                selectionArg = new String[]{id};
                 break;
             case Constants.URL_ALBUM:
-                selection = MediaStore.Audio.Albums._ID + "=" + arg;
+                selection = MediaStore.Audio.Albums._ID + "=" + id;
                 selectionArg = null;
         }
         String album_art = "";

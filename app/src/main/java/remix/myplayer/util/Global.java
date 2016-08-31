@@ -18,6 +18,17 @@ public class Global {
     public static int mAlbumArtistID = 0;
 
     /**
+     * 当前正在设置封面的专辑或艺术家名字
+     */
+    public static String mAlbumArtistName = "";
+
+    /**
+     * 当前正在设置的是专辑还是艺术家封面
+     * 1:专辑 2:艺术家
+     */
+    public static int mAlbunOrArtist = 1;
+
+    /**
      * 是否开启字母索引
      */
     public static boolean mIndexOpen = false;

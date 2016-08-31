@@ -100,14 +100,14 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Context wrapper = new ContextThemeWrapper(mContext,R.style.PopupMenuDayStyle);
+                        Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-                        MainActivity.mInstance.getMenuInflater().inflate(R.menu.alb_art_menu, popupMenu.getMenu());
+                        popupMenu.getMenuInflater().inflate(R.menu.artist_menu, popupMenu.getMenu());
                         mCursor.moveToPosition(position);
                         popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext,
                                 mCursor.getInt(ArtistFragment.mArtistIdIndex),
                                 Constants.ARTIST_HOLDER,
-                                mCursor.getString(ArtistFragment.mArtistIdIndex)));
+                                mCursor.getString(ArtistFragment.mArtistIndex)));
                         popupMenu.setGravity(Gravity.END);
                         popupMenu.show();
                     }

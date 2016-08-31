@@ -22,8 +22,8 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.AlbumFragment;
-import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.listener.AlbumArtistFolderListener;
+import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
@@ -101,13 +101,12 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                     public void onClick(View v) {
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
-//                        popupMenu = new PopupMenu(mContext,holder.mButton,Gravity.END)
                         popupMenu.getMenuInflater().inflate(R.menu.album_menu, popupMenu.getMenu());
                         mCursor.moveToPosition(position);
                         popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext,
                                 mCursor.getInt(AlbumFragment.mAlbumIdIndex),
                                 Constants.ALBUM_HOLDER,
-                                mCursor.getString(AlbumFragment.mAlbumIdIndex)));
+                                mCursor.getString(AlbumFragment.mAlbumIndex)));
                         popupMenu.show();
                     }
                 });

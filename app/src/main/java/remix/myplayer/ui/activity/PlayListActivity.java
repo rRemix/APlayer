@@ -61,7 +61,7 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 
         mInstance = this;
         mRecycleView.setLayoutManager(new GridLayoutManager(this, 2));
-        mAdapter = new PlayListAdapter(getApplicationContext());
+        mAdapter = new PlayListAdapter(this);
         mAdapter.setOnItemClickLitener(new PlayListAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(View view, int position) {

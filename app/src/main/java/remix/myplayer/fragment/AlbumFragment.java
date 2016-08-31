@@ -120,7 +120,9 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
             mAdapter.setCursor(null);
     }
 
-
+    public AlbumAdater getAdapter(){
+        return mAdapter;
+    }
 
     @Override
     public void onDestroy() {
