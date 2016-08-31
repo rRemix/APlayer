@@ -12,6 +12,10 @@ import java.util.Map;
  * 一些全局变量
  */
 public class Global {
+    /**
+     * 当前正在设置封面的专辑或艺术家id
+     */
+    public static int mAlbumArtistID = 0;
 
     /**
      * 是否开启字母索引

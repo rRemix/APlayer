@@ -2,30 +2,39 @@ package remix.myplayer.ui.activity;
 
 
 import android.Manifest;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.soundcloud.android.crop.Crop;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.update.UmengUpdateAgent;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -359,17 +368,59 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null){
+            //重启activity
             if(requestCode == UPDATE_THEME && data.getBooleanExtra("needRefresh",false)) {
                 mRecreateHandler.sendEmptyMessage(RECREATE);
-//                recreate();
                 return;
             }
-            if(requestCode == Constants.SELECL_ALBUM_IMAGE){
-                Toast.makeText(this,data.getData().toString(),Toast.LENGTH_SHORT).show();
+            //选择图片进行裁减
+            if (requestCode == Crop.REQUEST_PICK && resultCode == RESULT_OK) {
+                int id = data.getIntExtra("ID",-1);
+                File cacheDir = DiskCache.getDiskCacheDir(this,"crop");
+                if(!cacheDir.exists()){
+                    cacheDir.mkdir();
+                }
+                Uri destination = Uri.fromFile(new File(cacheDir, "cropped.jpg"));
+                Crop.of(data.getData(), destination).asSquare().start(this);
             }
-            if(requestCode == Constants.SELECT_ARTIST_IMAGE){
-                
+            //设置专辑或艺术家封面
+            if (requestCode == Crop.REQUEST_CROP) {
+//                int id = data.getIntExtra("ID",-1);
+                Uri outPut = Crop.getOutput(data);
+                Object scheme = outPut.getScheme();
+                String path = outPut.getEncodedPath();
+
+                Log.d(TAG," scheme:" + scheme);
+                int updateRow = -1;
+                int id = Global.mAlbumArtistID;
+                String errorTxt = requestCode == Constants.SELECL_ALBUM_IMAGE ? "设置专辑封面失败" : "设置艺术家封面失败";
+                if(outPut == null || TextUtils.isEmpty(outPut.getPath()) || id == -1){
+                    Toast.makeText(MainActivity.this, errorTxt, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                try {
+                    Uri o1 = MediaStore.Audio.Albums.getContentUri("album_art");
+                    Uri o2 = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+                    Uri o3= MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                    Uri uri = MediaStore.Audio.Media.getContentUriForPath(path);
+                    Uri uriNew = MediaStore.Audio.Media.getContentUri("album_art");
+                    ContentValues cv = new ContentValues();
+                    cv.put(MediaStore.Audio.Albums.ALBUM_ART,path);
+
+                    updateRow = getContentResolver().update(
+                            o3,
+                            cv,
+                            MediaStore.Audio.Albums.ALBUM_ID + "=" + id,
+                            null);
+
+                } catch (Exception e){
+                    e.printStackTrace();
+                } finally {
+                    Toast.makeText(this,updateRow > 0 ? "设置成功" : errorTxt,Toast.LENGTH_SHORT).show();
+                }
+
             }
+
         }
     }
 

@@ -108,6 +108,9 @@
         <activity android:name=".ui.dialog.ColorChooseDialog"
             android:theme="@style/PopupCenterDialog"/>
 
+        <!--图片裁剪-->
+        <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
+
         <activity android:name=".ui.dialog.ShareDialog"
             android:theme="@style/PopupBottomDialog"
             android:configChanges="keyboardHidden|orientation"

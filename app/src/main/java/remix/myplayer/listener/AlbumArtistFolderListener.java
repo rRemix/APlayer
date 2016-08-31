@@ -4,18 +4,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.soundcloud.android.crop.Crop;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.model.PlayListItem;
+import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
@@ -101,11 +102,17 @@ public class AlbumArtistFolderListener implements PopupMenu.OnMenuItemClickListe
                 break;
             //设置专辑封面
             case R.id.menu_album_thumb:
-                Intent getImageIntent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                getImageIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
-                /* 取得相片后返回本画面 */
-                if(mContext instanceof Activity)
-                    ((Activity)mContext).startActivityForResult(getImageIntent, Constants.SELECL_ALBUM_IMAGE);
+                Global.mAlbumArtistID = mId;
+                Intent ori = ((Activity)mContext).getIntent();
+                ori.putExtra("ID",mId);
+                ((Activity)mContext).setIntent(ori);
+                Crop.pickImage((Activity) mContext,Crop.REQUEST_PICK);
+
+//                Intent getImageIntent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                getImageIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
+//                /* 取得相片后返回本画面 */
+//                if(mContext instanceof Activity)
+//                    ((Activity)mContext).startActivityForResult(getImageIntent, Constants.SELECL_ALBUM_IMAGE);
                 break;
             default:
                 Toast.makeText(mContext, "Click " + item.getTitle(), Toast.LENGTH_SHORT).show();
