@@ -33,7 +33,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:design:23.3.0'
     compile 'com.android.support:palette-v7:23.3.0'
-    compile 'com.facebook.fresco:fresco:0.8.1'
+    compile 'com.facebook.fresco:fresco:0.13.0'
     compile 'com.umeng.analytics:analytics:latest.integration'
     compile 'com.afollestad.material-dialogs:core:0.9.0.1'
     compile 'com.soundcloud.android:android-crop:1.0.1@aar'

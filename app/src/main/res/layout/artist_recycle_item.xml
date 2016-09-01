@@ -18,8 +18,8 @@
             android:id="@+id/recycleview_simpleiview"
             android:layout_alignParentTop="true"
 
-            fresco:actualImageScaleType="center"
-            fresco:placeholderImageScaleType="center"
+            fresco:actualImageScaleType="centerCrop"
+            fresco:placeholderImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/artist_empty_bg"
             fresco:roundedCornerRadius="1dp"/>
         <RelativeLayout

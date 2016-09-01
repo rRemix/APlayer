@@ -198,7 +198,7 @@ public class DBUtil {
         if(id == null || id.equals(""))
             return null;
         //如果是专辑或者艺术家，先查找本地缓存
-        if(type == Constants.URL_ALBUM || type == Constants.URL_ARTIST){
+        if(type == Constants.URL_ARTIST){
             boolean isAlbum = type == Constants.URL_ALBUM;
             File img = isAlbum ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + "")) :
                                  new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + ""));

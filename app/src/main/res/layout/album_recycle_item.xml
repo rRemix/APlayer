@@ -16,8 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="164dp"
             android:id="@+id/recycleview_simpleiview"
-            fresco:actualImageScaleType="center"
-            fresco:placeholderImageScaleType="center"
+            fresco:actualImageScaleType="centerCrop"
+            fresco:placeholderImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/album_empty_bg"
             fresco:roundedCornerRadius="1dp"
             android:layout_alignParentTop="true" />

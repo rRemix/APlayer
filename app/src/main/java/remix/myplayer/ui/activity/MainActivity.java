@@ -2,16 +2,13 @@ package remix.myplayer.ui.activity;
 
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -23,18 +20,21 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
+import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.soundcloud.android.crop.Crop;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.update.UmengUpdateAgent;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,11 +96,33 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     private int mAlpha = ThemeStore.STATUS_BAR_ALPHA / 2;
     private final int RECREATE = 0;
-    private Handler mRecreateHandler = new Handler(){
+    private final int UPDATECOVER = 1;
+    private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            if(msg.what == RECREATE)
+            if(msg.what == RECREATE) {
                 recreate();
+            }
+            if(msg.what == UPDATECOVER){
+                //刷新
+                for(Fragment temp : getSupportFragmentManager().getFragments()){
+                    if(temp instanceof SongFragment){
+                       SongFragment songFragment = (SongFragment)temp;
+                        if(songFragment.getAdapter() != null)
+                            songFragment.getAdapter().notifyDataSetChanged();
+                    }
+                    if(temp instanceof AlbumFragment){
+                        AlbumFragment albumFragment = (AlbumFragment)temp;
+                        if(albumFragment.getAdapter() != null)
+                            albumFragment.getAdapter().notifyDataSetChanged();
+                    }
+                    if(temp instanceof ArtistFragment){
+                        ArtistFragment albumFragment = (ArtistFragment)temp;
+                        if(albumFragment.getAdapter() != null)
+                            albumFragment.getAdapter().notifyDataSetChanged();
+                    }
+                }
+            }
         }
     };
     //更新主题
@@ -169,12 +191,12 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
 
-        boolean isFirst = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "First", true);
-        int position = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "Pos", -1);
-        SharedPrefsUtil.putValue(getApplicationContext(), "setting", "First", false);
+        boolean isFirst = SharedPrefsUtil.getValue(this, "Setting", "First", true);
+        int position = SharedPrefsUtil.getValue(this, "Setting", "Pos", 0);
+        SharedPrefsUtil.putValue(this, "Setting", "First", false);
 
         if (Global.mPlayingList == null || Global.mPlayingList.size() == 0) {
-            SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", -1);
+            SharedPrefsUtil.putValue(getApplicationContext(), "Setting", "Pos", 0);
             return;
         }
 
@@ -187,20 +209,18 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             SharedPrefsUtil.putValue(this,"Setting","ThemeColor",ThemeStore.THEME_PINK);
         }
         //如果是第一次启动软件,将第一首歌曲设置为正在播放
-        try {
-            if (isFirst || position < 0) {
-                mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(Global.mPlayingList.get(0)), MusicService.getIsplay());
-                SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", 0);
-            } else {
-                if (position >= Global.mPlayingList.size()) {
-                    position = Global.mPlayingList.size() - 1;
-                    if (position >= 0)
-                        SharedPrefsUtil.putValue(getApplicationContext(), "setting", "Pos", position);
+        if (isFirst) {
+            mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(Global.mPlayingList.get(0)), MusicService.getIsplay());
+            SharedPrefsUtil.putValue(getApplicationContext(), "Setting", "Pos", 0);
+        } else {
+            if (position >= Global.mPlayingList.size()) {
+                position = Global.mPlayingList.size() - 1;
+                if (position >= 0){
+                    SharedPrefsUtil.putValue(getApplicationContext(), "Setting", "Pos", position);
+                    mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(Global.mPlayingList.get(position)), MusicService.getIsplay());
                 }
-                mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(Global.mPlayingList.get(position)), MusicService.getIsplay());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
         }
 
     }
@@ -283,7 +303,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(0);
-
     }
 
     //初始化custontab
@@ -321,10 +340,10 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                         //20M内存缓存
                         return new MemoryCacheParams(MAX_HEAP_SIZE / 8, Integer.MAX_VALUE, MAX_HEAP_SIZE / 8, Integer.MAX_VALUE, Integer.MAX_VALUE);
                     }
-                }).build();
-        Fresco.initialize(this, config);
+                })
+                .build();
+        Fresco.initialize(this,config);
     }
-
 
     private void initDrawerLayout() {
 //        mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
@@ -376,7 +395,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                 //重启activity
                 case UPDATE_THEME:
                     if(data.getBooleanExtra("needRefresh",false))
-                        mRecreateHandler.sendEmptyMessage(RECREATE);
+                        mRefreshHandler.sendEmptyMessage(RECREATE);
                     break;
                 //图片选择
                 case Crop.REQUEST_PICK:
@@ -402,19 +421,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                         Toast.makeText(MainActivity.this, errorTxt, Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    //刷新
-                    for(Fragment temp : getSupportFragmentManager().getFragments()){
-                        if(temp instanceof AlbumFragment){
-                            AlbumFragment albumFragment = (AlbumFragment)temp;
-                            if(albumFragment.getAdapter() != null)
-                                albumFragment.getAdapter().notifyDataSetChanged();
-                        }
-                        if(temp instanceof ArtistFragment){
-                            ArtistFragment albumFragment = (ArtistFragment)temp;
-                            if(albumFragment.getAdapter() != null)
-                                albumFragment.getAdapter().notifyDataSetChanged();
-                        }
-                    }
+                    new ModifyCoverThread(id,path).start();
                     break;
             }
         }
@@ -474,6 +481,69 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     @Override
     public int getType() {
         return Constants.MAINACTIVITY;
+    }
+
+
+    /**
+     * 将本专辑封面的缓存替换为剪切后的图片
+     */
+    class ModifyCoverThread extends Thread{
+        private int mId;
+        private String mNewPath;
+        public ModifyCoverThread(int id,String path){
+            mId = id;
+            mNewPath = path;
+        }
+        @Override
+        public void run() {
+            if(Global.mAlbunOrArtist == Constants.ARTIST_HOLDER){
+                mRefreshHandler.sendEmptyMessage(UPDATECOVER);
+                return;
+            }
+            String oriPath = DBUtil.getImageUrl(mId + "",Constants.URL_ALBUM);
+            if(TextUtils.isEmpty(oriPath)){
+                return;
+            }
+            //清除fresco的缓存
+            ImagePipeline imagePipeline = Fresco.getImagePipeline();
+            Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mId);
+            imagePipeline.evictFromCache(uri);
+
+            FileOutputStream fos = null;
+            FileInputStream fin = null;
+            try {
+                fos = new FileOutputStream(oriPath,false);
+                fin = new FileInputStream(mNewPath);
+                byte[] bytes = new byte[1000];
+                int length = -1;
+                while ((length = fin.read(bytes)) != -1){
+                    fos.write(bytes);
+                }
+                fos.flush();
+                mRefreshHandler.sendEmptyMessage(UPDATECOVER);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if(fos != null){
+                    try {
+                        fos.close();
+                        fos = null;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(fin != null){
+                    try {
+                        fin.close();
+                        fin = null;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }
     }
 
 //    @Override

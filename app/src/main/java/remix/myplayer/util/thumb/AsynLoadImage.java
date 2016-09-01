@@ -33,28 +33,13 @@ public class AsynLoadImage extends AsyncTask<Object,Integer,String> {
     @Override
     protected void onPostExecute(String url) {
         if(mImage != null && url != null) {
-            ImageRequest request = ImageRequestBuilder.newBuilderWithSource(Uri.parse("file:///" + url))
-                    .setImageDecodeOptions(ImageDecodeOptions.newBuilder()
-                            .setForceOldAnimationCode(false)
-                            .build())
-                    .build();
             DraweeController controller = Fresco.newDraweeControllerBuilder()
-                    .setImageRequest(request)
-//                    .setUri(Uri.parse("file:///" + url))
+                    .setUri(Uri.parse("file:///" + url))
                     .setOldController(mImage.getController())
                     .setAutoPlayAnimations(mAutoPlayAnimation)
                     .build();
             mImage.setController(controller);
-//            if(!mAutoPlayAnimation){
-//                DraweeController controller = Fresco.newDraweeControllerBuilder()
-//                        .setUri(Uri.parse("file:///" + url))
-//                        .setOldController(mImage.getController())
-//                        .setAutoPlayAnimations(false)
-//                        .build();
-//                mImage.setController(controller);
-//            } else {
-//                mImage.setImageURI(Uri.parse("file:///" + url));
-//            }
+
         }
     }
 }

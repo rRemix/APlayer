@@ -245,15 +245,15 @@ public class MusicService extends BaseService {
         };
 
         //获得上次退出时正在播放的歌曲
-        int Position = SharedPrefsUtil.getValue(getApplicationContext(),"setting","Pos",-1);
+        int position = SharedPrefsUtil.getValue(getApplicationContext(),"Setting","Pos",0);
         if(Global.mPlayingList != null && Global.mPlayingList.size() > 0) {
-            mId = Position == -1 ? Global.mPlayingList.get(0) : Global.mPlayingList.get(Position);
+            mId = Global.mPlayingList.get(position);
             mInfo = DBUtil.getMP3InfoById(mId);
-            mCurrent = Position == -1 ? 0 : Position;
+            mCurrent = position;
         } else
             mInfo = null;
         //播放模式
-        mPlayModel = SharedPrefsUtil.getValue(this,"setting", "PlayModel",Constants.PLAY_LOOP);
+        mPlayModel = SharedPrefsUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
         Init();
 
     }

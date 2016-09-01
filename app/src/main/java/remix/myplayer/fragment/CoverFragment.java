@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +23,7 @@ import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.thumb.SearchCover;
 
@@ -44,6 +45,7 @@ public class CoverFragment extends BaseFragment {
     private static final int COVERINDB = 0;
     private static final int COVERINCACHE =1;
     private static final int NOCOVER = 2;
+    private Uri mUri = Uri.EMPTY;
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -76,7 +78,6 @@ public class CoverFragment extends BaseFragment {
                 @Override
                 public void onAnimationEnd(Animation animation) {
                     //当消失的动画播放完毕后，设置新的封面背景，并播放中心放大的动画
-//                    setImage();
                     mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
                     mImage.startAnimation(mScaleAnimation);
                 }
@@ -102,11 +103,10 @@ public class CoverFragment extends BaseFragment {
     public void UpdateCover(MP3Item info, boolean withAnim){
         if(!isAdded())
             return;
-        if (mImage == null)
-            return;
-        if((mInfo = info) == null)
+        if (mImage == null || (mInfo = info) == null)
             return;
 
+        mUri = Uri.parse("file://" + DBUtil.getImageUrl(mInfo.getAlbumId() + "",Constants.URL_ALBUM));
         if(withAnim){
             //根据操作是上一首还是下一首播放动画
             int operation = Global.getOperation();
@@ -116,8 +116,22 @@ public class CoverFragment extends BaseFragment {
                 mImage.startAnimation(mLeftAnimation);
         } else {
             //如果不需要动画，直接设置背景
-//            setImage();
             mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
+//            mImage.setImageURI(mUri);
+        }
+    }
+
+    class UpdateCoverThread extends Thread{
+        private long mAlbumId;
+        public UpdateCoverThread(long id){
+            mAlbumId = id;
+        }
+        @Override
+        public void run() {
+            mUri = Uri.parse("file://" + DBUtil.getImageUrl(mAlbumId + "",Constants.URL_ALBUM));
+            Message msg = new Message();
+
+            mHandler.sendMessage(msg);
         }
     }
 

@@ -4,9 +4,14 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +20,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.controller.BaseControllerListener;
-import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -36,7 +41,6 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.thumb.AsynLoadImage;
 
 /**
  * 全部歌曲和最近添加页面所用adapter
@@ -45,7 +49,7 @@ import remix.myplayer.util.thumb.AsynLoadImage;
 /**
  * Created by Remix on 2016/4/11.
  */
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>{
+public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder>{
     private Cursor mCursor;
     private Context mContext;
     private OnItemClickListener mOnItemClickLitener;
@@ -55,6 +59,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
     public static final int ALLSONG = 0;
     public static final int RECENTLY = 1;
     private static int mCurrentAnimPosition = 0;//当前播放高亮动画的索引
+    private static int mOldAnimPostion = 0;
 
     public SongAdapter(Context context, int type) {
         this.mContext = context;
@@ -76,12 +81,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
     }
 
     @Override
-    public AllSongHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new AllSongHolder(LayoutInflater.from(mContext).inflate(R.layout.song_recycle_item,null,false));
+    public SongViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new SongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.song_recycle_item,null,false));
     }
 
     @Override
-    public void onBindViewHolder(final AllSongHolder holder, final int position) {
+    public void onBindViewHolder(final SongViewHolder holder, final int position) {
         final boolean allsong = mType == ALLSONG;
         if(allsong && (mCursor == null || !mCursor.moveToPosition(position))){
             return;
@@ -130,8 +135,18 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
             String album = CommonUtil.processInfo(temp.getAlbum(),CommonUtil.ALBUMTYPE);
             holder.mOther.setText(artist + "-" + album);
             //封面
+//            holder.mImage.setImageURI(Uri.EMPTY);
+//            new AsynLoadImage(holder.mImage).execute((int)temp.getAlbumId(),Constants.URL_ALBUM);
+//            String urlPath = DBUtil.getImageUrl(temp.getAlbumId() + "", Constants.URL_ALBUM);
+//            if(!TextUtils.isEmpty(urlPath)){
+//                DraweeController controller = Fresco.newDraweeControllerBuilder()
+//                        .setUri(Uri.fromFile(new File(urlPath)))
+//                        .setOldController(holder.mImage.getController())
+//                        .setAutoPlayAnimations(false)
+//                        .build();
+//                holder.mImage.setController(controller);
+//            }
 
-//            new AsynLoadImage(holder.mImage).execute((int)temp.getAlbumId(), Constants.URL_ALBUM,false);
             DraweeController controller = Fresco.newDraweeControllerBuilder()
                     .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()))
                     .setOldController(holder.mImage.getController())
@@ -183,7 +198,31 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
             return mInfoList != null ? mInfoList.size() : 0;
     }
 
-    public static class AllSongHolder extends RecyclerView.ViewHolder{
+    class AsynLoadImage extends AsyncTask<Object,Integer,String> {
+        private final SimpleDraweeView mImage;
+        public AsynLoadImage(SimpleDraweeView imageView) {
+            mImage = imageView;
+        }
+        @Override
+        protected String doInBackground(Object... params) {
+            return DBUtil.getImageUrl(params[0].toString(), (int)params[1]);
+        }
+        @Override
+        protected void onPostExecute(String url) {
+            if(mImage != null && url != null) {
+                DraweeController controller = Fresco.newDraweeControllerBuilder()
+                        .setUri(Uri.parse("file:///" + url))
+                        .setOldController(mImage.getController())
+                        .setAutoPlayAnimations(false)
+                        .build();
+                mImage.setController(controller);
+
+            }
+        }
+    }
+
+
+    public static class SongViewHolder extends RecyclerView.ViewHolder{
         public TextView mName;
         public TextView mOther;
         public SimpleDraweeView mImage;
@@ -191,7 +230,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.AllSongHolder>
         public ImageButton mItemButton;
         public TextView mIndex;
         public View mRootView;
-        public AllSongHolder(View itemView) {
+        public SongViewHolder(View itemView) {
             super(itemView);
             mRootView = itemView;
             mImage = (SimpleDraweeView)itemView.findViewById(R.id.song_head_image);
