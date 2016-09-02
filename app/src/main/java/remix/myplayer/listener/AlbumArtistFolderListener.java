@@ -58,12 +58,12 @@ public class AlbumArtistFolderListener implements PopupMenu.OnMenuItemClickListe
         }
         //播放列表
         else {
-            Iterator it = PlayListActivity.getPlayList().keySet().iterator();
+            Iterator it = Global.mPlaylist.keySet().iterator();
             for(int i = 0 ; i <= mId ; i++) {
                 it.hasNext();
                 name = it.next().toString();
             }
-            for(PlayListItem tmp : PlayListActivity.getPlayList().get(name))
+            for(PlayListItem tmp : Global.mPlaylist.get(name))
                 ids.add((long)tmp.getId());
         }
 
@@ -96,7 +96,7 @@ public class AlbumArtistFolderListener implements PopupMenu.OnMenuItemClickListe
                 }
                 else {
                     if(name != null && !name.equals("")) {
-                        PlayListActivity.getPlayList().remove(name);
+                        Global.mPlaylist.remove(name);
                         if(PlayListActivity.mInstance != null && PlayListActivity.mInstance.getAdapter() != null)
                             PlayListActivity.mInstance.UpdateAdapter();
                         XmlUtil.updatePlaylist();

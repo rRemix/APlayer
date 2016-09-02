@@ -59,9 +59,6 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
         notifyDataSetChanged();
     }
 
-
-    //<Params, Progress, Result>
-
     @Override
     public ArtistHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ArtistHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.artist_recycle_item, null, false));

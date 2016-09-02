@@ -31,6 +31,7 @@ import remix.myplayer.listener.AlbumArtistFolderListener;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.Global;
 
 /**
  * Created by taeja on 16-1-15.
@@ -63,8 +64,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
     public void onBindViewHolder(final PlayListHolder holder, final int position) {
         try {
             //根据当前索引，获得歌曲列表
-            Object o = PlayListActivity.getPlayList();
-            Iterator it = PlayListActivity.getPlayList().keySet().iterator();
+            Iterator it = Global.mPlaylist.keySet().iterator();
             String name = "";
             for(int i = 0 ; i<= position ;i++) {
                 it.hasNext();
@@ -125,7 +125,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
     @Override
     public int getItemCount() {
-        return PlayListActivity.getPlayList() == null ? 0 : PlayListActivity.getPlayList().size();
+        return Global.mPlaylist == null ? 0 :Global.mPlaylist.size();
     }
 
     public static class PlayListHolder extends BaseViewHolder {
@@ -151,7 +151,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         }
         @Override
         protected String doInBackground(String... params) {
-            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(params[0]);
+            ArrayList<PlayListItem> list = Global.mPlaylist.get(params[0]);
             String url = null;
             if(list != null && list.size() > 0) {
                 for(PlayListItem item : list){

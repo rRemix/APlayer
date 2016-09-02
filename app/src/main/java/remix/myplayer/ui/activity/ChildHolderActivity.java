@@ -156,7 +156,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
 //            return;
         if(mType == Constants.PLAYLIST_HOLDER){
             //播放列表
-            if(!PlayListActivity.getPlayList().containsKey(mArg)){
+            if(!Global.mPlaylist.containsKey(mArg)){
                 mAdapter.setList(new ArrayList<MP3Item>());
                 mNum.setText("0首歌曲");
             } else {
@@ -209,7 +209,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
                 break;
             //播放列表名
             case Constants.PLAYLIST_HOLDER:
-                ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(mArg);
+                ArrayList<PlayListItem> list = Global.mPlaylist.get(mArg);
                 ArrayList<Long> ids = new ArrayList<>();
                 if(list == null)
                     break;

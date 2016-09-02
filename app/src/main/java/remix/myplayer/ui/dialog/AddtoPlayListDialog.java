@@ -19,6 +19,7 @@ import remix.myplayer.adapter.PlayListAddtoAdapter;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.ui.activity.PlayListActivity;
+import remix.myplayer.util.Global;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -71,7 +72,7 @@ public class AddtoPlayListDialog extends BaseActivity {
                     String playlist = textView.getText().toString();
                     boolean isExist = false;
                     if(playlist != null && mSongName != null && mId > 0) {
-                        for(PlayListItem item : PlayListActivity.getPlayList().get(playlist)){
+                        for(PlayListItem item : Global.mPlaylist.get(playlist)){
                             if(item.getId() == mId){
                                 isExist = true;
                             }

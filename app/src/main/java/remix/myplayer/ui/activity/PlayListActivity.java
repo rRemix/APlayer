@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -25,6 +24,7 @@ import remix.myplayer.model.PlayListItem;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.dialog.AddPlayListDialog;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.Global;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -41,15 +41,6 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     FloatingActionButton mFloatButton;
 
     private PlayListAdapter mAdapter;
-    public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
-
-    static {
-        mPlaylist = XmlUtil.getPlayList("playlist.xml");
-    }
-
-    public static Map<String,ArrayList<PlayListItem>> getPlayList(){
-        return mPlaylist;
-    }
 
 
     @Override
@@ -66,12 +57,12 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
             @Override
             public void onItemClick(View view, int position) {
                 String name = "";
-                Iterator it = PlayListActivity.mPlaylist.keySet().iterator();
+                Iterator it = Global.mPlaylist.keySet().iterator();
                 for (int i = 0; i <= position; i++) {
                     it.hasNext();
                     name = it.next().toString();
                 }
-                if(mPlaylist.get(name).size() == 0) {
+                if(Global.mPlaylist.get(name).size() == 0) {
                     Toast.makeText(PlayListActivity.this, getString(R.string.list_isempty), Toast.LENGTH_SHORT).show();
                     return;
                 }

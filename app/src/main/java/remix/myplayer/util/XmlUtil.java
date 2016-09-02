@@ -9,6 +9,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -18,8 +19,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.model.PlayListItem;
+import remix.myplayer.ui.activity.PlayListActivity;
 
 /**
  * Created by taeja on 16-1-26.
@@ -46,7 +47,6 @@ public class XmlUtil {
         Map<String,ArrayList<PlayListItem>> map = new HashMap<String,ArrayList<PlayListItem>>();
         XmlPullParser parser = Xml.newPullParser();
         ArrayList<PlayListItem> list = null;
-        String key = null;
         FileInputStream in = null;
         try {
             in = mContext.openFileInput(name);
@@ -83,11 +83,9 @@ public class XmlUtil {
                 eventType = parser.next();
             }
 
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         } finally {
                 try {
@@ -114,10 +112,8 @@ public class XmlUtil {
             parser.setInput(in,"UTF-8");
             int eventType = parser.getEventType();
             String tag = null;
-            while(eventType != XmlPullParser.END_DOCUMENT)
-            {
-                switch (eventType)
-                {
+            while(eventType != XmlPullParser.END_DOCUMENT) {
+                switch (eventType) {
                     case XmlPullParser.START_DOCUMENT:
                         list = new ArrayList<>();
                         break;
@@ -161,7 +157,7 @@ public class XmlUtil {
      */
     public static void deletePlaylist(String name)  {
         if(name != null && !name.equals("")) {
-            PlayListActivity.getPlayList().remove(name);
+            Global.mPlaylist.remove(name);
             updatePlaylist();
         }
     }
@@ -172,7 +168,7 @@ public class XmlUtil {
      */
     public static void addPlaylist(String name) {
         if(name != null && !name.equals("")) {
-            PlayListActivity.getPlayList().put(name, new ArrayList<PlayListItem>());
+            Global.mPlaylist.put(name, new ArrayList<PlayListItem>());
             updatePlaylist();
         }
     }
@@ -184,7 +180,7 @@ public class XmlUtil {
      */
     public static void deleteSongFromPlayList(String name, PlayListItem item) {
         if(!item.getSongame().equals("") && !name.equals("")) {
-            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
+            ArrayList<PlayListItem> list = Global.mPlaylist.get(name);
             boolean ret = list.remove(item);
             updatePlaylist();
         }
@@ -200,7 +196,7 @@ public class XmlUtil {
      */
     public static void addSongToPlayList(String name, String song, int id, int album_id,String artist) {
         if(!name.equals("") && !song.equals("")) {
-            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
+            ArrayList<PlayListItem> list = Global.mPlaylist.get(name);
             list.add(new PlayListItem(song,id,album_id,artist));
             updatePlaylist();
         }
@@ -214,16 +210,14 @@ public class XmlUtil {
         FileOutputStream fos = null;
         try {
             fos = mContext.openFileOutput("playlist.xml",Context.MODE_PRIVATE);
-//            fos = new FileOutputStream(mPlayListFile);
             XmlSerializer parser =  XmlPullParserFactory.newInstance().newSerializer();
             parser.setOutput(fos,"utf-8");
             parser.startDocument("utf-8",true);
             parser.startTag(null,"playlist");
-            Iterator it = PlayListActivity.getPlayList().keySet().iterator();
-            while(it.hasNext())
-            {
+            Iterator it = Global.mPlaylist.keySet().iterator();
+            while(it.hasNext()) {
                 String key = it.next().toString();
-                ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(key);
+                ArrayList<PlayListItem> list = Global.mPlaylist.get(key);
                 parser.startTag(null,key);
                 for(int i = 0 ; i < list.size() ;i++)
                 {

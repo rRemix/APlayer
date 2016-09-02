@@ -1,6 +1,5 @@
 package remix.myplayer.ui.dialog;
 
-import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -15,6 +14,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.util.ColorUtil;
+import remix.myplayer.util.Global;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -43,7 +43,7 @@ public class AddPlayListDialog extends BaseActivity {
         //修改下划线颜色
         //修改光标颜色
         Theme.setTinit(mEdit,ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY),true);
-        mEdit.setText("本地歌单" + PlayListActivity.getPlayList().size());
+        mEdit.setText("本地歌单" + Global.mPlaylist.size());
     }
 
     public void onCancel(View v){

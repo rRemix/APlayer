@@ -46,10 +46,21 @@ public class CoverFragment extends BaseFragment {
     private static final int COVERINCACHE =1;
     private static final int NOCOVER = 2;
     private Uri mUri = Uri.EMPTY;
+    private final int WITH_ANIM =  1;
+    private final int NO_ANIM = 0;
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            mImage.setImageURI((Uri)msg.obj);
+            if(msg.what == NO_ANIM) {
+                mImage.setImageURI(mUri);
+            }
+            if(msg.what == WITH_ANIM){
+                int operation = Global.getOperation();
+                if(operation == Constants.PREV)
+                    mImage.startAnimation(mRightAnimation);
+                else if (operation == Constants.NEXT || operation == Constants.PLAYSELECTEDSONG)
+                    mImage.startAnimation(mLeftAnimation);
+            }
         }
     };
 
@@ -78,7 +89,9 @@ public class CoverFragment extends BaseFragment {
                 @Override
                 public void onAnimationEnd(Animation animation) {
                     //当消失的动画播放完毕后，设置新的封面背景，并播放中心放大的动画
-                    mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
+//                    mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
+                    mImage.setImageURI(mUri);
+//                    new UpdateCoverThread(mInfo.getAlbumId());
                     mImage.startAnimation(mScaleAnimation);
                 }
 
@@ -105,32 +118,34 @@ public class CoverFragment extends BaseFragment {
             return;
         if (mImage == null || (mInfo = info) == null)
             return;
-
-        mUri = Uri.parse("file://" + DBUtil.getImageUrl(mInfo.getAlbumId() + "",Constants.URL_ALBUM));
-        if(withAnim){
-            //根据操作是上一首还是下一首播放动画
-            int operation = Global.getOperation();
-            if(operation == Constants.PREV)
-                mImage.startAnimation(mRightAnimation);
-            else if (operation == Constants.NEXT || operation == Constants.PLAYSELECTEDSONG)
-                mImage.startAnimation(mLeftAnimation);
-        } else {
-            //如果不需要动画，直接设置背景
-            mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
-//            mImage.setImageURI(mUri);
-        }
+        new UpdateCoverThread(mInfo.getAlbumId(),withAnim ? WITH_ANIM : NO_ANIM).start();
+//        mUri = Uri.parse("file://" + DBUtil.getImageUrl(mInfo.getAlbumId() + "",Constants.URL_ALBUM));
+//        if(withAnim){
+//            //根据操作是上一首还是下一首播放动画
+//            int operation = Global.getOperation();
+//            if(operation == Constants.PREV)
+//                mImage.startAnimation(mRightAnimation);
+//            else if (operation == Constants.NEXT || operation == Constants.PLAYSELECTEDSONG)
+//                mImage.startAnimation(mLeftAnimation);
+//        } else {
+//            //如果不需要动画，直接设置背景
+//            mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
+////            mImage.setImageURI(mUri);
+//        }
     }
 
     class UpdateCoverThread extends Thread{
         private long mAlbumId;
-        public UpdateCoverThread(long id){
+        private int mWithAnim = 0;
+        public UpdateCoverThread(long id,int withAnim){
             mAlbumId = id;
+            mWithAnim = withAnim;
         }
         @Override
         public void run() {
             mUri = Uri.parse("file://" + DBUtil.getImageUrl(mAlbumId + "",Constants.URL_ALBUM));
             Message msg = new Message();
-
+            msg.what = mWithAnim;
             mHandler.sendMessage(msg);
         }
     }

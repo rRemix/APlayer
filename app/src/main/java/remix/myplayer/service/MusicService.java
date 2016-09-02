@@ -195,7 +195,6 @@ public class MusicService extends BaseService {
     }
     @Override
     public void onCreate() {
-
         super.onCreate();
 
         mContext = getApplicationContext();
@@ -244,14 +243,6 @@ public class MusicService extends BaseService {
             }
         };
 
-        //获得上次退出时正在播放的歌曲
-        int position = SharedPrefsUtil.getValue(getApplicationContext(),"Setting","Pos",0);
-        if(Global.mPlayingList != null && Global.mPlayingList.size() > 0) {
-            mId = Global.mPlayingList.get(position);
-            mInfo = DBUtil.getMP3InfoById(mId);
-            mCurrent = position;
-        } else
-            mInfo = null;
         //播放模式
         mPlayModel = SharedPrefsUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
         Init();
@@ -271,15 +262,11 @@ public class MusicService extends BaseService {
         mObserver = new MediaStoreObserver(new Handler(){
             @Override
             public void handleMessage(Message msg) {
+                //更新文件夹fragment
                 if(msg.what == Constants.UPDATE_FOLDER){
-                    //更新文件夹fragment
                     if(FolderFragment.mInstance != null){
                         FolderFragment.mInstance.UpdateAdapter();
                     }
-//                    //更新文件夹详情
-//                    if(ChildHolderActivity.mInstance != null) {
-//                        ChildHolderActivity.mInstance.UpdateData();
-//                    }
                 }
                 //更新正在播放列表
                 if(msg.what == Constants.UPDATE_PLAYINGLIST){
@@ -304,27 +291,21 @@ public class MusicService extends BaseService {
         mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
                 | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
-        UpdateLockScreen();
         mMediaSession.setCallback(new SessionCallBack());
         mMediaSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
         mMediaSession.setActive(true);
 
         //初始化Mediaplayer
-        mMediaPlayer = new MediaPlayer();
+        if(mMediaPlayer == null)
+            mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        try {
-            mMediaPlayer.setDataSource(mInfo != null ? mInfo.getUrl() : "");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 PlayNextOrPrev(true, true);
                 Global.setOperation(Constants.NEXT);
                 mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
-                //更新锁屏界面
-                UpdateLockScreen();
                 //更新通知栏
                 sendBroadcast(new Intent(Constants.NOTIFY));
             }
@@ -349,18 +330,18 @@ public class MusicService extends BaseService {
         EQActivity.Init();
     }
 
-    private void UpdateLockScreen() {
-        if(mInfo != null) {
-//            Bitmap bitmap = DBUtil.CheckBitmapByAlbumId((int) mInfo.getAlbumId(), false);
-//            if(bitmap == null)
-//                bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
-//            mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
-//                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
-//                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mInfo.getDisplayname())
-//                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, mInfo.getAlbum() + " - " + mInfo.getArtist())
-//                    .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,"res://remix.myplayer/"+ R.drawable.stat_notify)
-//                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,mInfo.getDuration())
-//                    .build());
+    public static void initDataSource(MP3Item item,int pos){
+        if(item == null)
+            return;
+        mInfo = item;
+        mId = mInfo.getId();
+        mCurrent = pos;
+        try {
+            if(mMediaPlayer == null)
+                mMediaPlayer = new MediaPlayer();
+            mMediaPlayer.setDataSource(mInfo.getUrl());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -597,8 +578,6 @@ public class MusicService extends BaseService {
                 control != Constants.PLAY_REPEATONE) {
             //更新相关activity
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
-            //更新锁屏界面
-            UpdateLockScreen();
             //更新通知栏
             sendBroadcast(new Intent(Constants.NOTIFY));
         }
@@ -623,7 +602,7 @@ public class MusicService extends BaseService {
             mFirstFlag = false;
             mIsplay = true;
             mIsIniting = false;
-            SharedPrefsUtil.putValue(MainActivity.mInstance,"setting","Pos",mCurrent);
+            SharedPrefsUtil.putValue(MainActivity.mInstance,"Setting","LastSongId",(int)mId);
         }
         catch (Exception e) {
             e.printStackTrace();

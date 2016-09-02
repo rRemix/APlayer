@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,15 +26,22 @@ public class DiskCache {
                 lrc_cacheDir.mkdir();
             mLrcCache = DiskLruCache.open(lrc_cacheDir, getAppVersion(mContext), 1, 2 * 1024 * 1024);
 
-            File album_cacheDir = getDiskCacheDir(mContext,"thumbnail/album");
-            if(!album_cacheDir.exists())
-                album_cacheDir.mkdir();
-            mAlbumCache = DiskLruCache.open(album_cacheDir,getAppVersion(mContext),1,10 * 1024 * 1024);
+            File thumbnailCacheDir = getDiskCacheDir(mContext,"thumbnail");
+            if(!thumbnailCacheDir.exists()){
+                if(!thumbnailCacheDir.mkdir()){
+                    Toast.makeText(mContext,"创建缓存目录失败",Toast.LENGTH_SHORT).show();
+                }
+            }
 
-            File artist_cacheDir = getDiskCacheDir(mContext,"thumbnail/artist");
-            if(!artist_cacheDir.exists())
-                artist_cacheDir.mkdir();
-            mAlbumCache = DiskLruCache.open(album_cacheDir,getAppVersion(mContext),1,10 * 1024 * 1024);
+//            File album_cacheDir = getDiskCacheDir(mContext,"thumbnail/album");
+//            if(!album_cacheDir.exists())
+//                album_cacheDir.mkdir();
+//            mAlbumCache = DiskLruCache.open(album_cacheDir,getAppVersion(mContext),1,10 * 1024 * 1024);
+//
+//            File artist_cacheDir = getDiskCacheDir(mContext,"thumbnail/artist");
+//            if(!artist_cacheDir.exists())
+//                artist_cacheDir.mkdir();
+//            mAlbumCache = DiskLruCache.open(album_cacheDir,getAppVersion(mContext),1,10 * 1024 * 1024);
 
         } catch (IOException e) {
             e.printStackTrace();

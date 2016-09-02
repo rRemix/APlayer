@@ -198,7 +198,7 @@ public class DBUtil {
         if(id == null || id.equals(""))
             return null;
         //如果是专辑或者艺术家，先查找本地缓存
-        if(type == Constants.URL_ARTIST){
+        if(type == Constants.URL_ARTIST || type == Constants.URL_ALBUM){
             boolean isAlbum = type == Constants.URL_ALBUM;
             File img = isAlbum ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + "")) :
                                  new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + ""));
@@ -478,7 +478,7 @@ public class DBUtil {
 
         } else {
             //如果是删除文件夹
-            //直接根据文件夹名字获得歌曲列表
+            //根据文件夹名字获得歌曲列表
             try {
                 for(int i = 0 ; i < list.size() ;i++){
                     cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.Media.DATA},
@@ -534,11 +534,11 @@ public class DBUtil {
      * @param id 需要删除的歌曲id
      */
     public static void deleteSongInPlayList(long id){
-        Iterator it = PlayListActivity.getPlayList().keySet().iterator();
+        Iterator it = Global.mPlaylist.keySet().iterator();
         ArrayList<PlayListItem> list = new ArrayList<>();
 
         while (it.hasNext()){
-            list = PlayListActivity.getPlayList().get(it.next());
+            list = Global.mPlaylist.get(it.next());
             if(list != null){
                 for(PlayListItem item : list){
                     if(item.getId() == id) {
@@ -558,7 +558,7 @@ public class DBUtil {
      */
     public static boolean deleteSongInPlayList(String playlist,long id){
         boolean ret = false;
-        ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(playlist);
+        ArrayList<PlayListItem> list = Global.mPlaylist.get(playlist);
         if(list != null){
             for(PlayListItem item : list){
                 if(item.getId() == id){

@@ -13,6 +13,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.activity.PlayListActivity;
+import remix.myplayer.util.Global;
 
 /**
  * Created by taeja on 16-2-1.
@@ -30,7 +31,7 @@ public class PlayListAddtoAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
-        return PlayListActivity.getPlayList().size();
+        return Global.mPlaylist != null ? Global.mPlaylist.size() : 0;
     }
 
     @Override
@@ -57,7 +58,7 @@ public class PlayListAddtoAdapter extends BaseAdapter{
 
         //根据索引显示播放列表名
         String name = null;
-        Iterator it = PlayListActivity.getPlayList().keySet().iterator();
+        Iterator it = Global.mPlaylist.keySet().iterator();
         for(int i = 0 ; i<= position ;i++) {
             it.hasNext();
             name = it.next().toString();

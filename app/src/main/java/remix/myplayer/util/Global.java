@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import remix.myplayer.model.PlayListItem;
+
 /**
  * 一些全局变量
  */
@@ -54,6 +56,7 @@ public class Global {
      */
     public static ArrayList<Long> mTodayList = new ArrayList<>();
     public static ArrayList<Long> mWeekList = new ArrayList<>();
+    public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
 
     public static void setOperation(int operation){
         mOperation = operation;

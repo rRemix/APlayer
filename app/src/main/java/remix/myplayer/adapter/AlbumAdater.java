@@ -30,6 +30,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.thumb.AsynLoadImage;
 
 /**
  * Created by Remix on 2015/12/20.
@@ -75,9 +76,9 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.album_bg_day : R.drawable.album_bg_night);
                 //设置封面
                 long albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
-//                holder.mImage.setImageURI(Uri.EMPTY);
-//                new AsynLoadImage(holder.mImage).execute((int)albumid,Constants.URL_ALBUM,true);
-                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
+                holder.mImage.setImageURI(Uri.EMPTY);
+                new AsynLoadImage(holder.mImage).execute((int)albumid,Constants.URL_ALBUM,true);
+//                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
             } catch (Exception e){
                 e.printStackTrace();
             }

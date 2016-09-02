@@ -32,7 +32,6 @@ public class PlayingListDialog extends BaseActivity {
     public static PlayingListDialog mInstance;
     private static boolean mNeedRefresh = false;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

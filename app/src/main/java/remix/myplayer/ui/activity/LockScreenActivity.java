@@ -260,7 +260,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         //判断是否收藏
         mIsLove = false;
         try {
-            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get("我的收藏");
+            ArrayList<PlayListItem> list = Global.mPlaylist.get("我的收藏");
             for(PlayListItem item : list){
                 if(item.getId() == mInfo.getId()){
                     mIsLove = true;

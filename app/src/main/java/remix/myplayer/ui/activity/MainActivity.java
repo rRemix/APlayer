@@ -9,12 +9,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
+import android.telephony.gsm.GsmCellLocation;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -22,14 +24,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.facebook.common.internal.Supplier;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.soundcloud.android.crop.Crop;
-import com.umeng.analytics.MobclickAgent;
-import com.umeng.update.UmengUpdateAgent;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,6 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.SocketHandler;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,10 +46,8 @@ import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.fragment.FolderFragment;
 import remix.myplayer.fragment.SongFragment;
-import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.service.TimerService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.ColorUtil;
@@ -58,9 +55,7 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.DiskCache;
-import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.SharedPrefsUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.XmlUtil;
@@ -81,6 +76,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     @BindView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
     private BottomActionBarFragment mBottomBar;
+    private MaterialDialog mMDProgressDialog;
     private final static String TAG = "MainActivity";
 
     private PagerAdapter mAdapter;
@@ -95,8 +91,11 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             Manifest.permission.READ_PHONE_STATE};
 
     private int mAlpha = ThemeStore.STATUS_BAR_ALPHA / 2;
-    private final int RECREATE = 0;
-    private final int UPDATECOVER = 1;
+    private final int RECREATE = 0;//重建activity
+    private final int UPDATECOVER = 1;//刷新adpater
+    private final int SHOW = 2;//显示进度框
+    private final int SUCCESS = 3;//缓存成功
+    private final int ERROR = 4;//缓存失败
     private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -121,6 +120,22 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                         if(albumFragment.getAdapter() != null)
                             albumFragment.getAdapter().notifyDataSetChanged();
                     }
+                }
+            }
+            if(msg.what == SHOW){
+                if(mMDProgressDialog != null)
+                    mMDProgressDialog.show();
+            }
+            if(msg.what == SUCCESS){
+                if(mMDProgressDialog != null){
+                    mMDProgressDialog.dismiss();
+                    Toast.makeText(MainActivity.this,"初始化成功", Toast.LENGTH_SHORT).show();
+                }
+            }
+            if(msg.what == ERROR){
+                if(mMDProgressDialog != null){
+                    mMDProgressDialog.dismiss();
+                    Toast.makeText(MainActivity.this,"初始化失败", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -154,11 +169,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //检查更新
-        UmengUpdateAgent.update(this);
-//        MobclickAgent.setDebugMode(true);
-        MobclickAgent.setCatchUncaughtExceptions(true);
-        initUtil();
+
         initTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -166,17 +177,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         ButterKnife.bind(this);
         mInstance = this;
 
-        if (mIsFirst) {
-            mIsFirst = false;
-            //读取歌曲
-            loadsongs();
-            startService(new Intent(this, MusicService.class));
-            //定时
-            startService(new Intent(this, TimerService.class));
-            //监听锁屏
-            new LockScreenListener(getApplicationContext()).beginListen();
-
-        }
         //播放的service
         MusicService.addCallback(MainActivity.this);
 
@@ -192,39 +192,59 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
 
         boolean isFirst = SharedPrefsUtil.getValue(this, "Setting", "First", true);
-        int position = SharedPrefsUtil.getValue(this, "Setting", "Pos", 0);
         SharedPrefsUtil.putValue(this, "Setting", "First", false);
 
-        if (Global.mPlayingList == null || Global.mPlayingList.size() == 0) {
-            SharedPrefsUtil.putValue(getApplicationContext(), "Setting", "Pos", 0);
-            return;
-        }
-
-
-        if (isFirst) {
-            //第一次启动添加我的收藏列表
-            XmlUtil.addPlaylist(getString(R.string.my_favorite));
+        //第一次启动软件
+        if(isFirst){
             //保存默认主题设置
             SharedPrefsUtil.putValue(this,"Setting","ThemeMode",ThemeStore.DAY);
             SharedPrefsUtil.putValue(this,"Setting","ThemeColor",ThemeStore.THEME_PINK);
         }
-        //如果是第一次启动软件,将第一首歌曲设置为正在播放
-        if (isFirst) {
-            mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(Global.mPlayingList.get(0)), MusicService.getIsplay());
-            SharedPrefsUtil.putValue(getApplicationContext(), "Setting", "Pos", 0);
-        } else {
-            if (position >= Global.mPlayingList.size()) {
-                position = Global.mPlayingList.size() - 1;
-                if (position >= 0){
-                    SharedPrefsUtil.putValue(getApplicationContext(), "Setting", "Pos", position);
-                    mBottomBar.UpdateBottomStatus(DBUtil.getMP3InfoById(Global.mPlayingList.get(position)), MusicService.getIsplay());
-                }
-            }
-
-        }
+        initLastSong();
 
     }
 
+    /**
+     * 初始化上一次退出时播放的歌曲
+     * 默认为第一首歌曲
+     */
+    private void initLastSong() {
+        //设置上次退出时正在播放的歌曲
+        int lastId = SharedPrefsUtil.getValue(this,"Setting","LastSongId",0);
+        //上次退出时正在播放的歌曲是否还存在
+        boolean isLastSongExist = false;
+        //上次退出时正在播放的歌曲的pos
+        int pos = 0;
+        //查找上次退出时的歌曲是否还存在
+        if (lastId >= Global.mPlayingList.size()) {
+            for(int i = 0 ; i < Global.mPlayingList.size();i++){
+                if(lastId == Global.mPlayingList.get(i)){
+                    isLastSongExist = true;
+                    pos = i;
+                }
+            }
+        }
+
+        boolean isPlay = mIsFirst ? false : MusicService.getIsplay();
+        MP3Item item = null;
+        if(isLastSongExist) {
+            item = DBUtil.getMP3InfoById(lastId);
+            mBottomBar.UpdateBottomStatus(item, isPlay);
+            MusicService.initDataSource(item,pos);
+        }else {
+            if(Global.mPlayingList.size() > 0){
+                int id =  Integer.valueOf(Global.mPlayingList.get(0).toString());
+                item = DBUtil.getMP3InfoById(id);
+                mBottomBar.UpdateBottomStatus(item,isPlay);
+                SharedPrefsUtil.putValue(this,"Setting","LastSongId",id);
+                MusicService.initDataSource(item,pos);
+            }
+        }
+    }
+
+    /**
+     * 初始化主题
+     */
     private void initTheme() {
         ThemeStore.THEME_MODE = ThemeStore.loadThemeMode();
         ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
@@ -323,27 +343,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         return true;
     }
 
-    private void initUtil() {
-        //初始化工具类
-        PermissionUtil.setContext(getApplicationContext());
-        XmlUtil.setContext(getApplicationContext());
-        DBUtil.setContext(getApplicationContext());
-        CommonUtil.setContext(getApplicationContext());
-        ErrUtil.setContext(getApplicationContext());
-        DiskCache.init(getApplicationContext());
-        ColorUtil.setContext(getApplicationContext());
-        final int MAX_HEAP_SIZE = (int) Runtime.getRuntime().maxMemory();//分配的可用内存
-        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
-                .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {
-                    @Override
-                    public MemoryCacheParams get() {
-                        //20M内存缓存
-                        return new MemoryCacheParams(MAX_HEAP_SIZE / 8, Integer.MAX_VALUE, MAX_HEAP_SIZE / 8, Integer.MAX_VALUE, Integer.MAX_VALUE);
-                    }
-                })
-                .build();
-        Fresco.initialize(this,config);
-    }
+
 
     private void initDrawerLayout() {
 //        mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
@@ -421,26 +421,16 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                         Toast.makeText(MainActivity.this, errorTxt, Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    new ModifyCoverThread(id,path).start();
+                    //清除fresco的缓存
+                    ImagePipeline imagePipeline = Fresco.getImagePipeline();
+                    Uri fileUri = Uri.parse("file:///" + path);
+                    Uri providerUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), id);
+                    imagePipeline.evictFromCache(fileUri);
+                    imagePipeline.evictFromCache(providerUri);
+                    mRefreshHandler.sendEmptyMessage(UPDATECOVER);
                     break;
             }
         }
-    }
-
-    //读取sd卡歌曲信息
-    public static void loadsongs() {
-        new Thread() {
-            @Override
-            public void run() {
-                //读取sd卡歌曲id
-                Global.mAllSongList = DBUtil.getAllSongsId();
-                //读取正在播放列表
-                Global.mPlayingList = XmlUtil.getPlayingList();
-                if (Global.mPlayingList == null || Global.mPlayingList.size() == 0)
-                    Global.mPlayingList = (ArrayList<Long>) Global.mAllSongList.clone();
-            }
-        }.start();
-
     }
 
     //隐藏侧滑菜单
@@ -448,6 +438,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         if (mDrawerLayout.isDrawerOpen(mNavigationView))
             mDrawerLayout.closeDrawer(mNavigationView);
     }
+
+
 
     @Override
     public void onBackPressed() {
@@ -496,6 +488,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         }
         @Override
         public void run() {
+
             if(Global.mAlbunOrArtist == Constants.ARTIST_HOLDER){
                 mRefreshHandler.sendEmptyMessage(UPDATECOVER);
                 return;
