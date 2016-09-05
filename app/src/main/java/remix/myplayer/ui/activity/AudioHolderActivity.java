@@ -237,7 +237,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
 
-
         mWidth = metrics.widthPixels;
         mHeight = metrics.heightPixels;
         mAnimIn = (AlphaAnimation)AnimationUtils.loadAnimation(this,R.anim.audio_bg_in);
@@ -430,11 +429,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     }
 
     public void UpdatePlayButton(boolean isPlay) {
-//        if(isPlay)
-//            mPlayBarPlay.setImageResource(R.drawable.bg_btn_holder_stop);
-//        else
-//            mPlayBarPlay.setImageResource(R.drawable.bg_btn_holder_play);
-//        mPlayBarPlay.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop), mSwatch.getRgb()));
+        mPlayBarPlay.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop), mSwatch.getRgb()));
     }
 
     private void initTop() {
@@ -524,30 +519,24 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
 
         //当操作不为播放或者暂停且正在运行时，更新界面
         if(Global.getOperation() != Constants.PLAYORPAUSE && mInfo != null ) {
-            try {
-                //更新顶部信息
-                UpdateTopStatus(mInfo);
-                //更新按钮状态
-//                UpdatePlayButton(isplay);
-                //更新歌词
-                ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
+            //更新顶部信息
+            UpdateTopStatus(mInfo);
+            //更新歌词
+            ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
 
-                //更新进度条
-                int temp = MusicService.getCurrentTime();
-                mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
-                mDuration = (int) mInfo.getDuration();
-                mSeekBar.setMax(mDuration);
-                //操作为播放选中歌曲时不更新背景
-//                if(mOperation != Constants.PLAYSELECTEDSONG)
-                new BitmapThread().start();
-            } catch (Exception e){
-                e.printStackTrace();
-            }
+            //更新进度条
+            int temp = MusicService.getCurrentTime();
+            mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
+            mDuration = (int) mInfo.getDuration();
+            mSeekBar.setMax(mDuration);
+
+            new BitmapThread().start();
         }
+        //操作为播放选中歌曲时不更新背景
         //只更新按钮状态
         else if(mIsRunning){
             //更新按钮状态
-//            UpdatePlayButton(isplay);
+            UpdatePlayButton(isplay);
         }
 
 
@@ -600,7 +589,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
             mSeekBar.setProgressDrawable(layerDrawable);
 
             //修改thumb颜色
-//                        Drawable drawable = mSeekBar.getThumb();
+            // Drawable drawable = mSeekBar.getThumb();
             Drawable drawable = getResources().getDrawable(R.drawable.thumb);
             Theme.TintDrawable(drawable,mColorDraken);
             mSeekBar.setThumb(drawable);
@@ -654,7 +643,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     }
 
     class CtrlListener implements View.OnClickListener{
-
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(Constants.CTL_ACTION);
