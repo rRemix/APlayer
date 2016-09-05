@@ -73,7 +73,7 @@ public class Application extends android.app.Application {
                     if (Global.mPlayingList == null || Global.mPlayingList.size() == 0)
                         Global.mPlayingList = Global.mAllSongList;
                 }
-
+                Global.mPlaylist = XmlUtil.getPlayList("playlist.xml");
             }
         }.start();
 

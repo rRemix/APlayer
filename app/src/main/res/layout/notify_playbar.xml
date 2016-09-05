@@ -46,7 +46,7 @@
                 android:lines="1"
                 android:ellipsize="end"
                 android:textSize="@dimen/s14_size"
-                android:textColor="@color/gray_6c6a6c"/>
+                android:textColor="@color/gray_8d8c8e"/>
         </LinearLayout>
 
 

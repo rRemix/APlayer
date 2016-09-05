@@ -226,20 +226,26 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         }
 
         boolean isPlay = mIsFirst ? false : MusicService.getIsplay();
-        MP3Item item = null;
-        if(isLastSongExist) {
-            item = DBUtil.getMP3InfoById(lastId);
-            mBottomBar.UpdateBottomStatus(item, isPlay);
-            MusicService.initDataSource(item,pos);
-        }else {
-            if(Global.mPlayingList.size() > 0){
-                int id =  Integer.valueOf(Global.mPlayingList.get(0).toString());
-                item = DBUtil.getMP3InfoById(id);
-                mBottomBar.UpdateBottomStatus(item,isPlay);
-                SharedPrefsUtil.putValue(this,"Setting","LastSongId",id);
+        if(mIsFirst){
+            mIsFirst = false;
+            MP3Item item = null;
+            if(isLastSongExist) {
+                item = DBUtil.getMP3InfoById(lastId);
+                mBottomBar.UpdateBottomStatus(item, isPlay);
                 MusicService.initDataSource(item,pos);
+            }else {
+                if(Global.mPlayingList.size() > 0){
+                    int id =  Integer.valueOf(Global.mPlayingList.get(0).toString());
+                    item = DBUtil.getMP3InfoById(id);
+                    mBottomBar.UpdateBottomStatus(item,isPlay);
+                    SharedPrefsUtil.putValue(this,"Setting","LastSongId",id);
+                    MusicService.initDataSource(item,pos);
+                }
             }
+        } else {
+            mBottomBar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
         }
+
     }
 
     /**

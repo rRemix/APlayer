@@ -39,13 +39,13 @@ public class MediaStoreObserver extends ContentObserver {
                     try {
                         boolean needupdate = false;
                         if(Global.mPlayingList != null){
-                            for(int i = Global.mPlayingList.size() - 1; i >= 0 ; i--){
-                                MP3Item temp = DBUtil.getMP3InfoById(Global.mPlayingList.get(i));
-                                if(temp == null) {
-                                    Global.mPlayingList.remove(i);
-                                    needupdate = true;
-                                }
-                            }
+//                            for(int i = Global.mPlayingList.size() - 1; i >= 0 ; i--){
+//                                MP3Item temp = DBUtil.getMP3InfoById(Global.mPlayingList.get(i));
+//                                if(temp == null) {
+//                                    Global.mPlayingList.remove(i);
+//                                    needupdate = true;
+//                                }
+//                            }
                             if(needupdate){
                                 XmlUtil.updatePlayingList();
                                 mHandler.sendEmptyMessage(Constants.UPDATE_PLAYINGLIST);

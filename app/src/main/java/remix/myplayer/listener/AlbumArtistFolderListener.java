@@ -97,7 +97,7 @@ public class AlbumArtistFolderListener implements PopupMenu.OnMenuItemClickListe
                 else {
                     if(name != null && !name.equals("")) {
                         Global.mPlaylist.remove(name);
-                        if(PlayListActivity.mInstance != null && PlayListActivity.mInstance.getAdapter() != null)
+                        if(PlayListActivity.mInstance != null)
                             PlayListActivity.mInstance.UpdateAdapter();
                         XmlUtil.updatePlaylist();
                     }

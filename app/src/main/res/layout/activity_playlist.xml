@@ -7,7 +7,6 @@
 
     <include layout="@layout/toolbar"/>
 
-
     <FrameLayout
         android:background="?attr/background_color_3"
         android:layout_width="match_parent"
@@ -29,7 +28,7 @@
             android:src="@drawable/playlist_fab_btn_add"
             app:backgroundTint="@color/purple_8e24aa"
             app:elevation="@dimen/d2_size"
-            app:pressedTranslationZ="@dimen/d4_size"/>
+            app:pressedTranslationZ="@dimen/d6_size"/>
     </FrameLayout>
 
 

@@ -3,11 +3,14 @@ package remix.myplayer.util.thumb;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ImageDecodeOptions;
+import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
@@ -33,13 +36,13 @@ public class AsynLoadImage extends AsyncTask<Object,Integer,String> {
     @Override
     protected void onPostExecute(String url) {
         if(mImage != null && url != null) {
-            DraweeController controller = Fresco.newDraweeControllerBuilder()
-                    .setUri(Uri.parse("file:///" + url))
-                    .setOldController(mImage.getController())
-                    .setAutoPlayAnimations(mAutoPlayAnimation)
-                    .build();
-            mImage.setController(controller);
+//            DraweeController controller = Fresco.newDraweeControllerBuilder()
+//                    .setUri(Uri.parse("file:///" + url))
+//                    .setOldController(mImage.getController())
+//                    .build();
+//            mImage.setController(controller);
 
+            mImage.setImageURI(Uri.parse("file:///" + url));
         }
     }
 }

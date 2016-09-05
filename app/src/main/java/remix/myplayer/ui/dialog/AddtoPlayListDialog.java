@@ -1,6 +1,9 @@
 package remix.myplayer.ui.dialog;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -14,6 +17,7 @@ import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAddtoAdapter;
 import remix.myplayer.model.PlayListItem;
@@ -32,6 +36,8 @@ import remix.myplayer.util.XmlUtil;
 public class AddtoPlayListDialog extends BaseActivity {
     @BindView(R.id.playlist_addto_list)
     ListView mList;
+    @BindView(R.id.playlist_addto_new)
+    TextView mNew;
 
     private PlayListAddtoAdapter mAdapter;
     private String mSongName;
@@ -39,6 +45,7 @@ public class AddtoPlayListDialog extends BaseActivity {
     private int mAlbumId;
     private String mArtist;
 
+    private final int ADDPLAYLIST = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,36 +74,65 @@ public class AddtoPlayListDialog extends BaseActivity {
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                try {
-                    TextView textView = (TextView)view.findViewById(R.id.playlist_addto_text);
-                    String playlist = textView.getText().toString();
-                    boolean isExist = false;
-                    if(playlist != null && mSongName != null && mId > 0) {
-                        for(PlayListItem item : Global.mPlaylist.get(playlist)){
-                            if(item.getId() == mId){
-                                isExist = true;
-                            }
-                        }
-                        if(isExist){
-                            Toast.makeText(AddtoPlayListDialog.this,getString(R.string.song_already_exist), Toast.LENGTH_SHORT).show();
-                        } else {
-                            XmlUtil.addSongToPlayList(playlist, mSongName,mId,mAlbumId,mArtist);
-                            Toast.makeText(AddtoPlayListDialog.this,getString(R.string.add_success), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                    else
-                        Toast.makeText(AddtoPlayListDialog.this,getString(R.string.add_error), Toast.LENGTH_SHORT).show();
-                    finish();
-                } catch (Exception e){
-                    e.printStackTrace();
+                if(view != null) {
+                    addSong(((TextView)view.findViewById(R.id.playlist_addto_text)).getText().toString());
+                } else {
+                    Toast.makeText(AddtoPlayListDialog.this,getString(R.string.add_error), Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
     }
 
-    public void onCancel(View v) {
-        finish();
+    /**
+     * 添加歌曲到播放列表
+     * @param playlistName
+     */
+    private void addSong(String playlistName) {
+        try {
+            boolean isExist = false;
+            if(!TextUtils.isEmpty(playlistName) && mSongName != null && mId > 0) {
+                for(PlayListItem item : Global.mPlaylist.get(playlistName)){
+                    if(item.getId() == mId){
+                        isExist = true;
+                    }
+                }
+                if(isExist){
+                    Toast.makeText(AddtoPlayListDialog.this,getString(R.string.song_already_exist), Toast.LENGTH_SHORT).show();
+                } else {
+                    XmlUtil.addSongToPlayList(playlistName, mSongName,mId,mAlbumId,mArtist);
+                    Toast.makeText(AddtoPlayListDialog.this,getString(R.string.add_success), Toast.LENGTH_SHORT).show();
+                }
+            }
+            else
+                Toast.makeText(AddtoPlayListDialog.this,getString(R.string.add_error), Toast.LENGTH_SHORT).show();
+            finish();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @OnClick({R.id.playlist_addto_cancel,R.id.playlist_addto_new})
+    public void onClick(View v) {
+        if(v.getId() == R.id.playlist_addto_cancel)
+            finish();
+        if(v.getId() == R.id.playlist_addto_new){
+            Intent intent = new Intent(this,AddPlayListDialog.class);
+            intent.putExtra("FromPlayListActivity",false);
+            startActivityForResult(intent,ADDPLAYLIST);
+        }
+    }
+
+    public PlayListAddtoAdapter getAdaper(){
+        return mAdapter;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == ADDPLAYLIST && resultCode == Activity.RESULT_OK && data != null){
+            addSong(data.getStringExtra("PlayListName"));
+            finish();
+        }
     }
 
     @Override

@@ -53,101 +53,62 @@ import remix.myplayer.util.SharedPrefsUtil;
 public class MusicService extends BaseService {
     private final static String TAG = "MusicService";
     public static MusicService mInstance;
-    /**
-     * 是否第一次启动
-     */
+    /** 是否第一次启动*/
     private static boolean mFirstFlag = true;
 
-    /**
-     * 是否正在设置mediapplayer的datasource
-     */
+    /** 是否正在设置mediapplayer的datasource */
     private static boolean mIsIniting = false;
 
-    /**
-     * 播放模式
-     */
+    /** 播放模式 */
     private static int mPlayModel = Constants.PLAY_LOOP;
 
-    /**
-     * 当前是否正在播放
-     */
+    /** 当前是否正在播放 */
     private static Boolean mIsplay = false;
 
-    /**
-     * 当前播放的索引
-     */
+    /** 当前播放的索引 */
     private static int mCurrent = 0;
 
-    /**
-     * 当前正在播放的歌曲id
-     */
+    /** 当前正在播放的歌曲id */
     private static long mId = -1;
 
-    /**
-     * 当前正在播放的mp3
-     */
+    /** 当前正在播放的mp3 */
     private static MP3Item mInfo = null;
 
-    /**
-     * MediaExtractor 获得码率等信息
-     */
+    /** MediaExtractor 获得码率等信息 */
     private static MediaExtractor mMediaExtractor;
-    /**
-     * MediaPlayer 负责歌曲的播放等
-     */
+
+    /** MediaPlayer 负责歌曲的播放等 */
     private static MediaPlayer mMediaPlayer;
 
-    /**
-     * 最大音量
-     */
+    /** 最大音量 */
     private int mMaxVolume = -1;
 
-    /**
-     * 当前音量
-     */
+    /** 当前音量 */
     private int mCurrentVolume = -1;
 
-    /**
-     * AudiaoManager
-     */
+    /** AudiaoManager */
     private AudioManager mAudioManager;
 
-    /**
-     * 回调接口的集合
-     */
+    /** 回调接口的集合 */
     private static List<Callback> mCallBacklist  = new ArrayList<Callback>(){};
 
-    /**
-     * 播放控制的Receiver
-     */
+    /** 播放控制的Receiver */
     private ControlReceiver mRecevier;
 
 
-    /**
-     * 监测耳机拔出的Receiver
-     */
+    /** 监测耳机拔出的Receiver*/
     private HeadsetPlugReceiver mHeadSetReceiver;
 
-    /**
-     * 监听AudioFocus的改变
-     */
-
-
+    /** 监听AudioFocus的改变 */
     private AudioManager.OnAudioFocusChangeListener mAudioFocusListener;
 
-    /**
-     * MediaSession
-     */
+    /** MediaSession */
     private MediaSessionCompat mMediaSession = null;
 
-    /**
-     * 当前是否获得AudioFocus
-     */
+    /** 当前是否获得AudioFocus */
     private boolean mAudioFouus = false;
 
-    /**
-     * 更新相关Activity的Handler
-     */
+    /** 更新相关Activity的Handler */
     private static Handler mUpdateUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -163,9 +124,7 @@ public class MusicService extends BaseService {
             }
         }
     };
-    /**
-     * TelePhoneManager
-     */
+    /** TelePhoneManager*/
     private TelephonyManager mTelePhoneManager;
 
 
@@ -191,7 +150,7 @@ public class MusicService extends BaseService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        UnInit();
+        unInit();
     }
     @Override
     public void onCreate() {
@@ -210,9 +169,9 @@ public class MusicService extends BaseService {
                 if(focusChange == AudioManager.AUDIOFOCUS_GAIN){
                     mAudioFouus = true;
                     if(mMediaPlayer == null)
-                        Init();
+                        init();
                     else if(mNeedContinue){
-                        PlayStart();
+                        playStart();
                         mNeedContinue = false;
                         Global.setOperation(Constants.PLAYORPAUSE);
                     }
@@ -222,10 +181,10 @@ public class MusicService extends BaseService {
                 //暂停播放
                 if(focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
                         focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK){
-                    mNeedContinue = true;
+                    mNeedContinue = mIsplay;
                     if(mIsplay && mMediaPlayer != null){
                         Global.setOperation(Constants.PLAYORPAUSE);
-                        Pause();
+                        pause();
                     }
                 }
 
@@ -234,7 +193,7 @@ public class MusicService extends BaseService {
                     mAudioFouus = false;
                     if(mIsplay && mMediaPlayer != null) {
                         Global.setOperation(Constants.PLAYORPAUSE);
-                        Pause();
+                        pause();
                     }
                 }
                 //通知更新ui
@@ -245,11 +204,11 @@ public class MusicService extends BaseService {
 
         //播放模式
         mPlayModel = SharedPrefsUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
-        Init();
+        init();
 
     }
 
-    private void Init() {
+    private void init() {
         //初始化两个Receiver
         mRecevier = new ControlReceiver();
         registerReceiver(mRecevier,new IntentFilter("remix.music.CTL_ACTION"));
@@ -313,7 +272,7 @@ public class MusicService extends BaseService {
         mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-                PlayStart();
+                playStart();
             }
         });
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
@@ -345,7 +304,7 @@ public class MusicService extends BaseService {
         }
     }
 
-    private void UnInit(){
+    private void unInit(){
         if(mMediaPlayer != null)
             mMediaPlayer.release();
         mMediaPlayer = null;
@@ -361,21 +320,21 @@ public class MusicService extends BaseService {
     /**
      * 播放下一首
      */
-    private void PlayNext() {
+    private void playNext() {
         PlayNextOrPrev(true,true);
     }
 
     /**
      * 播放上一首
      */
-    private void PlayPrevious() {
+    private void playPrevious() {
         PlayNextOrPrev(false, true);
     }
 
     /**
      * 开始播放
      */
-    private void PlayStart() {
+    private void playStart() {
         new Thread(){
             @Override
             //音量逐渐增大
@@ -412,25 +371,25 @@ public class MusicService extends BaseService {
      */
     private void PlayOrPause() {
         if(mMediaPlayer.isPlaying()) {
-            Pause();
+            pause();
         }
         else {
             if(mInfo == null)
                 return;
             if(mFirstFlag) {
-//                PlayStart();
+//                playStart();
                 PrepareAndPlay(mInfo.getUrl());
                 mFirstFlag = false;
                 return;
             }
-            PlayStart();
+            playStart();
         }
     }
 
     /**
      * 暂停
      */
-    private void Pause() {
+    private void pause() {
         mIsplay = false;
         mMediaPlayer.pause();
 //        new Thread(){
@@ -468,7 +427,7 @@ public class MusicService extends BaseService {
      * 比如在全部歌曲或者专辑详情里面选中某一首歌曲
      * @param position 播放索引
      */
-    private void PlaySelectSong(int position){
+    private void playSelectSong(int position){
        
         if((mCurrent = position) == -1 || (mCurrent > Global.mPlayingList.size() - 1))
             return;
@@ -493,7 +452,11 @@ public class MusicService extends BaseService {
         public void UpdateUI(MP3Item MP3Item, boolean isplay);
         public int getType();
     }
-    //添加Activity到回调接口
+
+    /**
+     * 将activity添加到回调接口
+     * @param callback
+     */
     public static void addCallback(Callback callback) {
         for(int i = mCallBacklist.size() - 1 ; i >= 0 ; i--){
             if(callback.getType() == mCallBacklist.get(i).getType()){
@@ -501,6 +464,7 @@ public class MusicService extends BaseService {
             }
         }
         mCallBacklist.add(callback);
+
     }
 
     /**
@@ -518,7 +482,7 @@ public class MusicService extends BaseService {
                 NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                 manager.cancel(0);
                 Global.setNotifyShowing(false);
-                Pause();
+                pause();
                 Update(Control);
                 return;
             }
@@ -526,15 +490,15 @@ public class MusicService extends BaseService {
             switch (Control) {
                 //播放listview选中的歌曲
                 case Constants.PLAYSELECTEDSONG:
-                    PlaySelectSong(intent.getIntExtra("Position", -1));
+                    playSelectSong(intent.getIntExtra("Position", -1));
                     break;
                 //播放上一首
                 case Constants.PREV:
-                    PlayPrevious();
+                    playPrevious();
                     break;
                 //播放下一首
                 case Constants.NEXT:
-                    PlayNext();
+                    playNext();
                     break;
                 //暂停或者继续播放
                 case Constants.PLAYORPAUSE:
@@ -545,11 +509,11 @@ public class MusicService extends BaseService {
                     break;
                 //暂停
                 case Constants.PAUSE:
-                    Pause();
+                    pause();
                     break;
                 //继续播放
                 case Constants.CONTINUE:
-                    PlayStart();
+                    playStart();
                     break;
                 //顺序播放
                 case Constants.PLAY_LOOP:
@@ -621,10 +585,10 @@ public class MusicService extends BaseService {
 
     /**
      * 根据当前播放模式，切换到上一首或者下一首
-     * @param IsNext 是否是播放下一首
-     * @param NeedPlay 是否需要播放
+     * @param isNext 是否是播放下一首
+     * @param needPlay 是否需要播放
      */
-    public void PlayNextOrPrev(boolean IsNext,boolean NeedPlay){
+    public void PlayNextOrPrev(boolean isNext,boolean needPlay){
         if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
             return;
 
@@ -633,7 +597,7 @@ public class MusicService extends BaseService {
             mId = Global.mPlayingList.get(mCurrent);
         }
         else if(mPlayModel == Constants.PLAY_LOOP) {
-            if(IsNext) {
+            if(isNext) {
                 if ((++mCurrent) > Global.mPlayingList.size() - 1)
                     mCurrent = 0;
                 mId = Global.mPlayingList.get(mCurrent);
@@ -653,7 +617,7 @@ public class MusicService extends BaseService {
             return;
         }
         mIsplay = true;
-        if(NeedPlay)
+        if(needPlay)
             PrepareAndPlay(mInfo.getUrl());
 
 //        RemoteControlClient.MetadataEditor editor = mRemoteCtrlClient.editMetadata(false);
@@ -702,7 +666,6 @@ public class MusicService extends BaseService {
      * 设置MediaPlayer播放进度
      * @param current
      */
-    //s何止进度
     public static void setProgress(int current) {
         if(mMediaPlayer != null)
             mMediaPlayer.seekTo(current);

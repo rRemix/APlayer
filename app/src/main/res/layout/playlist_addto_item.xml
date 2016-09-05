@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="80dp">
+    android:layout_height="wrap_content">
     <TextView
         android:id="@+id/playlist_addto_text"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="@dimen/d10_size"
+        android:layout_marginTop="@dimen/d10_size"
+        android:layout_marginBottom="@dimen/d10_size"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="17sp"
-        android:textColor="#001"
+        android:textSize="@dimen/s16_size"
+        android:textColor="@color/black_737373"
         android:text="歌单"
         android:gravity="center_vertical"/>
 </LinearLayout>

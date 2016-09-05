@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -40,8 +41,8 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     @BindView(R.id.floatbutton)
     FloatingActionButton mFloatButton;
 
+    private final int ADDPLAYLIST = 0;
     private PlayListAdapter mAdapter;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,17 +88,27 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 
     //打开添加播放列表的Dialog
     public void onAdd(View v) {
-        startActivity(new Intent(PlayListActivity.this, AddPlayListDialog.class));
+        Intent intent = new Intent(this,AddPlayListDialog.class);
+        intent.putExtra("FromPlayListActivity",true);
+        startActivityForResult(intent,ADDPLAYLIST);
     }
 
-    public PlayListAdapter getAdapter()
-    {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == ADDPLAYLIST && resultCode == Activity.RESULT_OK){
+            if(mAdapter != null){
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    public PlayListAdapter getAdapter() {
         return mAdapter;
     }
 
     @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
-
     }
 
     @Override

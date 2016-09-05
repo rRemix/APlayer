@@ -1,5 +1,7 @@
 package remix.myplayer.ui.dialog;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -54,7 +56,13 @@ public class AddPlayListDialog extends BaseActivity {
         String name = ((EditText)findViewById(R.id.playlist_add_edit)).getText().toString();
         if (name != null && !name.equals("")) {
             XmlUtil.addPlaylist(name);
-            PlayListActivity.mInstance.getAdapter().notifyDataSetChanged();
+            if(getIntent().getBooleanExtra("FromPlayListActivity",false)){
+                setResult(Activity.RESULT_OK);
+            } else {
+                Intent intent = new Intent();
+                intent.putExtra("PlayListName",name);
+                setResult(Activity.RESULT_OK,intent);
+            }
         }
         finish();
     }
