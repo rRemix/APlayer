@@ -3,4 +3,151 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/d18_size">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:text="歌曲路径: "
+            android:textStyle="bold"
+            android:textColor="@color/black_737373"/>
+        <TextView
+            android:id="@+id/song_detail_path"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:textColor="@color/black_737373"
+            android:text="123123123123123"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/d18_size">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:text="歌曲名: "
+            android:textStyle="bold"
+            android:textColor="@color/black_737373"/>
+        <TextView
+            android:id="@+id/song_detail_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:textColor="@color/black_737373"
+            android:text="123123123123123"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/d18_size">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:text="文件大小: "
+            android:textStyle="bold"
+            android:textColor="@color/black_737373"/>
+        <TextView
+            android:id="@+id/song_detail_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:textColor="@color/black_737373"
+            android:text="123123123123123"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/d18_size">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:text="格式: "
+            android:textStyle="bold"
+            android:textColor="@color/black_737373"/>
+        <TextView
+            android:id="@+id/song_detail_mime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:textColor="@color/black_737373"
+            android:text="123123123123123"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/d18_size">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:text="长度: "
+            android:textStyle="bold"
+            android:textColor="@color/black_737373"/>
+        <TextView
+            android:id="@+id/song_detail_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:textColor="@color/black_737373"
+            android:text="123123123123123"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/d18_size">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:text="比特率: "
+            android:textStyle="bold"
+            android:textColor="@color/black_737373"/>
+        <TextView
+            android:id="@+id/song_detail_bit_rate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:textColor="@color/black_737373"
+            android:text="123123123123123"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/d18_size">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:text="采样率: "
+            android:textStyle="bold"
+            android:textColor="@color/black_737373"/>
+        <TextView
+            android:id="@+id/song_detail_sample_rate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s16_size"
+            android:textColor="@color/black_737373"
+            android:text="123123123123123"/>
+    </LinearLayout>
+
 </LinearLayout>

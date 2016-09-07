@@ -32,7 +32,7 @@ import remix.myplayer.ui.customview.EQSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.SharedPrefsUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by taeja on 16-4-13.
@@ -89,8 +89,8 @@ public class EQActivity extends ToolbarActivity {
                     return;
                 }
                 //是否启用音效设置
-                mEnable = SharedPrefsUtil.getValue(Application.getContext(),"setting","EnableEQ",false) & Global.getHeadsetOn();
-                mInitialEnable = SharedPrefsUtil.getValue(Application.getContext(),"setting","InitialEnableEQ",false);
+                mEnable = SPUtil.getValue(Application.getContext(),"setting","EnableEQ",false) & Global.getHeadsetOn();
+                mInitialEnable = SPUtil.getValue(Application.getContext(),"setting","InitialEnableEQ",false);
 
                 //EQ
                 mEqualizer = new Equalizer(0, AudioSessionId);
@@ -98,13 +98,13 @@ public class EQActivity extends ToolbarActivity {
 //                //重低音
 //                mBassBoost = new BassBoost(0,AudioSessionId);
 //                mBassBoost.setEnabled(mEnable);
-//                mBassBoostLevel = (short)SharedPrefsUtil.getValue(Application.getContext(),"setting","BassBoostLevel",0);
+//                mBassBoostLevel = (short)SPUtil.getValue(Application.getContext(),"setting","BassBoostLevel",0);
 //                if(mEnable && mBassBoost.getStrengthSupported()){
 //                    mBassBoost.setStrength(mBassBoostLevel);
 //                }
 //                //环绕音效
 //                mVirtualizer = new Virtualizer(0,AudioSessionId);
-//                mVirtualizeLevel = (short)SharedPrefsUtil.getValue(Application.getContext(),"setting","VirtualizeLevel",0);
+//                mVirtualizeLevel = (short)SPUtil.getValue(Application.getContext(),"setting","VirtualizeLevel",0);
 //                mVirtualizer.setEnabled(mEnable);
 //                if(mEnable && mVirtualizer.getStrengthSupported()){
 //                    mVirtualizer.setStrength(mVirtualizeLevel);
@@ -115,7 +115,7 @@ public class EQActivity extends ToolbarActivity {
 
                 //得到之前存储的每个频率的db值
                 for(short i = 0 ; i < mBandNumber; i++){
-                    short temp = (short)(SharedPrefsUtil.getValue(Application.getContext(),"setting","Band" + i,0));
+                    short temp = (short)(SPUtil.getValue(Application.getContext(),"setting","Band" + i,0));
                     mBandFrequencys.add(temp);
                     if (mEnable){
                         mEqualizer.setBandLevel(i,temp);
@@ -207,7 +207,7 @@ public class EQActivity extends ToolbarActivity {
                     return;
                 }
                 mInitialEnable = isChecked;
-                SharedPrefsUtil.putValue(EQActivity.this,"setting","InitialEnableEQ",mInitialEnable);
+                SPUtil.putValue(EQActivity.this,"setting","InitialEnableEQ",mInitialEnable);
                 mEnable = isChecked;
                 UpdateEnable(isChecked);
             }
@@ -257,7 +257,7 @@ public class EQActivity extends ToolbarActivity {
 
     public void UpdateEnable(boolean enable) {
         mEnable = enable;
-        SharedPrefsUtil.putValue(EQActivity.this,"setting","EnableEQ",enable);
+        SPUtil.putValue(EQActivity.this,"setting","EnableEQ",enable);
 
         if(mSwitch != null) {
             mSwitch.setChecked(enable);
@@ -298,7 +298,7 @@ public class EQActivity extends ToolbarActivity {
                         //设置db值
                         mEqualizer.setBandLevel((short)i,temp);
                         //db值存储到sp
-                        SharedPrefsUtil.putValue(EQActivity.this,"setting","Band" + i,temp );
+                        SPUtil.putValue(EQActivity.this,"setting","Band" + i,temp );
                         break;
                     }
                 }
@@ -330,7 +330,7 @@ public class EQActivity extends ToolbarActivity {
             return;
         }
         mInitialEnable = true;
-        SharedPrefsUtil.putValue(EQActivity.this,"setting","InitialEnableEQ",mInitialEnable);
+        SPUtil.putValue(EQActivity.this,"setting","InitialEnableEQ",mInitialEnable);
         UpdateEnable(true);
         if(mBandFrequencys != null)
             mBandFrequencys.clear();
@@ -338,7 +338,7 @@ public class EQActivity extends ToolbarActivity {
             //设置db值
             mEqualizer.setBandLevel(i,(short) 0);
             //db值存储到sp
-            SharedPrefsUtil.putValue(EQActivity.this,"setting","Band" + i,(short)0 );
+            SPUtil.putValue(EQActivity.this,"setting","Band" + i,(short)0 );
             //设置seekbar进度
             setSeekBarProgress(mEQSeekBars.get(i),0);
             //存储每个频率的db值到内存
@@ -369,7 +369,7 @@ public class EQActivity extends ToolbarActivity {
 //                    int temp = mEqualizer.getBandLevel(i);
 //                    if(temp >= mMinEQLevel && temp <= mMaxEQLevel) {
 //                        //db值存储到SP
-//                        SharedPrefsUtil.putValue(EQActivity.this,"setting","Band" + i,temp);
+//                        SPUtil.putValue(EQActivity.this,"setting","Band" + i,temp);
 //                        setSeekBarProgress(mEQSeekBars.get(i),temp);
 //                    }
 //                }

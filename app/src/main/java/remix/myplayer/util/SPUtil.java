@@ -9,11 +9,10 @@ import android.content.SharedPreferences;
 
 /**
  * SharedPrefs工具类
- * 保存最近播放歌曲 是否第一次启动 扫描文件大小
  */
-public class SharedPrefsUtil {
-    public static SharedPrefsUtil mInstance;
-    public SharedPrefsUtil() {
+public class SPUtil {
+    public static SPUtil mInstance;
+    public SPUtil() {
         if(mInstance == null)
             mInstance = this;
     }

@@ -18,7 +18,7 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.SharedPrefsUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by taeja on 16-2-4.
@@ -49,7 +49,7 @@ public class NotifyReceiver extends BroadcastReceiver {
             return;
         
         if((MusicService.getCurrentMP3() != null)) {
-            boolean isSystemColor = SharedPrefsUtil.getValue(context,"setting","IsSystemColor",true);
+            boolean isSystemColor = SPUtil.getValue(context,"setting","IsSystemColor",true);
 
             MP3Item temp = MusicService.getCurrentMP3();
             //设置歌手，歌曲名

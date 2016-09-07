@@ -1,9 +1,9 @@
 package remix.myplayer.util;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.CursorWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -19,10 +19,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 
+import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.ui.activity.ChildHolderActivity;
-import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.model.PlayListItem;
+import remix.myplayer.ui.activity.ChildHolderActivity;
 
 /**
  * Created by taeja on 16-2-17.
@@ -55,12 +55,11 @@ public class DBUtil {
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
 
-
         //默认过滤文件大小500K
-        Constants.SCAN_SIZE = SharedPrefsUtil.getValue(mContext,"setting","scansize",-1);
+        Constants.SCAN_SIZE = SPUtil.getValue(mContext,"setting","scansize",-1);
         if( Constants.SCAN_SIZE < 0) {
             Constants.SCAN_SIZE = 512000;
-            SharedPrefsUtil.putValue(mContext,"setting","scansize",512000);
+            SPUtil.putValue(mContext,"setting","scansize",512000);
         }
 
         try{
@@ -71,6 +70,10 @@ public class DBUtil {
             if(cursor != null) {
                 Global.mFolderMap.clear();
                 while (cursor.moveToNext()) {
+                    String type = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.MIME_TYPE));
+
+                    Log.d(TAG,"type:" + type);
+
                     //计算歌曲添加时间
                     //如果满足条件添加到最近添加
                     long temp = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)) * 1000 ;
@@ -87,7 +90,6 @@ public class DBUtil {
                     long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
                     mAllSongList.add(id);
 
-
                     //根据歌曲路径对歌曲按文件夹分类
                     String full_path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                     SortWithFolder(id,full_path);
@@ -100,20 +102,19 @@ public class DBUtil {
                 cursor.close();
         }
 
-        try {
-            cursor = resolver.query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,null, null,null,null);
-            if(cursor != null){
-                while (cursor.moveToNext()){
-                    for(int i = 0 ; i < cursor.getColumnCount();i++){
-                        Log.d("SongInfo","name:" + cursor.getColumnName(i) + " value:" + cursor.getString(i));
-                    }
-                }
-
-            }
-        } catch (Exception e){
-            e.toString();
-        }
-
+//        try {
+//            cursor = resolver.query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,null, null,null,null);
+//            if(cursor != null){
+//                while (cursor.moveToNext()){
+//                    for(int i = 0 ; i < cursor.getColumnCount();i++){
+//                        Log.d("SongInfo","name:" + cursor.getColumnName(i) + " value:" + cursor.getString(i));
+//                    }
+//                }
+//
+//            }
+//        } catch (Exception e){
+//            e.toString();
+//        }
 
         return mAllSongList;
     }
@@ -362,7 +363,8 @@ public class DBUtil {
                 CommonUtil.getTime(duration),
                 cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)),
                 cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE)),
-                null);
+                null,
+                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.YEAR)));
     }
 
 
@@ -413,6 +415,95 @@ public class DBUtil {
         return mp3Item;
     }
 
+    /**
+     *
+     */
+    public static Uri insertGenre(long audioId,String genre){
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put(MediaStore.Audio.Genres.NAME,genre);
+            cv.put(MediaStore.Audio.Genres.Members.AUDIO_ID,audioId);
+            int id = (int)audioId;
+            Uri uri = MediaStore.Audio.Genres.getContentUriForAudioId("external",(int)audioId);
+
+            return  mContext.getContentResolver().insert(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,cv);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return Uri.EMPTY;
+    }
+
+    /**
+     * 根据歌曲id获得流派信息
+     * @param audioId
+     * @return
+     */
+    public static Genre getGenre(long audioId){
+        Cursor genreCursor = null;
+        Genre genre = new Genre();
+        try {
+            genreCursor = mContext.getContentResolver().query(MediaStore.Audio.Genres.getContentUriForAudioId("external",(int)audioId),
+                    null,null,null,null);
+            if(genreCursor != null && genreCursor.getCount() > 0 && genreCursor.moveToFirst()){
+                genre.GenreID = genreCursor.getInt(genreCursor.getColumnIndex(MediaStore.Audio.Genres._ID));
+                genre.GenreName = genreCursor.getString(genreCursor.getColumnIndex(MediaStore.Audio.Genres.NAME));
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(genreCursor != null && !genreCursor.isClosed())
+                genreCursor.close();
+        }
+        return genre;
+    }
+
+    /**
+     * 更新流派
+     * @param genreId
+     * @param genreName
+     * @return
+     */
+    public static int updateGenre(long genreId,String genreName){
+        int updateRow = 0;
+        try {
+            ContentValues genreCv = new ContentValues();
+            genreCv.put(MediaStore.Audio.Genres.NAME,genreName);
+            updateRow =  mContext.getContentResolver().update(
+                    MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,
+                    genreCv,
+                    MediaStore.Audio.Genres._ID + "=" + genreId,null) ;
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return updateRow;
+    }
+
+    /**
+     * 更新歌曲信息
+     * @param id
+     * @param title
+     * @param artist
+     * @param album
+     * @param year
+     * @return
+     */
+    public static int updateMP3Info(long id,String title,String artist,String album,String year){
+        int updateRow = 0;
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put(MediaStore.Audio.Media.TITLE,title);
+            cv.put(MediaStore.Audio.Media.ARTIST,artist);
+            cv.put(MediaStore.Audio.Media.ALBUM,album);
+            cv.put(MediaStore.Audio.Media.YEAR,year);
+            updateRow = mContext.getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    cv,
+                    MediaStore.Audio.Media._ID + "=" + id,null);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return updateRow;
+    }
 
 
     /**

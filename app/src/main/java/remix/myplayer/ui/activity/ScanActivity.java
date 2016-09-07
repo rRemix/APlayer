@@ -13,7 +13,7 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.ui.customview.FilterSizeSeekBar;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.SharedPrefsUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by taeja on 16-3-7.
@@ -63,7 +63,7 @@ public class ScanActivity extends ToolbarActivity {
                 int size = mSizeList.get(position);
                 if(size >= 0) {
                     //纪录下设置的大小
-                    SharedPrefsUtil.putValue(ScanActivity.this, "setting", "scansize", size);
+                    SPUtil.putValue(ScanActivity.this, "setting", "scansize", size);
                     Constants.SCAN_SIZE = size;
                 }
             }

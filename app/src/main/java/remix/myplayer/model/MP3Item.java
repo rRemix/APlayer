@@ -21,8 +21,13 @@ public class MP3Item implements Serializable,Cloneable {
     private String ReailTime;
     private String Url;
     private long Size;
+    private String Year;
     public MP3Item(){};
     public MP3Item(long id, String displayname, String title, String album, long albumid, String artist, long duration, String reailTime, String url, long size, String albumart) {
+        this(id,displayname,title,album,albumid,artist,duration,reailTime,url,size,albumart,null);
+    }
+
+    public MP3Item(long id, String displayname, String title, String album, long albumid, String artist, long duration, String reailTime, String url, long size, String albumart,String year){
         Id = id;
         Title = title;
         Displayname = displayname;
@@ -34,7 +39,9 @@ public class MP3Item implements Serializable,Cloneable {
         Url = url;
         Size = size;
         AlbumArt = albumart;
+        Year = year;
     }
+
     public MP3Item(MP3Item info) {
         this.Id = info.getId();
         this.Title = info.getTitle();
@@ -47,6 +54,7 @@ public class MP3Item implements Serializable,Cloneable {
         this.ReailTime = info.getReailTime();
         this.Url = info.getUrl();
         this.Size = info.getSize();
+        this.Year = info.getYear();
     }
 
     @Override
@@ -60,6 +68,23 @@ public class MP3Item implements Serializable,Cloneable {
         return o;
     }
 
+    @Override
+    public String toString() {
+        return "MP3Item{" +
+                "Id=" + Id +
+                ", Title='" + Title + '\'' +
+                ", Displayname='" + Displayname + '\'' +
+                ", Album='" + Album + '\'' +
+                ", AlbumId=" + AlbumId +
+                ", Artist='" + Artist + '\'' +
+                ", AlbumArt='" + AlbumArt + '\'' +
+                ", Duration=" + Duration +
+                ", ReailTime='" + ReailTime + '\'' +
+                ", Url='" + Url + '\'' +
+                ", Size=" + Size +
+                ", Year=" + Year +
+                '}';
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -67,12 +92,14 @@ public class MP3Item implements Serializable,Cloneable {
         return temp.getId() == this.getId();
     }
 
-    @Override
-    public String toString() {
-        return new String("Id = " + Id + " Name = " + Displayname + " Album = " + Album
-                + " Artist = " + Artist + " Duration = " + Duration + " Realtime = " + ReailTime + " Url = " + Url + " Size = " + Size);
+
+    public void setYear(String year){
+        Year = year;
     }
 
+    public String getYear(){
+        return Year;
+    }
 
     public void setTitle(String title){
         Title = title;

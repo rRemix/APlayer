@@ -2,7 +2,6 @@ package remix.myplayer.application;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Xml;
 
 import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -22,7 +21,7 @@ import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PermissionUtil;
-import remix.myplayer.util.SharedPrefsUtil;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -63,7 +62,7 @@ public class Application extends android.app.Application {
                 //读取sd卡歌曲id
                 Global.mAllSongList = DBUtil.getAllSongsId();
                 //读取正在播放列表
-                boolean isFirst = SharedPrefsUtil.getValue(mContext, "Setting", "First", true);
+                boolean isFirst = SPUtil.getValue(mContext, "Setting", "First", true);
                 if(isFirst){
                     //添加我的收藏列表
                     XmlUtil.addPlaylist("我的收藏");

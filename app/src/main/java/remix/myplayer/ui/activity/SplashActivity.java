@@ -10,7 +10,7 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SplashAdapter;
 import remix.myplayer.fragment.SplashFragment;
-import remix.myplayer.util.SharedPrefsUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by taeja on 16-6-8.
@@ -28,7 +28,7 @@ public class SplashActivity extends BaseAppCompatActivity {
         ButterKnife.bind(this);
 
 
-        boolean isFirst = SharedPrefsUtil.getValue(getApplicationContext(), "setting", "First", true);
+        boolean isFirst = SPUtil.getValue(getApplicationContext(), "setting", "First", true);
         if(!isFirst){
             startActivity(new Intent(this, MainActivity.class));
             finish();

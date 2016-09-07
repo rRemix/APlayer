@@ -257,6 +257,6 @@
 
     <!--侧滑菜单文字-->
     <style name="Drawer_text_style">
-        <item name="android:textSize">@dimen/s16_size</item>
+        <item name="android:textStyle">bold</item>
     </style>
 </resources>

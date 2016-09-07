@@ -1,27 +1,19 @@
 package remix.myplayer.ui.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.umeng.update.UmengUpdateAgent;
@@ -36,7 +28,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.ColorChooseDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.SharedPrefsUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * @ClassName SettingActivity
@@ -151,11 +143,11 @@ public class SettingActivity extends ToolbarActivity {
                     new MaterialDialog.Builder(this)
                             .title("通知栏底色")
                             .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
-                            .itemsCallbackSingleChoice(SharedPrefsUtil.getValue(SettingActivity.this,"setting","IsSystemColor",true) ? 0 : 1,
+                            .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"setting","IsSystemColor",true) ? 0 : 1,
                                     new MaterialDialog.ListCallbackSingleChoice() {
                                 @Override
                                 public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                    SharedPrefsUtil.putValue(SettingActivity.this,"setting","IsSystemColor",which == 0);
+                                    SPUtil.putValue(SettingActivity.this,"setting","IsSystemColor",which == 0);
                                     sendBroadcast(new Intent(Constants.NOTIFY));
                                     return true;
                                 }

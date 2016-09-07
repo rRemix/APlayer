@@ -37,7 +37,7 @@ import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.SharedPrefsUtil;
+import remix.myplayer.util.SPUtil;
 
 
 /**
@@ -203,7 +203,7 @@ public class MusicService extends BaseService {
         };
 
         //播放模式
-        mPlayModel = SharedPrefsUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
+        mPlayModel = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
         init();
 
     }
@@ -307,6 +307,8 @@ public class MusicService extends BaseService {
     private void unInit(){
         if(mMediaPlayer != null)
             mMediaPlayer.release();
+        if(mMediaExtractor != null)
+            mMediaExtractor.release();
         mMediaPlayer = null;
 //        mAudioManager.unregisterMediaButtonEventReceiver(mMediaPendingIntent);
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
@@ -566,7 +568,7 @@ public class MusicService extends BaseService {
             mFirstFlag = false;
             mIsplay = true;
             mIsIniting = false;
-            SharedPrefsUtil.putValue(MainActivity.mInstance,"Setting","LastSongId",(int)mId);
+            SPUtil.putValue(MainActivity.mInstance,"Setting","LastSongId",(int)mId);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -650,7 +652,7 @@ public class MusicService extends BaseService {
     public static void setPlayModel(int playModel) {
         if(playModel <= Constants.PLAY_REPEATONE && playModel >= Constants.PLAY_LOOP){
             mPlayModel = playModel;
-            SharedPrefsUtil.putValue(mContext,"setting", "PlayModel",mPlayModel);
+            SPUtil.putValue(mContext,"setting", "PlayModel",mPlayModel);
         }
     }
 
@@ -690,16 +692,34 @@ public class MusicService extends BaseService {
         }
 
         return mMediaExtractor.getTrackFormat(0);
-
     }
 
     /**
      * 获得歌曲码率信息
-     * @return type 0:码率 1:采样率 2:
+     * @return type 0:码率 1:采样率 2:格式
      */
-    public static int getRateInfo(int type){
+    public static String getRateInfo(int type){
         MediaFormat mf = getMediaFormat();
-        return mf != null ? (type == 0 ? mf.getInteger(MediaFormat.KEY_BIT_RATE) : mf.getInteger(MediaFormat.KEY_SAMPLE_RATE)) : 0;
+        if(mf == null)
+            return "";
+        switch (type){
+            case Constants.BIT_RATE:
+                if(mf.containsKey(MediaFormat.KEY_BIT_RATE)){
+                    return mf.getInteger(MediaFormat.KEY_BIT_RATE) + "";
+                } else {
+                    long durationUs = mf.containsKey(MediaFormat.KEY_DURATION) ? mf.getLong(MediaFormat.KEY_DURATION) : mInfo.getDuration();
+                    return mInfo.getSize() * 8 / (durationUs / 1000) + "";
+                }
+            case Constants.SAMPLE_RATE:
+                return mf.containsKey(MediaFormat.KEY_SAMPLE_RATE) ?
+                        mf.getInteger(MediaFormat.KEY_SAMPLE_RATE) + "":
+                        "";
+            case Constants.MIME:
+                return mf.containsKey(MediaFormat.KEY_MIME) ?
+                        mf.getString(MediaFormat.KEY_MIME) + "":
+                        "";
+            default:return "";
+        }
     }
 
 

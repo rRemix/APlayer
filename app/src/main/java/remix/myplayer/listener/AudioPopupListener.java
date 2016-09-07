@@ -1,61 +1,90 @@
 package remix.myplayer.listener;
 
-import android.content.ContentValues;
+import android.content.ContentUris;
 import android.content.Context;
+import android.media.MediaExtractor;
 import android.media.MediaFormat;
-import android.provider.MediaStore;
+import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputEditText;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import java.io.IOException;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
+import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.ui.activity.AudioHolderActivity;
+import remix.myplayer.util.CommonUtil;
+import remix.myplayer.util.Constants;
+import remix.myplayer.util.DBUtil;
 
 /**
  * @ClassName AudioPopupListener
- * @Description 播放界面窗口
+ * @Description
  * @Author Xiaoborui
  * @Date 2016/8/29 15:33
  */
 public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
     private Context mContext;
     private MP3Item mInfo;
-    View mRootView;
+    private View mEditRootView;
     @BindView(R.id.song_layout)
+    @Nullable
     TextInputLayout mSongLayout;
-    @BindView(R.id.song_edt)
-    TextInputEditText mSongEdt;
     @BindView(R.id.album_layout)
+    @Nullable
     TextInputLayout mAlbumLayout;
-    @BindView(R.id.album_edt)
-    TextInputEditText mAlbumEdt;
     @BindView(R.id.artist_layout)
+    @Nullable
     TextInputLayout mArtistLayout;
-    @BindView(R.id.artist_edt)
-    TextInputEditText mArtistEdt;
     @BindView(R.id.year_layout)
+    @Nullable
     TextInputLayout mYearLayout;
-    @BindView(R.id.year_edt)
-    TextInputEditText mYearEdt;
     @BindView(R.id.genre_layout)
+    @Nullable
     TextInputLayout mGenreLayout;
-    @BindView(R.id.genre_edt)
-    TextInputEditText mGenreEdt;
 
+    private View mDetailRootView;
+    @BindView(R.id.song_detail_path)
+    @Nullable
+    TextView mDetailPath;
+    @BindView(R.id.song_detail_name)
+    @Nullable
+    TextView mDetailName;
+    @BindView(R.id.song_detail_size)
+    @Nullable
+    TextView mDetailSize;
+    @BindView(R.id.song_detail_mime)
+    @Nullable
+    TextView mDetailMime;
+    @BindView(R.id.song_detail_duration)
+    @Nullable
+    TextView mDetailDuration;
+    @BindView(R.id.song_detail_bit_rate)
+    @Nullable
+    TextView mDetailBitRate;
+    @BindView(R.id.song_detail_sample_rate)
+    @Nullable
+    TextView mDetailSampleRate;
+
+    private Genre mGenreInfo;
 
     public AudioPopupListener(Context context,MP3Item info){
         mContext = context;
@@ -66,71 +95,110 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_edit:
-                break;
-            case R.id.menu_detail:
-
-                MediaFormat mf = MusicService.getMediaFormat();
-                int bitRate = mf.getInteger(MediaFormat.KEY_BIT_RATE);
-                int sampleRate = mf.getInteger(MediaFormat.KEY_SAMPLE_RATE);
-                int channelCount = mf.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
-                String mime = mf.getString(MediaFormat.KEY_MIME);
-                MaterialDialog dialog = new MaterialDialog.Builder(mContext)
-                        .title("歌曲详情")
-                        .customView(R.layout.dialog_song_detail,true)
-                        .positiveText("确定")
+                MaterialDialog editDialog = new MaterialDialog.Builder(mContext)
+                        .title("音乐标签编辑")
+                        .customView(R.layout.dialog_song_edit,true)
+                        .negativeText(R.string.cancel)
+                        .negativeColorRes(R.color.black)
+                        .positiveText(R.string.confirm)
                         .positiveColorRes(R.color.black)
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                //歌曲名
-                                ContentValues cv = new ContentValues();
-                                ContentValues genreCv = new ContentValues();
-                                String song = "",artist = "",album = "",genre = "",year = "";
-                                song = mSongLayout.getEditText() != null ? mSongLayout.getEditText().getText().toString() : mInfo.getTitle();
-                                if(TextUtils.isEmpty(song)){
+
+                                String title = "",artist = "",album = "",genre = "",year = "";
+                                title = mSongLayout.getEditText() != null ? mSongLayout.getEditText().getText().toString() : mInfo.getTitle();
+                                if(TextUtils.isEmpty(title)){
                                     Toast.makeText(mContext,"歌曲名不能为空",Toast.LENGTH_SHORT).show();
                                     return;
                                 }
                                 artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString() : "未知歌手";
                                 album = mAlbumLayout.getEditText() != null ? mAlbumLayout.getEditText().getText().toString() : "未知歌曲";
-                                year = mYearLayout.getEditText() != null ? mYearLayout.getEditText().getText().toString() : "";
+                                year = mYearLayout.getEditText() != null ? mYearLayout.getEditText().getText().toString() : " ";
                                 genre = mGenreLayout.getEditText() != null ? mGenreLayout.getEditText().getText().toString() : "";
-                                cv.put(MediaStore.Audio.Media.TITLE,song);
-                                cv.put(MediaStore.Audio.Media.ARTIST,artist);
-                                cv.put(MediaStore.Audio.Media.ALBUM,album);
-                                cv.put(MediaStore.Audio.Media.YEAR,year);
-                                genreCv.put(MediaStore.Audio.Genres.NAME,genre);
-                                int updateRow = -1;
-                                int updateGenre = -1;
-                                try {
-                                    updateRow = mContext.getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,cv,
-                                            MediaStore.Audio.Media._ID + "=" + mInfo.getId(),null);
-                                    updateGenre = mContext.getContentResolver().update(
-                                            MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,
-                                            genreCv,
-                                            MediaStore.Audio.Genres.Members.AUDIO_ID + "=" + mInfo.getAlbumId(),null);
-                                }catch (Exception e){
-                                    e.toString();
-                                }
 
-                                dialog.dismiss();
+                                int updateRow = -1;
+                                int updateGenreRow = -1;
+                                try {
+                                    updateRow = DBUtil.updateMP3Info(mInfo.getId(),title,artist,album,year);
+                                    if(mGenreInfo.GenreID > 0){
+                                        updateGenreRow = DBUtil.updateGenre(mGenreInfo.GenreID,genre);
+                                    }
+                                    else {
+                                        Uri newUri = DBUtil.insertGenre(mInfo.getId(),genre);
+                                        long genreId = ContentUris.parseId(newUri);
+                                        if(genreId > 0){
+                                            updateGenreRow = DBUtil.updateGenre(genreId,genre);
+                                        }
+                                    }
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                } finally {
+                                    if(updateGenreRow > 0 && updateRow > 0){
+                                        Toast.makeText(mContext, "保存成功" ,Toast.LENGTH_SHORT).show();
+                                        mInfo.setAlbum(album);
+                                        mInfo.setArtist(artist);
+                                        mInfo.setTitle(title);
+                                        ((AudioHolderActivity)mContext).UpdateTopStatus(mInfo);
+                                    } else {
+                                        Toast.makeText(mContext, "保存失败" ,Toast.LENGTH_SHORT).show();
+                                    }
+                                }
                             }
                         }).build();
-                dialog.show();
+                editDialog.show();
 
-                mRootView = dialog.getCustomView();
-                ButterKnife.bind(AudioPopupListener.this,mRootView);
-                mSongEdt.addTextChangedListener(new TextInputEditWatcher(mSongLayout,"歌曲名不能为空"));
-                mSongEdt.setText(mInfo.getTitle());
-                mAlbumEdt.setText(mInfo.getAlbum());
-                mArtistEdt.setText(mInfo.getArtist());
-
-//                mAlbumEdt.addTextChangedListener(new TextInputEditWatcher(mAlbumLayout));
-//                mArtistEdt.addTextChangedListener(new TextInputEditWatcher(mArtistLayout));
-//                mYearEdt.addTextChangedListener(new TextInputEditWatcher(mYearLayout));
-//                mGenreEdt.addTextChangedListener(new TextInputEditWatcher(mGenreLayout));
+                mEditRootView = editDialog.getCustomView();
+                if(mEditRootView != null){
+                    ButterKnife.bind(AudioPopupListener.this, mEditRootView);
+                    if(mSongLayout.getEditText() != null){
+                        mSongLayout.getEditText().addTextChangedListener(new TextInputEditWatcher(mSongLayout,"歌曲名不能为空"));
+                        mSongLayout.getEditText().setText(mInfo.getTitle());
+                    }
+                    if(mAlbumLayout.getEditText() != null) {
+                        mAlbumLayout.getEditText().setText(mInfo.getAlbum());
+                    }
+                    if(mArtistLayout.getEditText() != null) {
+                        mArtistLayout.getEditText().setText(mInfo.getArtist());
+                    }
+                    if(mYearLayout.getEditText() != null){
+                        mYearLayout.getEditText().setText(mInfo.getYear() + "");
+                    }
+                    mGenreInfo = DBUtil.getGenre(mInfo.getId());
+                    if(mGenreLayout.getEditText() != null){
+                        mGenreLayout.getEditText().setText(mGenreInfo.GenreName);
+                    }
+                }
                 break;
+            case R.id.menu_detail:
+                MaterialDialog detailDialog = new MaterialDialog.Builder(mContext)
+                        .title("歌曲详情")
+                        .customView(R.layout.dialog_song_detail,true)
+                        .positiveText(R.string.confirm)
+                        .positiveColorRes(R.color.black)
+                        .build();
+                detailDialog.show();
+                mDetailRootView = detailDialog.getCustomView();
+                if(mDetailRootView != null){
+                    ButterKnife.bind(AudioPopupListener.this,mDetailRootView);
 
+                    if(mDetailPath != null)
+                        mDetailPath.setText(mInfo.getUrl());
+                    if(mDetailName != null)
+                        mDetailName.setText(mInfo.getDisplayname());
+                    if(mDetailSize != null)
+                        mDetailSize.setText(mInfo.getSize() / 1024 / 1024 + "MB");
+                    if(mDetailMime != null)
+                        mDetailMime.setText(MusicService.getRateInfo(Constants.MIME));
+                    if(mDetailDuration != null)
+                        mDetailDuration.setText(CommonUtil.getTime(mInfo.getDuration()));
+                    if(mDetailBitRate != null)
+                        mDetailBitRate.setText(MusicService.getRateInfo(Constants.BIT_RATE) + " kb/s");
+                    if(mDetailSampleRate != null)
+                        mDetailSampleRate.setText(MusicService.getRateInfo(Constants.SAMPLE_RATE) + " Hz");
+
+                }
+                break;
         }
         return true;
     }

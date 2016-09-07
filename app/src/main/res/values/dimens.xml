@@ -4,8 +4,11 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
 
+    <dimen name="s20_size">20sp</dimen>
     <dimen name="s18_size">18sp</dimen>
+    <dimen name="s17_size">17sp</dimen>
     <dimen name="s16_size">16sp</dimen>
+    <dimen name="s15_size">15sp</dimen>
     <dimen name="s14_size">14sp</dimen>
     <dimen name="s12_size">12sp</dimen>
 

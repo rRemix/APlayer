@@ -32,7 +32,7 @@ import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.customview.CircleSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.SharedPrefsUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by taeja on 16-1-15.
@@ -144,8 +144,8 @@ public class TimerDialog extends BaseActivity {
 //        Theme.TintDrawable(mSwitch.getTrackDrawable(), ColorUtil.adjustAlpha(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899),0.7f));
 
         //读取保存的配置
-        boolean hasdefault = SharedPrefsUtil.getValue(this, "setting", "TimerDefault", false);
-        final int time = SharedPrefsUtil.getValue(this,"setting","TimerNum",-1);
+        boolean hasdefault = SPUtil.getValue(this, "setting", "TimerDefault", false);
+        final int time = SPUtil.getValue(this,"setting","TimerNum",-1);
 
         //默认选项
         if(hasdefault && time > 0){
@@ -163,16 +163,16 @@ public class TimerDialog extends BaseActivity {
                 if (isChecked) {
                     if (mTime > 0) {
                         Toast.makeText(TimerDialog.this, getString(R.string.set_success), Toast.LENGTH_SHORT).show();
-                        SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerDefault", true);
-                        SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerNum", (int) mTime);
+                        SPUtil.putValue(TimerDialog.this, "setting", "TimerDefault", true);
+                        SPUtil.putValue(TimerDialog.this, "setting", "TimerNum", (int) mTime);
                     } else {
                         Toast.makeText(TimerDialog.this, getString(R.string.plz_set_correct_time), Toast.LENGTH_SHORT).show();
                         mSwitch.setChecked(false);
                     }
                 } else {
                     Toast.makeText(TimerDialog.this, getString(R.string.cancel_success), Toast.LENGTH_SHORT).show();
-                    SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerDefault", false);
-                    SharedPrefsUtil.putValue(TimerDialog.this, "setting", "TimerNum", -1);
+                    SPUtil.putValue(TimerDialog.this, "setting", "TimerDefault", false);
+                    SPUtil.putValue(TimerDialog.this, "setting", "TimerNum", -1);
                 }
             }
         });

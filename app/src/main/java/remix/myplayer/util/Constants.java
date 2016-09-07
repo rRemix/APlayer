@@ -100,4 +100,11 @@ public class Constants {
     public final static int SELECL_ALBUM_IMAGE = 1000;
     //艺术家封面选择
     public final static int SELECT_ARTIST_IMAGE = 1001;
+
+    //码率
+    public final static int BIT_RATE = 0;
+    //采样率
+    public final static int SAMPLE_RATE = 1;
+    //类型
+    public final static int MIME = 2;
 }
