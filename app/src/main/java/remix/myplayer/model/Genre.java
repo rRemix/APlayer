@@ -14,4 +14,12 @@ public class Genre {
         GenreName = name;
     }
     public Genre(){};
+
+    @Override
+    public String toString() {
+        return "Genre{" +
+                "GenreID=" + GenreID +
+                ", GenreName='" + GenreName + '\'' +
+                '}';
+    }
 }

@@ -140,6 +140,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                         mInfo.setArtist(artist);
                                         mInfo.setTitle(title);
                                         ((AudioHolderActivity)mContext).UpdateTopStatus(mInfo);
+                                        ((AudioHolderActivity)mContext).setMP3Item(mInfo);
                                     } else {
                                         Toast.makeText(mContext, "保存失败" ,Toast.LENGTH_SHORT).show();
                                     }

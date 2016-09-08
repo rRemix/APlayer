@@ -189,17 +189,14 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
      * 默认为第一首歌曲
      */
     private void initLastSong() {
-        Log.d("InitLastSong","initLastSongStart");
         //读取上次退出时正在播放的歌曲的id
         int lastId = SPUtil.getValue(this,"Setting","LastSongId",0);
-        Log.d("InitLastSong","lastSongID:" + lastId);
         //上次退出时正在播放的歌曲是否还存在
         boolean isLastSongExist = false;
         //上次退出时正在播放的歌曲的pos
         int pos = 0;
         //查找上次退出时的歌曲是否还存在
 
-        Log.d("InitLastSong","playingListSize:" + Global.mPlayingList.size());
         for(int i = 0 ; i < Global.mPlayingList.size();i++){
             if(lastId == Global.mPlayingList.get(i)){
                 isLastSongExist = true;
@@ -208,15 +205,12 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             }
         }
 
-        Log.d("InitLastSong","lastSongExist:" + isLastSongExist);
-
         boolean isPlay = !mIsFirst && MusicService.getIsplay();
         if(mIsFirst){
             mIsFirst = false;
             MP3Item item = null;
             if(isLastSongExist) {
                 item = DBUtil.getMP3InfoById(lastId);
-                Log.d(TAG,"Mp3Item:" + item.toString());
                 mBottomBar.UpdateBottomStatus(item, isPlay);
                 MusicService.initDataSource(item,pos);
             }else {
@@ -231,7 +225,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         } else {
             mBottomBar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
         }
-        Log.d("InitLastSong","initLastSongEnd");
     }
 
     /**

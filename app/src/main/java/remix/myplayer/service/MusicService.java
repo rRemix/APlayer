@@ -705,10 +705,10 @@ public class MusicService extends BaseService {
         switch (type){
             case Constants.BIT_RATE:
                 if(mf.containsKey(MediaFormat.KEY_BIT_RATE)){
-                    return mf.getInteger(MediaFormat.KEY_BIT_RATE) + "";
+                    return mf.getInteger(MediaFormat.KEY_BIT_RATE) / 1024 + "";
                 } else {
                     long durationUs = mf.containsKey(MediaFormat.KEY_DURATION) ? mf.getLong(MediaFormat.KEY_DURATION) : mInfo.getDuration();
-                    return mInfo.getSize() * 8 / (durationUs / 1000) + "";
+                    return mInfo.getSize() * 8 / (durationUs / 1024) + "";
                 }
             case Constants.SAMPLE_RATE:
                 return mf.containsKey(MediaFormat.KEY_SAMPLE_RATE) ?

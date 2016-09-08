@@ -408,7 +408,18 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         });
     }
 
-    //更新顶部信息
+    /**
+     *
+     */
+    public void setMP3Item(MP3Item mp3Item){
+        if(mp3Item != null)
+            mInfo = mp3Item;
+    }
+
+    /**
+     * 更新顶部歌曲信息
+     * @param mp3Item
+     */
     public void UpdateTopStatus(MP3Item mp3Item) {
         if(mp3Item == null)
             return;
