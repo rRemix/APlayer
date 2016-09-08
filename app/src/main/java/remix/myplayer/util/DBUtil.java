@@ -1,6 +1,7 @@
 package remix.myplayer.util;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -68,11 +69,17 @@ public class DBUtil {
                     null,
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
             if(cursor != null) {
+//                Cursor genreCursor = resolver.query(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,null,null,null,null);
+//                if(genreCursor != null && genreCursor.getCount() > 0){
+//                    while (genreCursor.moveToNext()){
+//                        for(int i = 0 ; i < genreCursor.getColumnCount();i++){
+//                            Log.d(TAG,"volName:" + genreCursor.getColumnName(i) + " Value:" + genreCursor.getString(i));
+//                        }
+//                    }
+//                }
+
                 Global.mFolderMap.clear();
                 while (cursor.moveToNext()) {
-                    String type = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.MIME_TYPE));
-
-                    Log.d(TAG,"type:" + type);
 
                     //计算歌曲添加时间
                     //如果满足条件添加到最近添加
@@ -416,21 +423,35 @@ public class DBUtil {
     }
 
     /**
-     *
+     * 建立genreId与audioId的映射
+     * @param audioid
+     * @param genreId
      */
-    public static Uri insertGenre(long audioId,String genre){
+    public static boolean insearGenreMap(long audioid,int genreId){
         try {
             ContentValues cv = new ContentValues();
-            cv.put(MediaStore.Audio.Genres.NAME,genre);
-            cv.put(MediaStore.Audio.Genres.Members.AUDIO_ID,audioId);
-            int id = (int)audioId;
-            Uri uri = MediaStore.Audio.Genres.getContentUriForAudioId("external",(int)audioId);
+            cv.put(MediaStore.Audio.Genres.Members.AUDIO_ID,audioid);
+            return ContentUris.parseId(mContext.getContentResolver().insert(MediaStore.Audio.Genres.Members.getContentUri("external",genreId),cv)) > 0;
 
-            return  mContext.getContentResolver().insert(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,cv);
         } catch (Exception e){
             e.printStackTrace();
         }
-        return Uri.EMPTY;
+        return false;
+    }
+
+    /**
+     * 插入一条新的流派
+     */
+    public static long insertGenre(long audioId,String genre){
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put(MediaStore.Audio.Genres.NAME,genre);
+//            cv.put(MediaStore.Audio.Genres.Members.AUDIO_ID,audioId);
+            return ContentUris.parseId(mContext.getContentResolver().insert(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,cv));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return -1;
     }
 
     /**

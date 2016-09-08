@@ -1,28 +1,21 @@
 package remix.myplayer.listener;
 
-import android.content.ContentUris;
 import android.content.Context;
-import android.media.MediaExtractor;
-import android.media.MediaFormat;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-
-import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,7 +23,10 @@ import remix.myplayer.R;
 import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.AudioHolderActivity;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -98,6 +94,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 MaterialDialog editDialog = new MaterialDialog.Builder(mContext)
                         .title("音乐标签编辑")
                         .customView(R.layout.dialog_song_edit,true)
+//                        .inputType()
                         .negativeText(R.string.cancel)
                         .negativeColorRes(R.color.black)
                         .positiveText(R.string.confirm)
@@ -120,30 +117,31 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                 int updateRow = -1;
                                 int updateGenreRow = -1;
                                 try {
+                                    //更新歌曲等信息
                                     updateRow = DBUtil.updateMP3Info(mInfo.getId(),title,artist,album,year);
+                                    //更新流派信息
+                                    //先判断是否存在该流派，如果不存在先新建该流派，再建立歌曲与流派的映射
                                     if(mGenreInfo.GenreID > 0){
                                         updateGenreRow = DBUtil.updateGenre(mGenreInfo.GenreID,genre);
                                     }
                                     else {
-                                        Uri newUri = DBUtil.insertGenre(mInfo.getId(),genre);
-                                        long genreId = ContentUris.parseId(newUri);
-                                        if(genreId > 0){
-                                            updateGenreRow = DBUtil.updateGenre(genreId,genre);
+                                        long genreId = DBUtil.insertGenre(mInfo.getId(),genre);
+                                        if(genreId != -1){
+                                            updateGenreRow = DBUtil.insearGenreMap(mInfo.getId(),(int)genreId) ? 1 : -1;
                                         }
                                     }
                                 }catch (Exception e){
                                     e.printStackTrace();
-                                } finally {
-                                    if(updateGenreRow > 0 && updateRow > 0){
-                                        Toast.makeText(mContext, "保存成功" ,Toast.LENGTH_SHORT).show();
-                                        mInfo.setAlbum(album);
-                                        mInfo.setArtist(artist);
-                                        mInfo.setTitle(title);
-                                        ((AudioHolderActivity)mContext).UpdateTopStatus(mInfo);
-                                        ((AudioHolderActivity)mContext).setMP3Item(mInfo);
-                                    } else {
-                                        Toast.makeText(mContext, "保存失败" ,Toast.LENGTH_SHORT).show();
-                                    }
+                                }
+                                if(updateGenreRow > 0 && updateRow > 0){
+                                    Toast.makeText(mContext, "保存成功" ,Toast.LENGTH_SHORT).show();
+                                    mInfo.setAlbum(album);
+                                    mInfo.setArtist(artist);
+                                    mInfo.setTitle(title);
+                                    ((AudioHolderActivity)mContext).UpdateTopStatus(mInfo);
+                                    ((AudioHolderActivity)mContext).setMP3Item(mInfo);
+                                } else {
+                                    Toast.makeText(mContext, "保存失败" ,Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }).build();
@@ -152,25 +150,32 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 mEditRootView = editDialog.getCustomView();
                 if(mEditRootView != null){
                     ButterKnife.bind(AudioPopupListener.this, mEditRootView);
+                    int MdColor = ColorUtil.getColor(ThemeStore.getMaterialPrimaryColor());
                     if(mSongLayout.getEditText() != null){
+                        mSongLayout.setHintTextAppearance(Theme.getTheme(true));
                         mSongLayout.getEditText().addTextChangedListener(new TextInputEditWatcher(mSongLayout,"歌曲名不能为空"));
                         mSongLayout.getEditText().setText(mInfo.getTitle());
                     }
                     if(mAlbumLayout.getEditText() != null) {
+                        mAlbumLayout.setHintTextAppearance(Theme.getTheme(true));
                         mAlbumLayout.getEditText().setText(mInfo.getAlbum());
                     }
                     if(mArtistLayout.getEditText() != null) {
+                        mArtistLayout.setHintTextAppearance(Theme.getTheme(true));
                         mArtistLayout.getEditText().setText(mInfo.getArtist());
                     }
                     if(mYearLayout.getEditText() != null){
+                        mYearLayout.setHintTextAppearance(Theme.getTheme(true));
                         mYearLayout.getEditText().setText(mInfo.getYear() + "");
                     }
                     mGenreInfo = DBUtil.getGenre(mInfo.getId());
                     if(mGenreLayout.getEditText() != null){
+                        mGenreLayout.setHintTextAppearance(Theme.getTheme(true));
                         mGenreLayout.getEditText().setText(mGenreInfo.GenreName);
                     }
                 }
                 break;
+
             case R.id.menu_detail:
                 MaterialDialog detailDialog = new MaterialDialog.Builder(mContext)
                         .title("歌曲详情")

@@ -13,6 +13,7 @@ import android.support.annotation.StyleRes;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -55,10 +56,14 @@ public class Theme {
      * 为drawale着色
      * @param view
      * @param color
-     * @return
      */
-    public static Drawable TintDrawable(View view,@ColorInt int color){
-        return TintDrawable(view.getBackground(),color);
+    public static void TintDrawable(View view,@ColorInt int color){
+        if(view instanceof ImageView){
+            ((ImageView)view).setImageDrawable(TintDrawable(view.getBackground(),color));
+        } else {
+            view.setBackground(TintDrawable(view.getBackground(),color));
+        }
+
     }
 
     /**
@@ -98,14 +103,13 @@ public class Theme {
         return bg;
     }
 
-
-
     /**
-     * 设置主题
+     *
+     * @param ignoreNight
+     * @return
      */
-    @StyleRes
-    public static int getTheme() {
-        if (ThemeStore.THEME_MODE == ThemeStore.NIGHT) {
+    public static int getTheme(boolean ignoreNight){
+        if (!ignoreNight && ThemeStore.THEME_MODE == ThemeStore.NIGHT) {
             return R.style.NightTheme;
         }
         switch (ThemeStore.THEME_COLOR) {
@@ -119,8 +123,17 @@ public class Theme {
                 return R.style.DayTheme_Brown;
             case ThemeStore.THEME_INDIGO:
                 return R.style.DayTheme_Ingido;
+            default:return -1;
         }
-        return -1;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @StyleRes
+    public static int getTheme() {
+       return getTheme(false);
     }
 
     /**

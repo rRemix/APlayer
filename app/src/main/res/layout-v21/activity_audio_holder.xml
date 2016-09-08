@@ -122,7 +122,8 @@
                 android:id="@+id/text_hasplay"
                 android:text="00:00"
                 android:layout_marginLeft="4dp"
-                style="@style/Playtimetext"/>
+                style="@style/PlayTimeTextStyle"
+                android:textColor="@color/day_textcolor_primary"/>
             <SeekBar
                 android:id="@+id/seekbar"
                 android:maxHeight="2dp"
@@ -135,7 +136,8 @@
                 android:id="@+id/text_remain"
                 android:text="00:00"
                 android:layout_marginRight="4dp"
-                style="@style/Playtimetext"/>
+                style="@style/PlayTimeTextStyle"
+                android:textColor="@color/day_textcolor_primary"/>
         </LinearLayout>
 
         <!-- 三个播放控制按钮和两个控制播放模式 -->

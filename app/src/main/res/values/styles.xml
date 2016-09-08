@@ -80,7 +80,7 @@
     </style>
 
     <!-- 播放时间 -->
-    <style name="Playtimetext">
+    <style name="PlayTimeTextStyle">
 
         <item name="android:layout_weight">1</item>
         <item name="android:layout_width">0dp</item>
@@ -144,10 +144,12 @@
     <!--白天主题菜单-->
     <style name="PopupMenuDayStyle" parent="Base.ThemeOverlay.AppCompat.Light">
         <item name="android:disabledAlpha">0.5</item>
+        <item name="android:textColor">@color/day_textcolor_primary</item>
     </style>
     <!--夜间模式菜单-->
     <style name="PopupMenuNightStyle" parent="Base.ThemeOverlay.AppCompat.Dark">
         <item name="android:disabledAlpha">0.5</item>
+        <item name="android:textColor">@color/night_textcolor_primary</item>
     </style>
 
     <!--<style name="PopupMenuDayTextAppearanceSmall" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Small">-->
@@ -201,8 +203,6 @@
         <item name="material_color_primary">@color/night_background_color_3</item>
         <item name="material_color_primary_dark">@color/night_background_color_3</item>
         <item name="material_color_secondry">@color/purple_782899</item>
-        <item name="colorControlActivated">@color/purple_782899</item>
-        <item name="colorAccent">@color/purple_782899</item>
         <item name="background_color_main">@color/night_background_color_main</item>
         <item name="background_color_1">@color/night_background_color_3</item>
         <item name="background_color_2">@color/night_background_color_2</item>
@@ -212,6 +212,9 @@
         <item name="bg_aboutus">@drawable/bg_aboutus_night</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Dark</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
+        <item name="android:textColor">@color/md_brown_primary</item>
+        <item name="colorControlActivated">@color/purple_782899</item>
+        <item name="colorAccent">@color/purple_782899</item>
     </style>
 
     <style name="DayTheme.Purple" parent="@style/DayTheme">
@@ -220,6 +223,7 @@
         <item name="material_color_primary_dark">@color/md_purple_primary_dark</item>
         <item name="colorControlActivated">@color/md_purple_primary</item>
         <item name="colorAccent">@color/md_purple_primary</item>
+        <item name="android:textColor">@color/md_purple_primary</item>
     </style>
 
     <style name="DayTheme.Red" parent="@style/DayTheme">
@@ -228,6 +232,7 @@
         <item name="material_color_primary_dark">@color/md_red_primary_dark</item>
         <item name="colorControlActivated">@color/md_red_primary</item>
         <item name="colorAccent">@color/md_red_primary</item>
+        <item name="android:textColor">@color/md_red_primary</item>
     </style>
 
     <style name="DayTheme.Pink" parent="@style/DayTheme">
@@ -236,6 +241,7 @@
         <item name="material_color_primary_dark">@color/md_pink_primary_dark</item>
         <item name="colorControlActivated">@color/md_pink_primary</item>
         <item name="colorAccent">@color/md_pink_primary</item>
+        <item name="android:textColor">@color/md_pink_primary</item>
     </style>
 
     <style name="DayTheme.Brown" parent="@style/DayTheme">
@@ -244,6 +250,7 @@
         <item name="material_color_primary_dark">@color/md_brown_primary_dark</item>
         <item name="colorControlActivated">@color/md_brown_primary</item>
         <item name="colorAccent">@color/md_brown_primary</item>
+        <item name="android:textColor">@color/md_brown_primary</item>
     </style>
 
     <style name="DayTheme.Ingido" parent="@style/DayTheme">
@@ -252,6 +259,7 @@
         <item name="material_color_primary_dark">@color/md_indigo_primary_dark</item>
         <item name="colorControlActivated">@color/md_indigo_primary</item>
         <item name="colorAccent">@color/md_indigo_primary</item>
+        <item name="android:textColor">@color/md_indigo_primary</item>
     </style>
 
 

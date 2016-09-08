@@ -199,6 +199,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
 
     @Override
     protected void setUpTheme() {
+        super.setUpTheme();
     }
 
     @Override

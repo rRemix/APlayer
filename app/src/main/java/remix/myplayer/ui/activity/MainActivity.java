@@ -83,12 +83,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE};
 
-    private int mAlpha = ThemeStore.STATUS_BAR_ALPHA / 2;
     private final int RECREATE = 0;//重建activity
     private final int UPDATECOVER = 1;//刷新adpater
-    private final int SHOW = 2;//显示进度框
-    private final int SUCCESS = 3;//缓存成功
-    private final int ERROR = 4;//缓存失败
     private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
