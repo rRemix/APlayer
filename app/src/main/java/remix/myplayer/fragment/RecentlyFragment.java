@@ -73,7 +73,7 @@ public class RecentlyFragment extends BaseFragment {
         return rootView;
     }
 
-    public RecentlyAdapter getAdapter(){
-        return mAdapter;
-    }
+//    public RecentlyAdapter getAdapter(){
+//        return mAdapter;
+//    }
 }

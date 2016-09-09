@@ -103,5 +103,8 @@ public class FolderFragment extends BaseFragment {
         mIsRunning = false;
     }
 
-
+    @Override
+    public RecyclerView.Adapter getAdapter() {
+        return mAdapter;
+    }
 }

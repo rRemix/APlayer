@@ -155,6 +155,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
             mAdapter.setCursor(null);
     }
 
+    @Override
     public SongAdapter getAdapter(){
         return mAdapter;
     }

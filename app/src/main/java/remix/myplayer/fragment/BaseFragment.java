@@ -1,6 +1,7 @@
 package remix.myplayer.fragment;
 
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 
 import butterknife.BindView;
 import butterknife.Unbinder;
@@ -18,6 +19,10 @@ public class BaseFragment extends Fragment {
         super.onDestroyView();
         if(mUnBinder != null)
             mUnBinder.unbind();
+    }
+
+    public RecyclerView.Adapter getAdapter(){
+        return null;
     }
 
 }
