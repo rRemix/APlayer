@@ -94,18 +94,21 @@ public class SettingActivity extends ToolbarActivity {
             @Override
             public void apply(@NonNull ImageView view, int index) {
                 Drawable imgDrawable = view.getBackground();
-                Theme.TintDrawable(imgDrawable,color);
-                view.setImageDrawable(imgDrawable);
+                Theme.TintDrawable(view,imgDrawable,color);
             }
         });
 
     }
 
+    /**
+     * 设置夜间模式
+     * @param isNight
+     */
     private void setNightMode(boolean isNight){
         ThemeStore.THEME_MODE = isNight ? ThemeStore.NIGHT : ThemeStore.DAY;
         ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
-        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor();
-        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor();
+        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
+        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
         ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);
         mNeedRefresh = true;
         mRecreateHandler.sendEmptyMessage(RECREATE);
@@ -123,6 +126,7 @@ public class SettingActivity extends ToolbarActivity {
     protected void onClickNavigation() {
         onBackPressed();
     }
+
 
     @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_container,
                 R.id.setting_mode_container,R.id.setting_feedback_container,R.id.setting_about_container,

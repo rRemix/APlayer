@@ -17,7 +17,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +26,6 @@ import remix.myplayer.R;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.customview.CircleSeekBar;
 import remix.myplayer.util.ColorUtil;
@@ -41,7 +39,7 @@ import remix.myplayer.util.SPUtil;
 /**
  * 定时关闭界面
  */
-public class TimerDialog extends BaseActivity {
+public class TimerDialog extends BaseDialogActivity {
 
     //剩余时间
     @BindView(R.id.close_time)
@@ -117,7 +115,7 @@ public class TimerDialog extends BaseActivity {
         //初始化开始计时按钮
         int[] state_prs = new int[]{android.R.attr.state_pressed};
         int[] state_non_focus = new int[]{-android.R.attr.state_focused};
-        int color = ColorUtil.getColor(ThemeStore.isDay()? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899);
+        int color = ThemeStore.getStressColor();
         StateListDrawable bg = new StateListDrawable();
         bg.addState(state_prs,Theme.getBgCorner(1.0f,4,0,color));
         bg.addState(state_non_focus,Theme.getBgCorner(0.01f,4,1,color));
@@ -128,7 +126,7 @@ public class TimerDialog extends BaseActivity {
 
         //初始化switch
         ContextThemeWrapper ctw = new ContextThemeWrapper(this, Theme.getTheme());
-        mSwitch = new SwitchCompat(ctw);
+        mSwitch = findView(R.id.popup_timer_switch);
 //        int[] states_check = new int[]{android.R.attr.state_checked};
 //        int[] states_default = new int[]{};
 //        StateListDrawable trackDrawable = new StateListDrawable();
@@ -138,10 +136,10 @@ public class TimerDialog extends BaseActivity {
 //        trackDrawable.addState(states_default,getResources().getDrawable(R.drawable.md_track));
 //        mSwitch.setTrackDrawable(trackDrawable);
 
-        ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
+//        ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
 
-//        Theme.TintDrawable(mSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899));
-//        Theme.TintDrawable(mSwitch.getTrackDrawable(), ColorUtil.adjustAlpha(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899),0.7f));
+//        Theme.TintDrawable(mSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
+//        Theme.TintDrawable(mSwitch.getTrackDrawable(), ColorUtil.adjustAlpha(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899),0.7f));
 
         //读取保存的配置
         boolean hasdefault = SPUtil.getValue(this, "setting", "TimerDefault", false);

@@ -193,8 +193,8 @@ public class EQActivity extends ToolbarActivity {
         mToolBar.addView(mSwitch);
 
         mSwitch.setChecked(mEnable);
-//        Theme.TintDrawable(mSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899));
-//        Theme.TintDrawable(mSwitch.getTrackDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899));
+//        Theme.TintDrawable(mSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
+//        Theme.TintDrawable(mSwitch.getTrackDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -214,7 +214,7 @@ public class EQActivity extends ToolbarActivity {
         });
 
         //初始化重置按钮背景
-        mReset.setBackground(Theme.getBgCorner(1.0f,5,0,ColorUtil.getColor(ThemeStore.isDay()? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899)));
+        mReset.setBackground(Theme.getBgCorner(1.0f,5,0,ThemeStore.getStressColor()));
 
         addEQSeekBar();
 

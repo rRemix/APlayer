@@ -65,7 +65,7 @@ public class Application extends android.app.Application {
                 boolean isFirst = SPUtil.getValue(mContext, "Setting", "First", true);
                 if(isFirst){
                     //添加我的收藏列表
-                    XmlUtil.addPlaylist("我的收藏");
+                    XmlUtil.addPlaylist(mContext,"我的收藏");
                     Global.setPlayingList(Global.mAllSongList);
                 } else {
                     Global.mPlayingList = XmlUtil.getPlayingList();

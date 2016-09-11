@@ -91,9 +91,8 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
             }
             //popupmenu
             if(holder.mButton != null) {
-                Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more);
                 int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
-                holder.mButton.setImageDrawable(Theme.TintDrawable(drawable, tintColor));
+                Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

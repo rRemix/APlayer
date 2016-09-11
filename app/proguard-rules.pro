@@ -30,73 +30,48 @@
 -verbose
 #混淆时所采用的算法
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+#保持哪些类不被混淆
 #保护注解
 -keepattributes *Annotation*
-#保持哪些类不被混淆
 -keepattributes Signature
--keepattributes *Annotation*
-# 保留support下的所有类及其内部类
--keep class android.support.** {*;}
-# 保留四大组件
--keep public class * extends android.support.v4.**
--keep public class * extends android.support.v7.**
--keep public class * extends android.support.annotation.**
--keep public class * extends android.app.Activity
--keep public class * extends android.app.Application
--keep public class * extends android.app.Service
--keep public class * extends android.content.BroadcastReceiver
--keep public class * extends android.content.ContentProvider
--keep public class * extends android.app.backup.BackupAgentHelper
--keep public class * extends android.preference.Preference
--keep public class com.android.vending.licensing.ILicensingService
--keep public class javax.**
--keep class * extends java.lang.annotation.Annotation
+
+# 友盟
+-keep class com.umeng.update.protobuffer.** {
+        public <fields>;
+        public <methods>;
+}
+-keep class com.umeng.update.UmengUpdateAgent {
+        public <methods>;
+}
+-keep public class com.umeng.example.R$*{
+    public static final int *;
+}
 -keepclassmembers class * {
     public <init> (org.json.JSONObject);
 }
--keep public class [remix.myplayer].R$*{
-    public static final int *;
-}
--keepclasseswithmembernames class * {
-    native <methods>;
-}
--keepclasseswithmembers class * {
-    public <init>(android.content.Context, android.util.AttributeSet);
-}
--keepclasseswithmembers class * {
-    public <init>(android.content.Context, android.util.AttributeSet, int);
-}
--keepclassmembers class * extends android.app.Activity {
-    public void *(android.view.View);
-}
-# 保留枚举类不被混淆
--keepclassmembers enum * {
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
-# 保留Parcelable序列化类不被混淆
--keep class * implements android.os.Parcelable {
-    public static final android.os.Parcelable$Creator *;
-}
-# 保留Serializable序列化的类不被混淆
--keepclassmembers class * implements java.io.Serializable {
-    static final long serialVersionUID;
-    private static final java.io.ObjectStreamField[] serialPersistentFields;
-    !static !transient <fields>;
-    !private <fields>;
-    !private <methods>;
-    private void writeObject(java.io.ObjectOutputStream);
-    private void readObject(java.io.ObjectInputStream);
-    java.lang.Object writeReplace();
-    java.lang.Object readResolve();
-}
-# 保留本地native方法不被混淆
--keepclasseswithmembernames class * {
-    native <methods>;
-}
-# 对于带有回调函数的onXXEvent、**On*Listener的，不能被混淆
+# fresco
+-keep class android.support.v4.** { *; }
+-keep interface android.support.v4.app.** { *; }
+-dontwarn okio.**
+-dontwarn com.squareup.wire.**
+-dontwarn com.umeng.update.**
+-dontwarn android.support.v4.**
+-keep class okio.** {*;}
+-keep class com.squareup.wire.** {*;}
+-dontwarn com.squareup.okhttp.**
+-dontwarn okhttp3.**
+-dontwarn javax.annotation.**
+-dontwarn com.android.volley.toolbox.**
+-keep,allowobfuscation @interface com.facebook.common.internal.DoNotStrip
+-keep @com.facebook.common.internal.DoNotStrip class *
 -keepclassmembers class * {
-    void *(**On*Event); void *(**On*Listener);
+    @com.facebook.common.internal.DoNotStrip *;
+}
+-keepclassmembers class * {
+    native <methods>;
+}
+-keep class com.facebook.imagepipeline.animated.factory.AnimatedFactoryImpl {
+    public AnimatedFactoryImpl(com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory,com.facebook.imagepipeline.core.ExecutorSupplier);
 }
 # 腾讯
 -keep class com.tencent.open.TDialog$*
@@ -108,20 +83,30 @@
 -keep class com.tencent.mm.sdk.** {
     *;
 }
-# ButterKnife
--keep class butterknife.** { *; }
--dontwarn butterknife.internal.**
--keep class **$$ViewBinder { *; }
--keepclasseswithmembernames class * {
-    @butterknife.* <fields>;
+# 新浪微博
+
+-keep class com.sina.weibo.sdk.** {*;}
+-dontwarn com.weibo.sdk.android.WeiboDialog
+-dontwarn android.net.http.SslError
+-dontwarn android.webkit.WebViewClient
+-keep public class android.net.http.SslError{
+     *;
 }
--keepclasseswithmembernames class * {
-    @butterknife.* <methods>;
+-keep public class android.webkit.WebViewClient{
+    *;
 }
-# Fresco
--keep class com.facebook.fresco.** {*;}
--keep interface com.facebook.fresco.** {*;}
--keep enum com.facebook.fresco.** {*;}
-# 友盟
--keep public class * extends com.umeng.**
--keep class com.umeng.** { *; }
+-keep public class android.webkit.WebChromeClient{
+    *;
+}
+-keep public interface android.webkit.WebChromeClient$CustomViewCallback {
+    *;
+}
+-keep public interface android.webkit.ValueCallback {
+    *;
+}
+-keep class * implements android.webkit.WebChromeClient {
+    *;
+}
+
+
+

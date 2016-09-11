@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ChildHolderAdapter;
 import remix.myplayer.fragment.BottomActionBarFragment;
@@ -38,7 +39,6 @@ import remix.myplayer.util.Global;
 public class ChildHolderActivity extends ToolbarActivity implements MusicService.Callback{
     private final static String TAG = "ChildHolderActivity";
     private static boolean mIsRunning = false;
-    private ImageView mBack;
     //获得歌曲信息列表的参数
     private int mId;
     private int mType;
@@ -48,10 +48,8 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
     //歌曲数目与标题
     @BindView(R.id.album_holder_item_num)
     TextView mNum;
-
     @BindView(R.id.child_holder_recyclerView)
     RecyclerView mRecyclerView;
-
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
@@ -230,13 +228,8 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         return mInfoList;
     }
 
-    //退出按钮
-    public void onBack(View v){
-        finish();
-    }
-
-    //随机播放按钮
-    public void onPlayShuffle(View v){
+    @OnClick(R.id.shuffle_container)
+    public void onClick(View v){
         MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control", Constants.NEXT);
@@ -248,10 +241,6 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         sendBroadcast(intent);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 
     //更新界面
     @Override
@@ -268,9 +257,6 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         return Constants.CHILDHOLDERACTIVITY;
     }
 
-    public static void setFresh(boolean needfresh){
-        mNeedRefresh = needfresh;
-    }
 
     @Override
     protected void onResume() {

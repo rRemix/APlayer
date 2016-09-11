@@ -244,7 +244,7 @@ public class EQSeekBar extends View {
         mEnableTrackColor = typedArray.getColor(R.styleable.EQSeekBar_eqenabletrackcolor,
                 ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_enable_track_color : R.color.night_enable_track_color));
         mEnableProgressColor = typedArray.getColor(R.styleable.EQSeekBar_eqenableprogresscolor,
-                ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.night_nonenable_progress_color));
+                ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.night_nonenable_progress_color));
         mEnableTextColor = typedArray.getColor(R.styleable.EQSeekBar_eqtextcolor,
                 ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_enable_text_color : R.color.night_enable_text_color));
 

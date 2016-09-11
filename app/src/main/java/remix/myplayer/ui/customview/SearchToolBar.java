@@ -130,8 +130,8 @@ public class SearchToolBar extends Toolbar {
         mSearchListener = listener;
     }
     public interface SearchListener{
-        public void onSearch(String key,boolean isclick);
-        public void onClear();
-        public void onBack();
+        void onSearch(String key, boolean isclick);
+        void onClear();
+        void onBack();
     }
 }

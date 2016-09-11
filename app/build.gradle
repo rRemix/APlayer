@@ -13,6 +13,13 @@ android {
         versionName "1.1.2"
     }
     buildTypes {
+        debug {
+            minifyEnabled false
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+            zipAlignEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             //混淆代码
             minifyEnabled true
@@ -30,8 +37,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile files('libs/weiboSDKCore_3.1.2.jar')
-    compile files('libs/libammsdk.jar')
     testCompile 'junit:junit:4.12'
     compile project(':StackBlur')
     compile 'com.android.support:appcompat-v7:23.3.0'

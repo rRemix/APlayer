@@ -15,7 +15,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayingListAdapter;
-import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.util.Constants;
 
 /**
@@ -25,7 +24,7 @@ import remix.myplayer.util.Constants;
 /**
  * 正在播放列表Dialog
  */
-public class PlayingListDialog extends BaseActivity {
+public class PlayingListDialog extends BaseDialogActivity {
     @BindView(R.id.bottom_actionbar_play_list)
     ListView mListView;
     private PlayingListAdapter mAdapter;
@@ -51,7 +50,7 @@ public class PlayingListDialog extends BaseActivity {
         display.getMetrics(metrics);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
         lp.height = (int) (metrics.heightPixels * 0.55);
-        lp.width = (int) (metrics.widthPixels);
+        lp.width = metrics.widthPixels;
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
     }
@@ -78,9 +77,6 @@ public class PlayingListDialog extends BaseActivity {
         }
     }
 
-    public static void setFresh(boolean needfresh){
-        mNeedRefresh = true;
-    }
 
     @Override
     protected void onStart() {

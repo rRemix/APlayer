@@ -43,15 +43,15 @@ public class ThemeActivity extends BaseAppCompatActivity implements View.OnClick
             case R.id.day:
                 ThemeStore.THEME_MODE = ThemeStore.DAY;
                 ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
-                ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor();
-                ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor();
+                ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
+                ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
                 ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);
                 break;
             case R.id.night:
                 ThemeStore.THEME_MODE = ThemeStore.NIGHT;
                 ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
-                ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor();
-                ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor();
+                ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
+                ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
                 ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);
                 break;
             case R.id.change:
@@ -61,8 +61,8 @@ public class ThemeActivity extends BaseAppCompatActivity implements View.OnClick
                 if(++ThemeStore.THEME_COLOR > ThemeStore.THEME_INDIGO)
                     ThemeStore.THEME_COLOR = ThemeStore.THEME_PURPLE;
 
-                ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor();
-                ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor();
+                ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
+                ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
 
                 ThemeStore.saveThemeColor(ThemeStore.THEME_COLOR);
                 ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);

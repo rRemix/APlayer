@@ -7,11 +7,11 @@
     <include layout="@layout/toolbar"/>
 
     <RelativeLayout
+        android:id="@+id/shuffle_container"
         android:layout_width="match_parent"
         android:layout_height="38dp"
         android:background="@color/night_interval_color"
-        android:orientation="horizontal"
-        android:onClick="onPlayShuffle">
+        android:orientation="horizontal">
         <ImageButton
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"

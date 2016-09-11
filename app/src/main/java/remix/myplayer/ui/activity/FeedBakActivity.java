@@ -1,19 +1,19 @@
 package remix.myplayer.ui.activity;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.RippleDrawable;
-import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -41,43 +41,22 @@ public class FeedBakActivity extends ToolbarActivity {
         ButterKnife.bind(this);
         initToolbar(mToolBar,getString(R.string.back));
 
-        mSubmit.setBackground(Theme.getBgCorner(1.0f,5,0,ColorUtil.getColor(ThemeStore.isDay()? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899)));
+        mSubmit.setBackground(Theme.getBgCorner(1.0f,5,0,ThemeStore.getStressColor()));
     }
 
-
-    public void onSubmit(View v){
+    @OnClick(R.id.feedback_submit)
+    public void onClick(View v){
         Intent data = new Intent(Intent.ACTION_SENDTO);
         data.setData(Uri.parse("mailto:568920427@qq.com"));
         data.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback));
         data.putExtra(Intent.EXTRA_TEXT, mEditText.getText().toString());
-        startActivity(data);
+        startActivityForResult(data,0);
     }
 
-//    private void initToolbar() {
-//        mToolBar = (Toolbar) findViewById(R.id.toolbar);
-//        mToolBar.setTitle("返回");
-//        mToolBar.setTitleTextColor(Color.parseColor("#ffffffff"));
-//        setSupportActionBar(mToolBar);
-//        mToolBar.setNavigationIcon(R.drawable.common_btn_back);
-//        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                finish();
-//            }
-//        });
-//        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                switch (item.getItemId()) {
-//                    case R.id.toolbar_search:
-//                        startActivity(new Intent(FeedBakActivity.this, SearchActivity.class));
-//                        break;
-//                    case R.id.toolbar_timer:
-//                        startActivity(new Intent(FeedBakActivity.this, TimerDialog.class));
-//                        break;
-//                }
-//                return true;
-//            }
-//        });
-//    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Toast.makeText(this,resultCode == Activity.RESULT_OK ? "发送成功 感谢您的反馈!" : "发送失败 请重试!",Toast.LENGTH_SHORT).show();
+        finish();
+    }
 }

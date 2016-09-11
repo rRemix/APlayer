@@ -3,18 +3,19 @@ package remix.myplayer.ui.dialog;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.BaseActivity;
-import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.XmlUtil;
@@ -27,7 +28,7 @@ import remix.myplayer.util.XmlUtil;
  * 添加播放列表的对话框
  */
 
-public class AddPlayListDialog extends BaseActivity {
+public class AddPlayListDialog extends BaseDialogActivity {
     @BindView(R.id.playlist_add_edit)
     EditText mEdit;
 
@@ -46,36 +47,34 @@ public class AddPlayListDialog extends BaseActivity {
         //修改光标颜色
         Theme.setTinit(mEdit,ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY),true);
         mEdit.setText("本地歌单" + Global.mPlaylist.size());
+
     }
 
-    public void onCancel(View v){
-        finish();
-    }
-
-    public void onAdd(View v){
-        String name = ((EditText)findViewById(R.id.playlist_add_edit)).getText().toString();
-        if (name != null && !name.equals("")) {
-            XmlUtil.addPlaylist(name);
-            if(getIntent().getBooleanExtra("FromPlayListActivity",false)){
-                setResult(Activity.RESULT_OK);
-            } else {
-                Intent intent = new Intent();
-                intent.putExtra("PlayListName",name);
-                setResult(Activity.RESULT_OK,intent);
-            }
+    @OnClick({R.id.playlist_continue,R.id.playlist_cancel})
+    public void onClikc(View v){
+        switch (v.getId()){
+            case R.id.playlist_continue:
+                String name = ((EditText)findViewById(R.id.playlist_add_edit)).getText().toString();
+                if (!TextUtils.isEmpty(name)) {
+                    XmlUtil.addPlaylist(AddPlayListDialog.this,name);
+                    if(getIntent().getBooleanExtra("FromPlayListActivity",false)){
+                        setResult(Activity.RESULT_OK);
+                    } else {
+                        Intent intent = new Intent();
+                        intent.putExtra("PlayListName",name);
+                        setResult(Activity.RESULT_OK,intent);
+                    }
+                } else {
+                    Toast.makeText(AddPlayListDialog.this,R.string.add_playlist_error,Toast.LENGTH_SHORT).show();
+                }
+                finish();
+                break;
+            case R.id.playlist_cancel:
+                finish();
+                break;
         }
-        finish();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 
     @Override
     protected void onStart() {

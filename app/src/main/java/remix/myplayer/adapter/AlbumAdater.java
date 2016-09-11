@@ -1,6 +1,5 @@
 package remix.myplayer.adapter;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -47,6 +46,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
     public AlbumAdater(Cursor cursor, Context context) {
         this.mCursor = cursor;
         this.mContext = context;
+
     }
     public void setOnItemClickLitener(OnItemClickListener l)
     {
@@ -94,9 +94,8 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
             }
             //popupmenu
             if(holder.mButton != null) {
-                Drawable drawable = mContext.getResources().getDrawable(R.drawable.list_icn_more);
                 int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
-                holder.mButton.setImageDrawable(Theme.TintDrawable(drawable, tintColor));
+                Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

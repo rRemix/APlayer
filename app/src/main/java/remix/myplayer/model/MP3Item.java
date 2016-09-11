@@ -22,7 +22,8 @@ public class MP3Item implements Serializable,Cloneable {
     private String Url;
     private long Size;
     private String Year;
-    public MP3Item(){};
+    public MP3Item(){}
+
     public MP3Item(long id, String displayname, String title, String album, long albumid, String artist, long duration, String reailTime, String url, long size, String albumart) {
         this(id,displayname,title,album,albumid,artist,duration,reailTime,url,size,albumart,null);
     }
@@ -61,7 +62,7 @@ public class MP3Item implements Serializable,Cloneable {
     public Object clone() {
         Object o=null;
         try {
-            o = (MP3Item)super.clone();//Object 中的clone()识别出你要复制的是哪一个对象。
+            o = super.clone();//Object 中的clone()识别出你要复制的是哪一个对象。
         } catch(CloneNotSupportedException e) {
             System.out.println(e.toString());
         }

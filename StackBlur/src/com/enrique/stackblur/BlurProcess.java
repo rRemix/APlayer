@@ -10,5 +10,5 @@ interface BlurProcess {
 	 * @param radius the radius in pixels to blur the image
 	 * @return the blurred version of the image.
 	 */
-    public Bitmap blur(Bitmap original, float radius);
+	Bitmap blur(Bitmap original, float radius);
 }

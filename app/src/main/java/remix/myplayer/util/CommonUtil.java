@@ -413,7 +413,7 @@ public class CommonUtil {
         try {
             URL albumUrl = new URL("http://geci.me/api/cover/"  + albumId);
             HttpURLConnection httpURLConnection = (HttpURLConnection)albumUrl.openConnection();
-            httpURLConnection.connect();;
+            httpURLConnection.connect();
             InputStreamReader inReader = new InputStreamReader(httpURLConnection.getInputStream());
             br = new BufferedReader(inReader);
             if(br == null)

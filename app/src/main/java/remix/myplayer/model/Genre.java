@@ -13,7 +13,7 @@ public class Genre {
         GenreID = id;
         GenreName = name;
     }
-    public Genre(){};
+    public Genre(){}
 
     @Override
     public String toString() {

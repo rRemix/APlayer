@@ -41,10 +41,15 @@
     <string name="confirm">确认</string>
     <string name="cancel">取消</string>
     <string name="exit">退出</string>
+    <string name="new_playlist">新建播放列表</string>
+    <string name="create">创建</string>
+    <string name="input_playlist_name">请输入播放列表名字</string>
     <string name="song_lose_effect">该歌曲已经失效</string>
     <string name="song_already_exist">该歌曲已经存在</string>
-    <string name="add_success">添加成功</string>
-    <string name="add_error">添加失败</string>
+    <string name="add_playlist_success">新建播放列表成功</string>
+    <string name="add_playlist_error">新建播放列表失败</string>
+    <string name="add_song_playlist_success">该歌曲已经添加到播放列表</string>
+    <string name="add_song_playlist_error">添加歌曲到播放列表失败</string>
     <string name="confirm_delete_playlist">确认从该播放列表移除?</string>
     <string name="confirm_delete_song">确认从曲库删除?</string>
     <string name="confirm_delelte">确认删除</string>

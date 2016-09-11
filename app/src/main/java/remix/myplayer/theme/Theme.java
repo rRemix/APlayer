@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.StyleRes;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import java.lang.reflect.Field;
 
 import remix.myplayer.R;
+import remix.myplayer.application.Application;
 import remix.myplayer.util.ColorUtil;
 
 
@@ -57,13 +59,26 @@ public class Theme {
      * @param view
      * @param color
      */
-    public static void TintDrawable(View view,@ColorInt int color){
+    public static void TintDrawable(View view,Drawable drawable,@ColorInt int color){
         if(view instanceof ImageView){
-            ((ImageView)view).setImageDrawable(TintDrawable(view.getBackground(),color));
+            ((ImageView)view).setImageDrawable(TintDrawable(drawable,color));
         } else {
-            view.setBackground(TintDrawable(view.getBackground(),color));
+            view.setBackground(TintDrawable(drawable,color));
         }
+    }
 
+    /**
+     * 着色v背景
+     * @param view
+     * @param res
+     * @param color
+     */
+    public static void TintDrawable(View view, @DrawableRes int res,@ColorInt int color){
+        if(view instanceof ImageView){
+            ((ImageView)view).setImageDrawable(TintDrawable(Application.getContext().getResources().getDrawable(res),color));
+        } else {
+            view.setBackground(TintDrawable(Application.getContext().getResources().getDrawable(res),color));
+        }
     }
 
     /**
@@ -74,7 +89,7 @@ public class Theme {
      * @return
      */
     public static GradientDrawable getMaterialBgCorner(@FloatRange(from=0.0D, to=1.0D) float alpah, float corner, int stroke){
-        return getBgCorner(alpah,corner,stroke,ColorUtil.getColor(ThemeStore.getMaterialPrimaryColor()));
+        return getBgCorner(alpah,corner,stroke,ThemeStore.getMaterialColorPrimaryColor());
     }
 
     /**

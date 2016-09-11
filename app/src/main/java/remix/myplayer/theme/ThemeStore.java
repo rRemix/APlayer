@@ -48,7 +48,7 @@ public class ThemeStore {
      * @return
      */
     @ColorRes
-    public static int getMaterialPrimaryColor(){
+    public static int getMaterialPrimaryColorRes(){
         if(THEME_MODE == NIGHT){
             return R.color.md_night_primary;
         }
@@ -78,7 +78,7 @@ public class ThemeStore {
      * @return
      */
     @ColorRes
-    public static int getMaterialPrimaryDarkColor(){
+    public static int getMaterialPrimaryDarkColorRes(){
         if(THEME_MODE == NIGHT){
             return R.color.md_night_primary_dark;
         }
@@ -135,14 +135,21 @@ public class ThemeStore {
         return SPUtil.getValue(Application.getContext(),"Theme","ThemeMode",DAY);
     }
 
-    /**
-     * 获得强调色
-     * @return
-     */
     @ColorInt
     public static int getStressColor(){
-        return ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : R.color.purple_782899);
+        return ColorUtil.getColor(isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899);
     }
+
+    @ColorInt
+    public static int getMaterialColorPrimaryColor(){
+        return ColorUtil.getColor(ThemeStore.getMaterialPrimaryColorRes());
+    }
+
+    @ColorInt
+    public static int getMaterialColorPrimaryDarkColor(){
+        return ColorUtil.getColor(ThemeStore.getMaterialPrimaryDarkColorRes());
+    }
+
 
     @ColorInt
     public static int getTextColorPrimary(){

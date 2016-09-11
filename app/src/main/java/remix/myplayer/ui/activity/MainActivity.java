@@ -230,11 +230,11 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         ThemeStore.THEME_MODE = ThemeStore.loadThemeMode();
         ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
 
-        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor();
-        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor();
+        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
+        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
         Log.d(TAG,"primary:" + ThemeStore.MATERIAL_COLOR_PRIMARY + "\r\nprimary dark:" + ThemeStore.MATERIAL_COLOR_PRIMARY_DARK);
-//        int color = ThemeStore.getMaterialPrimaryColor(this);
-//        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryColor(ThemeStore.THEME_COLOR);
+//        int color = ThemeStore.getMaterialPrimaryColorRes(this);
+//        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryColorRes(ThemeStore.THEME_COLOR);
     }
 
     private void initColor() {
@@ -419,7 +419,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         if (mDrawerLayout.isDrawerOpen(mNavigationView))
             mDrawerLayout.closeDrawer(mNavigationView);
     }
-
 
 
     @Override

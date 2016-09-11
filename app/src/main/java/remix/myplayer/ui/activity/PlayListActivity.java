@@ -1,29 +1,30 @@
 package remix.myplayer.ui.activity;
 
-import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.util.Iterator;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.model.PlayListItem;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.dialog.AddPlayListDialog;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.XmlUtil;
@@ -38,11 +39,9 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     Toolbar mToolBar;
     @BindView(R.id.playlist_recycleview)
     RecyclerView mRecycleView;
-    @BindView(R.id.floatbutton)
-    FloatingActionButton mFloatButton;
 
-    private final int ADDPLAYLIST = 0;
     private PlayListAdapter mAdapter;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,21 +86,37 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 
 
     //打开添加播放列表的Dialog
-    public void onAdd(View v) {
-        Intent intent = new Intent(this,AddPlayListDialog.class);
-        intent.putExtra("FromPlayListActivity",true);
-        startActivityForResult(intent,ADDPLAYLIST);
+    @OnClick(R.id.floatbutton)
+    public void onAdd(View v){
+        new MaterialDialog.Builder(this)
+                .title("新建播放列表")
+                .titleColor(ThemeStore.getTextColorPrimary())
+                .positiveText("创建")
+                .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
+                .negativeText("取消")
+                .negativeColor(ThemeStore.getMaterialColorPrimaryColor())
+                .backgroundColor(ThemeStore.getBackgroundColor3())
+                .content(R.string.input_playlist_name)
+                .contentColor(ThemeStore.getTextColorPrimary())
+                .inputRange(1,15)
+                .input("", "本地歌单" + Global.mPlaylist.size(), new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        if(!TextUtils.isEmpty(input)){
+                            XmlUtil.addPlaylist(PlayListActivity.this,input.toString());
+                        }
+                    }
+                })
+                .dismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        if(mAdapter != null)
+                            mAdapter.notifyDataSetChanged();
+                    }
+                })
+                .show();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == ADDPLAYLIST && resultCode == Activity.RESULT_OK){
-            if(mAdapter != null){
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-    }
 
     public PlayListAdapter getAdapter() {
         return mAdapter;
@@ -129,10 +144,4 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         }
     }
 
-
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
 }

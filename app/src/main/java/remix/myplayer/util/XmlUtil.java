@@ -1,15 +1,16 @@
 package remix.myplayer.util;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Xml;
+import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -19,8 +20,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import remix.myplayer.R;
 import remix.myplayer.model.PlayListItem;
-import remix.myplayer.ui.activity.PlayListActivity;
 
 /**
  * Created by taeja on 16-1-26.
@@ -164,12 +165,16 @@ public class XmlUtil {
 
     /**
      * 添加某个播放列表
+     * @param context
      * @param name 需要添加的播放列表名字
      */
-    public static void addPlaylist(String name) {
+    public static void addPlaylist(Context context,String name) {
         if(name != null && !name.equals("")) {
             Global.mPlaylist.put(name, new ArrayList<PlayListItem>());
             updatePlaylist();
+            Toast.makeText(context,R.string.add_playlist_success,Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context,R.string.add_playlist_error,Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -189,16 +194,33 @@ public class XmlUtil {
 
     /**
      * 某个播放列表下新增歌曲
-     * @param name 播放列表名字
+     * @param playlistName 播放列表名
      * @param song 歌曲名
      * @param id 歌曲id
      * @param album_id 专辑id
      */
-    public static void addSongToPlayList(String name, String song, int id, int album_id,String artist) {
-        if(!name.equals("") && !song.equals("")) {
-            ArrayList<PlayListItem> list = Global.mPlaylist.get(name);
-            list.add(new PlayListItem(song,id,album_id,artist));
-            updatePlaylist();
+    public static void addSongToPlayList(Context context,String playlistName, String song, int id, int album_id,String artist) {
+        if(TextUtils.isEmpty(playlistName) || TextUtils.isEmpty(song) || id < 0 || album_id < 0){
+            Toast.makeText(context,R.string.add_song_playlist_error,Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            boolean isExist = false;
+            for(PlayListItem item : Global.mPlaylist.get(playlistName)){
+                if(item.getId() == id){
+                    isExist = true;
+                }
+            }
+            if(isExist){
+                Toast.makeText(context,context.getString(R.string.song_already_exist), Toast.LENGTH_SHORT).show();
+            } else {
+                ArrayList<PlayListItem> list = Global.mPlaylist.get(playlistName);
+                list.add(new PlayListItem(song,id,album_id,artist));
+                updatePlaylist();
+                Toast.makeText(context,context.getString(R.string.add_song_playlist_success), Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 

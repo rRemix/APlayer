@@ -24,10 +24,12 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.ui.dialog.ShareDialog;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.StatusBarUtil;
 
 /**
  * Created by taeja on 16-3-14.
@@ -89,6 +91,11 @@ public class RecordShareActivity extends BaseAppCompatActivity {
     };
 
     @Override
+    protected void setStatusBar() {
+        StatusBarUtil.setTransparent(this);
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
@@ -116,12 +123,16 @@ public class RecordShareActivity extends BaseAppCompatActivity {
         return mBackgroudCache;
     }
 
-    public void onShare(View v){
-        new ProcessThread().start();
-    }
-
-    public void onCancel(View v){
-        finish();
+    @OnClick({R.id.recordshare_cancel,R.id.recordshare_share})
+    public void onClikc(View v){
+        switch (v.getId()){
+            case R.id.recordshare_cancel:
+                finish();
+                break;
+            case R.id.recordshare_share:
+                new ProcessThread().start();
+                break;
+        }
     }
 
     class ProcessThread extends Thread{

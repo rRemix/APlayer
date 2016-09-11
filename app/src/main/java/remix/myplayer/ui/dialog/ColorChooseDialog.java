@@ -1,13 +1,11 @@
 package remix.myplayer.ui.dialog;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,7 +22,6 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.model.ColorChooseInfo;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.util.ColorUtil;
 
 /**
@@ -33,7 +30,7 @@ import remix.myplayer.util.ColorUtil;
  * @Author Xiaoborui
  * @Date 2016/8/26 11:14
  */
-public class ColorChooseDialog extends BaseActivity{
+public class ColorChooseDialog extends BaseDialogActivity {
     @BindView(R.id.color_container)
     LinearLayout mColorContainer;
     private final int[] mColors = new int[]{R.color.md_purple_primary,R.color.md_red_primary,
@@ -126,8 +123,8 @@ public class ColorChooseDialog extends BaseActivity{
             setResult(Activity.RESULT_OK,intent);
             ThemeStore.THEME_MODE = ThemeStore.DAY;
             ThemeStore.THEME_COLOR = mThemeColor;
-            ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColor();
-            ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColor();
+            ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
+            ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
             ThemeStore.saveThemeColor(ThemeStore.THEME_COLOR);
             ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);
             finish();

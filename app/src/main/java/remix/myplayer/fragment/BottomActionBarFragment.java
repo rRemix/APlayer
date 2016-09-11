@@ -65,13 +65,14 @@ public class BottomActionBarFragment extends BaseFragment{
         mUnBinder = ButterKnife.bind(this,rootView);
 
         //设置整个背景着色
-        Drawable RootDrawable = getResources().getDrawable(R.drawable.commom_playercontrols_bg);
-        Theme.TintDrawable(RootDrawable, ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.day_background_color_3 : R.color.night_background_color_3));
-        rootView.setBackground(RootDrawable);
+        Theme.TintDrawable(rootView,
+                R.drawable.commom_playercontrols_bg,
+                ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.day_background_color_3 : R.color.night_background_color_3));
         //设置向上按钮着色
-        Drawable coverDrawable = getResources().getDrawable(R.drawable.home_btn_back);
-        Theme.TintDrawable(coverDrawable,ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
-        mCover.setImageDrawable(coverDrawable);
+        Theme.TintDrawable(mCover,
+                R.drawable.home_btn_back,
+                ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
+
         mBottomActionBar = (RelativeLayout)rootView.findViewById(R.id.bottom_action_bar);
         //点击打开播放界面
         mBottomActionBar.setOnClickListener(new View.OnClickListener() {
@@ -99,13 +100,13 @@ public class BottomActionBarFragment extends BaseFragment{
         }
         //设置按钮着色
         if(isPlaying) {
-            Drawable PauseDrawable = getResources().getDrawable(R.drawable.bf_btn_stop);
-            Theme.TintDrawable(PauseDrawable,ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
-            mPlayButton.setImageDrawable(PauseDrawable);
+            Theme.TintDrawable(mPlayButton,
+                    R.drawable.bf_btn_stop,
+                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
         } else {
-            Drawable PlayDrawable = getResources().getDrawable(R.drawable.bf_btn_play);
-            Theme.TintDrawable(PlayDrawable, ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
-            mPlayButton.setImageDrawable(PlayDrawable);
+            Theme.TintDrawable(mPlayButton,
+                    R.drawable.bf_btn_play,
+                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
         }
     }
 }

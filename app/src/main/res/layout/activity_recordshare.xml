@@ -88,7 +88,7 @@
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:onClick="onShare"
+            android:id="@+id/recordshare_share"
             android:gravity="center">
             <ImageButton
                 android:layout_width="wrap_content"
@@ -110,12 +110,12 @@
             android:src="@drawable/divider1"/>
 
         <LinearLayout
+            android:id="@+id/recordshare_cancel"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:onClick="onCancel">
+            android:gravity="center">
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

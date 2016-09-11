@@ -37,6 +37,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.fragment.CoverFragment;
@@ -220,8 +221,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         initAnim();
         //初始化顶部信息
         initTop();
-        //初始化顶部两个按钮
-        initTopButton();
         //初始化三个指示标志
         initGuide();
         //初始化ViewPager
@@ -230,6 +229,70 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         initSeekBar();
         //初始化控制按钮
         initControlButton();
+    }
+
+    /**
+     * 上一首 下一首 播放、暂停
+     * @param v
+     */
+    @OnClick({R.id.playbar_next,R.id.playbar_prev,R.id.playbar_play})
+    public void onCtrlClick(View v){
+        Intent intent = new Intent(Constants.CTL_ACTION);
+        switch (v.getId()) {
+            case R.id.playbar_prev:
+                intent.putExtra("Control", Constants.PREV);
+                break;
+            case R.id.playbar_next:
+                intent.putExtra("Control", Constants.NEXT);
+                break;
+            case R.id.playbar_play:
+                intent.putExtra("Control", Constants.PLAYORPAUSE);
+                if(mSwatch != null)
+                    Theme.TintDrawable(mPlayBarPlay,!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,mColorDraken);
+
+                break;
+        }
+        sendBroadcast(intent);
+    }
+
+    /**
+     * 播放模式 播放列表 关闭 隐藏
+     * @param v
+     */
+    @OnClick({R.id.playbar_model,R.id.playbar_playinglist,R.id.top_hide,R.id.top_more})
+    public void onOtherClick(View v){
+        switch (v.getId()){
+            //设置播放模式
+            case R.id.playbar_model:
+                int currentmodel = MusicService.getPlayModel();
+                currentmodel = (currentmodel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentmodel);
+                MusicService.setPlayModel(currentmodel);
+                Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                        currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+                                R.drawable.play_btn_loop_one,mColorDraken);
+
+                String msg = currentmodel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
+                        currentmodel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
+                Toast.makeText(AudioHolderActivity.this, msg, Toast.LENGTH_SHORT).show();
+                break;
+            //打开正在播放列表
+            case R.id.playbar_playinglist:
+                startActivity(new Intent(AudioHolderActivity.this,PlayingListDialog.class));
+                break;
+            //关闭
+            case R.id.top_hide:
+                mFromBack = true;
+                finish();
+                break;
+            //弹出窗口
+            case R.id.top_more:
+                Context wrapper = new ContextThemeWrapper(AudioHolderActivity.this,R.style.PopupMenuDayStyle);
+                final PopupMenu popupMenu = new PopupMenu(wrapper,v, Gravity.TOP);
+                popupMenu.getMenuInflater().inflate(R.menu.audio_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(new AudioPopupListener(AudioHolderActivity.this,mInfo));
+                popupMenu.show();
+                break;
+        }
     }
 
     private void initAnim() {
@@ -267,48 +330,12 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
 
 
     private void initControlButton() {
-        //前进，播放，后退
-//        UpdatePlayButton(mIsPlay);
-        CtrlListener mListener = new CtrlListener();
-        mPlayBarPrev.setOnClickListener(mListener);
-        mPlayBarPlay.setOnClickListener(mListener);
-        mPlayBarNext.setOnClickListener(mListener);
 
         //初始化播放模式
         int playmodel = SPUtil.getValue(this,"setting", "PlayModel",Constants.PLAY_LOOP);
         mPlayModel.setImageDrawable(getResources().getDrawable(playmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                 playmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                         R.drawable.play_btn_loop_one));
-
-        mPlayModel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int currentmodel = MusicService.getPlayModel();
-                currentmodel = (currentmodel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentmodel);
-                MusicService.setPlayModel(currentmodel);
-                Drawable playModelDrawable = getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-                        currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-                                R.drawable.play_btn_loop_one);
-
-                mPlayModel.setImageDrawable(mSwatch != null ? Theme.TintDrawable(playModelDrawable,mSwatch.getRgb()) : playModelDrawable);
-//                mPlayModel.setImageDrawable(getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.bg_btn_holder_playmodel_normal :
-//                        currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.bg_btn_holder_playmodel_shuffle :
-//                                R.drawable.bg_btn_holder_playmodel_repeat));
-                String msg = currentmodel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
-                        currentmodel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
-                Toast.makeText(AudioHolderActivity.this, msg, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-        mPlayingList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(AudioHolderActivity.this,PlayingListDialog.class));
-            }
-        });
-
-
     }
 
     @Override
@@ -332,27 +359,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     @Override
     public void onDestroy() {
         super.onDestroy();
-    }
-
-
-    private void initTopButton(){
-        mTopHide.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mFromBack = true;
-                finish();
-            }
-        });
-        mTopMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Context wrapper = new ContextThemeWrapper(AudioHolderActivity.this,R.style.PopupMenuDayStyle);
-                final PopupMenu popupMenu = new PopupMenu(wrapper,v, Gravity.TOP);
-                popupMenu.getMenuInflater().inflate(R.menu.audio_menu, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new AudioPopupListener(AudioHolderActivity.this,mInfo));
-                popupMenu.show();
-            }
-        });
     }
 
     private void initGuide() {
@@ -441,7 +447,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     }
 
     public void UpdatePlayButton(boolean isPlay) {
-        mPlayBarPlay.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop), mSwatch.getRgb()));
+        Theme.TintDrawable(mPlayBarPlay,!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,mColorDraken);
     }
 
     private void initTop() {
@@ -607,23 +613,19 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
             mSeekBar.setThumb(drawable);
 
             //修改顶部按钮颜色
-            Drawable topHideDrawable = getResources().getDrawable(R.drawable.play_btn_back);
-            Drawable topMoreDrawable =  getResources().getDrawable(R.drawable.list_icn_more);
-            Theme.TintDrawable(topHideDrawable,mColorDraken);
-            Theme.TintDrawable(topMoreDrawable,mColorDraken);
-            mTopHide.setImageDrawable(topHideDrawable);
-            mTopMore.setImageDrawable(topMoreDrawable);
+            Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,mColorDraken);
+            Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,mColorDraken);
 
             //修改控制按钮颜色
-            mPlayBarNext.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.play_btn_next),mColorDraken));
-            mPlayBarPrev.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.play_btn_pre),mColorDraken));
+            Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,mColorDraken);
+            Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,mColorDraken);
+
             int currentmodel = MusicService.getPlayModel();
-            mPlayBarPlay.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop), mSwatch.getRgb()));
-            Drawable playModelDrawable = getResources().getDrawable(currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+            Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                     currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-                            R.drawable.play_btn_loop_one);
-            mPlayModel.setImageDrawable(mSwatch != null ? Theme.TintDrawable(playModelDrawable,mSwatch.getRgb()) : playModelDrawable);
-            mPlayingList.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.play_btn_normal_list), mSwatch.getRgb()));
+                            R.drawable.play_btn_loop_one,mColorDraken);
+            Theme.TintDrawable(mPlayBarPlay,!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,mColorDraken);
+            Theme.TintDrawable(mPlayingList,R.drawable.play_btn_normal_list,mColorDraken);
         }
     }
 
@@ -643,8 +645,10 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                     mSwatch = new Palette.Swatch(Color.GRAY,100);
                 mColorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
                 mColorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
-                mColorDraken = ColorUtil.shiftColor(mSwatch.getRgb(),0.8f);
-                mColorDark = mSwatch.getRgb();
+//                mColorDraken = ColorUtil.shiftColor(mSwatch.getRgb(),0.8f);
+//                mColorDark = mSwatch.getRgb();
+                mColorDraken = mSwatch.getRgb();
+                mColorDark = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.8f);
                 //锁屏界面字体颜色
                 mHColor =  mSwatch.getTitleTextColor();
                 mLColor = mSwatch.getBodyTextColor();
@@ -654,24 +658,4 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         }
     }
 
-    class CtrlListener implements View.OnClickListener{
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent(Constants.CTL_ACTION);
-            switch (v.getId()) {
-                case R.id.playbar_prev:
-                    intent.putExtra("Control", Constants.PREV);
-                    break;
-                case R.id.playbar_next:
-                    intent.putExtra("Control", Constants.NEXT);
-                    break;
-                case R.id.playbar_play:
-                    intent.putExtra("Control", Constants.PLAYORPAUSE);
-                    if(mSwatch != null)
-                        mPlayBarPlay.setImageDrawable(Theme.TintDrawable(getResources().getDrawable(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop), mSwatch.getRgb()));
-                    break;
-            }
-            sendBroadcast(intent);
-        }
-    }
 }

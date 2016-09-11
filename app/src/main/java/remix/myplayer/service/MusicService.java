@@ -134,7 +134,7 @@ public class MusicService extends BaseService {
 
     public MusicService(){}
     public MusicService(Context context) {
-        this.mContext = context;
+        mContext = context;
     }
     @Nullable
     @Override
@@ -451,8 +451,8 @@ public class MusicService extends BaseService {
      * 回调接口，当发生更新时，通知相关activity更新
      */
     public interface Callback {
-        public void UpdateUI(MP3Item MP3Item, boolean isplay);
-        public int getType();
+        void UpdateUI(MP3Item MP3Item, boolean isplay);
+        int getType();
     }
 
     /**
@@ -793,7 +793,7 @@ public class MusicService extends BaseService {
         @Override
         public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
             Intent intent_ctl = null;
-            KeyEvent event = (KeyEvent)mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+            KeyEvent event = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
             if(event == null) return  true;
 
             //过滤按下事件

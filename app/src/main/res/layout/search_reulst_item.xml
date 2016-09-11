@@ -17,17 +17,18 @@
         fresco:placeholderImageScaleType="centerCrop"
         fresco:placeholderImage="@drawable/song_artist_empty_bg"
         fresco:failureImage="@drawable/song_artist_empty_bg"
-        fresco:failureImageScaleType="centerCrop" />
+        fresco:failureImageScaleType="centerCrop"
+        fresco:roundAsCircle="true"/>
     <!--歌曲名、歌手、专辑-->
     <LinearLayout
-        android:layout_width="180dp"
+        android:layout_width="match_parent"
         android:layout_height="@dimen/item_height"
         android:layout_gravity="center_vertical"
         android:gravity="center_vertical"
         android:orientation="vertical"
         android:layout_toRightOf="@id/search_image">
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:id="@+id/search_name"
             android:textColor="?attr/text_color_primary"
@@ -38,7 +39,7 @@
             android:ellipsize="end"/>
         <TextView
             android:id="@+id/search_detail"
-            android:layout_width="match_parent"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:textColor="?attr/text_color"
             android:textSize="@dimen/s12_size"

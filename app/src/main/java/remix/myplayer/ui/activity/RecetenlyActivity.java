@@ -15,6 +15,8 @@ import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -46,12 +48,26 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     Toolbar mToolBar;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
-
+    private MaterialDialog mMDDialog;
+    private final int START = 0;
+    private final int END = 1;
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            mAdapter.setInfoList(mInfoList);
-            mShuffle.setVisibility(mInfoList == null || mInfoList.size() == 0 ? View.GONE : View.VISIBLE);
+            switch (msg.what){
+                case START:
+                    if(mMDDialog != null && !mMDDialog.isShowing()){
+                        mMDDialog.show();
+                    }
+                    break;
+                case END:
+                    if(mMDDialog != null && mMDDialog.isShowing()){
+                        mAdapter.setInfoList(mInfoList);
+                        mShuffle.setVisibility(mInfoList == null || mInfoList.size() == 0 ? View.GONE : View.VISIBLE);
+                        mMDDialog.dismiss();
+                    }
+            }
+
         }
     };
 
@@ -87,12 +103,19 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         });
         mRecyclerView.setAdapter(mAdapter);
 
+        mMDDialog = new MaterialDialog.Builder(this)
+                .title("加载中")
+                .content("请稍等")
+                .progress(true, 0)
+                .progressIndeterminateStyle(false).build();
+
         initToolbar(mToolBar,getString(R.string.recently));
         new Thread(){
             @Override
             public void run() {
+                mHandler.sendEmptyMessage(START);
                 mInfoList = DBUtil.getMP3ListByIds(Global.mWeekList);
-                mHandler.sendEmptyMessage(0);
+                mHandler.sendEmptyMessage(END);
             }
         }.start();
     }

@@ -34,6 +34,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
@@ -114,12 +115,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
                 Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
                     @Override
                     public void onGenerated(Palette palette) {
-//                        Palette.Swatch a = palette.getVibrantSwatch();//有活力
-//                        Palette.Swatch b = palette.getDarkVibrantSwatch();//有活力 暗色
-//                        Palette.Swatch c = palette.getLightVibrantSwatch();//有活力 亮色
-//                        Palette.Swatch d = palette.getMutedSwatch();//柔和
                         Palette.Swatch e = palette.getDarkMutedSwatch();//柔和 暗色
-//                        Palette.Swatch f = palette.getLightMutedSwatch();//柔和 亮色
                         if(e != null){
                             Log.d(TAG,"mill: population --" + e.getPopulation());
                             mSong.setTextColor(e.getBodyTextColor());
@@ -161,13 +157,6 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
 
         //初始化控件
         mImageBackground.setAlpha(0.75f);
-        try {
-//            mBlurringView = (BlurringView)findViewById(R.id.lockscreen_blur_background);
-//            mBlurringView.setBlurredView(mImageBackground);
-//            mBlurringView.setOverlayColor(Color.parseColor("#004D4D4D"));
-        } catch (Exception e){
-            e.printStackTrace();
-        }
 
         mArrowContainer.startAnimation(AnimationUtils.loadAnimation(this,R.anim.arrow_left_to_right));
 
@@ -223,11 +212,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         super.onStop();
         mIsRunning = false;
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
+    
 
     @Override
     protected void onResume() {
@@ -287,12 +272,15 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         return Constants.LOCKSCREENACTIIVITY;
     }
 
-    //添加或取消收藏
-    public void onLove(View v){
+    /**
+     * 添加或取消收藏
+     */
+    @OnClick(R.id.lockscreen_love)
+    public void onLove(){
         if(mInfo == null)
             return;
         if(!mIsLove){
-            XmlUtil.addSongToPlayList(getString(R.string.my_favorite),mInfo.getTitle(),(int)mInfo.getId(),(int)mInfo.getAlbumId(),mInfo.getArtist());
+            XmlUtil.addSongToPlayList(this,getString(R.string.my_favorite),mInfo.getTitle(),(int)mInfo.getId(),(int)mInfo.getAlbumId(),mInfo.getArtist());
         } else {
             XmlUtil.deleteSongFromPlayList(getString(R.string.my_favorite),new PlayListItem(mInfo.getTitle(),(int)mInfo.getId(),(int)mInfo.getAlbumId(),mInfo.getArtist()));
         }
@@ -300,46 +288,25 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         mLoveButton.setImageResource(mIsLove ? R.drawable.lock_btn_loved : R.drawable.lock_btn_love);
     }
 
-
     @Override
     public void onBackPressed() {
-
     }
 
     //高斯模糊线程
     class BlurThread extends Thread{
         @Override
         public void run() {
-            long start = System.currentTimeMillis();
             if (mWidth > 0 && mHeight > 0 ) {
                 if (mInfo == null) return;
-                float radius = 40;
-                float widthscaleFactor = 3.3f;
-                float heightscaleFactor = (float) (widthscaleFactor * (mHeight * 1.0 / mWidth));
-
                 mRawBitMap = DBUtil.getAlbumBitmapBySongId((int) mInfo.getId(),false);
                 if(mRawBitMap == null)
                     mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.artist_empty_bg);
 
-//                mNewBitMap = Bitmap.createBitmap((int) (mWidth / widthscaleFactor), (int) (mHeight / heightscaleFactor), Bitmap.Config.ARGB_8888);
-//                Canvas canvas = new Canvas(mNewBitMap);
-//                Paint paint = new Paint();
-//                paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-//                paint.setAlpha((int) (255 * 0.75));
-//                canvas.drawBitmap(mRawBitMap, 0, 0, paint);
-//                mNewBitMap = CommonUtil.doBlur(mNewBitMap, (int) radius, true);
 
                 mStackBlurManager = new StackBlurManager(mRawBitMap);
                 mStackBlurManager.process(40);
                 mNewBitMap = mStackBlurManager.returnBlurredImage();
-//                Paint paint = new Paint();
-//                paint.setFlags(Paint.FILTER_BITMAP_FLAG);
-//                paint.setAlpha((int) (255 * 0.75));
-//                Canvas canvas = new Canvas(mNewBitMap);
-//                canvas.drawBitmap(mNewBitMap,0,0,paint);
             }
-
-            Log.d(TAG,"mill: " + (System.currentTimeMillis() - start));
             mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
         }
     }

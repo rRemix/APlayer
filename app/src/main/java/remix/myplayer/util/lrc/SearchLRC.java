@@ -220,10 +220,7 @@ public class SearchLRC {
     }
 
     private void SetFindLRC(int number) {
-        if(number == 0)
-            mIsFind = false;
-        else
-            mIsFind = true;
+        mIsFind = number != 0;
     }
 
     public boolean GetFindLRC(){

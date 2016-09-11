@@ -1,4 +1,4 @@
-package remix.myplayer.ui.activity;
+package remix.myplayer.ui.dialog;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
@@ -11,24 +11,52 @@ import android.view.WindowManager;
 
 import com.umeng.analytics.MobclickAgent;
 
+import remix.myplayer.R;
 import remix.myplayer.manager.ActivityManager;
+import remix.myplayer.theme.ThemeStore;
 
 /**
  * Created by Remix on 2016/3/16.
  */
 
 
-public abstract class BaseActivity extends Activity {
+public abstract class BaseDialogActivity extends Activity {
     protected <T extends View> T findView(int id){
         return (T)findViewById(id);
     }
 
-
+    /**
+     * 设置主题
+     */
+    protected void setUpTheme(){
+//        setTheme(ThemeStore.isDay() ? R.style.DayTheme : R.style.NightTheme);
+        if(ThemeStore.THEME_MODE == ThemeStore.NIGHT) {
+            setTheme(R.style.NightTheme);
+            return;
+        }
+        switch (ThemeStore.THEME_COLOR){
+            case ThemeStore.THEME_PURPLE:
+                setTheme(R.style.DayTheme_Purple);
+                break;
+            case ThemeStore.THEME_RED:
+                setTheme(R.style.DayTheme_Red);
+                break;
+            case ThemeStore.THEME_PINK:
+                setTheme(R.style.DayTheme_Pink);
+                break;
+            case ThemeStore.THEME_BROWN:
+                setTheme(R.style.DayTheme_Brown);
+                break;
+            case ThemeStore.THEME_INDIGO:
+                setTheme(R.style.DayTheme_Ingido);
+                break;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        setUpTheme();
         super.onCreate(savedInstanceState);
-
         //静止横屏
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //将该activity添加到ActivityManager,用于退出程序时关闭

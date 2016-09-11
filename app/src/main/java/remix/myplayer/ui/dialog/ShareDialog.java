@@ -38,8 +38,8 @@ import java.net.URLEncoder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.ui.activity.BaseActivity;
 import remix.myplayer.ui.activity.RecordShareActivity;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.Constants;
@@ -52,7 +52,7 @@ import remix.myplayer.util.DBUtil;
 /**
  * 分享的Dialog
  */
-public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
+public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Response{
     public static ShareDialog mInstance;
     //四个分享按钮
     @BindView(R.id.share_qq)
@@ -86,7 +86,7 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         mInstance = this;
 
         mInfo = (MP3Item)getIntent().getExtras().getSerializable("MP3Item");
-        mType = (int)getIntent().getExtras().getInt("Type");
+        mType = getIntent().getExtras().getInt("Type");
         mImageUrl = getIntent().getExtras().getString("Url");
         if(mInfo == null)
             return;
@@ -98,8 +98,8 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.height = (int) (200 * metrics.densityDpi / 160);
-        lp.width = (int) (metrics.widthPixels);
+        lp.height = 200 * metrics.densityDpi / 160;
+        lp.width = metrics.widthPixels;
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
 
@@ -116,21 +116,21 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         if (savedInstanceState != null) {
             mWeiboApi.handleWeiboResponse(getIntent(), this);
         }
+    }
 
-
-        mQQ.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    @OnClick({R.id.share_qq,R.id.share_weibo,R.id.share_wechat,R.id.share_circlefriend,R.id.popup_share_cancel})
+    public void onShare(View v){
+        switch (v.getId()){
+            case R.id.popup_share_cancel:
+                finish();
+                break;
+            case R.id.share_qq:
                 if(mType == Constants.SHARESONG)
                     shareSongtoQQ();
                 else
                     shareMindtoQQ();
-
-            }
-        });
-        mWeibo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                break;
+            case R.id.share_weibo:
                 if( !mWeiboApi.isWeiboAppInstalled()) {
                     Toast.makeText(ShareDialog.this, "您还未安装微博客户端",
                             Toast.LENGTH_SHORT).show();
@@ -140,21 +140,23 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
                     shareSongtoWeibo();
                 else
                     shareMindtoWeibo();
-
-            }
-        });
-
-        WeChatClickListener listener = new WeChatClickListener();
-        mWechat.setOnClickListener(listener);
-
-        mCircleFrient.setOnClickListener(listener);
-
-        mCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+                break;
+            case R.id.share_wechat:
+            case R.id.share_circlefriend:
+                if (!mWechatApi.isWXAppInstalled()) {
+                    Toast.makeText(ShareDialog.this, "您还未安装微信客户端",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+                if(mType == Constants.SHARESONG){
+                    shareSongtoWechat(v);
+                }
+                else {
+                    shareMindtoWeChat(v);
+                }
+                break;
+        }
     }
 
     //分享心情到qq
@@ -208,26 +210,6 @@ public class ShareDialog extends BaseActivity implements IWeiboHandler.Response{
         request.transaction = String.valueOf(System.currentTimeMillis());
         request.multiMessage = msg;
         mWeiboApi.sendRequest(ShareDialog.this, request);
-    }
-
-    //微信
-    class WeChatClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-
-            if (!mWechatApi.isWXAppInstalled()) {
-                Toast.makeText(ShareDialog.this, "您还未安装微信客户端",
-                        Toast.LENGTH_SHORT).show();
-                finish();
-                return;
-            }
-            if(mType == Constants.SHARESONG){
-                shareSongtoWechat(v);
-            }
-            else {
-                shareMindtoWeChat(v);
-            }
-        }
     }
 
     //分享心情到微信

@@ -24,12 +24,10 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.BaseActivity;
-import remix.myplayer.ui.activity.BaseAppCompatActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 
@@ -40,7 +38,7 @@ import remix.myplayer.util.DBUtil;
 /**
  * 歌曲的选项对话框
  */
-public class OptionDialog extends BaseActivity {
+public class OptionDialog extends BaseDialogActivity {
     //添加 设置铃声 分享 删除按钮
     @BindView(R.id.popup_add)
     ImageView mAdd;
@@ -95,47 +93,40 @@ public class OptionDialog extends BaseActivity {
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
 
-//        mCancel= (Button)findViewById(R.id.popup_cancel);
-        //添加到播放列表
-        mAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(OptionDialog.this,AddtoPlayListDialog.class);
-                Bundle arg = new Bundle();
-                arg.putString("SongName",mInfo.getTitle());
-                arg.putLong("Id",mInfo.getId());
-                arg.putLong("AlbumId",mInfo.getAlbumId());
-                arg.putString("Artist",mInfo.getArtist());
-                intent.putExtras(arg);
-                startActivity(intent);
+    }
+
+    @OnClick({R.id.popup_add,R.id.popup_share,R.id.popup_delete,R.id.popup_ring})
+    public void onClick(View v){
+        switch (v.getId()){
+            //添加到播放列表
+            case R.id.popup_add:
+                Intent intentAdd = new Intent(OptionDialog.this,AddtoPlayListDialog.class);
+                Bundle ardAdd = new Bundle();
+                ardAdd.putString("SongName",mInfo.getTitle());
+                ardAdd.putLong("Id",mInfo.getId());
+                ardAdd.putLong("AlbumId",mInfo.getAlbumId());
+                ardAdd.putString("Artist",mInfo.getArtist());
+                intentAdd.putExtras(ardAdd);
+                startActivity(intentAdd);
                 finish();
-            }
-        });
-        //设置手机铃声
-        mRing.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                break;
+            //设置铃声
+            case R.id.popup_ring:
                 setRing(mInfo.getUrl(), (int) mInfo.getId());
                 finish();
-            }
-        });
-        //分享
-        mShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(OptionDialog.this,ShareDialog.class);
-                Bundle arg = new Bundle();
-                arg.putSerializable("MP3Item",mInfo);
-                arg.putInt("Type",Constants.SHARESONG);
-                intent.putExtras(arg);
-                startActivity(intent);
+                break;
+            //分享
+            case R.id.popup_share:
+                Intent intentShare = new Intent(OptionDialog.this,ShareDialog.class);
+                Bundle argShare = new Bundle();
+                argShare.putSerializable("MP3Item",mInfo);
+                argShare.putInt("Type",Constants.SHARESONG);
+                intentShare.putExtras(argShare);
+                startActivity(intentShare);
                 finish();
-            }
-        });
-        //删除
-        mDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                break;
+            //删除
+            case R.id.popup_delete:
                 try {
                     String title = mIsDeletePlayList ? getString(R.string.confirm_delete_playlist) :getString(R.string.confirm_delete_song);
                     new MaterialDialog.Builder(OptionDialog.this)
@@ -170,9 +161,9 @@ public class OptionDialog extends BaseActivity {
                 } catch (Exception e){
                     e.printStackTrace();
                 }
+                break;
 
-            }
-        });
+        }
     }
 
 

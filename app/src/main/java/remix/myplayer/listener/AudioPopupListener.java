@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -150,7 +149,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 mEditRootView = editDialog.getCustomView();
                 if(mEditRootView != null){
                     ButterKnife.bind(AudioPopupListener.this, mEditRootView);
-                    int MdColor = ColorUtil.getColor(ThemeStore.getMaterialPrimaryColor());
+
                     if(mSongLayout.getEditText() != null){
                         mSongLayout.setHintTextAppearance(Theme.getTheme(true));
                         mSongLayout.getEditText().addTextChangedListener(new TextInputEditWatcher(mSongLayout,"歌曲名不能为空"));
