@@ -2,17 +2,39 @@ package remix.myplayer.application;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.support.v7.app.AppCompatDialog;
+import android.util.JsonToken;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.umeng.analytics.MobclickAgent;
-import com.umeng.update.UmengUpdateAgent;
+import com.umeng.message.IUmengRegisterCallback;
+import com.umeng.message.PushAgent;
+import com.umeng.message.UmengNotificationClickHandler;
+import com.umeng.message.entity.UMessage;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+import remix.myplayer.R;
 import remix.myplayer.listener.LockScreenListener;
+import remix.myplayer.model.UpdateInfo;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.CrashHandler;
@@ -38,6 +60,76 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
+        //初始化友盟推送
+        PushAgent mPushAgent = PushAgent.getInstance(this);
+        //注册推送服务，每次调用register方法都会回调该接口
+        mPushAgent.register(new IUmengRegisterCallback() {
+
+            @Override
+            public void onSuccess(String deviceToken) {
+                //注册成功会返回device token
+                Log.d("DeviceToken","DeviceToker:" + deviceToken);
+            }
+
+            @Override
+            public void onFailure(String s, String s1) {
+
+            }
+        });
+        UmengNotificationClickHandler notificationClickHandler = new UmengNotificationClickHandler() {
+            @Override
+            public void dealWithCustomAction(Context context, UMessage msg) {
+                Toast.makeText(context, msg.custom, Toast.LENGTH_LONG).show();
+                try {
+                    final UpdateInfo info = new UpdateInfo();
+                    JSONObject json = new JSONObject(msg.custom);
+                    JSONArray logs = json.getJSONArray("update_log");
+                    for(int i = 0; i < logs.length();i++){
+                        info.Logs.add(logs.getString(i) + "\n");
+                    }
+                    info.ApkUrl = json.getString("apk_url");
+                    info.MD5 = json.getString("md5");
+                    info.VersionName = json.getString("version");
+                    info.Size = json.getInt("target_size");
+
+                    final AppCompatDialog dialog = new AppCompatDialog(MainActivity.mInstance);
+                    dialog.setContentView(R.layout.umeng_update_dialog);
+                    Object o1 = dialog.findViewById(R.id.update_version);
+                    Object o2 = dialog.findViewById(R.id.update_size);
+                    ((TextView)dialog.findViewById(R.id.update_version)).setText("最新版本:" + info.VersionName);
+                    ((TextView)dialog.findViewById(R.id.update_size)).setText("新版本大小:" + info.Size);
+                    ((TextView)dialog.findViewById(R.id.update_log)).setText("更新内容\n");
+                    for(int i = 0 ; i < info.Logs.size();i++){
+                        ((TextView)dialog.findViewById(R.id.update_log)).setText(((TextView) dialog.findViewById(R.id.update_log)).getText() + info.Logs.get(i));
+                    }
+                    dialog.findViewById(R.id.umeng_update_id_cancel).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if(dialog != null && !dialog.isShowing())
+                                dialog.dismiss();
+                        }
+                    });
+                    dialog.findViewById(R.id.umeng_update_id_ok).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Uri uri = Uri.parse(info.ApkUrl);
+                            Intent it = new Intent(Intent.ACTION_VIEW, uri);
+                            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(it);
+                            if(dialog != null && !dialog.isShowing())
+                                dialog.dismiss();
+                        }
+                    });
+                    dialog.show();
+
+                } catch (JSONException e) {
+                    Log.d("Application","创建更新对话框错误:" + e.toString());
+                    Toast.makeText(context,"创建更新对话框错误:" + e.toString(),Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+        };
+        mPushAgent.setNotificationClickHandler(notificationClickHandler);
         CrashHandler crashHandler = CrashHandler.getInstance();
         crashHandler.init(this);
         startService(new Intent(this, MusicService.class));
@@ -45,8 +137,7 @@ public class Application extends android.app.Application {
         startService(new Intent(this, TimerService.class));
         //监听锁屏
         new LockScreenListener(getApplicationContext()).beginListen();
-        //检查更新
-        UmengUpdateAgent.update(this);
+        //异常捕获
         MobclickAgent.setCatchUncaughtExceptions(true);
         initUtil();
         loadSong();
@@ -62,16 +153,10 @@ public class Application extends android.app.Application {
                 //读取sd卡歌曲id
                 Global.mAllSongList = DBUtil.getAllSongsId();
                 //读取正在播放列表
-                boolean isFirst = SPUtil.getValue(mContext, "Setting", "First", true);
-                if(isFirst){
-                    //添加我的收藏列表
-                    XmlUtil.addPlaylist(mContext,"我的收藏");
-                    Global.setPlayingList(Global.mAllSongList);
-                } else {
-                    Global.mPlayingList = XmlUtil.getPlayingList();
-                    if (Global.mPlayingList == null || Global.mPlayingList.size() == 0)
-                        Global.mPlayingList = Global.mAllSongList;
-                }
+                Global.mPlayingList = XmlUtil.getPlayingList();
+                if (Global.mPlayingList == null || Global.mPlayingList.size() == 0)
+                    Global.mPlayingList = Global.mAllSongList;
+
                 Global.mPlaylist = XmlUtil.getPlayList("playlist.xml");
             }
         }.start();

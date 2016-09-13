@@ -53,6 +53,7 @@ import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
+import remix.myplayer.util.XmlUtil;
 
 /**
  *
@@ -171,11 +172,10 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             //保存默认主题设置
             SPUtil.putValue(this,"Setting","ThemeMode",ThemeStore.DAY);
             SPUtil.putValue(this,"Setting","ThemeColor",ThemeStore.THEME_PINK);
+            //添加我的收藏列表
+            XmlUtil.addPlaylist(this,"我的收藏");
+            Global.setPlayingList(Global.mAllSongList);
         }
-        //第一次打开activity
-//        if(mIsFirst){
-//            Global.mAllSongList = DBUtil.getAllSongsId();
-//        }
         initLastSong();
 
     }

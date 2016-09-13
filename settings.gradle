@@ -1,2 +1,2 @@
-include ':app', ':StackBlur'
+include ':app', ':StackBlur', ':PushSDK'
 

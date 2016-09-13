@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.umeng.analytics.MobclickAgent;
+import com.umeng.message.PushAgent;
 
 import remix.myplayer.R;
 import remix.myplayer.manager.ActivityManager;
@@ -55,6 +56,8 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         setUpTheme();
         super.onCreate(savedInstanceState);
+        //友盟推送
+        PushAgent.getInstance(this).onAppStart();
         //静止横屏
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //将该activity添加到ActivityManager,用于退出程序时关闭

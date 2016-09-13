@@ -56,27 +56,30 @@
             android:background="#008bea" />
         <!-- Content -->
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="最新版本:1.0.0"
+            android:id="@+id/update_version"
+            android:padding="@dimen/d10_size"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="新版本大小:6.5MB"
+            android:id="@+id/update_size"
+            android:layout_marginLeft="@dimen/d10_size"/>
+
         <ScrollView
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:padding="10dp" >
 
-            <LinearLayout
-                android:layout_width="fill_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
-
-                <TextView
-                    android:id="@+id/umeng_update_content"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginTop="10dp"
-                    android:focusable="true"
-                    android:textColor="#000" />
-            </LinearLayout>
+                android:id="@+id/update_log"/>
         </ScrollView>
         
         <!-- Ignore CheckBox -->
@@ -89,7 +92,7 @@
 	        android:button="@drawable/umeng_update_button_check_selector"
 	        android:textColor="#000" />
 
-        <!-- OK&Cancel PagerButton -->
+        <!-- OK&Cancel Button -->
 
         <LinearLayout
             android:layout_width="fill_parent"

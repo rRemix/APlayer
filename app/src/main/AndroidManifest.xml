@@ -23,9 +23,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".application.Application">
-        <meta-data android:value="56d6563367e58e6aa70005af" android:name="UMENG_APPKEY"/>
-        <meta-data android:value="Umeng" android:name="UMENG_CHANNEL"/>
+        <!--友盟统计与推送-->
+        <meta-data android:name="UMENG_APPKEY" android:value="56d6563367e58e6aa70005af"/>
+        <meta-data android:name="UMENG_MESSAGE_SECRET" android:value="5cc69b6b8425a8e30cf6f0b40b67bda3"/>
+        <meta-data android:name="UMENG_CHANNEL" android:value="UMENG_CHANNEL"/>
 
+        <!--闪屏页-->
         <activity android:name=".ui.activity.SplashActivity"
             android:theme="@style/ActivityStyle">
 
@@ -122,24 +125,6 @@
             </intent-filter>
         </activity>
 
-        <!--ShareSdk-->
-        <!--<activity-->
-            <!--android:name="com.mob.tools.MobUIShell"-->
-            <!--android:theme="@android:style/Theme.Translucent.NoTitleBar"-->
-            <!--android:configChanges="keyboardHidden|orientation|screenSize"-->
-            <!--android:screenOrientation="portrait"-->
-            <!--android:windowSoftInputMode="stateHidden|adjustResize" >-->
-            <!--<intent-filter>-->
-                <!--<data android:scheme="tencent1105030910" />-->
-                <!--<action android:name="android.intent.action.VIEW" />-->
-                <!--<category android:name="android.intent.category.BROWSABLE" />-->
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-            <!--</intent-filter>-->
-            <!--<intent-filter>-->
-                <!--<action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />-->
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
 
         <!--有盟-->
         <service
@@ -150,7 +135,6 @@
             android:name="com.umeng.update.UpdateDialogActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
-
 
         <!--微信-->
         <activity

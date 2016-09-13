@@ -14,6 +14,6 @@
 	<string name="UMIgnore">Ingore this</string>
 	<string name="UMToast_IsUpdating">Updating....</string>
 	<string name="UMDialog_InstallAPK">The lastest version has been downloaded, install now ?</string>
-	<string name="UMUpdateCheck">2.7.0.0.20160201</string>
+	<string name="UMUpdateCheck">2.8.0.0.20160506</string>
 
 </resources>

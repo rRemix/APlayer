@@ -35,7 +35,27 @@
 -keepattributes *Annotation*
 -keepattributes Signature
 
-# 友盟
+#友盟推送
+-dontwarn com.taobao.**
+-dontwarn anet.channel.**
+-dontwarn anetwork.channel.**
+-dontwarn org.android.**
+-dontwarn org.apache.thrift.**
+-dontwarn com.xiaomi.**
+-dontwarn com.huawei.**
+-keep class com.taobao.** {*;}
+-keep class org.android.** {*;}
+-keep class anet.channel.** {*;}
+-keep class com.umeng.** {*;}
+-keep class com.xiaomi.** {*;}
+-keep class com.huawei.** {*;}
+-keep class org.apache.thrift.** {*;}
+
+-keep public class **.R$*{
+   public static final int *;
+}
+
+#友盟统计
 -keep class com.umeng.update.protobuffer.** {
         public <fields>;
         public <methods>;

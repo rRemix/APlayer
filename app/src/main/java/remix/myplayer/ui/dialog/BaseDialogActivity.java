@@ -10,6 +10,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.umeng.analytics.MobclickAgent;
+import com.umeng.message.PushAgent;
 
 import remix.myplayer.R;
 import remix.myplayer.manager.ActivityManager;
@@ -57,11 +58,11 @@ public abstract class BaseDialogActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
 //        setUpTheme();
         super.onCreate(savedInstanceState);
+        PushAgent.getInstance(this).onAppStart();
         //静止横屏
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //将该activity添加到ActivityManager,用于退出程序时关闭
         ActivityManager.AddActivity(this);
-
         //4.4 全透明状态栏
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);

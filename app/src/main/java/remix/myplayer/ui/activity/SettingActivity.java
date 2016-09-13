@@ -16,7 +16,6 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.umeng.update.UmengUpdateAgent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -186,7 +185,7 @@ public class SettingActivity extends ToolbarActivity {
                 break;
             //检查更新
             case R.id.setting_update_container:
-                UmengUpdateAgent.forceUpdate(SettingActivity.this);
+//                UmengUpdateAgent.forceUpdate(SettingActivity.this);
         }
     }
 
