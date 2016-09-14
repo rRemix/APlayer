@@ -10,6 +10,6 @@ public class UpdateInfo implements Serializable {
     public ArrayList<String> Logs = new ArrayList<>();
     public String VersionName;
     public String ApkUrl;
-    public int Size;
+    public String Size;
     public String MD5;
 }

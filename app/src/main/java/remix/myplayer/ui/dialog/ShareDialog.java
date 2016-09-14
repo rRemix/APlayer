@@ -228,7 +228,6 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
             msg.setThumbImage(thumbBmp);
         }
 
-
         //发送请求
         SendMessageToWX.Req req = new SendMessageToWX.Req();
         req.transaction = buildTransaction("img");
@@ -261,7 +260,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if(intent.getAction() == "com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY")
+        if(intent.getAction().equals("com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY"))
             mWeiboApi.handleWeiboResponse(intent, this);
     }
 

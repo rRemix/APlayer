@@ -1,6 +1,7 @@
 package remix.myplayer.util;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -10,6 +11,8 @@ import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
+import android.text.TextUtils;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -399,6 +402,18 @@ public class CommonUtil {
             sb.append(hex);
         }
         return sb.toString();
+    }
+
+    /**
+     * 浏览器打开指定地址
+     */
+    public static void openUrl(String url){
+        if(TextUtils.isEmpty(url))
+            return;
+        Uri uri = Uri.parse(url);
+        Intent it = new Intent(Intent.ACTION_VIEW, uri);
+        it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(it);
     }
 
     /**

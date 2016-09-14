@@ -3,10 +3,15 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="214dp"
-    android:paddingTop="8dp"
-    android:paddingLeft="8dp"
-    android:paddingRight="8dp"
-    android:background="?android:attr/selectableItemBackground">
+    android:paddingTop="@dimen/d8_size"
+    android:paddingLeft="@dimen/d6_size"
+    android:paddingRight="@dimen/d6_size"
+    android:background="@color/transparent">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"/>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

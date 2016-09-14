@@ -26,7 +26,7 @@
         <!--友盟统计与推送-->
         <meta-data android:name="UMENG_APPKEY" android:value="56d6563367e58e6aa70005af"/>
         <meta-data android:name="UMENG_MESSAGE_SECRET" android:value="5cc69b6b8425a8e30cf6f0b40b67bda3"/>
-        <meta-data android:name="UMENG_CHANNEL" android:value="UMENG_CHANNEL"/>
+        <meta-data android:name="UMENG_CHANNEL" android:value="${UMENG_CHANNEL_VALUE}"/>
 
         <!--闪屏页-->
         <activity android:name=".ui.activity.SplashActivity"

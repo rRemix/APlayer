@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:layout_width="164dp"
+    android:layout_width="match_parent"
     android:layout_height="196dp"
-    android:paddingTop="8dp"
-    android:paddingLeft="8dp"
-    android:paddingRight="8dp"
-    android:background="?android:attr/selectableItemBackground">
+    android:paddingTop="@dimen/d8_size"
+    android:paddingLeft="@dimen/d6_size"
+    android:paddingRight="@dimen/d6_size"
+    android:background="@color/transparent">
     <RelativeLayout
         android:id="@+id/artist_item_container"
         android:layout_width="match_parent"

@@ -29,6 +29,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+        wandoujia{}
+        meizu{}
+        xiaomi{}
+        chuizi{}
+        kuan{}
+        productFlavors.all { flavor ->
+            flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+        }
+    }
     lintOptions{
         checkReleaseBuilds false
         abortOnError false
