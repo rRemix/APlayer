@@ -3,7 +3,7 @@ package remix.myplayer.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -75,7 +75,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 holder.mText1.setText(album);
                 holder.mText2.setText(artist);
                 //设置背景
-//                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.album_bg_day : R.drawable.album_bg_night);
+                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.album_bg_day : R.drawable.album_bg_night);
                 //设置封面
                 long albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
                 holder.mImage.setImageURI(Uri.EMPTY);
@@ -85,12 +85,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 e.printStackTrace();
             }
 
-//            holder.mCardBackground.setOnTouchListener(new View.OnTouchListener() {
-//                @Override
-//                public boolean onTouch(View v, MotionEvent event) {
-//                    return false;
-//                }
-//            });
+
             if(mOnItemClickLitener != null) {
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -107,12 +102,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                         return true;
                     }
                 });
-                holder.mButton.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return false;
-                    }
-                });
+
             }
             //popupmenu
             if(holder.mButton != null) {
@@ -150,7 +140,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
         public ImageButton mButton;
         @BindView(R.id.recycleview_simpleiview)
         public SimpleDraweeView mImage;
-        @BindView(R.id.album_item_container)
+        @BindView(R.id.item_container)
         public RelativeLayout mContainer;
         @BindView(R.id.recycleview_card)
         public Button mCardBackground;
