@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:visible="true" android:id="@+id/group_2">
+        <item android:id="@+id/toolbar_delete" android:icon="@android:drawable/ic_menu_delete"
+            android:title="删除" app:showAsAction="always"/>
+        <item android:id="@+id/toolbar_add_playlist" android:icon="@android:drawable/ic_menu_add"
+            android:title="加入播放列表" app:showAsAction="always"/>
+        <item android:id="@+id/toolbar_add_playing" android:icon="@android:drawable/ic_menu_set_as"
+            android:title="加入播放队列" app:showAsAction="always"/>
+    </group>
+</menu>

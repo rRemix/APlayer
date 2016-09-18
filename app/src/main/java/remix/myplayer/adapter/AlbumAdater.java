@@ -10,8 +10,10 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -73,7 +75,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 holder.mText1.setText(album);
                 holder.mText2.setText(artist);
                 //设置背景
-                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.album_bg_day : R.drawable.album_bg_night);
+//                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.album_bg_day : R.drawable.album_bg_night);
                 //设置封面
                 long albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
                 holder.mImage.setImageURI(Uri.EMPTY);
@@ -83,12 +85,32 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 e.printStackTrace();
             }
 
+//            holder.mCardBackground.setOnTouchListener(new View.OnTouchListener() {
+//                @Override
+//                public boolean onTouch(View v, MotionEvent event) {
+//                    return false;
+//                }
+//            });
             if(mOnItemClickLitener != null) {
-                holder.mImage.setOnClickListener(new View.OnClickListener() {
+                holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         int pos = holder.getAdapterPosition();
                         mOnItemClickLitener.onItemClick(holder.mImage,pos);
+                    }
+                });
+                //多选菜单
+                holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        mOnItemClickLitener.onItemLongClick(v,position);
+                        return true;
+                    }
+                });
+                holder.mButton.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return false;
                     }
                 });
             }
@@ -111,6 +133,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                     }
                 });
             }
+
         }
     }
     @Override
@@ -129,6 +152,8 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
         public SimpleDraweeView mImage;
         @BindView(R.id.album_item_container)
         public RelativeLayout mContainer;
+        @BindView(R.id.recycleview_card)
+        public Button mCardBackground;
 
         public AlbumHolder(View v) {
             super(v);

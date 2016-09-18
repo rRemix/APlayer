@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -60,6 +61,8 @@ import remix.myplayer.util.XmlUtil;
  */
 public class MainActivity extends BaseAppCompatActivity implements MusicService.Callback {
     public static MainActivity mInstance = null;
+    @BindView(R.id.multi_menu)
+    RelativeLayout mMultiMenu;
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
     @BindView(R.id.tabs)
@@ -72,6 +75,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     DrawerLayout mDrawerLayout;
     private BottomActionBarFragment mBottomBar;
     private final static String TAG = "MainActivity";
+    public static boolean mMultiShow = false;
 
     private PagerAdapter mAdapter;
     //是否正在运行
@@ -255,12 +259,9 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
         setSupportActionBar(mToolBar);
         mToolBar.setNavigationIcon(R.drawable.actionbar_menu);
-        mToolBar.setBackgroundColor(getResources().getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
-//        mToolBar.setLogo(R.drawable.allsong_icon_musicbox);
         mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mDrawerLayout.openDrawer(mDrawerMenu);
                 mDrawerLayout.openDrawer(mNavigationView);
             }
         });
@@ -273,6 +274,15 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                         break;
                     case R.id.toolbar_timer:
                         startActivity(new Intent(MainActivity.this, TimerDialog.class));
+                        break;
+                    case R.id.toolbar_delete:
+                        Toast.makeText(MainActivity.this,"删除",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.toolbar_add_playing:
+                        Toast.makeText(MainActivity.this,"添加到正在播放列表 ",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.toolbar_add_playlist:
+                        Toast.makeText(MainActivity.this,"添加到播放列表",Toast.LENGTH_SHORT).show();
                         break;
                 }
                 return true;
@@ -320,11 +330,49 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        getMenuInflater().inflate(mMultiShow ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
         return true;
     }
 
+    public void showMultiMenu(){
+        mMultiShow = true;
+        mToolBar.setNavigationIcon(R.drawable.actionbar_delete);
+        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideMulitMenu();
+            }
+        });
+        invalidateOptionsMenu();
+    }
 
+    public void hideMulitMenu(){
+        mMultiShow = false;
+        mToolBar.setNavigationIcon(R.drawable.actionbar_menu);
+        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDrawerLayout.openDrawer(mNavigationView);
+            }
+        });
+        invalidateOptionsMenu();
+    }
+
+    public void updateOptionsMenu(boolean multiShow){
+        mMultiShow = multiShow;
+        mToolBar.setNavigationIcon(mMultiShow ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mMultiShow){
+                    updateOptionsMenu(false);
+                } else {
+                    mDrawerLayout.openDrawer(mNavigationView);
+                }
+            }
+        });
+        invalidateOptionsMenu();
+    }
 
     private void initDrawerLayout() {
         mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
@@ -414,18 +462,15 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         }
     }
 
-    //隐藏侧滑菜单
-    public void HideDrawer() {
-        if (mDrawerLayout.isDrawerOpen(mNavigationView))
-            mDrawerLayout.closeDrawer(mNavigationView);
-    }
-
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(mNavigationView))
+        if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
             mDrawerLayout.closeDrawer(mNavigationView);
-        else {
+        } else if(mMultiShow) {
+            updateOptionsMenu(false);
+//            hideMulitMenu();
+        } else {
             Intent home = new Intent(Intent.ACTION_MAIN);
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             home.addCategory(Intent.CATEGORY_HOME);

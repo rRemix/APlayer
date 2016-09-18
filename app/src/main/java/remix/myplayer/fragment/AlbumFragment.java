@@ -12,12 +12,9 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,6 +22,7 @@ import remix.myplayer.R;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.adapter.AlbumAdater;
 import remix.myplayer.listener.OnItemClickListener;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
 
 /**
@@ -80,6 +78,11 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
             }
             @Override
             public void onItemLongClick(View view, int position) {
+                if(getActivity() instanceof MainActivity){
+                    MainActivity mainActivity = (MainActivity)getActivity();
+                    MainActivity.mMultiShow = true;
+                    mainActivity.updateOptionsMenu(true);
+                }
             }
         });
         mRecycleView.setAdapter(mAdapter);

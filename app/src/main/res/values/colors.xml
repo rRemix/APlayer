@@ -75,6 +75,7 @@
     <color name="day_background_color_1">@color/white</color>
     <color name="day_background_color_2">#f7f7f6</color>
     <color name="day_background_color_3">@color/white</color>
+    <color name="day_card_color">#f7f7f7</color>
     <color name="day_interval_color">#edeceb</color>
     <color name="day_aboutus_background_color">@color/background_color_3</color>
     <color name="day_scan_track_color">#edeceb</color>
@@ -91,6 +92,7 @@
     <color name="night_background_color_1">@color/background_color_1</color>
     <color name="night_background_color_2">@color/background_color_2</color>
     <color name="night_background_color_3">@color/background_color_3</color>
+    <color name="night_card_color">@color/background_color_2</color>
     <color name="night_interval_color">#e2e1e2</color>
     <color name="night_aboutus_background_color">#cccccc</color>
     <color name="night_scan_track_color">@color/gray_6d6c69</color>

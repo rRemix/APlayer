@@ -190,6 +190,7 @@
         <item name="background_color_1">@color/day_background_color_1</item>
         <item name="background_color_2">@color/day_background_color_2</item>
         <item name="background_color_3">@color/day_background_color_3</item>
+        <item name="card_color">@color/day_card_color</item>
         <item name="text_color_primary">@color/day_textcolor_primary</item>
         <item name="text_color">@color/day_textcolor</item>
         <item name="bg_aboutus">@drawable/bg_aboutus_day</item>
@@ -207,6 +208,7 @@
         <item name="background_color_1">@color/night_background_color_3</item>
         <item name="background_color_2">@color/night_background_color_2</item>
         <item name="background_color_3">@color/night_background_color_3</item>
+        <item name="card_color">@color/night_card_color</item>
         <item name="text_color_primary">@color/night_textcolor_primary</item>
         <item name="text_color">@color/night_textcolor</item>
         <item name="bg_aboutus">@drawable/bg_aboutus_night</item>
