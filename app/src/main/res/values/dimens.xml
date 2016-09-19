@@ -44,4 +44,6 @@
     <dimen name="d80_size">80dp</dimen>
     <dimen name="d90_size">90dp</dimen>
     <dimen name="d100_size">100dp</dimen>
+    <dimen name="d120_size">120dp</dimen>
+    <dimen name="d150_size">150dp</dimen>
 </resources>

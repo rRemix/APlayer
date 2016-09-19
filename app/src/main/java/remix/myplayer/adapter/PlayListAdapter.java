@@ -1,7 +1,6 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.view.ContextThemeWrapper;
@@ -25,7 +24,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.listener.AlbumArtistFolderListener;
 import remix.myplayer.util.ColorUtil;
@@ -91,10 +89,18 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 //            }
 
             if(mOnItemClickLitener != null) {
-                holder.mImage.setOnClickListener(new View.OnClickListener() {
+                holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mOnItemClickLitener.onItemClick(holder.mImage,position);
+                        mOnItemClickLitener.onItemClick(v,position);
+                    }
+                });
+                //多选菜单
+                holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        mOnItemClickLitener.onItemLongClick(v,position);
+                        return true;
                     }
                 });
             }
@@ -135,7 +141,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         public SimpleDraweeView mImage;
         @BindView(R.id.recycleview_button)
         public ImageView mButton;
-        @BindView(R.id.playlist_item_container)
+        @BindView(R.id.item_container)
         public RelativeLayout mContainer;
         public PlayListHolder(View itemView) {
             super(itemView);

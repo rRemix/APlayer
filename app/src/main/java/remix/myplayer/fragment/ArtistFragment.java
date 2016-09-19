@@ -22,6 +22,7 @@ import remix.myplayer.R;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.adapter.ArtistAdapter;
 import remix.myplayer.listener.OnItemClickListener;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
 
 /**
@@ -77,6 +78,11 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
 
             @Override
             public void onItemLongClick(View view, int position) {
+                if(getActivity() instanceof MainActivity){
+                    MainActivity mainActivity = (MainActivity)getActivity();
+                    MainActivity.mMultiShow = true;
+                    mainActivity.updateOptionsMenu(true);
+                }
             }
         });
         mRecycleView.setAdapter(mAdapter);

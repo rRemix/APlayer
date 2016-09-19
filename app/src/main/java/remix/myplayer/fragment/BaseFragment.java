@@ -2,6 +2,7 @@ package remix.myplayer.fragment;
 
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import butterknife.BindView;
 import butterknife.Unbinder;
@@ -23,6 +24,15 @@ public class BaseFragment extends Fragment {
 
     public RecyclerView.Adapter getAdapter(){
         return null;
+    }
+
+    protected void cleanSelectedViews(){
+
+    }
+
+    protected void setViewSelected(View v,boolean selected){
+        if(v != null)
+            v.setSelected(selected);
     }
 
 }

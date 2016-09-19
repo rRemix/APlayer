@@ -3,7 +3,6 @@ package remix.myplayer.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -26,7 +25,6 @@ import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.listener.AlbumArtistFolderListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -81,11 +79,19 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
             }
 
             if(mOnItemClickLitener != null) {
-                holder.mImage.setOnClickListener(new View.OnClickListener() {
+                holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         int pos = holder.getAdapterPosition();
-                        mOnItemClickLitener.onItemClick(holder.mImage,pos);
+                        mOnItemClickLitener.onItemClick(v,pos);
+                    }
+                });
+                //多选菜单
+                holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        mOnItemClickLitener.onItemLongClick(v,position);
+                        return true;
                     }
                 });
             }
@@ -126,7 +132,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
         public SimpleDraweeView mImage;
         @BindView(R.id.recycleview_button)
         public ImageButton mButton;
-        @BindView(R.id.artist_item_container)
+        @BindView(R.id.item_container)
         public RelativeLayout mContainer;
 
         public ArtistHolder(View v) {

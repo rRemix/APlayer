@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
@@ -43,6 +45,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     private LoaderManager mManager;
     private AlbumAdater mAdapter;
     private static int LOADER_ID = 1;
+    private ArrayList<View> mSelectedViews = new ArrayList<>();
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -61,27 +64,40 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
 //        mRecycleView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
-
         mAdapter = new AlbumAdater(mCursor,getActivity());
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(mCursor != null && mCursor.moveToPosition(position)) {
-                    int albumid = mCursor.getInt(mAlbumIdIndex);
-                    String title = mCursor.getString(mAlbumIndex);
-                    Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
-                    intent.putExtra("Id", albumid);
-                    intent.putExtra("Title", title);
-                    intent.putExtra("Type", Constants.ALBUM_HOLDER);
-                    startActivity(intent);
+                if(MainActivity.mMultiShow){
+                    if(!mSelectedViews.contains(view)){
+                        mSelectedViews.add(view);
+                        setViewSelected(view,true);
+                    }
+                } else {
+                    if(mCursor != null && mCursor.moveToPosition(position)) {
+                        int albumid = mCursor.getInt(mAlbumIdIndex);
+                        String title = mCursor.getString(mAlbumIndex);
+                        Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
+                        intent.putExtra("Id", albumid);
+                        intent.putExtra("Title", title);
+                        intent.putExtra("Type", Constants.ALBUM_HOLDER);
+                        startActivity(intent);
+                    }
                 }
+
             }
             @Override
             public void onItemLongClick(View view, int position) {
                 if(getActivity() instanceof MainActivity){
-                    MainActivity mainActivity = (MainActivity)getActivity();
-                    MainActivity.mMultiShow = true;
-                    mainActivity.updateOptionsMenu(true);
+                    if(!mSelectedViews.contains(view)){
+                        mSelectedViews.add(view);
+                        setViewSelected(view,true);
+                    }
+
+                    if(!MainActivity.mMultiShow){
+                        MainActivity.mMultiShow = true;
+                        ((MainActivity) getActivity()).updateOptionsMenu(true);
+                    }
                 }
             }
         });
@@ -128,6 +144,16 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         return mAdapter;
     }
 
+
+    @Override
+    public void cleanSelectedViews() {
+        for(View view : mSelectedViews){
+            if(view != null)
+                setViewSelected(view,false);
+        }
+        mSelectedViews.clear();
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -135,8 +161,4 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
             mCursor.close();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 }

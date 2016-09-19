@@ -43,7 +43,7 @@
         <LinearLayout
             android:id="@+id/item_container_text"
             android:layout_centerVertical="true"
-            android:layout_width="@dimen/d100_size"
+            android:layout_width="@dimen/d120_size"
             android:layout_height="42dp"
             android:orientation="vertical"
             android:layout_marginLeft="8dp"
@@ -79,10 +79,9 @@
     </RelativeLayout>
 
     <Button
-        android:visibility="visible"
         android:tag="card_background"
         android:id="@+id/recycleview_card"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_card_ripple" />
+        android:background="@drawable/bg_card" />
 </remix.myplayer.ui.customview.CardFrameLayout>

@@ -44,8 +44,6 @@ public class CardFrameLayout extends FrameLayout {
     private Button mCardBg;
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        int paddingTop = getPaddingTop();
-        int paddingLeft = getPaddingLeft();
 
         for(int i = 0 ; i < getChildCount();i++){
             View child = getChildAt(i);
@@ -67,10 +65,10 @@ public class CardFrameLayout extends FrameLayout {
             //判断是否点击在更多按钮上
             Rect rect = new Rect();
             mMoreButton.getHitRect(rect);
-            rect.top += paddingTop;
-            rect.bottom += paddingTop;
-            rect.left += paddingLeft;
-            rect.right += paddingLeft;
+            rect.top += getPaddingTop();
+            rect.bottom += getPaddingTop();
+            rect.left += getPaddingLeft();
+            rect.right += getPaddingLeft();
             mTargetView = null;
             mTargetView = rect.contains((int) ev.getX(), (int) ev.getY()) ? mMoreButton : mContainer;
         }
@@ -78,13 +76,14 @@ public class CardFrameLayout extends FrameLayout {
         if(mTargetView == null)
             return super.dispatchTouchEvent(ev);
 
+        Log.d("CardFrameLayout","left:" + mTargetView.getLeft() + " top:" + mTargetView.getTop());
         if(mTargetView instanceof RelativeLayout) {
             mCardBg.dispatchTouchEvent(ev);
             ev.setLocation(ev.getX() - mTargetView.getLeft(),ev.getY() - mTargetView.getTop());
             return mTargetView.dispatchTouchEvent(ev);
         } else {
-            final float targetX = ev.getX() - paddingLeft - mTargetView.getLeft();
-            final float targetY = ev.getY() - paddingTop - mTargetView.getTop();
+            final float targetX = ev.getX() - mTargetView.getLeft();
+            final float targetY = ev.getY() - mTargetView.getTop();
             ev.setLocation(targetX,targetY);
             return mTargetView.dispatchTouchEvent(ev);
         }

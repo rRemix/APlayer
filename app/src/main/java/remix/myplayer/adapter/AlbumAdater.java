@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -18,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.util.RippleHelper;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
@@ -91,14 +93,14 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                     @Override
                     public void onClick(View v) {
                         int pos = holder.getAdapterPosition();
-                        mOnItemClickLitener.onItemClick(holder.mImage,pos);
+                        mOnItemClickLitener.onItemClick(holder.mCardBackground,pos);
                     }
                 });
                 //多选菜单
                 holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        mOnItemClickLitener.onItemLongClick(v,position);
+                        mOnItemClickLitener.onItemLongClick(holder.mCardBackground,position);
                         return true;
                     }
                 });

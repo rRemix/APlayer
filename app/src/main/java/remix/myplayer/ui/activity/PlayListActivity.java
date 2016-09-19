@@ -41,7 +41,7 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     RecyclerView mRecycleView;
 
     private PlayListAdapter mAdapter;
-
+    public static boolean mMultiShow = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,6 +76,8 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 
             @Override
             public void onItemLongClick(View view, int position) {
+                mMultiShow = true;
+                updateOptionsMenu(true);
             }
         });
         mRecycleView.setAdapter(mAdapter);
@@ -134,8 +136,34 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        getMenuInflater().inflate(mMultiShow ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
         return true;
+    }
+
+
+    public void updateOptionsMenu(boolean multiShow){
+        mMultiShow = multiShow;
+        mToolBar.setNavigationIcon(mMultiShow ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mMultiShow){
+                    updateOptionsMenu(false);
+                } else {
+                   finish();
+                }
+            }
+        });
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mMultiShow) {
+            updateOptionsMenu(false);
+        } else {
+           finish();
+        }
     }
 
     public void UpdateAdapter() {

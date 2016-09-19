@@ -140,10 +140,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         mIsRunning = false;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -446,7 +442,11 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             mDrawerLayout.closeDrawer(mNavigationView);
         } else if(mMultiShow) {
             updateOptionsMenu(false);
-//            hideMulitMenu();
+            for(Fragment tempFragment : getSupportFragmentManager().getFragments()){
+                if(tempFragment instanceof AlbumFragment){
+                    ((AlbumFragment) tempFragment).cleanSelectedViews();
+                }
+            }
         } else {
             Intent home = new Intent(Intent.ACTION_MAIN);
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -477,80 +477,5 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         return Constants.MAINACTIVITY;
     }
 
-
-    /**
-     * 将本专辑封面的缓存替换为剪切后的图片
-     */
-    class ModifyCoverThread extends Thread{
-        private int mId;
-        private String mNewPath;
-        public ModifyCoverThread(int id,String path){
-            mId = id;
-            mNewPath = path;
-        }
-        @Override
-        public void run() {
-
-            if(Global.mAlbunOrArtist == Constants.ARTIST_HOLDER){
-                mRefreshHandler.sendEmptyMessage(UPDATECOVER);
-                return;
-            }
-            String oriPath = DBUtil.getImageUrl(mId + "",Constants.URL_ALBUM);
-            if(TextUtils.isEmpty(oriPath)){
-                return;
-            }
-            //清除fresco的缓存
-            ImagePipeline imagePipeline = Fresco.getImagePipeline();
-            Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mId);
-            imagePipeline.evictFromCache(uri);
-
-            FileOutputStream fos = null;
-            FileInputStream fin = null;
-            try {
-                fos = new FileOutputStream(oriPath,false);
-                fin = new FileInputStream(mNewPath);
-                byte[] bytes = new byte[1000];
-                int length = -1;
-                while ((length = fin.read(bytes)) != -1){
-                    fos.write(bytes);
-                }
-                fos.flush();
-                mRefreshHandler.sendEmptyMessage(UPDATECOVER);
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if(fos != null){
-                    try {
-                        fos.close();
-                        fos = null;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if(fin != null){
-                    try {
-                        fin.close();
-                        fin = null;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-        }
-    }
-
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        switch (requestCode) {
-//            case PERMISSIONCODE: {
-//                boolean haspermission = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
-//                break;
-//            }
-//
-//            default:break;
-//        }
-//    }
 }
 
