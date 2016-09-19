@@ -14,11 +14,8 @@ android {
     }
     buildTypes {
         debug {
+            debuggable true
             minifyEnabled false
-            buildConfigField "boolean", "LOG_DEBUG", "false"
-            zipAlignEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
             //混淆代码

@@ -28,50 +28,54 @@
             fresco:placeholderImage="@drawable/album_empty_bg"
             fresco:roundedCornerRadius="1dp"
             android:layout_alignParentTop="true" />
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="42dp"
+
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
+            android:layout_below="@id/recycleview_simpleiview"
+            android:id="@+id/recycleview_button"
+            android:src="@drawable/list_icn_more"
+            android:background="@drawable/bg_common_ripple"/>
+
+        <LinearLayout
+            android:id="@+id/item_container_text"
+            android:layout_centerVertical="true"
+            android:layout_width="@dimen/d100_size"
+            android:layout_height="42dp"
+            android:orientation="vertical"
+            android:layout_marginLeft="8dp"
+            android:gravity="center_vertical"
+            android:layout_toLeftOf="@id/recycleview_button"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
             android:layout_below="@id/recycleview_simpleiview">
-            <LinearLayout
-                android:layout_centerVertical="true"
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_marginLeft="8dp"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_gravity="center_vertical"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:text="专辑名"
-                    android:id="@+id/recycleview_text1"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    android:textColor="?attr/text_color_primary"
-                    android:textSize="@dimen/s14_size"/>
-                <TextView
-                    android:layout_marginTop="2dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/recycleview_text2"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    android:layout_below="@id/recycleview_text1"
-                    android:text="歌手名"
-                    android:textColor="?attr/text_color"
-                    android:textSize="@dimen/s12_size"/>
-            </LinearLayout>
-            <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:id="@+id/recycleview_button"
-                android:src="@drawable/list_icn_more"
-                android:background="@drawable/bg_common_ripple"/>
-        </RelativeLayout>
+            <TextView
+                android:layout_gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="专辑名"
+                android:id="@+id/recycleview_text1"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textColor="?attr/text_color_primary"
+                android:textSize="@dimen/s14_size"/>
+            <TextView
+                android:layout_marginTop="2dp"
+                android:layout_gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/recycleview_text2"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_below="@id/recycleview_text1"
+                android:text="歌手名"
+                android:textColor="?attr/text_color"
+                android:textSize="@dimen/s12_size"/>
+        </LinearLayout>
+
     </RelativeLayout>
 
     <Button

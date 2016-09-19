@@ -165,6 +165,7 @@ public class Application extends android.app.Application {
         new LockScreenListener(getApplicationContext()).beginListen();
         //异常捕获
         MobclickAgent.setCatchUncaughtExceptions(true);
+        MobclickAgent.setDebugMode(true);
         initUtil();
         loadSong();
     }

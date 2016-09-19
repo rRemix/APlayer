@@ -334,29 +334,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         return true;
     }
 
-    public void showMultiMenu(){
-        mMultiShow = true;
-        mToolBar.setNavigationIcon(R.drawable.actionbar_delete);
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideMulitMenu();
-            }
-        });
-        invalidateOptionsMenu();
-    }
-
-    public void hideMulitMenu(){
-        mMultiShow = false;
-        mToolBar.setNavigationIcon(R.drawable.actionbar_menu);
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDrawerLayout.openDrawer(mNavigationView);
-            }
-        });
-        invalidateOptionsMenu();
-    }
 
     public void updateOptionsMenu(boolean multiShow){
         mMultiShow = multiShow;
