@@ -89,7 +89,6 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
                         updateOptionsMenu(true);
                     MultiChoice.RemoveOrAddView(view);
                 }
-
             }
         });
         mRecycleView.setAdapter(mAdapter);

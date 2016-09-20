@@ -9,7 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -51,7 +51,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
     @BindView(R.id.child_holder_recyclerView)
     RecyclerView mRecyclerView;
     @BindView(R.id.toolbar)
-    Toolbar mToolbar;
+    Toolbar mToolBar;
 
     private String Title;
     private BottomActionBarFragment mActionbar;
@@ -70,6 +70,8 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
             mNum.setText(mInfoList.size() + "首歌曲");
         }
     };
+
+    private MultiChoice MultiChoice = new MultiChoice();
 
 
     @Override
@@ -98,28 +100,36 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if (mInfoList != null && mInfoList.size() == 0)
-                    return;
-                ArrayList<Long> ids = new ArrayList<Long>();
-                for (MP3Item info : mInfoList) {
-                    if(info != null && info.getId() > 0)
-                        ids.add(info.getId());
-                }
-                //设置正在播放列表
-                Global.setPlayingList((ArrayList) ids.clone());
+                if(MultiChoice.ISHOW ){
+                    MultiChoice.RemoveOrAddView(view);
+                } else {
+                    if (mInfoList != null && mInfoList.size() == 0)
+                        return;
+                    ArrayList<Long> ids = new ArrayList<Long>();
+                    for (MP3Item info : mInfoList) {
+                        if(info != null && info.getId() > 0)
+                            ids.add(info.getId());
+                    }
+                    //设置正在播放列表
+                    Global.setPlayingList((ArrayList) ids.clone());
 
-                Intent intent = new Intent(Constants.CTL_ACTION);
-                Bundle arg = new Bundle();
-                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                arg.putInt("Position", position);
-                intent.putExtras(arg);
-                sendBroadcast(intent);
+                    Intent intent = new Intent(Constants.CTL_ACTION);
+                    Bundle arg = new Bundle();
+                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                    arg.putInt("Position", position);
+                    intent.putExtras(arg);
+                    sendBroadcast(intent);
+                }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-
+                if(!MultiChoice.ISHOW)
+                    updateOptionsMenu(true);
+                MultiChoice.RemoveOrAddView(view);
             }
+
+
         });
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new RecyclerItemDecoration(this,RecyclerItemDecoration.VERTICAL_LIST,getResources().getDrawable(R.drawable.divider)));
@@ -140,13 +150,43 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         } else
             Title = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
         //初始化toolbar
-        initToolbar(mToolbar,Title);
+        initToolbar(mToolBar,Title);
         //初始化底部状态栏
         mActionbar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
             return;
 
         mActionbar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
+    }
+
+    public void updateOptionsMenu(boolean multiShow){
+        MultiChoice.ISHOW = multiShow;
+        mToolBar.setNavigationIcon(MultiChoice.ISHOW ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(MultiChoice.ISHOW){
+                    updateOptionsMenu(false);
+                } else {
+                    finish();
+                }
+            }
+        });
+        invalidateOptionsMenu();
+    }
+
+    private void cleanSelectedViews() {
+        MultiChoice.cleanSelectedViews();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(MultiChoice.ISHOW) {
+            updateOptionsMenu(false);
+            cleanSelectedViews();
+        } else {
+            finish();
+        }
     }
 
     public void UpdateData(){

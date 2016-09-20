@@ -4,14 +4,9 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +15,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.generic.GenericDraweeHierarchy;
-import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -34,11 +27,11 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
 
@@ -166,6 +159,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             holder.mItemButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if(MainActivity.MultiChoice.ISHOW)
+                        return;
                     MP3Item temp = allsong ? DBUtil.getMP3InfoById(Global.mAllSongList.get(holder.getAdapterPosition())) : mInfoList.get(holder.getAdapterPosition());
                     Intent intent = new Intent(mContext, OptionDialog.class);
                     intent.putExtra("MP3Item", temp);
@@ -175,13 +170,21 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         }
 
         //
-        if(mOnItemClickLitener != null && holder.mRootView != null) {
-            holder.mRootView.setOnClickListener(new View.OnClickListener() {
+        if(mOnItemClickLitener != null && holder.mContainer != null) {
+            holder.mContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition());
                 }
             });
+            holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition());
+                    return true;
+                }
+            });
+
         }
 
     }
@@ -226,10 +229,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         public ColumnView mColumnView;
         public ImageButton mItemButton;
         public TextView mIndex;
-        public View mRootView;
+        public View mContainer;
         public SongViewHolder(View itemView) {
             super(itemView);
-            mRootView = itemView;
+            mContainer = itemView;
             mImage = (SimpleDraweeView)itemView.findViewById(R.id.song_head_image);
             mName = (TextView)itemView.findViewById(R.id.song_title);
             mOther = (TextView)itemView.findViewById(R.id.song_other);

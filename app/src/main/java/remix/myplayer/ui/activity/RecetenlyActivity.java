@@ -26,6 +26,7 @@ import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -51,6 +52,8 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     private MaterialDialog mMDDialog;
     private final int START = 0;
     private final int END = 1;
+    private MultiChoice MultiChoice = new MultiChoice();
+
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -88,17 +91,25 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Intent intent = new Intent(Constants.CTL_ACTION);
-                Bundle arg = new Bundle();
-                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                arg.putInt("Position", position);
-                intent.putExtras(arg);
-                Global.setPlayingList(Global.mWeekList);
-                sendBroadcast(intent);
+                if(MultiChoice.ISHOW ){
+                    MultiChoice.RemoveOrAddView(view);
+                } else {
+                    Intent intent = new Intent(Constants.CTL_ACTION);
+                    Bundle arg = new Bundle();
+                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                    arg.putInt("Position", position);
+                    intent.putExtras(arg);
+                    Global.setPlayingList(Global.mWeekList);
+                    sendBroadcast(intent);
+                }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
+                if(!MultiChoice.ISHOW)
+                    updateOptionsMenu(true);
+                MultiChoice.RemoveOrAddView(view);
+
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -118,6 +129,36 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
                 mHandler.sendEmptyMessage(END);
             }
         }.start();
+    }
+
+    public void updateOptionsMenu(boolean multiShow){
+        MultiChoice.ISHOW = multiShow;
+        mToolBar.setNavigationIcon(MultiChoice.ISHOW ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(MultiChoice.ISHOW){
+                    updateOptionsMenu(false);
+                } else {
+                    finish();
+                }
+            }
+        });
+        invalidateOptionsMenu();
+    }
+
+    private void cleanSelectedViews() {
+        MultiChoice.cleanSelectedViews();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(MultiChoice.ISHOW) {
+            updateOptionsMenu(false);
+            cleanSelectedViews();
+        } else {
+            finish();
+        }
     }
 
     //随机播放

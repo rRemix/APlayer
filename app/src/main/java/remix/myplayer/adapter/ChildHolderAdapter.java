@@ -2,9 +2,7 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,8 +15,8 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.model.MP3Item;
 import remix.myplayer.listener.OnItemClickListener;
+import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -106,11 +104,18 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
             });
         }
 
-        if(holder.mRootView != null && mOnItemClickLitener != null){
-            holder.mRootView.setOnClickListener(new View.OnClickListener() {
+        if(holder.mContainer != null && mOnItemClickLitener != null){
+            holder.mContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition());
+                }
+            });
+            holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition());
+                    return true;
                 }
             });
         }
@@ -128,10 +133,10 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
         public ImageButton mButton;
         @BindView(R.id.song_columnview)
         public ColumnView mColumnView;
-        public View mRootView;
+        public View mContainer;
         public ViewHoler(View itemView) {
             super(itemView);
-            mRootView = itemView;
+            mContainer = itemView;
         }
     }
 }

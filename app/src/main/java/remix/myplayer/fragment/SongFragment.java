@@ -4,10 +4,7 @@ package remix.myplayer.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Canvas;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -16,16 +13,9 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.facebook.drawee.generic.GenericDraweeHierarchy;
-import com.facebook.drawee.view.SimpleDraweeView;
-
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,6 +24,7 @@ import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.RecyclerItemDecoration;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 
@@ -59,6 +50,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     RecyclerView mRecyclerView;
     private SongAdapter mAdapter;
     private static int LOADER_ID = 1;
+    public static boolean isFirstSelected = true;
 
     @Override
     public void onAttach(Context context) {
@@ -109,17 +101,33 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Global.setPlayingList(Global.mAllSongList);
-                Intent intent = new Intent(Constants.CTL_ACTION);
-                Bundle arg = new Bundle();
-                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                arg.putInt("Position", position);
-                intent.putExtras(arg);
-                getActivity().sendBroadcast(intent);
+                if(MainActivity.MultiChoice.ISHOW && getUserVisibleHint()){
+                    MainActivity.MultiChoice.RemoveOrAddView(view);
+                } else {
+                    Global.setPlayingList(Global.mAllSongList);
+                    Intent intent = new Intent(Constants.CTL_ACTION);
+                    Bundle arg = new Bundle();
+                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                    arg.putInt("Position", position);
+                    intent.putExtras(arg);
+                    getActivity().sendBroadcast(intent);
+                }
+
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
+                if(isFirstSelected && getUserVisibleHint()){
+                    isFirstSelected = false;
+                    MainActivity.MultiChoice.RemoveOrAddView(view);
+                }
+                if(getActivity() instanceof MainActivity){
+                    if(MainActivity.MultiChoice.ISHOW && getUserVisibleHint())
+                        MainActivity.MultiChoice.RemoveOrAddView(view);
+                    if(!MainActivity.MultiChoice.ISHOW){
+                        ((MainActivity) getActivity()).updateOptionsMenu(true);
+                    }
+                }
             }
         });
         mRecyclerView.setAdapter(mAdapter);

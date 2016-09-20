@@ -450,7 +450,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         } else if(MultiChoice.ISHOW) {
             updateOptionsMenu(false);
             MultiChoice.cleanSelectedViews();
-            AlbumFragment.isFirstSelected = ArtistFragment.isFirstSelected = true;
+            AlbumFragment.isFirstSelected = ArtistFragment.isFirstSelected  = SongFragment.isFirstSelected = true;
 //            for(Fragment tempFragment : getSupportFragmentManager().getFragments()){
 //                if(tempFragment instanceof AlbumFragment){
 //                    ((AlbumFragment) tempFragment).cleanSelectedViews();
