@@ -25,6 +25,7 @@ import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.XmlUtil;
@@ -41,8 +42,7 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     RecyclerView mRecycleView;
 
     private PlayListAdapter mAdapter;
-    public static boolean mMultiShow = false;
-
+    public static MultiChoice MultiChoice = new MultiChoice();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,30 +54,42 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         mRecycleView.setLayoutManager(new GridLayoutManager(this, 2));
         mAdapter = new PlayListAdapter(this);
         mAdapter.setOnItemClickLitener(new PlayListAdapter.OnItemClickLitener() {
-            @Override
-            public void onItemClick(View view, int position) {
+            private String getName(int position){
                 String name = "";
                 Iterator it = Global.mPlaylist.keySet().iterator();
                 for (int i = 0; i <= position; i++) {
                     it.hasNext();
                     name = it.next().toString();
                 }
-                if(Global.mPlaylist.get(name).size() == 0) {
-                    Toast.makeText(PlayListActivity.this, getString(R.string.list_isempty), Toast.LENGTH_SHORT).show();
-                    return;
+                return name;
+            }
+            @Override
+            public void onItemClick(View view, int position) {
+                String name = getName(position);
+                if(MultiChoice.ISHOW && !name.equals(PlayListActivity.this.getString(R.string.my_favorite))){
+                    MultiChoice.RemoveOrAddView(view);
+                } else {
+                    if(Global.mPlaylist.get(name).size() == 0) {
+                        Toast.makeText(PlayListActivity.this, getString(R.string.list_isempty), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Intent intent = new Intent(PlayListActivity.this, ChildHolderActivity.class);
+                    intent.putExtra("Test",true);
+                    intent.putExtra("Id", position);
+                    intent.putExtra("Title", name);
+                    intent.putExtra("Type", Constants.PLAYLIST_HOLDER);
+                    startActivity(intent);
                 }
-                Intent intent = new Intent(PlayListActivity.this, ChildHolderActivity.class);
-                intent.putExtra("Test",true);
-                intent.putExtra("Id", position);
-                intent.putExtra("Title", name);
-                intent.putExtra("Type", Constants.PLAYLIST_HOLDER);
-                startActivity(intent);
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                mMultiShow = true;
-                updateOptionsMenu(true);
+                if(!getName(position).equals(PlayListActivity.this.getString(R.string.my_favorite))){
+                    if(!MultiChoice.ISHOW)
+                        updateOptionsMenu(true);
+                    MultiChoice.RemoveOrAddView(view);
+                }
+
             }
         });
         mRecycleView.setAdapter(mAdapter);
@@ -136,18 +148,17 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(mMultiShow ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
+        getMenuInflater().inflate(MultiChoice.ISHOW ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
         return true;
     }
 
-
     public void updateOptionsMenu(boolean multiShow){
-        mMultiShow = multiShow;
-        mToolBar.setNavigationIcon(mMultiShow ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+        MultiChoice.ISHOW = multiShow;
+        mToolBar.setNavigationIcon(MultiChoice.ISHOW ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
         mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mMultiShow){
+                if(MultiChoice.ISHOW){
                     updateOptionsMenu(false);
                 } else {
                    finish();
@@ -159,8 +170,9 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 
     @Override
     public void onBackPressed() {
-        if(mMultiShow) {
+        if(MultiChoice.ISHOW) {
             updateOptionsMenu(false);
+            cleanSelectedViews();
         } else {
            finish();
         }
@@ -172,4 +184,7 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         }
     }
 
+    private void cleanSelectedViews() {
+        MultiChoice.cleanSelectedViews();
+    }
 }

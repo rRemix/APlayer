@@ -33,19 +33,27 @@
             android:layout_alignParentBottom="true"
             android:layout_below="@id/recycleview_simpleiview"/>
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/item_container_text"
             android:layout_width="@dimen/d120_size"
             android:layout_height="32dp"
-            android:text="歌手名"
-            android:id="@+id/recycleview_text1"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textColor="?attr/text_color_primary"
-            android:textSize="@dimen/s14_size"
+            android:orientation="vertical"
             android:layout_marginLeft="8dp"
-            android:layout_alignParentLeft="true"
+            android:gravity="center_vertical"
+            android:layout_toLeftOf="@id/recycleview_button"
             android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@id/recycleview_button"/>
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/recycleview_simpleiview">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="歌手名"
+                android:id="@+id/recycleview_text1"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textColor="?attr/text_color_primary"
+                android:textSize="@dimen/s14_size" />
+        </LinearLayout>
     </RelativeLayout>
 
     <Button
@@ -53,5 +61,5 @@
         android:id="@+id/recycleview_card"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_card_ripple" />
+        android:background="@drawable/bg_card" />
 </remix.myplayer.ui.customview.CardFrameLayout>

@@ -28,9 +28,6 @@ import com.facebook.imagepipeline.core.ImagePipeline;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 import butterknife.BindView;
@@ -45,6 +42,7 @@ import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -75,13 +73,14 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     DrawerLayout mDrawerLayout;
     private BottomActionBarFragment mBottomBar;
     private final static String TAG = "MainActivity";
-    public static boolean mMultiShow = false;
 
     private PagerAdapter mAdapter;
     //是否正在运行
     private static boolean mIsRunning = false;
     //是否第一次启动
     private static boolean mIsFirst = true;
+
+    public static MultiChoice MultiChoice = new MultiChoice();
 
     private static final int PERMISSIONCODE = 100;
     private static final String[] PERMISSIONS = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -326,18 +325,18 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(mMultiShow ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
+        getMenuInflater().inflate(MultiChoice.ISHOW ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
         return true;
     }
 
 
     public void updateOptionsMenu(boolean multiShow){
-        mMultiShow = multiShow;
-        mToolBar.setNavigationIcon(mMultiShow ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+        MultiChoice.ISHOW = multiShow;
+        mToolBar.setNavigationIcon(MultiChoice.ISHOW ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
         mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mMultiShow){
+                if(MultiChoice.ISHOW){
                     updateOptionsMenu(false);
                 } else {
                     mDrawerLayout.openDrawer(mNavigationView);
@@ -345,6 +344,14 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             }
         });
         invalidateOptionsMenu();
+    }
+
+    public void RemoveOrAddView(View v){
+        MultiChoice.RemoveOrAddView(v);
+    }
+
+    public MultiChoice getMultiChoice(){
+        return MultiChoice;
     }
 
     private void initDrawerLayout() {
@@ -440,13 +447,15 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
             mDrawerLayout.closeDrawer(mNavigationView);
-        } else if(mMultiShow) {
+        } else if(MultiChoice.ISHOW) {
             updateOptionsMenu(false);
-            for(Fragment tempFragment : getSupportFragmentManager().getFragments()){
-                if(tempFragment instanceof AlbumFragment){
-                    ((AlbumFragment) tempFragment).cleanSelectedViews();
-                }
-            }
+            MultiChoice.cleanSelectedViews();
+            AlbumFragment.isFirstSelected = ArtistFragment.isFirstSelected = true;
+//            for(Fragment tempFragment : getSupportFragmentManager().getFragments()){
+//                if(tempFragment instanceof AlbumFragment){
+//                    ((AlbumFragment) tempFragment).cleanSelectedViews();
+//                }
+//            }
         } else {
             Intent home = new Intent(Intent.ACTION_MAIN);
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

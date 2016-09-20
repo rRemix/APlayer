@@ -79,7 +79,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
                     final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                     popupMenu.getMenuInflater().inflate(R.menu.folder_menu, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext,
-                            position,
+                            holder.getAdapterPosition(),
                             Constants.FOLDER_HOLDER,
                             full_path));
                     popupMenu.setGravity(Gravity.END);

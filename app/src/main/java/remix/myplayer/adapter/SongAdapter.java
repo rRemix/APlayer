@@ -166,7 +166,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             holder.mItemButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    MP3Item temp = allsong ? DBUtil.getMP3InfoById(Global.mAllSongList.get(position)) : mInfoList.get(position);
+                    MP3Item temp = allsong ? DBUtil.getMP3InfoById(Global.mAllSongList.get(holder.getAdapterPosition())) : mInfoList.get(holder.getAdapterPosition());
                     Intent intent = new Intent(mContext, OptionDialog.class);
                     intent.putExtra("MP3Item", temp);
                     mContext.startActivity(intent);
@@ -179,9 +179,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             holder.mRootView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int pos = holder.getAdapterPosition();
-                    if (pos >= 0)
-                        mOnItemClickLitener.onItemClick(v, pos);
+                    mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition());
                 }
             });
         }

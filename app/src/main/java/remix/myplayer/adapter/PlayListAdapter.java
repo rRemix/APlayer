@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -26,6 +27,8 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.listener.AlbumArtistFolderListener;
+import remix.myplayer.ui.activity.MainActivity;
+import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -92,14 +95,14 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mOnItemClickLitener.onItemClick(v,position);
+                        mOnItemClickLitener.onItemClick(holder.mCardBackground,holder.getAdapterPosition());
                     }
                 });
                 //多选菜单
                 holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        mOnItemClickLitener.onItemLongClick(v,position);
+                        mOnItemClickLitener.onItemLongClick(holder.mCardBackground,holder.getAdapterPosition());
                         return true;
                     }
                 });
@@ -115,10 +118,12 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                     holder.mButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            if(PlayListActivity.MultiChoice.ISHOW)
+                                return;
                             Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                             popupMenu.getMenuInflater().inflate(R.menu.playlist_menu, popupMenu.getMenu());
-                            popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext, position, Constants.PLAYLIST_HOLDER, ""));
+                            popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext, holder.getAdapterPosition(), Constants.PLAYLIST_HOLDER, ""));
                             popupMenu.show();
                         }
                     });
@@ -143,6 +148,9 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         public ImageView mButton;
         @BindView(R.id.item_container)
         public RelativeLayout mContainer;
+        @BindView(R.id.recycleview_card)
+        public Button mCardBackground;
+
         public PlayListHolder(View itemView) {
             super(itemView);
 

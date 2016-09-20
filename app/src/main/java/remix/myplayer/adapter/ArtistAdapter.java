@@ -11,6 +11,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -25,6 +26,7 @@ import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.listener.AlbumArtistFolderListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -82,15 +84,14 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        int pos = holder.getAdapterPosition();
-                        mOnItemClickLitener.onItemClick(v,pos);
+                        mOnItemClickLitener.onItemClick(holder.mCardBackground,holder.getAdapterPosition());
                     }
                 });
                 //多选菜单
                 holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        mOnItemClickLitener.onItemLongClick(v,position);
+                        mOnItemClickLitener.onItemLongClick(holder.mCardBackground,holder.getAdapterPosition());
                         return true;
                     }
                 });
@@ -102,10 +103,12 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if(MainActivity.MultiChoice.ISHOW)
+                            return;
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                         popupMenu.getMenuInflater().inflate(R.menu.artist_menu, popupMenu.getMenu());
-                        mCursor.moveToPosition(position);
+                        mCursor.moveToPosition(holder.getAdapterPosition());
                         popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext,
                                 mCursor.getInt(ArtistFragment.mArtistIdIndex),
                                 Constants.ARTIST_HOLDER,
@@ -134,6 +137,8 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
         public ImageButton mButton;
         @BindView(R.id.item_container)
         public RelativeLayout mContainer;
+        @BindView(R.id.recycleview_card)
+        public Button mCardBackground;
 
         public ArtistHolder(View v) {
             super(v);

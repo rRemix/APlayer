@@ -30,6 +30,7 @@ import remix.myplayer.listener.AlbumArtistFolderListener;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -92,15 +93,14 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        int pos = holder.getAdapterPosition();
-                        mOnItemClickLitener.onItemClick(holder.mCardBackground,pos);
+                        mOnItemClickLitener.onItemClick(holder.mCardBackground,holder.getAdapterPosition());
                     }
                 });
                 //多选菜单
                 holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        mOnItemClickLitener.onItemLongClick(holder.mCardBackground,position);
+                        mOnItemClickLitener.onItemLongClick(holder.mCardBackground,holder.getAdapterPosition());
                         return true;
                     }
                 });
@@ -113,10 +113,12 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if(MainActivity.MultiChoice.ISHOW)
+                            return;
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
                         popupMenu.getMenuInflater().inflate(R.menu.album_menu, popupMenu.getMenu());
-                        mCursor.moveToPosition(position);
+                        mCursor.moveToPosition(holder.getAdapterPosition());
                         popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext,
                                 mCursor.getInt(AlbumFragment.mAlbumIdIndex),
                                 Constants.ALBUM_HOLDER,
