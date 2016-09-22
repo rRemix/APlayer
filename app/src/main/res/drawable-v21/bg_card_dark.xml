@@ -3,7 +3,7 @@
     <item>
         <selector>
             <item android:state_selected="true"
-                android:drawable="@drawable/bg_selected" />
+                android:drawable="@drawable/bg_selected_dark" />
             <item android:drawable="@android:color/transparent" />
         </selector>
     </item>

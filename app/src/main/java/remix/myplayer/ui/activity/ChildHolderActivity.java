@@ -37,7 +37,7 @@ import remix.myplayer.util.Global;
  * 专辑、艺术家、文件夹、播放列表详情
  */
 public class ChildHolderActivity extends ToolbarActivity implements MusicService.Callback{
-    private final static String TAG = "ChildHolderActivity";
+    public final static String TAG = ChildHolderActivity.class.getSimpleName();
     private static boolean mIsRunning = false;
     //获得歌曲信息列表的参数
     private int mId;
@@ -71,7 +71,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         }
     };
 
-    private MultiChoice MultiChoice = new MultiChoice();
+    public static MultiChoice MultiChoice = new MultiChoice();
 
 
     @Override
@@ -82,6 +82,24 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
 
         mInstance = this;
         MusicService.addCallback(ChildHolderActivity.this);
+        MultiChoice.setOnUpdateOptionMenuListener(new MultiChoice.onUpdateOptionMenuListener() {
+            @Override
+            public void onUpdate(boolean multiShow) {
+                MultiChoice.setShowing(multiShow);
+                mToolBar.setNavigationIcon(MultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+                mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(MultiChoice.isShow()){
+                            MultiChoice.UpdateOptionMenu(false);
+                        } else {
+                            finish();
+                        }
+                    }
+                });
+                invalidateOptionsMenu();
+            }
+        });
 
         //参数id，类型，标题
         mId = getIntent().getIntExtra("Id", -1);
@@ -100,9 +118,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(MultiChoice.ISHOW ){
-                    MultiChoice.RemoveOrAddView(view);
-                } else {
+                if(!MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
                     if (mInfoList != null && mInfoList.size() == 0)
                         return;
                     ArrayList<Long> ids = new ArrayList<Long>();
@@ -124,9 +140,10 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
 
             @Override
             public void onItemLongClick(View view, int position) {
-                if(!MultiChoice.ISHOW)
-                    updateOptionsMenu(true);
-                MultiChoice.RemoveOrAddView(view);
+                MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
+//                if(!MultiChoice.isShow())
+//                    updateOptionsMenu(true);
+//                MultiChoice.RemoveOrAddView(view);
             }
 
 
@@ -159,30 +176,15 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         mActionbar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
 
-    public void updateOptionsMenu(boolean multiShow){
-        MultiChoice.ISHOW = multiShow;
-        mToolBar.setNavigationIcon(MultiChoice.ISHOW ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(MultiChoice.ISHOW){
-                    updateOptionsMenu(false);
-                } else {
-                    finish();
-                }
-            }
-        });
-        invalidateOptionsMenu();
-    }
 
     private void cleanSelectedViews() {
-        MultiChoice.cleanSelectedViews();
+        MultiChoice.clear();
     }
 
     @Override
     public void onBackPressed() {
-        if(MultiChoice.ISHOW) {
-            updateOptionsMenu(false);
+        if(MultiChoice.isShow()) {
+            MultiChoice.UpdateOptionMenu(false);
             cleanSelectedViews();
         } else {
             finish();

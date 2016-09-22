@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -15,8 +14,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,6 +44,8 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     private static int LOADER_ID = 1;
     private MultiChoice mMultiChoice = new MultiChoice();
     public static boolean isFirstSelected = true;
+    public static final String TAG = ArtistFragment.class.getSimpleName();
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -70,9 +69,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(MainActivity.MultiChoice.ISHOW && getUserVisibleHint()) {
-                    MainActivity.MultiChoice.RemoveOrAddView(view);
-                }else {
+                if(getUserVisibleHint() && !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
                     int artistid = mCursor.getInt(mArtistIdIndex);
                     String title = mCursor.getString(mArtistIndex);
                     Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
@@ -81,22 +78,36 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
                     intent.putExtra("Type", Constants.ARTIST_HOLDER);
                     startActivity(intent);
                 }
+
+//                if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint()) {
+//                    MainActivity.MultiChoice.RemoveOrAddView(view);
+//                }else {
+//                    int artistid = mCursor.getInt(mArtistIdIndex);
+//                    String title = mCursor.getString(mArtistIndex);
+//                    Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
+//                    intent.putExtra("Id", artistid);
+//                    intent.putExtra("Title", title);
+//                    intent.putExtra("Type", Constants.ARTIST_HOLDER);
+//                    startActivity(intent);
+//                }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                if(getActivity() instanceof MainActivity){
-                    if(isFirstSelected && getUserVisibleHint()){
-                        isFirstSelected = false;
-                        MainActivity.MultiChoice.RemoveOrAddView(view);
-                    }
-
-                    if(MainActivity.MultiChoice.ISHOW && getUserVisibleHint())
-                        MainActivity.MultiChoice.RemoveOrAddView(view);
-                    if(!MainActivity.MultiChoice.ISHOW){
-                        ((MainActivity) getActivity()).updateOptionsMenu(true);
-                    }
-                }
+                if(getUserVisibleHint())
+                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
+//                if(getActivity() instanceof MainActivity){
+//                    if(isFirstSelected && getUserVisibleHint()){
+//                        isFirstSelected = false;
+//                        MainActivity.MultiChoice.RemoveOrAddView(view);
+//                    }
+//
+//                    if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint())
+//                        MainActivity.MultiChoice.RemoveOrAddView(view);
+//                    if(!MainActivity.MultiChoice.mIsShow){
+//                        ((MainActivity) getActivity()).updateOptionsMenu(true);
+//                    }
+//                }
             }
         });
         mRecycleView.setAdapter(mAdapter);
@@ -128,7 +139,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     }
 
     public void cleanSelectedViews() {
-        mMultiChoice.cleanSelectedViews();
+        mMultiChoice.clear();
     }
 
     @Override

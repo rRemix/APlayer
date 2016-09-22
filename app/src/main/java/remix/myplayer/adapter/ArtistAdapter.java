@@ -22,6 +22,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.ArtistFragment;
+import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.listener.AlbumArtistFolderListener;
 import remix.myplayer.theme.Theme;
@@ -103,7 +104,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(MainActivity.MultiChoice.ISHOW)
+                        if(MainActivity.MultiChoice.isShow())
                             return;
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
@@ -118,6 +119,12 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                     }
                 });
             }
+        }
+        if(MainActivity.MultiChoice.getTag().equals(ArtistFragment.TAG) &&
+                MainActivity.MultiChoice.mSelectedPosition.contains(position)){
+            MainActivity.MultiChoice.AddView(holder.mCardBackground);
+        } else {
+            holder.mCardBackground.setSelected(false);
         }
     }
 

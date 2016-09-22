@@ -41,6 +41,7 @@ import remix.myplayer.util.Global;
  * 目前为最近7天添加
  */
 public class RecetenlyActivity extends ToolbarActivity implements MusicService.Callback{
+    public static final String TAG = RecetenlyActivity.class.getSimpleName();
     private ArrayList<MP3Item> mInfoList;
     private SongAdapter mAdapter;
     @BindView(R.id.recently_shuffle)
@@ -52,7 +53,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     private MaterialDialog mMDDialog;
     private final int START = 0;
     private final int END = 1;
-    private MultiChoice MultiChoice = new MultiChoice();
+    public static MultiChoice MultiChoice = new MultiChoice();
 
     private Handler mHandler = new Handler(){
         @Override
@@ -81,8 +82,26 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recently);
         ButterKnife.bind(this);
-
         MusicService.addCallback(RecetenlyActivity.this);
+        MultiChoice.setOnUpdateOptionMenuListener(new MultiChoice.onUpdateOptionMenuListener() {
+            @Override
+            public void onUpdate(boolean multiShow) {
+                MultiChoice.setShowing(multiShow);
+                mToolBar.setNavigationIcon(MultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+                mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(MultiChoice.isShow()){
+                            MultiChoice.UpdateOptionMenu(false);
+                        } else {
+                            finish();
+                        }
+                    }
+                });
+                invalidateOptionsMenu();
+            }
+        });
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.addItemDecoration(new RecyclerItemDecoration(this,RecyclerItemDecoration.VERTICAL_LIST,getResources().getDrawable(R.drawable.divider)));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -91,9 +110,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(MultiChoice.ISHOW ){
-                    MultiChoice.RemoveOrAddView(view);
-                } else {
+                if(!MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
@@ -102,14 +119,25 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
                     Global.setPlayingList(Global.mWeekList);
                     sendBroadcast(intent);
                 }
+//                if(MultiChoice.isShow()){
+//                    MultiChoice.RemoveOrAddView(view);
+//                } else {
+//                    Intent intent = new Intent(Constants.CTL_ACTION);
+//                    Bundle arg = new Bundle();
+//                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+//                    arg.putInt("Position", position);
+//                    intent.putExtras(arg);
+//                    Global.setPlayingList(Global.mWeekList);
+//                    sendBroadcast(intent);
+//                }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                if(!MultiChoice.ISHOW)
-                    updateOptionsMenu(true);
-                MultiChoice.RemoveOrAddView(view);
-
+                MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
+//                if(!MultiChoice.isShow())
+//                    updateOptionsMenu(true);
+//                MultiChoice.RemoveOrAddView(view);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -131,30 +159,15 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         }.start();
     }
 
-    public void updateOptionsMenu(boolean multiShow){
-        MultiChoice.ISHOW = multiShow;
-        mToolBar.setNavigationIcon(MultiChoice.ISHOW ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(MultiChoice.ISHOW){
-                    updateOptionsMenu(false);
-                } else {
-                    finish();
-                }
-            }
-        });
-        invalidateOptionsMenu();
-    }
 
     private void cleanSelectedViews() {
-        MultiChoice.cleanSelectedViews();
+        MultiChoice.clear();
     }
 
     @Override
     public void onBackPressed() {
-        if(MultiChoice.ISHOW) {
-            updateOptionsMenu(false);
+        if(MultiChoice.isShow()) {
+            MultiChoice.UpdateOptionMenu(false);
             cleanSelectedViews();
         } else {
             finish();

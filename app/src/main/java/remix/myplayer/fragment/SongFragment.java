@@ -13,6 +13,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,8 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     private SongAdapter mAdapter;
     private static int LOADER_ID = 1;
     public static boolean isFirstSelected = true;
+    public static final String TAG = SongFragment.class.getSimpleName();
+
 
     @Override
     public void onAttach(Context context) {
@@ -101,9 +104,8 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(MainActivity.MultiChoice.ISHOW && getUserVisibleHint()){
-                    MainActivity.MultiChoice.RemoveOrAddView(view);
-                } else {
+                Log.d(TAG,"view:" + view.toString());
+                if(!MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
                     Global.setPlayingList(Global.mAllSongList);
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
@@ -113,21 +115,37 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
                     getActivity().sendBroadcast(intent);
                 }
 
+//                if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint()){
+//                    MainActivity.MultiChoice.RemoveOrAddView(view);
+//                } else {
+//                    Global.setPlayingList(Global.mAllSongList);
+//                    Intent intent = new Intent(Constants.CTL_ACTION);
+//                    Bundle arg = new Bundle();
+//                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+//                    arg.putInt("Position", position);
+//                    intent.putExtras(arg);
+//                    getActivity().sendBroadcast(intent);
+//                }
+
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                if(isFirstSelected && getUserVisibleHint()){
-                    isFirstSelected = false;
-                    MainActivity.MultiChoice.RemoveOrAddView(view);
-                }
-                if(getActivity() instanceof MainActivity){
-                    if(MainActivity.MultiChoice.ISHOW && getUserVisibleHint())
-                        MainActivity.MultiChoice.RemoveOrAddView(view);
-                    if(!MainActivity.MultiChoice.ISHOW){
-                        ((MainActivity) getActivity()).updateOptionsMenu(true);
-                    }
-                }
+                Log.d(TAG,"view:" + view.toString());
+                if(getUserVisibleHint())
+                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
+
+//                if(isFirstSelected && getUserVisibleHint()){
+//                    isFirstSelected = false;
+//                    MainActivity.MultiChoice.RemoveOrAddView(view);
+//                }
+//                if(getActivity() instanceof MainActivity){
+//                    if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint())
+//                        MainActivity.MultiChoice.RemoveOrAddView(view);
+//                    if(!MainActivity.MultiChoice.mIsShow){
+//                        ((MainActivity) getActivity()).updateOptionsMenu(true);
+//                    }
+//                }
             }
         });
         mRecyclerView.setAdapter(mAdapter);

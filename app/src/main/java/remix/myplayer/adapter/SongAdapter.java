@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.MainActivity;
+import remix.myplayer.ui.activity.RecetenlyActivity;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
@@ -159,7 +161,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             holder.mItemButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(MainActivity.MultiChoice.ISHOW)
+                    if(MainActivity.MultiChoice.isShow())
                         return;
                     MP3Item temp = allsong ? DBUtil.getMP3InfoById(Global.mAllSongList.get(holder.getAdapterPosition())) : mInfoList.get(holder.getAdapterPosition());
                     Intent intent = new Intent(mContext, OptionDialog.class);
@@ -169,7 +171,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             });
         }
 
-        //
+
         if(mOnItemClickLitener != null && holder.mContainer != null) {
             holder.mContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -187,6 +189,27 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
         }
 
+//        if(holder.mContainer.getTag(0) != null && (boolean)(holder.mContainer.getTag(0))){
+//            MainActivity.MultiChoice.AddView(holder.mContainer);
+//        } else {
+//            holder.mContainer.setSelected(false);
+//        }
+
+        if(mType == ALLSONG){
+            if(MainActivity.MultiChoice.getTag().equals(SongFragment.TAG) &&
+                    MainActivity.MultiChoice.mSelectedPosition.contains(position)){
+                MainActivity.MultiChoice.AddView(holder.mContainer);
+            } else {
+                holder.mContainer.setSelected(false);
+            }
+        } else {
+            if(RecetenlyActivity.MultiChoice.getTag().equals(RecetenlyActivity.TAG) &&
+                    RecetenlyActivity.MultiChoice.mSelectedPosition.contains(position)){
+                RecetenlyActivity.MultiChoice.AddView(holder.mContainer);
+            } else {
+                holder.mContainer.setSelected(false);
+            }
+        }
     }
 
     @Override

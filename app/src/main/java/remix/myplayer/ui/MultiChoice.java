@@ -1,13 +1,8 @@
 package remix.myplayer.ui;
 
-import android.app.Activity;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import java.util.ArrayList;
-
-import remix.myplayer.R;
 
 /**
  * @ClassName
@@ -17,13 +12,85 @@ import remix.myplayer.R;
  */
 public class MultiChoice {
     /** 当前正在操作的activity或者fragment */
-    public String TAG = "";
+    private String mTag = "";
     /** 多选菜单是否正在显示 */
-    public boolean ISHOW = false;
+    private boolean mIsShow = false;
     /** 所有选中状态的view */
     public ArrayList<View> mSelectedViews = new ArrayList<>();
+    public ArrayList<Integer> mSelectedPosition = new ArrayList<>();
+    /** 更新optionmenu */
+    private onUpdateOptionMenuListener mUpdateOptionMenuListener;
 
+    public boolean isShow(){
+        return mIsShow;
+    }
 
+    public void setShowing(boolean showing){
+        mIsShow = showing;
+    }
+
+    public void setTag(String tag){
+        mTag = tag;
+    }
+
+    public String getTag(){
+        return mTag;
+    }
+
+    public interface onUpdateOptionMenuListener {
+        void onUpdate(boolean multiShow);
+    }
+
+    public void setOnUpdateOptionMenuListener(onUpdateOptionMenuListener l){
+        mUpdateOptionMenuListener = l;
+    }
+
+    /**
+     *
+     * @param view
+     * @param tag
+     */
+    public boolean itemAddorRemoveWithClick(View view,int position,String tag){
+        if(mIsShow && mTag.equals(tag)){
+            mIsShow = true;
+            RemoveOrAddView(view);
+            RemoveOrAddPosition(position);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param view
+     * @param tag
+     */
+    public void itemAddorRemoveWithLongClick(View view,int position,String tag){
+        if(!mIsShow && mTag.equals("")){
+            RemoveOrAddView(view);
+            RemoveOrAddPosition(position);
+            mTag = tag;
+            mIsShow = true;
+            if(mUpdateOptionMenuListener != null)
+                mUpdateOptionMenuListener.onUpdate(true);
+            return;
+        }
+        if(mIsShow && mTag.equals(tag)){
+            RemoveOrAddView(view);
+            RemoveOrAddPosition(position);
+        }
+
+    }
+
+    public void UpdateOptionMenu(boolean multishow){
+        if(mUpdateOptionMenuListener != null)
+            mUpdateOptionMenuListener.onUpdate(multishow);
+    }
+
+    public void AddView(View view){
+        if(!mSelectedViews.contains(view))
+            setViewSelected(view,true);
+    }
 
     /**
      * 添加或者删除选中的view
@@ -37,35 +104,30 @@ public class MultiChoice {
             mSelectedViews.add(view);
             setViewSelected(view,true);
         }
-
     }
 
-    /**
-     * 添加view
-     * @param v
-     */
-    public void addSelectedView(View v){
-        if(!mSelectedViews.contains(v)){
-            mSelectedViews.add(v);
-            setViewSelected(v,true);
+    public void RemoveOrAddPosition(int position){
+        if(mSelectedPosition.contains(position))
+            mSelectedPosition.remove(position);
+        else {
+            mSelectedPosition.add(position);
         }
     }
 
     /**
-     *
+     * 重置
      */
-    public void removeSelectedView(View v){
-        if(mSelectedViews.contains(v)){
-            mSelectedViews.remove(v);
-            setViewSelected(v,false);
-        }
-
+    public void clear(){
+        clearSelectedViews();
+        mSelectedViews.clear();
+        mSelectedPosition.clear();
+        mTag = "";
     }
 
     /**
      * 清除所有view的选中状态
      */
-    public void cleanSelectedViews(){
+    public void clearSelectedViews(){
         for(View view : mSelectedViews){
             if(view != null)
                 setViewSelected(view,false);
@@ -79,20 +141,21 @@ public class MultiChoice {
      * @param selected
      */
     public void setViewSelected(View v,boolean selected){
-        if(v != null)
+        if(v != null) {
             v.setSelected(selected);
+        }
     }
 
     /**
      * 更新toolbar
      */
 //    public void updateOptionsMenu(boolean multiShow, final Activity activity, final Toolbar toolbar, final Object target){
-//        ISHOW = multiShow;
-//        toolbar.setNavigationIcon(ISHOW ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+//        mIsShow = multiShow;
+//        toolbar.setNavigationIcon(mIsShow ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
 //        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                if(ISHOW){
+//                if(mIsShow){
 //                    updateOptionsMenu(false,activity,toolbar,target);
 //                } else {
 //                    if(target instanceof DrawerLayout){

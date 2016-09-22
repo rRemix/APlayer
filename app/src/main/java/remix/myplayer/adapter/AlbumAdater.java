@@ -3,15 +3,12 @@ package remix.myplayer.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.Rect;
-import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -19,13 +16,13 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.util.RippleHelper;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.AlbumFragment;
+import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.AlbumArtistFolderListener;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.theme.Theme;
@@ -113,7 +110,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(MainActivity.MultiChoice.ISHOW)
+                        if(MainActivity.MultiChoice.isShow())
                             return;
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
@@ -128,6 +125,12 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 });
             }
 
+            if(MainActivity.MultiChoice.getTag().equals(AlbumFragment.TAG) &&
+                    MainActivity.MultiChoice.mSelectedPosition.contains(position)){
+                MainActivity.MultiChoice.AddView(holder.mCardBackground);
+            } else {
+                holder.mCardBackground.setSelected(false);
+            }
         }
     }
     @Override

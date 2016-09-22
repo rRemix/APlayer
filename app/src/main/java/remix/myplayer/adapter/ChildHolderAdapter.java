@@ -15,11 +15,14 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.activity.ChildHolderActivity;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
@@ -93,6 +96,8 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if(ChildHolderActivity.MultiChoice.isShow())
+                        return;
                     Intent intent = new Intent(mContext, OptionDialog.class);
                     intent.putExtra("MP3Item", temp);
                     if (mType == Constants.PLAYLIST_HOLDER) {
@@ -118,6 +123,13 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
                     return true;
                 }
             });
+        }
+
+        if(ChildHolderActivity.MultiChoice.getTag().equals(ChildHolderActivity.TAG) &&
+                ChildHolderActivity.MultiChoice.mSelectedPosition.contains(position)){
+            ChildHolderActivity.MultiChoice.AddView(holder.mContainer);
+        } else {
+            holder.mContainer.setSelected(false);
         }
     }
 

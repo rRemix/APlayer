@@ -23,10 +23,12 @@ import java.util.Iterator;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.listener.AlbumArtistFolderListener;
+import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.util.ColorUtil;
@@ -63,74 +65,67 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
     @Override
     public void onBindViewHolder(final PlayListHolder holder, final int position) {
+        String name = "";
         try {
             //根据当前索引，获得歌曲列表
             Iterator it = Global.mPlaylist.keySet().iterator();
-            String name = "";
             for(int i = 0 ; i<= position ;i++) {
                 it.hasNext();
                 name = it.next().toString();
             }
-            //设置播放列表名字
-            holder.mName.setText(name);
-            //设置背景
-            holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.art_bg_night);
-            //设置专辑封面
-            new AsynLoadImage(holder.mImage).execute(name);
-//            ArrayList<PlayListItem> list = PlayListActivity.getPlayList().get(name);
-//            if(list != null && list.size() > 0) {
-//                for(PlayListItem item : list){
-//                    String url = DBUtil.getImageUrl(item.getAlbumId() + "",Constants.URL_ALBUM);
-//                    if(url != null && !url.equals("")) {
-//                        File file = new File(url);
-//                        if(!file.exists())
-//                            continue;
-//                        holder.mImage.setImageURI(Uri.parse(url));
-//                        break;
-//                    }
-//                }
-//            }
-
-            if(mOnItemClickLitener != null) {
-                holder.mContainer.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mOnItemClickLitener.onItemClick(holder.mCardBackground,holder.getAdapterPosition());
-                    }
-                });
-                //多选菜单
-                holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        mOnItemClickLitener.onItemLongClick(holder.mCardBackground,holder.getAdapterPosition());
-                        return true;
-                    }
-                });
-            }
-
-            if(holder.mButton != null) {
-                boolean isLove = name.equals(mContext.getString(R.string.my_favorite));
-                Theme.TintDrawable(holder.mButton,
-                        isLove ? R.drawable.playlist_love : R.drawable.list_icn_more,
-                        ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
-                holder.mButton.setClickable(!isLove);
-                if(!isLove){
-                    holder.mButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if(PlayListActivity.MultiChoice.ISHOW)
-                                return;
-                            Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
-                            final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-                            popupMenu.getMenuInflater().inflate(R.menu.playlist_menu, popupMenu.getMenu());
-                            popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext, holder.getAdapterPosition(), Constants.PLAYLIST_HOLDER, ""));
-                            popupMenu.show();
-                        }
-                    });
-                }
-            }
         } catch (Exception e){
             e.toString();
+        }
+        //设置播放列表名字
+        holder.mName.setText(name);
+        //设置背景
+        holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.art_bg_night);
+        //设置专辑封面
+        new AsynLoadImage(holder.mImage).execute(name);
+
+        if(mOnItemClickLitener != null) {
+            holder.mContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnItemClickLitener.onItemClick(holder.mCardBackground,holder.getAdapterPosition());
+                }
+            });
+            //多选菜单
+            holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    mOnItemClickLitener.onItemLongClick(holder.mCardBackground,holder.getAdapterPosition());
+                    return true;
+                }
+            });
+        }
+
+        if(holder.mButton != null) {
+            boolean isLove = name.equals(mContext.getString(R.string.my_favorite));
+            Theme.TintDrawable(holder.mButton,
+                    isLove ? R.drawable.playlist_love : R.drawable.list_icn_more,
+                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
+            holder.mButton.setClickable(!isLove);
+            if(!isLove){
+                holder.mButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(PlayListActivity.MultiChoice.isShow())
+                            return;
+                        Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
+                        final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
+                        popupMenu.getMenuInflater().inflate(R.menu.playlist_menu, popupMenu.getMenu());
+                        popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext, holder.getAdapterPosition(), Constants.PLAYLIST_HOLDER, ""));
+                        popupMenu.show();
+                    }
+                });
+            }
+        }
+        if(PlayListActivity.MultiChoice.getTag().equals(PlayListActivity.TAG) &&
+                PlayListActivity.MultiChoice.mSelectedPosition.contains(position)){
+            PlayListActivity.MultiChoice.AddView(holder.mCardBackground);
+        } else {
+            holder.mCardBackground.setSelected(false);
         }
     }
 

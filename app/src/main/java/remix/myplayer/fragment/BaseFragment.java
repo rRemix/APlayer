@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import butterknife.Unbinder;
+import remix.myplayer.ui.MultiChoice;
 
 /**
  * @ClassName
@@ -27,5 +28,39 @@ public class BaseFragment extends Fragment {
         return null;
     }
 
-
+//    /**
+//     *
+//     * @param multiChoice
+//     * @param view
+//     * @param tag
+//     */
+//    protected boolean itemAddorRemoveWithClick(MultiChoice multiChoice,View view,String tag){
+//        if(multiChoice.mIsShow && getUserVisibleHint() && multiChoice.TAG.equals(tag)){
+//            multiChoice.mIsShow = true;
+//            multiChoice.RemoveOrAddView(view);
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    /**
+//     *
+//     * @param multiChoice
+//     * @param view
+//     * @param tag
+//     */
+//    protected void itemAddorRemoveWithLongClick(MultiChoice multiChoice,View view,String tag){
+//        if(!multiChoice.mIsShow && getUserVisibleHint() && multiChoice.TAG.equals("")){
+//            multiChoice.RemoveOrAddView(view);
+//            multiChoice.TAG = tag;
+//            multiChoice.mIsShow = true;
+////            multiChoice.updateOptionsMenu(true);
+//
+//            return;
+//        }
+//        if(multiChoice.mIsShow && getUserVisibleHint() && multiChoice.TAG.equals(tag)){
+//            multiChoice.RemoveOrAddView(view);
+//        }
+//
+//    }
 }

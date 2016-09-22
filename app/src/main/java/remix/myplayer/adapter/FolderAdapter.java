@@ -2,7 +2,6 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +18,8 @@ import java.util.Iterator;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.fragment.FolderFragment;
+import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.listener.AlbumArtistFolderListener;
 import remix.myplayer.theme.Theme;
@@ -88,14 +89,27 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
             });
         }
 
-        if(mOnItemClickLitener != null && holder.mRootView != null) {
-            holder.mRootView.setOnClickListener(new View.OnClickListener() {
+        if(mOnItemClickLitener != null && holder.mContainer != null) {
+            holder.mContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int pos = holder.getAdapterPosition();
-                    mOnItemClickLitener.onItemClick(v,pos);
+                    mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition());
                 }
             });
+            holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition());
+                    return true;
+                }
+            });
+        }
+
+        if(MainActivity.MultiChoice.getTag().equals(FolderFragment.TAG) &&
+                MainActivity.MultiChoice.mSelectedPosition.contains(position)){
+            MainActivity.MultiChoice.AddView(holder.mContainer);
+        } else {
+            holder.mContainer.setSelected(false);
         }
     }
 
@@ -105,7 +119,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
     }
 
     public static class FolderHolder extends BaseViewHolder {
-        public View mRootView;
+        public View mContainer;
         @BindView(R.id.folder_image)
         public ImageView mImg;
         @BindView(R.id.folder_name)
@@ -118,7 +132,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
         public ImageButton mButton;
         public FolderHolder(View itemView) {
             super(itemView);
-            mRootView = itemView;
+            mContainer = itemView;
         }
     }
 }

@@ -16,8 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
@@ -48,6 +46,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     private static int LOADER_ID = 1;
     private MultiChoice mMultiChoice = new MultiChoice();
     public static boolean isFirstSelected = true;
+    public static final String TAG = AlbumFragment.class.getSimpleName();
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -70,9 +69,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(MainActivity.MultiChoice.ISHOW && getUserVisibleHint()){
-                    MainActivity.MultiChoice.RemoveOrAddView(view);
-                } else {
+                if(getUserVisibleHint() && !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
                     if(mCursor != null && mCursor.moveToPosition(position)) {
                         int albumid = mCursor.getInt(mAlbumIdIndex);
                         String title = mCursor.getString(mAlbumIndex);
@@ -83,20 +80,38 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
                         startActivity(intent);
                     }
                 }
+
+//                if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint()){
+//                    MainActivity.MultiChoice.RemoveOrAddView(view);
+//                } else {
+//                    if(mCursor != null && mCursor.moveToPosition(position)) {
+//                        int albumid = mCursor.getInt(mAlbumIdIndex);
+//                        String title = mCursor.getString(mAlbumIndex);
+//                        Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
+//                        intent.putExtra("Id", albumid);
+//                        intent.putExtra("Title", title);
+//                        intent.putExtra("Type", Constants.ALBUM_HOLDER);
+//                        startActivity(intent);
+//                    }
+//                }
             }
             @Override
             public void onItemLongClick(View view, int position) {
-                if(isFirstSelected && getUserVisibleHint()){
-                    isFirstSelected = false;
-                    MainActivity.MultiChoice.RemoveOrAddView(view);
+                if(getUserVisibleHint()){
+                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
                 }
-                if(getActivity() instanceof MainActivity){
-                    if(MainActivity.MultiChoice.ISHOW && getUserVisibleHint())
-                        MainActivity.MultiChoice.RemoveOrAddView(view);
-                    if(!MainActivity.MultiChoice.ISHOW){
-                        ((MainActivity) getActivity()).updateOptionsMenu(true);
-                    }
-                }
+
+//                if(isFirstSelected && getUserVisibleHint()){
+//                    isFirstSelected = false;
+//                    MainActivity.MultiChoice.RemoveOrAddView(view);
+//                }
+//                if(getActivity() instanceof MainActivity){
+//                    if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint())
+//                        MainActivity.MultiChoice.RemoveOrAddView(view);
+//                    if(!MainActivity.MultiChoice.mIsShow){
+//                        ((MainActivity) getActivity()).updateOptionsMenu(true);
+//                    }
+//                }
             }
         });
         mRecycleView.setAdapter(mAdapter);
@@ -144,7 +159,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
 
 
     public void cleanSelectedViews() {
-        mMultiChoice.cleanSelectedViews();
+        mMultiChoice.clear();
     }
 
     @Override

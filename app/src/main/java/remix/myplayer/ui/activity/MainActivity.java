@@ -123,22 +123,20 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     @Override
     protected void onResume() {
         super.onResume();
+        if(MultiChoice.isShow()){
+            MultiChoice.clearSelectedViews();
+        }
         mIsRunning = true;
         //更新UI
         UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-    }
 
     @Override
     protected void onStop() {
         super.onStop();
         mIsRunning = false;
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +146,25 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
         ButterKnife.bind(this);
         mInstance = this;
+
+        MultiChoice.setOnUpdateOptionMenuListener(new MultiChoice.onUpdateOptionMenuListener() {
+            @Override
+            public void onUpdate(boolean multiShow) {
+                MultiChoice.setShowing(multiShow);
+                mToolBar.setNavigationIcon(MultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+                mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(MultiChoice.isShow()){
+                            MultiChoice.UpdateOptionMenu(false);
+                        } else {
+                            mDrawerLayout.openDrawer(mNavigationView);
+                        }
+                    }
+                });
+                invalidateOptionsMenu();
+            }
+        });
 
         //播放的service
         MusicService.addCallback(MainActivity.this);
@@ -325,33 +342,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(MultiChoice.ISHOW ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
+        getMenuInflater().inflate(MultiChoice.isShow() ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
         return true;
-    }
-
-
-    public void updateOptionsMenu(boolean multiShow){
-        MultiChoice.ISHOW = multiShow;
-        mToolBar.setNavigationIcon(MultiChoice.ISHOW ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(MultiChoice.ISHOW){
-                    updateOptionsMenu(false);
-                } else {
-                    mDrawerLayout.openDrawer(mNavigationView);
-                }
-            }
-        });
-        invalidateOptionsMenu();
-    }
-
-    public void RemoveOrAddView(View v){
-        MultiChoice.RemoveOrAddView(v);
-    }
-
-    public MultiChoice getMultiChoice(){
-        return MultiChoice;
     }
 
     private void initDrawerLayout() {
@@ -447,15 +439,11 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
             mDrawerLayout.closeDrawer(mNavigationView);
-        } else if(MultiChoice.ISHOW) {
-            updateOptionsMenu(false);
-            MultiChoice.cleanSelectedViews();
-            AlbumFragment.isFirstSelected = ArtistFragment.isFirstSelected  = SongFragment.isFirstSelected = true;
-//            for(Fragment tempFragment : getSupportFragmentManager().getFragments()){
-//                if(tempFragment instanceof AlbumFragment){
-//                    ((AlbumFragment) tempFragment).cleanSelectedViews();
-//                }
-//            }
+        } else if(MultiChoice.isShow()) {
+//            updateOptionsMenu(false);
+            MultiChoice.UpdateOptionMenu(false);
+            MultiChoice.clear();
+
         } else {
             Intent home = new Intent(Intent.ACTION_MAIN);
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -20,6 +20,7 @@ import remix.myplayer.adapter.FolderAdapter;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.ui.activity.ChildHolderActivity;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 
@@ -37,6 +38,9 @@ public class FolderFragment extends BaseFragment {
     RecyclerView mRecyclerView;
 
     private FolderAdapter mAdapter;
+    public static boolean isFirstSelected = true;
+    public static final String TAG = FolderFragment.class.getSimpleName();
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,22 +54,53 @@ public class FolderFragment extends BaseFragment {
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
-                intent.putExtra("Id", position);
-                intent.putExtra("Type", Constants.FOLDER_HOLDER);
-                if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
-                    return;
-                Iterator it = Global.mFolderMap.keySet().iterator();
-                String full_path = null;
-                for(int i = 0 ; i <= position ; i++)
-                    full_path = it.next().toString();
-                intent.putExtra("Title", full_path);
-                startActivity(intent);
+                if(getUserVisibleHint() && !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
+                    Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
+                    intent.putExtra("Id", position);
+                    intent.putExtra("Type", Constants.FOLDER_HOLDER);
+                    if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
+                        return;
+                    Iterator it = Global.mFolderMap.keySet().iterator();
+                    String full_path = null;
+                    for(int i = 0 ; i <= position ; i++)
+                        full_path = it.next().toString();
+                    intent.putExtra("Title", full_path);
+                    startActivity(intent);
+                }
+
+//                if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint()){
+//                    MainActivity.MultiChoice.RemoveOrAddView(view);
+//                } else {
+//                    Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
+//                    intent.putExtra("Id", position);
+//                    intent.putExtra("Type", Constants.FOLDER_HOLDER);
+//                    if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
+//                        return;
+//                    Iterator it = Global.mFolderMap.keySet().iterator();
+//                    String full_path = null;
+//                    for(int i = 0 ; i <= position ; i++)
+//                        full_path = it.next().toString();
+//                    intent.putExtra("Title", full_path);
+//                    startActivity(intent);
+//                }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
+                if(getUserVisibleHint())
+                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
 
+//                if(isFirstSelected && getUserVisibleHint()){
+//                    isFirstSelected = false;
+//                    MainActivity.MultiChoice.RemoveOrAddView(view);
+//                }
+//                if(getActivity() instanceof MainActivity){
+//                    if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint())
+//                        MainActivity.MultiChoice.RemoveOrAddView(view);
+//                    if(!MainActivity.MultiChoice.mIsShow){
+//                        ((MainActivity) getActivity()).updateOptionsMenu(true);
+//                    }
+//                }
             }
         });
         mRecyclerView.setAdapter(mAdapter);
