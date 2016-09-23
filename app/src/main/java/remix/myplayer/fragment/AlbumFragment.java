@@ -21,7 +21,6 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.AlbumAdater;
 import remix.myplayer.listener.OnItemClickListener;
-import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
@@ -44,8 +43,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     private LoaderManager mManager;
     private AlbumAdater mAdapter;
     private static int LOADER_ID = 1;
-    private MultiChoice mMultiChoice = new MultiChoice();
-    public static boolean isFirstSelected = true;
+
     public static final String TAG = AlbumFragment.class.getSimpleName();
     @Override
     public void onAttach(Context context) {
@@ -71,6 +69,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
             public void onItemClick(View view, int position) {
                 if(getUserVisibleHint() && !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
                     if(mCursor != null && mCursor.moveToPosition(position)) {
+                        if(mCursor != null && mCursor.moveToPosition(position)) {
                         int albumid = mCursor.getInt(mAlbumIdIndex);
                         String title = mCursor.getString(mAlbumIndex);
                         Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
@@ -78,40 +77,16 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
                         intent.putExtra("Title", title);
                         intent.putExtra("Type", Constants.ALBUM_HOLDER);
                         startActivity(intent);
+                        }
                     }
                 }
 
-//                if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint()){
-//                    MainActivity.MultiChoice.RemoveOrAddView(view);
-//                } else {
-//                    if(mCursor != null && mCursor.moveToPosition(position)) {
-//                        int albumid = mCursor.getInt(mAlbumIdIndex);
-//                        String title = mCursor.getString(mAlbumIndex);
-//                        Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
-//                        intent.putExtra("Id", albumid);
-//                        intent.putExtra("Title", title);
-//                        intent.putExtra("Type", Constants.ALBUM_HOLDER);
-//                        startActivity(intent);
-//                    }
-//                }
             }
             @Override
             public void onItemLongClick(View view, int position) {
                 if(getUserVisibleHint()){
                     MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
                 }
-
-//                if(isFirstSelected && getUserVisibleHint()){
-//                    isFirstSelected = false;
-//                    MainActivity.MultiChoice.RemoveOrAddView(view);
-//                }
-//                if(getActivity() instanceof MainActivity){
-//                    if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint())
-//                        MainActivity.MultiChoice.RemoveOrAddView(view);
-//                    if(!MainActivity.MultiChoice.mIsShow){
-//                        ((MainActivity) getActivity()).updateOptionsMenu(true);
-//                    }
-//                }
             }
         });
         mRecycleView.setAdapter(mAdapter);
@@ -157,10 +132,6 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         return mAdapter;
     }
 
-
-    public void cleanSelectedViews() {
-        mMultiChoice.clear();
-    }
 
     @Override
     public void onDestroy() {

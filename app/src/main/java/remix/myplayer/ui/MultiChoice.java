@@ -4,6 +4,8 @@ import android.view.View;
 
 import java.util.ArrayList;
 
+import remix.myplayer.model.MultiPosition;
+
 /**
  * @ClassName
  * @Description
@@ -12,12 +14,12 @@ import java.util.ArrayList;
  */
 public class MultiChoice {
     /** 当前正在操作的activity或者fragment */
-    private String mTag = "";
+    public static String TAG = "";
     /** 多选菜单是否正在显示 */
     private boolean mIsShow = false;
     /** 所有选中状态的view */
     public ArrayList<View> mSelectedViews = new ArrayList<>();
-    public ArrayList<Integer> mSelectedPosition = new ArrayList<>();
+    public ArrayList<MultiPosition> mSelectedPosition = new ArrayList<>();
     /** 更新optionmenu */
     private onUpdateOptionMenuListener mUpdateOptionMenuListener;
 
@@ -29,13 +31,7 @@ public class MultiChoice {
         mIsShow = showing;
     }
 
-    public void setTag(String tag){
-        mTag = tag;
-    }
 
-    public String getTag(){
-        return mTag;
-    }
 
     public interface onUpdateOptionMenuListener {
         void onUpdate(boolean multiShow);
@@ -51,7 +47,7 @@ public class MultiChoice {
      * @param tag
      */
     public boolean itemAddorRemoveWithClick(View view,int position,String tag){
-        if(mIsShow && mTag.equals(tag)){
+        if(mIsShow && TAG.equals(tag)){
             mIsShow = true;
             RemoveOrAddView(view);
             RemoveOrAddPosition(position);
@@ -66,16 +62,16 @@ public class MultiChoice {
      * @param tag
      */
     public void itemAddorRemoveWithLongClick(View view,int position,String tag){
-        if(!mIsShow && mTag.equals("")){
+        if(!mIsShow && TAG.equals("")){
             RemoveOrAddView(view);
             RemoveOrAddPosition(position);
-            mTag = tag;
+            TAG = tag;
             mIsShow = true;
             if(mUpdateOptionMenuListener != null)
                 mUpdateOptionMenuListener.onUpdate(true);
             return;
         }
-        if(mIsShow && mTag.equals(tag)){
+        if(mIsShow && TAG.equals(tag)){
             RemoveOrAddView(view);
             RemoveOrAddPosition(position);
         }
@@ -88,8 +84,10 @@ public class MultiChoice {
     }
 
     public void AddView(View view){
-        if(!mSelectedViews.contains(view))
-            setViewSelected(view,true);
+        if(!mSelectedViews.contains(view)) {
+            mSelectedViews.add(view);
+        }
+        setViewSelected(view, true);
     }
 
     /**
@@ -107,10 +105,11 @@ public class MultiChoice {
     }
 
     public void RemoveOrAddPosition(int position){
-        if(mSelectedPosition.contains(position))
-            mSelectedPosition.remove(position);
+        MultiPosition pos = new MultiPosition(position);
+        if(mSelectedPosition.contains(pos))
+            mSelectedPosition.remove(pos);
         else {
-            mSelectedPosition.add(position);
+            mSelectedPosition.add(pos);
         }
     }
 
@@ -121,7 +120,7 @@ public class MultiChoice {
         clearSelectedViews();
         mSelectedViews.clear();
         mSelectedPosition.clear();
-        mTag = "";
+        TAG = "";
     }
 
     /**

@@ -46,12 +46,6 @@ public class DBUtil {
      * @return
      */
     public static ArrayList<Long> getAllSongsId() {
-        //获得今天日期
-        Calendar today = Calendar.getInstance();
-        today.setTime(new Date());
-        long today_mill = today.getTimeInMillis();
-        long day_mill = (1000 * 3600 * 24);
-
         ArrayList<Long> mAllSongList = new ArrayList<>();
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
@@ -80,23 +74,8 @@ public class DBUtil {
 
                 Global.mFolderMap.clear();
                 while (cursor.moveToNext()) {
-
-                    //计算歌曲添加时间
-                    //如果满足条件添加到最近添加
-                    long temp = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)) * 1000 ;
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(new Date(temp));
-                    int between = (int)((today_mill - calendar.getTimeInMillis()) / day_mill);
-                    if(between <= 7 && between >= 0){
-                        Global.mWeekList.add(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
-                        if(between == 0){
-                            Global.mTodayList.add(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
-                        }
-                    }
-
                     long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
                     mAllSongList.add(id);
-
                     //根据歌曲路径对歌曲按文件夹分类
                     String full_path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                     SortWithFolder(id,full_path);

@@ -1,14 +1,21 @@
 package remix.myplayer.ui.activity;
 
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -18,6 +25,8 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,8 +49,10 @@ import remix.myplayer.util.Global;
  * 最近添加歌曲的界面
  * 目前为最近7天添加
  */
-public class RecetenlyActivity extends ToolbarActivity implements MusicService.Callback{
+public class RecetenlyActivity extends ToolbarActivity implements MusicService.Callback,LoaderManager.LoaderCallbacks<Cursor>{
     public static final String TAG = RecetenlyActivity.class.getSimpleName();
+    private static int LOADER_ID = 1;
+
     private ArrayList<MP3Item> mInfoList;
     private SongAdapter mAdapter;
     @BindView(R.id.recently_shuffle)
@@ -50,12 +61,15 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     Toolbar mToolBar;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
+    private Cursor mCursor;
+
     private MaterialDialog mMDDialog;
-    private final int START = 0;
-    private final int END = 1;
+
     public static MultiChoice MultiChoice = new MultiChoice();
 
-    private Handler mHandler = new Handler(){
+    private static final int START = 0;
+    private static final int END = 1;
+    private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
@@ -70,10 +84,26 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
                         mShuffle.setVisibility(mInfoList == null || mInfoList.size() == 0 ? View.GONE : View.VISIBLE);
                         mMDDialog.dismiss();
                     }
+                    break;
+                case Constants.UPDATE_MULTI:
+                    MultiChoice.clearSelectedViews();
+                    break;
+                case Constants.UPDATE_ADAPTER:
+                    if(mAdapter != null)
+                        mAdapter.notifyDataSetChanged();
             }
 
         }
     };
+    private LoaderManager mManager;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(MultiChoice.isShow()){
+            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,6 +113,9 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         setContentView(R.layout.activity_recently);
         ButterKnife.bind(this);
         MusicService.addCallback(RecetenlyActivity.this);
+        mManager = getLoaderManager();
+        mManager.initLoader(LOADER_ID++, null, this);
+
         MultiChoice.setOnUpdateOptionMenuListener(new MultiChoice.onUpdateOptionMenuListener() {
             @Override
             public void onUpdate(boolean multiShow) {
@@ -93,11 +126,15 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
                     public void onClick(View v) {
                         if(MultiChoice.isShow()){
                             MultiChoice.UpdateOptionMenu(false);
+                            MultiChoice.clear();
                         } else {
                             finish();
                         }
                     }
                 });
+                if(!MultiChoice.isShow()){
+                    MultiChoice.clear();
+                }
                 invalidateOptionsMenu();
             }
         });
@@ -119,25 +156,11 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
                     Global.setPlayingList(Global.mWeekList);
                     sendBroadcast(intent);
                 }
-//                if(MultiChoice.isShow()){
-//                    MultiChoice.RemoveOrAddView(view);
-//                } else {
-//                    Intent intent = new Intent(Constants.CTL_ACTION);
-//                    Bundle arg = new Bundle();
-//                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-//                    arg.putInt("Position", position);
-//                    intent.putExtras(arg);
-//                    Global.setPlayingList(Global.mWeekList);
-//                    sendBroadcast(intent);
-//                }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
                 MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
-//                if(!MultiChoice.isShow())
-//                    updateOptionsMenu(true);
-//                MultiChoice.RemoveOrAddView(view);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -149,26 +172,29 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
                 .progressIndeterminateStyle(false).build();
 
         initToolbar(mToolBar,getString(R.string.recently));
-        new Thread(){
-            @Override
-            public void run() {
-                mHandler.sendEmptyMessage(START);
-                mInfoList = DBUtil.getMP3ListByIds(Global.mWeekList);
-                mHandler.sendEmptyMessage(END);
-            }
-        }.start();
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                mRefreshHandler.sendEmptyMessage(START);
+//                mInfoList = DBUtil.getMP3ListByIds(Global.mWeekList);
+//                mRefreshHandler.sendEmptyMessage(END);
+//            }
+//        }.start();
     }
 
 
-    private void cleanSelectedViews() {
-        MultiChoice.clear();
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(MultiChoice.isShow()){
+            mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
+        }
     }
 
     @Override
     public void onBackPressed() {
         if(MultiChoice.isShow()) {
             MultiChoice.UpdateOptionMenu(false);
-            cleanSelectedViews();
         } else {
             finish();
         }
@@ -190,10 +216,6 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
 
     @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
-//        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
-//        for(Fragment fragment : fragmentList){
-//            ((RecentlyFragment) fragment).getAdapter().notifyDataSetChanged();
-//        }
         mAdapter.notifyDataSetChanged();
     }
 
@@ -206,8 +228,45 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        getMenuInflater().inflate(MultiChoice.isShow() ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
         return true;
     }
 
+
+    @Override
+    public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        //获得今天日期
+        Calendar today = Calendar.getInstance();
+        today.setTime(new Date());
+        return new android.content.CursorLoader(this,
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                null,
+                MediaStore.Audio.Media.DATE_ADDED + ">=" + (today.getTimeInMillis() / 1000 - (3600 * 24 * 7)),
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
+        if(data == null)
+            return;
+        //查询完毕后保存结果，并设置查询索引
+        mCursor = data;
+        mAdapter.setCursor(mCursor);
+    }
+
+    @Override
+    public void onLoaderReset(android.content.Loader<Cursor> loader) {
+        if (mAdapter != null)
+            mAdapter.setCursor(null);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mCursor != null) {
+            mCursor.close();
+            mCursor = null;
+        }
+    }
 }

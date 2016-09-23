@@ -24,10 +24,12 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.SongFragment;
+import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.listener.AlbumArtistFolderListener;
+import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.activity.PlayListActivity;
@@ -121,8 +123,8 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                 });
             }
         }
-        if(PlayListActivity.MultiChoice.getTag().equals(PlayListActivity.TAG) &&
-                PlayListActivity.MultiChoice.mSelectedPosition.contains(position)){
+        if(MultiChoice.TAG.equals(PlayListActivity.TAG) &&
+                PlayListActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
             PlayListActivity.MultiChoice.AddView(holder.mCardBackground);
         } else {
             holder.mCardBackground.setSelected(false);

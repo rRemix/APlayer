@@ -3,6 +3,8 @@ package remix.myplayer.ui.activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -43,6 +45,20 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 
     private PlayListAdapter mAdapter;
     public static MultiChoice MultiChoice = new MultiChoice();
+    private Handler mRefreshHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case Constants.UPDATE_MULTI:
+                    MultiChoice.clearSelectedViews();
+                    break;
+                case Constants.UPDATE_ADAPTER:
+                    if(mAdapter != null)
+                        mAdapter.notifyDataSetChanged();
+                    break;
+            }
+        }
+    };
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,11 +75,15 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
                     public void onClick(View v) {
                         if(MultiChoice.isShow()){
                             MultiChoice.UpdateOptionMenu(false);
+                            MultiChoice.clear();
                         } else {
                             finish();
                         }
                     }
                 });
+                if(!MultiChoice.isShow()){
+                    MultiChoice.clear();
+                }
                 invalidateOptionsMenu();
             }
         });
@@ -170,10 +190,25 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if(MultiChoice.isShow()){
+            mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(MultiChoice.isShow()){
+            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         if(MultiChoice.isShow()) {
             MultiChoice.UpdateOptionMenu(false);
-            cleanSelectedViews();
         } else {
            finish();
         }
@@ -185,7 +220,4 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         }
     }
 
-    private void cleanSelectedViews() {
-        MultiChoice.clear();
-    }
 }

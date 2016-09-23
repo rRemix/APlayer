@@ -87,31 +87,39 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE};
 
-    private final int RECREATE = 0;//重建activity
-    private final int UPDATECOVER = 1;//刷新adpater
+
     private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            if(msg.what == RECREATE) {
+            if(msg.what == Constants.RECREATE_ACTIVITY) {
                 recreate();
             }
-            if(msg.what == UPDATECOVER){
-                //刷新
+            else if(msg.what == Constants.UPDATE_MULTI){
+                MultiChoice.clearSelectedViews();
+            }
+            else if(msg.what == Constants.UPDATE_ADAPTER){
+                //刷新适配器
                 for(Fragment temp : getSupportFragmentManager().getFragments()){
                     if(temp instanceof SongFragment){
                        SongFragment songFragment = (SongFragment)temp;
-                        if(songFragment.getAdapter() != null)
+                        if(songFragment.getAdapter() != null && songFragment.getUserVisibleHint())
                             songFragment.getAdapter().notifyDataSetChanged();
                     }
                     if(temp instanceof AlbumFragment){
                         AlbumFragment albumFragment = (AlbumFragment)temp;
-                        if(albumFragment.getAdapter() != null)
+                        if(albumFragment.getAdapter() != null && albumFragment.getUserVisibleHint())
                             albumFragment.getAdapter().notifyDataSetChanged();
                     }
                     if(temp instanceof ArtistFragment){
-                        ArtistFragment albumFragment = (ArtistFragment)temp;
-                        if(albumFragment.getAdapter() != null)
-                            albumFragment.getAdapter().notifyDataSetChanged();
+                        ArtistFragment artistFragment = (ArtistFragment)temp;
+                        if(artistFragment.getAdapter() != null && artistFragment.getUserVisibleHint())
+                            artistFragment.getAdapter().notifyDataSetChanged();
+                    }
+                    if(temp instanceof FolderFragment){
+                        FolderFragment folderFragment = (FolderFragment) temp;
+                        if(folderFragment.getAdapter() != null && folderFragment.getUserVisibleHint()){
+                            folderFragment.getAdapter().notifyDataSetChanged();
+                        }
                     }
                 }
             }
@@ -124,13 +132,20 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     protected void onResume() {
         super.onResume();
         if(MultiChoice.isShow()){
-            MultiChoice.clearSelectedViews();
+            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
         mIsRunning = true;
         //更新UI
         UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(MultiChoice.isShow()){
+            mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
+        }
+    }
 
     @Override
     protected void onStop() {
@@ -157,11 +172,15 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                     public void onClick(View v) {
                         if(MultiChoice.isShow()){
                             MultiChoice.UpdateOptionMenu(false);
+                            MultiChoice.clear();
                         } else {
                             mDrawerLayout.openDrawer(mNavigationView);
                         }
                     }
                 });
+                if(!MultiChoice.isShow()){
+                    MultiChoice.clear();
+                }
                 invalidateOptionsMenu();
             }
         });
@@ -396,7 +415,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                 //重启activity
                 case UPDATE_THEME:
                     if(data.getBooleanExtra("needRefresh",false))
-                        mRefreshHandler.sendEmptyMessage(RECREATE);
+                        mRefreshHandler.sendEmptyMessage(Constants.RECREATE_ACTIVITY);
                     break;
                 //图片选择
                 case Crop.REQUEST_PICK:
@@ -428,7 +447,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                     Uri providerUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), id);
                     imagePipeline.evictFromCache(fileUri);
                     imagePipeline.evictFromCache(providerUri);
-                    mRefreshHandler.sendEmptyMessage(UPDATECOVER);
+                    mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                     break;
             }
         }
@@ -442,8 +461,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         } else if(MultiChoice.isShow()) {
 //            updateOptionsMenu(false);
             MultiChoice.UpdateOptionMenu(false);
-            MultiChoice.clear();
-
         } else {
             Intent home = new Intent(Intent.ACTION_MAIN);
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

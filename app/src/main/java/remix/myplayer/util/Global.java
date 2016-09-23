@@ -54,7 +54,6 @@ public class Global {
     /**
      * 最近添加列表
      */
-    public static ArrayList<Long> mTodayList = new ArrayList<>();
     public static ArrayList<Long> mWeekList = new ArrayList<>();
     public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
 

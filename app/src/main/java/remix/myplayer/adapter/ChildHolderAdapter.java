@@ -18,9 +18,11 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.MultiPosition;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.customview.ColumnView;
@@ -125,8 +127,8 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
             });
         }
 
-        if(ChildHolderActivity.MultiChoice.getTag().equals(ChildHolderActivity.TAG) &&
-                ChildHolderActivity.MultiChoice.mSelectedPosition.contains(position)){
+        if(MultiChoice.TAG.equals(ChildHolderActivity.TAG) &&
+                ChildHolderActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
             ChildHolderActivity.MultiChoice.AddView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);

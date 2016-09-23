@@ -104,7 +104,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Log.d(TAG,"view:" + view.toString());
+                Log.d(TAG,"position:" + position);
                 if(!MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
                     Global.setPlayingList(Global.mAllSongList);
                     Intent intent = new Intent(Constants.CTL_ACTION);

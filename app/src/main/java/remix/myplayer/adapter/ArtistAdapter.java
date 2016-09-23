@@ -25,8 +25,10 @@ import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.listener.AlbumArtistFolderListener;
+import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -85,14 +87,14 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mOnItemClickLitener.onItemClick(holder.mCardBackground,holder.getAdapterPosition());
+                        mOnItemClickLitener.onItemClick(holder.mCardBackground,position);
                     }
                 });
                 //多选菜单
                 holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        mOnItemClickLitener.onItemLongClick(holder.mCardBackground,holder.getAdapterPosition());
+                        mOnItemClickLitener.onItemLongClick(holder.mCardBackground,position);
                         return true;
                     }
                 });
@@ -120,8 +122,8 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 });
             }
         }
-        if(MainActivity.MultiChoice.getTag().equals(ArtistFragment.TAG) &&
-                MainActivity.MultiChoice.mSelectedPosition.contains(position)){
+        if(MultiChoice.TAG.equals(ArtistFragment.TAG) &&
+                MainActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
             MainActivity.MultiChoice.AddView(holder.mCardBackground);
         } else {
             holder.mCardBackground.setSelected(false);

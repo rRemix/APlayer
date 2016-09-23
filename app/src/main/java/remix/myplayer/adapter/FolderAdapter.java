@@ -22,8 +22,10 @@ import remix.myplayer.fragment.FolderFragment;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.listener.AlbumArtistFolderListener;
+import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -105,8 +107,8 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
             });
         }
 
-        if(MainActivity.MultiChoice.getTag().equals(FolderFragment.TAG) &&
-                MainActivity.MultiChoice.mSelectedPosition.contains(position)){
+        if(MultiChoice.TAG.equals(FolderFragment.TAG) &&
+                MainActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
             MainActivity.MultiChoice.AddView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);

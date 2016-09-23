@@ -38,6 +38,7 @@ import remix.myplayer.util.Global;
  */
 public class ChildHolderActivity extends ToolbarActivity implements MusicService.Callback{
     public final static String TAG = ChildHolderActivity.class.getSimpleName();
+
     private static boolean mIsRunning = false;
     //获得歌曲信息列表的参数
     private int mId;
@@ -60,14 +61,18 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
     public static ChildHolderActivity mInstance = null;
     //是否需要更新adapter
     private static boolean mNeedRefresh = false;
-    //更新ListView
-    private Handler mHandler = new Handler(){
+    //更新
+    private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            if(mInfoList == null)
-                return;
-            mAdapter.setList(mInfoList);
-            mNum.setText(mInfoList.size() + "首歌曲");
+            if(msg.what == Constants.UPDATE_MULTI){
+                MultiChoice.clearSelectedViews();
+            } else if(msg.what == Constants.UPDATE_ADAPTER){
+                if(mInfoList == null)
+                    return;
+                mAdapter.setList(mInfoList);
+                mNum.setText(mInfoList.size() + "首歌曲");
+            }
         }
     };
 
@@ -84,19 +89,23 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         MusicService.addCallback(ChildHolderActivity.this);
         MultiChoice.setOnUpdateOptionMenuListener(new MultiChoice.onUpdateOptionMenuListener() {
             @Override
-            public void onUpdate(boolean multiShow) {
+            public void onUpdate(final boolean multiShow) {
                 MultiChoice.setShowing(multiShow);
                 mToolBar.setNavigationIcon(MultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
                 mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(MultiChoice.isShow()){
+                        if(multiShow){
                             MultiChoice.UpdateOptionMenu(false);
+                            MultiChoice.clear();
                         } else {
                             finish();
                         }
                     }
                 });
+                if(!MultiChoice.isShow()){
+                    MultiChoice.clear();
+                }
                 invalidateOptionsMenu();
             }
         });
@@ -110,7 +119,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
             @Override
             public void run() {
                 mInfoList = getMP3List();
-                mHandler.sendEmptyMessage(0);
+                mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
             }
         }.start();
 
@@ -177,15 +186,11 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
     }
 
 
-    private void cleanSelectedViews() {
-        MultiChoice.clear();
-    }
 
     @Override
     public void onBackPressed() {
         if(MultiChoice.isShow()) {
             MultiChoice.UpdateOptionMenu(false);
-            cleanSelectedViews();
         } else {
             finish();
         }
@@ -221,7 +226,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         @Override
         public void run() {
             mInfoList = getMP3List();
-            mHandler.sendEmptyMessage(0);
+            mRefreshHandler.sendEmptyMessage(0);
         }
     }
 
@@ -299,15 +304,21 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         return Constants.CHILDHOLDERACTIVITY;
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(MultiChoice.isShow()){
+            mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
+        }
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        if(mNeedRefresh){
-//            UpdateData();
-//            mNeedRefresh = false;
-//        }
         mIsRunning = true;
+        if(MultiChoice.isShow()){
+            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+        }
     }
 
     @Override

@@ -70,13 +70,15 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
             @Override
             public void onItemClick(View view, int position) {
                 if(getUserVisibleHint() && !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
-                    int artistid = mCursor.getInt(mArtistIdIndex);
-                    String title = mCursor.getString(mArtistIndex);
-                    Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
-                    intent.putExtra("Id", artistid);
-                    intent.putExtra("Title", title);
-                    intent.putExtra("Type", Constants.ARTIST_HOLDER);
-                    startActivity(intent);
+                    if (mCursor.moveToPosition(position)) {
+                        int artistid = mCursor.getInt(mArtistIdIndex);
+                        String title = mCursor.getString(mArtistIndex);
+                        Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
+                        intent.putExtra("Id", artistid);
+                        intent.putExtra("Title", title);
+                        intent.putExtra("Type", Constants.ARTIST_HOLDER);
+                        startActivity(intent);
+                    }
                 }
 
 //                if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint()) {

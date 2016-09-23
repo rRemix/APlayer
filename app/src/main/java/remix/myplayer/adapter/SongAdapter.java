@@ -25,9 +25,11 @@ import remix.myplayer.R;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.MultiPosition;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.activity.RecetenlyActivity;
 import remix.myplayer.ui.customview.ColumnView;
@@ -82,20 +84,16 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
     @Override
     public void onBindViewHolder(final SongViewHolder holder, final int position) {
-        final boolean allsong = mType == ALLSONG;
-        if(allsong && (mCursor == null || !mCursor.moveToPosition(position))){
+        if(mCursor == null || !mCursor.moveToPosition(position)){
             return;
         }
-        if(!allsong && (mInfoList == null || mInfoList.get(position) == null))
-            return;
 
-        final MP3Item temp = allsong ? new MP3Item(mCursor.getInt(SongFragment.mSongId),
+        final MP3Item temp = new MP3Item(mCursor.getInt(SongFragment.mSongId),
                 mCursor.getString(SongFragment.mDisPlayNameIndex),
                 mCursor.getString(SongFragment.mTitleIndex),
                 mCursor.getString(SongFragment.mAlbumIndex),
                 mCursor.getInt(SongFragment.mAlbumIdIndex),
-                mCursor.getString(SongFragment.mArtistIndex),0,"","",0,"") :
-                mInfoList.get(position);
+                mCursor.getString(SongFragment.mArtistIndex),0,"","",0,"");
 
         //获得当前播放的歌曲
         final MP3Item currentMP3 = MusicService.getCurrentMP3();
@@ -113,14 +111,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             if(MusicService.getIsplay() && !holder.mColumnView.getStatus() && highlight){
                 holder.mColumnView.startAnim();
             }
-
             else if(!MusicService.getIsplay() && holder.mColumnView.getStatus()){
                 holder.mColumnView.stopAnim();
             }
         }
 
         try {
-            boolean isDay = ThemeStore.THEME_MODE == ThemeStore.DAY;
             //设置歌曲名
             String name = CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE);
             holder.mName.setText(name);
@@ -163,7 +159,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
                 public void onClick(View v) {
                     if(MainActivity.MultiChoice.isShow())
                         return;
-                    MP3Item temp = allsong ? DBUtil.getMP3InfoById(Global.mAllSongList.get(holder.getAdapterPosition())) : mInfoList.get(holder.getAdapterPosition());
                     Intent intent = new Intent(mContext, OptionDialog.class);
                     intent.putExtra("MP3Item", temp);
                     mContext.startActivity(intent);
@@ -176,49 +171,40 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             holder.mContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition());
+                    mOnItemClickLitener.onItemClick(v, holder.getLayoutPosition());
                 }
             });
             holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition());
+                    mOnItemClickLitener.onItemLongClick(v,holder.getLayoutPosition());
                     return true;
                 }
             });
 
         }
 
-//        if(holder.mContainer.getTag(0) != null && (boolean)(holder.mContainer.getTag(0))){
-//            MainActivity.MultiChoice.AddView(holder.mContainer);
-//        } else {
-//            holder.mContainer.setSelected(false);
-//        }
 
         if(mType == ALLSONG){
-            if(MainActivity.MultiChoice.getTag().equals(SongFragment.TAG) &&
-                    MainActivity.MultiChoice.mSelectedPosition.contains(position)){
+            if(MultiChoice.TAG.equals(SongFragment.TAG) &&
+                    MainActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
                 MainActivity.MultiChoice.AddView(holder.mContainer);
             } else {
                 holder.mContainer.setSelected(false);
             }
-        } else {
-            if(RecetenlyActivity.MultiChoice.getTag().equals(RecetenlyActivity.TAG) &&
-                    RecetenlyActivity.MultiChoice.mSelectedPosition.contains(position)){
-                RecetenlyActivity.MultiChoice.AddView(holder.mContainer);
-            } else {
-                holder.mContainer.setSelected(false);
-            }
+//        } else {
+//            if(MultiChoice.TAG.equals(RecetenlyActivity.TAG) &&
+//                    RecetenlyActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+//                RecetenlyActivity.MultiChoice.AddView(holder.mContainer);
+//            } else {
+//                holder.mContainer.setSelected(false);
+//            }
         }
     }
 
     @Override
     public int getItemCount() {
-        if(mType == ALLSONG) {
-            return mCursor != null && !mCursor.isClosed() ?mCursor.getCount() : 0;
-        }
-        else
-            return mInfoList != null ? mInfoList.size() : 0;
+        return mCursor != null && !mCursor.isClosed() ? mCursor.getCount() : 0;
     }
 
     class AsynLoadImage extends AsyncTask<Object,Integer,String> {

@@ -96,10 +96,6 @@ public class Constants {
     public final static int UPDATE_PLAYINGLIST = 1;
     public final static int UPDATE_PLAYLIST = 2;
 
-    //专辑封面选择
-    public final static int SELECL_ALBUM_IMAGE = 1000;
-    //艺术家封面选择
-    public final static int SELECT_ARTIST_IMAGE = 1001;
 
     //码率
     public final static int BIT_RATE = 0;
@@ -107,4 +103,11 @@ public class Constants {
     public final static int SAMPLE_RATE = 1;
     //类型
     public final static int MIME = 2;
+
+    //更新适配器
+    public final static int UPDATE_ADAPTER = 100;
+    //多选更新
+    public final static int UPDATE_MULTI = 101;
+    //重建activity
+    public final static int RECREATE_ACTIVITY = 102;
 }
