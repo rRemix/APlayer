@@ -23,15 +23,12 @@ import java.util.Iterator;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.model.PlayListItem;
-import remix.myplayer.listener.AlbumArtistFolderListener;
+import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.activity.ChildHolderActivity;
-import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -109,6 +106,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                     ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
             holder.mButton.setClickable(!isLove);
             if(!isLove){
+                final String finalName = name;
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -117,7 +115,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                         popupMenu.getMenuInflater().inflate(R.menu.playlist_menu, popupMenu.getMenu());
-                        popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext, holder.getAdapterPosition(), Constants.PLAYLIST_HOLDER, ""));
+                        popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext, holder.getAdapterPosition(), Constants.PLAYLIST, finalName));
                         popupMenu.show();
                     }
                 });

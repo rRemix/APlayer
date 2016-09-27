@@ -22,9 +22,8 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.ArtistFragment;
-import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
-import remix.myplayer.listener.AlbumArtistFolderListener;
+import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -112,9 +111,9 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                         popupMenu.getMenuInflater().inflate(R.menu.artist_menu, popupMenu.getMenu());
                         mCursor.moveToPosition(holder.getAdapterPosition());
-                        popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext,
+                        popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
                                 mCursor.getInt(ArtistFragment.mArtistIdIndex),
-                                Constants.ARTIST_HOLDER,
+                                Constants.ARTIST,
                                 mCursor.getString(ArtistFragment.mArtistIndex)));
                         popupMenu.setGravity(Gravity.END);
                         popupMenu.show();

@@ -19,9 +19,8 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.FolderFragment;
-import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
-import remix.myplayer.listener.AlbumArtistFolderListener;
+import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -81,9 +80,9 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
                     Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                     final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                     popupMenu.getMenuInflater().inflate(R.menu.folder_menu, popupMenu.getMenu());
-                    popupMenu.setOnMenuItemClickListener(new AlbumArtistFolderListener(mContext,
+                    popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
                             holder.getAdapterPosition(),
-                            Constants.FOLDER_HOLDER,
+                            Constants.FOLDER,
                             full_path));
                     popupMenu.setGravity(Gravity.END);
                     popupMenu.show();

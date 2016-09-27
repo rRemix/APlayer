@@ -3,7 +3,6 @@ package remix.myplayer.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -57,7 +56,7 @@ public class FolderFragment extends BaseFragment {
                 if(getUserVisibleHint() && !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
                     Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
                     intent.putExtra("Id", position);
-                    intent.putExtra("Type", Constants.FOLDER_HOLDER);
+                    intent.putExtra("Type", Constants.FOLDER);
                     if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
                         return;
                     Iterator it = Global.mFolderMap.keySet().iterator();
@@ -68,39 +67,12 @@ public class FolderFragment extends BaseFragment {
                     startActivity(intent);
                 }
 
-//                if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint()){
-//                    MainActivity.MultiChoice.RemoveOrAddView(view);
-//                } else {
-//                    Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
-//                    intent.putExtra("Id", position);
-//                    intent.putExtra("Type", Constants.FOLDER_HOLDER);
-//                    if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
-//                        return;
-//                    Iterator it = Global.mFolderMap.keySet().iterator();
-//                    String full_path = null;
-//                    for(int i = 0 ; i <= position ; i++)
-//                        full_path = it.next().toString();
-//                    intent.putExtra("Title", full_path);
-//                    startActivity(intent);
-//                }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
                 if(getUserVisibleHint())
                     MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
-
-//                if(isFirstSelected && getUserVisibleHint()){
-//                    isFirstSelected = false;
-//                    MainActivity.MultiChoice.RemoveOrAddView(view);
-//                }
-//                if(getActivity() instanceof MainActivity){
-//                    if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint())
-//                        MainActivity.MultiChoice.RemoveOrAddView(view);
-//                    if(!MainActivity.MultiChoice.mIsShow){
-//                        ((MainActivity) getActivity()).updateOptionsMenu(true);
-//                    }
-//                }
             }
         });
         mRecyclerView.setAdapter(mAdapter);

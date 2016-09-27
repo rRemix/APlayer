@@ -87,14 +87,29 @@ public class Global {
     }
 
     /**
-     * 更新内存与本地的正在播放列表
+     * 设置正在播放列表
      * @param list
      */
     public static void setPlayingList(ArrayList<Long> list) {
+        mPlayingList.clear();
         mPlayingList = list;
         XmlUtil.updatePlayingList();
     }
 
 
+    /**
+     * 添加歌曲到正在播放列表
+     * @param list
+     */
+    public static void AddSongToPlayingList(ArrayList<Long> list) {
+        ArrayList<Long> songIdlist = new ArrayList<>();
+        for (Long id : list){
+            if(!mPlayingList.contains(id))
+                songIdlist.add(id);
+        }
+        mPlayingList.clear();
+        mPlayingList = songIdlist;
+        XmlUtil.updatePlayingList();
+    }
 
 }

@@ -76,40 +76,18 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
                         Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
                         intent.putExtra("Id", artistid);
                         intent.putExtra("Title", title);
-                        intent.putExtra("Type", Constants.ARTIST_HOLDER);
+                        intent.putExtra("Type", Constants.ARTIST);
                         startActivity(intent);
                     }
                 }
 
-//                if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint()) {
-//                    MainActivity.MultiChoice.RemoveOrAddView(view);
-//                }else {
-//                    int artistid = mCursor.getInt(mArtistIdIndex);
-//                    String title = mCursor.getString(mArtistIndex);
-//                    Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
-//                    intent.putExtra("Id", artistid);
-//                    intent.putExtra("Title", title);
-//                    intent.putExtra("Type", Constants.ARTIST_HOLDER);
-//                    startActivity(intent);
-//                }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
                 if(getUserVisibleHint())
                     MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
-//                if(getActivity() instanceof MainActivity){
-//                    if(isFirstSelected && getUserVisibleHint()){
-//                        isFirstSelected = false;
-//                        MainActivity.MultiChoice.RemoveOrAddView(view);
-//                    }
-//
-//                    if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint())
-//                        MainActivity.MultiChoice.RemoveOrAddView(view);
-//                    if(!MainActivity.MultiChoice.mIsShow){
-//                        ((MainActivity) getActivity()).updateOptionsMenu(true);
-//                    }
-//                }
+
             }
         });
         mRecycleView.setAdapter(mAdapter);

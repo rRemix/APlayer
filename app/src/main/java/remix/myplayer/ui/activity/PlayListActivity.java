@@ -113,7 +113,7 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
                     intent.putExtra("Test",true);
                     intent.putExtra("Id", position);
                     intent.putExtra("Title", name);
-                    intent.putExtra("Type", Constants.PLAYLIST_HOLDER);
+                    intent.putExtra("Type", Constants.PLAYLIST);
                     startActivity(intent);
                 }
             }

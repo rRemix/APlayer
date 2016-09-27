@@ -163,11 +163,11 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         //歌曲数目与标题
-        if(mType != Constants.FOLDER_HOLDER) {
+        if(mType != Constants.FOLDER) {
             if(mArg.contains("unknown")){
-                if(mType == Constants.ARTIST_HOLDER)
+                if(mType == Constants.ARTIST)
                     Title = getString(R.string.unknow_artist);
-                else if(mType == Constants.ALBUM_HOLDER){
+                else if(mType == Constants.ALBUM){
                     Title = getString(R.string.unknow_album);
                 }
             } else {
@@ -199,7 +199,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
     public void UpdateData(){
 //        if(!mIsRunning)
 //            return;
-        if(mType == Constants.PLAYLIST_HOLDER){
+        if(mType == Constants.PLAYLIST){
             //播放列表
             if(!Global.mPlaylist.containsKey(mArg)){
                 mAdapter.setList(new ArrayList<MP3Item>());
@@ -207,7 +207,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
             } else {
                 new UpdateThread().start();
             }
-        } else if(mType == Constants.FOLDER_HOLDER){
+        } else if(mType == Constants.FOLDER){
             //文件夹
             mArg = getIntent().getStringExtra("Title");
             if(!Global.mFolderMap.containsKey(mArg)){
@@ -240,20 +240,20 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         mInfoList = new ArrayList<>();
         switch (mType) {
             //专辑id
-            case Constants.ALBUM_HOLDER:
-                mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ALBUM_HOLDER);
+            case Constants.ALBUM:
+                mInfoList = DBUtil.getMP3InfoByArg(mId, Constants.ALBUM);
                 break;
             //歌手id
-            case Constants.ARTIST_HOLDER:
-                mInfoList = DBUtil.getMP3InfoByArtistIdOrAlbumId(mId, Constants.ARTIST_HOLDER);
+            case Constants.ARTIST:
+                mInfoList = DBUtil.getMP3InfoByArg(mId, Constants.ARTIST);
                 break;
             //文件夹名
-            case Constants.FOLDER_HOLDER:
+            case Constants.FOLDER:
                 mInfoList = DBUtil.getMP3ListByIds(Global.mFolderMap.get(mArg));
                 mArg = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
                 break;
             //播放列表名
-            case Constants.PLAYLIST_HOLDER:
+            case Constants.PLAYLIST:
                 ArrayList<PlayListItem> list = Global.mPlaylist.get(mArg);
                 ArrayList<Long> ids = new ArrayList<>();
                 if(list == null)

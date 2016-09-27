@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import remix.myplayer.R;
 import remix.myplayer.theme.ThemeStore;
@@ -49,6 +50,16 @@ public class ToolbarActivity extends BaseAppCompatActivity {
                     case R.id.toolbar_timer:
                         startActivity(new Intent(ToolbarActivity.this, TimerDialog.class));
                         break;
+                    case R.id.toolbar_delete:
+
+                        Toast.makeText(ToolbarActivity.this,"删除",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.toolbar_add_playing:
+                        Toast.makeText(ToolbarActivity.this,"添加到正在播放列表 ",Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.toolbar_add_playlist:
+                        Toast.makeText(ToolbarActivity.this,"添加到播放列表",Toast.LENGTH_SHORT).show();
+                        break;
                 }
                 return true;
             }
@@ -59,13 +70,5 @@ public class ToolbarActivity extends BaseAppCompatActivity {
         finish();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 }

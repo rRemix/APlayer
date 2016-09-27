@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.MultiPosition;
@@ -24,7 +23,6 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
-import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
@@ -102,7 +100,7 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
                         return;
                     Intent intent = new Intent(mContext, OptionDialog.class);
                     intent.putExtra("MP3Item", temp);
-                    if (mType == Constants.PLAYLIST_HOLDER) {
+                    if (mType == Constants.PLAYLIST) {
                         intent.putExtra("IsDeletePlayList", true);
                         intent.putExtra("PlayListName", mArg);
                     }

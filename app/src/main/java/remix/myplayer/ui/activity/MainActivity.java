@@ -155,6 +155,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         initTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -407,7 +409,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null){
-            boolean isAlbum = Global.mAlbunOrArtist == Constants.ALBUM_HOLDER;
+            boolean isAlbum = Global.mAlbunOrArtist == Constants.ALBUM;
             String errorTxt = isAlbum ? "设置专辑封面失败" : "设置艺术家封面失败";
             int id = Global.mAlbumArtistID; //专辑或艺术家封面
             String name = Global.mAlbumArtistName;

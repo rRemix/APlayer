@@ -8,17 +8,12 @@ package remix.myplayer.util;
  * 常量值
  */
 public class Constants {
-
-    //删除选项
-    public final static int DELETE_SINGLE = 0;
-    public final static int DELETE_ALBUM = 1;
-    public final static int DELETE_ARTIST = 2;
-    public final static int DELETE_FOLDER = 3;
-    //启动哪一个fragment
-    public final static int PLAYLIST_HOLDER = 0;
-    public final static int ALBUM_HOLDER = 1;
-    public final static int ARTIST_HOLDER = 2;
-    public final static int FOLDER_HOLDER = 3;
+    //操作类型
+    public final static int SONG = 0;
+    public final static int ALBUM = 1;
+    public final static int ARTIST = 2;
+    public final static int FOLDER = 3;
+    public final static int PLAYLIST = 4;
 
     public final static String THEME_ACTION = "remix.music.THEME_ACTION";
     public final static String CTL_ACTION = "remix.music.CTL_ACTION";

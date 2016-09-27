@@ -138,10 +138,12 @@ public class OptionDialog extends BaseDialogActivity {
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                     String result = "";
                                     if(!mIsDeletePlayList){
-                                        result = DBUtil.deleteSong(mInfo.getUrl(), Constants.DELETE_SINGLE)? getString(R.string.delete_success) :
+                                        result = DBUtil.deleteSong(mInfo.getId() + "", Constants.SONG) ?
+                                                getString(R.string.delete_success) :
                                                 getString(R.string.delete_error);
                                     } else {
-                                        result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ? getString(R.string.delete_success):
+                                        result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ?
+                                                getString(R.string.delete_success):
                                                 getString(R.string.delete_error);
                                     }
                                     Toast.makeText(OptionDialog.this,result,Toast.LENGTH_SHORT).show();

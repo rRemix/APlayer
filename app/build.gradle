@@ -30,7 +30,7 @@ android {
 
         meizu{}
         productFlavors.all { flavor ->
-            flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+            flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
         }
     }
     lintOptions{
