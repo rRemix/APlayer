@@ -28,6 +28,9 @@
         <meta-data android:name="UMENG_MESSAGE_SECRET" android:value="5cc69b6b8425a8e30cf6f0b40b67bda3"/>
         <meta-data android:name="UMENG_CHANNEL" android:value="${UMENG_CHANNEL_VALUE}"/>
 
+        <!--bombupdate-->
+        <meta-data  android:name="BMOB_CHANNEL" android:value="Channel ID"/>
+
         <!--闪屏页-->
         <activity android:name=".ui.activity.SplashActivity"
             android:theme="@style/ActivityStyle">
@@ -125,16 +128,12 @@
             </intent-filter>
         </activity>
 
-
-        <!--有盟-->
-        <service
-            android:name="com.umeng.update.net.DownloadingService"
-            android:process=":DownloadingService" >
-        </service>
+        <!--bombupdate-->
         <activity
-            android:name="com.umeng.update.UpdateDialogActivity"
+            android:name="cn.bmob.v3.update.UpdateDialogActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
+
 
         <!--微信-->
         <activity

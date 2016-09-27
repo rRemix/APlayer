@@ -12,8 +12,9 @@ public class MultiPosition {
         Position = pos;
     }
 
+
     @Override
     public boolean equals(Object o) {
-        return this.Position == ((MultiPosition)o).Position;
+        return o instanceof MultiPosition && this.Position == ((MultiPosition)o).Position;
     }
 }

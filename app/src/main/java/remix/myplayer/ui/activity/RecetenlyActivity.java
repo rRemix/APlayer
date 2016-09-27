@@ -269,4 +269,5 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
             mCursor = null;
         }
     }
+
 }

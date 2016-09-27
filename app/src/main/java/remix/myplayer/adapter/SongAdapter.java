@@ -166,7 +166,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             });
         }
 
-
         if(mOnItemClickLitener != null && holder.mContainer != null) {
             holder.mContainer.setOnClickListener(new View.OnClickListener() {
                 @Override

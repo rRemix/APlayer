@@ -115,6 +115,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
         }
     }
 
+
     @Override
     public int getItemCount() {
         return Global.mFolderMap == null ? 0 : Global.mFolderMap.size();
@@ -137,4 +138,5 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
             mContainer = itemView;
         }
     }
+
 }

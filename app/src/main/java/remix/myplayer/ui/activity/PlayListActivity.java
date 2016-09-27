@@ -188,7 +188,6 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         return true;
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();

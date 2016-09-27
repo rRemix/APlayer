@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import cn.bmob.v3.Bmob;
 import remix.myplayer.R;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.model.UpdateInfo;
@@ -64,6 +65,8 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
+        //bomb
+        Bmob.initialize(this, "0c070110fffa9e88a1362643fb9d4d64");
         //初始化友盟推送
         PushAgent mPushAgent = PushAgent.getInstance(this);
         //注册推送服务，每次调用register方法都会回调该接口
@@ -120,33 +123,6 @@ public class Application extends android.app.Application {
                         ((TextView)(materialDialog.getCustomView().findViewById(R.id.update_log))).setText(logs);
                         materialDialog.show();
                     }
-
-//                    final AppCompatDialog dialog = new AppCompatDialog(MainActivity.mInstance);
-//                    dialog.setContentView(R.layout.umeng_update_dialog);
-//
-//                    ((TextView)dialog.findViewById(R.id.update_version)).setText("最新版本:" + info.VersionName);
-//                    ((TextView)dialog.findViewById(R.id.update_size)).setText("新版本大小:" + info.Size);
-//                    String logs = "";
-//                    for(int i = 0 ; i < info.Logs.size();i++){
-//                        logs += (i + "." + info.Logs.get(i) + "\n");
-//                    }
-//                    ((TextView)dialog.findViewById(R.id.update_log)).setText("更新内容\n" + logs);
-//                    dialog.findViewById(R.id.umeng_update_id_cancel).setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            if(dialog != null && !dialog.isShowing())
-//                                dialog.dismiss();
-//                        }
-//                    });
-//                    dialog.findViewById(R.id.umeng_update_id_ok).setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            CommonUtil.openUrl(info.ApkUrl);
-//                            if(dialog != null && !dialog.isShowing())
-//                                dialog.dismiss();
-//                        }
-//                    });
-//                    dialog.show();
 
                 } catch (JSONException e) {
                     Log.d("Application","创建更新对话框错误:" + e.toString());

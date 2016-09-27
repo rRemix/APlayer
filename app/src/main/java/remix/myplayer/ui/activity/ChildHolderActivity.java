@@ -288,7 +288,6 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         sendBroadcast(intent);
     }
 
-
     //更新界面
     @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {

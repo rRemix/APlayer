@@ -132,9 +132,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
 
     @Override
     public int getItemCount() {
-        if(mCursor != null)
-            return mCursor.getCount();
-        return 0;
+        return mCursor != null ? mCursor.getCount() : 0;
     }
 
     public static class ArtistHolder extends BaseViewHolder {

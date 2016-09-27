@@ -87,7 +87,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE};
 
-
+    //更新主题
+    private final int UPDATE_THEME = 1;
     private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -125,8 +126,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             }
         }
     };
-    //更新主题
-    private final int UPDATE_THEME = 1;
+
 
     @Override
     protected void onResume() {
