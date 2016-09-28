@@ -350,6 +350,8 @@ public class MusicService extends BaseService {
 
                 mMediaPlayer.start();
 
+                //更新所有界面
+                Update(Global.getOperation());
 //                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
 //                if(mCurrentVolume == 0)
 //                    return;
@@ -395,6 +397,8 @@ public class MusicService extends BaseService {
     private void pause() {
         mIsplay = false;
         mMediaPlayer.pause();
+        //更新所有界面
+        Update(Global.getOperation());
 //        new Thread(){
 //            //音量逐渐减小后暂停
 //            @Override
@@ -537,7 +541,7 @@ public class MusicService extends BaseService {
                     mPlayModel = Constants.PLAY_REPEATONE;
                 default:break;
             }
-            Update(Control);
+//            Update(Control);
         }
     }
 

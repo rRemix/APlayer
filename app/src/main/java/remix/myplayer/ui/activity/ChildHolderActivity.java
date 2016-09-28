@@ -255,7 +255,6 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
             //播放列表名
             case Constants.PLAYLIST:
                 ArrayList<PlayListItem> list = Global.mPlaylist.get(mArg);
-                ArrayList<Long> ids = new ArrayList<>();
                 if(list == null)
                     break;
                 for(PlayListItem item : list) {

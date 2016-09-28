@@ -80,6 +80,8 @@ public class BottomActionBarFragment extends BaseFragment{
         mBottomActionBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(MusicService.getCurrentMP3() == null)
+                    return;
                 Intent intent = new Intent(v.getContext(), AudioHolderActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("MP3Item",MusicService.getCurrentMP3());

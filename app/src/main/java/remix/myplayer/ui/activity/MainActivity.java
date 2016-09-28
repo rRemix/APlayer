@@ -155,7 +155,6 @@ public class MainActivity extends ToolbarActivity implements MusicService.Callba
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         initTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -246,14 +245,15 @@ public class MainActivity extends ToolbarActivity implements MusicService.Callba
                 MusicService.initDataSource(item,pos);
 
             }else {
-                //重新找到一个歌曲id
-                int id =  Global.mPlayingList.get(0);
-                for(int i = 0 ; i < Global.mPlayingList.size() ;i++){
-                    id = Global.mPlayingList.get(i);
-                    if (id != lastId)
-                        break;
-                }
+
                 if(Global.mPlayingList.size() > 0){
+                    //重新找到一个歌曲id
+                    int id =  Global.mPlayingList.get(0);
+                    for(int i = 0 ; i < Global.mPlayingList.size() ;i++){
+                        id = Global.mPlayingList.get(i);
+                        if (id != lastId)
+                            break;
+                    }
                     item = DBUtil.getMP3InfoById(id);
                     mBottomBar.UpdateBottomStatus(item,isPlay);
                     SPUtil.putValue(this,"Setting","LastSongId",id);
