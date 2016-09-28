@@ -157,13 +157,12 @@ public class Application extends android.app.Application {
                 Global.mAllSongList = DBUtil.getAllSongsId();
                 //读取正在播放列表
                 Global.mPlayingList = XmlUtil.getPlayingList();
-                if (Global.mPlayingList == null || Global.mPlayingList.size() == 0)
-                    Global.mPlayingList = Global.mAllSongList;
-
+                Global.setPlayingList(Global.mPlayingList == null || Global.mPlayingList.size() == 0 ?
+                                        Global.mAllSongList : Global.mPlayingList);
+                //读取播放列表
                 Global.mPlaylist = XmlUtil.getPlayList("playlist.xml");
             }
         }.start();
-
     }
 
     private void initUtil() {

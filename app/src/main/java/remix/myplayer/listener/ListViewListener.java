@@ -26,7 +26,7 @@ public class ListViewListener implements AdapterView.OnItemClickListener {
     }
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Global.setPlayingList((ArrayList<Long>) Global.mAllSongList.clone());
+        Global.setPlayingList(Global.mAllSongList);
         Intent intent = new Intent(Constants.CTL_ACTION);
         Bundle arg = new Bundle();
         arg.putInt("Control", Constants.PLAYSELECTEDSONG);

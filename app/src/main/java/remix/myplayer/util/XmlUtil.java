@@ -103,9 +103,9 @@ public class XmlUtil {
      * 获得正在播放列表
      * @return
      */
-    public static ArrayList<Long> getPlayingList()  {
+    public static ArrayList<Integer> getPlayingList()  {
         XmlPullParser parser = Xml.newPullParser();
-        ArrayList<Long> list = null;
+        ArrayList<Integer> list = null;
         FileInputStream in = null;
         try {
             in = mContext.openFileInput("playinglist.xml");
@@ -122,7 +122,7 @@ public class XmlUtil {
                         if(parser.getName().equals("playinglist") )
                             tag = parser.getName();
                         if(tag != null && parser.getName().equals("song")) {
-                            list.add(Long.parseLong(parser.getAttributeValue(0)));
+                            list.add(Integer.parseInt(parser.getAttributeValue(0)));
                         }
                         break;
                     case XmlPullParser.END_TAG:
@@ -199,10 +199,9 @@ public class XmlUtil {
      * @param id 歌曲id
      * @param album_id 专辑id
      */
-    public static void addSongToPlayList(Context context,String playlistName, String song, int id, int album_id,String artist) {
+    public static boolean addSongToPlayList(String playlistName, String song, int id, int album_id,String artist,boolean needUpdate) {
         if(TextUtils.isEmpty(playlistName) || TextUtils.isEmpty(song) || id < 0 || album_id < 0){
-            Toast.makeText(context,R.string.add_song_playlist_error,Toast.LENGTH_SHORT).show();
-            return;
+            return false;
         }
         try {
             boolean isExist = false;
@@ -212,18 +211,36 @@ public class XmlUtil {
                 }
             }
             if(isExist){
-                Toast.makeText(context,context.getString(R.string.song_already_exist), Toast.LENGTH_SHORT).show();
+                return false;
             } else {
                 ArrayList<PlayListItem> list = Global.mPlaylist.get(playlistName);
                 list.add(new PlayListItem(song,id,album_id,artist));
-                updatePlaylist();
-                Toast.makeText(context,context.getString(R.string.add_song_playlist_success), Toast.LENGTH_SHORT).show();
+                if(needUpdate)
+                    updatePlaylist();
+                return true;
             }
         } catch (Exception e){
             e.printStackTrace();
         }
+        return false;
     }
 
+    /**
+     * 某个播放列表下新增多首歌曲
+     */
+    public static int addSongsToPlayList(String playlistName, ArrayList<PlayListItem> itemList) {
+        if (itemList == null)
+            return 0;
+        int num = 0;
+        for(PlayListItem item : itemList){
+            if(addSongToPlayList(playlistName,item.getSongame(),item.getId(),item.getAlbumId(),item.getArtist(),false)){
+                num++;
+            }
+        }
+        if(num > 0)
+            updatePlaylist();
+        return num;
+    }
 
     /**
      * 更新播放列表
@@ -288,11 +305,28 @@ public class XmlUtil {
      * 添加歌曲到正在播放列表
      * @param id 需要添加的歌曲id
      */
-    public static void addSongToPlayingList(long id) {
-        if(id > 0) {
+    public static void addSongToPlayingList(int id) {
+        if(id > 0 && Global.mPlayingList != null && !Global.mPlayingList.contains(id)) {
             Global.mPlayingList.add(id);
             updatePlayingList();
         }
+    }
+
+    /**
+     * 添加多首歌曲到正在播放列表
+     * @param idList 需要添加的歌曲id列表
+     */
+    public static int addSongsToPlayingList(ArrayList<Integer> idList) {
+        int num = 0;
+        for(Integer id : idList){
+            if(id > 0 && Global.mPlayingList != null && !Global.mPlayingList.contains(id)) {
+                Global.mPlayingList.add(id);
+                num++;
+            }
+        }
+        if(num > 0)
+            updatePlayingList();
+        return num;
     }
 
     /**

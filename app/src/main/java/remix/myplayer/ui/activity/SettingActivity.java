@@ -146,11 +146,11 @@ public class SettingActivity extends ToolbarActivity {
                     new MaterialDialog.Builder(this)
                             .title("通知栏底色")
                             .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
-                            .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"setting","IsSystemColor",true) ? 0 : 1,
+                            .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"Setting","IsSystemColor",true) ? 0 : 1,
                                     new MaterialDialog.ListCallbackSingleChoice() {
                                 @Override
                                 public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                    SPUtil.putValue(SettingActivity.this,"setting","IsSystemColor",which == 0);
+                                    SPUtil.putValue(SettingActivity.this,"Setting","IsSystemColor",which == 0);
                                     sendBroadcast(new Intent(Constants.NOTIFY));
                                     return true;
                                 }

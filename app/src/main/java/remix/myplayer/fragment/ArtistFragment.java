@@ -69,7 +69,9 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(getUserVisibleHint() && !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
+                int artistId = getArtsitId(position);
+                if(getUserVisibleHint() && artistId > 0 &&
+                        !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,artistId,TAG)){
                     if (mCursor.moveToPosition(position)) {
                         int artistid = mCursor.getInt(mArtistIdIndex);
                         String title = mCursor.getString(mArtistIndex);
@@ -85,8 +87,9 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
 
             @Override
             public void onItemLongClick(View view, int position) {
-                if(getUserVisibleHint())
-                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
+                int artistId = getArtsitId(position);
+                if(getUserVisibleHint() && artistId > 0)
+                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,artistId,TAG);
 
             }
         });
@@ -103,6 +106,15 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
                 null,
                 null);
     }
+
+    private int getArtsitId(int position){
+        int artistId = -1;
+        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
+            artistId = mCursor.getInt(ArtistFragment.mArtistIdIndex);
+        }
+        return artistId;
+    }
+
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         if(mAdapter != null)
@@ -118,9 +130,6 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         mAdapter.setCursor(data);
     }
 
-    public void cleanSelectedViews() {
-        mMultiChoice.clear();
-    }
 
     @Override
     public ArtistAdapter getAdapter(){

@@ -1,5 +1,7 @@
 package remix.myplayer.fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
@@ -107,6 +109,13 @@ public class BottomActionBarFragment extends BaseFragment{
             Theme.TintDrawable(mPlayButton,
                     R.drawable.bf_btn_play,
                     ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
+        }
+    }
+
+    class UpdateUIReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            UpdateBottomStatus(MusicService.getCurrentMP3(),MusicService.getIsplay());
         }
     }
 }

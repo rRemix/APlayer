@@ -4,7 +4,13 @@ import android.view.View;
 
 import java.util.ArrayList;
 
+import remix.myplayer.fragment.AlbumFragment;
+import remix.myplayer.fragment.ArtistFragment;
+import remix.myplayer.fragment.FolderFragment;
+import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.model.MultiPosition;
+import remix.myplayer.ui.activity.PlayListActivity;
+import remix.myplayer.util.Constants;
 
 /**
  * @ClassName
@@ -15,11 +21,20 @@ import remix.myplayer.model.MultiPosition;
 public class MultiChoice {
     /** 当前正在操作的activity或者fragment */
     public static String TAG = "";
+    public static int TYPE = -1;
+
     /** 多选菜单是否正在显示 */
     private boolean mIsShow = false;
+
     /** 所有选中状态的view */
     public ArrayList<View> mSelectedViews = new ArrayList<>();
+
+    /** 所有选中view的position */
     public ArrayList<MultiPosition> mSelectedPosition = new ArrayList<>();
+
+    /** 所有选中view对应的参数 包括歌曲id 专辑id 艺术家id 文件夹名 播放列表名 */
+    public ArrayList<Object> mSelectedArg = new ArrayList<>();
+
     /** 更新optionmenu */
     private onUpdateOptionMenuListener mUpdateOptionMenuListener;
 
@@ -30,8 +45,6 @@ public class MultiChoice {
     public void setShowing(boolean showing){
         mIsShow = showing;
     }
-
-
 
     public interface onUpdateOptionMenuListener {
         void onUpdate(boolean multiShow);
@@ -44,13 +57,17 @@ public class MultiChoice {
     /**
      *
      * @param view
+     * @param position
+     * @param arg
      * @param tag
+     * @return
      */
-    public boolean itemAddorRemoveWithClick(View view,int position,String tag){
+    public boolean itemAddorRemoveWithClick(View view,int position,Object arg,String tag){
         if(mIsShow && TAG.equals(tag)){
             mIsShow = true;
             RemoveOrAddView(view);
             RemoveOrAddPosition(position);
+            RemoveOrAddArg(arg);
             return true;
         }
         return false;
@@ -59,22 +76,22 @@ public class MultiChoice {
     /**
      *
      * @param view
+     * @param position
+     * @param arg
      * @param tag
      */
-    public void itemAddorRemoveWithLongClick(View view,int position,String tag){
+    public void itemAddorRemoveWithLongClick(View view,int position,Object arg,String tag){
+        //当前没有处于多选状态
         if(!mIsShow && TAG.equals("")){
-            RemoveOrAddView(view);
-            RemoveOrAddPosition(position);
             TAG = tag;
+            TYPE = getType(TAG);
             mIsShow = true;
             if(mUpdateOptionMenuListener != null)
                 mUpdateOptionMenuListener.onUpdate(true);
-            return;
         }
-        if(mIsShow && TAG.equals(tag)){
-            RemoveOrAddView(view);
-            RemoveOrAddPosition(position);
-        }
+        RemoveOrAddView(view);
+        RemoveOrAddPosition(position);
+        RemoveOrAddArg(arg);
 
     }
 
@@ -104,6 +121,10 @@ public class MultiChoice {
         }
     }
 
+    /**
+     * 添加或者删除选中view在adapter中的position
+     * @param position
+     */
     public void RemoveOrAddPosition(int position){
         MultiPosition pos = new MultiPosition(position);
         if(mSelectedPosition.contains(pos))
@@ -114,13 +135,27 @@ public class MultiChoice {
     }
 
     /**
+     * 添加或者删除选中的view对应的参数，如歌曲id
+     * @param arg
+     */
+    public void RemoveOrAddArg(Object arg){
+        if(mSelectedArg.contains(arg)){
+            mSelectedArg.remove(arg);
+        } else {
+            mSelectedArg.add(arg);
+        }
+    }
+
+    /**
      * 重置
      */
     public void clear(){
         clearSelectedViews();
         mSelectedViews.clear();
         mSelectedPosition.clear();
+        mSelectedArg.clear();
         TAG = "";
+        TYPE = -1;
     }
 
     /**
@@ -145,25 +180,20 @@ public class MultiChoice {
         }
     }
 
-    /**
-     * 更新toolbar
-     */
-//    public void updateOptionsMenu(boolean multiShow, final Activity activity, final Toolbar toolbar, final Object target){
-//        mIsShow = multiShow;
-//        toolbar.setNavigationIcon(mIsShow ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
-//        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(mIsShow){
-//                    updateOptionsMenu(false,activity,toolbar,target);
-//                } else {
-//                    if(target instanceof DrawerLayout){
-//                        ((DrawerLayout)target)
-//                    }
-//                    mDrawerLayout.openDrawer(mNavigationView);
-//                }
-//            }
-//        });
-//        activity.invalidateOptionsMenu();
-//    }
+    public static int getType(String tag){
+
+        if(tag.equals(SongFragment.TAG))
+            return Constants.SONG;
+        else if(tag.equals(AlbumFragment.TAG))
+            return Constants.ALBUM;
+        else if (tag.equals(ArtistFragment.TAG))
+            return Constants.ARTIST;
+        else if(tag.equals(FolderFragment.TAG))
+            return Constants.FOLDER;
+        else if(tag.equals(PlayListActivity.TAG))
+            return Constants.PLAYLIST;
+        else
+            return -1;
+    }
+
 }

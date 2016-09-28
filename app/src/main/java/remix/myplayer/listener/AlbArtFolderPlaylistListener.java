@@ -26,7 +26,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
     private int mId;
     //0:专辑 1:歌手 2:文件夹 3:播放列表
     private int mType;
-    //专辑名 艺术家名 文件夹路径 播放列表名字
+    //专辑名 艺术家名 文件夹或者播放列表position
     private String mKey;
     public AlbArtFolderPlaylistListener(Context Context, int id, int type, String key) {
         this.mContext = Context;
@@ -36,9 +36,9 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
     }
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        ArrayList<Long> idList = new ArrayList<Long>();
+        ArrayList<Integer> idList = new ArrayList<>();
         //根据不同参数获得歌曲id列表
-        idList = DBUtil.getIdsByArg(mId,mType);
+        idList = DBUtil.getSongIdListByArg(mId,mType);
 
         if(idList == null || idList.size() == 0){
             Toast.makeText(mContext,mContext.getString(R.string.list_isempty),Toast.LENGTH_SHORT).show();
@@ -62,10 +62,8 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
             //删除
             case R.id.menu_delete:
                 Toast.makeText(mContext,
-                        DBUtil.deleteSong(
-                        mType == Constants.ALBUM || mType == Constants.ARTIST ? mId  + "" : mKey , mType) ? R.string.delete_success : R.string.delete_error ,
+                        DBUtil.deleteSong(mId , mType) ? R.string.delete_success : R.string.delete_error ,
                         Toast.LENGTH_SHORT).show();
-
                 break;
             //设置专辑封面
             case R.id.menu_album_thumb:

@@ -25,7 +25,7 @@ public class ScanActivity extends ToolbarActivity {
     FilterSizeSeekBar mFilterSizeSeekbar;
     private int mPosition;
     public static ArrayList<Integer> mSizeList = new ArrayList<>();
-    //几种扫描代写哦啊
+    //几种扫描大小
     static {
         mSizeList.add(0);
         mSizeList.add(300 * 1024);
@@ -63,7 +63,7 @@ public class ScanActivity extends ToolbarActivity {
                 int size = mSizeList.get(position);
                 if(size >= 0) {
                     //纪录下设置的大小
-                    SPUtil.putValue(ScanActivity.this, "setting", "scansize", size);
+                    SPUtil.putValue(ScanActivity.this, "Setting", "ScanSize", size);
                     Constants.SCAN_SIZE = size;
                 }
             }

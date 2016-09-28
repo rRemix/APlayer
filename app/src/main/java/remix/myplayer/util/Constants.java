@@ -30,7 +30,7 @@ public class Constants {
     public final static int PLAYORPAUSE = 2;
     public final static int NEXT = 3;
     public final static int PAUSE = 4;
-    public final static int CONTINUE = 5;
+    public final static int START = 5;
     //播放模式
     public final static int PLAY_LOOP = 6;
     public final static int PLAY_SHUFFLE = 7;

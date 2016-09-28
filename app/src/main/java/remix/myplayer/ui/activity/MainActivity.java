@@ -57,7 +57,7 @@ import remix.myplayer.util.XmlUtil;
 /**
  *
  */
-public class MainActivity extends BaseAppCompatActivity implements MusicService.Callback {
+public class MainActivity extends ToolbarActivity implements MusicService.Callback {
     public static MainActivity mInstance = null;
     @BindView(R.id.multi_menu)
     RelativeLayout mMultiMenu;
@@ -156,7 +156,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
         initTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -191,7 +190,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         MusicService.addCallback(MainActivity.this);
 
         //初始化toolbar
-        initToolbar();
+        initToolbar(mToolBar,"");
         initPager();
         initTab();
         //初始化测滑菜单
@@ -211,7 +210,6 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
             SPUtil.putValue(this,"Setting","ThemeColor",ThemeStore.THEME_PINK);
             //添加我的收藏列表
             XmlUtil.addPlaylist(this,"我的收藏");
-            Global.setPlayingList(Global.mAllSongList);
         }
         initLastSong();
 
@@ -230,8 +228,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         int pos = 0;
         //查找上次退出时的歌曲是否还存在
 
-        for(int i = 0 ; i < Global.mPlayingList.size();i++){
-            if(lastId == Global.mPlayingList.get(i)){
+        for(int i = 0 ; i < Global.mAllSongList.size();i++){
+            if(lastId == Global.mAllSongList.get(i)){
                 isLastSongExist = true;
                 pos = i;
                 break;
@@ -242,17 +240,25 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
         if(mIsFirst){
             mIsFirst = false;
             MP3Item item = null;
-            if(isLastSongExist) {
-                item = DBUtil.getMP3InfoById(lastId);
+            //上次退出时保存的正在播放的歌曲已失效
+            if(isLastSongExist && (item = DBUtil.getMP3InfoById(lastId)) != null) {
                 mBottomBar.UpdateBottomStatus(item, isPlay);
                 MusicService.initDataSource(item,pos);
+
             }else {
+                //重新找到一个歌曲id
+                int id =  Global.mPlayingList.get(0);
+                for(int i = 0 ; i < Global.mPlayingList.size() ;i++){
+                    id = Global.mPlayingList.get(i);
+                    if (id != lastId)
+                        break;
+                }
                 if(Global.mPlayingList.size() > 0){
-                    int id =  Integer.valueOf(Global.mPlayingList.get(0).toString());
                     item = DBUtil.getMP3InfoById(id);
                     mBottomBar.UpdateBottomStatus(item,isPlay);
                     SPUtil.putValue(this,"Setting","LastSongId",id);
-                    MusicService.initDataSource(item,pos);
+                    MusicService.initDataSource(item,0);
+
                 }
             }
         } else {
@@ -287,7 +293,8 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                 ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
     }
 
-    private void initToolbar() {
+    @Override
+    protected void initToolbar(Toolbar toolbar, String title) {
         mToolBar.setTitle("");
 
         setSupportActionBar(mToolBar);
@@ -298,6 +305,7 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                 mDrawerLayout.openDrawer(mNavigationView);
             }
         });
+
         mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -309,13 +317,13 @@ public class MainActivity extends BaseAppCompatActivity implements MusicService.
                         startActivity(new Intent(MainActivity.this, TimerDialog.class));
                         break;
                     case R.id.toolbar_delete:
-                        Toast.makeText(MainActivity.this,"删除",Toast.LENGTH_SHORT).show();
+                        Test(MultiChoice);
                         break;
                     case R.id.toolbar_add_playing:
-                        Toast.makeText(MainActivity.this,"添加到正在播放列表 ",Toast.LENGTH_SHORT).show();
+                        Test(MultiChoice);
                         break;
                     case R.id.toolbar_add_playlist:
-                        Toast.makeText(MainActivity.this,"添加到播放列表",Toast.LENGTH_SHORT).show();
+                        Test(MultiChoice);
                         break;
                 }
                 return true;

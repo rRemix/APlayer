@@ -332,7 +332,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     private void initControlButton() {
 
         //初始化播放模式
-        int playmodel = SPUtil.getValue(this,"setting", "PlayModel",Constants.PLAY_LOOP);
+        int playmodel = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
         mPlayModel.setImageDrawable(getResources().getDrawable(playmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                 playmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                         R.drawable.play_btn_loop_one));

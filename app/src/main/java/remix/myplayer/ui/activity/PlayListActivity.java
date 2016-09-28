@@ -28,6 +28,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.XmlUtil;
@@ -92,19 +93,10 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         mRecycleView.setLayoutManager(new GridLayoutManager(this, 2));
         mAdapter = new PlayListAdapter(this);
         mAdapter.setOnItemClickLitener(new PlayListAdapter.OnItemClickLitener() {
-            private String getName(int position){
-                String name = "";
-                Iterator it = Global.mPlaylist.keySet().iterator();
-                for (int i = 0; i <= position; i++) {
-                    it.hasNext();
-                    name = it.next().toString();
-                }
-                return name;
-            }
             @Override
             public void onItemClick(View view, int position) {
-                String name = getName(position);
-                if(!MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
+                String name = CommonUtil.getMapkeyByPosition(Global.mPlaylist,position);
+                if(!TextUtils.isEmpty(name) && !MultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
                     if(Global.mPlaylist.get(name).size() == 0) {
                         Toast.makeText(PlayListActivity.this, getString(R.string.list_isempty), Toast.LENGTH_SHORT).show();
                         return;
@@ -120,12 +112,9 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 
             @Override
             public void onItemLongClick(View view, int position) {
-                MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
-//                if(!getName(position).equals(PlayListActivity.this.getString(R.string.my_favorite))){
-//                    if(!MultiChoice.isShow())
-//                        MultiChoice.UpdateOptionMenu(true);
-//                    MultiChoice.RemoveOrAddView(view);
-//                }
+                String name = CommonUtil.getMapkeyByPosition(Global.mPlaylist,position);
+                if(!TextUtils.isEmpty(name))
+                    MultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG);
             }
         });
         mRecycleView.setAdapter(mAdapter);

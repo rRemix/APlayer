@@ -55,7 +55,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
     Toolbar mToolBar;
 
     private String Title;
-    private BottomActionBarFragment mActionbar;
+    private BottomActionBarFragment mBottombar;
 
     private ChildHolderAdapter mAdapter;
     public static ChildHolderActivity mInstance = null;
@@ -127,16 +127,17 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(!MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
+                long songid = mInfoList.get(position).getId();
+                if(songid > 0 && !MultiChoice.itemAddorRemoveWithClick(view,position,songid,TAG)){
                     if (mInfoList != null && mInfoList.size() == 0)
                         return;
-                    ArrayList<Long> ids = new ArrayList<Long>();
+                    ArrayList<Integer> ids = new ArrayList<>();
                     for (MP3Item info : mInfoList) {
                         if(info != null && info.getId() > 0)
                             ids.add(info.getId());
                     }
                     //设置正在播放列表
-                    Global.setPlayingList((ArrayList) ids.clone());
+                    Global.setPlayingList(ids);
 
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
@@ -149,10 +150,9 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
 
             @Override
             public void onItemLongClick(View view, int position) {
-                MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
-//                if(!MultiChoice.isShow())
-//                    updateOptionsMenu(true);
-//                MultiChoice.RemoveOrAddView(view);
+                long songid = mInfoList.get(position).getId();
+                if(songid > 0)
+                    MultiChoice.itemAddorRemoveWithLongClick(view,position,songid,TAG);
             }
 
 
@@ -178,11 +178,11 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         //初始化toolbar
         initToolbar(mToolBar,Title);
         //初始化底部状态栏
-        mActionbar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
+        mBottombar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
             return;
 
-        mActionbar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
+        mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
     }
 
 
@@ -281,10 +281,10 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control", Constants.NEXT);
         //设置正在播放列表
-        ArrayList<Long> ids = new ArrayList<Long>();
+        ArrayList<Integer> ids = new ArrayList<>();
         for (MP3Item info : mInfoList)
             ids.add(info.getId());
-        Global.setPlayingList((ArrayList) ids.clone());
+        Global.setPlayingList(ids);
         sendBroadcast(intent);
     }
 
@@ -292,7 +292,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
     @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
         //底部状态兰
-        mActionbar.UpdateBottomStatus(MP3Item, isplay);
+        mBottombar.UpdateBottomStatus(MP3Item, isplay);
         //更新高亮歌曲
         if(mAdapter != null)
             mAdapter.notifyDataSetChanged();

@@ -78,9 +78,10 @@ public class AddtoPlayListDialog extends BaseDialogActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(view != null) {
-                    XmlUtil.addSongToPlayList(AddtoPlayListDialog.this,
-                            ((TextView)view.findViewById(R.id.playlist_addto_text)).getText().toString(),
-                            mSongName,mId,mAlbumId,mArtist);
+                    Toast.makeText(AddtoPlayListDialog.this,
+                            XmlUtil.addSongToPlayList(((TextView)view.findViewById(R.id.playlist_addto_text)).getText().toString()
+                            ,mSongName,mId,mAlbumId,mArtist,true) ?
+                            R.string.add_song_playlist_success : R.string.add_song_playlist_error,Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(AddtoPlayListDialog.this,getString(R.string.add_playlist_error), Toast.LENGTH_SHORT).show();
                 }
@@ -112,7 +113,8 @@ public class AddtoPlayListDialog extends BaseDialogActivity {
                             if(!TextUtils.isEmpty(input)){
                                 XmlUtil.addPlaylist(AddtoPlayListDialog.this,input.toString());
                                 if(mAddAfterCreate){
-                                    XmlUtil.addSongToPlayList(AddtoPlayListDialog.this,input.toString(),mSongName,mId,mAlbumId,mArtist);
+                                    Toast.makeText(AddtoPlayListDialog.this,XmlUtil.addSongToPlayList(input.toString(),mSongName,mId,mAlbumId,mArtist,true) ?
+                                                    R.string.add_song_playlist_success : R.string.add_song_playlist_error,Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }

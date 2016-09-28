@@ -142,8 +142,8 @@ public class TimerDialog extends BaseDialogActivity {
 //        Theme.TintDrawable(mSwitch.getTrackDrawable(), ColorUtil.adjustAlpha(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899),0.7f));
 
         //读取保存的配置
-        boolean hasdefault = SPUtil.getValue(this, "setting", "TimerDefault", false);
-        final int time = SPUtil.getValue(this,"setting","TimerNum",-1);
+        boolean hasdefault = SPUtil.getValue(this, "Setting", "TimerDefault", false);
+        final int time = SPUtil.getValue(this,"Setting","TimerNum",-1);
 
         //默认选项
         if(hasdefault && time > 0){
@@ -161,16 +161,16 @@ public class TimerDialog extends BaseDialogActivity {
                 if (isChecked) {
                     if (mTime > 0) {
                         Toast.makeText(TimerDialog.this, getString(R.string.set_success), Toast.LENGTH_SHORT).show();
-                        SPUtil.putValue(TimerDialog.this, "setting", "TimerDefault", true);
-                        SPUtil.putValue(TimerDialog.this, "setting", "TimerNum", (int) mTime);
+                        SPUtil.putValue(TimerDialog.this, "Setting", "TimerDefault", true);
+                        SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", (int) mTime);
                     } else {
                         Toast.makeText(TimerDialog.this, getString(R.string.plz_set_correct_time), Toast.LENGTH_SHORT).show();
                         mSwitch.setChecked(false);
                     }
                 } else {
                     Toast.makeText(TimerDialog.this, getString(R.string.cancel_success), Toast.LENGTH_SHORT).show();
-                    SPUtil.putValue(TimerDialog.this, "setting", "TimerDefault", false);
-                    SPUtil.putValue(TimerDialog.this, "setting", "TimerNum", -1);
+                    SPUtil.putValue(TimerDialog.this, "Setting", "TimerDefault", false);
+                    SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", -1);
                 }
             }
         });

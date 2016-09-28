@@ -104,8 +104,8 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Log.d(TAG,"position:" + position);
-                if(!MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
+                int id = getSongID(position);
+                if(id > 0 && !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,id,TAG)){
                     Global.setPlayingList(Global.mAllSongList);
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
@@ -115,42 +115,27 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
                     getActivity().sendBroadcast(intent);
                 }
 
-//                if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint()){
-//                    MainActivity.MultiChoice.RemoveOrAddView(view);
-//                } else {
-//                    Global.setPlayingList(Global.mAllSongList);
-//                    Intent intent = new Intent(Constants.CTL_ACTION);
-//                    Bundle arg = new Bundle();
-//                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-//                    arg.putInt("Position", position);
-//                    intent.putExtras(arg);
-//                    getActivity().sendBroadcast(intent);
-//                }
-
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                Log.d(TAG,"view:" + view.toString());
-                if(getUserVisibleHint())
-                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
+                int id = getSongID(position);
+                if(getUserVisibleHint() && id > 0)
+                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG);
 
-//                if(isFirstSelected && getUserVisibleHint()){
-//                    isFirstSelected = false;
-//                    MainActivity.MultiChoice.RemoveOrAddView(view);
-//                }
-//                if(getActivity() instanceof MainActivity){
-//                    if(MainActivity.MultiChoice.mIsShow && getUserVisibleHint())
-//                        MainActivity.MultiChoice.RemoveOrAddView(view);
-//                    if(!MainActivity.MultiChoice.mIsShow){
-//                        ((MainActivity) getActivity()).updateOptionsMenu(true);
-//                    }
-//                }
             }
         });
         mRecyclerView.setAdapter(mAdapter);
 
         return rootView;
+    }
+
+    private int getSongID(int position){
+        int id = -1;
+        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
+            id = mCursor.getInt(mSongId);
+        }
+        return id;
     }
 
     @Override

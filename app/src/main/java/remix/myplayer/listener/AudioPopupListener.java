@@ -124,7 +124,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                         updateGenreRow = DBUtil.updateGenre(mGenreInfo.GenreID,genre);
                                     }
                                     else {
-                                        long genreId = DBUtil.insertGenre(mInfo.getId(),genre);
+                                        long genreId = DBUtil.insertGenre(genre);
                                         if(genreId != -1){
                                             updateGenreRow = DBUtil.insearGenreMap(mInfo.getId(),(int)genreId) ? 1 : -1;
                                         }

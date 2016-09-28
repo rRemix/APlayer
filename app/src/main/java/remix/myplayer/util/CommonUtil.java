@@ -12,7 +12,6 @@ import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 import android.text.TextUtils;
-import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +27,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 import remix.myplayer.R;
 import remix.myplayer.util.thumb.SearchCover;
@@ -345,9 +347,8 @@ public class CommonUtil {
      */
     public static boolean deleteFile(String path){
         File file = new File(path);
-        if(file.exists())
-            return file.delete();
-        return false;
+        boolean s = file.exists() && file.delete();
+        return s;
     }
 
     /**
@@ -373,6 +374,22 @@ public class CommonUtil {
                 return origin;
             }
         }
+    }
+
+    /**
+     *
+     * @param map
+     * @param position
+     * @return
+     */
+    public static  <T extends Object> String getMapkeyByPosition(Map<String,ArrayList<T>> map, int position){
+        if(map == null || map.size() == 0 || position < 0)
+            return "";
+        Iterator it = map.keySet().iterator();
+        String key = "";
+        for(int i = 0 ; i <= position ; i++)
+            key = it.next().toString();
+        return key;
     }
 
     /**

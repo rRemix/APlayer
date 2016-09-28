@@ -2,9 +2,9 @@
 /local.properties
 /.idea
 *.iml
-.DS_Store
 /build
-/captures
+/.git
+
 /app/app-release.apk
 
 StackBlur/build

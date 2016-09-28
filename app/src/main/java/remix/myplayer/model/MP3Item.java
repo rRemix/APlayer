@@ -10,11 +10,11 @@ import java.io.Serializable;
  * 歌曲信息
  */
 public class MP3Item implements Serializable,Cloneable {
-    private long Id;
+    private int Id;
     private String Title;
     private String Displayname;
     private String Album;
-    private long AlbumId;
+    private int AlbumId;
     private String Artist;
     private String AlbumArt;
     private long Duration;
@@ -24,11 +24,11 @@ public class MP3Item implements Serializable,Cloneable {
     private String Year;
     public MP3Item(){}
 
-    public MP3Item(long id, String displayname, String title, String album, long albumid, String artist, long duration, String reailTime, String url, long size, String albumart) {
+    public MP3Item(int id, String displayname, String title, String album, int albumid, String artist, long duration, String reailTime, String url, long size, String albumart) {
         this(id,displayname,title,album,albumid,artist,duration,reailTime,url,size,albumart,null);
     }
 
-    public MP3Item(long id, String displayname, String title, String album, long albumid, String artist, long duration, String reailTime, String url, long size, String albumart,String year){
+    public MP3Item(int id, String displayname, String title, String album, int albumid, String artist, long duration, String reailTime, String url, long size, String albumart,String year){
         Id = id;
         Title = title;
         Displayname = displayname;
@@ -110,9 +110,9 @@ public class MP3Item implements Serializable,Cloneable {
         return Title;
     }
 
-    public long getAlbumId(){return AlbumId;}
+    public int getAlbumId(){return AlbumId;}
 
-    public void setAlbumId(long albumId){AlbumId = albumId;}
+    public void setAlbumId(int albumId){AlbumId = albumId;}
 
     public String getAlbumArt() {
         return AlbumArt;
@@ -130,11 +130,11 @@ public class MP3Item implements Serializable,Cloneable {
         ReailTime = reailTime;
     }
 
-    public long getId() {
+    public int getId() {
         return Id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         Id = id;
     }
 

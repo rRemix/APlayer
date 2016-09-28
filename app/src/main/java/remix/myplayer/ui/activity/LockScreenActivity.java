@@ -280,9 +280,9 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         if(mInfo == null)
             return;
         if(!mIsLove){
-            XmlUtil.addSongToPlayList(this,getString(R.string.my_favorite),mInfo.getTitle(),(int)mInfo.getId(),(int)mInfo.getAlbumId(),mInfo.getArtist());
+            XmlUtil.addSongToPlayList(getString(R.string.my_favorite),mInfo.getTitle(),mInfo.getId(),mInfo.getAlbumId(),mInfo.getArtist(),true);
         } else {
-            XmlUtil.deleteSongFromPlayList(getString(R.string.my_favorite),new PlayListItem(mInfo.getTitle(),(int)mInfo.getId(),(int)mInfo.getAlbumId(),mInfo.getArtist()));
+            XmlUtil.deleteSongFromPlayList(getString(R.string.my_favorite),new PlayListItem(mInfo.getTitle(),mInfo.getId(),mInfo.getAlbumId(),mInfo.getArtist()));
         }
         mIsLove = !mIsLove;
         mLoveButton.setImageResource(mIsLove ? R.drawable.lock_btn_loved : R.drawable.lock_btn_love);

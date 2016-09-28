@@ -27,12 +27,12 @@ import java.util.List;
 import java.util.Random;
 
 import remix.myplayer.R;
-import remix.myplayer.ui.activity.EQActivity;
-import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.fragment.FolderFragment;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.observer.MediaStoreObserver;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
+import remix.myplayer.ui.activity.EQActivity;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -69,7 +69,7 @@ public class MusicService extends BaseService {
     private static int mCurrent = 0;
 
     /** 当前正在播放的歌曲id */
-    private static long mId = -1;
+    private static int mId = -1;
 
     /** 当前正在播放的mp3 */
     private static MP3Item mInfo = null;
@@ -349,6 +349,7 @@ public class MusicService extends BaseService {
                 mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 
                 mMediaPlayer.start();
+
 //                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
 //                if(mCurrentVolume == 0)
 //                    return;
@@ -430,7 +431,7 @@ public class MusicService extends BaseService {
      * @param position 播放索引
      */
     private void playSelectSong(int position){
-       
+
         if((mCurrent = position) == -1 || (mCurrent > Global.mPlayingList.size() - 1))
             return;
         mId = Global.mPlayingList.get(mCurrent);
@@ -489,6 +490,12 @@ public class MusicService extends BaseService {
                 return;
             }
 
+            if(Control == Constants.PLAYSELECTEDSONG || Control == Constants.PREV || Control == Constants.NEXT
+                    || Control == Constants.PLAYORPAUSE || Control == Constants.PAUSE || Control == Constants.START){
+                if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
+                    return;
+            }
+
             switch (Control) {
                 //播放listview选中的歌曲
                 case Constants.PLAYSELECTEDSONG:
@@ -514,7 +521,7 @@ public class MusicService extends BaseService {
                     pause();
                     break;
                 //继续播放
-                case Constants.CONTINUE:
+                case Constants.START:
                     playStart();
                     break;
                 //顺序播放
@@ -568,7 +575,7 @@ public class MusicService extends BaseService {
             mFirstFlag = false;
             mIsplay = true;
             mIsIniting = false;
-            SPUtil.putValue(MainActivity.mInstance,"Setting","LastSongId",(int)mId);
+            SPUtil.putValue(MainActivity.mInstance,"Setting","LastSongId",mId);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -652,7 +659,7 @@ public class MusicService extends BaseService {
     public static void setPlayModel(int playModel) {
         if(playModel <= Constants.PLAY_REPEATONE && playModel >= Constants.PLAY_LOOP){
             mPlayModel = playModel;
-            SPUtil.putValue(mContext,"setting", "PlayModel",mPlayModel);
+            SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
         }
     }
 

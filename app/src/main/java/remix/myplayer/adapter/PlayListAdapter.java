@@ -104,7 +104,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
             Theme.TintDrawable(holder.mButton,
                     isLove ? R.drawable.playlist_love : R.drawable.list_icn_more,
                     ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
-            holder.mButton.setClickable(!isLove);
+//            holder.mButton.setClickable(!isLove);
             if(!isLove){
                 final String finalName = name;
                 holder.mButton.setOnClickListener(new View.OnClickListener() {

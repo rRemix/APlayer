@@ -138,7 +138,7 @@ public class OptionDialog extends BaseDialogActivity {
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                     String result = "";
                                     if(!mIsDeletePlayList){
-                                        result = DBUtil.deleteSong(mInfo.getId() + "", Constants.SONG) ?
+                                        result = DBUtil.deleteSong(mInfo.getId() , Constants.SONG) ?
                                                 getString(R.string.delete_success) :
                                                 getString(R.string.delete_error);
                                     } else {

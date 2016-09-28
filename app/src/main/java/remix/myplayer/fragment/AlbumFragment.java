@@ -67,7 +67,9 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(getUserVisibleHint() && !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
+                int albumId = getAlbumID(position);
+                if(getUserVisibleHint() && albumId > 0 &&
+                        !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,albumId,TAG)){
                     if(mCursor != null && mCursor.moveToPosition(position)) {
                         if(mCursor != null && mCursor.moveToPosition(position)) {
                         int albumid = mCursor.getInt(mAlbumIdIndex);
@@ -84,8 +86,9 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
             }
             @Override
             public void onItemLongClick(View view, int position) {
-                if(getUserVisibleHint()){
-                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
+                int albumId = getAlbumID(position);
+                if(getUserVisibleHint() && albumId > 0){
+                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,albumId,TAG);
                 }
             }
         });
@@ -93,6 +96,13 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         return rootView;
     }
 
+    private int getAlbumID(int position){
+        int albumId = -1;
+        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
+            albumId = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
+        }
+        return albumId;
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

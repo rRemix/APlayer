@@ -8,14 +8,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -62,6 +58,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
     private Cursor mCursor;
+    private ArrayList<Integer> mIdList = new ArrayList<>();
 
     private MaterialDialog mMDDialog;
 
@@ -147,20 +144,23 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(!MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
+                int id = getSongId(position);
+                if(id > 0 && !MultiChoice.itemAddorRemoveWithClick(view,position,id,TAG)){
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    Global.setPlayingList(Global.mWeekList);
+                    Global.setPlayingList(mIdList);
                     sendBroadcast(intent);
                 }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
+                int id = getSongId(position);
+                if(id > 0)
+                    MultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -183,6 +183,14 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
     }
 
 
+    private int getSongId(int position){
+        int id = -1;
+        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
+            id = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media._ID));
+        }
+        return id;
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -202,14 +210,14 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
 
     //随机播放
     public void onPlayShuffle(View v){
-        if(Global.mWeekList == null || Global.mWeekList.size() == 0){
+        if(mIdList == null || mIdList.size() == 0){
             Toast.makeText(RecetenlyActivity.this,getString(R.string.no_song),Toast.LENGTH_SHORT).show();
             return;
         }
         MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control", Constants.NEXT);
-        Global.setPlayingList(Global.mWeekList);
+        Global.setPlayingList(mIdList);
         sendBroadcast(intent);
     }
 
@@ -252,6 +260,7 @@ public class RecetenlyActivity extends ToolbarActivity implements MusicService.C
             return;
         //查询完毕后保存结果，并设置查询索引
         mCursor = data;
+        mIdList = DBUtil.getSongIdListByCursor(mCursor);
         mAdapter.setCursor(mCursor);
     }
 

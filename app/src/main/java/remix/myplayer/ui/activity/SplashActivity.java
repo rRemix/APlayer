@@ -28,7 +28,7 @@ public class SplashActivity extends BaseAppCompatActivity {
         ButterKnife.bind(this);
 
 
-        boolean isFirst = SPUtil.getValue(getApplicationContext(), "setting", "First", true);
+        boolean isFirst = SPUtil.getValue(getApplicationContext(), "Setting", "First", true);
         if(!isFirst){
             startActivity(new Intent(this, MainActivity.class));
             finish();

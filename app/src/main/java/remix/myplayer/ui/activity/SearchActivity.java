@@ -98,10 +98,10 @@ public class SearchActivity extends ToolbarActivity {
                 intent.putExtras(arg);
                 getApplicationContext().sendBroadcast(intent);
                 if (mCursor != null && mCursor.getCount() > 0 && mCursor.moveToFirst()) {
-                    ArrayList<Long> list = new ArrayList<>();
+                    ArrayList<Integer> list = new ArrayList<>();
                     for(int i = 0 ; i < mCursor.getCount(); i++) {
                         mCursor.moveToPosition(i);
-                        list.add(mCursor.getLong(mIdIndex));
+                        list.add(mCursor.getInt(mIdIndex));
                     }
                     Global.setPlayingList(list);
                 }
@@ -188,10 +188,10 @@ public class SearchActivity extends ToolbarActivity {
             getApplicationContext().sendBroadcast(intent);
             if (mCursor != null && mCursor.getCount() > 0 && mCursor.moveToFirst()) {
                 {
-                    ArrayList<Long> list = new ArrayList<>();
+                    ArrayList<Integer> list = new ArrayList<>();
                     for(int i = 0 ; i < mCursor.getCount(); i++) {
                         mCursor.moveToPosition(i);
-                        list.add(mCursor.getLong(mIdIndex));
+                        list.add(mCursor.getInt(mIdIndex));
                     }
                     Global.setPlayingList(list);
                 }

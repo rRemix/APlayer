@@ -108,7 +108,7 @@ public class ThemeStore {
      * @param themeColor
      */
     public static void saveThemeColor(int themeColor){
-        SPUtil.putValue(Application.getContext(),"Theme","ThemeColor",themeColor);
+        SPUtil.putValue(Application.getContext(),"Setting","ThemeColor",themeColor);
     }
 
     /**
@@ -116,7 +116,7 @@ public class ThemeStore {
      * @return
      */
     public static int loadThemeColor(){
-        return SPUtil.getValue(Application.getContext(),"Theme","ThemeColor",ThemeStore.THEME_PINK);
+        return SPUtil.getValue(Application.getContext(),"Setting","ThemeColor",ThemeStore.THEME_PINK);
     }
 
     /**
@@ -124,7 +124,7 @@ public class ThemeStore {
      * @param mode
      */
     public static void saveThemeMode(int mode){
-        SPUtil.putValue(Application.getContext(),"Theme","ThemeMode",mode);
+        SPUtil.putValue(Application.getContext(),"Setting","ThemeMode",mode);
     }
 
     /**
@@ -132,7 +132,7 @@ public class ThemeStore {
      * @return
      */
     public static int loadThemeMode(){
-        return SPUtil.getValue(Application.getContext(),"Theme","ThemeMode",DAY);
+        return SPUtil.getValue(Application.getContext(),"Setting","ThemeMode",DAY);
     }
 
     @ColorInt

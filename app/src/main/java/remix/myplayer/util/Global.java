@@ -42,19 +42,18 @@ public class Global {
     /**
      * 所有歌曲id
      */
-    public static ArrayList<Long> mAllSongList = new ArrayList<>();
+    public static ArrayList<Integer> mAllSongList = new ArrayList<>();
     /**
      * 正在播放歌曲id
      */
-    public static ArrayList<Long> mPlayingList = new ArrayList<>();
+    public static ArrayList<Integer> mPlayingList = new ArrayList<>();
     /**
      * 文件夹名与对应的所有歌曲id
      */
-    public static Map<String,ArrayList<Long>> mFolderMap = new HashMap<>();
+    public static Map<String,ArrayList<Integer>> mFolderMap = new HashMap<>();
     /**
      * 最近添加列表
      */
-    public static ArrayList<Long> mWeekList = new ArrayList<>();
     public static Map<String,ArrayList<PlayListItem>> mPlaylist = new HashMap<>();
 
     public static void setOperation(int operation){
@@ -90,9 +89,8 @@ public class Global {
      * 设置正在播放列表
      * @param list
      */
-    public static void setPlayingList(ArrayList<Long> list) {
-        mPlayingList.clear();
-        mPlayingList = list;
+    public static void setPlayingList(ArrayList<Integer> list) {
+        mPlayingList = (ArrayList<Integer>) list.clone();
         XmlUtil.updatePlayingList();
     }
 
@@ -101,9 +99,9 @@ public class Global {
      * 添加歌曲到正在播放列表
      * @param list
      */
-    public static void AddSongToPlayingList(ArrayList<Long> list) {
-        ArrayList<Long> songIdlist = new ArrayList<>();
-        for (Long id : list){
+    public static void AddSongToPlayingList(ArrayList<Integer> list) {
+        ArrayList<Integer> songIdlist = new ArrayList<>();
+        for (Integer id : list){
             if(!mPlayingList.contains(id))
                 songIdlist.add(id);
         }

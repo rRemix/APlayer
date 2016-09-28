@@ -6,11 +6,10 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.Iterator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,6 +19,7 @@ import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MainActivity;
+import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 
@@ -42,7 +42,7 @@ public class FolderFragment extends BaseFragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_folder,null);
         mUnBinder = ButterKnife.bind(this,rootView);
 
@@ -53,17 +53,20 @@ public class FolderFragment extends BaseFragment {
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(getUserVisibleHint() && !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,TAG)){
+                String path = CommonUtil.getMapkeyByPosition(Global.mFolderMap,position);
+                if(getUserVisibleHint() && !TextUtils.isEmpty(path) &&
+                        !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
                     Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
                     intent.putExtra("Id", position);
                     intent.putExtra("Type", Constants.FOLDER);
-                    if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
-                        return;
-                    Iterator it = Global.mFolderMap.keySet().iterator();
-                    String full_path = null;
-                    for(int i = 0 ; i <= position ; i++)
-                        full_path = it.next().toString();
-                    intent.putExtra("Title", full_path);
+//                    if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
+//                        return;
+//                    Iterator it = Global.mFolderMap.keySet().iterator();
+//                    String full_path = null;
+//                    for(int i = 0 ; i <= position ; i++)
+//                        full_path = it.next().toString();
+//                    intent.putExtra("Title", full_path);
+                    intent.putExtra("Title",path);
                     startActivity(intent);
                 }
 
@@ -71,8 +74,9 @@ public class FolderFragment extends BaseFragment {
 
             @Override
             public void onItemLongClick(View view, int position) {
-                if(getUserVisibleHint())
-                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,TAG);
+                String path = CommonUtil.getMapkeyByPosition(Global.mFolderMap,position);
+                if(getUserVisibleHint() && !TextUtils.isEmpty(path))
+                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG);
             }
         });
         mRecyclerView.setAdapter(mAdapter);

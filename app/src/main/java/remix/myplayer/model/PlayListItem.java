@@ -8,61 +8,61 @@ package remix.myplayer.model;
  * 播放列表Item
  */
 public class PlayListItem {
-    private String mSongName;
-    private int mId;
-    private int mAlbumId;
-    private String mArtist;
-    private PlayListItem(){}
+    public String SongName;
+    public int SongId;
+    public int AlbumId;
+    public String Artist;
+    public PlayListItem(){}
     public PlayListItem(String SongName, int Id,int AlbumId,String Artist) {
-        this.mSongName = SongName;
-        this.mId = Id;
-        this.mAlbumId = AlbumId;
-        this.mArtist = Artist;
+        this.SongName = SongName;
+        this.SongId = Id;
+        this.AlbumId = AlbumId;
+        this.Artist = Artist;
     }
 
     public String getArtist() {
-        return mArtist;
+        return Artist;
     }
 
     public void setArtist(String SongName) {
-        this.mArtist = SongName;
+        this.Artist = SongName;
     }
 
     public String getSongame() {
-        return mSongName;
+        return SongName;
     }
 
     public void setSongName(String SongName) {
-        this.mSongName = SongName;
+        this.SongName = SongName;
     }
 
     public int getId() {
-        return mId;
+        return SongId;
     }
 
     public void setId(int mId) {
-        this.mId = mId;
+        this.SongId = mId;
     }
 
     public int getAlbumId() {
-        return mAlbumId;
+        return AlbumId;
     }
 
     public void setAlbumId(int mId) {
-        this.mAlbumId = mId;
+        this.AlbumId = mId;
     }
 
     @Override
     public String toString() {
         return "PlayListItem{" +
-                "SongName='" + mSongName + '\'' +
-                ", Id=" + mId +
+                "SongName='" + SongName + '\'' +
+                ", Id=" + SongId +
                 '}';
     }
 
     @Override
     public boolean equals(Object o) {
         PlayListItem item = (PlayListItem)o;
-        return item.getId() == mId;
+        return item.getId() == SongId;
     }
 }
