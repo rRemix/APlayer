@@ -39,6 +39,7 @@ import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.fragment.FolderFragment;
 import remix.myplayer.fragment.SongFragment;
+import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
@@ -57,7 +58,7 @@ import remix.myplayer.util.XmlUtil;
 /**
  *
  */
-public class MainActivity extends ToolbarActivity implements MusicService.Callback {
+public class MainActivity extends MultiChoiceActivity implements MusicService.Callback {
     public static MainActivity mInstance = null;
     @BindView(R.id.multi_menu)
     RelativeLayout mMultiMenu;
@@ -80,8 +81,6 @@ public class MainActivity extends ToolbarActivity implements MusicService.Callba
     //是否第一次启动
     private static boolean mIsFirst = true;
 
-    public static MultiChoice MultiChoice = new MultiChoice();
-
     private static final int PERMISSIONCODE = 100;
     private static final String[] PERMISSIONS = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -96,30 +95,40 @@ public class MainActivity extends ToolbarActivity implements MusicService.Callba
                 recreate();
             }
             else if(msg.what == Constants.UPDATE_MULTI){
-                MultiChoice.clearSelectedViews();
+                mMultiChoice.clearSelectedViews();
             }
-            else if(msg.what == Constants.UPDATE_ADAPTER){
+            else if (msg.what == Constants.UPDATE_MULTI_ADAPTER
+                    || msg.what == Constants.UPDATE_ADAPTER){
+                boolean isMulti = msg.what == Constants.UPDATE_MULTI_ADAPTER;
+
                 //刷新适配器
                 for(Fragment temp : getSupportFragmentManager().getFragments()){
                     if(temp instanceof SongFragment){
-                       SongFragment songFragment = (SongFragment)temp;
-                        if(songFragment.getAdapter() != null && songFragment.getUserVisibleHint())
-                            songFragment.getAdapter().notifyDataSetChanged();
+                        SongFragment songFragment = (SongFragment)temp;
+                        if(songFragment.getAdapter() != null){
+                            if(!isMulti || (isMulti && MultiChoice.TAG.equals(SongFragment.TAG)))
+                                songFragment.getAdapter().notifyDataSetChanged();
+                        }
                     }
                     if(temp instanceof AlbumFragment){
                         AlbumFragment albumFragment = (AlbumFragment)temp;
-                        if(albumFragment.getAdapter() != null && albumFragment.getUserVisibleHint())
-                            albumFragment.getAdapter().notifyDataSetChanged();
+                        if(albumFragment.getAdapter() != null){
+                            if(!isMulti || (isMulti && MultiChoice.TAG.equals(AlbumFragment.TAG)))
+                                albumFragment.getAdapter().notifyDataSetChanged();
+                        }
                     }
                     if(temp instanceof ArtistFragment){
                         ArtistFragment artistFragment = (ArtistFragment)temp;
-                        if(artistFragment.getAdapter() != null && artistFragment.getUserVisibleHint())
-                            artistFragment.getAdapter().notifyDataSetChanged();
+                        if(artistFragment.getAdapter() != null){
+                            if(!isMulti || (isMulti && MultiChoice.TAG.equals(ArtistFragment.TAG)))
+                                artistFragment.getAdapter().notifyDataSetChanged();
+                        }
                     }
                     if(temp instanceof FolderFragment){
                         FolderFragment folderFragment = (FolderFragment) temp;
-                        if(folderFragment.getAdapter() != null && folderFragment.getUserVisibleHint()){
-                            folderFragment.getAdapter().notifyDataSetChanged();
+                        if(folderFragment.getAdapter() != null){
+                            if(!isMulti || (isMulti && MultiChoice.TAG.equals(FolderFragment.TAG)))
+                                folderFragment.getAdapter().notifyDataSetChanged();
                         }
                     }
                 }
@@ -131,7 +140,7 @@ public class MainActivity extends ToolbarActivity implements MusicService.Callba
     @Override
     protected void onResume() {
         super.onResume();
-        if(MultiChoice.isShow()){
+        if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
         mIsRunning = true;
@@ -142,7 +151,7 @@ public class MainActivity extends ToolbarActivity implements MusicService.Callba
     @Override
     protected void onPause() {
         super.onPause();
-        if(MultiChoice.isShow()){
+        if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
         }
     }
@@ -162,24 +171,24 @@ public class MainActivity extends ToolbarActivity implements MusicService.Callba
         ButterKnife.bind(this);
         mInstance = this;
 
-        MultiChoice.setOnUpdateOptionMenuListener(new MultiChoice.onUpdateOptionMenuListener() {
+        mMultiChoice.setOnUpdateOptionMenuListener(new OnUpdateOptionMenuListener() {
             @Override
             public void onUpdate(boolean multiShow) {
-                MultiChoice.setShowing(multiShow);
-                mToolBar.setNavigationIcon(MultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+                mMultiChoice.setShowing(multiShow);
+                mToolBar.setNavigationIcon(mMultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
                 mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(MultiChoice.isShow()){
-                            MultiChoice.UpdateOptionMenu(false);
-                            MultiChoice.clear();
+                        if(mMultiChoice.isShow()){
+                            mMultiChoice.UpdateOptionMenu(false);
+                            mMultiChoice.clear();
                         } else {
                             mDrawerLayout.openDrawer(mNavigationView);
                         }
                     }
                 });
-                if(!MultiChoice.isShow()){
-                    MultiChoice.clear();
+                if(!mMultiChoice.isShow()){
+                    mMultiChoice.clear();
                 }
                 invalidateOptionsMenu();
             }
@@ -295,9 +304,9 @@ public class MainActivity extends ToolbarActivity implements MusicService.Callba
 
     @Override
     protected void initToolbar(Toolbar toolbar, String title) {
+        super.initToolbar(toolbar,"");
         mToolBar.setTitle("");
 
-        setSupportActionBar(mToolBar);
         mToolBar.setNavigationIcon(R.drawable.actionbar_menu);
         mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -305,31 +314,6 @@ public class MainActivity extends ToolbarActivity implements MusicService.Callba
                 mDrawerLayout.openDrawer(mNavigationView);
             }
         });
-
-        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.toolbar_search:
-                        startActivity(new Intent(MainActivity.this, SearchActivity.class));
-                        break;
-                    case R.id.toolbar_timer:
-                        startActivity(new Intent(MainActivity.this, TimerDialog.class));
-                        break;
-                    case R.id.toolbar_delete:
-                        Test(MultiChoice);
-                        break;
-                    case R.id.toolbar_add_playing:
-                        Test(MultiChoice);
-                        break;
-                    case R.id.toolbar_add_playlist:
-                        Test(MultiChoice);
-                        break;
-                }
-                return true;
-            }
-        });
-
     }
 
 
@@ -368,12 +352,6 @@ public class MainActivity extends ToolbarActivity implements MusicService.Callba
         mTablayout.setupWithViewPager(mViewPager);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(MultiChoice.isShow() ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
-        return true;
-    }
 
     private void initDrawerLayout() {
         mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
@@ -468,9 +446,9 @@ public class MainActivity extends ToolbarActivity implements MusicService.Callba
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
             mDrawerLayout.closeDrawer(mNavigationView);
-        } else if(MultiChoice.isShow()) {
+        } else if(mMultiChoice.isShow()) {
 //            updateOptionsMenu(false);
-            MultiChoice.UpdateOptionMenu(false);
+            mMultiChoice.UpdateOptionMenu(false);
         } else {
             Intent home = new Intent(Intent.ACTION_MAIN);
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

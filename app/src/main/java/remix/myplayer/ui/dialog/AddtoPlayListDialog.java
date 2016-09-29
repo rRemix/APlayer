@@ -79,11 +79,12 @@ public class AddtoPlayListDialog extends BaseDialogActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(view != null) {
                     Toast.makeText(AddtoPlayListDialog.this,
-                            XmlUtil.addSongToPlayList(((TextView)view.findViewById(R.id.playlist_addto_text)).getText().toString()
-                            ,mSongName,mId,mAlbumId,mArtist,true) ?
-                            R.string.add_song_playlist_success : R.string.add_song_playlist_error,Toast.LENGTH_SHORT).show();
+                            getString(R.string.add_multi_song_playlist_success,
+                                    XmlUtil.addSongToPlayList(((TextView)view.findViewById(R.id.playlist_addto_text)).getText().toString()
+                                    ,mSongName,mId,mAlbumId,mArtist,true) ? 1 : 0),
+                            Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(AddtoPlayListDialog.this,getString(R.string.add_playlist_error), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddtoPlayListDialog.this,R.string.add_song_playlist_error, Toast.LENGTH_SHORT).show();
                 }
                 finish();
             }
@@ -113,8 +114,11 @@ public class AddtoPlayListDialog extends BaseDialogActivity {
                             if(!TextUtils.isEmpty(input)){
                                 XmlUtil.addPlaylist(AddtoPlayListDialog.this,input.toString());
                                 if(mAddAfterCreate){
-                                    Toast.makeText(AddtoPlayListDialog.this,XmlUtil.addSongToPlayList(input.toString(),mSongName,mId,mAlbumId,mArtist,true) ?
-                                                    R.string.add_song_playlist_success : R.string.add_song_playlist_error,Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(AddtoPlayListDialog.this,
+                                            getString(R.string.add_multi_song_playlist_success,
+                                                    XmlUtil.addSongToPlayList(input.toString(),mSongName,mId,mAlbumId,mArtist,true) ? 1 : 0),
+                                            Toast.LENGTH_SHORT).show();
+
                                 }
                             }
                         }

@@ -36,9 +36,10 @@ import remix.myplayer.util.Global;
 public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHolder> {
     private Context mContext;
     private OnItemClickListener mOnItemClickLitener;
-
-    public FolderAdapter(Context context) {
+    private MultiChoice mMultiChoice;
+    public FolderAdapter(Context context,MultiChoice multiChoice) {
         this.mContext = context;
+        this.mMultiChoice = multiChoice;
     }
     public void setOnItemClickLitener(OnItemClickListener l)
     {
@@ -107,8 +108,8 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
         }
 
         if(MultiChoice.TAG.equals(FolderFragment.TAG) &&
-                MainActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
-            MainActivity.MultiChoice.AddView(holder.mContainer);
+                mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+            mMultiChoice.AddView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);
         }

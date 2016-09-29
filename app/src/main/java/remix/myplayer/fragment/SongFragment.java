@@ -24,8 +24,10 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.ui.activity.MainActivity;
+import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 
@@ -37,7 +39,6 @@ import remix.myplayer.util.Global;
  * 全部歌曲的Fragment
  */
 public class SongFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private LoaderManager mManager;
     private Cursor mCursor = null;
     //歌曲名 艺术家 专辑名 专辑id 歌曲id对应的索引
     public static int mDisPlayNameIndex = -1;
@@ -53,13 +54,13 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     private static int LOADER_ID = 1;
     public static boolean isFirstSelected = true;
     public static final String TAG = SongFragment.class.getSimpleName();
-
+    private MultiChoice mMultiChoice;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mManager = getLoaderManager();
-        mManager.initLoader(LOADER_ID++, null, this);
+        LoaderManager manager = getLoaderManager();
+        manager.initLoader(LOADER_ID++, null, this);
     }
 
     @Override
@@ -100,12 +101,15 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         mRecyclerView.addItemDecoration(new RecyclerItemDecoration(getContext(),RecyclerItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mAdapter = new SongAdapter(getActivity(), SongAdapter.ALLSONG);
+        if(getActivity() instanceof MultiChoiceActivity){
+            mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
+        }
+        mAdapter = new SongAdapter(getActivity(),mMultiChoice, SongAdapter.ALLSONG);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 int id = getSongID(position);
-                if(id > 0 && !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,id,TAG)){
+                if(id > 0 && !mMultiChoice.itemAddorRemoveWithClick(view,position,id,TAG)){
                     Global.setPlayingList(Global.mAllSongList);
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
@@ -114,15 +118,13 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
                     intent.putExtras(arg);
                     getActivity().sendBroadcast(intent);
                 }
-
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
                 int id = getSongID(position);
                 if(getUserVisibleHint() && id > 0)
-                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG);
-
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG);
             }
         });
         mRecyclerView.setAdapter(mAdapter);

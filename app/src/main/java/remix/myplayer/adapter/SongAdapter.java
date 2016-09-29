@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,13 +30,11 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MainActivity;
-import remix.myplayer.ui.activity.RecetenlyActivity;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.DBUtil;
-import remix.myplayer.util.Global;
 
 /**
  * 全部歌曲和最近添加页面所用adapter
@@ -49,6 +46,7 @@ import remix.myplayer.util.Global;
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder>{
     private Cursor mCursor;
     private Context mContext;
+    private MultiChoice mMultiChoice;
     private OnItemClickListener mOnItemClickLitener;
     private ArrayList<MP3Item> mInfoList;
     private ArrayList<String> mSortList;
@@ -58,8 +56,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
     private static int mCurrentAnimPosition = 0;//当前播放高亮动画的索引
     private static int mOldAnimPostion = 0;
 
-    public SongAdapter(Context context, int type) {
+    public SongAdapter(Context context, MultiChoice multiChoice,int type) {
         this.mContext = context;
+        this.mMultiChoice = multiChoice;
         this.mType = type;
     }
     public void setOnItemClickLitener(OnItemClickListener l)
@@ -157,7 +156,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             holder.mItemButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(MainActivity.MultiChoice.isShow())
+                    if(mMultiChoice.isShow())
                         return;
                     Intent intent = new Intent(mContext, OptionDialog.class);
                     intent.putExtra("MP3Item", temp);
@@ -186,8 +185,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
         if(mType == ALLSONG){
             if(MultiChoice.TAG.equals(SongFragment.TAG) &&
-                    MainActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
-                MainActivity.MultiChoice.AddView(holder.mContainer);
+                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+                mMultiChoice.AddView(holder.mContainer);
             } else {
                 holder.mContainer.setSelected(false);
             }

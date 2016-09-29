@@ -44,16 +44,17 @@ import remix.myplayer.util.thumb.AsynLoadImage;
 public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHolder>{
     private Cursor mCursor;
     private Context mContext;
-
+    private MultiChoice mMultiChoice;
     public void setOnItemClickLitener(OnItemClickListener mOnItemClickLitener) {
         this.mOnItemClickLitener = mOnItemClickLitener;
     }
 
     private OnItemClickListener mOnItemClickLitener;
 
-    public ArtistAdapter(Cursor cursor, Context context) {
+    public ArtistAdapter(Cursor cursor, Context context,MultiChoice multiChoice) {
         this.mCursor = cursor;
         this.mContext = context;
+        this.mMultiChoice = multiChoice;
     }
 
     public void setCursor(Cursor mCursor) {
@@ -105,7 +106,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(MainActivity.MultiChoice.isShow())
+                        if(mMultiChoice.isShow())
                             return;
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
@@ -122,8 +123,8 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
             }
         }
         if(MultiChoice.TAG.equals(ArtistFragment.TAG) &&
-                MainActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
-            MainActivity.MultiChoice.AddView(holder.mCardBackground);
+                mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+            mMultiChoice.AddView(holder.mCardBackground);
         } else {
             holder.mCardBackground.setSelected(false);
         }

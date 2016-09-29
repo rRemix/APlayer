@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -31,30 +32,21 @@ public class MultiChoiceActivity extends ToolbarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mMultiChoice = new MultiChoice(this);
     }
 
     @Override
     protected void initToolbar(Toolbar toolbar, String title) {
-        toolbar.setTitle(title);
-        toolbar.setTitleTextColor(Color.parseColor("#ffffffff"));
-//        toolbar.setBackgroundColor(ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY));
-        setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.common_btn_back);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickNavigation();
-            }
-        });
+        super.initToolbar(toolbar,title);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.toolbar_search:
-                        startActivity(new Intent(ToolbarActivity.this, SearchActivity.class));
+                        startActivity(new Intent(MultiChoiceActivity.this, SearchActivity.class));
                         break;
                     case R.id.toolbar_timer:
-                        startActivity(new Intent(ToolbarActivity.this, TimerDialog.class));
+                        startActivity(new Intent(MultiChoiceActivity.this, TimerDialog.class));
                         break;
                     case R.id.toolbar_delete:
                         if(mMultiChoice != null)
@@ -73,4 +65,13 @@ public class MultiChoiceActivity extends ToolbarActivity {
             }
         });
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(mMultiChoice.isShow() ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+
 }

@@ -101,6 +101,8 @@ public class Constants {
 
     //更新适配器
     public final static int UPDATE_ADAPTER = 100;
+    //更新多选状态下适配器
+    public final static int UPDATE_MULTI_ADAPTER = 103;
     //多选更新
     public final static int UPDATE_MULTI = 101;
     //重建activity

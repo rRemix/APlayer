@@ -18,11 +18,11 @@ import android.view.ViewGroup;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.adapter.ArtistAdapter;
 import remix.myplayer.listener.OnItemClickListener;
-import remix.myplayer.ui.activity.MainActivity;
+import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.activity.ChildHolderActivity;
+import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.Constants;
 
 /**
@@ -39,18 +39,16 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     //艺术家与艺术家id的索引
     public static int mArtistIdIndex = -1;
     public static int mArtistIndex = -1;
-    private LoaderManager mManager;
     private ArtistAdapter mAdapter;
     private static int LOADER_ID = 1;
-    private MultiChoice mMultiChoice = new MultiChoice();
     public static boolean isFirstSelected = true;
     public static final String TAG = ArtistFragment.class.getSimpleName();
-
+    private MultiChoice mMultiChoice;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mManager = getLoaderManager();
-        mManager.initLoader(LOADER_ID++, null, this);
+        LoaderManager manager = getLoaderManager();
+        manager.initLoader(LOADER_ID++, null, this);
     }
 
     @Override
@@ -65,13 +63,16 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         mUnBinder = ButterKnife.bind(this,rootView);
 
         mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-        mAdapter = new ArtistAdapter(mCursor,getActivity());
+        if(getActivity() instanceof MultiChoiceActivity){
+            mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
+        }
+        mAdapter = new ArtistAdapter(mCursor,getActivity(),mMultiChoice);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 int artistId = getArtsitId(position);
                 if(getUserVisibleHint() && artistId > 0 &&
-                        !MainActivity.MultiChoice.itemAddorRemoveWithClick(view,position,artistId,TAG)){
+                        !mMultiChoice.itemAddorRemoveWithClick(view,position,artistId,TAG)){
                     if (mCursor.moveToPosition(position)) {
                         int artistid = mCursor.getInt(mArtistIdIndex);
                         String title = mCursor.getString(mArtistIndex);
@@ -89,7 +90,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
             public void onItemLongClick(View view, int position) {
                 int artistId = getArtsitId(position);
                 if(getUserVisibleHint() && artistId > 0)
-                    MainActivity.MultiChoice.itemAddorRemoveWithLongClick(view,position,artistId,TAG);
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,artistId,TAG);
 
             }
         });

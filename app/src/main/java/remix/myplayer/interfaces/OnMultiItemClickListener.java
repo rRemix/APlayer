@@ -7,4 +7,7 @@ package remix.myplayer.interfaces;
  * @Date 2016/9/29 10:02
  */
 public interface OnMultiItemClickListener {
+    void OnAddToPlayingList();
+    void OnAddToPlayList();
+    void OnDelete();
 }

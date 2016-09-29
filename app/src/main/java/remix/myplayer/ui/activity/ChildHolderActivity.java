@@ -19,11 +19,11 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ChildHolderAdapter;
 import remix.myplayer.fragment.BottomActionBarFragment;
+import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.listener.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -36,7 +36,7 @@ import remix.myplayer.util.Global;
 /**
  * 专辑、艺术家、文件夹、播放列表详情
  */
-public class ChildHolderActivity extends ToolbarActivity implements MusicService.Callback{
+public class ChildHolderActivity extends MultiChoiceActivity implements MusicService.Callback{
     public final static String TAG = ChildHolderActivity.class.getSimpleName();
 
     private static boolean mIsRunning = false;
@@ -66,7 +66,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == Constants.UPDATE_MULTI){
-                MultiChoice.clearSelectedViews();
+                mMultiChoice.clearSelectedViews();
             } else if(msg.what == Constants.UPDATE_ADAPTER){
                 if(mInfoList == null)
                     return;
@@ -76,9 +76,6 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
         }
     };
 
-    public static MultiChoice MultiChoice = new MultiChoice();
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,24 +84,24 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
 
         mInstance = this;
         MusicService.addCallback(ChildHolderActivity.this);
-        MultiChoice.setOnUpdateOptionMenuListener(new MultiChoice.onUpdateOptionMenuListener() {
+        mMultiChoice.setOnUpdateOptionMenuListener(new OnUpdateOptionMenuListener() {
             @Override
             public void onUpdate(final boolean multiShow) {
-                MultiChoice.setShowing(multiShow);
-                mToolBar.setNavigationIcon(MultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+                mMultiChoice.setShowing(multiShow);
+                mToolBar.setNavigationIcon(mMultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
                 mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(multiShow){
-                            MultiChoice.UpdateOptionMenu(false);
-                            MultiChoice.clear();
+                        if(mMultiChoice.isShow()){
+                            mMultiChoice.UpdateOptionMenu(false);
+                            mMultiChoice.clear();
                         } else {
                             finish();
                         }
                     }
                 });
-                if(!MultiChoice.isShow()){
-                    MultiChoice.clear();
+                if(!mMultiChoice.isShow()){
+                    mMultiChoice.clear();
                 }
                 invalidateOptionsMenu();
             }
@@ -123,12 +120,12 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
             }
         }.start();
 
-        mAdapter = new ChildHolderAdapter(this,mType,mArg);
+        mAdapter = new ChildHolderAdapter(this,mType,mArg,mMultiChoice);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 long songid = mInfoList.get(position).getId();
-                if(songid > 0 && !MultiChoice.itemAddorRemoveWithClick(view,position,songid,TAG)){
+                if(songid > 0 && !mMultiChoice.itemAddorRemoveWithClick(view,position,songid,TAG)){
                     if (mInfoList != null && mInfoList.size() == 0)
                         return;
                     ArrayList<Integer> ids = new ArrayList<>();
@@ -152,7 +149,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
             public void onItemLongClick(View view, int position) {
                 long songid = mInfoList.get(position).getId();
                 if(songid > 0)
-                    MultiChoice.itemAddorRemoveWithLongClick(view,position,songid,TAG);
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,songid,TAG);
             }
 
 
@@ -183,14 +180,13 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
             return;
 
         mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
+
     }
-
-
 
     @Override
     public void onBackPressed() {
-        if(MultiChoice.isShow()) {
-            MultiChoice.UpdateOptionMenu(false);
+        if(mMultiChoice.isShow()) {
+            mMultiChoice.UpdateOptionMenu(false);
         } else {
             finish();
         }
@@ -305,7 +301,7 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
     @Override
     protected void onPause() {
         super.onPause();
-        if(MultiChoice.isShow()){
+        if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
         }
     }
@@ -314,9 +310,10 @@ public class ChildHolderActivity extends ToolbarActivity implements MusicService
     protected void onResume() {
         super.onResume();
         mIsRunning = true;
-        if(MultiChoice.isShow()){
+        if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
+
     }
 
     @Override

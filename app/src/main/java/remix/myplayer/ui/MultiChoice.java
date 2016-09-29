@@ -1,16 +1,23 @@
 package remix.myplayer.ui;
 
+import android.content.Context;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import remix.myplayer.R;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.FolderFragment;
 import remix.myplayer.fragment.SongFragment;
+import remix.myplayer.interfaces.OnMultiItemClickListener;
+import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.XmlUtil;
 
 /**
  * @ClassName
@@ -18,7 +25,9 @@ import remix.myplayer.util.Constants;
  * @Author Xiaoborui
  * @Date 2016/9/20 16:12
  */
-public class MultiChoice {
+public class MultiChoice implements OnMultiItemClickListener {
+    private Context mContext;
+
     /** 当前正在操作的activity或者fragment */
     public static String TAG = "";
     public static int TYPE = -1;
@@ -36,7 +45,18 @@ public class MultiChoice {
     public ArrayList<Object> mSelectedArg = new ArrayList<>();
 
     /** 更新optionmenu */
-    private onUpdateOptionMenuListener mUpdateOptionMenuListener;
+    private OnUpdateOptionMenuListener mUpdateOptionMenuListener;
+
+    /** 构造函数 */
+    public MultiChoice(Context context){
+        mContext = context;
+    }
+
+    public MultiChoice(){}
+    public void setContext(Context context){
+        mContext = context;
+    }
+
 
     public boolean isShow(){
         return mIsShow;
@@ -46,13 +66,101 @@ public class MultiChoice {
         mIsShow = showing;
     }
 
-    public interface onUpdateOptionMenuListener {
-        void onUpdate(boolean multiShow);
+    @Override
+    public void OnAddToPlayingList() {
+        int num = 0;
+        ArrayList<Integer> idList = new ArrayList<>();
+        switch (TYPE){
+            case Constants.SONG:
+                for(Object arg : mSelectedArg){
+                    if (arg instanceof Integer)
+                        idList.add((Integer) arg);
+                }
+                break;
+            case Constants.ALBUM:
+            case Constants.ARTIST:
+            case Constants.FOLDER:
+            case Constants.PLAYLIST:
+                for(Object arg : mSelectedArg){
+                    ArrayList<Integer> tempList = DBUtil.getSongIdListByArg(arg,TYPE);
+                    if(tempList != null && tempList.size() > 0)
+                        idList.addAll(DBUtil.getSongIdListByArg(arg,TYPE));
+                }
+                break;
+        }
+        num = XmlUtil.addSongsToPlayingList(idList);
+        Toast.makeText(mContext, mContext.getResources().getString(R.string.add_multi_song_playinglist_success,num),Toast.LENGTH_SHORT).show();
+        UpdateOptionMenu(false);
     }
 
-    public void setOnUpdateOptionMenuListener(onUpdateOptionMenuListener l){
+    @Override
+    public void OnAddToPlayList() {
+        int num = 0;
+        ArrayList<Integer> idList = new ArrayList<>();
+        switch (TYPE){
+            case Constants.SONG:
+                for(Object arg : mSelectedArg){
+                    if (arg instanceof Integer)
+                        idList.add((Integer) arg);
+                }
+                break;
+            case Constants.ALBUM:
+            case Constants.ARTIST:
+            case Constants.FOLDER:
+            case Constants.PLAYLIST:
+                for(Object arg : mSelectedArg){
+                    ArrayList<Integer> tempList = DBUtil.getSongIdListByArg(arg,TYPE);
+                    if(tempList != null && tempList.size() > 0)
+                        idList.addAll(DBUtil.getSongIdListByArg(arg,TYPE));
+                }
+                break;
+        }
+        num = XmlUtil.addSongsToPlayList("我的收藏",DBUtil.getPlayListItemListByIds(idList));
+        Toast.makeText(mContext, mContext.getString(R.string.add_multi_song_playlist_success,num)
+                ,Toast.LENGTH_SHORT).show();
+        UpdateOptionMenu(false);
+    }
+
+    @Override
+    public void OnDelete() {
+        int num = 0;
+        ArrayList<Integer> idList = new ArrayList<>();
+        switch (TYPE){
+            case Constants.SONG:
+                for(Object arg : mSelectedArg){
+                    if (arg instanceof Integer)
+                        idList.add((Integer) arg);
+                }
+                break;
+            case Constants.ALBUM:
+            case Constants.ARTIST:
+            case Constants.FOLDER:
+            case Constants.PLAYLIST:
+                for(Object arg : mSelectedArg){
+                    ArrayList<Integer> tempList = DBUtil.getSongIdListByArg(arg,TYPE);
+                    if(tempList != null && tempList.size() > 0)
+                        idList.addAll(tempList);
+                }
+                break;
+        }
+        for(Integer id : idList){
+            if( DBUtil.deleteSong(id,Constants.SONG))
+                num++;
+        }
+
+        if(num > 0){
+            Toast.makeText(mContext, mContext.getString(R.string.delete_success),Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(mContext,R.string.delete_error,Toast.LENGTH_SHORT).show();
+        }
+        UpdateOptionMenu(false);
+    }
+
+
+    public void setOnUpdateOptionMenuListener(OnUpdateOptionMenuListener l){
         mUpdateOptionMenuListener = l;
     }
+
 
     /**
      *
@@ -195,5 +303,4 @@ public class MultiChoice {
         else
             return -1;
     }
-
 }

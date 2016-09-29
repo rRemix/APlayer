@@ -45,10 +45,12 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
     private Cursor mCursor;
     private Context mContext;
     private OnItemClickListener mOnItemClickLitener;
+    private MultiChoice mMultiChoice;
 
-    public AlbumAdater(Cursor cursor, Context context) {
+    public AlbumAdater(Cursor cursor, Context context,MultiChoice multiChoice) {
         this.mCursor = cursor;
         this.mContext = context;
+        this.mMultiChoice = multiChoice;
 
     }
     public void setOnItemClickLitener(OnItemClickListener l)
@@ -112,7 +114,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(MainActivity.MultiChoice.isShow())
+                        if(mMultiChoice.isShow())
                             return;
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
@@ -128,8 +130,8 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
             }
 
             if(MultiChoice.TAG.equals(AlbumFragment.TAG) &&
-                    MainActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
-                MainActivity.MultiChoice.AddView(holder.mCardBackground);
+                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+                mMultiChoice.AddView(holder.mCardBackground);
             } else {
                 holder.mCardBackground.setSelected(false);
             }

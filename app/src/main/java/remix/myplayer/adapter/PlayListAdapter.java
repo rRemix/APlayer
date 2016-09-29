@@ -44,8 +44,10 @@ import remix.myplayer.util.Global;
  */
 public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayListHolder> {
     private Context mContext;
-    public PlayListAdapter(Context context) {
+    private MultiChoice mMultiChoice;
+    public PlayListAdapter(Context context,MultiChoice multiChoice) {
         this.mContext = context;
+        this.mMultiChoice = multiChoice;
     }
 
     private OnItemClickLitener mOnItemClickLitener;
@@ -101,16 +103,17 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
         if(holder.mButton != null) {
             boolean isLove = name.equals(mContext.getString(R.string.my_favorite));
-            Theme.TintDrawable(holder.mButton,
-                    isLove ? R.drawable.playlist_love : R.drawable.list_icn_more,
+//            Theme.TintDrawable(holder.mButton,
+//                    isLove ? R.drawable.playlist_love : R.drawable.list_icn_more,
+//                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
+            Theme.TintDrawable(holder.mButton, R.drawable.list_icn_more,
                     ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
-//            holder.mButton.setClickable(!isLove);
-            if(!isLove){
+//            if(!isLove){
                 final String finalName = name;
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(PlayListActivity.MultiChoice.isShow())
+                        if(mMultiChoice.isShow())
                             return;
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
@@ -119,11 +122,11 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                         popupMenu.show();
                     }
                 });
-            }
+//            }
         }
         if(MultiChoice.TAG.equals(PlayListActivity.TAG) &&
-                PlayListActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
-            PlayListActivity.MultiChoice.AddView(holder.mCardBackground);
+                mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+            mMultiChoice.AddView(holder.mCardBackground);
         } else {
             holder.mCardBackground.setSelected(false);
         }

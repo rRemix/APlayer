@@ -43,12 +43,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/meizuDebug/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/meizuDebug/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/meizuDebug/shaders" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/meizu/debug" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/meizu/debug" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/meizu/debug" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/meizu/debug" isTestSource="true" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/meizu/debug" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/androidTest/meizu/debug" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/apt/test/meizu/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizuDebug/res" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizuDebug/resources" type="java-test-resource" />
@@ -58,6 +52,12 @@
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizuDebug/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizuDebug/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizuDebug/shaders" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/meizu/debug" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/meizu/debug" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/meizu/debug" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/meizu/debug" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/meizu/debug" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/androidTest/meizu/debug" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/meizu/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/meizu/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/meizu/assets" type="java-resource" />
@@ -66,14 +66,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/meizu/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/meizu/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/meizu/shaders" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/res" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/assets" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/aidl" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/jni" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/rs" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizu/res" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizu/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizu/assets" type="java-test-resource" />
@@ -82,6 +74,14 @@
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizu/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizu/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizu/shaders" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/res" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/assets" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/aidl" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/jni" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/rs" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/assets" type="java-resource" />
@@ -159,7 +159,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 23 Platform (1)" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="palette-v7-23.3.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-24.1.1" level="project" />

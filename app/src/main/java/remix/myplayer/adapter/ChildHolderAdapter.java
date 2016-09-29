@@ -37,11 +37,13 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
     private Context mContext;
     private int mType;
     private String mArg;
+    private MultiChoice mMultiChoice ;
     private OnItemClickListener mOnItemClickLitener;
-    public ChildHolderAdapter(Context context, int type, String arg){
+    public ChildHolderAdapter(Context context, int type, String arg,MultiChoice multiChoice){
         this.mContext = context;
         this.mType = type;
         this.mArg = arg;
+        this.mMultiChoice = multiChoice;
     }
 
     public void setList(ArrayList<MP3Item> list){
@@ -96,7 +98,7 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(ChildHolderActivity.MultiChoice.isShow())
+                    if(mMultiChoice.isShow())
                         return;
                     Intent intent = new Intent(mContext, OptionDialog.class);
                     intent.putExtra("MP3Item", temp);
@@ -126,8 +128,8 @@ public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.
         }
 
         if(MultiChoice.TAG.equals(ChildHolderActivity.TAG) &&
-                ChildHolderActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
-            ChildHolderActivity.MultiChoice.AddView(holder.mContainer);
+                mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+            mMultiChoice.AddView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);
         }

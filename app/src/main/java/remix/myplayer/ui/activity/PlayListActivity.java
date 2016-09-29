@@ -17,17 +17,15 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import java.util.Iterator;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
+import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -36,7 +34,7 @@ import remix.myplayer.util.XmlUtil;
 /**
  * Created by taeja on 16-1-15.
  */
-public class PlayListActivity extends ToolbarActivity implements MusicService.Callback{
+public class PlayListActivity extends MultiChoiceActivity implements MusicService.Callback{
     public static final String TAG = PlayListActivity.class.getSimpleName();
     public static PlayListActivity mInstance = null;
     @BindView(R.id.toolbar)
@@ -45,13 +43,12 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     RecyclerView mRecycleView;
 
     private PlayListAdapter mAdapter;
-    public static MultiChoice MultiChoice = new MultiChoice();
     private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case Constants.UPDATE_MULTI:
-                    MultiChoice.clearSelectedViews();
+                    mMultiChoice.clearSelectedViews();
                     break;
                 case Constants.UPDATE_ADAPTER:
                     if(mAdapter != null)
@@ -66,24 +63,24 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         setContentView(R.layout.activity_playlist);
         ButterKnife.bind(this);
         MusicService.addCallback(PlayListActivity.this);
-        MultiChoice.setOnUpdateOptionMenuListener(new MultiChoice.onUpdateOptionMenuListener() {
+        mMultiChoice.setOnUpdateOptionMenuListener(new OnUpdateOptionMenuListener() {
             @Override
             public void onUpdate(boolean multiShow) {
-                MultiChoice.setShowing(multiShow);
-                mToolBar.setNavigationIcon(MultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+                mMultiChoice.setShowing(multiShow);
+                mToolBar.setNavigationIcon(mMultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
                 mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(MultiChoice.isShow()){
-                            MultiChoice.UpdateOptionMenu(false);
-                            MultiChoice.clear();
+                        if(mMultiChoice.isShow()){
+                            mMultiChoice.UpdateOptionMenu(false);
+                            mMultiChoice.clear();
                         } else {
                             finish();
                         }
                     }
                 });
-                if(!MultiChoice.isShow()){
-                    MultiChoice.clear();
+                if(!mMultiChoice.isShow()){
+                    mMultiChoice.clear();
                 }
                 invalidateOptionsMenu();
             }
@@ -91,12 +88,12 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
 
         mInstance = this;
         mRecycleView.setLayoutManager(new GridLayoutManager(this, 2));
-        mAdapter = new PlayListAdapter(this);
+        mAdapter = new PlayListAdapter(this,mMultiChoice);
         mAdapter.setOnItemClickLitener(new PlayListAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(View view, int position) {
                 String name = CommonUtil.getMapkeyByPosition(Global.mPlaylist,position);
-                if(!TextUtils.isEmpty(name) && !MultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
+                if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
                     if(Global.mPlaylist.get(name).size() == 0) {
                         Toast.makeText(PlayListActivity.this, getString(R.string.list_isempty), Toast.LENGTH_SHORT).show();
                         return;
@@ -113,20 +110,24 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
             @Override
             public void onItemLongClick(View view, int position) {
                 String name = CommonUtil.getMapkeyByPosition(Global.mPlaylist,position);
-                if(!TextUtils.isEmpty(name))
-                    MultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG);
+                if(!TextUtils.isEmpty(name) && !name.equals(getString(R.string.my_favorite)))
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG);
             }
         });
         mRecycleView.setAdapter(mAdapter);
 
         //初始化tooblar
         initToolbar(mToolBar,getString(R.string.playlist));
+
     }
 
 
     //打开添加播放列表的Dialog
     @OnClick(R.id.floatbutton)
     public void onAdd(View v){
+        if(mMultiChoice.isShow())
+            return;
+
         new MaterialDialog.Builder(this)
                 .title("新建播放列表")
                 .titleColor(ThemeStore.getTextColorPrimary())
@@ -170,17 +171,12 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
         return Constants.PLAYLISTACTIVITY;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(MultiChoice.isShow() ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
-        return true;
-    }
+
 
     @Override
     protected void onPause() {
         super.onPause();
-        if(MultiChoice.isShow()){
+        if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
         }
     }
@@ -188,15 +184,15 @@ public class PlayListActivity extends ToolbarActivity implements MusicService.Ca
     @Override
     protected void onResume() {
         super.onResume();
-        if(MultiChoice.isShow()){
+        if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
     }
 
     @Override
     public void onBackPressed() {
-        if(MultiChoice.isShow()) {
-            MultiChoice.UpdateOptionMenu(false);
+        if(mMultiChoice.isShow()) {
+            mMultiChoice.UpdateOptionMenu(false);
         } else {
            finish();
         }

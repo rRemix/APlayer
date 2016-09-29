@@ -319,7 +319,7 @@ public class XmlUtil {
     public static int addSongsToPlayingList(ArrayList<Integer> idList) {
         int num = 0;
         for(Integer id : idList){
-            if(id > 0 && Global.mPlayingList != null && !Global.mPlayingList.contains(id)) {
+            if(id > 0 && Global.mPlayingList != null) {
                 Global.mPlayingList.add(id);
                 num++;
             }
