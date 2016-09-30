@@ -24,6 +24,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAddtoAdapter;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.XmlUtil;
 
@@ -79,7 +80,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(view != null) {
                     Toast.makeText(AddtoPlayListDialog.this,
-                            getString(R.string.add_multi_song_playlist_success,
+                            getString(R.string.add_song_playlist_success,
                                     XmlUtil.addSongToPlayList(((TextView)view.findViewById(R.id.playlist_addto_text)).getText().toString()
                                     ,mSongName,mId,mAlbumId,mArtist,true) ? 1 : 0),
                             Toast.LENGTH_SHORT).show();
@@ -115,7 +116,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity {
                                 XmlUtil.addPlaylist(AddtoPlayListDialog.this,input.toString());
                                 if(mAddAfterCreate){
                                     Toast.makeText(AddtoPlayListDialog.this,
-                                            getString(R.string.add_multi_song_playlist_success,
+                                            getString(R.string.add_song_playlist_success,
                                                     XmlUtil.addSongToPlayList(input.toString(),mSongName,mId,mAlbumId,mArtist,true) ? 1 : 0),
                                             Toast.LENGTH_SHORT).show();
 
@@ -126,8 +127,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity {
                     .dismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
-                            if(mAdapter != null)
-                                mAdapter.notifyDataSetChanged();
+                            finish();
                         }
                     })
                     .show();

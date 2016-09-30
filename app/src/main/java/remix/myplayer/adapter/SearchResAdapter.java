@@ -16,10 +16,9 @@ import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.listener.OnItemClickListener;
+import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.activity.SearchActivity;
 
 /**

@@ -20,7 +20,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.ChildHolderAdapter;
 import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
-import remix.myplayer.listener.OnItemClickListener;
+import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.service.MusicService;

@@ -19,7 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SearchResAdapter;
-import remix.myplayer.listener.OnItemClickListener;
+import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.RecyclerItemDecoration;
 import remix.myplayer.ui.customview.SearchToolBar;
 import remix.myplayer.util.Constants;

@@ -22,14 +22,13 @@ import java.util.ArrayList;
 
 import remix.myplayer.R;
 import remix.myplayer.fragment.SongFragment;
-import remix.myplayer.listener.OnItemClickListener;
+import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;

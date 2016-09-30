@@ -60,8 +60,6 @@ import remix.myplayer.util.XmlUtil;
  */
 public class MainActivity extends MultiChoiceActivity implements MusicService.Callback {
     public static MainActivity mInstance = null;
-    @BindView(R.id.multi_menu)
-    RelativeLayout mMultiMenu;
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
     @BindView(R.id.tabs)

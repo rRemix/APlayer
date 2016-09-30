@@ -1,4 +1,4 @@
-package remix.myplayer.listener;
+package remix.myplayer.interfaces;
 
 import android.view.View;
 

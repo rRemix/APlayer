@@ -1,10 +1,17 @@
 package remix.myplayer.ui;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import remix.myplayer.R;
 import remix.myplayer.fragment.AlbumFragment;
@@ -14,9 +21,11 @@ import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MultiPosition;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.Global;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -89,14 +98,14 @@ public class MultiChoice implements OnMultiItemClickListener {
                 break;
         }
         num = XmlUtil.addSongsToPlayingList(idList);
-        Toast.makeText(mContext, mContext.getResources().getString(R.string.add_multi_song_playinglist_success,num),Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, mContext.getResources().getString(R.string.add_song_playinglist_success,num),Toast.LENGTH_SHORT).show();
         UpdateOptionMenu(false);
     }
 
     @Override
     public void OnAddToPlayList() {
-        int num = 0;
-        ArrayList<Integer> idList = new ArrayList<>();
+
+        final ArrayList<Integer> idList = new ArrayList<>();
         switch (TYPE){
             case Constants.SONG:
                 for(Object arg : mSelectedArg){
@@ -115,10 +124,62 @@ public class MultiChoice implements OnMultiItemClickListener {
                 }
                 break;
         }
-        num = XmlUtil.addSongsToPlayList("我的收藏",DBUtil.getPlayListItemListByIds(idList));
-        Toast.makeText(mContext, mContext.getString(R.string.add_multi_song_playlist_success,num)
-                ,Toast.LENGTH_SHORT).show();
-        UpdateOptionMenu(false);
+
+        //获得所有播放列表的名字
+        Iterator it = Global.mPlaylist.keySet().iterator();
+        ArrayList<String> playlistNameList = new ArrayList<>();
+        while (it.hasNext()){
+            playlistNameList.add(it.next().toString());
+        }
+        new MaterialDialog.Builder(mContext)
+                .title(R.string.add_to_playlist)
+                .titleColorAttr(R.attr.text_color_primary)
+                .items(playlistNameList.toArray(new CharSequence[playlistNameList.size()]))
+                .itemsColorAttr(R.attr.text_color_primary)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        final int num;
+                        num = XmlUtil.addSongsToPlayList(text.toString(),DBUtil.getPlayListItemListByIds(idList));
+                        Toast.makeText(mContext, mContext.getString(R.string.add_song_playlist_success, num)
+                                ,Toast.LENGTH_SHORT).show();
+                        UpdateOptionMenu(false);
+                    }
+                })
+                .neutralText(R.string.create_playlist)
+                .neutralColorAttr(R.attr.material_color_primary)
+                .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        new MaterialDialog.Builder(mContext)
+                                .title(R.string.new_playlist)
+                                .titleColor(ThemeStore.getTextColorPrimary())
+                                .positiveText(R.string.create)
+                                .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
+                                .negativeText(R.string.cancel)
+                                .negativeColor(ThemeStore.getTextColorPrimary())
+                                .backgroundColor(ThemeStore.getBackgroundColor3())
+                                .content(R.string.input_playlist_name)
+                                .contentColor(ThemeStore.getTextColorPrimary())
+                                .inputRange(1,15)
+                                .input("", "本地歌单" + Global.mPlaylist.size(), new MaterialDialog.InputCallback() {
+                                    @Override
+                                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                                        if(!TextUtils.isEmpty(input)){
+                                            XmlUtil.addPlaylist(mContext,input.toString());
+                                            final int num;
+                                            num = XmlUtil.addSongsToPlayList(input.toString(),DBUtil.getPlayListItemListByIds(idList));
+                                            Toast.makeText(mContext, mContext.getString(R.string.add_song_playlist_success, num)
+                                                    ,Toast.LENGTH_SHORT).show();
+                                            UpdateOptionMenu(false);
+                                        }
+                                    }
+                                })
+                                .show();
+                    }
+                })
+                .backgroundColorAttr(R.attr.background_color_3).build().show();
+
     }
 
     @Override
@@ -132,22 +193,27 @@ public class MultiChoice implements OnMultiItemClickListener {
                         idList.add((Integer) arg);
                 }
                 break;
+            case Constants.PLAYLIST:
+                for(Object arg : mSelectedArg){
+                    if (arg instanceof Integer && DBUtil.deleteSong((Integer) arg,Constants.PLAYLIST)){
+                        num++;
+                    }
+                }
+                break;
             case Constants.ALBUM:
             case Constants.ARTIST:
             case Constants.FOLDER:
-            case Constants.PLAYLIST:
                 for(Object arg : mSelectedArg){
                     ArrayList<Integer> tempList = DBUtil.getSongIdListByArg(arg,TYPE);
                     if(tempList != null && tempList.size() > 0)
                         idList.addAll(tempList);
                 }
+                for(Integer id : idList){
+                    if( DBUtil.deleteSong(id,Constants.SONG))
+                        num++;
+                }
                 break;
         }
-        for(Integer id : idList){
-            if( DBUtil.deleteSong(id,Constants.SONG))
-                num++;
-        }
-
         if(num > 0){
             Toast.makeText(mContext, mContext.getString(R.string.delete_success),Toast.LENGTH_SHORT).show();
         } else {
