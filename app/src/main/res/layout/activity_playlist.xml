@@ -7,6 +7,33 @@
 
     <include layout="@layout/toolbar"/>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/d48_size"
+        android:background="@color/white">
+        <ImageView
+            android:id="@+id/list_model"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_list2"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/d18_size"
+            android:layout_marginRight="@dimen/d18_size"
+            android:layout_centerVertical="true"/>
+        <ImageView
+            android:id="@+id/grid_model"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_list1"
+            android:layout_toLeftOf="@id/list_model"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/d8_size"
+        android:background="@color/gray_6c6a6c"/>
+
     <FrameLayout
         android:background="?attr/background_color_3"
         android:layout_width="match_parent"

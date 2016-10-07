@@ -63,7 +63,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
 
     @Override
     public ArtistHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ArtistHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.artist_recycle_item, null, false));
+        return new ArtistHolder(LayoutInflater.from(parent.getContext()).inflate(ArtistFragment.ListModel == 1 ? R.layout.artist_recycle_list_item : R.layout.artist_recycle_grid_item, null, false));
     }
 
     @Override
@@ -74,7 +74,7 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 String artist = CommonUtil.processInfo(mCursor.getString(ArtistFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
                 holder.mText1.setText(artist);
                 //设置背景
-                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.art_bg_night);
+//                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.art_bg_night);
                 //设置封面
                 holder.mImage.setImageURI(Uri.EMPTY);
                 new AsynLoadImage(holder.mImage).execute(mCursor.getInt(ArtistFragment.mArtistIdIndex),Constants.URL_ARTIST,true);
@@ -86,14 +86,14 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mOnItemClickLitener.onItemClick(holder.mCardBackground,position);
+                        mOnItemClickLitener.onItemClick(holder.mContainer,position);
                     }
                 });
                 //多选菜单
                 holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        mOnItemClickLitener.onItemLongClick(holder.mCardBackground,position);
+                        mOnItemClickLitener.onItemLongClick(holder.mContainer,position);
                         return true;
                     }
                 });
@@ -123,9 +123,9 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
         }
         if(MultiChoice.TAG.equals(ArtistFragment.TAG) &&
                 mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
-            mMultiChoice.AddView(holder.mCardBackground);
+            mMultiChoice.AddView(holder.mContainer);
         } else {
-            holder.mCardBackground.setSelected(false);
+            holder.mContainer.setSelected(false);
         }
     }
 
@@ -143,8 +143,6 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
         public ImageButton mButton;
         @BindView(R.id.item_container)
         public RelativeLayout mContainer;
-        @BindView(R.id.recycleview_card)
-        public Button mCardBackground;
 
         public ArtistHolder(View v) {
             super(v);

@@ -61,7 +61,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
     @Override
     public PlayListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new PlayListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.playlist_recycle_item, null, false));
+        return new PlayListHolder(LayoutInflater.from(parent.getContext()).inflate(PlayListActivity.ListModel == 1 ? R.layout.playlist_recycle_list_item : R.layout.playlist_recycle_grid_item, null, false));
     }
 
     @Override
@@ -79,8 +79,9 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         }
         //设置播放列表名字
         holder.mName.setText(name);
+        holder.mOther.setText("111");
         //设置背景
-        holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.art_bg_night);
+//        holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.art_bg_night);
         //设置专辑封面
         new AsynLoadImage(holder.mImage).execute(name);
 
@@ -88,14 +89,14 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
             holder.mContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mOnItemClickLitener.onItemClick(holder.mCardBackground,holder.getAdapterPosition());
+                    mOnItemClickLitener.onItemClick(holder.mContainer,holder.getAdapterPosition());
                 }
             });
             //多选菜单
             holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    mOnItemClickLitener.onItemLongClick(holder.mCardBackground,holder.getAdapterPosition());
+                    mOnItemClickLitener.onItemLongClick(holder.mContainer,holder.getAdapterPosition());
                     return true;
                 }
             });
@@ -126,9 +127,9 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         }
         if(MultiChoice.TAG.equals(PlayListActivity.TAG) &&
                 mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
-            mMultiChoice.AddView(holder.mCardBackground);
+            mMultiChoice.AddView(holder.mContainer);
         } else {
-            holder.mCardBackground.setSelected(false);
+            holder.mContainer.setSelected(false);
         }
     }
 
@@ -138,16 +139,16 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
     }
 
     public static class PlayListHolder extends BaseViewHolder {
-        @BindView(R.id.playlist_item_name)
+        @BindView(R.id.recycleview_text1)
         public TextView mName;
+        @BindView(R.id.recycleview_text2)
+        public TextView mOther;
         @BindView(R.id.recycleview_simpleiview)
         public SimpleDraweeView mImage;
         @BindView(R.id.recycleview_button)
         public ImageView mButton;
         @BindView(R.id.item_container)
         public RelativeLayout mContainer;
-        @BindView(R.id.recycleview_card)
-        public Button mCardBackground;
 
         public PlayListHolder(View itemView) {
             super(itemView);

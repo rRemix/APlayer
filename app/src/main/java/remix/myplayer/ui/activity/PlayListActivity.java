@@ -2,17 +2,21 @@ package remix.myplayer.ui.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -25,10 +29,12 @@ import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -41,6 +47,14 @@ public class PlayListActivity extends MultiChoiceActivity implements MusicServic
     Toolbar mToolBar;
     @BindView(R.id.playlist_recycleview)
     RecyclerView mRecycleView;
+
+    //列表显示与网格显示切换
+    @BindView(R.id.list_model)
+    ImageView mListModelBtn;
+    @BindView(R.id.grid_model)
+    ImageView mGridModelBtn;
+    //当前列表模式 1:列表 2:网格
+    public static int ListModel = 2;
 
     private PlayListAdapter mAdapter;
     private Handler mRefreshHandler = new Handler(){
@@ -87,7 +101,8 @@ public class PlayListActivity extends MultiChoiceActivity implements MusicServic
         });
 
         mInstance = this;
-        mRecycleView.setLayoutManager(new GridLayoutManager(this, 2));
+        ListModel = SPUtil.getValue(this,"Setting","AlbumModel",2);
+        mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(this) : new GridLayoutManager(this, 2));
         mAdapter = new PlayListAdapter(this,mMultiChoice);
         mAdapter.setOnItemClickLitener(new PlayListAdapter.OnItemClickLitener() {
             @Override
@@ -116,6 +131,22 @@ public class PlayListActivity extends MultiChoiceActivity implements MusicServic
         });
         mRecycleView.setAdapter(mAdapter);
 
+        StateListDrawable stateListDrawable1 = new StateListDrawable();
+        Drawable drawable1 =  Theme.TintDrawable(Theme.getDrawable(this,R.drawable.btn_list2), ThemeStore.getMaterialColorPrimaryColor());
+        stateListDrawable1.addState(new int[]{android.R.attr.state_pressed}, drawable1);
+        stateListDrawable1.addState(new int[]{android.R.attr.state_selected}, drawable1);
+        stateListDrawable1.addState(new int[]{}, Theme.getDrawable(this,R.drawable.btn_list2));
+        mListModelBtn.setImageDrawable(stateListDrawable1);
+        mListModelBtn.setSelected(ListModel == 1);
+
+        StateListDrawable stateListDrawable2 = new StateListDrawable();
+        Drawable drawable2 =  Theme.TintDrawable(Theme.getDrawable(this,R.drawable.btn_list1), ThemeStore.getMaterialColorPrimaryColor());
+        stateListDrawable2.addState(new int[]{android.R.attr.state_pressed}, drawable2);
+        stateListDrawable2.addState(new int[]{android.R.attr.state_selected}, drawable2);
+        stateListDrawable2.addState(new int[]{}, Theme.getDrawable(this,R.drawable.btn_list1));
+        mGridModelBtn.setImageDrawable(stateListDrawable2);
+        mGridModelBtn.setSelected(ListModel == 2);
+
         //初始化tooblar
         initToolbar(mToolBar,getString(R.string.playlist));
 
@@ -123,38 +154,58 @@ public class PlayListActivity extends MultiChoiceActivity implements MusicServic
 
 
     //打开添加播放列表的Dialog
-    @OnClick(R.id.floatbutton)
+    @OnClick({R.id.list_model,R.id.grid_model,R.id.floatbutton})
     public void onAdd(View v){
-        if(mMultiChoice.isShow())
-            return;
+        switch (v.getId()){
+            case R.id.floatbutton:
+                if(mMultiChoice.isShow())
+                    return;
+                new MaterialDialog.Builder(this)
+                        .title("新建播放列表")
+                        .titleColor(ThemeStore.getTextColorPrimary())
+                        .positiveText("创建")
+                        .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
+                        .negativeText("取消")
+                        .negativeColor(ThemeStore.getMaterialColorPrimaryColor())
+                        .backgroundColor(ThemeStore.getBackgroundColor3())
+                        .content(R.string.input_playlist_name)
+                        .contentColor(ThemeStore.getTextColorPrimary())
+                        .inputRange(1,15)
+                        .input("", "本地歌单" + Global.mPlaylist.size(), new MaterialDialog.InputCallback() {
+                            @Override
+                            public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                                if(!TextUtils.isEmpty(input)){
+                                    XmlUtil.addPlaylist(PlayListActivity.this,input.toString());
+                                }
+                            }
+                        })
+                        .dismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                if(mAdapter != null)
+                                    mAdapter.notifyDataSetChanged();
+                            }
+                        })
+                        .show();
+                break;
+            case R.id.list_model:
+            case R.id.grid_model:
+                mListModelBtn.setSelected(v.getId() == R.id.list_model);
+                mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
+                ListModel = v.getId() == R.id.list_model ? 1 : 2;
+                mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(this) : new GridLayoutManager(this, 2));
+                SPUtil.putValue(this,"Setting","AlbumModel",ListModel);
+                if(mAdapter != null)
+                    mAdapter.notifyDataSetChanged();
+                break;
 
-        new MaterialDialog.Builder(this)
-                .title("新建播放列表")
-                .titleColor(ThemeStore.getTextColorPrimary())
-                .positiveText("创建")
-                .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
-                .negativeText("取消")
-                .negativeColor(ThemeStore.getMaterialColorPrimaryColor())
-                .backgroundColor(ThemeStore.getBackgroundColor3())
-                .content(R.string.input_playlist_name)
-                .contentColor(ThemeStore.getTextColorPrimary())
-                .inputRange(1,15)
-                .input("", "本地歌单" + Global.mPlaylist.size(), new MaterialDialog.InputCallback() {
-                    @Override
-                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                        if(!TextUtils.isEmpty(input)){
-                            XmlUtil.addPlaylist(PlayListActivity.this,input.toString());
-                        }
-                    }
-                })
-                .dismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        if(mAdapter != null)
-                            mAdapter.notifyDataSetChanged();
-                    }
-                })
-                .show();
+        }
+
+    }
+
+    @OnClick({R.id.list_model,R.id.grid_model})
+    public void onSwitch(View v){
+
     }
 
 
@@ -170,7 +221,6 @@ public class PlayListActivity extends MultiChoiceActivity implements MusicServic
     public int getType() {
         return Constants.PLAYLISTACTIVITY;
     }
-
 
 
     @Override

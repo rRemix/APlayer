@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/item_container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:minHeight="56dp"
+    android:clickable="true"
+    android:background="@drawable/bg_song_card">
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:id="@+id/recycleview_simpleiview"
+        fresco:actualImageScaleType="centerCrop"
+        fresco:placeholderImageScaleType="centerCrop"
+        fresco:placeholderImage="@drawable/album_empty_bg"
+        fresco:failureImage="@drawable/album_empty_bg"
+        fresco:failureImageScaleType="centerCrop"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/d8_size"/>
+
+    <LinearLayout
+        android:layout_width="180dp"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/recycleview_simpleiview"
+        android:layout_margin="@dimen/d8_size"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:id="@+id/song_text_container">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:ellipsize="end"
+            android:textSize="@dimen/s14_size"
+            android:textColor="?attr/text_color_primary"
+            android:id="@+id/recycleview_text1" />
+        <TextView
+            android:id="@+id/recycleview_text2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:ellipsize="end"
+            android:textSize="@dimen/s12_size"
+            android:textColor="?attr/text_color"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+    <!--结尾处按钮-->
+    <ImageButton
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"
+        android:id="@+id/recycleview_button"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:src="@drawable/list_icn_more"
+        android:background="@drawable/bg_common_ripple"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/gray_6c6a6c"
+        android:layout_alignParentBottom="true"/>
+</RelativeLayout>

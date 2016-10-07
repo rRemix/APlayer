@@ -3,6 +3,8 @@ package remix.myplayer.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -10,20 +12,26 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ArtistAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by Remix on 2015/12/22.
@@ -41,9 +49,17 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     public static int mArtistIndex = -1;
     private ArtistAdapter mAdapter;
     private static int LOADER_ID = 1;
-    public static boolean isFirstSelected = true;
     public static final String TAG = ArtistFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
+
+    //列表显示与网格显示切换
+    @BindView(R.id.list_model)
+    ImageView mListModelBtn;
+    @BindView(R.id.grid_model)
+    ImageView mGridModelBtn;
+    //当前列表模式 1:列表 2:网格
+    public static int ListModel = 2;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -62,7 +78,8 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         View rootView = inflater.inflate(R.layout.fragment_artist,null);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-        mRecycleView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        ListModel = SPUtil.getValue(getActivity(),"Setting","ArtistModel",2);
+        mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
@@ -95,6 +112,23 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
             }
         });
         mRecycleView.setAdapter(mAdapter);
+
+        StateListDrawable stateListDrawable1 = new StateListDrawable();
+        Drawable drawable1 =  Theme.TintDrawable(Theme.getDrawable(getActivity(),R.drawable.btn_list2), ThemeStore.getMaterialColorPrimaryColor());
+        stateListDrawable1.addState(new int[]{android.R.attr.state_pressed}, drawable1);
+        stateListDrawable1.addState(new int[]{android.R.attr.state_selected}, drawable1);
+        stateListDrawable1.addState(new int[]{}, Theme.getDrawable(getActivity(),R.drawable.btn_list2));
+        mListModelBtn.setImageDrawable(stateListDrawable1);
+        mListModelBtn.setSelected(ListModel == 1);
+
+        StateListDrawable stateListDrawable2 = new StateListDrawable();
+        Drawable drawable2 =  Theme.TintDrawable(Theme.getDrawable(getActivity(),R.drawable.btn_list1), ThemeStore.getMaterialColorPrimaryColor());
+        stateListDrawable2.addState(new int[]{android.R.attr.state_pressed}, drawable2);
+        stateListDrawable2.addState(new int[]{android.R.attr.state_selected}, drawable2);
+        stateListDrawable2.addState(new int[]{}, Theme.getDrawable(getActivity(),R.drawable.btn_list1));
+        mGridModelBtn.setImageDrawable(stateListDrawable2);
+        mGridModelBtn.setSelected(ListModel == 2);
+
         return rootView;
     }
     @Override
@@ -106,6 +140,17 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
                 MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
                 null,
                 null);
+    }
+
+    @OnClick({R.id.list_model,R.id.grid_model})
+    public void onSwitch(View v){
+        mListModelBtn.setSelected(v.getId() == R.id.list_model);
+        mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
+        ListModel = v.getId() == R.id.list_model ? 1 : 2;
+        mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+        SPUtil.putValue(getActivity(),"Setting","ArtistModel",ListModel);
+        if(mAdapter != null)
+            mAdapter.notifyDataSetChanged();
     }
 
     private int getArtsitId(int position){

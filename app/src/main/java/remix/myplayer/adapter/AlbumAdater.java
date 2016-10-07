@@ -11,7 +11,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -22,8 +21,8 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.AlbumFragment;
-import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -63,7 +62,7 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
 
     @Override
     public AlbumHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new AlbumHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.album_recycle_item, null, false));
+        return new AlbumHolder(LayoutInflater.from(parent.getContext()).inflate(AlbumFragment.ListModel == 1 ? R.layout.album_recycle_list_item : R.layout.album_recycle_grid_item, null, false));
     }
 
     @Override
@@ -75,9 +74,9 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 String album = CommonUtil.processInfo(mCursor.getString(AlbumFragment.mAlbumIndex),CommonUtil.ALBUMTYPE);
 
                 holder.mText1.setText(album);
-                holder.mText2.setText(artist);
+                holder.mText2.setText(AlbumFragment.ListModel == 1 ? artist : artist);
                 //设置背景
-                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.album_bg_day : R.drawable.album_bg_night);
+//                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.album_bg_day : R.drawable.album_bg_night);
                 //设置封面
                 long albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
                 holder.mImage.setImageURI(Uri.EMPTY);
@@ -92,14 +91,14 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mOnItemClickLitener.onItemClick(holder.mCardBackground,holder.getAdapterPosition());
+                        mOnItemClickLitener.onItemClick(holder.mContainer,holder.getAdapterPosition());
                     }
                 });
                 //多选菜单
                 holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        mOnItemClickLitener.onItemLongClick(holder.mCardBackground,holder.getAdapterPosition());
+                        mOnItemClickLitener.onItemLongClick(holder.mContainer,holder.getAdapterPosition());
                         return true;
                     }
                 });
@@ -130,9 +129,9 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
 
             if(MultiChoice.TAG.equals(AlbumFragment.TAG) &&
                     mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
-                mMultiChoice.AddView(holder.mCardBackground);
+                mMultiChoice.AddView(holder.mContainer);
             } else {
-                holder.mCardBackground.setSelected(false);
+                holder.mContainer.setSelected(false);
             }
         }
     }
@@ -152,8 +151,6 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
         public SimpleDraweeView mImage;
         @BindView(R.id.item_container)
         public RelativeLayout mContainer;
-        @BindView(R.id.recycleview_card)
-        public Button mCardBackground;
 
         public AlbumHolder(View v) {
             super(v);
