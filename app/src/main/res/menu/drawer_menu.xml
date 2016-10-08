@@ -11,9 +11,9 @@
             android:icon="@drawable/drawer_icon_recently"
             android:title="@string/recently" />
 
-        <item android:id="@+id/item_playlist"
+        <item android:id="@+id/item_folder"
             android:icon="@drawable/drawer_icon_list"
-            android:title="@string/drawer_playlist"/>
+            android:title="@string/drawer_folder"/>
     </group>
 
     <group android:id="@+id/group_2"

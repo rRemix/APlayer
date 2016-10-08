@@ -5,8 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/toolbar"/>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/d48_size"
@@ -45,11 +43,13 @@
         </android.support.v7.widget.RecyclerView>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/floatbutton"
+            android:id="@+id/add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
-            android:layout_margin="@dimen/d40_size"
+            android:layout_marginLeft="@dimen/d40_size"
+            android:layout_marginRight="@dimen/d40_size"
+            android:layout_marginBottom="@dimen/d70_size"
             android:clickable="true"
             android:src="@drawable/playlist_fab_btn_add"
             app:backgroundTint="@color/purple_8e24aa"

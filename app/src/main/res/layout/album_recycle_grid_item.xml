@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="218dp"
     android:paddingTop="@dimen/d8_size"
     android:paddingLeft="@dimen/d6_size"
-    android:paddingRight="@dimen/d6_size">
+    android:paddingRight="@dimen/d6_size"
+    android:background="#efefef">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="210dp"
         android:id="@+id/item_container"
-        android:background="@drawable/bg_card_dark">
+        android:background="@drawable/bg_grid_card">
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="124dp"
             android:layout_height="123dp"
@@ -19,7 +21,7 @@
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/album_empty_bg"
-            fresco:roundedCornerRadius="1dp"
+            fresco:roundedCornerRadius="@dimen/d2_size"
             android:layout_alignParentTop="true"
             android:layout_marginTop="@dimen/d18_size"
             android:layout_marginRight="@dimen/d24_size"
@@ -27,10 +29,10 @@
             android:layout_marginBottom="@dimen/d18_size"/>
 
         <View
-            android:id="@+id/album_divider"
+            android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="@dimen/d1_size"
-            android:background="?attr/background_color_main"
+            android:background="#efefef"
             android:layout_below="@id/recycleview_simpleiview"
             android:layout_marginLeft="@dimen/d4_size"
             android:layout_marginRight="@dimen/d4_size"/>
@@ -41,7 +43,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:layout_below="@id/album_divider"
+            android:layout_below="@id/divider"
             android:id="@+id/recycleview_button"
             android:src="@drawable/list_icn_more"
             android:background="@drawable/bg_common_ripple"/>
@@ -57,7 +59,7 @@
             android:layout_toLeftOf="@id/recycleview_button"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_below="@id/album_divider">
+            android:layout_below="@id/divider">
             <TextView
                 android:layout_gravity="center_vertical"
                 android:layout_width="match_parent"
@@ -80,11 +82,5 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <!--<Button-->
-        <!--android:visibility="visible"-->
-        <!--android:tag="card_background"-->
-        <!--android:id="@+id/recycleview_card"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:background="@drawable/bg_card_dark" />-->
+
 </FrameLayout>

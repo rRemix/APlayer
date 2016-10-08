@@ -1,26 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<remix.myplayer.ui.customview.CardFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="196dp"
     android:paddingTop="@dimen/d8_size"
     android:paddingLeft="@dimen/d6_size"
-    android:paddingRight="@dimen/d6_size">
+    android:paddingRight="@dimen/d6_size"
+    android:background="#efefef">
     <RelativeLayout
         android:id="@+id/item_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/art_bg_night">
+        android:layout_height="188dp"
+        android:background="@drawable/bg_grid_card">
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="match_parent"
             android:layout_height="164dp"
             android:id="@+id/recycleview_simpleiview"
             android:layout_alignParentTop="true"
-
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/artist_empty_bg"
             fresco:roundedCornerRadius="1dp"/>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/d1_size"
+            android:background="#efefef"
+            android:layout_below="@id/recycleview_simpleiview"
+            android:layout_marginLeft="@dimen/d4_size"
+            android:layout_marginRight="@dimen/d4_size"/>
 
         <ImageButton
             android:layout_width="32dp"
@@ -31,7 +40,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:layout_below="@id/recycleview_simpleiview"/>
+            android:layout_below="@id/divider"/>
 
         <LinearLayout
             android:id="@+id/item_container_text"
@@ -43,7 +52,7 @@
             android:layout_toLeftOf="@id/recycleview_button"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_below="@id/recycleview_simpleiview">
+            android:layout_below="@id/divider">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,9 +66,9 @@
     </RelativeLayout>
 
     <Button
+        android:visibility="gone"
         android:tag="card_background"
         android:id="@+id/recycleview_card"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/bg_card_dark" />
-</remix.myplayer.ui.customview.CardFrameLayout>
+        android:layout_height="match_parent" />
+</FrameLayout>

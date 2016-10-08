@@ -24,7 +24,7 @@ import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.RecyclerItemDecoration;
+import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -96,7 +96,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         });
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.addItemDecoration(new RecyclerItemDecoration(getContext(),RecyclerItemDecoration.VERTICAL_LIST));
+        mRecyclerView.addItemDecoration(new ListItemDecoration(getContext(), ListItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         if(getActivity() instanceof MultiChoiceActivity){

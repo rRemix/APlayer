@@ -62,7 +62,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
             //删除
             case R.id.menu_delete:
                 Toast.makeText(mContext,
-                        DBUtil.deleteSong(mId , mType) ? R.string.delete_success : R.string.delete_error ,
+                        DBUtil.delete(mId , mType) ? R.string.delete_success : R.string.delete_error ,
                         Toast.LENGTH_SHORT).show();
                 break;
             //设置专辑封面

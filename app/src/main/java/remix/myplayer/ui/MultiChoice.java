@@ -1,7 +1,6 @@
 package remix.myplayer.ui;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
@@ -16,13 +15,13 @@ import java.util.Iterator;
 import remix.myplayer.R;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.ArtistFragment;
-import remix.myplayer.fragment.FolderFragment;
+import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.PlayListActivity;
+import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
@@ -195,7 +194,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                 break;
             case Constants.PLAYLIST:
                 for(Object arg : mSelectedArg){
-                    if (arg instanceof Integer && DBUtil.deleteSong((Integer) arg,Constants.PLAYLIST)){
+                    if (arg instanceof Integer && DBUtil.delete((Integer) arg,Constants.PLAYLIST)){
                         num++;
                     }
                 }
@@ -208,12 +207,13 @@ public class MultiChoice implements OnMultiItemClickListener {
                     if(tempList != null && tempList.size() > 0)
                         idList.addAll(tempList);
                 }
-                for(Integer id : idList){
-                    if( DBUtil.deleteSong(id,Constants.SONG))
-                        num++;
-                }
                 break;
         }
+        for(Integer id : idList){
+            if( DBUtil.delete(id,Constants.SONG))
+                num++;
+        }
+
         if(num > 0){
             Toast.makeText(mContext, mContext.getString(R.string.delete_success),Toast.LENGTH_SHORT).show();
         } else {
@@ -227,9 +227,7 @@ public class MultiChoice implements OnMultiItemClickListener {
         mUpdateOptionMenuListener = l;
     }
 
-
     /**
-     *
      * @param view
      * @param position
      * @param arg
@@ -277,8 +275,8 @@ public class MultiChoice implements OnMultiItemClickListener {
     public void AddView(View view){
         if(!mSelectedViews.contains(view)) {
             mSelectedViews.add(view);
+            setViewSelected(view, true);
         }
-        setViewSelected(view, true);
     }
 
     /**
@@ -362,9 +360,9 @@ public class MultiChoice implements OnMultiItemClickListener {
             return Constants.ALBUM;
         else if (tag.equals(ArtistFragment.TAG))
             return Constants.ARTIST;
-        else if(tag.equals(FolderFragment.TAG))
+        else if(tag.equals(FolderActivity.TAG))
             return Constants.FOLDER;
-        else if(tag.equals(PlayListActivity.TAG))
+        else if(tag.equals(PlayListFragment.TAG))
             return Constants.PLAYLIST;
         else
             return -1;

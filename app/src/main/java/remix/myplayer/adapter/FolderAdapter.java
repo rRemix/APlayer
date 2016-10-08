@@ -18,13 +18,13 @@ import java.util.Iterator;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.fragment.FolderFragment;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -106,7 +106,7 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHold
             });
         }
 
-        if(MultiChoice.TAG.equals(FolderFragment.TAG) &&
+        if(MultiChoice.TAG.equals(FolderActivity.TAG) &&
                 mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
             mMultiChoice.AddView(holder.mContainer);
         } else {

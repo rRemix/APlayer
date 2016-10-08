@@ -12,9 +12,9 @@ import android.view.View;
 /**
  * Created by taeja on 16-6-23.
  */
-public class RecyclerItemDecoration extends RecyclerView.ItemDecoration {
+public class ListItemDecoration extends RecyclerView.ItemDecoration {
     private static final int[] ATTRS = new int[]{
-            android.R.attr.listDivider
+            android.R.attr.listDivider,
     };
 
     public static final int HORIZONTAL_LIST = LinearLayoutManager.HORIZONTAL;
@@ -25,14 +25,14 @@ public class RecyclerItemDecoration extends RecyclerView.ItemDecoration {
 
     private int mOrientation;
 
-    public RecyclerItemDecoration(Context context, int orientation) {
+    public ListItemDecoration(Context context, int orientation) {
         final TypedArray a = context.obtainStyledAttributes(ATTRS);
         mDivider = a.getDrawable(0);
         a.recycle();
         setOrientation(orientation);
     }
 
-    public RecyclerItemDecoration(Context context,int orientation,Drawable divider){
+    public ListItemDecoration(Context context, int orientation, Drawable divider){
         this(context,orientation);
         mDivider = divider;
     }

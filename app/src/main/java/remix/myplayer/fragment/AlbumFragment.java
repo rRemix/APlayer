@@ -3,6 +3,7 @@ package remix.myplayer.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
@@ -28,9 +29,12 @@ import remix.myplayer.adapter.AlbumAdater;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.GridItemDecoration;
+import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 
@@ -78,7 +82,10 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
 
         ListModel = SPUtil.getValue(getActivity(),"Setting","AlbumModel",2);
         mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-//        mRecycleView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
+//        mRecycleView.addItemDecoration(ListModel == 1 ?
+//                new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST) :
+//                new GridItemDecoration(getActivity(),12, Color.RED));
+
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
         if(getActivity() instanceof MultiChoiceActivity){
@@ -115,20 +122,10 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         });
         mRecycleView.setAdapter(mAdapter);
 
-        StateListDrawable stateListDrawable1 = new StateListDrawable();
-        Drawable drawable1 =  Theme.TintDrawable(Theme.getDrawable(getActivity(),R.drawable.btn_list2), ThemeStore.getMaterialColorPrimaryColor());
-        stateListDrawable1.addState(new int[]{android.R.attr.state_pressed}, drawable1);
-        stateListDrawable1.addState(new int[]{android.R.attr.state_selected}, drawable1);
-        stateListDrawable1.addState(new int[]{}, Theme.getDrawable(getActivity(),R.drawable.btn_list2));
-        mListModelBtn.setImageDrawable(stateListDrawable1);
+        mListModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list2));
         mListModelBtn.setSelected(ListModel == 1);
 
-        StateListDrawable stateListDrawable2 = new StateListDrawable();
-        Drawable drawable2 =  Theme.TintDrawable(Theme.getDrawable(getActivity(),R.drawable.btn_list1), ThemeStore.getMaterialColorPrimaryColor());
-        stateListDrawable2.addState(new int[]{android.R.attr.state_pressed}, drawable2);
-        stateListDrawable2.addState(new int[]{android.R.attr.state_selected}, drawable2);
-        stateListDrawable2.addState(new int[]{}, Theme.getDrawable(getActivity(),R.drawable.btn_list1));
-        mGridModelBtn.setImageDrawable(stateListDrawable2);
+        mGridModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list1));
         mGridModelBtn.setSelected(ListModel == 2);
         return rootView;
     }
@@ -147,6 +144,9 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
         ListModel = v.getId() == R.id.list_model ? 1 : 2;
         mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+//        mRecycleView.addItemDecoration(ListModel == 1 ?
+//                new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST) :
+//                new GridItemDecoration(getActivity(),12, Color.rgb(0xef,0xef,0xef)));
         SPUtil.putValue(getActivity(),"Setting","AlbumModel",ListModel);
         if(mAdapter != null)
             mAdapter.notifyDataSetChanged();

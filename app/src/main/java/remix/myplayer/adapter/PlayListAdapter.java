@@ -3,13 +3,13 @@ package remix.myplayer.adapter;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,16 +23,17 @@ import java.util.Iterator;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.fragment.PlayListFragment;
+import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
+import remix.myplayer.model.PlayListItem;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.model.PlayListItem;
-import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 
 /**
@@ -61,7 +62,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
     @Override
     public PlayListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new PlayListHolder(LayoutInflater.from(parent.getContext()).inflate(PlayListActivity.ListModel == 1 ? R.layout.playlist_recycle_list_item : R.layout.playlist_recycle_grid_item, null, false));
+        return new PlayListHolder(LayoutInflater.from(parent.getContext()).inflate(PlayListFragment.ListModel == 1 ? R.layout.playlist_recycle_list_item : R.layout.playlist_recycle_grid_item, null, false));
     }
 
     @Override
@@ -125,11 +126,22 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                 });
 //            }
         }
-        if(MultiChoice.TAG.equals(PlayListActivity.TAG) &&
+
+        //是否处于选中状态
+        if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&
                 mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
             mMultiChoice.AddView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);
+        }
+
+        //设置padding
+        if(PlayListFragment.ListModel == 2 && holder.mRoot != null){
+            if(position % 2 == 0){
+                holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,8),DensityUtil.dip2px(mContext,3),0);
+            } else {
+                holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,8),DensityUtil.dip2px(mContext,6),0);
+            }
         }
     }
 
@@ -150,9 +162,11 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         @BindView(R.id.item_container)
         public RelativeLayout mContainer;
 
+        @BindView(R.id.root)
+        @Nullable
+        public View mRoot;
         public PlayListHolder(View itemView) {
             super(itemView);
-
         }
     }
 

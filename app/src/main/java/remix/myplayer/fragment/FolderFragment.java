@@ -17,7 +17,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.FolderAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.RecyclerItemDecoration;
+import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.CommonUtil;
@@ -38,18 +38,17 @@ public class FolderFragment extends BaseFragment {
     RecyclerView mRecyclerView;
 
     private FolderAdapter mAdapter;
-    public static boolean isFirstSelected = true;
     public static final String TAG = FolderFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
 
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_folder,null);
+        View rootView = inflater.inflate(R.layout.activity_folder,null);
         mUnBinder = ButterKnife.bind(this,rootView);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.addItemDecoration(new RecyclerItemDecoration(getContext(),RecyclerItemDecoration.VERTICAL_LIST));
+        mRecyclerView.addItemDecoration(new ListItemDecoration(getContext(), ListItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();

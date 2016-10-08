@@ -4,6 +4,7 @@
 
     <string name="drawer_recently">最近添加</string>
     <string name="drawer_playlist">播放列表</string>
+    <string name="drawer_folder">文件夹</string>
     <string name="drawer_allsong">全部歌曲</string>
     <string name="drawer_setting">设置</string>
 

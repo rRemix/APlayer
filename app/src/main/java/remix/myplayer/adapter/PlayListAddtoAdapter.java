@@ -12,7 +12,6 @@ import java.util.Iterator;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.ui.activity.PlayListActivity;
 import remix.myplayer.util.Global;
 
 /**

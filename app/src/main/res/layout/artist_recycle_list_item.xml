@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="56dp"
     android:minHeight="56dp"
-    android:background="@drawable/bg_song_card">
+    android:background="@drawable/bg_list_card">
     <com.facebook.drawee.view.SimpleDraweeView
         android:layout_width="42dp"
         android:layout_height="42dp"

@@ -24,7 +24,7 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.RecyclerItemDecoration;
+import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
@@ -59,8 +59,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
     private ChildHolderAdapter mAdapter;
     public static ChildHolderActivity mInstance = null;
-    //是否需要更新adapter
-    private static boolean mNeedRefresh = false;
+
     //更新
     private Handler mRefreshHandler = new Handler(){
         @Override
@@ -155,7 +154,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
         });
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addItemDecoration(new RecyclerItemDecoration(this,RecyclerItemDecoration.VERTICAL_LIST,getResources().getDrawable(R.drawable.divider)));
+        mRecyclerView.addItemDecoration(new ListItemDecoration(this, ListItemDecoration.VERTICAL_LIST,getResources().getDrawable(R.drawable.divider)));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 

@@ -20,7 +20,7 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SearchResAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.ui.RecyclerItemDecoration;
+import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.customview.SearchToolBar;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -112,7 +112,7 @@ public class SearchActivity extends ToolbarActivity {
         });
         mSearchResRecyclerView.setAdapter(mSearchResAdapter);
         mSearchResRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mSearchResRecyclerView.addItemDecoration(new RecyclerItemDecoration(this,RecyclerItemDecoration.VERTICAL_LIST));
+        mSearchResRecyclerView.addItemDecoration(new ListItemDecoration(this, ListItemDecoration.VERTICAL_LIST));
         mSearchResRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         UpdateUI();

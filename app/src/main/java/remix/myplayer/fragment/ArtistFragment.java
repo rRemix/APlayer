@@ -113,20 +113,10 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         });
         mRecycleView.setAdapter(mAdapter);
 
-        StateListDrawable stateListDrawable1 = new StateListDrawable();
-        Drawable drawable1 =  Theme.TintDrawable(Theme.getDrawable(getActivity(),R.drawable.btn_list2), ThemeStore.getMaterialColorPrimaryColor());
-        stateListDrawable1.addState(new int[]{android.R.attr.state_pressed}, drawable1);
-        stateListDrawable1.addState(new int[]{android.R.attr.state_selected}, drawable1);
-        stateListDrawable1.addState(new int[]{}, Theme.getDrawable(getActivity(),R.drawable.btn_list2));
-        mListModelBtn.setImageDrawable(stateListDrawable1);
+        mListModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list2));
         mListModelBtn.setSelected(ListModel == 1);
 
-        StateListDrawable stateListDrawable2 = new StateListDrawable();
-        Drawable drawable2 =  Theme.TintDrawable(Theme.getDrawable(getActivity(),R.drawable.btn_list1), ThemeStore.getMaterialColorPrimaryColor());
-        stateListDrawable2.addState(new int[]{android.R.attr.state_pressed}, drawable2);
-        stateListDrawable2.addState(new int[]{android.R.attr.state_selected}, drawable2);
-        stateListDrawable2.addState(new int[]{}, Theme.getDrawable(getActivity(),R.drawable.btn_list1));
-        mGridModelBtn.setImageDrawable(stateListDrawable2);
+        mGridModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list1));
         mGridModelBtn.setSelected(ListModel == 2);
 
         return rootView;

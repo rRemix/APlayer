@@ -17,10 +17,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -37,14 +35,13 @@ import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
-import remix.myplayer.fragment.FolderFragment;
+import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -122,11 +119,11 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                                 artistFragment.getAdapter().notifyDataSetChanged();
                         }
                     }
-                    if(temp instanceof FolderFragment){
-                        FolderFragment folderFragment = (FolderFragment) temp;
-                        if(folderFragment.getAdapter() != null){
-                            if(!isMulti || (isMulti && MultiChoice.TAG.equals(FolderFragment.TAG)))
-                                folderFragment.getAdapter().notifyDataSetChanged();
+                    if(temp instanceof PlayListFragment){
+                        PlayListFragment playListFragment = (PlayListFragment) temp;
+                        if(playListFragment.getAdapter() != null){
+                            if(!isMulti || (isMulti && MultiChoice.TAG.equals(PlayListFragment.TAG)))
+                                playListFragment.getAdapter().notifyDataSetChanged();
                         }
                     }
                 }
@@ -329,11 +326,11 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mAdapter.setTitles(new String[]{getResources().getString(R.string.tab_song),
                 getResources().getString(R.string.tab_album),
                 getResources().getString(R.string.tab_artist),
-                getResources().getString(R.string.tab_folder)});
+                getResources().getString(R.string.tab_playlist)});
         mAdapter.AddFragment(new SongFragment());
         mAdapter.AddFragment(new AlbumFragment());
         mAdapter.AddFragment(new ArtistFragment());
-        mAdapter.AddFragment(new FolderFragment());
+        mAdapter.AddFragment(new PlayListFragment());
 
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(0);
@@ -345,7 +342,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_song)));
         mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_album)));
         mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_artist)));
-        mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_folder)));
+        mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_playlist)));
         //viewpager与tablayout关联
         mTablayout.setupWithViewPager(mViewPager);
     }
@@ -366,8 +363,8 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                         //最近添加
                         startActivity(new Intent(MainActivity.this, RecetenlyActivity.class));
                         break;
-                    case R.id.item_playlist:
-                        startActivity(new Intent(MainActivity.this, PlayListActivity.class));
+                    case R.id.item_folder:
+                        startActivity(new Intent(MainActivity.this, FolderActivity.class));
                         break;
                     case R.id.item_allsong:
                         mDrawerLayout.closeDrawer(mNavigationView);

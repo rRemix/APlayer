@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
@@ -233,14 +234,21 @@ public class Theme {
      * @param id
      * @return
      */
-
-
     public static Drawable getDrawable(Context context, int id) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             return context.getResources().getDrawable(id);
         } else {
             return context.getDrawable(id);
         }
+    }
+
+    public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context,@DrawableRes int resId){
+        StateListDrawable stateListDrawable = new StateListDrawable();
+        Drawable drawable1 =  Theme.TintDrawable(Theme.getDrawable(context,resId), ThemeStore.getMaterialColorPrimaryColor());
+        stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, drawable1);
+        stateListDrawable.addState(new int[]{android.R.attr.state_selected}, drawable1);
+        stateListDrawable.addState(new int[]{}, Theme.getDrawable(context,resId));
+        return stateListDrawable;
     }
 
 }

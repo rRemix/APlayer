@@ -18,11 +18,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.ui.activity.ChildHolderActivity;
-import remix.myplayer.ui.activity.PlayListActivity;
 
 /**
  * Created by taeja on 16-2-17.
@@ -586,7 +586,7 @@ public class DBUtil {
      * @param type 删除类型 包括单个歌曲、专辑、艺术家、文件夹
      * @return 是否删除成功
      */
-    public static boolean deleteSong(int data,int type) {
+    public static boolean delete(int data, int type) {
         ContentResolver resolver = mContext.getContentResolver();
         String where = "";
         String[] arg = null;
@@ -602,8 +602,8 @@ public class DBUtil {
             String playListName =  CommonUtil.getMapkeyByPosition(Global.mPlaylist,data);
             if(!TextUtils.isEmpty(playListName)) {
                 Global.mPlaylist.remove(playListName);
-                if(PlayListActivity.mInstance != null)
-                    PlayListActivity.mInstance.UpdateAdapter();
+                if(PlayListFragment.mInstance != null)
+                    PlayListFragment.mInstance.UpdateAdapter();
                 XmlUtil.updatePlaylist();
                 return true;
             }

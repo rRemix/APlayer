@@ -27,11 +27,11 @@ import java.util.List;
 import java.util.Random;
 
 import remix.myplayer.R;
-import remix.myplayer.fragment.FolderFragment;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.observer.MediaStoreObserver;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
 import remix.myplayer.ui.activity.EQActivity;
+import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.util.Constants;
@@ -223,8 +223,8 @@ public class MusicService extends BaseService {
             public void handleMessage(Message msg) {
                 //更新文件夹fragment
                 if(msg.what == Constants.UPDATE_FOLDER){
-                    if(FolderFragment.mInstance != null){
-                        FolderFragment.mInstance.UpdateAdapter();
+                    if(FolderActivity.mInstance != null){
+                        FolderActivity.mInstance.UpdateAdapter();
                     }
                 }
                 //更新正在播放列表

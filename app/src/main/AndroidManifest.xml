@@ -59,7 +59,7 @@
         <activity android:name=".ui.activity.SearchActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".ui.activity.PlayListActivity"
+        <activity android:name=".ui.activity.FolderActivity"
             android:theme="@style/ActivityStyle">
         </activity>
 
