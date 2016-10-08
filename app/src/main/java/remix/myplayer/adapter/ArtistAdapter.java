@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
+import remix.myplayer.BuildConfig;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.AlbumFragment;

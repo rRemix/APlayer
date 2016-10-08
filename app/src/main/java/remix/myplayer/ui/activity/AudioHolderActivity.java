@@ -18,7 +18,6 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
@@ -55,6 +54,7 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 
@@ -166,7 +166,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                     mContainer.startAnimation(mAnimOut);
                 else
                     changeColor();
-                Log.d(TAG,"duration:" + (System.currentTimeMillis() - start));
+                LogUtil.d(TAG,"duration:" + (System.currentTimeMillis() - start));
                 //更新专辑封面
                 ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
                 if(mFistStart)
@@ -376,7 +376,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         mDuration = (int)mInfo.getDuration();
         final int temp = MusicService.getCurrentTime();
         mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
-        Log.d(TAG,"Duration:" + mDuration + "  CurrentTime:" + mCurrentTime);
+        LogUtil.d(TAG,"Duration:" + mDuration + "  CurrentTime:" + mCurrentTime);
 
         if(mDuration > 0 && mCurrentTime >= 0 && (mDuration - mCurrentTime) > 0){
             mHasPlay.setText(CommonUtil.getTime(mCurrentTime));

@@ -1,24 +1,18 @@
 package remix.myplayer.ui.customview;
 
 import android.content.Context;
-import android.graphics.Point;
 import android.graphics.Rect;
-import android.media.Image;
-import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import remix.myplayer.R;
-import remix.myplayer.application.Application;
-import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2016/9/18.
@@ -76,7 +70,7 @@ public class CardFrameLayout extends FrameLayout {
         if(mTargetView == null)
             return super.dispatchTouchEvent(ev);
 
-        Log.d("CardFrameLayout","left:" + mTargetView.getLeft() + " top:" + mTargetView.getTop());
+        LogUtil.d("CardFrameLayout","left:" + mTargetView.getLeft() + " top:" + mTargetView.getTop());
         if(mTargetView instanceof RelativeLayout) {
             mCardBg.dispatchTouchEvent(ev);
             ev.setLocation(ev.getX() - mTargetView.getLeft(),ev.getY() - mTargetView.getTop());

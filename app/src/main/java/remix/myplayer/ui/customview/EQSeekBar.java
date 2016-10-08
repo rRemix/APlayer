@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -17,6 +16,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.LogUtil;
 
 /**
  * Created by taeja on 16-4-13.
@@ -367,14 +367,14 @@ public class EQSeekBar extends View {
         else
             mDBText = "0";
 
-        Log.d(TAG,"DB: " + mDB);
+        LogUtil.d(TAG,"DB: " + mDB);
 
         invalidate();
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Log.d(TAG,"EventY:" + event.getY());
+        LogUtil.d(TAG,"EventY:" + event.getY());
         int eventY = (int)event.getY();
         seekTo(eventY,event.getAction() == MotionEvent.ACTION_UP);
         return true;

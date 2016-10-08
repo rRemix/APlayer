@@ -9,7 +9,6 @@ import android.os.Message;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
@@ -30,6 +29,7 @@ import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.customview.CircleSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 
 /**
@@ -261,7 +261,7 @@ public class TimerDialog extends BaseDialogActivity {
                 msg.obj = text;
                 msg.arg1 = min;
                 mHandler.sendMessage(msg);
-                Log.d("Timer","SendMsg");
+                LogUtil.d("Timer","SendMsg");
                 try {
                     sleep(1000);
                 }catch (InterruptedException e){

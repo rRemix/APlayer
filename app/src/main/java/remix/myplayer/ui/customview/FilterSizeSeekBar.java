@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -18,6 +17,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2016/3/7.
@@ -175,8 +175,8 @@ public class FilterSizeSeekBar extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Log.d(TAG,"EventX:" + event.getX());
-        Log.d(TAG,"EventY:" + event.getY());
+        LogUtil.d(TAG,"EventX:" + event.getX());
+        LogUtil.d(TAG,"EventY:" + event.getY());
         int eventX = (int)event.getX();
         boolean isUp = event.getAction() == MotionEvent.ACTION_UP ;
 

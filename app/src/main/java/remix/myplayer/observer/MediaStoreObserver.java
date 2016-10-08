@@ -2,12 +2,11 @@ package remix.myplayer.observer;
 
 import android.database.ContentObserver;
 import android.os.Handler;
-import android.util.Log;
 
-import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -27,7 +26,7 @@ public class MediaStoreObserver extends ContentObserver {
 
     @Override
     public void onChange(boolean selfChange) {
-        Log.d("ThreadId","id in observer: " + Thread.currentThread().getId());
+        LogUtil.d("ThreadId","id in observer: " + Thread.currentThread().getId());
         if(!selfChange){
             Global.mAllSongList = DBUtil.getAllSongsId();
 

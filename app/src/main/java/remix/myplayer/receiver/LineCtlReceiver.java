@@ -3,12 +3,12 @@ package remix.myplayer.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.KeyEvent;
 
 import java.util.Timer;
 
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.LogUtil;
 
 /**
  * Created by taeja on 16-2-5.
@@ -46,7 +46,7 @@ public class LineCtlReceiver extends BroadcastReceiver {
         if(keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ||
                 keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ||
                 keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
-            Log.d(TAG,"receive remote ctrl");
+            LogUtil.d(TAG,"receive remote ctrl");
             intent_ctl = new Intent(Constants.CTL_ACTION);
             int arg = keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.PLAYORPAUSE :
                     keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Constants.NEXT : Constants.PREV;
@@ -57,7 +57,7 @@ public class LineCtlReceiver extends BroadcastReceiver {
 
 
         mSingleTime = event.getEventTime() - event.getDownTime();//按键按下到松开的时长
-        Log.d(TAG,"count=" + mCount);
+        LogUtil.d(TAG,"count=" + mCount);
         //如果是第一次按下，开启一条线程去判断用户操作
         if(mCount == 0){
             new Thread(){

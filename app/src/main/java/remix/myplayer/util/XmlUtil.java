@@ -2,7 +2,6 @@ package remix.myplayer.util;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.Xml;
 import android.widget.Toast;
 
@@ -66,7 +65,7 @@ public class XmlUtil {
                         if(tag != null && parser.getName().equals("song")) {
                             item = new PlayListItem(parser.getAttributeValue(0),Integer.parseInt(parser.getAttributeValue(1)),
                                     Integer.parseInt(parser.getAttributeValue(2)),parser.getAttributeValue(3));
-                            Log.d("XmlUtil",item.toString());
+                            LogUtil.d("XmlUtil",item.toString());
                         }
                         break;
                     case XmlPullParser.END_TAG:

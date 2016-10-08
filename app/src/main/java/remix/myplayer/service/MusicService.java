@@ -17,7 +17,6 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -37,6 +36,7 @@ import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 
 
@@ -278,7 +278,7 @@ public class MusicService extends BaseService {
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                Log.d(TAG, "what = " + what + " extar = " + extra);
+                LogUtil.d(TAG, "what = " + what + " extar = " + extra);
                 return true;
             }
         });
@@ -824,8 +824,8 @@ public class MusicService extends BaseService {
                 return true;
             }
 
-            Log.d(TAG,"count=" + mCount);
-            Log.d(TAG,"AudioFocus:" + mAudioFouus);
+            LogUtil.d(TAG,"count=" + mCount);
+            LogUtil.d(TAG,"AudioFocus:" + mAudioFouus);
 //            if(!mAudioFouus)
 //                return true;
             //如果是第一次按下，开启一条线程去判断用户操作

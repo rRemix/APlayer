@@ -9,7 +9,6 @@ import android.os.Message;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +28,9 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.EQSeekBar;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 
 /**
@@ -83,7 +82,7 @@ public class EQActivity extends ToolbarActivity {
             @Override
             public void run() {
                 int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
-                Log.d(TAG,"AudioSessionId:" + AudioSessionId);
+                LogUtil.d(TAG,"AudioSessionId:" + AudioSessionId);
                 if(AudioSessionId  == 0) {
                     Toast.makeText(Application.getContext(),"均衡器初始化失败",Toast.LENGTH_SHORT).show();
                     return;

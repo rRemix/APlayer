@@ -20,6 +20,7 @@ import remix.myplayer.model.LrcItem;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.DiskLruCache;
+import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2015/12/7.
@@ -165,7 +166,7 @@ public class SearchLRC {
             }
 
         } catch (Exception e) {
-            Log.d(TAG, s);
+            LogUtil.d(TAG, s);
             e.printStackTrace();
         } finally {
             try {

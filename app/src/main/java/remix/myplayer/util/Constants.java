@@ -8,6 +8,9 @@ package remix.myplayer.util;
  * 常量值
  */
 public class Constants {
+    //应用包名
+    public final static String PACKAGE_NAME = "remix.myplayer";
+
     //操作类型
     public final static int SONG = 0;
     public final static int ALBUM = 1;

@@ -19,7 +19,7 @@ android {
         }
         release {
             //混淆代码
-            minifyEnabled 
+            minifyEnabled true
             buildConfigField "boolean", "LOG_DEBUG", "false"
             zipAlignEnabled true
             shrinkResources true

@@ -4,24 +4,16 @@ import android.app.Activity;
 import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.graphics.Palette;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,13 +28,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
+import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
-import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -117,7 +110,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
                     public void onGenerated(Palette palette) {
                         Palette.Swatch e = palette.getDarkMutedSwatch();//柔和 暗色
                         if(e != null){
-                            Log.d(TAG,"mill: population --" + e.getPopulation());
+                            LogUtil.d(TAG,"mill: population --" + e.getPopulation());
                             mSong.setTextColor(e.getBodyTextColor());
                             mArtist.setTextColor(e.getTitleTextColor());
 
@@ -185,7 +178,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
                 if(mDistance > 0 || ((mView.getScrollX() + (-mDistance)) < 0)) {
                     mView.scrollBy((int) -mDistance, 0);
                 }
-                Log.d(TAG,"distance:" + mDistance + "\r\n");
+                LogUtil.d(TAG,"distance:" + mDistance + "\r\n");
                 break;
             case MotionEvent.ACTION_UP:
                 //判断当前位置是否超过整个屏幕宽度的0.25
@@ -223,7 +216,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
 
     @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
-        Log.d(TAG,this.toString());
+        LogUtil.d(TAG,this.toString());
         mInfo = MP3Item;
         if(!mIsRunning )
             return;
@@ -252,7 +245,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
                 }
             }
         } catch (Exception e){
-            Log.d(TAG,"list error:" + e.toString());
+            LogUtil.d(TAG,"list error:" + e.toString());
             e.printStackTrace();
         }
         if(mLoveButton != null) {

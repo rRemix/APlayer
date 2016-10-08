@@ -2,14 +2,7 @@ package remix.myplayer.application;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatDialog;
-import android.util.JsonToken;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,15 +22,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import cn.bmob.v3.Bmob;
 import remix.myplayer.R;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.model.UpdateInfo;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
-import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.ColorUtil;
@@ -47,8 +37,8 @@ import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.PermissionUtil;
-import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -65,6 +55,8 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
+        //日志
+        LogUtil.isDebug = true;
         //bomb
         Bmob.initialize(this, "0c070110fffa9e88a1362643fb9d4d64");
         //初始化友盟推送
@@ -74,7 +66,7 @@ public class Application extends android.app.Application {
             @Override
             public void onSuccess(String deviceToken) {
                 //注册成功会返回device token
-                Log.d("DeviceToken","DeviceToker:" + deviceToken);
+                LogUtil.d("DeviceToken","DeviceToker:" + deviceToken);
             }
             @Override
             public void onFailure(String s, String s1) {
@@ -125,7 +117,7 @@ public class Application extends android.app.Application {
                     }
 
                 } catch (JSONException e) {
-                    Log.d("Application","创建更新对话框错误:" + e.toString());
+                    LogUtil.d("Application","创建更新对话框错误:" + e.toString());
                     Toast.makeText(context,"创建更新对话框错误:" + e.toString(),Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 }

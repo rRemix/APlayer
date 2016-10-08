@@ -3,7 +3,6 @@ package remix.myplayer.wxapi;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.tencent.mm.sdk.modelbase.BaseReq;
@@ -37,12 +36,10 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler{
 
     @Override
     public void onReq(BaseReq baseReq) {
-        Log.d("WX",baseReq.toString());
     }
 
     @Override
     public void onResp(BaseResp baseResp) {
-        Log.d("WX",baseResp.toString());
         if(ShareDialog.mInstance != null ){
             String result = "";
             switch (baseResp.errCode) {
