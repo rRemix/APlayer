@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/notify_bg"
-        android:scaleType="fitXY"/>
+        android:scaleType="centerCrop"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
         android:id="@+id/notify_container">
         <ImageView
             android:id="@+id/notify_image"
-            android:layout_width="100dp"
+            android:layout_width="@dimen/d100_size"
             android:layout_height="match_parent"
             android:layout_centerVertical="true"
             android:src="@drawable/song_artist_empty_bg"/>
@@ -50,7 +50,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/transparent"
+                    android:background="?android:attr/selectableItemBackground"
                     android:layout_marginRight="12dp"
                     android:src="@drawable/notify_btn_close_white"/>
             </RelativeLayout>
@@ -79,13 +79,13 @@
                     android:id="@+id/notify_prev"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:background="@color/transparent"
+                    android:background="?android:attr/selectableItemBackground"
                     android:src="@drawable/notify_prev" />
                 <ImageButton
                     android:id="@+id/notify_play"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/transparent"
+                    android:background="?android:attr/selectableItemBackground"
                     android:src="@drawable/notify_play"
                     android:layout_marginLeft="25dp"
                     android:layout_marginRight="25dp"/>
@@ -94,7 +94,7 @@
                     android:id="@+id/notify_next"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:background="@color/transparent"
+                    android:background="?android:attr/selectableItemBackground"
                     android:src="@drawable/notify_next"/>
             </LinearLayout>
         </LinearLayout>

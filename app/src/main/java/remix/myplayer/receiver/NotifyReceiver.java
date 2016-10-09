@@ -6,12 +6,14 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
 import remix.myplayer.R;
+import remix.myplayer.application.Application;
 import remix.myplayer.ui.activity.AudioHolderActivity;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
@@ -38,6 +40,15 @@ public class NotifyReceiver extends BroadcastReceiver {
     }
 
     private void UpdateNotify(Context context,boolean frommainactivity) {
+        Configuration mConfiguration = Application.getContext().getResources().getConfiguration(); //获取设置的配置信息
+        int ori = mConfiguration.orientation ; //获取屏幕方向
+
+        if(ori == mConfiguration.ORIENTATION_LANDSCAPE){
+            ori = 1;
+        }else if(ori == mConfiguration.ORIENTATION_PORTRAIT){
+            ori = 2;
+        }
+
         boolean isBig = context.getResources().getDisplayMetrics().widthPixels >= 1000;
 
         mRemoteView = new RemoteViews(context.getPackageName(), isBig ? R.layout.notify_playbar_big : R.layout.notify_playbar);
@@ -64,7 +75,7 @@ public class NotifyReceiver extends BroadcastReceiver {
             mRemoteView.setImageViewResource(R.id.notify_bg,isSystemColor ? R.drawable.bg_system : R.drawable.bg_black);
 
             //设置封面
-            Bitmap bitmap = DBUtil.getAlbumBitmapBySongId((int) temp.getId(), true);
+            Bitmap bitmap = DBUtil.getAlbumBitmapBySongId(temp.getId(), true);
             if(bitmap != null)
                 mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
             else

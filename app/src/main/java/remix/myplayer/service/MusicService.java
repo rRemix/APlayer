@@ -33,6 +33,7 @@ import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.dialog.PlayingListDialog;
+import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
@@ -498,6 +499,10 @@ public class MusicService extends BaseService {
                     || Control == Constants.PLAYORPAUSE || Control == Constants.PAUSE || Control == Constants.START){
                 if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
                     return;
+                if(CommonUtil.isFastDoubleClick()) {
+                    Toast.makeText(mContext,"请不要过快操作",Toast.LENGTH_SHORT).show();
+                    return;
+                }
             }
 
             switch (Control) {

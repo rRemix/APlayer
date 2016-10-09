@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/notify_bg"
-        android:scaleType="fitXY"/>
+        android:scaleType="centerCrop"/>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -59,13 +59,13 @@
                 android:layout_centerInParent="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/transparent"
+                android:background="?android:attr/selectableItemBackground"
                 android:src="@drawable/notify_next" />
             <ImageButton
                 android:id="@+id/notify_next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/transparent"
+                android:background="?android:attr/selectableItemBackground"
                 android:src="@drawable/notify_next"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"/>
@@ -75,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/notify_close"
                 android:src="@drawable/notify_btn_close_white"
-                android:background="@color/transparent" />
+                android:background="?android:attr/selectableItemBackground" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

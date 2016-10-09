@@ -51,46 +51,7 @@ public class CommonUtil {
 
 
     /**
-     * 压缩图片用于分享
-     * @param bmp 原始图片
-     * @param needRecycle 是否需要回收
-     * @return 压缩后的byte数组
-     */
-    public static byte[] bmpToByteArray(final Bitmap bmp, final boolean needRecycle) {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, output);
-        if (needRecycle) {
-            bmp.recycle();
-        }
-
-        byte[] result = output.toByteArray();
-        try {
-            output.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return result;
-    }
-
-    public static Bitmap doBlur(Bitmap sentBitmap,int radius){
-        Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
-
-        final RenderScript rs = RenderScript.create(mContext);
-        final Allocation input = Allocation.createFromBitmap(rs, sentBitmap, Allocation.MipmapControl.MIPMAP_NONE,
-                Allocation.USAGE_SCRIPT);
-        final Allocation output = Allocation.createTyped(rs, input.getType());
-        final ScriptIntrinsicBlur script = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
-        script.setRadius(radius /* e.g. 3.f */);
-        script.setInput(input);
-        script.forEach(output);
-        output.copyTo(bitmap);
-        return bitmap;
-    }
-
-    //高斯模糊
-    /**
-     *
+     * 高斯模糊
      * @param sentBitmap 需要模糊的bitmap
      * @param radius 模糊半径 数值越大，模糊程度越高
      * @param canReuseInBitmap
@@ -302,11 +263,9 @@ public class CommonUtil {
     }
 
 
-    //获得歌曲时长，分：秒
-
     /**
-     * 根据时间戳，解析时间
-     * @param duration 时间戳
+     * 转换时间
+     * @param duration
      * @return 00:00格式的时间
      */
     public static String getTime(long duration) {
@@ -390,6 +349,23 @@ public class CommonUtil {
         for(int i = 0 ; i <= position ; i++)
             key = it.next().toString();
         return key;
+    }
+
+
+
+    /**
+     * 判断是否连续点击
+     * @return
+     */
+    private static long lastClickTime;
+    public static boolean isFastDoubleClick() {
+        long time = System.currentTimeMillis();
+        long timeD = time - lastClickTime;
+        if ( 0 < timeD && timeD < 500) {
+            return true;
+        }
+        lastClickTime = time;
+        return false;
     }
 
     /**
