@@ -4,9 +4,7 @@ package remix.myplayer.ui.activity;
 import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,7 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -460,15 +458,20 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
     //更新界面
     @Override
-    public void UpdateUI(MP3Item mP3Item, boolean isplay) {
+    public void UpdateUI(MP3Item mp3Item, boolean isplay) {
         if (!mIsRunning)
             return;
-        mBottomBar.UpdateBottomStatus(mP3Item, isplay);
+        mBottomBar.UpdateBottomStatus(mp3Item, isplay);
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         for (Fragment fragment : fragmentList) {
             if (fragment instanceof SongFragment && ((SongFragment) fragment).getAdapter() != null) {
                 ((SongFragment) fragment).getAdapter().notifyDataSetChanged();
             }
+        }
+        View headView = mNavigationView.getHeaderView(0);
+        if(headView != null && mp3Item != null){
+            TextView textView = (TextView) headView.findViewById(R.id.header_txt);
+            textView.setText(mp3Item.getArtist() + "-" + mp3Item.getTitle());
         }
     }
 

@@ -25,5 +25,5 @@
         android:layout_marginBottom="@dimen/d16_size"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="歌曲名-歌手名"/>
+        android:text="歌曲名"/>
 </LinearLayout>
