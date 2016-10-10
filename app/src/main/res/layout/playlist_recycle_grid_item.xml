@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="218dp"
-    android:paddingTop="@dimen/d8_size"
+    android:paddingBottom="@dimen/d8_size"
     android:paddingLeft="@dimen/d6_size"
-    android:paddingRight="@dimen/d6_size"
-    android:background="#efefef">
+    android:paddingRight="@dimen/d6_size">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="218dp"
+        android:layout_height="210dp"
         android:id="@+id/item_container"
-        android:background="@drawable/bg_grid_card">
+        android:background="?attr/background_grid">
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="124dp"
             android:layout_height="123dp"
@@ -20,7 +20,7 @@
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/album_empty_bg"
-            fresco:roundedCornerRadius="1dp"
+            fresco:roundedCornerRadius="2dp"
             android:layout_alignParentTop="true"
             android:layout_marginTop="@dimen/d18_size"
             android:layout_marginRight="@dimen/d24_size"
@@ -31,7 +31,7 @@
             android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="@dimen/d1_size"
-            android:background="#efefef"
+            android:background="?attr/background_grid_color"
             android:layout_below="@id/recycleview_simpleiview"/>
 
         <ImageButton
@@ -48,10 +48,11 @@
         <LinearLayout
             android:id="@+id/item_container_text"
             android:layout_centerVertical="true"
-            android:layout_width="@dimen/d120_size"
-            android:layout_height="57dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="@dimen/d8_size"
+            android:layout_marginRight="@dimen/d8_size"
             android:gravity="center_vertical"
             android:layout_toLeftOf="@id/recycleview_button"
             android:layout_alignParentBottom="true"

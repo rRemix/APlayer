@@ -125,8 +125,6 @@ public class MusicService extends BaseService {
             }
         }
     };
-    /** TelePhoneManager*/
-    private TelephonyManager mTelePhoneManager;
 
 
     private ContentObserver mObserver;
@@ -216,8 +214,6 @@ public class MusicService extends BaseService {
         mHeadSetReceiver = new HeadsetPlugReceiver();
         registerReceiver(mHeadSetReceiver,new IntentFilter(Intent.ACTION_HEADSET_PLUG));
 
-        //监听通话
-        mTelePhoneManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
         //监听媒体库变化
         mObserver = new MediaStoreObserver(new Handler(){
             @Override

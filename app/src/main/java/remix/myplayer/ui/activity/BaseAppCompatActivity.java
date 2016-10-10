@@ -1,9 +1,12 @@
 package remix.myplayer.ui.activity;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.message.PushAgent;
@@ -12,6 +15,8 @@ import remix.myplayer.R;
 import remix.myplayer.manager.ActivityManager;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
+import remix.myplayer.util.Constants;
+import remix.myplayer.util.Global;
 import remix.myplayer.util.StatusBarUtil;
 
 /**
@@ -91,4 +96,5 @@ public class BaseAppCompatActivity extends AppCompatActivity {
         super.onPause();
         MobclickAgent.onPause(this);
     }
+
 }

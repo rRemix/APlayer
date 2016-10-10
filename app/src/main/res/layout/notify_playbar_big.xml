@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="120dp"
     android:orientation="horizontal">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/notify_bg"
-        android:scaleType="centerCrop"/>
+        android:scaleType="fitXY"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,10 +17,12 @@
         android:id="@+id/notify_container">
         <ImageView
             android:id="@+id/notify_image"
-            android:layout_width="@dimen/d100_size"
-            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_centerVertical="true"
-            android:src="@drawable/song_artist_empty_bg"/>
+            android:src="@drawable/song_artist_empty_bg"
+            android:scaleType="centerCrop"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,16 +36,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="10dp">
-                <TextView
-                    android:id="@+id/notify_song"
-                    android:text="歌曲名"
-                    android:layout_width="190dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:lines="1"
-                    android:ellipsize="end"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/s16_size"/>
                 <ImageButton
                     android:id="@+id/notify_close"
                     android:layout_centerVertical="true"
@@ -52,18 +44,31 @@
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:layout_marginRight="12dp"
+                    android:layout_marginLeft="12dp"
                     android:src="@drawable/notify_btn_close_white"/>
+                <TextView
+                    android:id="@+id/notify_song"
+                    android:text="歌曲名"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:lines="1"
+                    android:ellipsize="end"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/s16_size"
+                    android:layout_toLeftOf="@id/notify_close"/>
+
             </RelativeLayout>
             <!--歌手与专辑-->
 
             <TextView
                 android:id="@+id/notify_artist_album"
                 android:text="歌手名"
-                android:layout_width="190dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="12dp"
                 android:lines="1"
                 android:ellipsize="end"
                 android:textSize="@dimen/s14_size"
@@ -74,26 +79,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:gravity="center">
+                android:gravity="center"
+                android:weightSum="3"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
                 <ImageButton
                     android:id="@+id/notify_prev"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:background="?android:attr/selectableItemBackground"
                     android:src="@drawable/notify_prev" />
                 <ImageButton
                     android:id="@+id/notify_play"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:background="?android:attr/selectableItemBackground"
-                    android:src="@drawable/notify_play"
-                    android:layout_marginLeft="25dp"
-                    android:layout_marginRight="25dp"/>
+                    android:src="@drawable/notify_play" />
 
                 <ImageButton
                     android:id="@+id/notify_next"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:background="?android:attr/selectableItemBackground"
                     android:src="@drawable/notify_next"/>
             </LinearLayout>

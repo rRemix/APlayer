@@ -138,9 +138,9 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         //设置padding
         if(PlayListFragment.ListModel == 2 && holder.mRoot != null){
             if(position % 2 == 0){
-                holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,8),DensityUtil.dip2px(mContext,3),0);
+                holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),0,DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,8));
             } else {
-                holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,8),DensityUtil.dip2px(mContext,6),0);
+                holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),0,DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,8));
             }
         }
     }

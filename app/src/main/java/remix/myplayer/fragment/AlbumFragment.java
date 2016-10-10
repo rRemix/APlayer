@@ -106,7 +106,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
                         intent.putExtra("Id", albumid);
                         intent.putExtra("Title", title);
                         intent.putExtra("Type", Constants.ALBUM);
-                        startActivity(intent);
+//                        startActivity(intent);
                         }
                     }
                 }

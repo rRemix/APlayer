@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/background_grid_color">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -28,7 +29,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/d8_size"
-        android:background="@color/gray_6c6a6c"/>
+        android:background="?attr/background_color_2"/>
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"

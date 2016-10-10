@@ -4,7 +4,9 @@ package remix.myplayer.ui.activity;
 import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;

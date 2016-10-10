@@ -40,15 +40,6 @@ public class NotifyReceiver extends BroadcastReceiver {
     }
 
     private void UpdateNotify(Context context,boolean frommainactivity) {
-        Configuration mConfiguration = Application.getContext().getResources().getConfiguration(); //获取设置的配置信息
-        int ori = mConfiguration.orientation ; //获取屏幕方向
-
-        if(ori == mConfiguration.ORIENTATION_LANDSCAPE){
-            ori = 1;
-        }else if(ori == mConfiguration.ORIENTATION_PORTRAIT){
-            ori = 2;
-        }
-
         boolean isBig = context.getResources().getDisplayMetrics().widthPixels >= 1000;
 
         mRemoteView = new RemoteViews(context.getPackageName(), isBig ? R.layout.notify_playbar_big : R.layout.notify_playbar);
@@ -56,7 +47,7 @@ public class NotifyReceiver extends BroadcastReceiver {
         mIsplay = MusicService.getIsplay();
 //        if(frommainactivity && !mIsplay)
 //            return;
-        if(!Global.getNotifyShowing() && !mIsplay)
+        if(!Global.isNotifyShowing() && !mIsplay)
             return;
         
         if((MusicService.getCurrentMP3() != null)) {
@@ -137,7 +128,7 @@ public class NotifyReceiver extends BroadcastReceiver {
                     );
             mBuilder.setContentIntent(resultPendingIntent);
             Notification mNotify = mBuilder.build();
-            //根据分辨率设置大布局或者普通布局
+            //根据分辨率设置布局
             if(isBig)
                 mNotify.bigContentView = mRemoteView;
             else

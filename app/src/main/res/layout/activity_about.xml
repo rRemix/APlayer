@@ -12,8 +12,6 @@
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:background="?attr/background_color_3">
-
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_gravity="center_horizontal"

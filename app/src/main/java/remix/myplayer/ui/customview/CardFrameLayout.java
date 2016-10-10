@@ -45,9 +45,9 @@ public class CardFrameLayout extends FrameLayout {
                 mContainer = (RelativeLayout) child;
                 mMoreButton = (ImageButton) mContainer.findViewById(R.id.recycleview_button);
             }
-            if(child.getId() == R.id.recycleview_card && child instanceof Button){
-                mCardBg = (Button) child;
-            }
+//            if(child.getId() == R.id.recycleview_card && child instanceof Button){
+//                mCardBg = (Button) child;
+//            }
         }
 
         if(mContainer == null || mMoreButton == null || mCardBg == null){

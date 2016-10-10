@@ -81,7 +81,7 @@ public class Global {
     public static void setNotifyShowing(boolean isshow){
         mNotifyShowing = isshow;
     }
-    public static boolean getNotifyShowing(){
+    public static boolean isNotifyShowing(){
         return mNotifyShowing;
     }
 
