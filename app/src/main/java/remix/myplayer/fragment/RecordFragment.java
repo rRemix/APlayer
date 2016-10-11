@@ -28,6 +28,13 @@ public class RecordFragment extends BaseFragment{
     @BindView(R.id.edit_record)
     EditText mEdit;
     private static String mRecord = "";
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPageName = RecordFragment.class.getSimpleName();
+    }
+
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

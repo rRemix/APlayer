@@ -64,6 +64,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mPageName = TAG;
         mInstance = this;
     }
 

@@ -19,6 +19,8 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.umeng.analytics.MobclickAgent;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
@@ -73,6 +75,7 @@ public class TimerDialog extends BaseDialogActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        MobclickAgent.onEvent(this,"Timer");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_timer);
         ButterKnife.bind(this);

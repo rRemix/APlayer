@@ -1,6 +1,5 @@
 package remix.myplayer.ui.activity;
 
-import android.app.Activity;
 import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,6 +20,7 @@ import android.widget.TextView;
 
 import com.enrique.stackblur.StackBlurManager;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 
@@ -47,7 +47,7 @@ import remix.myplayer.util.XmlUtil;
  * 实际为将手机解锁并对Activity进行处理，使其看起来像锁屏界面
  */
 
-public class LockScreenActivity extends Activity implements MusicService.Callback{
+public class LockScreenActivity extends BaseAppCompatActivity implements MusicService.Callback{
     private final static String TAG = "LockScreenActivity";
     public static LockScreenActivity mInstance;
     //当前播放的歌曲信息
@@ -93,7 +93,6 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
     private static boolean mIsPlay = false;
     //是否第一次打开
     private boolean mIsFirst = true;
-    private StackBlurManager mStackBlurManager;
     private Handler mBlurHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -120,6 +119,15 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
             }
         }
     };
+
+    @Override
+    protected void setUpTheme() {
+    }
+
+    @Override
+    protected void setStatusBar() {
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -205,13 +213,19 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
         super.onStop();
         mIsRunning = false;
     }
-    
 
     @Override
     protected void onResume() {
+        MobclickAgent.onPageStart(LockScreenActivity.class.getSimpleName());
         super.onResume();
         mIsRunning = true;
         UpdateUI(mInfo,mIsPlay);
+    }
+
+    public void onPause() {
+        MobclickAgent.onPageEnd(LockScreenActivity.class.getSimpleName());
+        super.onPause();
+        MobclickAgent.onPause(this);
     }
 
     @Override
@@ -296,7 +310,7 @@ public class LockScreenActivity extends Activity implements MusicService.Callbac
                     mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.artist_empty_bg);
 
 
-                mStackBlurManager = new StackBlurManager(mRawBitMap);
+                StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
                 mStackBlurManager.process(40);
                 mNewBitMap = mStackBlurManager.returnBlurredImage();
             }

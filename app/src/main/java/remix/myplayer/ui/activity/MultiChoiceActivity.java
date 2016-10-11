@@ -6,6 +6,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.umeng.analytics.MobclickAgent;
+
 import remix.myplayer.R;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.dialog.TimerDialog;
@@ -47,14 +49,17 @@ public class MultiChoiceActivity extends ToolbarActivity {
                         startActivity(new Intent(MultiChoiceActivity.this, TimerDialog.class));
                         break;
                     case R.id.toolbar_delete:
+                        MobclickAgent.onEvent(MultiChoiceActivity.this,"Delete");
                         if(mMultiChoice != null)
                             mMultiChoice.OnDelete();
                         break;
                     case R.id.toolbar_add_playing:
+                        MobclickAgent.onEvent(MultiChoiceActivity.this,"AddtoPlayingList");
                         if(mMultiChoice != null)
                             mMultiChoice.OnAddToPlayingList();
                         break;
                     case R.id.toolbar_add_playlist:
+                        MobclickAgent.onEvent(MultiChoiceActivity.this,"AddtoPlayList");
                         if(mMultiChoice != null)
                             mMultiChoice.OnAddToPlayList();
                         break;

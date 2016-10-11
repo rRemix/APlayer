@@ -56,6 +56,12 @@ public class PlayListFragment extends BaseFragment{
     private PlayListAdapter mAdapter;
     private MultiChoice mMultiChoice;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPageName = TAG;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

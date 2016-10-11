@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 
+import com.umeng.analytics.MobclickAgent;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
@@ -65,9 +67,13 @@ public class SplashActivity extends BaseAppCompatActivity {
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onResume() {
+        MobclickAgent.onPageStart(SplashActivity.class.getSimpleName());
+        super.onResume();
+    }
+    public void onPause() {
+        MobclickAgent.onPageEnd(SplashActivity.class.getSimpleName());
+        super.onPause();
     }
 
 }

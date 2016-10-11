@@ -10,6 +10,7 @@ import com.umeng.message.PushAgent;
 
 import remix.myplayer.R;
 import remix.myplayer.manager.ActivityManager;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -79,6 +80,9 @@ public class BaseAppCompatActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         ActivityManager.RemoveActivity(this);
+        if(this instanceof MusicService.Callback){
+            MusicService.removeCallback((MusicService.Callback) this);
+        }
     }
 
     @Override

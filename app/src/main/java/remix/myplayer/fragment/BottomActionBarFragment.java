@@ -53,6 +53,7 @@ public class BottomActionBarFragment extends BaseFragment{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mInstance = this;
+        mPageName = BottomActionBarFragment.class.getSimpleName();
     }
     @Override
     public void onDestroy() {

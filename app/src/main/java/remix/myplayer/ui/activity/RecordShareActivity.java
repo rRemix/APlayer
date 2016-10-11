@@ -18,6 +18,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.umeng.analytics.MobclickAgent;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -97,6 +99,7 @@ public class RecordShareActivity extends BaseAppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        MobclickAgent.onEvent(this,"Share");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recordshare);
@@ -135,6 +138,9 @@ public class RecordShareActivity extends BaseAppCompatActivity {
         }
     }
 
+    /**
+     * 将图片保存到本地
+     */
     class ProcessThread extends Thread{
         FileOutputStream fos = null;
         @Override
@@ -179,6 +185,15 @@ public class RecordShareActivity extends BaseAppCompatActivity {
             intent.putExtras(arg);
             startActivity(intent);
         }
+    }
+
+    public void onResume() {
+        MobclickAgent.onPageStart(RecordShareActivity.class.getSimpleName());
+        super.onResume();
+    }
+    public void onPause() {
+        MobclickAgent.onPageEnd(RecetenlyActivity.class.getSimpleName());
+        super.onPause();
     }
 
 }

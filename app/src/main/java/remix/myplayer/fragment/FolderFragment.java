@@ -32,7 +32,6 @@ import remix.myplayer.util.Global;
  * 文件夹Fragment
  */
 public class FolderFragment extends BaseFragment {
-    private static boolean mIsRunning = false;
     public static FolderFragment mInstance;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
@@ -40,6 +39,7 @@ public class FolderFragment extends BaseFragment {
     private FolderAdapter mAdapter;
     public static final String TAG = FolderFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
+
 
     @Nullable
     @Override
@@ -84,7 +84,7 @@ public class FolderFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mInstance = this;
+        mPageName = TAG;
     }
 
 
@@ -99,17 +99,7 @@ public class FolderFragment extends BaseFragment {
         super.onPause();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        mIsRunning = true;
-    }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        mIsRunning = false;
-    }
 
     @Override
     public RecyclerView.Adapter getAdapter() {

@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -100,6 +101,7 @@ public class OptionDialog extends BaseDialogActivity {
         switch (v.getId()){
             //添加到播放列表
             case R.id.popup_add:
+                MobclickAgent.onEvent(this,"AddtoPlayList");
                 Intent intentAdd = new Intent(OptionDialog.this,AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
                 ardAdd.putString("SongName",mInfo.getTitle());
@@ -112,11 +114,13 @@ public class OptionDialog extends BaseDialogActivity {
                 break;
             //设置铃声
             case R.id.popup_ring:
-                setRing(mInfo.getUrl(), (int) mInfo.getId());
+                MobclickAgent.onEvent(this,"Ring");
+                setRing(mInfo.getUrl(), mInfo.getId());
                 finish();
                 break;
             //分享
             case R.id.popup_share:
+                MobclickAgent.onEvent(this,"Share");
                 Intent intentShare = new Intent(OptionDialog.this,ShareDialog.class);
                 Bundle argShare = new Bundle();
                 argShare.putSerializable("MP3Item",mInfo);
@@ -127,6 +131,7 @@ public class OptionDialog extends BaseDialogActivity {
                 break;
             //删除
             case R.id.popup_delete:
+                MobclickAgent.onEvent(this,"Delete");
                 try {
                     String title = mIsDeletePlayList ? getString(R.string.confirm_delete_playlist) :getString(R.string.confirm_delete_song);
                     new MaterialDialog.Builder(OptionDialog.this)

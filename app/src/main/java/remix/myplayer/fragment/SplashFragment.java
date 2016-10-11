@@ -28,6 +28,7 @@ public class SplashFragment extends BaseFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mIndex = getArguments().getInt("Index");
+        mPageName = SplashFragment.class.getSimpleName();
     }
 
     @Nullable

@@ -13,6 +13,8 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.umeng.analytics.MobclickAgent;
+
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -60,6 +62,7 @@ public class SearchActivity extends ToolbarActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        MobclickAgent.onEvent(this,"Search");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
@@ -177,26 +180,13 @@ public class SearchActivity extends ToolbarActivity {
         mSearchResBlank.setVisibility(flag? View.GONE :View.VISIBLE);
     }
 
-    class ListViewListener implements AdapterView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Intent intent = new Intent(Constants.CTL_ACTION);
-            Bundle arg = new Bundle();
-            arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-            arg.putInt("Position", position);
-            intent.putExtras(arg);
-            getApplicationContext().sendBroadcast(intent);
-            if (mCursor != null && mCursor.getCount() > 0 && mCursor.moveToFirst()) {
-                {
-                    ArrayList<Integer> list = new ArrayList<>();
-                    for(int i = 0 ; i < mCursor.getCount(); i++) {
-                        mCursor.moveToPosition(i);
-                        list.add(mCursor.getInt(mIdIndex));
-                    }
-                    Global.setPlayingList(list);
-                }
-            }
-        }
+    public void onResume() {
+        MobclickAgent.onPageStart(SearchActivity.class.getSimpleName());
+        super.onResume();
+    }
+    public void onPause() {
+        MobclickAgent.onPageEnd(SearchActivity.class.getSimpleName());
+        super.onPause();
     }
 
 }

@@ -67,6 +67,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mPageName = TAG;
     }
 
     @Nullable

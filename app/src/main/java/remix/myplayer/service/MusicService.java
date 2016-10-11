@@ -113,14 +113,17 @@ public class MusicService extends BaseService {
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == Constants.UPDATE_INFORMATION) {
-                try {
-                    for (int i = 0; i < mCallBacklist.size(); i++) {
-                        if(mCallBacklist.get(i) != null)
+                for (int i = 0; i < mCallBacklist.size(); i++) {
+                    if(mCallBacklist.get(i) != null){
+                        try {
                             mCallBacklist.get(i).UpdateUI(mInfo,mIsplay);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+
                 }
+
             }
         }
     };
@@ -395,34 +398,6 @@ public class MusicService extends BaseService {
         mMediaPlayer.pause();
         //更新所有界面
         Update(Global.getOperation());
-//        new Thread(){
-//            //音量逐渐减小后暂停
-//            @Override
-//            public void run(){
-//                mIsplay = false;
-//                mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-//                mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-//                mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PAUSED,getCurrentTime()));
-//                if(mCurrentVolume <= 10){
-//                    mMediaPlayer.pause();
-//                    return;
-//                }
-//                int sleeptime = 100 / mCurrentVolume;
-//                int temp = mCurrentVolume;
-//                while(temp-- > 0){
-//                    try {
-//                        sleep(sleeptime);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
-//                            AudioManager.FLAG_PLAY_SOUND);
-//                }
-//                mMediaPlayer.pause();
-//                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume,
-//                        AudioManager.FLAG_PLAY_SOUND);
-//            }
-//        }.start();
     }
 
     /**
@@ -457,7 +432,7 @@ public class MusicService extends BaseService {
     }
 
     /**
-     * 将activity添加到回调接口
+     * 将activity添加到队列
      * @param callback
      */
     public static void addCallback(Callback callback) {
@@ -467,7 +442,16 @@ public class MusicService extends BaseService {
             }
         }
         mCallBacklist.add(callback);
+    }
 
+    /**
+     * 将callback移出队列
+     * @param callback
+     */
+    public static void removeCallback(Callback callback){
+        if(mCallBacklist != null && mCallBacklist.size() > 0){
+            mCallBacklist.remove(callback);
+        }
     }
 
     /**

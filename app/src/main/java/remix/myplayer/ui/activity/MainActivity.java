@@ -466,12 +466,12 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         if (!mIsRunning)
             return;
         mBottomBar.UpdateBottomStatus(mp3Item, isplay);
-        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
-        for (Fragment fragment : fragmentList) {
-            if (fragment instanceof SongFragment && ((SongFragment) fragment).getAdapter() != null) {
-                ((SongFragment) fragment).getAdapter().notifyDataSetChanged();
-            }
-        }
+//        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+//        for (Fragment fragment : fragmentList) {
+//            if (fragment instanceof SongFragment && ((SongFragment) fragment).getAdapter() != null) {
+//                ((SongFragment) fragment).getAdapter().notifyDataSetChanged();
+//            }
+//        }
         View headView = mNavigationView.getHeaderView(0);
         if(headView != null && mp3Item != null){
             TextView textView = (TextView) headView.findViewById(R.id.header_txt);

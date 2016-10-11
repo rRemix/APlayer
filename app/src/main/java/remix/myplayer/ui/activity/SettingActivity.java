@@ -16,6 +16,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -71,7 +72,6 @@ public class SettingActivity extends ToolbarActivity {
             mFromColorChoose = savedInstanceState.getBoolean("fromColorChoose");
         }
 
-
         mModeSwitch.setChecked(!ThemeStore.isDay());
         mModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -85,7 +85,6 @@ public class SettingActivity extends ToolbarActivity {
             }
         });
 
-
         //初始化颜色
         final int color = ThemeStore.isDay() ? ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY) : ColorUtil.getColor(R.color.purple_782899);
         ((GradientDrawable)mColorSrc.getDrawable()).setColor(color);
@@ -97,7 +96,15 @@ public class SettingActivity extends ToolbarActivity {
                 Theme.TintDrawable(view,imgDrawable,color);
             }
         });
+    }
 
+    public void onResume() {
+        MobclickAgent.onPageStart(SettingActivity.class.getSimpleName());
+        super.onResume();
+    }
+    public void onPause() {
+        MobclickAgent.onPageEnd(SettingActivity.class.getSimpleName());
+        super.onPause();
     }
 
     /**
@@ -144,6 +151,7 @@ public class SettingActivity extends ToolbarActivity {
             //通知栏底色
             case R.id.setting_notify_container:
                 try {
+                    MobclickAgent.onEvent(this,"NotifyColor");
                     new MaterialDialog.Builder(this)
                             .title("通知栏底色")
                             .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
@@ -168,10 +176,12 @@ public class SettingActivity extends ToolbarActivity {
                 break;
             //夜间模式
             case R.id.setting_mode_container:
+                MobclickAgent.onEvent(this,"NightModel");
                 mModeSwitch.setChecked(!mModeSwitch.isChecked());
                 break;
             //音效设置
             case R.id.setting_eq_container:
+                MobclickAgent.onEvent(this,"EQ");
                 Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
                 i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
                 startActivityForResult(i, 0);
@@ -186,6 +196,7 @@ public class SettingActivity extends ToolbarActivity {
                 break;
             //检查更新
             case R.id.setting_update_container:
+                MobclickAgent.onEvent(this,"CheckUpdate");
                 BmobUpdateAgent.forceUpdate(this);
         }
     }

@@ -17,6 +17,8 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.umeng.analytics.MobclickAgent;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -64,7 +66,6 @@ public class EQActivity extends ToolbarActivity {
 
     private static short mBassBoostLevel;
     private static short mVirtualizeLevel;
-    private static boolean mIsRunning;
     private static boolean mHasInitial = false;
     private Handler mHandler = new Handler(){
         @Override
@@ -148,24 +149,14 @@ public class EQActivity extends ToolbarActivity {
 
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-//        unregisterReceiver(mEQReceiver);
-    }
-
-    @Override
-    protected void onResume() {
+    public void onResume() {
+        MobclickAgent.onPageStart(EQActivity.class.getSimpleName());
         super.onResume();
-        mIsRunning = true;
     }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mIsRunning = false;
+    public void onPause() {
+        MobclickAgent.onPageEnd(EQActivity.class.getSimpleName());
+        super.onPause();
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

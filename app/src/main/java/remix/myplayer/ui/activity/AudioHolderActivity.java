@@ -32,6 +32,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.umeng.analytics.MobclickAgent;
+
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -252,6 +254,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
 
                 break;
         }
+        MobclickAgent.onEvent(this,v.getId() == R.id.playbar_prev ? "Prev" : v.getId() == R.id.playbar_next ? "Next" : "Play");
         sendBroadcast(intent);
     }
 
@@ -264,6 +267,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         switch (v.getId()){
             //设置播放模式
             case R.id.playbar_model:
+                MobclickAgent.onEvent(this,"PlayModel");
                 int currentmodel = MusicService.getPlayModel();
                 currentmodel = (currentmodel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentmodel);
                 MusicService.setPlayModel(currentmodel);
@@ -277,6 +281,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 break;
             //打开正在播放列表
             case R.id.playbar_playinglist:
+                MobclickAgent.onEvent(this,"PlayingList");
                 startActivity(new Intent(AudioHolderActivity.this,PlayingListDialog.class));
                 break;
             //关闭
@@ -330,7 +335,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
 
 
     private void initControlButton() {
-
         //初始化播放模式
         int playmodel = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
         mPlayModel.setImageDrawable(getResources().getDrawable(playmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
@@ -349,17 +353,12 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         new ProgeressThread().start();
     }
 
-
     @Override
     protected void onStop() {
         super.onStop();
         mIsRunning = false;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
 
     private void initGuide() {
         mGuideList = new ArrayList<>();
@@ -447,7 +446,8 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     }
 
     public void UpdatePlayButton(boolean isPlay) {
-        Theme.TintDrawable(mPlayBarPlay,!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,mColorDraken);
+        if(mPlayBarPlay != null)
+            Theme.TintDrawable(mPlayBarPlay,!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,mColorDraken);
     }
 
     private void initTop() {
@@ -552,11 +552,10 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         }
         //操作为播放选中歌曲时不更新背景
         //只更新按钮状态
-        else if(mIsRunning){
+        else{
             //更新按钮状态
             UpdatePlayButton(isplay);
         }
-
 
     }
 
@@ -585,6 +584,9 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         }
     }
 
+    /**
+     * 修改所有控件颜色
+     */
     private void changeColor(){
         //修改颜色
         if(mTopDetail != null && mTopTitle != null && mRawBitMap != null){
@@ -643,7 +645,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
                 mSwatch = palette.getMutedSwatch();
                 if(mSwatch == null)
                     mSwatch = new Palette.Swatch(Color.GRAY,100);
-                mColorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
+                mColorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.4f);
                 mColorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
 //                mColorDraken = ColorUtil.shiftColor(mSwatch.getRgb(),0.8f);
 //                mColorDark = mSwatch.getRgb();

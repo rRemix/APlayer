@@ -3,6 +3,8 @@ package remix.myplayer.fragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 
+import com.umeng.analytics.MobclickAgent;
+
 import butterknife.Unbinder;
 
 /**
@@ -13,6 +15,7 @@ import butterknife.Unbinder;
  */
 public class BaseFragment extends Fragment {
     protected Unbinder mUnBinder;
+    protected String mPageName = BaseFragment.class.getSimpleName();
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -20,8 +23,18 @@ public class BaseFragment extends Fragment {
             mUnBinder.unbind();
     }
 
+
     public RecyclerView.Adapter getAdapter(){
         return null;
+    }
+
+    public void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart(mPageName); //统计页面，"MainScreen"为页面名称，可自定义
+    }
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd(mPageName);
     }
     
 //    /**

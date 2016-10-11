@@ -59,6 +59,8 @@ public class Application extends android.app.Application {
         LogUtil.isDebug = true;
         //bomb
         Bmob.initialize(this, "0c070110fffa9e88a1362643fb9d4d64");
+        //禁止默认的页面统计方式
+        MobclickAgent.openActivityDurationTrack(false);
         //初始化友盟推送
         PushAgent mPushAgent = PushAgent.getInstance(this);
         //注册推送服务，每次调用register方法都会回调该接口

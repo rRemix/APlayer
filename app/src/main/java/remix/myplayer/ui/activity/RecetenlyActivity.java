@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -93,6 +94,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        MobclickAgent.onEvent(this,"RecentlyAdd");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
@@ -172,7 +174,11 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
 //        }.start();
     }
 
-
+    /**
+     * 获得歌曲id
+     * @param position
+     * @return
+     */
     private int getSongId(int position){
         int id = -1;
         if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
@@ -180,7 +186,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         }
         return id;
     }
-
 
 
     @Override
@@ -248,15 +253,16 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
 
     @Override
     protected void onResume() {
+        MobclickAgent.onPageStart(RecetenlyActivity.class.getSimpleName());
         super.onResume();
         if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
-
     }
 
     @Override
     protected void onPause() {
+        MobclickAgent.onPageEnd(RecetenlyActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);

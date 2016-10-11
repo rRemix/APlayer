@@ -59,6 +59,13 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     public static int ListModel = 2;
 
     public static final String TAG = AlbumFragment.class.getSimpleName();
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPageName = TAG;
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

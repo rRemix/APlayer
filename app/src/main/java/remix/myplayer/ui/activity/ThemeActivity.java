@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.umeng.analytics.MobclickAgent;
+
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.theme.ThemeStore;
@@ -27,14 +29,13 @@ public class ThemeActivity extends BaseAppCompatActivity implements View.OnClick
         findView(R.id.exit).setOnClickListener(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onResume() {
+        MobclickAgent.onPageStart(ThemeActivity.class.getSimpleName());
+        super.onResume();
     }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
+    public void onPause() {
+        MobclickAgent.onPageEnd(ThemeActivity.class.getSimpleName());
+        super.onPause();
     }
 
     @Override

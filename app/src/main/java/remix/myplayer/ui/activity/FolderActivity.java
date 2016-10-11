@@ -11,6 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.umeng.analytics.MobclickAgent;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
@@ -50,6 +52,7 @@ public class FolderActivity extends MultiChoiceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        MobclickAgent.onEvent(this,"Folder");
         super.onCreate(savedInstanceState);
         mInstance = this;
         initViews();
@@ -128,19 +131,21 @@ public class FolderActivity extends MultiChoiceActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        MobclickAgent.onPageStart(FolderActivity.class.getSimpleName());
+        super.onResume();
+        if(mMultiChoice.isShow()){
+            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+        }
+    }
+
     protected void onPause() {
+        MobclickAgent.onPageEnd(FolderActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(mMultiChoice.isShow()){
-            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-        }
-
-    }
 }

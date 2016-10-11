@@ -1,6 +1,9 @@
 package remix.myplayer.listener;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.media.audiofx.AudioEffect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
@@ -15,6 +18,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,7 +27,9 @@ import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.AudioHolderActivity;
+import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
@@ -86,6 +92,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
+        MobclickAgent.onEvent(mContext,item.getItemId() == R.id.menu_edit ? "SongEdit" : "SongDetail" );
         switch (item.getItemId()){
             case R.id.menu_edit:
                 MaterialDialog editDialog = new MaterialDialog.Builder(mContext)
@@ -202,6 +209,45 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
 
                 }
                 break;
+            case R.id.menu_timer:
+                mContext.startActivity(new Intent(mContext, TimerDialog.class));
+                break;
+            case R.id.menu_eq:
+                Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+                i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
+                ((Activity)mContext).startActivityForResult(i, 0);
+                break;
+            case R.id.menu_delete:
+                try {
+                    new MaterialDialog.Builder(mContext)
+                            .content(R.string.confirm_delete_song)
+                            .positiveText(R.string.confirm)
+                            .negativeText(R.string.cancel)
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    String result = "";
+                                    result = DBUtil.delete(mInfo.getId() , Constants.SONG) ?
+                                            mContext.getString(R.string.delete_success) :
+                                            mContext.getString(R.string.delete_error);
+                                    Toast.makeText(mContext,result,Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                }
+                            })
+                            .backgroundColor(ThemeStore.getBackgroundColor3())
+                            .positiveColor(ThemeStore.getTextColorPrimary())
+                            .negativeColor(ThemeStore.getTextColorPrimary())
+                            .contentColor(ThemeStore.getTextColorPrimary())
+                            .show();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                break;
+
         }
         return true;
     }

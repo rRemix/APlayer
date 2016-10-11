@@ -11,6 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+import com.umeng.analytics.MobclickAgent;
+
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -299,6 +301,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
     @Override
     protected void onPause() {
+        MobclickAgent.onPageEnd(ChildHolderActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
@@ -307,12 +310,12 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
     @Override
     protected void onResume() {
+        MobclickAgent.onPageEnd(ChildHolderActivity.class.getSimpleName());
         super.onResume();
         mIsRunning = true;
         if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
-
     }
 
     @Override

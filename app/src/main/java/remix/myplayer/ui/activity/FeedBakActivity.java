@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.umeng.analytics.MobclickAgent;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -57,5 +59,14 @@ public class FeedBakActivity extends ToolbarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         Toast.makeText(this,resultCode == Activity.RESULT_OK ? "发送成功 感谢您的反馈!" : "发送失败 请重试!",Toast.LENGTH_SHORT).show();
         finish();
+    }
+
+    public void onResume() {
+        MobclickAgent.onPageStart(FeedBakActivity.class.getSimpleName());
+        super.onResume();
+    }
+    public void onPause() {
+        MobclickAgent.onPageEnd(FeedBakActivity.class.getSimpleName());
+        super.onPause();
     }
 }
