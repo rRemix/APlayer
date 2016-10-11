@@ -72,58 +72,60 @@ public class Application extends android.app.Application {
             public void onFailure(String s, String s1) {
             }
         });
-        UmengNotificationClickHandler notificationClickHandler = new UmengNotificationClickHandler() {
-            @Override
-            public void dealWithCustomAction(Context context, UMessage msg) {
-                try {
-                    final UpdateInfo info = new UpdateInfo();
-                    JSONObject json = new JSONObject(msg.custom);
-                    JSONArray jsonlogs = json.getJSONArray("update_log");
-                    for(int i = 0; i < jsonlogs.length();i++){
-                        info.Logs.add(jsonlogs.getString(i));
-                    }
-                    info.ApkUrl = json.getString("apk_url");
-                    info.MD5 = json.getString("md5");
-                    info.VersionName = json.getString("version");
-                    info.Size = json.getString("target_size");
 
-                    if(MainActivity.mInstance == null){
-                        CommonUtil.openUrl(info.ApkUrl);
-                    } else {
-                        MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.mInstance)
-                                .title("发现新版本")
-                                .titleColor(ThemeStore.getTextColorPrimary())
-                                .backgroundColor(ThemeStore.getBackgroundColor3())
-                                .customView(R.layout.dialog_update,true)
-                                .positiveText("立即更新")
-                                .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
-                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                    @Override
-                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        CommonUtil.openUrl(info.ApkUrl);
-                                    }
-                                })
-                                .negativeText("以后再说")
-                                .negativeColor(ThemeStore.getTextColorPrimary())
-                                .build();
-                        ((TextView)(materialDialog.getCustomView().findViewById(R.id.update_version))).setText(info.VersionName);
-                        ((TextView)(materialDialog.getCustomView().findViewById(R.id.update_size))).setText(info.Size);
-                        String logs = "";
-                        for(int i = 0 ; i < info.Logs.size();i++){
-                            logs += (i + 1 + "." + info.Logs.get(i) + "\n");
-                        }
-                        ((TextView)(materialDialog.getCustomView().findViewById(R.id.update_log))).setText(logs);
-                        materialDialog.show();
-                    }
+//        UmengNotificationClickHandler notificationClickHandler = new UmengNotificationClickHandler() {
+//            @Override
+//            public void dealWithCustomAction(Context context, UMessage msg) {
+//                try {
+//                    final UpdateInfo info = new UpdateInfo();
+//                    JSONObject json = new JSONObject(msg.custom);
+//                    JSONArray jsonlogs = json.getJSONArray("update_log");
+//                    for(int i = 0; i < jsonlogs.length();i++){
+//                        info.Logs.add(jsonlogs.getString(i));
+//                    }
+//                    info.ApkUrl = json.getString("apk_url");
+//                    info.MD5 = json.getString("md5");
+//                    info.VersionName = json.getString("version");
+//                    info.Size = json.getString("target_size");
+//
+//                    if(MainActivity.mInstance == null){
+//                        CommonUtil.openUrl(info.ApkUrl);
+//                    } else {
+//                        MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.mInstance)
+//                                .title("发现新版本")
+//                                .titleColor(ThemeStore.getTextColorPrimary())
+//                                .backgroundColor(ThemeStore.getBackgroundColor3())
+//                                .customView(R.layout.dialog_update,true)
+//                                .positiveText("立即更新")
+//                                .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
+//                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+//                                    @Override
+//                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+//                                        CommonUtil.openUrl(info.ApkUrl);
+//                                    }
+//                                })
+//                                .negativeText("以后再说")
+//                                .negativeColor(ThemeStore.getTextColorPrimary())
+//                                .build();
+//                        ((TextView)(materialDialog.getCustomView().findViewById(R.id.update_version))).setText(info.VersionName);
+//                        ((TextView)(materialDialog.getCustomView().findViewById(R.id.update_size))).setText(info.Size);
+//                        String logs = "";
+//                        for(int i = 0 ; i < info.Logs.size();i++){
+//                            logs += (i + 1 + "." + info.Logs.get(i) + "\n");
+//                        }
+//                        ((TextView)(materialDialog.getCustomView().findViewById(R.id.update_log))).setText(logs);
+//                        materialDialog.show();
+//                    }
+//
+//                } catch (JSONException e) {
+//                    LogUtil.d("Application","创建更新对话框错误:" + e.toString());
+//                    Toast.makeText(context,"创建更新对话框错误:" + e.toString(),Toast.LENGTH_SHORT).show();
+//                    e.printStackTrace();
+//                }
+//            }
+//        };
+//        mPushAgent.setNotificationClickHandler(notificationClickHandler);
 
-                } catch (JSONException e) {
-                    LogUtil.d("Application","创建更新对话框错误:" + e.toString());
-                    Toast.makeText(context,"创建更新对话框错误:" + e.toString(),Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
-            }
-        };
-        mPushAgent.setNotificationClickHandler(notificationClickHandler);
         CrashHandler crashHandler = CrashHandler.getInstance();
         crashHandler.init(this);
         startService(new Intent(this, MusicService.class));

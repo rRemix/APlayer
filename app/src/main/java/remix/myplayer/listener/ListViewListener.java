@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 
-import java.util.ArrayList;
-
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 

@@ -17,7 +17,6 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.ColorUtil;
 
 /**
  * Created by taeja on 16-3-7.

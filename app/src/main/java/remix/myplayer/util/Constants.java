@@ -11,6 +11,10 @@ public class Constants {
     //应用包名
     public final static String PACKAGE_NAME = "remix.myplayer";
 
+    //显示模式 1:列表 2:网格
+    public final static int LIST_MODEL = 1;
+    public final static int GRID_MODEL = 2;
+
     //操作类型
     public final static int SONG = 0;
     public final static int ALBUM = 1;

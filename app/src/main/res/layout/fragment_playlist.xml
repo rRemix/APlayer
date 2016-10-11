@@ -30,7 +30,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="@dimen/d8_size"
+        android:layout_height="@dimen/d12_size"
         android:background="?attr/background_color_2"/>
 
     <FrameLayout

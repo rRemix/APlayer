@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root"
+    android:id="@+id/item_root"
     android:layout_width="match_parent"
     android:layout_height="198dp"
     android:paddingBottom="@dimen/d8_size"
@@ -15,7 +15,7 @@
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="123dp"
             android:layout_height="123dp"
-            android:id="@+id/recycleview_simpleiview"
+            android:id="@+id/item_simpleiview"
             android:layout_alignParentTop="true"
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImageScaleType="centerCrop"
@@ -31,14 +31,14 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/d1_size"
             android:background="?attr/background_grid_color"
-            android:layout_below="@id/recycleview_simpleiview"
+            android:layout_below="@id/item_simpleiview"
             android:layout_marginLeft="@dimen/d4_size"
             android:layout_marginRight="@dimen/d4_size"/>
 
         <ImageButton
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:id="@+id/recycleview_button"
+            android:id="@+id/item_button"
             android:src="@drawable/list_icn_more"
             android:background="@drawable/bg_common_ripple"
             android:layout_centerVertical="true"
@@ -54,7 +54,7 @@
             android:layout_marginLeft="@dimen/d8_size"
             android:layout_marginRight="@dimen/d8_size"
             android:gravity="center_vertical"
-            android:layout_toLeftOf="@id/recycleview_button"
+            android:layout_toLeftOf="@id/item_button"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/divider">
@@ -62,7 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="歌手名"
-                android:id="@+id/recycleview_text1"
+                android:id="@+id/item_text1"
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:textColor="?attr/text_color_primary"

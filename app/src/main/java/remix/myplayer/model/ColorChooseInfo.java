@@ -1,6 +1,5 @@
 package remix.myplayer.model;
 
-import android.support.annotation.ColorRes;
 import android.widget.ImageView;
 
 /**

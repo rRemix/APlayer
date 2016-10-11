@@ -30,6 +30,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.fragment.AlbumFragment;
@@ -216,6 +217,9 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             XmlUtil.addPlaylist(this,"我的收藏");
         }
         initLastSong();
+
+        BmobUpdateAgent.setUpdateOnlyWifi(false);
+        BmobUpdateAgent.update(this);
 
     }
 

@@ -20,6 +20,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -185,7 +186,7 @@ public class SettingActivity extends ToolbarActivity {
                 break;
             //检查更新
             case R.id.setting_update_container:
-//                UmengUpdateAgent.forceUpdate(SettingActivity.this);
+                BmobUpdateAgent.forceUpdate(this);
         }
     }
 

@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,13 +62,20 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return PlayListFragment.getModel();
+    }
+    @Override
     public PlayListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new PlayListHolder(LayoutInflater.from(parent.getContext()).inflate(PlayListFragment.ListModel == 1 ? R.layout.playlist_recycle_list_item : R.layout.playlist_recycle_grid_item, null, false));
+        return viewType == Constants.LIST_MODEL ?
+                new PlayListListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.playlist_recycle_list_item,parent,false)) :
+                new PlayListGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.playlist_recycle_grid_item,parent,false));
     }
 
     @Override
     public void onBindViewHolder(final PlayListHolder holder, final int position) {
         String name = "";
+        ArrayList<PlayListItem> items = new ArrayList<>();
         try {
             //根据当前索引，获得歌曲列表
             Iterator it = Global.mPlaylist.keySet().iterator();
@@ -80,7 +88,10 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
         }
         //设置播放列表名字
         holder.mName.setText(name);
-        holder.mOther.setText("111");
+        if(!TextUtils.isEmpty(name)){
+            items = Global.mPlaylist.get(name);
+        }
+        holder.mOther.setText(items != null ? items.size() + "首" : "");
         //设置背景
 //        holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.art_bg_night);
         //设置专辑封面
@@ -151,21 +162,33 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
     }
 
     public static class PlayListHolder extends BaseViewHolder {
-        @BindView(R.id.recycleview_text1)
+        @BindView(R.id.item_text1)
         public TextView mName;
-        @BindView(R.id.recycleview_text2)
+        @BindView(R.id.item_text2)
         public TextView mOther;
-        @BindView(R.id.recycleview_simpleiview)
+        @BindView(R.id.item_simpleiview)
         public SimpleDraweeView mImage;
-        @BindView(R.id.recycleview_button)
+        @BindView(R.id.item_button)
         public ImageView mButton;
         @BindView(R.id.item_container)
         public RelativeLayout mContainer;
 
-        @BindView(R.id.root)
+        @BindView(R.id.item_root)
         @Nullable
         public View mRoot;
         public PlayListHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
+    public static class PlayListListHolder extends PlayListHolder{
+        public PlayListListHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
+    public static class PlayListGridHolder extends PlayListHolder{
+        public PlayListGridHolder(View itemView) {
             super(itemView);
         }
     }

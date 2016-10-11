@@ -1,7 +1,5 @@
 package remix.myplayer.util.lrc;
 
-import android.util.Log;
-
 import org.json.JSONObject;
 
 import java.io.BufferedReader;

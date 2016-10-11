@@ -24,7 +24,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAddtoAdapter;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.XmlUtil;
 

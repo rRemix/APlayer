@@ -1,9 +1,11 @@
 package remix.myplayer.adapter;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -21,6 +23,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
@@ -32,7 +35,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.thumb.AsynLoadImage;
 
 /**
  * Created by Remix on 2015/12/20.
@@ -63,27 +65,37 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
     }
 
     @Override
-    public AlbumHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new AlbumHolder(LayoutInflater.from(parent.getContext()).inflate(AlbumFragment.ListModel == 1 ? R.layout.album_recycle_list_item : R.layout.album_recycle_grid_item, null, false));
+    public int getItemViewType(int position) {
+        return AlbumFragment.getModel();
     }
+
+    @Override
+    public AlbumHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return viewType == Constants.LIST_MODEL ?
+                new AlbumListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.album_recycle_list_item,parent,false)) :
+                new AlbumGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.album_recycle_grid_item,parent,false));
+    }
+
 
     @Override
     public void onBindViewHolder(final AlbumHolder holder, final int position) {
         if(mCursor.moveToPosition(position)) {
+
             try {
                 //获得并设置专辑与艺术家
                 String artist = CommonUtil.processInfo(mCursor.getString(AlbumFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
                 String album = CommonUtil.processInfo(mCursor.getString(AlbumFragment.mAlbumIndex),CommonUtil.ALBUMTYPE);
 
                 holder.mText1.setText(album);
-                holder.mText2.setText(AlbumFragment.ListModel == 1 ? artist : artist);
-                //设置背景
-//                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.album_bg_day : R.drawable.album_bg_night);
+                holder.mText2.setText(artist);
                 //设置封面
-                long albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
-                holder.mImage.setImageURI(Uri.EMPTY);
-                new AsynLoadImage(holder.mImage).execute((int)albumid,Constants.URL_ALBUM,true);
-//                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
+                int albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
+//                holder.mImage.setImageURI(Uri.EMPTY);
+//                new AsynLoadImage(holder.mImage).execute(albumid,Constants.URL_ALBUM,true);
+                if(holder instanceof AlbumListHolder){
+                    new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);
+                }
+                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -152,23 +164,34 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
     }
 
     public static class AlbumHolder extends BaseViewHolder {
-        @BindView(R.id.recycleview_text1)
+        @BindView(R.id.item_text1)
         public TextView mText1;
-        @BindView(R.id.recycleview_text2)
+        @BindView(R.id.item_text2)
         public TextView mText2;
-        @BindView(R.id.recycleview_button)
+        @BindView(R.id.item_button)
         public ImageButton mButton;
-        @BindView(R.id.recycleview_simpleiview)
+        @BindView(R.id.item_simpleiview)
         public SimpleDraweeView mImage;
         @BindView(R.id.item_container)
         public RelativeLayout mContainer;
-        @BindView(R.id.root)
+        @BindView(R.id.item_root)
         @Nullable
         public View mRoot;
         public AlbumHolder(View v) {
             super(v);
         }
+    }
 
+    public static class AlbumGridHolder extends AlbumHolder {
+        public AlbumGridHolder(View v) {
+            super(v);
+        }
+    }
+
+    public static class AlbumListHolder extends AlbumHolder {
+        public AlbumListHolder(View v) {
+            super(v);
+        }
     }
 
 }

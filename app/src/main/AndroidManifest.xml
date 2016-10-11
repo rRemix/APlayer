@@ -14,6 +14,9 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <uses-permission android:name="android.permission.GET_TASKS" />
+    <!--推送所需的权限-->
+    <uses-permission android:name="android.permission.RECEIVE_USER_PRESENT" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 
     <application
@@ -29,7 +32,7 @@
         <meta-data android:name="UMENG_CHANNEL" android:value="${CHANNEL_VALUE}"/>
 
         <!--bombupdate-->
-        <meta-data  android:name="BMOB_CHANNEL" android:value="${CHANNEL_VALUE}"/>
+        <meta-data  android:name="BMOB_CHANNEL" android:value="bmob"/>
 
         <!--闪屏页-->
         <activity android:name=".ui.activity.SplashActivity"
@@ -133,7 +136,6 @@
             android:name="cn.bmob.v3.update.UpdateDialogActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
-
 
         <!--微信-->
         <activity

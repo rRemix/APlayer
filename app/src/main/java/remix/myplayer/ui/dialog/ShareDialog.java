@@ -40,8 +40,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.ui.activity.RecordShareActivity;
 import remix.myplayer.model.MP3Item;
+import remix.myplayer.ui.activity.RecordShareActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DBUtil;
 

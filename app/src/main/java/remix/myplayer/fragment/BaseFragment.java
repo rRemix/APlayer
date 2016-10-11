@@ -1,13 +1,9 @@
 package remix.myplayer.fragment;
 
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 
 import butterknife.Unbinder;
-import remix.myplayer.ui.MultiChoice;
 
 /**
  * @ClassName
@@ -27,7 +23,7 @@ public class BaseFragment extends Fragment {
     public RecyclerView.Adapter getAdapter(){
         return null;
     }
-
+    
 //    /**
 //     *
 //     * @param multiChoice

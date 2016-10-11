@@ -8,7 +8,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import remix.myplayer.R;
-import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.dialog.TimerDialog;
 
 

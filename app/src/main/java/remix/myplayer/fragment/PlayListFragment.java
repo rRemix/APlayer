@@ -78,7 +78,6 @@ public class PlayListFragment extends BaseFragment{
                         return;
                     }
                     Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
-                    intent.putExtra("Test",true);
                     intent.putExtra("Id", position);
                     intent.putExtra("Title", name);
                     intent.putExtra("Type", Constants.PLAYLIST);
@@ -96,12 +95,16 @@ public class PlayListFragment extends BaseFragment{
         mRecycleView.setAdapter(mAdapter);
 
         mListModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list2));
-        mListModelBtn.setSelected(ListModel == 1);
+        mListModelBtn.setSelected(ListModel == Constants.LIST_MODEL);
 
         mGridModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list1));
-        mGridModelBtn.setSelected(ListModel == 2);
+        mGridModelBtn.setSelected(ListModel == Constants.GRID_MODEL);
 
         return rootView;
+    }
+
+    public static synchronized int getModel(){
+        return ListModel;
     }
 
     //打开添加播放列表的Dialog
@@ -141,13 +144,14 @@ public class PlayListFragment extends BaseFragment{
                 break;
             case R.id.list_model:
             case R.id.grid_model:
+                int newModel = v.getId() == R.id.list_model ? Constants.LIST_MODEL : Constants.GRID_MODEL;
+                if(newModel == ListModel)
+                    return;
                 mListModelBtn.setSelected(v.getId() == R.id.list_model);
                 mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
-                ListModel = v.getId() == R.id.list_model ? 1 : 2;
-                mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+                ListModel = newModel;
+                mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
                 SPUtil.putValue(getActivity(),"Setting","PlayListModel",ListModel);
-                if(mAdapter != null)
-                    mAdapter.notifyDataSetChanged();
                 break;
 
         }

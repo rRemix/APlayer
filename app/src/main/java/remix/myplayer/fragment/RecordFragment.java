@@ -3,7 +3,6 @@ package remix.myplayer.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -15,8 +14,8 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.ui.activity.RecordShareActivity;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.ui.activity.RecordShareActivity;
 
 /**
  * Created by Remix on 2015/12/28.

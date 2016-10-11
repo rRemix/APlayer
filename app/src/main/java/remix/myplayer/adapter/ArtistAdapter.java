@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -12,7 +13,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -20,10 +20,10 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
-import remix.myplayer.BuildConfig;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.fragment.AlbumFragment;
+import remix.myplayer.asynctask.AsynLoadImage;
+import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
@@ -35,7 +35,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.thumb.AsynLoadImage;
 
 /**
  * Created by Remix on 2015/12/22.
@@ -66,8 +65,14 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return ArtistFragment.getModel();
+    }
+    @Override
     public ArtistHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ArtistHolder(LayoutInflater.from(parent.getContext()).inflate(ArtistFragment.ListModel == 1 ? R.layout.artist_recycle_list_item : R.layout.artist_recycle_grid_item, null, false));
+        return viewType == Constants.LIST_MODEL ?
+                new ArtistListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.artist_recycle_list_item,parent,false)) :
+                new ArtistGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.artist_recycle_grid_item,parent,false));
     }
 
     @Override
@@ -77,11 +82,13 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 //设置歌手名
                 String artist = CommonUtil.processInfo(mCursor.getString(ArtistFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
                 holder.mText1.setText(artist);
-                //设置背景
-//                holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.art_bg_night);
+                int artistId = mCursor.getInt(ArtistFragment.mArtistIdIndex);
+                if(holder instanceof ArtistListHolder){
+                    new AsynLoadSongNum(holder.mText2,Constants.ARTIST).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId);
+                }
                 //设置封面
                 holder.mImage.setImageURI(Uri.EMPTY);
-                new AsynLoadImage(holder.mImage).execute(mCursor.getInt(ArtistFragment.mArtistIdIndex),Constants.URL_ARTIST,true);
+                new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId,Constants.URL_ARTIST,true);
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -150,18 +157,33 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
     }
 
     public static class ArtistHolder extends BaseViewHolder {
-        @BindView(R.id.recycleview_text1)
+        @BindView(R.id.item_text1)
         public TextView mText1;
-        @BindView(R.id.recycleview_simpleiview)
+        @BindView(R.id.item_text2)
+        @Nullable
+        public TextView mText2;
+        @BindView(R.id.item_simpleiview)
         public SimpleDraweeView mImage;
-        @BindView(R.id.recycleview_button)
+        @BindView(R.id.item_button)
         public ImageButton mButton;
         @BindView(R.id.item_container)
         public RelativeLayout mContainer;
-        @BindView(R.id.root)
+        @BindView(R.id.item_root)
         @Nullable
         public View mRoot;
         public ArtistHolder(View v) {
+            super(v);
+        }
+    }
+
+    public static class ArtistListHolder extends ArtistHolder{
+        public ArtistListHolder(View v) {
+            super(v);
+        }
+    }
+
+    public static class ArtistGridHolder extends ArtistHolder{
+        public ArtistGridHolder(View v) {
             super(v);
         }
     }

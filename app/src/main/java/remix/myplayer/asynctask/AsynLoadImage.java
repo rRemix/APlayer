@@ -1,18 +1,9 @@
-package remix.myplayer.util.thumb;
+package remix.myplayer.asynctask;
 
-import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.controller.ControllerListener;
-import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.common.ImageDecodeOptions;
-import com.facebook.imagepipeline.image.ImageInfo;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import remix.myplayer.util.DBUtil;
 

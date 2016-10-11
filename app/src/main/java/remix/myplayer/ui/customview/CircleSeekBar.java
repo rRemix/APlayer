@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.AbsSeekBar;
-import android.widget.SeekBar;
 
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;

@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import remix.myplayer.ui.activity.LockScreenActivity;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.ui.activity.LockScreenActivity;
 
 /**
  * Created by taeja on 16-3-11.

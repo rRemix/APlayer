@@ -3,9 +3,6 @@ package remix.myplayer.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -28,13 +25,9 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.AlbumAdater;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.Theme;
-import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.GridItemDecoration;
-import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 
@@ -106,7 +99,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
                         intent.putExtra("Id", albumid);
                         intent.putExtra("Title", title);
                         intent.putExtra("Type", Constants.ALBUM);
-//                        startActivity(intent);
+                        startActivity(intent);
                         }
                     }
                 }
@@ -123,10 +116,10 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         mRecycleView.setAdapter(mAdapter);
 
         mListModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list2));
-        mListModelBtn.setSelected(ListModel == 1);
+        mListModelBtn.setSelected(ListModel == Constants.LIST_MODEL);
 
         mGridModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list1));
-        mGridModelBtn.setSelected(ListModel == 2);
+        mGridModelBtn.setSelected(ListModel == Constants.GRID_MODEL);
         return rootView;
     }
 
@@ -138,18 +131,23 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         return albumId;
     }
 
+    public static synchronized int getModel(){
+        return ListModel;
+    }
+
     @OnClick({R.id.list_model,R.id.grid_model})
     public void onSwitch(View v){
+        int newModel = v.getId() == R.id.list_model ? Constants.LIST_MODEL : Constants.GRID_MODEL;
+        if(newModel == ListModel)
+            return;
         mListModelBtn.setSelected(v.getId() == R.id.list_model);
         mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
-        ListModel = v.getId() == R.id.list_model ? 1 : 2;
-        mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+        ListModel = newModel;
+        mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
 //        mRecycleView.addItemDecoration(ListModel == 1 ?
 //                new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST) :
 //                new GridItemDecoration(getActivity(),12, Color.rgb(0xef,0xef,0xef)));
         SPUtil.putValue(getActivity(),"Setting","AlbumModel",ListModel);
-        if(mAdapter != null)
-            mAdapter.notifyDataSetChanged();
     }
 
     @Override
