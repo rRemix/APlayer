@@ -7,7 +7,8 @@ import android.test.InstrumentationTestCase;
  */
 public class TestClass extends InstrumentationTestCase {
     public void testwidth_height() {
-//        ImageUtil.getInstance().getImageOption();
+
+
     }
 
 }

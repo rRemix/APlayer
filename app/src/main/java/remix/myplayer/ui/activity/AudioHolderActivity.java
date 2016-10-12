@@ -631,6 +631,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         }
     }
 
+
     //高斯模糊线程
     class BitmapThread extends Thread{
         @Override

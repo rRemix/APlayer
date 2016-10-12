@@ -1,5 +1,8 @@
 package remix.myplayer;
 
+import android.net.Uri;
+import android.provider.MediaStore;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,6 +13,10 @@ import static org.junit.Assert.assertEquals;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri uri1 = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
+        Uri uri2 = MediaStore.Audio.Artists.getContentUri(MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS);
     }
+
+
 }

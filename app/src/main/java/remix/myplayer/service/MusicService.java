@@ -10,6 +10,7 @@ import android.media.AudioManager;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaPlayer;
+import android.media.audiofx.AudioEffect;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -285,7 +286,11 @@ public class MusicService extends BaseService {
         mMediaExtractor = new MediaExtractor();
 
         //初始化音效设置
-        EQActivity.Init();
+        Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+        i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
+        if(CommonUtil.isIntentAvailable(this,i)){
+            EQActivity.Init();
+        }
     }
 
     public static void initDataSource(MP3Item item,int pos){

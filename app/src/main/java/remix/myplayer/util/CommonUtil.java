@@ -2,6 +2,8 @@ package remix.myplayer.util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -24,6 +26,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import remix.myplayer.R;
@@ -278,6 +281,19 @@ public class CommonUtil {
             else
                 return minute + ":" + second;
         }
+    }
+
+    /**
+     * 检测 响应某个意图的Activity 是否存在
+     * @param context
+     * @param intent
+     * @return
+     */
+    public static boolean isIntentAvailable(Context context, Intent intent) {
+        final PackageManager packageManager = context.getPackageManager();
+        List<ResolveInfo> list = packageManager.queryIntentActivities(intent,
+                PackageManager.MATCH_DEFAULT_ONLY);
+        return list != null && list.size() > 0;
     }
 
     /**

@@ -33,6 +33,7 @@ import butterknife.ButterKnife;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
+import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;

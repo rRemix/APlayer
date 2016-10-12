@@ -29,6 +29,7 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.AudioHolderActivity;
+import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -213,9 +214,14 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 mContext.startActivity(new Intent(mContext, TimerDialog.class));
                 break;
             case R.id.menu_eq:
-                Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-                i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
-                ((Activity)mContext).startActivityForResult(i, 0);
+                MobclickAgent.onEvent(mContext,"EQ");
+                Intent audioEffectIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+                audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
+                if(CommonUtil.isIntentAvailable(mContext,audioEffectIntent)){
+                    ((Activity)mContext).startActivityForResult(audioEffectIntent, 0);
+                } else {
+                    mContext.startActivity(new Intent(mContext,EQActivity.class));
+                }
                 break;
             case R.id.menu_delete:
                 try {

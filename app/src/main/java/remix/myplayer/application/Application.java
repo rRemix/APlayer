@@ -2,6 +2,8 @@ package remix.myplayer.application;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +26,7 @@ import org.json.JSONObject;
 
 import cn.bmob.v3.Bmob;
 import remix.myplayer.R;
+import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.model.UpdateInfo;
 import remix.myplayer.service.MusicService;
@@ -53,6 +56,9 @@ public class Application extends android.app.Application {
 
     @Override
     public void onCreate() {
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri uri1 = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
+        Uri uri2 = MediaStore.Audio.Artists.getContentUri(MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS);
         super.onCreate();
         mContext = getApplicationContext();
         //日志
@@ -140,6 +146,13 @@ public class Application extends android.app.Application {
         MobclickAgent.setDebugMode(true);
         initUtil();
         loadSong();
+
+        try {
+            Object o = new DBOpenHelper(this).getWritableDatabase();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     /**

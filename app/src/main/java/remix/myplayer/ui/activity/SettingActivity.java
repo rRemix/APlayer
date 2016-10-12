@@ -28,6 +28,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.ColorChooseDialog;
 import remix.myplayer.util.ColorUtil;
+import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 
@@ -181,10 +182,15 @@ public class SettingActivity extends ToolbarActivity {
                 break;
             //音效设置
             case R.id.setting_eq_container:
+
                 MobclickAgent.onEvent(this,"EQ");
-                Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-                i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
-                startActivityForResult(i, 0);
+                Intent audioEffectIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+                audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
+                if(CommonUtil.isIntentAvailable(this,audioEffectIntent)){
+                    startActivityForResult(audioEffectIntent, 0);
+                } else {
+                    startActivity(new Intent(this,EQActivity.class));
+                }
                 break;
             //意见与反馈
             case R.id.setting_feedback_container:

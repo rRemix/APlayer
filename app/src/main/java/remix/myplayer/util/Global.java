@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.model.PlayListItem;
 
 /**
@@ -109,5 +110,7 @@ public class Global {
         mPlayingList = songIdlist;
         XmlUtil.updatePlayingList();
     }
+
+
 
 }
