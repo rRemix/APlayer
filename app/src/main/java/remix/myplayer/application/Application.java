@@ -2,14 +2,7 @@ package remix.myplayer.application;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.common.internal.Supplier;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
@@ -17,22 +10,11 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
-import com.umeng.message.UmengNotificationClickHandler;
-import com.umeng.message.entity.UMessage;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import cn.bmob.v3.Bmob;
-import remix.myplayer.R;
-import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.LockScreenListener;
-import remix.myplayer.model.UpdateInfo;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
-import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.CrashHandler;
@@ -56,9 +38,7 @@ public class Application extends android.app.Application {
 
     @Override
     public void onCreate() {
-        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Uri uri1 = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
-        Uri uri2 = MediaStore.Audio.Artists.getContentUri(MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS);
+
         super.onCreate();
         mContext = getApplicationContext();
         //日志
@@ -146,12 +126,6 @@ public class Application extends android.app.Application {
         MobclickAgent.setDebugMode(true);
         initUtil();
         loadSong();
-
-        try {
-            Object o = new DBOpenHelper(this).getWritableDatabase();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
 
     }
 

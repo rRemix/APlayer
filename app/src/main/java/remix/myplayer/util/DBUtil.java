@@ -516,7 +516,7 @@ public class DBUtil {
         Cursor genreCursor = null;
         Genre genre = new Genre();
         try {
-            genreCursor = mContext.getContentResolver().query(MediaStore.Audio.Genres.getContentUriForAudioId("external",(int)audioId),
+            genreCursor = mContext.getContentResolver().query(MediaStore.Audio.Genres.getContentUriForAudioId("external",audioId),
                     null,null,null,null);
             if(genreCursor != null && genreCursor.getCount() > 0 && genreCursor.moveToFirst()){
                 genre.GenreID = genreCursor.getInt(genreCursor.getColumnIndex(MediaStore.Audio.Genres._ID));

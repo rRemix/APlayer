@@ -196,6 +196,10 @@
         <service android:name=".service.MusicService"/>
         <service android:name=".service.TimerService"/>
 
+        <provider
+            android:authorities="remix.myplayer"
+            android:name=".db.DBContentProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>

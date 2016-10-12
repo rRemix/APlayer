@@ -1,6 +1,7 @@
 package remix.myplayer.observer;
 
 import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Handler;
 
 import remix.myplayer.util.Constants;
@@ -22,6 +23,11 @@ public class MediaStoreObserver extends ContentObserver {
     public MediaStoreObserver(Handler handler) {
         super(handler);
         mHandler = handler;
+    }
+
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
+        super.onChange(selfChange, uri);
     }
 
     @Override
@@ -90,4 +96,8 @@ public class MediaStoreObserver extends ContentObserver {
         }
     }
 
+    @Override
+    public boolean deliverSelfNotifications() {
+        return true;
+    }
 }

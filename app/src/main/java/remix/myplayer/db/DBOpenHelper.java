@@ -16,8 +16,6 @@ import remix.myplayer.util.LogUtil;
  */
 public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String DBNAME = "playlist.db";
-    public static final String TABLE_PLAY_LIST = "play_list";
-    public static final String TABLE_PLAY_LIST_SONG = "play_list_song";
     public static final int VERSION = 1;
     public static final String CREATE_TABLE_PLAY_LIST =
             "create table if not exists play_list(" +
@@ -27,6 +25,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String CREATE_TABLE_PLAY_LIST_SONG =
             "create table if not exists play_list_song(" +
                     "_id integer primary key," +
+                    "audio_id integer," +
                     "play_list_id integer," +
                     "title text," +
                     "album text," +

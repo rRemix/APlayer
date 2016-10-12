@@ -5,6 +5,7 @@ import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,14 +27,13 @@ import com.facebook.imagepipeline.core.ImagePipeline;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
-import remix.myplayer.db.DBOpenHelper;
+import remix.myplayer.db.DBContentProvider;
+import remix.myplayer.db.PlayLists;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
@@ -219,9 +219,37 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         }
         initLastSong();
 
-        BmobUpdateAgent.setUpdateOnlyWifi(false);
-        BmobUpdateAgent.update(this);
+//        BmobUpdateAgent.setUpdateOnlyWifi(false);
+//        BmobUpdateAgent.update(this);
 
+        DBContentProvider provider = new DBContentProvider(this);
+//        try {
+//            ContentValues cv = new ContentValues();
+//            cv.put(PlayLists.PlayListColumns.NAME,"我的收藏");
+//            cv.put(PlayLists.PlayListColumns.COUNT,0);
+//
+//            ContentValues cv1 = new ContentValues();
+//            cv1.put(PlayLists.PlayListColumns.NAME,"播放队列");
+//            cv1.put(PlayLists.PlayListColumns.COUNT,0);
+//            provider.insert(PlayLists.MULTIPLE,cv);
+//            provider.insert(PlayLists.MULTIPLE,cv1);
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        }
+        try {
+            Cursor cursor = provider.query(PlayLists.MULTIPLE,null,null,null,null);
+            if(cursor != null && cursor.getCount() > 0){
+                while (cursor.moveToNext()) {
+                    for (int i = 0; i < cursor.getColumnCount(); i++) {
+                        String name = cursor.getColumnName(i);
+                        String value = cursor.getString(i);
+                        LogUtil.d("DBTest", "name:" + name + " value:" + value);
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
