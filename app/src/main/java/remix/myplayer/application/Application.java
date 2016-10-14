@@ -15,15 +15,17 @@ import cn.bmob.v3.Bmob;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.CrashHandler;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.PermissionUtil;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -136,12 +138,13 @@ public class Application extends android.app.Application {
         new Thread() {
             @Override
             public void run() {
+
                 //读取sd卡歌曲id
-                Global.mAllSongList = DBUtil.getAllSongsId();
+                Global.mAllSongList = MediaStoreUtil.getAllSongsId();
                 //读取正在播放列表
-                Global.mPlayingList = XmlUtil.getPlayingList();
-                Global.setPlayingList(Global.mPlayingList == null || Global.mPlayingList.size() == 0 ?
-                                        Global.mAllSongList : Global.mPlayingList);
+                Global.mPlayQueue = XmlUtil.getPlayQueue();
+                Global.setPlayQueue(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0 ?
+                                        Global.mAllSongList : Global.mPlayQueue);
                 //读取播放列表
                 Global.mPlaylist = XmlUtil.getPlayList("playlist.xml");
             }
@@ -152,7 +155,7 @@ public class Application extends android.app.Application {
         //初始化工具类
         PermissionUtil.setContext(mContext);
         XmlUtil.setContext(mContext);
-        DBUtil.setContext(mContext);
+        MediaStoreUtil.setContext(mContext);
         CommonUtil.setContext(mContext);
         ErrUtil.setContext(mContext);
         DiskCache.init(mContext);

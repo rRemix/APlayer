@@ -27,12 +27,9 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                     "_id integer primary key," +
                     "audio_id integer," +
                     "play_list_id integer," +
-                    "title text," +
-                    "album text," +
-                    "artist text," +
-                    "album_id integer," +
-                    "artist_id integer," +
-                    "url text)";
+                    "play_list_name text," +
+                    "_data text)";
+
     public static final String CREATE_TRIGGER_DELETE_PLAY_LIST =
             "create trigger play_list_delete_trigger " +
                     "after delete on play_list " +

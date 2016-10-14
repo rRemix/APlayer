@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.os.Handler;
 
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.XmlUtil;
@@ -34,7 +34,7 @@ public class MediaStoreObserver extends ContentObserver {
     public void onChange(boolean selfChange) {
         LogUtil.d("ThreadId","id in observer: " + Thread.currentThread().getId());
         if(!selfChange){
-            Global.mAllSongList = DBUtil.getAllSongsId();
+            Global.mAllSongList = MediaStoreUtil.getAllSongsId();
 
             mHandler.sendEmptyMessage(Constants.UPDATE_FOLDER);
             //检查正在播放列表中是否有歌曲删除
@@ -43,16 +43,16 @@ public class MediaStoreObserver extends ContentObserver {
                 public void run() {
                     try {
                         boolean needupdate = false;
-                        if(Global.mPlayingList != null){
-//                            for(int i = Global.mPlayingList.size() - 1; i >= 0 ; i--){
-//                                MP3Item temp = DBUtil.getMP3InfoById(Global.mPlayingList.get(i));
+                        if(Global.mPlayQueue != null){
+//                            for(int i = Global.mPlayQueue.size() - 1; i >= 0 ; i--){
+//                                MP3Item temp = MediaStoreUtil.getMP3InfoById(Global.mPlayQueue.get(i));
 //                                if(temp == null) {
-//                                    Global.mPlayingList.remove(i);
+//                                    Global.mPlayQueue.remove(i);
 //                                    needupdate = true;
 //                                }
 //                            }
                             if(needupdate){
-                                XmlUtil.updatePlayingList();
+                                XmlUtil.updatePlayQueue();
                                 mHandler.sendEmptyMessage(Constants.UPDATE_PLAYINGLIST);
                             }
                         }
@@ -75,7 +75,7 @@ public class MediaStoreObserver extends ContentObserver {
 //                            list = PlayListActivity.getPlayList().get(it.next());
 //                            if(list != null){
 //                                for(int i = list.size() - 1 ; i >= 0  ; i--){
-//                                    MP3Item temp = DBUtil.getMP3InfoById(list.get(i).getId());
+//                                    MP3Item temp = MediaStoreUtil.getMP3InfoById(list.get(i).getId());
 //                                    if(temp == null || temp.equals(new MP3Item())){
 //                                        list.remove(i);
 //                                        needupdate = true;

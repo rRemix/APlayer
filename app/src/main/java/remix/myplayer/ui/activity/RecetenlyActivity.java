@@ -34,7 +34,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 
 /**
@@ -142,7 +142,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    Global.setPlayingList(mIdList);
+                    Global.setPlayQueue(mIdList);
                     sendBroadcast(intent);
                 }
             }
@@ -168,7 +168,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
 //            @Override
 //            public void run() {
 //                mRefreshHandler.sendEmptyMessage(START);
-//                mInfoList = DBUtil.getMP3ListByIds(Global.mWeekList);
+//                mInfoList = MediaStoreUtil.getMP3ListByIds(Global.mWeekList);
 //                mRefreshHandler.sendEmptyMessage(END);
 //            }
 //        }.start();
@@ -206,7 +206,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control", Constants.NEXT);
-        Global.setPlayingList(mIdList);
+        Global.setPlayQueue(mIdList);
         sendBroadcast(intent);
     }
 
@@ -241,7 +241,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
             return;
         //查询完毕后保存结果，并设置查询索引
         mCursor = data;
-        mIdList = DBUtil.getSongIdListByCursor(mCursor);
+        mIdList = MediaStoreUtil.getSongIdListByCursor(mCursor);
         mAdapter.setCursor(mCursor);
     }
 

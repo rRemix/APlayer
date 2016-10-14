@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.model.PlayListItem;
 
 /**
@@ -47,7 +46,7 @@ public class Global {
     /**
      * 正在播放歌曲id
      */
-    public static ArrayList<Integer> mPlayingList = new ArrayList<>();
+    public static ArrayList<Integer> mPlayQueue = new ArrayList<>();
     /**
      * 文件夹名与对应的所有歌曲id
      */
@@ -90,9 +89,9 @@ public class Global {
      * 设置正在播放列表
      * @param list
      */
-    public static void setPlayingList(ArrayList<Integer> list) {
-        mPlayingList = (ArrayList<Integer>) list.clone();
-        XmlUtil.updatePlayingList();
+    public static void setPlayQueue(ArrayList<Integer> list) {
+        mPlayQueue = (ArrayList<Integer>) list.clone();
+        XmlUtil.updatePlayQueue();
     }
 
 
@@ -100,15 +99,15 @@ public class Global {
      * 添加歌曲到正在播放列表
      * @param list
      */
-    public static void AddSongToPlayingList(ArrayList<Integer> list) {
+    public static void AddSongToPlayQueue(ArrayList<Integer> list) {
         ArrayList<Integer> songIdlist = new ArrayList<>();
         for (Integer id : list){
-            if(!mPlayingList.contains(id))
+            if(!mPlayQueue.contains(id))
                 songIdlist.add(id);
         }
-        mPlayingList.clear();
-        mPlayingList = songIdlist;
-        XmlUtil.updatePlayingList();
+        mPlayQueue.clear();
+        mPlayQueue = songIdlist;
+        XmlUtil.updatePlayQueue();
     }
 
 

@@ -43,7 +43,7 @@ import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.ui.activity.RecordShareActivity;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * Created by Remix on 2015/12/9.
@@ -170,7 +170,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     //分享歌曲到qq
     private void shareSongtoQQ() {
         Bundle bundle = new Bundle();
-        String album_url = DBUtil.getAlbumUrlByAlbumId(mInfo.getAlbumId());
+        String album_url = MediaStoreUtil.getAlbumUrlByAlbumId(mInfo.getAlbumId());
         bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
         bundle.putString(QQShare.SHARE_TO_QQ_TITLE, mInfo.getTitle());
         bundle.putString(QQShare.SHARE_TO_QQ_SUMMARY, mInfo.getArtist());

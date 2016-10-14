@@ -33,7 +33,7 @@ import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * @ClassName AudioPopupListener
@@ -123,16 +123,16 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                 int updateGenreRow = -1;
                                 try {
                                     //更新歌曲等信息
-                                    updateRow = DBUtil.updateMP3Info(mInfo.getId(),title,artist,album,year);
+                                    updateRow = MediaStoreUtil.updateMP3Info(mInfo.getId(),title,artist,album,year);
                                     //更新流派信息
                                     //先判断是否存在该流派，如果不存在先新建该流派，再建立歌曲与流派的映射
                                     if(mGenreInfo.GenreID > 0){
-                                        updateGenreRow = DBUtil.updateGenre(mGenreInfo.GenreID,genre);
+                                        updateGenreRow = MediaStoreUtil.updateGenre(mGenreInfo.GenreID,genre);
                                     }
                                     else {
-                                        long genreId = DBUtil.insertGenre(genre);
+                                        long genreId = MediaStoreUtil.insertGenre(genre);
                                         if(genreId != -1){
-                                            updateGenreRow = DBUtil.insearGenreMap(mInfo.getId(),(int)genreId) ? 1 : -1;
+                                            updateGenreRow = MediaStoreUtil.insertGenreMap(mInfo.getId(),(int)genreId) ? 1 : -1;
                                         }
                                     }
                                 }catch (Exception e){
@@ -173,7 +173,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         mYearLayout.setHintTextAppearance(Theme.getTheme(true));
                         mYearLayout.getEditText().setText(mInfo.getYear() + "");
                     }
-                    mGenreInfo = DBUtil.getGenre(mInfo.getId());
+                    mGenreInfo = MediaStoreUtil.getGenre(mInfo.getId());
                     if(mGenreLayout.getEditText() != null){
                         mGenreLayout.setHintTextAppearance(Theme.getTheme(true));
                         mGenreLayout.getEditText().setText(mGenreInfo.GenreName);
@@ -233,7 +233,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                     String result = "";
-                                    result = DBUtil.delete(mInfo.getId() , Constants.SONG) ?
+                                    result = MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) ?
                                             mContext.getString(R.string.delete_success) :
                                             mContext.getString(R.string.delete_error);
                                     Toast.makeText(mContext,result,Toast.LENGTH_SHORT).show();

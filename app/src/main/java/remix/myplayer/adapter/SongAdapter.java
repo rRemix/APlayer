@@ -33,7 +33,7 @@ import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * 全部歌曲和最近添加页面所用adapter
@@ -126,7 +126,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             //封面
 //            holder.mImage.setImageURI(Uri.EMPTY);
 //            new AsynLoadImage(holder.mImage).execute((int)temp.getAlbumId(),Constants.URL_ALBUM);
-//            String urlPath = DBUtil.getImageUrl(temp.getAlbumId() + "", Constants.URL_ALBUM);
+//            String urlPath = MediaStoreUtil.getImageUrl(temp.getAlbumId() + "", Constants.URL_ALBUM);
 //            if(!TextUtils.isEmpty(urlPath)){
 //                DraweeController controller = Fresco.newDraweeControllerBuilder()
 //                        .setUri(Uri.fromFile(new File(urlPath)))
@@ -211,7 +211,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         }
         @Override
         protected String doInBackground(Object... params) {
-            return DBUtil.getImageUrl(params[0].toString(), (int)params[1]);
+            return MediaStoreUtil.getImageUrl(params[0].toString(), (int)params[1]);
         }
         @Override
         protected void onPostExecute(String url) {

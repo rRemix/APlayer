@@ -2,9 +2,14 @@ package remix.myplayer.fragment;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,9 +44,12 @@ import remix.myplayer.util.XmlUtil;
  * @Author Xiaoborui
  * @Date 2016/10/8 09:46
  */
-public class PlayListFragment extends BaseFragment{
+public class PlayListFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>{
     public static final String TAG = PlayListFragment.class.getSimpleName();
     public static PlayListFragment mInstance = null;
+    public static int mPlayListIDIndex;
+    public static int mPlayListNameIndex;
+    private Cursor mCursor;
     @BindView(R.id.playlist_recycleview)
     RecyclerView mRecycleView;
 
@@ -77,6 +85,7 @@ public class PlayListFragment extends BaseFragment{
         mAdapter.setOnItemClickLitener(new PlayListAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(View view, int position) {
+                mAdapter.notifyDataSetChanged();
                 String name = CommonUtil.getMapkeyByPosition(Global.mPlaylist,position);
                 if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
                     if(Global.mPlaylist.get(name).size() == 0) {
@@ -172,5 +181,38 @@ public class PlayListFragment extends BaseFragment{
         if(mAdapter != null){
             mAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(), MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                new String[]{MediaStore.Audio.Playlists.NAME,MediaStore.Audio.Playlists._ID},null,null,null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+//        if(data == null)
+//            return;
+//        //查询完毕后保存结果，并设置查询索引
+//        try {
+//            mCursor = data;
+//            mPlayListIDIndex = data.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+//            mAdapter.setCursor(data);
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+//        if (mAdapter != null)
+//            mAdapter.setCursor(null);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+//        if(mCursor != null)
+//            mCursor.close();
     }
 }

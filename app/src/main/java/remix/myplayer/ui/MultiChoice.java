@@ -23,7 +23,7 @@ import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.XmlUtil;
 
@@ -90,9 +90,9 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.FOLDER:
             case Constants.PLAYLIST:
                 for(Object arg : mSelectedArg){
-                    ArrayList<Integer> tempList = DBUtil.getSongIdListByArg(arg,TYPE);
+                    ArrayList<Integer> tempList = MediaStoreUtil.getSongIdListByArg(arg,TYPE);
                     if(tempList != null && tempList.size() > 0)
-                        idList.addAll(DBUtil.getSongIdListByArg(arg,TYPE));
+                        idList.addAll(MediaStoreUtil.getSongIdListByArg(arg,TYPE));
                 }
                 break;
         }
@@ -117,9 +117,9 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.FOLDER:
             case Constants.PLAYLIST:
                 for(Object arg : mSelectedArg){
-                    ArrayList<Integer> tempList = DBUtil.getSongIdListByArg(arg,TYPE);
+                    ArrayList<Integer> tempList = MediaStoreUtil.getSongIdListByArg(arg,TYPE);
                     if(tempList != null && tempList.size() > 0)
-                        idList.addAll(DBUtil.getSongIdListByArg(arg,TYPE));
+                        idList.addAll(MediaStoreUtil.getSongIdListByArg(arg,TYPE));
                 }
                 break;
         }
@@ -139,7 +139,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                     @Override
                     public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                         final int num;
-                        num = XmlUtil.addSongsToPlayList(text.toString(),DBUtil.getPlayListItemListByIds(idList));
+                        num = XmlUtil.addSongsToPlayList(text.toString(), MediaStoreUtil.getPlayListItemListByIds(idList));
                         Toast.makeText(mContext, mContext.getString(R.string.add_song_playlist_success, num)
                                 ,Toast.LENGTH_SHORT).show();
                         UpdateOptionMenu(false);
@@ -167,7 +167,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                                         if(!TextUtils.isEmpty(input)){
                                             XmlUtil.addPlaylist(mContext,input.toString());
                                             final int num;
-                                            num = XmlUtil.addSongsToPlayList(input.toString(),DBUtil.getPlayListItemListByIds(idList));
+                                            num = XmlUtil.addSongsToPlayList(input.toString(), MediaStoreUtil.getPlayListItemListByIds(idList));
                                             Toast.makeText(mContext, mContext.getString(R.string.add_song_playlist_success, num)
                                                     ,Toast.LENGTH_SHORT).show();
                                             UpdateOptionMenu(false);
@@ -194,7 +194,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                 break;
             case Constants.PLAYLIST:
                 for(Object arg : mSelectedArg){
-                    if (arg instanceof Integer && DBUtil.delete((Integer) arg,Constants.PLAYLIST)){
+                    if (arg instanceof Integer && MediaStoreUtil.delete((Integer) arg,Constants.PLAYLIST)){
                         num++;
                     }
                 }
@@ -203,14 +203,14 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.ARTIST:
             case Constants.FOLDER:
                 for(Object arg : mSelectedArg){
-                    ArrayList<Integer> tempList = DBUtil.getSongIdListByArg(arg,TYPE);
+                    ArrayList<Integer> tempList = MediaStoreUtil.getSongIdListByArg(arg,TYPE);
                     if(tempList != null && tempList.size() > 0)
                         idList.addAll(tempList);
                 }
                 break;
         }
         for(Integer id : idList){
-            if( DBUtil.delete(id,Constants.SONG))
+            if( MediaStoreUtil.delete(id,Constants.SONG))
                 num++;
         }
 

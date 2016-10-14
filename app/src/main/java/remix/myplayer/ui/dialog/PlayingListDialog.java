@@ -14,7 +14,7 @@ import android.widget.ListView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.adapter.PlayingListAdapter;
+import remix.myplayer.adapter.PlayQueueAdapter;
 import remix.myplayer.util.Constants;
 
 /**
@@ -27,7 +27,7 @@ import remix.myplayer.util.Constants;
 public class PlayingListDialog extends BaseDialogActivity {
     @BindView(R.id.bottom_actionbar_play_list)
     ListView mListView;
-    private PlayingListAdapter mAdapter;
+    private PlayQueueAdapter mAdapter;
     public static PlayingListDialog mInstance;
     private static boolean mNeedRefresh = false;
 
@@ -38,7 +38,7 @@ public class PlayingListDialog extends BaseDialogActivity {
         ButterKnife.bind(this);
 
         mInstance = this;
-        mAdapter = new PlayingListAdapter( getApplicationContext());
+        mAdapter = new PlayQueueAdapter( getApplicationContext());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new ListViewListener());
 
@@ -55,7 +55,7 @@ public class PlayingListDialog extends BaseDialogActivity {
         w.setGravity(Gravity.BOTTOM);
     }
 
-    public PlayingListAdapter getAdapter(){
+    public PlayQueueAdapter getAdapter(){
         return mAdapter;
     }
 

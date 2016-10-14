@@ -28,7 +28,7 @@ import remix.myplayer.model.PlayListItem;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 
 /**
@@ -135,7 +135,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
                             ids.add(info.getId());
                     }
                     //设置正在播放列表
-                    Global.setPlayingList(ids);
+                    Global.setPlayQueue(ids);
 
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
@@ -177,7 +177,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         initToolbar(mToolBar,Title);
         //初始化底部状态栏
         mBottombar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
+        if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
             return;
 
         mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
@@ -238,15 +238,15 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         switch (mType) {
             //专辑id
             case Constants.ALBUM:
-                mInfoList = DBUtil.getMP3InfoByArg(mId, Constants.ALBUM);
+                mInfoList = MediaStoreUtil.getMP3InfoByArg(mId, Constants.ALBUM);
                 break;
             //歌手id
             case Constants.ARTIST:
-                mInfoList = DBUtil.getMP3InfoByArg(mId, Constants.ARTIST);
+                mInfoList = MediaStoreUtil.getMP3InfoByArg(mId, Constants.ARTIST);
                 break;
             //文件夹名
             case Constants.FOLDER:
-                mInfoList = DBUtil.getMP3ListByIds(Global.mFolderMap.get(mArg));
+                mInfoList = MediaStoreUtil.getMP3ListByIds(Global.mFolderMap.get(mArg));
                 mArg = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
                 break;
             //播放列表名
@@ -258,10 +258,10 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
                     MP3Item temp = new MP3Item(item.getId(),item.getSongame(),item.getSongame(),"",item.getAlbumId(),
                             item.getArtist(),0,"","",0,"");
                     mInfoList.add(temp);
-//                    MP3Item temp = DBUtil.getMP3InfoById(item.getId());
+//                    MP3Item temp = MediaStoreUtil.getMP3InfoById(item.getId());
 //                    //该歌曲已经失效
 //                    if(temp == null){
-//                        DBUtil.deleteSongInPlayList(mArg,item.getId());
+//                        MediaStoreUtil.deleteSongInPlayList(mArg,item.getId());
 //                    } else {
 //                        mInfoList.add(temp);
 //                    }
@@ -280,7 +280,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         ArrayList<Integer> ids = new ArrayList<>();
         for (MP3Item info : mInfoList)
             ids.add(info.getId());
-        Global.setPlayingList(ids);
+        Global.setPlayQueue(ids);
         sendBroadcast(intent);
     }
 

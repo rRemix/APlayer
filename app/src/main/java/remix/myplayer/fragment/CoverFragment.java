@@ -22,7 +22,7 @@ import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.thumb.SearchCover;
 
@@ -124,7 +124,7 @@ public class CoverFragment extends BaseFragment {
         if (mImage == null || (mInfo = info) == null)
             return;
         new UpdateCoverThread(mInfo.getAlbumId(),withAnim ? WITH_ANIM : NO_ANIM).start();
-//        mUri = Uri.parse("file://" + DBUtil.getImageUrl(mInfo.getAlbumId() + "",Constants.URL_ALBUM));
+//        mUri = Uri.parse("file://" + MediaStoreUtil.getImageUrl(mInfo.getAlbumId() + "",Constants.URL_ALBUM));
 //        if(withAnim){
 //            //根据操作是上一首还是下一首播放动画
 //            int operation = Global.getOperation();
@@ -148,7 +148,7 @@ public class CoverFragment extends BaseFragment {
         }
         @Override
         public void run() {
-            mUri = Uri.parse("file://" + DBUtil.getImageUrl(mAlbumId + "",Constants.URL_ALBUM));
+            mUri = Uri.parse("file://" + MediaStoreUtil.getImageUrl(mAlbumId + "",Constants.URL_ALBUM));
             Message msg = new Message();
             msg.what = mWithAnim;
             mHandler.sendMessage(msg);

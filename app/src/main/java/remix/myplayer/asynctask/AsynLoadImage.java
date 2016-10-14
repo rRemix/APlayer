@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * @ClassName
@@ -22,7 +22,7 @@ public class AsynLoadImage extends AsyncTask<Object,Integer,String> {
     @Override
     protected String doInBackground(Object... params) {
         mAutoPlayAnimation = (boolean)params[2];
-        return DBUtil.getImageUrl(params[0].toString(), (int)params[1]);
+        return MediaStoreUtil.getImageUrl(params[0].toString(), (int)params[1]);
     }
     @Override
     protected void onPostExecute(String url) {

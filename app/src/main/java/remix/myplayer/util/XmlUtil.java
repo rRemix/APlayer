@@ -21,6 +21,7 @@ import java.util.Map;
 
 import remix.myplayer.R;
 import remix.myplayer.model.PlayListItem;
+import remix.myplayer.ui.activity.ChildHolderActivity;
 
 /**
  * Created by taeja on 16-1-26.
@@ -102,7 +103,7 @@ public class XmlUtil {
      * 获得正在播放列表
      * @return
      */
-    public static ArrayList<Integer> getPlayingList()  {
+    public static ArrayList<Integer> getPlayQueue()  {
         XmlPullParser parser = Xml.newPullParser();
         ArrayList<Integer> list = null;
         FileInputStream in = null;
@@ -293,10 +294,10 @@ public class XmlUtil {
      * 删除正在播放列表中歌曲
      * @param id 需要删除的歌曲id
      */
-    public static void deleteSongFromPlayingList(long id) {
-        if(id > 0 && Global.mPlayingList.contains(id)) {
-            Global.mPlayingList.remove(id);
-            updatePlayingList();
+    public static void deleteSongFromPlayQueue(long id) {
+        if(id > 0 && Global.mPlayQueue.contains(id)) {
+            Global.mPlayQueue.remove(id);
+            updatePlayQueue();
         }
     }
 
@@ -304,10 +305,10 @@ public class XmlUtil {
      * 添加歌曲到正在播放列表
      * @param id 需要添加的歌曲id
      */
-    public static void addSongToPlayingList(int id) {
-        if(id > 0 && Global.mPlayingList != null && !Global.mPlayingList.contains(id)) {
-            Global.mPlayingList.add(id);
-            updatePlayingList();
+    public static void addSongToPlayQueue(int id) {
+        if(id > 0 && Global.mPlayQueue != null && !Global.mPlayQueue.contains(id)) {
+            Global.mPlayQueue.add(id);
+            updatePlayQueue();
         }
     }
 
@@ -318,20 +319,20 @@ public class XmlUtil {
     public static int addSongsToPlayingList(ArrayList<Integer> idList) {
         int num = 0;
         for(Integer id : idList){
-            if(id > 0 && Global.mPlayingList != null) {
-                Global.mPlayingList.add(id);
+            if(id > 0 && Global.mPlayQueue != null) {
+                Global.mPlayQueue.add(id);
                 num++;
             }
         }
         if(num > 0)
-            updatePlayingList();
+            updatePlayQueue();
         return num;
     }
 
     /**
      * 更新正在播放列表
      */
-    public static void updatePlayingList() {
+    public static void updatePlayQueue() {
         FileOutputStream fos = null;
         try {
             fos = mContext.openFileOutput("playinglist.xml",Context.MODE_PRIVATE);
@@ -340,10 +341,10 @@ public class XmlUtil {
             serializer.setOutput(fos,"utf-8");
             serializer.startDocument("utf-8",true);
             serializer.startTag(null,"playinglist");
-            for(int i = 0; i < Global.mPlayingList.size(); i++)
+            for(int i = 0; i < Global.mPlayQueue.size(); i++)
             {
                 serializer.startTag(null,"song");
-                serializer.attribute(null,"id", Global.mPlayingList.get(i).toString());
+                serializer.attribute(null,"id", Global.mPlayQueue.get(i).toString());
                 serializer.endTag(null,"song");
             }
             serializer.endTag(null,"playinglist");
@@ -366,105 +367,26 @@ public class XmlUtil {
         }
     }
 
-//    //添加到搜索历史
-//    public static void addKey(String key){
-//        if(!SearchActivity.mSearchHisKeyList.contains(key)){
-//            SearchActivity.mSearchHisKeyList.add(key);
-//            updateSearchList();
-//        }
-//    }
-//    //删除一个搜索记录
-//    public static void deleteKey(String key){
-//        if(SearchActivity.mSearchHisKeyList.contains(key)){
-//            SearchActivity.mSearchHisKeyList.remove(key);
-//            updateSearchList();
-//        }
-//    }
-//    //清空搜索历史
-//    public static void removeallKey(){
-//        if(SearchActivity.mSearchHisKeyList.size() > 0){
-//            SearchActivity.mSearchHisKeyList.clear();
-//            updateSearchList();
-//        }
-//    }
-//    //更新搜索历史记录
-//    public static void updateSearchList(){
-//        XmlSerializer serializer = null;
-//        FileOutputStream fos = null;
-//        try {
-////            fos = new FileOutputStream(mSearchHistoryFile);
-//            serializer =  XmlPullParserFactory.newInstance().newSerializer();
-//            fos = mContext.openFileOutput("searchhistory.xml",Context.MODE_PRIVATE);
-//            serializer.setOutput(fos,"utf-8");
-//            serializer.startDocument("utf-8",true);
-//            serializer.startTag(null,"searchhistory");
-//            for(int i = 0 ; i < SearchActivity.mSearchHisKeyList.size() ; i++){
-//                serializer.startTag(null,"key");
-//                serializer.text(SearchActivity.mSearchHisKeyList.get(i).toString());
-//                serializer.endTag(null,"key");
-//                Log.d(TAG,"key[" + i + "]: " + SearchActivity.mSearchHisKeyList.get(i));
-//            }
-//            serializer.endTag(null,"searchhistory");
-//            serializer.endDocument();
-//        } catch (XmlPullParserException e) {
-//            e.printStackTrace();
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        } finally {
-//            if(fos != null)
-//                try {
-//                    fos.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//        }
-//    }
-
-    //获得搜索历史记录
-    public static ArrayList<String> getSearchHisList()  {
-        XmlPullParser parser = Xml.newPullParser();
-        ArrayList<String> list = new ArrayList<>();
-        FileInputStream in = null;
-        try {
-//            in = new FileInputStream(mSearchHistoryFile);
-            in = mContext.openFileInput("searchhistory.xml");
-//
-            parser.setInput(in,"utf-8");
-            int eventType = parser.getEventType();
-            while(eventType != XmlPullParser.END_DOCUMENT){
-                switch (eventType){
-                    case XmlPullParser.START_DOCUMENT:
-                        break;
-                    case XmlPullParser.START_TAG:
-                        if(parser.getName().equals("key")) {
-                            list.add(parser.nextText());
-                        }
-                        break;
-                    case XmlPullParser.END_TAG:
-                        break;
-                    case XmlPullParser.END_DOCUMENT:
-                        break;
+    /**
+     * 根据歌曲id删除某播放列表中歌曲
+     * @param playlist 播放列表名
+     * @param id 需要删除的歌曲id
+     * @return 删除是否成功
+     */
+    public static boolean deleteSongInPlayList(String playlist,int id){
+        boolean ret = false;
+        ArrayList<PlayListItem> list = Global.mPlaylist.get(playlist);
+        if(list != null){
+            for(PlayListItem item : list){
+                if(item.getId() == id){
+                    ret = list.remove(item);
+                    if(ChildHolderActivity.mInstance != null)
+                        ChildHolderActivity.mInstance.UpdateData();
+                    updatePlaylist();
+                    break;
                 }
-                eventType = parser.next();
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if(in != null)
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
         }
-        return list;
+       return ret;
     }
 }

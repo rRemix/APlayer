@@ -30,7 +30,8 @@ import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.XmlUtil;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -143,11 +144,11 @@ public class OptionDialog extends BaseDialogActivity {
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                     String result = "";
                                     if(!mIsDeletePlayList){
-                                        result = DBUtil.delete(mInfo.getId() , Constants.SONG) ?
+                                        result = MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) ?
                                                 getString(R.string.delete_success) :
                                                 getString(R.string.delete_error);
                                     } else {
-                                        result = DBUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ?
+                                        result = XmlUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ?
                                                 getString(R.string.delete_success):
                                                 getString(R.string.delete_error);
                                     }

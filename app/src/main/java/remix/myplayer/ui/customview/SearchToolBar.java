@@ -42,8 +42,8 @@ public class SearchToolBar extends Toolbar {
         //设置EditText光标与下划线颜色
 //        mEditText.getBackground().setColorFilter(getResources().getColor(R.color.progress_complete), PorterDuff.Mode.SRC_ATOP);
 
-//        final int size = DBUtil.mSearchKeyList.size();
-//        String[] strs = (String[]) DBUtil.mSearchKeyList.toArray(new String[size]);
+//        final int size = MediaStoreUtil.mSearchKeyList.size();
+//        String[] strs = (String[]) MediaStoreUtil.mSearchKeyList.toArray(new String[size]);
 //        ArrayAdapter adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_list_item_1, strs);
 //        mEditText.setAdapter(adapter);
 

@@ -54,7 +54,7 @@ import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
@@ -637,7 +637,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
         @Override
         public void run() {
             if(mInfo != null){
-                mRawBitMap = DBUtil.getAlbumBitmapBySongId((int) mInfo.getId(),false);
+                mRawBitMap = MediaStoreUtil.getAlbumBitmapBySongId((int) mInfo.getId(),false);
                 if(mRawBitMap == null)
                     mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
 

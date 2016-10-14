@@ -33,9 +33,9 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * Created by taeja on 16-1-15.
@@ -154,6 +154,13 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                 holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),0,DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,8));
             }
         }
+
+        registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+            }
+        });
     }
 
     @Override
@@ -205,7 +212,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
             String url = null;
             if(list != null && list.size() > 0) {
                 for(PlayListItem item : list){
-                    url = DBUtil.getImageUrl(item.getAlbumId() + "",Constants.URL_ALBUM);
+                    url = MediaStoreUtil.getImageUrl(item.getAlbumId() + "",Constants.URL_ALBUM);
                     if(url != null && !url.equals("")) {
                         File file = new File(url);
                         if(file.exists()) {

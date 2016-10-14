@@ -15,7 +15,7 @@ import java.util.Date;
 public class ErrUtil {
 
     private static File mFile;
-    private static final String TAG = "DBUtil";
+    private static final String TAG = "MediaStoreUtil";
     private static Context mContext;
     public static void setContext(Context context){
         mContext = context;

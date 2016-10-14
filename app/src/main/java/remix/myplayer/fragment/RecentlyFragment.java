@@ -66,7 +66,7 @@
 //                intent.putExtras(arg);
 //                getActivity().sendBroadcast(intent);
 //                view.setSelected(true);
-//                Global.setPlayingList(mType == Constants.DAY ? Global.mTodayList : Global.mWeekList);
+//                Global.setPlayQueue(mType == Constants.DAY ? Global.mTodayList : Global.mWeekList);
 //            }
 //        });
 //

@@ -5,7 +5,6 @@ import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,8 +31,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
-import remix.myplayer.db.DBContentProvider;
-import remix.myplayer.db.PlayLists;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
@@ -47,7 +44,7 @@ import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
@@ -77,7 +74,9 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     //是否正在运行
     private static boolean mIsRunning = false;
     //是否第一次启动
-    private static boolean mIsFirst = true;
+    private boolean mIsFirst = true;
+    //是否是安装后第一次打开软件
+    private boolean mIsFirstAfterInstall = true;
 
     private static final int PERMISSIONCODE = 100;
     private static final String[] PERMISSIONS = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -206,11 +205,11 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
 
-        boolean isFirst = SPUtil.getValue(this, "Setting", "First", true);
+        mIsFirstAfterInstall = SPUtil.getValue(this, "Setting", "First", true);
         SPUtil.putValue(this, "Setting", "First", false);
 
         //第一次启动软件
-        if(isFirst){
+        if(mIsFirstAfterInstall){
             //保存默认主题设置
             SPUtil.putValue(this,"Setting","ThemeMode",ThemeStore.DAY);
             SPUtil.putValue(this,"Setting","ThemeColor",ThemeStore.THEME_PINK);
@@ -222,34 +221,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 //        BmobUpdateAgent.setUpdateOnlyWifi(false);
 //        BmobUpdateAgent.update(this);
 
-        DBContentProvider provider = new DBContentProvider(this);
-//        try {
-//            ContentValues cv = new ContentValues();
-//            cv.put(PlayLists.PlayListColumns.NAME,"我的收藏");
-//            cv.put(PlayLists.PlayListColumns.COUNT,0);
-//
-//            ContentValues cv1 = new ContentValues();
-//            cv1.put(PlayLists.PlayListColumns.NAME,"播放队列");
-//            cv1.put(PlayLists.PlayListColumns.COUNT,0);
-//            provider.insert(PlayLists.MULTIPLE,cv);
-//            provider.insert(PlayLists.MULTIPLE,cv1);
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        }
-        try {
-            Cursor cursor = provider.query(PlayLists.MULTIPLE,null,null,null,null);
-            if(cursor != null && cursor.getCount() > 0){
-                while (cursor.moveToNext()) {
-                    for (int i = 0; i < cursor.getColumnCount(); i++) {
-                        String name = cursor.getColumnName(i);
-                        String value = cursor.getString(i);
-                        LogUtil.d("DBTest", "name:" + name + " value:" + value);
-                    }
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -257,6 +228,20 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
      * 默认为第一首歌曲
      */
     private void initLastSong() {
+        if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
+            return;
+        //如果是第一次打开，设置第一手歌曲为正在播放
+        if(mIsFirstAfterInstall){
+            int id =  Global.mPlayQueue.get(0);
+            MP3Item item = MediaStoreUtil.getMP3InfoById(id);
+            if(item != null){
+                mBottomBar.UpdateBottomStatus(item,false);
+                SPUtil.putValue(this,"Setting","LastSongId",id);
+                MusicService.initDataSource(item,0);
+            }
+            return;
+        }
+
         //读取上次退出时正在播放的歌曲的id
         int lastId = SPUtil.getValue(this,"Setting","LastSongId",0);
         //上次退出时正在播放的歌曲是否还存在
@@ -277,26 +262,23 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         if(mIsFirst){
             mIsFirst = false;
             MP3Item item = null;
-            //上次退出时保存的正在播放的歌曲已失效
-            if(isLastSongExist && (item = DBUtil.getMP3InfoById(lastId)) != null) {
+            //上次退出时保存的正在播放的歌曲未失效
+            if(isLastSongExist && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
                 mBottomBar.UpdateBottomStatus(item, isPlay);
                 MusicService.initDataSource(item,pos);
-
             }else {
-
-                if(Global.mPlayingList.size() > 0){
+                if(Global.mPlayQueue.size() > 0){
                     //重新找到一个歌曲id
-                    int id =  Global.mPlayingList.get(0);
-                    for(int i = 0 ; i < Global.mPlayingList.size() ;i++){
-                        id = Global.mPlayingList.get(i);
+                    int id =  Global.mPlayQueue.get(0);
+                    for(int i = 0; i < Global.mPlayQueue.size() ; i++){
+                        id = Global.mPlayQueue.get(i);
                         if (id != lastId)
                             break;
                     }
-                    item = DBUtil.getMP3InfoById(id);
+                    item = MediaStoreUtil.getMP3InfoById(id);
                     mBottomBar.UpdateBottomStatus(item,isPlay);
                     SPUtil.putValue(this,"Setting","LastSongId",id);
                     MusicService.initDataSource(item,0);
-
                 }
             }
         } else {

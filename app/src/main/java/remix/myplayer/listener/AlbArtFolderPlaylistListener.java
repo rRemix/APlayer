@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 import remix.myplayer.R;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 
 /**
@@ -38,7 +38,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
     public boolean onMenuItemClick(MenuItem item) {
         ArrayList<Integer> idList = new ArrayList<>();
         //根据不同参数获得歌曲id列表
-        idList = DBUtil.getSongIdListByArg(mId,mType);
+        idList = MediaStoreUtil.getSongIdListByArg(mId,mType);
 
         if(idList == null || idList.size() == 0){
             Toast.makeText(mContext,mContext.getString(R.string.list_isempty),Toast.LENGTH_SHORT).show();
@@ -47,7 +47,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
         switch (item.getItemId()) {
             //播放
             case R.id.menu_play:
-                Global.setPlayingList(idList);
+                Global.setPlayQueue(idList);
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 Bundle arg = new Bundle();
                 arg.putInt("Control", Constants.PLAYSELECTEDSONG);
@@ -57,12 +57,12 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 break;
             //添加到播放队列
             case R.id.menu_add:
-                Global.AddSongToPlayingList(idList);
+                Global.AddSongToPlayQueue(idList);
                 break;
             //删除
             case R.id.menu_delete:
                 Toast.makeText(mContext,
-                        DBUtil.delete(mId , mType) ? R.string.delete_success : R.string.delete_error ,
+                        MediaStoreUtil.delete(mId , mType) ? R.string.delete_success : R.string.delete_error ,
                         Toast.LENGTH_SHORT).show();
                 break;
             //设置专辑封面

@@ -91,7 +91,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
                 MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 intent.putExtra("Control", Constants.NEXT);
-                Global.setPlayingList(Global.mAllSongList);
+                Global.setPlayQueue(Global.mAllSongList);
                 getActivity().sendBroadcast(intent);
             }
         });
@@ -109,7 +109,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
             public void onItemClick(View view, int position) {
                 int id = getSongID(position);
                 if(id > 0 && !mMultiChoice.itemAddorRemoveWithClick(view,position,id,TAG)){
-                    Global.setPlayingList(Global.mAllSongList);
+                    Global.setPlayQueue(Global.mAllSongList);
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);

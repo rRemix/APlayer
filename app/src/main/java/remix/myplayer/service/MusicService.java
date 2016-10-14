@@ -35,7 +35,7 @@ import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
@@ -412,11 +412,11 @@ public class MusicService extends BaseService {
      */
     private void playSelectSong(int position){
 
-        if((mCurrent = position) == -1 || (mCurrent > Global.mPlayingList.size() - 1))
+        if((mCurrent = position) == -1 || (mCurrent > Global.mPlayQueue.size() - 1))
             return;
-        mId = Global.mPlayingList.get(mCurrent);
+        mId = Global.mPlayQueue.get(mCurrent);
         MP3Item temp = mInfo;
-        mInfo = DBUtil.getMP3InfoById(mId);
+        mInfo = MediaStoreUtil.getMP3InfoById(mId);
         if(mInfo == null) {
             mInfo = temp;
             Toast.makeText(mContext,getString(R.string.song_lose_effect),Toast.LENGTH_SHORT).show();
@@ -481,7 +481,7 @@ public class MusicService extends BaseService {
 
             if(Control == Constants.PLAYSELECTEDSONG || Control == Constants.PREV || Control == Constants.NEXT
                     || Control == Constants.PLAYORPAUSE || Control == Constants.PAUSE || Control == Constants.START){
-                if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
+                if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
                     return;
                 if(CommonUtil.isFastDoubleClick()) {
                     Toast.makeText(mContext,"请不要过快操作",Toast.LENGTH_SHORT).show();
@@ -504,7 +504,7 @@ public class MusicService extends BaseService {
                     break;
                 //暂停或者继续播放
                 case Constants.PLAYORPAUSE:
-                    if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
+                    if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
                         return;
                     mIsplay = !mIsplay;
                     PlayOrPause();
@@ -580,9 +580,9 @@ public class MusicService extends BaseService {
      * @return 随机索引
      */
     private static int getShuffle(){
-        if(Global.mPlayingList.size() == 1)
+        if(Global.mPlayQueue.size() == 1)
             return 0;
-        return new Random().nextInt(Global.mPlayingList.size() - 1);
+        return new Random().nextInt(Global.mPlayQueue.size() - 1);
     }
 
     /**
@@ -591,28 +591,28 @@ public class MusicService extends BaseService {
      * @param needPlay 是否需要播放
      */
     public void PlayNextOrPrev(boolean isNext,boolean needPlay){
-        if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
+        if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
             return;
 
         if(mPlayModel == Constants.PLAY_SHUFFLE) {
             mCurrent = getShuffle();
-            mId = Global.mPlayingList.get(mCurrent);
+            mId = Global.mPlayQueue.get(mCurrent);
         }
         else if(mPlayModel == Constants.PLAY_LOOP) {
             if(isNext) {
-                if ((++mCurrent) > Global.mPlayingList.size() - 1)
+                if ((++mCurrent) > Global.mPlayQueue.size() - 1)
                     mCurrent = 0;
-                mId = Global.mPlayingList.get(mCurrent);
+                mId = Global.mPlayQueue.get(mCurrent);
             }
             else {
                 if ((--mCurrent) < 0)
-                    mCurrent = Global.mPlayingList.size() - 1;
-                mId = Global.mPlayingList.get(mCurrent);
+                    mCurrent = Global.mPlayQueue.size() - 1;
+                mId = Global.mPlayQueue.get(mCurrent);
             }
         }
 
         MP3Item temp = mInfo;
-        mInfo = DBUtil.getMP3InfoById(mId);
+        mInfo = MediaStoreUtil.getMP3InfoById(mId);
         if(mInfo == null) {
             mInfo = temp;
             Toast.makeText(mContext,getString(R.string.song_lose_effect),Toast.LENGTH_SHORT).show();
@@ -623,7 +623,7 @@ public class MusicService extends BaseService {
             PrepareAndPlay(mInfo.getUrl());
 
 //        RemoteControlClient.MetadataEditor editor = mRemoteCtrlClient.editMetadata(false);
-//        editor.putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK,DBUtil.CheckBitmapByAlbumId((int)mInfo.getAlbumId(),false));
+//        editor.putBitmap(RemoteControlClient.MetadataEditor.BITMAP_KEY_ARTWORK,MediaStoreUtil.CheckBitmapByAlbumId((int)mInfo.getAlbumId(),false));
 //        editor.putString(MediaMetadataRetriever.METADATA_KEY_ALBUM,mInfo.getAlbum());
 //        editor.putString(MediaMetadataRetriever.METADATA_KEY_ARTIST,mInfo.getArtist());
 //        editor.putString(MediaMetadataRetriever.METADATA_KEY_TITLE,mInfo.getDisplayname());

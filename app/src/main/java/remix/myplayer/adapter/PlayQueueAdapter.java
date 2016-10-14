@@ -18,7 +18,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.XmlUtil;
 
@@ -29,7 +29,7 @@ import remix.myplayer.util.XmlUtil;
 /**
  * 正在播放列表的适配器
  */
-public class PlayingListAdapter extends BaseAdapter {
+public class PlayQueueAdapter extends BaseAdapter {
     private Context mContext;
     private Handler mHandler = new Handler() {
         @Override
@@ -37,19 +37,19 @@ public class PlayingListAdapter extends BaseAdapter {
             notifyDataSetChanged();
         }
     };
-    public PlayingListAdapter(Context context) {
+    public PlayQueueAdapter(Context context) {
         mContext = context;
     }
 
 
     @Override
     public int getCount() {
-        return Global.mPlayingList != null ? Global.mPlayingList.size() : 0;
+        return Global.mPlayQueue != null ? Global.mPlayQueue.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return Global.mPlayingList != null ? Global.mPlayingList.get(position) : null;
+        return Global.mPlayQueue != null ? Global.mPlayQueue.get(position) : null;
     }
 
     @Override
@@ -69,10 +69,10 @@ public class PlayingListAdapter extends BaseAdapter {
             holder = (PlayListHolder)convertView.getTag();
 
 
-        if(Global.mPlayingList == null || Global.mPlayingList.size() == 0)
+        if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
             return convertView;
 
-        final MP3Item temp = DBUtil.getMP3InfoById(Global.mPlayingList.get(position));
+        final MP3Item temp = MediaStoreUtil.getMP3InfoById(Global.mPlayQueue.get(position));
         if(temp != null) {
             //设置歌曲与艺术家
             holder.mSong.setText(CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE));
@@ -81,7 +81,7 @@ public class PlayingListAdapter extends BaseAdapter {
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    XmlUtil.deleteSongFromPlayingList(temp.getId());
+                    XmlUtil.deleteSongFromPlayQueue(temp.getId());
                     if(temp.getId() == MusicService.getCurrentMP3().getId()) {
                         Intent intent = new Intent(Constants.CTL_ACTION);
                         intent.putExtra("Control", Constants.NEXT);

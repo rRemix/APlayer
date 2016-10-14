@@ -12,6 +12,7 @@ public class PlayListItem {
     public int SongId;
     public int AlbumId;
     public String Artist;
+    public String AlbumUrl;
     public PlayListItem(){}
     public PlayListItem(String SongName, int Id,int AlbumId,String Artist) {
         this.SongName = SongName;
@@ -19,6 +20,7 @@ public class PlayListItem {
         this.AlbumId = AlbumId;
         this.Artist = Artist;
     }
+
 
     public String getArtist() {
         return Artist;

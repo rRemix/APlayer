@@ -22,7 +22,6 @@ import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
-import remix.myplayer.ui.activity.ChildHolderActivity;
 
 /**
  * Created by taeja on 16-2-17.
@@ -32,10 +31,10 @@ import remix.myplayer.ui.activity.ChildHolderActivity;
  * 数据库工具类
  *
  */
-public class DBUtil {
-    private static final String TAG = "DBUtil";
+public class MediaStoreUtil {
+    private static final String TAG = "MediaStoreUtil";
     private static Context mContext;
-    private DBUtil(){}
+    private MediaStoreUtil(){}
     public static void setContext(Context context){
         mContext = context;
     }
@@ -78,52 +77,36 @@ public class DBUtil {
                 cursor.close();
         }
 
-//        try {
-//            cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null, null,null,null);
-//            if(cursor != null){
-//                while (cursor.moveToNext()){
-//                    for(int i = 0 ; i < cursor.getColumnCount();i++){
-//                        Log.d("SongInfo","name:" + cursor.getColumnName(i) + " value:" + cursor.getString(i));
-//                    }
-//                }
-//
-//            }
-//        } catch (Exception e){
-//            e.toString();
-//        }
+        ContentValues cv = new ContentValues();
+        cv.put(MediaStore.Audio.Playlists.NAME,"AA99");
+        Uri uri = mContext.getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,cv);
+        long playListId = 0;
+        cursor = mContext.getContentResolver().query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,null,null,null,null);
+        if(cursor != null){
+            if(cursor.moveToFirst())
+                playListId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Playlists._ID));
+        }
 
-//        try {
-//            ArrayList<Integer> testList = new ArrayList<>();
-//            for(int i = 0 ; i < 50 ;i++){
-//                testList.add(mAllSongList.get(i));
-//            }
-//            String where = "";
-//            String[] arg = new String[testList.size()];
-//            for(int i = 0 ; i < testList.size() ;i++){
-//                arg[i] = testList.get(i) + "";
-//                where += (MediaStore.Audio.Media._ID + "=?");
-//                if(i != testList.size() - 1){
-//                    where += " or ";
-//                }
-//            }
-//
-//            long start1 = System.currentTimeMillis();
-//            for(int i = 0 ; i < 10;i++){
-//                for(int j = 0 ; j < testList.size(); j++){
-//                    Object o = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null, MediaStore.Audio.Media._ID + "=" + testList.get(j),null,null);
-//                }
-//            }
-//            Log.d(TAG,"result1:" + (System.currentTimeMillis() - start1));
-//
-//            long start2 = System.currentTimeMillis();
-//            for(int i = 0 ; i < 10;i++){
-//                Object o = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null,where,arg,null,null);
-//            }
-//            Log.d(TAG,"result1:" + (System.currentTimeMillis() - start2));
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        }
-
+        for(int i = 0 ; i < 2 ;i++){
+            ContentValues cv1 = new ContentValues();
+            cv1.put(MediaStore.Audio.Playlists.Members.AUDIO_ID,mAllSongList.get(i));
+            Uri newUri =  mContext.getContentResolver().insert(MediaStore.Audio.Playlists.Members.getContentUri("external",playListId),cv1);
+        }
+        try {
+            cursor = mContext.getContentResolver()
+                    .query(MediaStore.Audio.Playlists.Members.getContentUri("external",playListId),
+                            new String[]{MediaStore.Audio.Playlists.Members.TITLE,MediaStore.Audio.Playlists.Members.ARTIST},
+                            null,null,null);
+            if(cursor != null){
+                while (cursor.moveToNext()){
+                    for(int i = 0 ; i < cursor.getColumnCount();i++){
+                        LogUtil.d("DBTest","name:" + cursor.getColumnName(i) + " value:" + cursor.getString(i));
+                    }
+                }
+            }
+        } catch (Exception e){
+            e.toString();
+        }
 
         return mAllSongList;
     }
@@ -481,11 +464,12 @@ public class DBUtil {
      * @param audioid
      * @param genreId
      */
-    public static boolean insearGenreMap(int audioid,int genreId){
+    public static boolean insertGenreMap(int audioid, int genreId){
         try {
             ContentValues cv = new ContentValues();
             cv.put(MediaStore.Audio.Genres.Members.AUDIO_ID,audioid);
-            return ContentUris.parseId(mContext.getContentResolver().insert(MediaStore.Audio.Genres.Members.getContentUri("external",genreId),cv)) > 0;
+            Uri uri = mContext.getContentResolver().insert(MediaStore.Audio.Genres.Members.getContentUri("external",genreId),cv);
+            return uri != null && ContentUris.parseId(uri) > 0;
 
         } catch (Exception e){
             e.printStackTrace();
@@ -500,7 +484,8 @@ public class DBUtil {
         try {
             ContentValues cv = new ContentValues();
             cv.put(MediaStore.Audio.Genres.NAME,genre);
-            return ContentUris.parseId(mContext.getContentResolver().insert(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,cv));
+            Uri uri = mContext.getContentResolver().insert(MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI,cv);
+            return uri != null ? ContentUris.parseId(uri) : -1;
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -577,6 +562,80 @@ public class DBUtil {
             e.printStackTrace();
         }
         return updateRow;
+    }
+
+    /**
+     * 根据播放列表id获得所有
+     * @param playlistId
+     * @return
+     */
+    public static ArrayList<Integer> getSongsByPlayListId(int playlistId){
+        return null;
+    }
+
+    public static int insertPlayList(String playlistName){
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put(MediaStore.Audio.Playlists.NAME,playlistName);
+            Uri uri = mContext.getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,cv);
+            return uri != null ? (int) ContentUris.parseId(uri) : -1;
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return -1;
+
+    }
+
+    /**
+     * 添加歌曲到播放列表
+     * @param audioId
+     * @param playlistId
+     * @return
+     */
+    public static boolean insertSongToPlayList(int audioId,int playlistId){
+        if(audioId < 0 || playlistId < 0)
+            return false;
+        ContentValues cv = new ContentValues();
+        cv.put(MediaStore.Audio.Playlists.Members.AUDIO_ID,audioId);
+        Uri uri = mContext.getContentResolver().insert(MediaStore.Audio.Playlists.Members.getContentUri("external",playlistId),cv);
+        return uri != null && ContentUris.parseId(uri) > 0;
+    }
+
+    /**
+     * 从某个播放列表删除一首歌曲
+     * @param audioId
+     * @param playlistId
+     * @return
+     */
+    public static boolean deleteSongFromPlayList(int audioId,int playlistId){
+        if(audioId < 0 || playlistId < 0)
+            return false;
+        ContentValues cv = new ContentValues();
+        cv.put(MediaStore.Audio.Playlists.Members.AUDIO_ID,audioId);
+        return mContext.getContentResolver().delete(MediaStore.Audio.Playlists.Members.getContentUri("external",playlistId),
+                MediaStore.Audio.Playlists.Members.AUDIO_ID +" = "+audioId,null) > 0;
+    }
+
+    /**
+     * 删除播放列表多首歌曲
+     * @param IdList
+     * @param playlistId
+     * @return
+     */
+    public static int deleteMultiSongFromPlayList(ArrayList<Integer> IdList,int playlistId){
+        if(IdList == null || IdList.size() == 0 || playlistId < 0)
+            return 0;
+        String where = "";
+        String[] arg = new String[IdList.size()];
+        for(int i = 0 ; i < IdList.size() ;i++){
+            arg[i] = IdList.get(i) + "";
+            where += (MediaStore.Audio.Media._ID + "=?");
+            if(i != IdList.size() - 1){
+                where += " or ";
+            }
+        }
+        return mContext.getContentResolver().delete(MediaStore.Audio.Playlists.Members.getContentUri("external",playlistId),
+                where,arg);
     }
 
 
@@ -695,8 +754,8 @@ public class DBUtil {
                 return false;
             deleteNumInMediaStore += resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,where,arg);
 //            for (Integer id : idList) {
-//                if(Global.mPlayingList.contains(id)){
-//                    Global.mPlayingList.remove(id);
+//                if(Global.mPlayQueue.contains(id)){
+//                    Global.mPlayQueue.remove(id);
 //                }
 //                deleteNumInMediaStore += resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, where,
 //                        new String[]{id + ""});
@@ -707,11 +766,11 @@ public class DBUtil {
         if(deleteSuccess){
             ArrayList<Integer> deleteIdList = new ArrayList<>();
             for(Integer deleteId : idList){
-                if(Global.mPlayingList.contains(deleteId)){
+                if(Global.mPlayQueue.contains(deleteId)){
                     deleteIdList.add(deleteId);
                 }
             }
-            return Global.mPlayingList.removeAll(deleteIdList) && deleteSuccess;
+            return Global.mPlayQueue.removeAll(deleteIdList) && deleteSuccess;
         } else {
             return false;
         }
@@ -787,29 +846,6 @@ public class DBUtil {
             }
         }
         return ids;
-    }
-
-    /**
-     * 根据歌曲id删除某播放列表中歌曲
-     * @param playlist 播放列表名
-     * @param id 需要删除的歌曲id
-     * @return 删除是否成功
-     */
-    public static boolean deleteSongInPlayList(String playlist,int id){
-        boolean ret = false;
-        ArrayList<PlayListItem> list = Global.mPlaylist.get(playlist);
-        if(list != null){
-            for(PlayListItem item : list){
-                if(item.getId() == id){
-                    ret = list.remove(item);
-                    if(ChildHolderActivity.mInstance != null)
-                        ChildHolderActivity.mInstance.UpdateData();
-                    XmlUtil.updatePlaylist();
-                    break;
-                }
-            }
-        }
-       return ret;
     }
 
 

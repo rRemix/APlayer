@@ -16,7 +16,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.AudioHolderActivity;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.SPUtil;
 
@@ -64,7 +64,7 @@ public class NotifyReceiver extends BroadcastReceiver {
             mRemoteView.setImageViewResource(R.id.notify_bg,isSystemColor ? R.drawable.bg_system : R.drawable.bg_black);
 
             //设置封面
-            Bitmap bitmap = DBUtil.getAlbumBitmapBySongId(temp.getId(), true);
+            Bitmap bitmap = MediaStoreUtil.getAlbumBitmapBySongId(temp.getId(), true);
             if(bitmap != null)
                 mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
             else
@@ -101,7 +101,7 @@ public class NotifyReceiver extends BroadcastReceiver {
 
 
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-//                    .setLargeIcon(DBUtil.CheckBitmapByAlbumId((int)temp.getAlbumId(),false))
+//                    .setLargeIcon(MediaStoreUtil.CheckBitmapByAlbumId((int)temp.getAlbumId(),false))
                     .setContent(mRemoteView)
                     .setContentText("")
                     .setContentTitle("")

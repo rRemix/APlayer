@@ -9,7 +9,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -106,7 +105,7 @@ public class SearchActivity extends ToolbarActivity {
                         mCursor.moveToPosition(i);
                         list.add(mCursor.getInt(mIdIndex));
                     }
-                    Global.setPlayingList(list);
+                    Global.setPlayQueue(list);
                 }
             }
             @Override

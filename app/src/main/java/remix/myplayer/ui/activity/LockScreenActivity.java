@@ -33,7 +33,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DBUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.XmlUtil;
@@ -305,7 +305,7 @@ public class LockScreenActivity extends BaseAppCompatActivity implements MusicSe
         public void run() {
             if (mWidth > 0 && mHeight > 0 ) {
                 if (mInfo == null) return;
-                mRawBitMap = DBUtil.getAlbumBitmapBySongId((int) mInfo.getId(),false);
+                mRawBitMap = MediaStoreUtil.getAlbumBitmapBySongId((int) mInfo.getId(),false);
                 if(mRawBitMap == null)
                     mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.artist_empty_bg);
 
