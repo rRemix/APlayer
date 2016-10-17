@@ -1,5 +1,6 @@
 package remix.myplayer.fragment;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -38,7 +39,6 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
-import remix.myplayer.util.XmlUtil;
 
 /**
  * @ClassName
@@ -52,6 +52,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     public static PlayListFragment mInstance = null;
     public static int mPlayListIDIndex;
     public static int mPlayListNameIndex;
+    public static int mPlayListSongCountIndex;
     private Cursor mCursor;
     @BindView(R.id.playlist_recycleview)
     RecyclerView mRecycleView;
@@ -68,8 +69,8 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     private MultiChoice mMultiChoice;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         mPageName = TAG;
         LoaderManager manager = getLoaderManager();
         manager.initLoader(LOADER_ID++, null, this);
@@ -97,12 +98,12 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
                     return;
                 }
                 if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
-                    if(Global.mPlaylist.get(name).size() == 0) {
+                    if(getPlayListSongCount(position) == 0) {
                         Toast.makeText(getActivity(), getString(R.string.list_isempty), Toast.LENGTH_SHORT).show();
                         return;
                     }
                     Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
-                    intent.putExtra("Id", position);
+                    intent.putExtra("Id", getPlayListId(position));
                     intent.putExtra("Title", name);
                     intent.putExtra("Type", Constants.PLAYLIST);
                     intent.putExtra("PlayListID", getPlayListId(position));
@@ -146,6 +147,14 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
             playlistName = mCursor.getString(PlayListFragment.mPlayListNameIndex);
         }
         return playlistName;
+    }
+
+    private int getPlayListSongCount(int position){
+        int count = 0;
+        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
+            count = mCursor.getInt(PlayListFragment.mPlayListSongCountIndex);
+        }
+        return count;
     }
 
     //打开添加播放列表的Dialog
@@ -213,8 +222,8 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), PlayLists.CONTENT_URI,
-                new String[]{MediaStore.Audio.Playlists.NAME,MediaStore.Audio.Playlists._ID},
-                PlayLists.PlayListColumns.NAME + "!= ?",new String[]{"我的收藏"},null);
+                null,
+                PlayLists.PlayListColumns.NAME + "!= ?",new String[]{Constants.PLAY_QUEUE},null);
     }
 
     @Override
@@ -226,6 +235,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
             mCursor = data;
             mPlayListIDIndex = data.getColumnIndex(PlayLists.PlayListColumns._ID);
             mPlayListNameIndex = data.getColumnIndex(PlayLists.PlayListColumns.NAME);
+            mPlayListSongCountIndex = data.getColumnIndex(PlayLists.PlayListColumns.COUNT);
             mAdapter.setCursor(data);
         } catch (Exception e){
             e.printStackTrace();
@@ -241,7 +251,11 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(mCursor != null)
+        if(mCursor != null) {
             mCursor.close();
+        }
+        if(mAdapter != null){
+            mAdapter.setCursor(null);
+        }
     }
 }

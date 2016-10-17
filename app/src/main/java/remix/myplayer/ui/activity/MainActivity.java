@@ -219,7 +219,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             Global.mPlayQueueId = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
             SPUtil.putValue(this,"Setting","PlayQueueID",Global.mPlayQueueId);
             Global.mMyLoveId = PlayListUtil.addPlayList(getString(R.string.my_favorite));
-
+            SPUtil.putValue(this,"Setting","MyLoveID",Global.mMyLoveId);
         }
         initLastSong();
 

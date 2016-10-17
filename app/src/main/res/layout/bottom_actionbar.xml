@@ -37,8 +37,7 @@
                 android:lines="1"
                 android:textColor="?attr/text_color_primary"
                 android:textSize="@dimen/s18_size"
-                android:id="@+id/bottom_title"
-                android:text="歌曲名"/>
+                android:id="@+id/bottom_title" />
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
@@ -46,8 +45,7 @@
                 android:lines="1"
                 android:id="@+id/bottom_artist"
                 android:textSize="@dimen/s14_size"
-                android:textColor="?attr/text_color"
-                android:text="歌手"/>
+                android:textColor="?attr/text_color" />
         </LinearLayout>
         <!-- 下一首与播放按钮 -->
 

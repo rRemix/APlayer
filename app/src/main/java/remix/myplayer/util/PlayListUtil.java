@@ -82,6 +82,8 @@ public class PlayListUtil {
      * @return 新增歌曲的id
      */
     public static int addSong(PlayListSongInfo info){
+        if(getIDList(info.PlayListID).contains(info.AudioId))
+            return 0;
         ContentValues cv = new ContentValues();
         cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID,info.AudioId);
 //        cv.put(PlayListSongs.PlayListSongColumns.Album,info.Album);
@@ -228,11 +230,11 @@ public class PlayListUtil {
         ArrayList<Integer> IDList = new ArrayList<>();
         Cursor cursor = null;
         try {
-            cursor = mProvider.query(PlayLists.CONTENT_URI,new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
-                    PlayLists.PlayListColumns._ID + "=?",new String[]{playlistId + ""},null,null);
+            cursor = mContext.getContentResolver().query(PlayListSongs.CONTENT_URI,new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
+                    PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?",new String[]{playlistId + ""},null,null);
             if(cursor != null && cursor.getCount() > 0){
                 while (cursor.moveToNext()){
-                    IDList.add(cursor.getInt(cursor.getInt(cursor.getColumnIndex(PlayListSongs.PlayListSongColumns.AUDIO_ID))));
+                    IDList.add(cursor.getInt(cursor.getColumnIndex(PlayListSongs.PlayListSongColumns.AUDIO_ID)));
                 }
             }
         } catch (Exception e){
@@ -253,9 +255,9 @@ public class PlayListUtil {
     public static PlayListNewInfo getPlayListInfo(Cursor cursor){
         PlayListNewInfo info = new PlayListNewInfo();
         try {
+            info.Count = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
             info._Id = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns._ID));
             info.Name = cursor.getString(cursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
-            info.Count = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
         } catch (Exception e){
             e.printStackTrace();
         }

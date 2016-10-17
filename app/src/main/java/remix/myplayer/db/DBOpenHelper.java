@@ -25,7 +25,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String CREATE_TABLE_PLAY_LIST_SONG =
             "create table if not exists play_list_song(" +
                     "_id integer primary key," +
-                    "audio_id integer unique," +
+                    "audio_id integer," +
                     "play_list_id integer," +
                     "play_list_name text)";
 //    "create table if not exists play_list_song(" +

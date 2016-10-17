@@ -13,7 +13,9 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
+import remix.myplayer.application.Application;
 import remix.myplayer.util.LogUtil;
 
 /**
@@ -30,7 +32,8 @@ public class DBContentProvider extends ContentProvider {
     public static final int PLAY_LIST_SONG_MULTIPLE = 3;
 //    public static final int PLAY_LIST_SONG_SINGLE = 4;
     private static UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-    private Context mContext;
+    private static DBOpenHelper mOpenHelper;
+
     private static ContentObserver mPlayListObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
@@ -71,32 +74,35 @@ public class DBContentProvider extends ContentProvider {
     }
 
     public DBContentProvider(){
-        super();
+
     }
     public DBContentProvider(Context context){
-        mContext = context;
+
     }
 
     @Override
     public boolean onCreate() {
-        if(mContext != null && mContext.getContentResolver() != null){
-//            mContext.getContentResolver().registerContentObserver(PlayLists.CONTENT_URI,true,mPlayListObserver);
-//            mContext.getContentResolver().registerContentObserver(PlayListSongs.CONTENT_URI,true,mPlayListSongObserver);
-        }
+        mOpenHelper = new DBOpenHelper(Application.getContext());
         return true;
     }
+
 
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        SQLiteDatabase db = DBOpenHelper.getInstance().getReadableDatabase();
-        int match = mUriMatcher.match(uri);
-        Cursor cursor = db.query(match == PLAY_LIST_MULTIPLE  ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
-                projection,selection,selectionArgs,null,null,null);
-//        cursor.setNotificationUri(mContext.getContentResolver(), uri);
-
-        if(db != null)
-            db.close();
+        Cursor cursor = null;
+        SQLiteDatabase db = new DBOpenHelper(Application.getContext()).getReadableDatabase();
+        try {
+            int match = mUriMatcher.match(uri);
+            cursor = db.query(match == PLAY_LIST_MULTIPLE  ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
+                        projection,selection,selectionArgs,null,null,null);
+            cursor.setNotificationUri(Application.getContext().getContentResolver(), uri);
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+//            if(db != null)
+//                db.close();
+        }
         return cursor;
     }
 
@@ -108,7 +114,7 @@ public class DBContentProvider extends ContentProvider {
         if(songs == null || songs.size() == 0)
             return 0;
         int lines = 0;
-        SQLiteDatabase db = DBOpenHelper.getInstance().getWritableDatabase();
+        SQLiteDatabase db = new DBOpenHelper(Application.getContext()).getWritableDatabase();
         for(PlayListSongInfo info : songs){
             try {
                 ContentValues cv = new ContentValues();
@@ -120,6 +126,9 @@ public class DBContentProvider extends ContentProvider {
                 }
             } catch (Exception e){
                 e.printStackTrace();
+            } finally {
+//                if(db != null )
+//                    db.close();
             }
         }
 //        try {
@@ -157,44 +166,41 @@ public class DBContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        SQLiteDatabase db = DBOpenHelper.getInstance().getWritableDatabase();
+        SQLiteDatabase db = new DBOpenHelper(Application.getContext()).getWritableDatabase();
         int match = mUriMatcher.match(uri);
         Uri newUri = Uri.EMPTY;
         try {
-            synchronized (DBOpenHelper.getInstance()){
-                if(match == PLAY_LIST_MULTIPLE || match == PLAY_LIST_SONG_MULTIPLE){
-                    long rowId = db.insert(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,null,values);
-                    LogUtil.d("DBTest","rowId:" + rowId);
-                    if(rowId > 0){
-                        newUri = ContentUris.withAppendedId(match == PLAY_LIST_MULTIPLE ? PlayLists.CONTENT_URI : PlayListSongs.CONTENT_URI,rowId);
-                        mContext.getContentResolver().notifyChange(newUri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
+            if(match == PLAY_LIST_MULTIPLE || match == PLAY_LIST_SONG_MULTIPLE){
+                long rowId = db.insert(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,null,values);
+                LogUtil.d("DBTest","rowId:" + rowId);
+                if(rowId > 0){
+                    newUri = ContentUris.withAppendedId(match == PLAY_LIST_MULTIPLE ? PlayLists.CONTENT_URI : PlayListSongs.CONTENT_URI,rowId);
+//                    mContext.getContentResolver().notifyChange(newUri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
                     }
                 }
-            }
+//            }
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            if(db != null)
-                db.close();
+//            if(db != null )
+//                db.close();
         }
         return newUri;
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = DBOpenHelper.getInstance().getWritableDatabase();
+        SQLiteDatabase db = new DBOpenHelper(Application.getContext()).getWritableDatabase();
         int match = mUriMatcher.match(uri);
         int deleteRow = 0;
         try {
-            synchronized (DBOpenHelper.getInstance()){
-                deleteRow = db.delete(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME, selection,selectionArgs);
-                mContext.getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
-            }
+            deleteRow = db.delete(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME, selection, selectionArgs);
+//            mContext.getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
         }catch (Exception e){
             e.printStackTrace();
         } finally {
-            if(db != null)
-                db.close();
+//            if(db != null)
+//                db.close();
         }
 
         return deleteRow;
@@ -202,20 +208,18 @@ public class DBContentProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = DBOpenHelper.getInstance().getWritableDatabase();
+        SQLiteDatabase db = new DBOpenHelper(Application.getContext()).getWritableDatabase();
         int match = mUriMatcher.match(uri);
         int updateRow = 0;
         try {
-            synchronized (DBOpenHelper.getInstance()){
-                updateRow = db.delete(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
-                        selection,selectionArgs);
-                mContext.getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
-            }
+            updateRow = db.delete(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
+                    selection,selectionArgs);
+//            mContext.getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            if(db != null)
-                db.close();
+//            if(db != null )
+//                db.close();
         }
 
         return updateRow;

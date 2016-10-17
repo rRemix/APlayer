@@ -140,11 +140,11 @@ public class Application extends android.app.Application {
             public void run() {
                 //读取sd卡歌曲id
                 Global.mAllSongList = MediaStoreUtil.getAllSongsId();
-                //读取正在播放列表
-                if(!SPUtil.getValue(mContext, "Setting", "First", true)){
-                    Global.mPlayQueueId = SPUtil.getValue(mContext,"Setting","PlayQueueID",Global.mPlayQueueId);
-                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
-                }
+                //读取播放队列
+//                if(!SPUtil.getValue(mContext, "Setting", "First", true)){
+//                    Global.mPlayQueueId = SPUtil.getValue(mContext,"Setting","PlayQueueID",Global.mPlayQueueId);
+//                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
+//                }
 //                Global.mPlayQueue = XmlUtil.getPlayQueue();
 //                Global.setPlayQueue(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0 ?
 //                                        Global.mAllSongList : Global.mPlayQueue);

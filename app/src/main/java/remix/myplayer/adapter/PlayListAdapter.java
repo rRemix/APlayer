@@ -87,7 +87,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
             if(info == null)
                 return;
             holder.mName.setText(info.Name);
-            holder.mOther.setText(info.Count);
+            holder.mOther.setText(info.Count + "首歌曲");
             //设置专辑封面
             new AsynLoadImage(holder.mImage).execute(info._Id);
 
@@ -271,8 +271,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 
     class AsynLoadImage extends AsyncTask<Integer,Integer,String> {
         private final SimpleDraweeView mImage;
-        public AsynLoadImage(SimpleDraweeView imageView)
-        {
+        public AsynLoadImage(SimpleDraweeView imageView) {
             mImage = imageView;
         }
         @Override
