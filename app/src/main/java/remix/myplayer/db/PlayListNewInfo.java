@@ -10,4 +10,9 @@ public class PlayListNewInfo {
     public int _Id;
     public String Name;
     public int Count;
+    public PlayListNewInfo(){}
+    public PlayListNewInfo(String name, int count) {
+        Name = name;
+        Count = count;
+    }
 }

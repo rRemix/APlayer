@@ -10,6 +10,8 @@ package remix.myplayer.util;
 public class Constants {
     //应用包名
     public final static String PACKAGE_NAME = "remix.myplayer";
+    //播放队列
+    public final static String PLAY_QUEUE = "播放队列";
 
     //显示模式 1:列表 2:网格
     public final static int LIST_MODEL = 1;

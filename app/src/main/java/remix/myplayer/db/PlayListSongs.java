@@ -14,6 +14,10 @@ public class PlayListSongs {
         public static final String AUDIO_ID = "audio_id";
         public static final String PLAY_LIST_ID = "play_list_id";
         public static final String PLAY_LIST_NAME = "play_list_name";
-        public static final String DATA = "_data";
+//        public static final String Album_ID = "album_id";
+//        public static final String Album = "album";
+//        public static final String Artist = "artist";
+//        public static final String Artist_ID = "artist_id";
+//        public static final String DATA = "data";
     }
 }

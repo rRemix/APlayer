@@ -48,6 +48,7 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.XmlUtil;
@@ -214,7 +215,11 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             SPUtil.putValue(this,"Setting","ThemeMode",ThemeStore.DAY);
             SPUtil.putValue(this,"Setting","ThemeColor",ThemeStore.THEME_PINK);
             //添加我的收藏列表
-            XmlUtil.addPlaylist(this,"我的收藏");
+//            XmlUtil.addPlaylist(this,"我的收藏");
+            Global.mPlayQueueId = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
+            SPUtil.putValue(this,"Setting","PlayQueueID",Global.mPlayQueueId);
+            Global.mMyLoveId = PlayListUtil.addPlayList(getString(R.string.my_favorite));
+
         }
         initLastSong();
 
@@ -228,9 +233,14 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
      * 默认为第一首歌曲
      */
     private void initLastSong() {
+        //第一次打开软件，播放队列以及正在播放歌曲都为空
+//        if(mIsFirstAfterInstall){
+//            mBottomBar.UpdateBottomStatus(new MP3Item(),false);
+//        }
+
         if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
             return;
-        //如果是第一次打开，设置第一手歌曲为正在播放
+        //如果是第一次打开，设置第一首歌曲为正在播放
         if(mIsFirstAfterInstall){
             int id =  Global.mPlayQueue.get(0);
             MP3Item item = MediaStoreUtil.getMP3InfoById(id);

@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Handler;
@@ -105,29 +104,51 @@ public class DBContentProvider extends ContentProvider {
      *  插入多条歌曲信息
      * @return
      */
-    public int insertMultiple(ArrayList<ContentValues> songs){
+    public int insertMultiSong(ArrayList<PlayListSongInfo> songs){
         if(songs == null || songs.size() == 0)
             return 0;
         int lines = 0;
         SQLiteDatabase db = DBOpenHelper.getInstance().getWritableDatabase();
-        try {
-            synchronized (DBOpenHelper.getInstance()){
-                db.beginTransaction();
-                for(ContentValues song : songs){
-                    if(db.insert(PlayListSongs.TABLE_NAME,null,song) > 0){
-                        lines++;
-                    }
+        for(PlayListSongInfo info : songs){
+            try {
+                ContentValues cv = new ContentValues();
+                cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID,info.AudioId);
+                cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID,info.PlayListID);
+                cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME,info.PlayListName);
+                if(db.insert(PlayListSongs.TABLE_NAME,null,cv) > 0){
+                    lines++;
                 }
-                db.setTransactionSuccessful();
-                db.endTransaction();
-                mContext.getContentResolver().notifyChange(PlayListSongs.CONTENT_URI,null);
+            } catch (Exception e){
+                e.printStackTrace();
             }
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            if(db != null)
-                db.close();
         }
+//        try {
+//            synchronized (DBOpenHelper.getInstance()){
+//                db.beginTransaction();
+//                for(PlayListSongInfo info : songs){
+//                    ContentValues cv = new ContentValues();
+//                    cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID,info.AudioId);
+//                    cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID,info.PlayListID);
+//                    cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME,info.PlayListName);
+//                    try {
+//                        if(db.insert(PlayListSongs.TABLE_NAME,null,cv) > 0){
+//                            lines++;
+//                        }
+//                    } catch (Exception e){
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//                db.setTransactionSuccessful();
+//                db.endTransaction();
+//                mContext.getContentResolver().notifyChange(PlayListSongs.CONTENT_URI,null);
+//            }
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        } finally {
+//            if(db != null)
+//                db.close();
+//        }
 
         return lines;
     }

@@ -28,15 +28,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
+import remix.myplayer.db.PlayListSongInfo;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
-import remix.myplayer.util.XmlUtil;
+import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.PlayListUtil;
 
 /**
  * Created by Remix on 2016/3/9.
@@ -287,9 +288,11 @@ public class LockScreenActivity extends BaseAppCompatActivity implements MusicSe
         if(mInfo == null)
             return;
         if(!mIsLove){
-            XmlUtil.addSongToPlayList(getString(R.string.my_favorite),mInfo.getTitle(),mInfo.getId(),mInfo.getAlbumId(),mInfo.getArtist(),true);
+            PlayListUtil.addSong(new PlayListSongInfo(mInfo.getId(),Global.mMyLoveId,getString(R.string.my_favorite)));
+//            XmlUtil.addSongToPlayList(getString(R.string.my_favorite),mInfo.getTitle(),mInfo.getId(),mInfo.getAlbumId(),mInfo.getArtist(),true);
         } else {
-            XmlUtil.deleteSongFromPlayList(getString(R.string.my_favorite),new PlayListItem(mInfo.getTitle(),mInfo.getId(),mInfo.getAlbumId(),mInfo.getArtist()));
+            PlayListUtil.deleteSong(mInfo.getId(),Global.mMyLoveId);
+//            XmlUtil.deleteSongFromPlayList(getString(R.string.my_favorite),new PlayListItem(mInfo.getTitle(),mInfo.getId(),mInfo.getAlbumId(),mInfo.getArtist()));
         }
         mIsLove = !mIsLove;
         mLoveButton.setImageResource(mIsLove ? R.drawable.lock_btn_loved : R.drawable.lock_btn_love);

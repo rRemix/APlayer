@@ -30,13 +30,12 @@
         <!--android:layout_height="1dp"-->
         <!--android:background="#E6E6E6" />-->
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="7"
         android:layout_marginTop="1dp"
-        android:id="@+id/playlist_addto_list"
-        android:divider="@null" />
+        android:id="@+id/playlist_addto_list" />
     <Button
         android:id="@+id/playlist_addto_cancel"
         android:layout_margin="20dp"

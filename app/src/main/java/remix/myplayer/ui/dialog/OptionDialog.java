@@ -31,6 +31,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -148,7 +149,7 @@ public class OptionDialog extends BaseDialogActivity {
                                                 getString(R.string.delete_success) :
                                                 getString(R.string.delete_error);
                                     } else {
-                                        result = XmlUtil.deleteSongInPlayList(mPlayListName,mInfo.getId()) ?
+                                        result = PlayListUtil.deleteSong(mInfo.getId(),mPlayListName) ?
                                                 getString(R.string.delete_success):
                                                 getString(R.string.delete_error);
                                     }

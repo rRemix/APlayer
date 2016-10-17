@@ -20,6 +20,7 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -81,7 +82,8 @@ public class PlayQueueAdapter extends BaseAdapter {
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    XmlUtil.deleteSongFromPlayQueue(temp.getId());
+//                    XmlUtil.deleteSongFromPlayQueue(temp.getId());
+                    PlayListUtil.deleteSong(temp.getId(),Global.mPlayQueueId);
                     if(temp.getId() == MusicService.getCurrentMP3().getId()) {
                         Intent intent = new Intent(Constants.CTL_ACTION);
                         intent.putExtra("Control", Constants.NEXT);
@@ -92,6 +94,10 @@ public class PlayQueueAdapter extends BaseAdapter {
 //                    notifyDataSetChanged();
                 }
             });
+        } else {
+            //歌曲已经失效
+            holder.mSong.setText(mContext.getString(R.string.song_lose_effect));
+            holder.mArtist.setVisibility(View.GONE);
         }
         return convertView;
 

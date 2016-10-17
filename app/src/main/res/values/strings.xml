@@ -56,6 +56,8 @@
     <string name="add_song_playinglist_error">添加歌曲到播放队列失败</string>
     <string name="add_song_playlist_error">添加歌曲到该播放列表失败</string>
 
+    <string name="load_playlist_error">加载播放列表失败</string>
+
     <string name="confirm_delete_playlist">确认从该播放列表移除?</string>
     <string name="confirm_delete_song">确认从曲库删除?</string>
     <string name="confirm_delelte">确认删除</string>
@@ -74,6 +76,5 @@
     <string name="create_playlist">创建播放列表...</string>
     <string name="use_system_color">使用系统底色</string>
     <string name="use_black_color">使用黑色底色</string>
-
 
 </resources>

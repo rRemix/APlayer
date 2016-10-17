@@ -30,6 +30,7 @@ import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.PlayListUtil;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -251,21 +252,15 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
                 break;
             //播放列表名
             case Constants.PLAYLIST:
-                ArrayList<PlayListItem> list = Global.mPlaylist.get(mArg);
-                if(list == null)
-                    break;
-                for(PlayListItem item : list) {
-                    MP3Item temp = new MP3Item(item.getId(),item.getSongame(),item.getSongame(),"",item.getAlbumId(),
-                            item.getArtist(),0,"","",0,"");
-                    mInfoList.add(temp);
-//                    MP3Item temp = MediaStoreUtil.getMP3InfoById(item.getId());
-//                    //该歌曲已经失效
-//                    if(temp == null){
-//                        MediaStoreUtil.deleteSongInPlayList(mArg,item.getId());
-//                    } else {
-//                        mInfoList.add(temp);
-//                    }
-                }
+//                ArrayList<PlayListItem> list = Global.mPlaylist.get(mArg);
+//                if(list == null)
+//                    break;
+//                for(PlayListItem item : list) {
+//                    MP3Item temp = new MP3Item(item.getId(),item.getSongame(),item.getSongame(),"",item.getAlbumId(),
+//                            item.getArtist(),0,"","",0,"");
+//                    mInfoList.add(temp);
+//                }
+                mInfoList = MediaStoreUtil.getMP3ListByIds(PlayListUtil.getIDList(mId));
                 break;
         }
         return mInfoList;

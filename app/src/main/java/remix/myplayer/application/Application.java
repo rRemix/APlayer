@@ -15,16 +15,16 @@ import cn.bmob.v3.Bmob;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.CrashHandler;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.XmlUtil;
 
@@ -132,21 +132,24 @@ public class Application extends android.app.Application {
     }
 
     /**
-     * 读取歌曲id列表与正在播放列表
+     * 读取歌曲id列表与播放队列
      */
     public void loadSong() {
         new Thread() {
             @Override
             public void run() {
-
                 //读取sd卡歌曲id
                 Global.mAllSongList = MediaStoreUtil.getAllSongsId();
                 //读取正在播放列表
-                Global.mPlayQueue = XmlUtil.getPlayQueue();
-                Global.setPlayQueue(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0 ?
-                                        Global.mAllSongList : Global.mPlayQueue);
+                if(!SPUtil.getValue(mContext, "Setting", "First", true)){
+                    Global.mPlayQueueId = SPUtil.getValue(mContext,"Setting","PlayQueueID",Global.mPlayQueueId);
+                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
+                }
+//                Global.mPlayQueue = XmlUtil.getPlayQueue();
+//                Global.setPlayQueue(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0 ?
+//                                        Global.mAllSongList : Global.mPlayQueue);
                 //读取播放列表
-                Global.mPlaylist = XmlUtil.getPlayList("playlist.xml");
+//                Global.mPlaylist = XmlUtil.getPlayList("playlist.xml");
             }
         }.start();
     }
@@ -160,6 +163,7 @@ public class Application extends android.app.Application {
         ErrUtil.setContext(mContext);
         DiskCache.init(mContext);
         ColorUtil.setContext(mContext);
+        PlayListUtil.setContext(mContext);
         final int CacheSize = (int)(Runtime.getRuntime().maxMemory() / 8);
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
                 .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {

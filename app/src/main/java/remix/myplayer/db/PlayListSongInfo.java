@@ -7,8 +7,19 @@ package remix.myplayer.db;
  * @Date 2016/10/13 11:21
  */
 public class PlayListSongInfo {
-    public int AudioId;
     public int _Id;
+    public int AudioId;
+//    public int AlbumID;
+//    public String Album;
+//    public int ArtistID;
+//    public String Artist;
+//    public String Data;
     public int PlayListID;
     public String PlayListName;
+    public PlayListSongInfo(){}
+    public PlayListSongInfo(int audioId, int playListID,String playListName) {
+        AudioId = audioId;
+        PlayListID = playListID;
+        PlayListName = playListName;
+    }
 }

@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import remix.myplayer.application.Application;
+import remix.myplayer.db.PlayListSongInfo;
+import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.model.PlayListItem;
 
 /**
@@ -30,10 +33,6 @@ public class Global {
      */
     public static int mAlbunOrArtist = 1;
 
-    /**
-     * 是否开启字母索引
-     */
-    public static boolean mIndexOpen = false;
 
     /**
      * 操作类型
@@ -85,31 +84,60 @@ public class Global {
         return mNotifyShowing;
     }
 
+    public static int mPlayQueueId = 0;
+    public static int mMyLoveId;
     /**
      * 设置正在播放列表
-     * @param list
+     * @param newQueueIdList
      */
-    public static void setPlayQueue(ArrayList<Integer> list) {
-        mPlayQueue = (ArrayList<Integer>) list.clone();
-        XmlUtil.updatePlayQueue();
+    public static void setPlayQueue(final ArrayList<Integer> newQueueIdList) {
+//        mPlayQueue = (ArrayList<Integer>) list.clone();
+//        XmlUtil.updatePlayQueue();
+        new Thread(){
+            @Override
+            public void run() {
+                mPlayQueue = (ArrayList<Integer>) newQueueIdList.clone();
+                PlayListUtil.deleteMultiSongs(mPlayQueue,mPlayQueueId);
+                ArrayList<PlayListSongInfo> infos = new ArrayList<>();
+                for(Integer id : newQueueIdList){
+                    infos.add(new PlayListSongInfo(id,mPlayQueueId,Constants.PLAY_QUEUE));
+                }
+                PlayListUtil.addMultiSongs(infos);
+            }
+        }.start();
     }
-
 
     /**
      * 添加歌曲到正在播放列表
-     * @param list
+     * @param newQueueIdList
      */
-    public static void AddSongToPlayQueue(ArrayList<Integer> list) {
-        ArrayList<Integer> songIdlist = new ArrayList<>();
-        for (Integer id : list){
-            if(!mPlayQueue.contains(id))
-                songIdlist.add(id);
-        }
-        mPlayQueue.clear();
-        mPlayQueue = songIdlist;
-        XmlUtil.updatePlayQueue();
+    public static void AddSongToPlayQueue(final ArrayList<Integer> newQueueIdList) {
+//        ArrayList<Integer> songIdlist = new ArrayList<>();
+//        for (Integer id : list){
+//            if(!mPlayQueue.contains(id))
+//                songIdlist.add(id);
+//        }
+//        mPlayQueue.clear();
+//        mPlayQueue = songIdlist;
+//        XmlUtil.updatePlayQueue();
+        new Thread(){
+            @Override
+            public void run() {
+                ArrayList<Integer> songIdlist = new ArrayList<>();
+                for (Integer id : newQueueIdList){
+                if(!mPlayQueue.contains(id))
+                    songIdlist.add(id);
+                }
+                mPlayQueue.clear();
+                mPlayQueue = songIdlist;
+                PlayListUtil.deleteMultiSongs(mPlayQueue,mPlayQueueId);
+                ArrayList<PlayListSongInfo> infos = new ArrayList<>();
+                for(Integer id : newQueueIdList){
+                    infos.add(new PlayListSongInfo(id,mPlayQueueId,Constants.PLAY_QUEUE));
+                }
+                PlayListUtil.addMultiSongs(infos);
+            }
+        }.start();
     }
-
-
 
 }

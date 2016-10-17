@@ -27,6 +27,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
+import remix.myplayer.db.PlayLists;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -35,6 +36,7 @@ import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.XmlUtil;
 
@@ -46,6 +48,7 @@ import remix.myplayer.util.XmlUtil;
  */
 public class PlayListFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>{
     public static final String TAG = PlayListFragment.class.getSimpleName();
+    private static int LOADER_ID = 0;
     public static PlayListFragment mInstance = null;
     public static int mPlayListIDIndex;
     public static int mPlayListNameIndex;
@@ -68,11 +71,13 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPageName = TAG;
+        LoaderManager manager = getLoaderManager();
+        manager.initLoader(LOADER_ID++, null, this);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_playlist,null);
         mUnBinder = ButterKnife.bind(this,rootView);
 
@@ -85,8 +90,12 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
         mAdapter.setOnItemClickLitener(new PlayListAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(View view, int position) {
-                mAdapter.notifyDataSetChanged();
-                String name = CommonUtil.getMapkeyByPosition(Global.mPlaylist,position);
+//                String name = CommonUtil.getMapkeyByPosition(Global.mPlaylist,position);
+                String name = getPlayListName(position);
+                //多选状态下我的收藏列表不能被选中
+                if(mMultiChoice.isShow() && name.equals(getString(R.string.my_favorite))){
+                    return;
+                }
                 if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
                     if(Global.mPlaylist.get(name).size() == 0) {
                         Toast.makeText(getActivity(), getString(R.string.list_isempty), Toast.LENGTH_SHORT).show();
@@ -96,6 +105,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
                     intent.putExtra("Id", position);
                     intent.putExtra("Title", name);
                     intent.putExtra("Type", Constants.PLAYLIST);
+                    intent.putExtra("PlayListID", getPlayListId(position));
                     startActivity(intent);
                 }
             }
@@ -122,6 +132,22 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
         return ListModel;
     }
 
+    private int getPlayListId(int position){
+        int playListId = -1;
+        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
+            playListId = mCursor.getInt(PlayListFragment.mPlayListIDIndex);
+        }
+        return playListId;
+    }
+
+    private String getPlayListName(int position){
+        String playlistName = "";
+        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
+            playlistName = mCursor.getString(PlayListFragment.mPlayListNameIndex);
+        }
+        return playlistName;
+    }
+
     //打开添加播放列表的Dialog
     @OnClick({R.id.list_model,R.id.grid_model,R.id.add})
     public void onClick(View v){
@@ -144,7 +170,8 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
                             @Override
                             public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                                 if(!TextUtils.isEmpty(input)){
-                                    XmlUtil.addPlaylist(getActivity(),input.toString());
+//                                    XmlUtil.addPlaylist(getActivity(),input.toString());
+                                    PlayListUtil.addPlayList(input.toString());
                                 }
                             }
                         })
@@ -185,34 +212,36 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getActivity(), MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                new String[]{MediaStore.Audio.Playlists.NAME,MediaStore.Audio.Playlists._ID},null,null,null);
+        return new CursorLoader(getActivity(), PlayLists.CONTENT_URI,
+                new String[]{MediaStore.Audio.Playlists.NAME,MediaStore.Audio.Playlists._ID},
+                PlayLists.PlayListColumns.NAME + "!= ?",new String[]{"我的收藏"},null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-//        if(data == null)
-//            return;
-//        //查询完毕后保存结果，并设置查询索引
-//        try {
-//            mCursor = data;
-//            mPlayListIDIndex = data.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-//            mAdapter.setCursor(data);
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        }
+        if(data == null)
+            return;
+        //查询完毕后保存结果，并设置查询索引
+        try {
+            mCursor = data;
+            mPlayListIDIndex = data.getColumnIndex(PlayLists.PlayListColumns._ID);
+            mPlayListNameIndex = data.getColumnIndex(PlayLists.PlayListColumns.NAME);
+            mAdapter.setCursor(data);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-//        if (mAdapter != null)
-//            mAdapter.setCursor(null);
+        if (mAdapter != null)
+            mAdapter.setCursor(null);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        if(mCursor != null)
-//            mCursor.close();
+        if(mCursor != null)
+            mCursor.close();
     }
 }

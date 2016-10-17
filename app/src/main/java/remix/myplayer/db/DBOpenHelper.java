@@ -20,15 +20,23 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String CREATE_TABLE_PLAY_LIST =
             "create table if not exists play_list(" +
                     "_id integer primary key ," +
-                    "name text," +
+                    "name text unique," +
                     "count integer)";
     public static final String CREATE_TABLE_PLAY_LIST_SONG =
             "create table if not exists play_list_song(" +
                     "_id integer primary key," +
-                    "audio_id integer," +
+                    "audio_id integer unique," +
                     "play_list_id integer," +
-                    "play_list_name text," +
-                    "_data text)";
+                    "play_list_name text)";
+//    "create table if not exists play_list_song(" +
+//            "_id integer primary key," +
+//            "audio_id integer," +
+//            "play_list_id integer," +
+//            "_data text," +
+//            "artist text," +
+//            "artist_id integer," +
+//            "album text," +
+//            "album_id integer)";
 
     public static final String CREATE_TRIGGER_DELETE_PLAY_LIST =
             "create trigger play_list_delete_trigger " +
