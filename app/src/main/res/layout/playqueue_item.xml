@@ -38,4 +38,9 @@
         android:layout_centerVertical="true"
         android:src="@drawable/bg_btn_playlist_delete"
         android:background="@color/transparent"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#E6E6E6"
+        android:layout_alignParentBottom="true"/>
 </RelativeLayout>

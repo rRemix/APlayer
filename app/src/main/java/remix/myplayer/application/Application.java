@@ -11,14 +11,10 @@ import com.umeng.analytics.MobclickAgent;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import cn.bmob.v3.Bmob;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.LockScreenListener;
-import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.util.ColorUtil;
@@ -31,8 +27,6 @@ import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.SPUtil;
-import remix.myplayer.util.XmlUtil;
 
 /**
  * Created by taeja on 16-3-16.
@@ -165,7 +159,6 @@ public class Application extends android.app.Application {
         //初始化工具类
         DBManager.initialInstance(new DBOpenHelper(mContext));
         PermissionUtil.setContext(mContext);
-        XmlUtil.setContext(mContext);
         MediaStoreUtil.setContext(mContext);
         CommonUtil.setContext(mContext);
         ErrUtil.setContext(mContext);

@@ -17,14 +17,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="9">
-        <ListView
-            android:choiceMode="singleChoice"
-            android:divider="#E6E6E6"
-            android:dividerHeight="1px"
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/bottom_actionbar_play_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </ListView>
+            android:layout_height="match_parent"/>
     </LinearLayout>
 
 </LinearLayout>

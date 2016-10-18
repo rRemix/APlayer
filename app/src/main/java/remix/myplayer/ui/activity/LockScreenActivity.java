@@ -28,10 +28,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.model.PlayListItem;
+import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -253,12 +252,11 @@ public class LockScreenActivity extends BaseAppCompatActivity implements MusicSe
         //判断是否收藏
         mIsLove = false;
         try {
-            ArrayList<PlayListItem> list = Global.mPlayList.get("我的收藏");
-            for(PlayListItem item : list){
-                if(item.getId() == mInfo.getId()){
-                    mIsLove = true;
-                }
-            }
+            ArrayList<Integer> list = PlayListUtil.getIDList(Global.mMyLoveId);
+            if(list == null || list.size() == 0)
+                return;
+            if(list.contains(mInfo.getId()))
+                mIsLove = true;
         } catch (Exception e){
             LogUtil.d(TAG,"list error:" + e.toString());
             e.printStackTrace();

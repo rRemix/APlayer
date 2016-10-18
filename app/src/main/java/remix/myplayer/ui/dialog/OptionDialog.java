@@ -32,7 +32,6 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.XmlUtil;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -69,7 +68,7 @@ public class OptionDialog extends BaseDialogActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //去掉标题
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_option);
         ButterKnife.bind(this);
@@ -95,7 +94,6 @@ public class OptionDialog extends BaseDialogActivity {
         lp.width = (metrics.widthPixels);
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
-
     }
 
     @OnClick({R.id.popup_add,R.id.popup_share,R.id.popup_delete,R.id.popup_ring})

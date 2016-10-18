@@ -23,10 +23,9 @@ import remix.myplayer.model.PlayListNewInfo;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.XmlUtil;
 
 /**
  * @ClassName
@@ -103,7 +102,6 @@ public class MultiChoice implements OnMultiItemClickListener {
 //        }
 
         num = Global.AddSongToPlayQueue(idList);
-//        num = XmlUtil.addSongsToPlayingList(idList);
         Toast.makeText(mContext, mContext.getResources().getString(R.string.add_song_playinglist_success,num),Toast.LENGTH_SHORT).show();
         UpdateOptionMenu(false);
     }
@@ -148,7 +146,6 @@ public class MultiChoice implements OnMultiItemClickListener {
                     @Override
                     public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                         final int num;
-//                        num = XmlUtil.addSongsToPlayList(text.toString(), MediaStoreUtil.getPlayListItemListByIds(idList));
                         num = PlayListUtil.addMultiSongs(idList,playListInfoList.get(which).Name,playListInfoList.get(which)._Id);
                         Toast.makeText(mContext, mContext.getString(R.string.add_song_playlist_success, num)
                                 ,Toast.LENGTH_SHORT).show();
@@ -175,10 +172,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                                     @Override
                                     public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                                         if(!TextUtils.isEmpty(input)){
-                                            XmlUtil.addPlaylist(mContext,input.toString());
                                             final int num;
-//                                            num = XmlUtil.addSongsToPlayList(input.toString(), MediaStoreUtil.getPlayListItemListByIds(idList));
-
                                             int newPlayListId = PlayListUtil.addPlayList(input.toString());
                                             num = PlayListUtil.addMultiSongs(idList,input.toString(),newPlayListId);
                                             Toast.makeText(mContext, mContext.getString(R.string.add_song_playlist_success, num)

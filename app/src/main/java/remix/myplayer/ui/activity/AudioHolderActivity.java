@@ -50,7 +50,7 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.customview.AudioViewPager;
 import remix.myplayer.ui.customview.LrcView;
-import remix.myplayer.ui.dialog.PlayingListDialog;
+import remix.myplayer.ui.dialog.PlayQueueDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -282,7 +282,7 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
             //打开正在播放列表
             case R.id.playbar_playinglist:
                 MobclickAgent.onEvent(this,"PlayingList");
-                startActivity(new Intent(AudioHolderActivity.this,PlayingListDialog.class));
+                startActivity(new Intent(AudioHolderActivity.this,PlayQueueDialog.class));
                 break;
             //关闭
             case R.id.top_hide:

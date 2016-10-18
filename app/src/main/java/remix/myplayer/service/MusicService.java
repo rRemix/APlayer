@@ -32,7 +32,6 @@ import remix.myplayer.receiver.HeadsetPlugReceiver;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.ui.activity.MainActivity;
-import remix.myplayer.ui.dialog.PlayingListDialog;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
@@ -130,8 +129,7 @@ public class MusicService extends BaseService {
     };
 
 
-    private ContentObserver mObserver;
-
+    private ContentObserver mMediaStoreObserver;
     private static Context mContext;
 
     public MusicService(){}
@@ -218,7 +216,7 @@ public class MusicService extends BaseService {
         registerReceiver(mHeadSetReceiver,new IntentFilter(Intent.ACTION_HEADSET_PLUG));
 
         //监听媒体库变化
-        mObserver = new MediaStoreObserver(new Handler(){
+        mMediaStoreObserver = new MediaStoreObserver(new Handler(){
             @Override
             public void handleMessage(Message msg) {
                 //更新文件夹fragment
@@ -227,21 +225,9 @@ public class MusicService extends BaseService {
                         FolderActivity.mInstance.UpdateAdapter();
                     }
                 }
-                //更新正在播放列表
-                if(msg.what == Constants.UPDATE_PLAYINGLIST){
-                    if(PlayingListDialog.mInstance != null){
-                        PlayingListDialog.mInstance.UpdateAdapter();
-                    }
-                }
-//                //更新播放列表
-//                if(msg.what == Constants.UPDATE_PLAYLIST){
-//                    if(PlayListActivity.mInstance != null)
-//                        PlayListActivity.mInstance.UpdateAdapter();
-//                }
-
             }
         });
-        getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,true,mObserver);
+        getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,true, mMediaStoreObserver);
 
 
         //初始化MediaSesson 用于监听线控操作
@@ -319,7 +305,7 @@ public class MusicService extends BaseService {
         mMediaSession.release();
         unregisterReceiver(mRecevier);
         unregisterReceiver(mHeadSetReceiver);
-        getContentResolver().unregisterContentObserver(mObserver);
+        getContentResolver().unregisterContentObserver(mMediaStoreObserver);
     }
 
 

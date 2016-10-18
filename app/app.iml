@@ -65,14 +65,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/meizu/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/meizu/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/meizu/shaders" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/res" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/assets" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/aidl" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/jni" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/rs" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizu/res" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizu/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizu/assets" type="java-test-resource" />
@@ -81,6 +73,14 @@
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizu/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizu/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testMeizu/shaders" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/res" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/assets" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/aidl" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/jni" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/rs" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestMeizu/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/assets" type="java-resource" />
@@ -105,14 +105,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/shaders" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/res" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/assets" type="java-test-resource" />
@@ -121,6 +113,14 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/shaders" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/shaders" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/bundles" />
@@ -158,7 +158,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 23 Platform (1)" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="palette-v7-23.3.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-24.1.1" level="project" />
@@ -189,5 +189,9 @@
     <orderEntry type="library" exported="" name="butterknife-annotations-8.2.1" level="project" />
     <orderEntry type="module" module-name="PushSDK" exported="" />
     <orderEntry type="module" module-name="StackBlur" exported="" />
+    <orderEntry type="library" exported="" name="utdid4all-1.1.5_proguard" level="project" />
+    <orderEntry type="library" exported="" name="com.umeng.message_v3.0.1" level="project" />
+    <orderEntry type="library" exported="" name="renderscript-v8" level="project" />
+    <orderEntry type="library" exported="" name="1_renderscript-v8" level="project" />
   </component>
 </module>

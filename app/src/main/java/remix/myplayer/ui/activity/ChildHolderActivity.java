@@ -193,32 +193,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         }
     }
 
-    public void UpdateData(){
-//        if(!mIsRunning)
-//            return;
-        if(mType == Constants.PLAYLIST){
-            //播放列表
-//            if(!Global.mPlayList.containsKey(mArg)){
-//                mAdapter.setList(new ArrayList<MP3Item>());
-//                mNum.setText("0首歌曲");
-//            } else {
-//                new UpdateThread().start();
-//            }
-        } else if(mType == Constants.FOLDER){
-            //文件夹
-            mArg = getIntent().getStringExtra("Title");
-            if(!Global.mFolderMap.containsKey(mArg)){
-                mAdapter.setList(new ArrayList<MP3Item>());
-                mNum.setText("0首歌曲");
-            } else {
-                new UpdateThread().start();
-            }
-        } else {
-            //艺术家或者专辑
-            new UpdateThread().start();
-        }
-    }
-
     class UpdateThread extends Thread{
         @Override
         public void run() {

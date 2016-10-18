@@ -18,7 +18,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.XmlUtil;
+import remix.myplayer.util.PlayListUtil;
 
 /**
  * Created by taeja on 16-3-17.
@@ -56,7 +56,7 @@ public class AddPlayListDialog extends BaseDialogActivity {
             case R.id.playlist_continue:
                 String name = ((EditText)findViewById(R.id.playlist_add_edit)).getText().toString();
                 if (!TextUtils.isEmpty(name)) {
-                    XmlUtil.addPlaylist(AddPlayListDialog.this,name);
+                    PlayListUtil.addPlayList(name);
                     if(getIntent().getBooleanExtra("FromPlayListActivity",false)){
                         setResult(Activity.RESULT_OK);
                     } else {
