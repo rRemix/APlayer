@@ -44,7 +44,7 @@ public class FolderActivity extends MultiChoiceActivity {
     private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            if(msg.what == Constants.UPDATE_MULTI){
+            if(msg.what == Constants.CLEAR_MULTI){
                 mMultiChoice.clearSelectedViews();
             }
         }
@@ -144,7 +144,7 @@ public class FolderActivity extends MultiChoiceActivity {
         MobclickAgent.onPageEnd(FolderActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
-            mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
+            mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
         }
     }
 

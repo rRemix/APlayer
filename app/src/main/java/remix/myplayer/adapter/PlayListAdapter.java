@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -24,19 +23,17 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.db.PlayListNewInfo;
+import remix.myplayer.model.PlayListNewInfo;
 import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.MultiPosition;
-import remix.myplayer.model.PlayListItem;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 
@@ -153,7 +150,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 //        ArrayList<PlayListItem> items = new ArrayList<>();
 //        try {
 //            //根据当前索引，获得歌曲列表
-//            Iterator it = Global.mPlaylist.keySet().iterator();
+//            Iterator it = Global.mPlayList.keySet().iterator();
 //            for(int i = 0 ; i<= position ;i++) {
 //                it.hasNext();
 //                name = it.next().toString();
@@ -164,7 +161,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
 //        //设置播放列表名字
 //        holder.mName.setText(name);
 //        if(!TextUtils.isEmpty(name)){
-//            items = Global.mPlaylist.get(name);
+//            items = Global.mPlayList.get(name);
 //        }
 //        holder.mOther.setText(items != null ? items.size() + "首" : "");
 //        //设置背景

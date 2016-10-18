@@ -80,7 +80,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
                         mMDDialog.dismiss();
                     }
                     break;
-                case Constants.UPDATE_MULTI:
+                case Constants.CLEAR_MULTI:
                     mMultiChoice.clearSelectedViews();
                     break;
                 case Constants.UPDATE_ADAPTER:
@@ -265,7 +265,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         MobclickAgent.onPageEnd(RecetenlyActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
-            mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
+            mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
         }
     }
 

@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import java.util.LinkedList;
 
-import remix.myplayer.model.LrcItem;
+import remix.myplayer.model.LrcInfo;
 import remix.myplayer.ui.activity.AudioHolderActivity;
 import remix.myplayer.util.DensityUtil;
 
@@ -20,7 +20,7 @@ import remix.myplayer.util.DensityUtil;
 public class LrcView extends TextView {
     public static LrcView mInstance;
     private static final String TAG = LrcView.class.getSimpleName();
-    private LinkedList<LrcItem> mlrcList;
+    private LinkedList<LrcInfo> mlrcList;
     //普通歌词画笔
     private Paint mPaint;
     //高亮歌词的索引
@@ -76,7 +76,7 @@ public class LrcView extends TextView {
         mScroller = new Scroller(getContext());
     }
 
-    public void UpdateLrc(LinkedList<LrcItem> list){
+    public void UpdateLrc(LinkedList<LrcInfo> list){
         mlrcList = list;
         if(mlrcList != null)
             mTotalRow = mlrcList.size();
@@ -177,7 +177,7 @@ public class LrcView extends TextView {
             return -1;
         int index=0;
         for(int i = 0;i < mlrcList.size(); i++) {
-            LrcItem temp = mlrcList.get(i);
+            LrcInfo temp = mlrcList.get(i);
             if(temp.getStartTime() < time)
                 ++index;
 

@@ -158,7 +158,7 @@ public class XmlUtil {
      */
     public static void deletePlaylist(String name)  {
         if(name != null && !name.equals("")) {
-            Global.mPlaylist.remove(name);
+            Global.mPlayList.remove(name);
             updatePlaylist();
         }
     }
@@ -168,28 +168,16 @@ public class XmlUtil {
      * @param context
      * @param name 需要添加的播放列表名字
      */
-    public static void addPlaylist(Context context,String name) {
-        if(name != null && !name.equals("")) {
-            Global.mPlaylist.put(name, new ArrayList<PlayListItem>());
-            updatePlaylist();
-            Toast.makeText(context,R.string.add_playlist_success,Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(context,R.string.add_playlist_error,Toast.LENGTH_SHORT).show();
-        }
-    }
+//    public static void addPlaylist(Context context,String name) {
+//        if(name != null && !name.equals("")) {
+//            Global.mPlayList.put(name, new ArrayList<PlayListItem>());
+//            updatePlaylist();
+//            Toast.makeText(context,R.string.add_playlist_success,Toast.LENGTH_SHORT).show();
+//        } else {
+//            Toast.makeText(context,R.string.add_playlist_error,Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
-    /**
-     * 删除某个播放列表下的歌曲
-     * @param name 播放列表名字
-     * @param item 删除歌曲
-     */
-    public static void deleteSongFromPlayList(String name, PlayListItem item) {
-        if(!item.getSongame().equals("") && !name.equals("")) {
-            ArrayList<PlayListItem> list = Global.mPlaylist.get(name);
-            boolean ret = list.remove(item);
-            updatePlaylist();
-        }
-    }
 
 
     /**
@@ -199,31 +187,31 @@ public class XmlUtil {
      * @param id 歌曲id
      * @param album_id 专辑id
      */
-    public static boolean addSongToPlayList(String playlistName, String song, int id, int album_id,String artist,boolean needUpdate) {
-        if(TextUtils.isEmpty(playlistName) || TextUtils.isEmpty(song) || id < 0 || album_id < 0){
-            return false;
-        }
-        try {
-            boolean isExist = false;
-            for(PlayListItem item : Global.mPlaylist.get(playlistName)){
-                if(item.getId() == id){
-                    isExist = true;
-                }
-            }
-            if(isExist){
-                return false;
-            } else {
-                ArrayList<PlayListItem> list = Global.mPlaylist.get(playlistName);
-                list.add(new PlayListItem(song,id,album_id,artist));
-                if(needUpdate)
-                    updatePlaylist();
-                return true;
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return false;
-    }
+//    public static boolean addSongToPlayList(String playlistName, String song, int id, int album_id,String artist,boolean needUpdate) {
+//        if(TextUtils.isEmpty(playlistName) || TextUtils.isEmpty(song) || id < 0 || album_id < 0){
+//            return false;
+//        }
+//        try {
+//            boolean isExist = false;
+//            for(PlayListItem item : Global.mPlayList.get(playlistName)){
+//                if(item.getId() == id){
+//                    isExist = true;
+//                }
+//            }
+//            if(isExist){
+//                return false;
+//            } else {
+//                ArrayList<PlayListItem> list = Global.mPlayList.get(playlistName);
+//                list.add(new PlayListItem(song,id,album_id,artist));
+//                if(needUpdate)
+//                    updatePlaylist();
+//                return true;
+//            }
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
 
     /**
      * 某个播放列表下新增多首歌曲
@@ -245,49 +233,49 @@ public class XmlUtil {
     /**
      * 更新播放列表
      */
-    public static void updatePlaylist() {
-        FileOutputStream fos = null;
-        try {
-            fos = mContext.openFileOutput("playlist.xml",Context.MODE_PRIVATE);
-            XmlSerializer parser =  XmlPullParserFactory.newInstance().newSerializer();
-            parser.setOutput(fos,"utf-8");
-            parser.startDocument("utf-8",true);
-            parser.startTag(null,"playlist");
-            Iterator it = Global.mPlaylist.keySet().iterator();
-            while(it.hasNext()) {
-                String key = it.next().toString();
-                ArrayList<PlayListItem> list = Global.mPlaylist.get(key);
-                parser.startTag(null,key);
-                for(int i = 0 ; i < list.size() ;i++)
-                {
-                    parser.startTag(null,"song");
-                    parser.attribute(null,"name",list.get(i).getSongame());
-                    parser.attribute(null,"id",String.valueOf(list.get(i).getId()));
-                    parser.attribute(null,"albumid",String.valueOf(list.get(i).getAlbumId()));
-                    parser.attribute(null,"artist",list.get(i).getArtist());
-                    parser.endTag(null,"song");
-                }
-                parser.endTag(null,key);
-            }
-            parser.endTag(null,"playlist");
-            parser.endDocument();
-        }
-        catch (XmlPullParserException e){
-            e.printStackTrace();
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                if(fos != null)
-                    fos.close();
-            }
-            catch (IOException e){
-                e.printStackTrace();
-            }
-        }
-    }
+//    public static void updatePlaylist() {
+//        FileOutputStream fos = null;
+//        try {
+//            fos = mContext.openFileOutput("playlist.xml",Context.MODE_PRIVATE);
+//            XmlSerializer parser =  XmlPullParserFactory.newInstance().newSerializer();
+//            parser.setOutput(fos,"utf-8");
+//            parser.startDocument("utf-8",true);
+//            parser.startTag(null,"playlist");
+//            Iterator it = Global.mPlayList.keySet().iterator();
+//            while(it.hasNext()) {
+//                String key = it.next().toString();
+//                ArrayList<PlayListItem> list = Global.mPlayList.get(key);
+//                parser.startTag(null,key);
+//                for(int i = 0 ; i < list.size() ;i++)
+//                {
+//                    parser.startTag(null,"song");
+//                    parser.attribute(null,"name",list.get(i).getSongame());
+//                    parser.attribute(null,"id",String.valueOf(list.get(i).getId()));
+//                    parser.attribute(null,"albumid",String.valueOf(list.get(i).getAlbumId()));
+//                    parser.attribute(null,"artist",list.get(i).getArtist());
+//                    parser.endTag(null,"song");
+//                }
+//                parser.endTag(null,key);
+//            }
+//            parser.endTag(null,"playlist");
+//            parser.endDocument();
+//        }
+//        catch (XmlPullParserException e){
+//            e.printStackTrace();
+//        }
+//        catch (IOException e){
+//            e.printStackTrace();
+//        }
+//        finally {
+//            try {
+//                if(fos != null)
+//                    fos.close();
+//            }
+//            catch (IOException e){
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
 
     /**
@@ -373,20 +361,20 @@ public class XmlUtil {
      * @param id 需要删除的歌曲id
      * @return 删除是否成功
      */
-    public static boolean deleteSongInPlayList(String playlist,int id){
-        boolean ret = false;
-        ArrayList<PlayListItem> list = Global.mPlaylist.get(playlist);
-        if(list != null){
-            for(PlayListItem item : list){
-                if(item.getId() == id){
-                    ret = list.remove(item);
-                    if(ChildHolderActivity.mInstance != null)
-                        ChildHolderActivity.mInstance.UpdateData();
-                    updatePlaylist();
-                    break;
-                }
-            }
-        }
-       return ret;
-    }
+//    public static boolean deleteSongInPlayList(String playlist,int id){
+//        boolean ret = false;
+//        ArrayList<PlayListItem> list = Global.mPlayList.get(playlist);
+//        if(list != null){
+//            for(PlayListItem item : list){
+//                if(item.getId() == id){
+//                    ret = list.remove(item);
+//                    if(ChildHolderActivity.mInstance != null)
+//                        ChildHolderActivity.mInstance.UpdateData();
+//                    updatePlaylist();
+//                    break;
+//                }
+//            }
+//        }
+//       return ret;
+//    }
 }

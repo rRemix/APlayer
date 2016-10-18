@@ -11,8 +11,14 @@ import com.umeng.analytics.MobclickAgent;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import cn.bmob.v3.Bmob;
+import remix.myplayer.db.DBManager;
+import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.LockScreenListener;
+import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.util.ColorUtil;
@@ -140,6 +146,7 @@ public class Application extends android.app.Application {
             public void run() {
                 //读取sd卡歌曲id
                 Global.mAllSongList = MediaStoreUtil.getAllSongsId();
+
                 //读取播放队列
 //                if(!SPUtil.getValue(mContext, "Setting", "First", true)){
 //                    Global.mPlayQueueId = SPUtil.getValue(mContext,"Setting","PlayQueueID",Global.mPlayQueueId);
@@ -149,13 +156,14 @@ public class Application extends android.app.Application {
 //                Global.setPlayQueue(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0 ?
 //                                        Global.mAllSongList : Global.mPlayQueue);
                 //读取播放列表
-//                Global.mPlaylist = XmlUtil.getPlayList("playlist.xml");
+//                Global.mPlayList = XmlUtil.getPlayList("playlist.xml");
             }
         }.start();
     }
 
     private void initUtil() {
         //初始化工具类
+        DBManager.initialInstance(new DBOpenHelper(mContext));
         PermissionUtil.setContext(mContext);
         XmlUtil.setContext(mContext);
         MediaStoreUtil.setContext(mContext);

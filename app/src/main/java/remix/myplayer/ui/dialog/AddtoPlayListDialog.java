@@ -24,7 +24,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAddtoAdapter;
-import remix.myplayer.db.PlayListSongInfo;
+import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.Theme;
@@ -137,7 +137,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                     .content(R.string.input_playlist_name)
                     .contentColor(ThemeStore.getTextColorPrimary())
                     .inputRange(1,15)
-                    .input("", "本地歌单" + Global.mPlaylist.size(), new MaterialDialog.InputCallback() {
+                    .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
                         @Override
                         public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                             if(!TextUtils.isEmpty(input)){

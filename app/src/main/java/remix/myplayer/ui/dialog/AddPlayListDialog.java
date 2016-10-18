@@ -46,7 +46,7 @@ public class AddPlayListDialog extends BaseDialogActivity {
         //修改下划线颜色
         //修改光标颜色
         Theme.setTinit(mEdit,ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY),true);
-        mEdit.setText("本地歌单" + Global.mPlaylist.size());
+        mEdit.setText("本地歌单" + Global.mPlayList.size());
 
     }
 

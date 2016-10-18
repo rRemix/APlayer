@@ -38,7 +38,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
     public boolean onMenuItemClick(MenuItem item) {
         ArrayList<Integer> idList = new ArrayList<>();
         //根据不同参数获得歌曲id列表
-        idList = MediaStoreUtil.getSongIdListByArg(mId,mType);
+        idList = MediaStoreUtil.getSongIdList(mId,mType);
 
         if(idList == null || idList.size() == 0){
             Toast.makeText(mContext,mContext.getString(R.string.list_isempty),Toast.LENGTH_SHORT).show();

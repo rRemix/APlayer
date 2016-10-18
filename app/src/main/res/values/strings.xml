@@ -51,7 +51,7 @@
     <string name="add_playlist_error">新建播放列表失败</string>
 
     <string name="add_to_playlist">添加到播放列表</string>
-    <string name="add_song_playlist_success">添加%d首歌曲到该播放列表</string>
+    <string name="add_song_playlist_success">添加%d首歌曲到播放列表</string>
     <string name="add_song_playinglist_success">添加%d首歌曲到播放队列</string>
     <string name="add_song_playinglist_error">添加歌曲到播放队列失败</string>
     <string name="add_song_playlist_error">添加歌曲到播放列表失败</string>

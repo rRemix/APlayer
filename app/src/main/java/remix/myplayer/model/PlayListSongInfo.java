@@ -1,4 +1,4 @@
-package remix.myplayer.db;
+package remix.myplayer.model;
 
 /**
  * @ClassName

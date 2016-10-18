@@ -3,15 +3,15 @@ package remix.myplayer.util;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
 
-import remix.myplayer.db.DBContentProvider;
-import remix.myplayer.db.PlayListNewInfo;
-import remix.myplayer.db.PlayListSongInfo;
+import remix.myplayer.model.PlayListNewInfo;
+import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
 
@@ -24,11 +24,11 @@ import remix.myplayer.db.PlayLists;
 public class PlayListUtil {
     private static final String TAG = "PlayListUtil";
     private static Context mContext;
-    private static DBContentProvider mProvider;
+//    private static DBContentProvider mProvider;
     private PlayListUtil(){}
     public static void setContext(Context context){
         mContext = context;
-        mProvider = new DBContentProvider(mContext);
+//        mProvider = new DBContentProvider(mContext);
     }
 
     /**
@@ -42,7 +42,7 @@ public class PlayListUtil {
         ContentValues cv = new ContentValues();
         cv.put(PlayLists.PlayListColumns.COUNT, 0);
         cv.put(PlayLists.PlayListColumns.NAME, playListName);
-        Uri uri = mProvider.insert(PlayLists.CONTENT_URI, cv);
+        Uri uri = mContext.getContentResolver().insert(PlayLists.CONTENT_URI, cv);
         return uri != null ? (int) ContentUris.parseId(uri) : -1;
     }
 
@@ -52,7 +52,7 @@ public class PlayListUtil {
      * @return
      */
     public static boolean deletePlayList(int id){
-        return id > 0 && mProvider.delete(PlayLists.CONTENT_URI, PlayLists.PlayListColumns._ID + "=?",new String[]{id + ""}) > 0;
+        return id > 0 && mContext.getContentResolver().delete(PlayLists.CONTENT_URI, PlayLists.PlayListColumns._ID + "=?",new String[]{id + ""}) > 0;
     }
 
     /**
@@ -73,7 +73,7 @@ public class PlayListUtil {
                 where += " or ";
             }
         }
-        return mProvider.delete(PlayLists.CONTENT_URI,where,whereArgs);
+        return mContext.getContentResolver().delete(PlayLists.CONTENT_URI,where,whereArgs);
     }
 
     /**
@@ -92,7 +92,7 @@ public class PlayListUtil {
 //        cv.put(PlayListSongs.PlayListSongColumns.Artist_ID,info.ArtistID);
         cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID,info.PlayListID);
         cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME,info.PlayListName);
-        Uri uri = mProvider.insert(PlayListSongs.CONTENT_URI, cv);
+        Uri uri = mContext.getContentResolver().insert(PlayListSongs.CONTENT_URI, cv);
         return uri != null ? (int) ContentUris.parseId(uri) : -1;
     }
 
@@ -102,7 +102,64 @@ public class PlayListUtil {
      * @return
      */
     public static int addMultiSongs(ArrayList<PlayListSongInfo> infos){
-        return infos != null && infos.size() > 0 ? mProvider.insertMultiSong(infos) : 0;
+        if(infos == null || infos.size() == 0 )
+            return 0;
+        //不重复添加
+        ArrayList<Integer> rawIDList = getIDList(infos.get(0).PlayListID);
+        for(int i = 0 ; i < rawIDList.size() ;i++){
+            for(int j = infos.size() - 1; j >= 0; j--){
+                if(rawIDList.get(i) == infos.get(j).AudioId)
+                    infos.remove(j);
+            }
+        }
+
+        ContentValues[] values = new ContentValues[infos.size()];
+        for(int i = 0 ; i < infos.size() ;i++){
+            ContentValues cv = new ContentValues();
+            PlayListSongInfo info = infos.get(i);
+            cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME,info.PlayListName);
+            cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID,info.PlayListID);
+            cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID,info.AudioId);
+            values[i] = cv;
+        }
+        return mContext.getContentResolver().bulkInsert(PlayListSongs.CONTENT_URI,values);
+    }
+
+    /**
+     * 添加多首歌曲
+     * @param IDList
+     * @return
+     */
+    public static int addMultiSongs(ArrayList<Integer> IDList,String playListName){
+        return addMultiSongs(IDList,playListName,getPlayListID(playListName));
+    }
+
+    /**
+     * 添加多首歌曲
+     * @param IDList
+     * @return
+     */
+    public static int addMultiSongs(ArrayList<Integer> IDList,String playListName,int playListId){
+        if(IDList == null || IDList.size() == 0 )
+            return 0;
+        //不重复添加
+        ArrayList<Integer> rawIDList = getIDList(playListName);
+        for(int i = 0 ; i < rawIDList.size() ;i++){
+            for(int j = IDList.size() - 1; j >= 0; j--){
+                if(rawIDList.get(i).equals(IDList.get(j)))
+                    IDList.remove(j);
+            }
+        }
+
+        ContentValues[] values = new ContentValues[IDList.size()];
+        for(int i = 0 ; i < IDList.size() ;i++){
+            ContentValues cv = new ContentValues();
+            cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME,playListName);
+            cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID,playListId);
+            cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID,IDList.get(i));
+            values[i] = cv;
+        }
+        return mContext.getContentResolver().bulkInsert(PlayListSongs.CONTENT_URI,values);
     }
 
     /**
@@ -113,7 +170,7 @@ public class PlayListUtil {
      */
     public static boolean deleteSong(int audioId,int playListId){
         return audioId > 0 &&
-                mProvider.delete(PlayListSongs.CONTENT_URI,
+                mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI,
                         PlayListSongs.PlayListSongColumns.AUDIO_ID + "=?" + " and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?",
                         new String[]{audioId + "",playListId + ""}) > 0;
     }
@@ -126,7 +183,7 @@ public class PlayListUtil {
      */
     public static boolean deleteSong(int audioId,String playListName){
         return audioId > 0 && !TextUtils.isEmpty(playListName) &&
-                mProvider.delete(PlayListSongs.CONTENT_URI,
+                mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI,
                         PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME + "=?" + " and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME + "=?",
                         new String[]{audioId + "",playListName}) > 0;
     }
@@ -151,12 +208,13 @@ public class PlayListUtil {
                 if (i != IdList.size() - 1) {
                     where += " or ";
                 }
+                whereArgs[i] = IdList.get(i) + "";
             }else {
                 where += (") and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?");
                 whereArgs[i] = playlistId + "";
             }
         }
-        return mProvider.delete(PlayListSongs.CONTENT_URI,where,whereArgs);
+        return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI,where,whereArgs);
     }
 
     /**
@@ -167,7 +225,7 @@ public class PlayListUtil {
     public static String getPlayListName(int playListId){
         Cursor cursor = null;
         try {
-            cursor = mProvider.query(PlayLists.CONTENT_URI,new String[]{PlayLists.PlayListColumns.NAME},
+            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI,new String[]{PlayLists.PlayListColumns.NAME},
                     PlayLists.PlayListColumns._ID + "=?",new String[]{playListId + ""},null,null);
             if(cursor != null && cursor.getCount() > 0 && cursor.moveToFirst())
                 return cursor.getString(cursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
@@ -182,10 +240,10 @@ public class PlayListUtil {
      * @param playListName
      * @return
      */
-    public static int getPlayListName(String playListName){
+    public static int getPlayListID(String playListName){
         Cursor cursor = null;
         try {
-            cursor = mProvider.query(PlayLists.CONTENT_URI,new String[]{PlayLists.PlayListColumns._ID},
+            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI,new String[]{PlayLists.PlayListColumns._ID},
                     PlayLists.PlayListColumns.NAME + "=?",new String[]{playListName},null,null);
             if(cursor != null && cursor.getCount() > 0 && cursor.moveToFirst())
                 return cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns._ID));
@@ -193,6 +251,34 @@ public class PlayListUtil {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    /**
+     * 返回系统中除播放队列所有播放列表
+     * @return
+     */
+    public static ArrayList<PlayListNewInfo> getAllPlayListInfo(){
+        ArrayList<PlayListNewInfo> playList = new ArrayList<>();
+        Cursor cursor = null;
+        try {
+            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI,null,PlayLists.PlayListColumns.NAME + "!= ?",
+                    new String[]{Constants.PLAY_QUEUE},null);
+            if(cursor != null && cursor.getCount() > 0){
+                while (cursor.moveToNext()){
+                    PlayListNewInfo info = new PlayListNewInfo();
+                    info._Id = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns._ID));
+                    info.Count = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
+                    info.Name = cursor.getString(cursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
+                    playList.add(info);
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
+        }
+        return playList;
     }
 
     /**
@@ -204,7 +290,7 @@ public class PlayListUtil {
         ArrayList<Integer> IDList = new ArrayList<>();
         Cursor cursor = null;
         try {
-            cursor = mProvider.query(PlayLists.CONTENT_URI,new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
+            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI,new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
                     PlayLists.PlayListColumns.NAME + "=?",new String[]{playlistName},null,null);
             if(cursor != null && cursor.getCount() > 0){
                 while (cursor.moveToNext()){

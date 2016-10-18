@@ -56,7 +56,7 @@ public class MultiChoiceActivity extends ToolbarActivity {
                     case R.id.toolbar_add_playing:
                         MobclickAgent.onEvent(MultiChoiceActivity.this,"AddtoPlayingList");
                         if(mMultiChoice != null)
-                            mMultiChoice.OnAddToPlayingList();
+                            mMultiChoice.OnAddToPlayQueue();
                         break;
                     case R.id.toolbar_add_playlist:
                         MobclickAgent.onEvent(MultiChoiceActivity.this,"AddtoPlayList");

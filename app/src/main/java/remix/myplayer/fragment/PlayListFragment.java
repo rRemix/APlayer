@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -34,7 +33,6 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
@@ -91,13 +89,13 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
         mAdapter.setOnItemClickLitener(new PlayListAdapter.OnItemClickLitener() {
             @Override
             public void onItemClick(View view, int position) {
-//                String name = CommonUtil.getMapkeyByPosition(Global.mPlaylist,position);
+//                String name = CommonUtil.getMapkeyByPosition(Global.mPlayList,position);
                 String name = getPlayListName(position);
                 //多选状态下我的收藏列表不能被选中
                 if(mMultiChoice.isShow() && name.equals(getString(R.string.my_favorite))){
                     return;
                 }
-                if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
+                if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,getPlayListId(position),TAG)){
                     if(getPlayListSongCount(position) == 0) {
                         Toast.makeText(getActivity(), getString(R.string.list_isempty), Toast.LENGTH_SHORT).show();
                         return;
@@ -113,9 +111,9 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
 
             @Override
             public void onItemLongClick(View view, int position) {
-                String name = CommonUtil.getMapkeyByPosition(Global.mPlaylist,position);
+                String name = getPlayListName(position);
                 if(!TextUtils.isEmpty(name) && !name.equals(getString(R.string.my_favorite)))
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG);
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,getPlayListId(position),TAG);
             }
         });
         mRecycleView.setAdapter(mAdapter);
@@ -175,7 +173,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
                         .content(R.string.input_playlist_name)
                         .contentColor(ThemeStore.getTextColorPrimary())
                         .inputRange(1,15)
-                        .input("", "本地歌单" + Global.mPlaylist.size(), new MaterialDialog.InputCallback() {
+                        .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
                             @Override
                             public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                                 if(!TextUtils.isEmpty(input)){

@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.soundcloud.android.crop.Crop;
+import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
 
@@ -48,10 +49,8 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
-import remix.myplayer.util.XmlUtil;
 
 /**
  *
@@ -92,41 +91,37 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             if(msg.what == Constants.RECREATE_ACTIVITY) {
                 recreate();
             }
-            else if(msg.what == Constants.UPDATE_MULTI){
+            else if(msg.what == Constants.CLEAR_MULTI){
                 mMultiChoice.clearSelectedViews();
             }
-            else if (msg.what == Constants.UPDATE_MULTI_ADAPTER
-                    || msg.what == Constants.UPDATE_ADAPTER){
-                boolean isMulti = msg.what == Constants.UPDATE_MULTI_ADAPTER;
-
+            else if (msg.what == Constants.UPDATE_ADAPTER || msg.what == Constants.UPDATE_ALLSONG_ADAPTER){
+                boolean isAllSongOnly = msg.what == Constants.UPDATE_ADAPTER;
                 //刷新适配器
                 for(Fragment temp : getSupportFragmentManager().getFragments()){
                     if(temp instanceof SongFragment){
                         SongFragment songFragment = (SongFragment)temp;
                         if(songFragment.getAdapter() != null){
-                            if(!isMulti || (isMulti && MultiChoice.TAG.equals(SongFragment.TAG)))
-                                songFragment.getAdapter().notifyDataSetChanged();
+                            songFragment.getAdapter().notifyDataSetChanged();
                         }
+                        if(isAllSongOnly)
+                            return;
                     }
                     if(temp instanceof AlbumFragment){
                         AlbumFragment albumFragment = (AlbumFragment)temp;
                         if(albumFragment.getAdapter() != null){
-                            if(!isMulti || (isMulti && MultiChoice.TAG.equals(AlbumFragment.TAG)))
-                                albumFragment.getAdapter().notifyDataSetChanged();
+                            albumFragment.getAdapter().notifyDataSetChanged();
                         }
                     }
                     if(temp instanceof ArtistFragment){
                         ArtistFragment artistFragment = (ArtistFragment)temp;
                         if(artistFragment.getAdapter() != null){
-                            if(!isMulti || (isMulti && MultiChoice.TAG.equals(ArtistFragment.TAG)))
-                                artistFragment.getAdapter().notifyDataSetChanged();
+                            artistFragment.getAdapter().notifyDataSetChanged();
                         }
                     }
                     if(temp instanceof PlayListFragment){
                         PlayListFragment playListFragment = (PlayListFragment) temp;
                         if(playListFragment.getAdapter() != null){
-                            if(!isMulti || (isMulti && MultiChoice.TAG.equals(PlayListFragment.TAG)))
-                                playListFragment.getAdapter().notifyDataSetChanged();
+                            playListFragment.getAdapter().notifyDataSetChanged();
                         }
                     }
                 }
@@ -137,6 +132,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
     @Override
     protected void onResume() {
+        MobclickAgent.onPageStart(MainActivity.class.getSimpleName());
         super.onResume();
         if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
@@ -148,9 +144,10 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
     @Override
     protected void onPause() {
+        MobclickAgent.onPageStart(MainActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
-            mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
+            mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
         }
     }
 
@@ -209,18 +206,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mIsFirstAfterInstall = SPUtil.getValue(this, "Setting", "First", true);
         SPUtil.putValue(this, "Setting", "First", false);
 
-        //第一次启动软件
-        if(mIsFirstAfterInstall){
-            //保存默认主题设置
-            SPUtil.putValue(this,"Setting","ThemeMode",ThemeStore.DAY);
-            SPUtil.putValue(this,"Setting","ThemeColor",ThemeStore.THEME_PINK);
-            //添加我的收藏列表
-//            XmlUtil.addPlaylist(this,"我的收藏");
-            Global.mPlayQueueId = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
-            SPUtil.putValue(this,"Setting","PlayQueueID",Global.mPlayQueueId);
-            Global.mMyLoveId = PlayListUtil.addPlayList(getString(R.string.my_favorite));
-            SPUtil.putValue(this,"Setting","MyLoveID",Global.mMyLoveId);
-        }
         initLastSong();
 
 //        BmobUpdateAgent.setUpdateOnlyWifi(false);
@@ -373,7 +358,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mTablayout.setupWithViewPager(mViewPager);
     }
 
-
     private void initDrawerLayout() {
         mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
         ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed},{android.R.attr.state_checked} ,{}},
@@ -493,6 +477,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 //                ((SongFragment) fragment).getAdapter().notifyDataSetChanged();
 //            }
 //        }
+        mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ALLSONG_ADAPTER);
         View headView = mNavigationView.getHeaderView(0);
         if(headView != null && mp3Item != null){
             TextView textView = (TextView) headView.findViewById(R.id.header_txt);

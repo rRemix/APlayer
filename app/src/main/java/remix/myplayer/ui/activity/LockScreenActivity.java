@@ -28,7 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.db.PlayListSongInfo;
+import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
@@ -253,7 +253,7 @@ public class LockScreenActivity extends BaseAppCompatActivity implements MusicSe
         //判断是否收藏
         mIsLove = false;
         try {
-            ArrayList<PlayListItem> list = Global.mPlaylist.get("我的收藏");
+            ArrayList<PlayListItem> list = Global.mPlayList.get("我的收藏");
             for(PlayListItem item : list){
                 if(item.getId() == mInfo.getId()){
                     mIsLove = true;

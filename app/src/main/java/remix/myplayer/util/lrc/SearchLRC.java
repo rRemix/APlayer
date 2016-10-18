@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-import remix.myplayer.model.LrcItem;
+import remix.myplayer.model.LrcInfo;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.DiskLruCache;
@@ -66,7 +66,7 @@ public class SearchLRC {
      * 根据歌词id,发送请求并解析歌词
      * @return 歌词信息list
      */
-    public LinkedList<LrcItem> getLrc(){
+    public LinkedList<LrcInfo> getLrc(){
         //获得输入流
         BufferedReader br = null;
 
@@ -123,7 +123,7 @@ public class SearchLRC {
      * @param needcache 是否需要缓存
      * @return
      */
-    public LinkedList<LrcItem> parseLrc(BufferedReader br, boolean needcache){
+    public LinkedList<LrcInfo> parseLrc(BufferedReader br, boolean needcache){
         //解析歌词
         TreeMap<Integer,String> lrcMap = new TreeMap<>();
         lrcMap.clear();
@@ -176,17 +176,17 @@ public class SearchLRC {
         }
 
         //将解析后的歌词封装
-        LinkedList<LrcItem> list = new LinkedList();
+        LinkedList<LrcInfo> list = new LinkedList();
         Iterator it = lrcMap.keySet().iterator();
         while (it.hasNext()) {
             int startime = (int)it.next();
             String sentence = lrcMap.get(startime);
-            list.add(new LrcItem(sentence,startime));
+            list.add(new LrcInfo(sentence,startime));
         }
         //设置每句歌词开始与结束时间
         for(int i = 0 ; i < list.size() - 1 ;i++) {
-            LrcItem cur = list.get(i);
-            LrcItem nxt = list.get(i + 1);
+            LrcInfo cur = list.get(i);
+            LrcInfo nxt = list.get(i + 1);
             list.get(i).setEndTime(nxt.getStartTime());
             list.get(i).setDuration(cur.getEndTime() - cur.getStartTime());
         }

@@ -34,38 +34,6 @@ public class DBContentProvider extends ContentProvider {
     private static UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     private static DBOpenHelper mOpenHelper;
 
-    private static ContentObserver mPlayListObserver = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange) {
-            super.onChange(selfChange);
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            super.onChange(selfChange, uri);
-        }
-
-        @Override
-        public boolean deliverSelfNotifications() {
-            return super.deliverSelfNotifications();
-        }
-    };
-    private static ContentObserver mPlayListSongObserver = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange) {
-            super.onChange(selfChange);
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            super.onChange(selfChange, uri);
-        }
-
-        @Override
-        public boolean deliverSelfNotifications() {
-            return super.deliverSelfNotifications();
-        }
-    };
     static {
         mUriMatcher.addURI(AUTHORITY, "/" + PlayLists.TABLE_NAME, PLAY_LIST_MULTIPLE);
 //        mUriMatcher.addURI(AUTHORITY, "/" + PlayLists.TABLE_NAME + "#", PLAY_LIST_SINGLE);
@@ -73,16 +41,9 @@ public class DBContentProvider extends ContentProvider {
 //        mUriMatcher.addURI(AUTHORITY, "/" + PlayListSongs.TABLE_NAME + "#", PLAY_LIST_SONG_SINGLE);
     }
 
-    public DBContentProvider(){
-
-    }
-    public DBContentProvider(Context context){
-
-    }
-
     @Override
     public boolean onCreate() {
-        mOpenHelper = new DBOpenHelper(Application.getContext());
+//        mOpenHelper = new DBOpenHelper(Application.getContext());
         return true;
     }
 
@@ -91,7 +52,7 @@ public class DBContentProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor cursor = null;
-        SQLiteDatabase db = new DBOpenHelper(Application.getContext()).getReadableDatabase();
+        SQLiteDatabase db = DBManager.getInstance().openDataBase();
         try {
             int match = mUriMatcher.match(uri);
             cursor = db.query(match == PLAY_LIST_MULTIPLE  ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
@@ -102,6 +63,7 @@ public class DBContentProvider extends ContentProvider {
         } finally {
 //            if(db != null)
 //                db.close();
+//            DBManager.getInstance().closeDataBase();
         }
         return cursor;
     }
@@ -110,55 +72,24 @@ public class DBContentProvider extends ContentProvider {
      *  插入多条歌曲信息
      * @return
      */
-    public int insertMultiSong(ArrayList<PlayListSongInfo> songs){
-        if(songs == null || songs.size() == 0)
+    @Override
+    public int bulkInsert(Uri uri, ContentValues[] values) {
+        if(uri == null || values == null || values.length == 0)
             return 0;
+        SQLiteDatabase db = DBManager.getInstance().openDataBase();
         int lines = 0;
-        SQLiteDatabase db = new DBOpenHelper(Application.getContext()).getWritableDatabase();
-        for(PlayListSongInfo info : songs){
-            try {
-                ContentValues cv = new ContentValues();
-                cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID,info.AudioId);
-                cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID,info.PlayListID);
-                cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME,info.PlayListName);
-                if(db.insert(PlayListSongs.TABLE_NAME,null,cv) > 0){
-                    lines++;
-                }
-            } catch (Exception e){
-                e.printStackTrace();
-            } finally {
-//                if(db != null )
-//                    db.close();
+        try {
+            db.beginTransaction(); //开始事务
+            //数据库操作
+            for (ContentValues cv : values) {
+                insert(uri, cv);
+                lines++;
             }
+            db.setTransactionSuccessful(); // Commit
+            Application.getContext().getContentResolver().notifyChange(uri,null);
+        } finally {
+            db.endTransaction(); //结束事务
         }
-//        try {
-//            synchronized (DBOpenHelper.getInstance()){
-//                db.beginTransaction();
-//                for(PlayListSongInfo info : songs){
-//                    ContentValues cv = new ContentValues();
-//                    cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID,info.AudioId);
-//                    cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID,info.PlayListID);
-//                    cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME,info.PlayListName);
-//                    try {
-//                        if(db.insert(PlayListSongs.TABLE_NAME,null,cv) > 0){
-//                            lines++;
-//                        }
-//                    } catch (Exception e){
-//                        e.printStackTrace();
-//                    }
-//
-//                }
-//                db.setTransactionSuccessful();
-//                db.endTransaction();
-//                mContext.getContentResolver().notifyChange(PlayListSongs.CONTENT_URI,null);
-//            }
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        } finally {
-//            if(db != null)
-//                db.close();
-//        }
-
         return lines;
     }
 
@@ -166,7 +97,7 @@ public class DBContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        SQLiteDatabase db = new DBOpenHelper(Application.getContext()).getWritableDatabase();
+        SQLiteDatabase db = DBManager.getInstance().openDataBase();
         int match = mUriMatcher.match(uri);
         Uri newUri = Uri.EMPTY;
         try {
@@ -175,27 +106,27 @@ public class DBContentProvider extends ContentProvider {
                 LogUtil.d("DBTest","rowId:" + rowId);
                 if(rowId > 0){
                     newUri = ContentUris.withAppendedId(match == PLAY_LIST_MULTIPLE ? PlayLists.CONTENT_URI : PlayListSongs.CONTENT_URI,rowId);
-//                    mContext.getContentResolver().notifyChange(newUri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
-                    }
+                    Application.getContext().getContentResolver().notifyChange(newUri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
                 }
-//            }
+            }
         } catch (Exception e){
             e.printStackTrace();
         } finally {
 //            if(db != null )
 //                db.close();
+//            DBManager.getInstance().closeDataBase();
         }
         return newUri;
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = new DBOpenHelper(Application.getContext()).getWritableDatabase();
+        SQLiteDatabase db = DBManager.getInstance().openDataBase();
         int match = mUriMatcher.match(uri);
         int deleteRow = 0;
         try {
             deleteRow = db.delete(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME, selection, selectionArgs);
-//            mContext.getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
+            Application.getContext().getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
         }catch (Exception e){
             e.printStackTrace();
         } finally {
@@ -208,13 +139,13 @@ public class DBContentProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = new DBOpenHelper(Application.getContext()).getWritableDatabase();
+        SQLiteDatabase db = DBManager.getInstance().openDataBase();
         int match = mUriMatcher.match(uri);
         int updateRow = 0;
         try {
             updateRow = db.delete(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
                     selection,selectionArgs);
-//            mContext.getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
+            Application.getContext().getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
         } catch (Exception e){
             e.printStackTrace();
         } finally {

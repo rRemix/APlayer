@@ -110,10 +110,10 @@ public class Constants {
 
     //更新适配器
     public final static int UPDATE_ADAPTER = 100;
-    //更新多选状态下适配器
-    public final static int UPDATE_MULTI_ADAPTER = 103;
+    //更新全部歌曲adapter
+    public final static int UPDATE_ALLSONG_ADAPTER = 103;
     //多选更新
-    public final static int UPDATE_MULTI = 101;
+    public final static int CLEAR_MULTI = 101;
     //重建activity
     public final static int RECREATE_ACTIVITY = 102;
 }

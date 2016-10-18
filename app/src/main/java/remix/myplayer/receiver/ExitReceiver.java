@@ -7,6 +7,7 @@ import android.content.Intent;
 
 import com.umeng.analytics.MobclickAgent;
 
+import remix.myplayer.db.DBManager;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.manager.ActivityManager;
 import remix.myplayer.manager.ServiceManager;
@@ -22,9 +23,11 @@ public class ExitReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
+            //关闭数据库
+            DBManager.getInstance().closeDataBase();
             //停止所有service
             ServiceManager.StopAll();
-            //关闭同孩子栏
+            //关闭通知
             ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
             //停止锁屏监听
             if(LockScreenListener.mInstance != null){

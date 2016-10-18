@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.model.LrcItem;
+import remix.myplayer.model.LrcInfo;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.ui.customview.LrcView;
 import remix.myplayer.util.CommonUtil;
@@ -36,7 +36,7 @@ public class LrcFragment extends BaseFragment {
     @BindView(R.id.lrc_view)
     LrcView mLrcView;
     //歌词列表
-    private LinkedList<LrcItem> mLrcList;
+    private LinkedList<LrcInfo> mLrcList;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {

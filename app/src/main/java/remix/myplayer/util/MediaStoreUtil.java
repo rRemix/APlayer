@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import remix.myplayer.db.PlayLists;
 import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
@@ -582,17 +581,17 @@ public class MediaStoreUtil {
         int deleteNunInSD = 0;
 
         //播放列表直接删除
-        if(type == Constants.PLAYLIST){
-            String playListName =  CommonUtil.getMapkeyByPosition(Global.mPlaylist,data);
-            if(!TextUtils.isEmpty(playListName)) {
-                Global.mPlaylist.remove(playListName);
-                if(PlayListFragment.mInstance != null)
-                    PlayListFragment.mInstance.UpdateAdapter();
-                XmlUtil.updatePlaylist();
-                return true;
-            }
-            return false;
-        }
+//        if(type == Constants.PLAYLIST){
+//            String playListName =  CommonUtil.getMapkeyByPosition(Global.mPlayList,data);
+//            if(!TextUtils.isEmpty(playListName)) {
+//                Global.mPlayList.remove(playListName);
+//                if(PlayListFragment.mInstance != null)
+//                    PlayListFragment.mInstance.UpdateAdapter();
+//                XmlUtil.updatePlaylist();
+//                return true;
+//            }
+//            return false;
+//        }
 
         //拼接参数
         switch (type) {
@@ -707,7 +706,7 @@ public class MediaStoreUtil {
      * @param type
      * @return
      */
-    public static ArrayList<Integer> getSongIdListByArg(Object arg , int type){
+    public static ArrayList<Integer> getSongIdList(Object arg , int type){
         Cursor cursor = null;
         ContentResolver resolver = mContext.getContentResolver();
         ArrayList<Integer> ids = new ArrayList<>();
@@ -745,12 +744,12 @@ public class MediaStoreUtil {
         }
         //播放列表
         if(type == Constants.PLAYLIST){
-//            Iterator it = Global.mPlaylist.keySet().iterator();
+//            Iterator it = Global.mPlayList.keySet().iterator();
 //            String playlistName = "";
 //            for(int i = 0 ; i <= (int)arg ; i++) {
 //                playlistName = it.next().toString();
 //            }
-//            for(PlayListItem tmp : Global.mPlaylist.get(playlistName))
+//            for(PlayListItem tmp : Global.mPlayList.get(playlistName))
 //                ids.add(tmp.getId());
             ids = PlayListUtil.getIDList((Integer) arg);
         }

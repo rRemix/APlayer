@@ -10,7 +10,6 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import remix.myplayer.R;
 import remix.myplayer.fragment.AlbumFragment;
@@ -20,11 +19,13 @@ import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MultiPosition;
+import remix.myplayer.model.PlayListNewInfo;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.XmlUtil;
 
 /**
@@ -75,7 +76,7 @@ public class MultiChoice implements OnMultiItemClickListener {
     }
 
     @Override
-    public void OnAddToPlayingList() {
+    public void OnAddToPlayQueue() {
         int num = 0;
         ArrayList<Integer> idList = new ArrayList<>();
         switch (TYPE){
@@ -90,13 +91,19 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.FOLDER:
             case Constants.PLAYLIST:
                 for(Object arg : mSelectedArg){
-                    ArrayList<Integer> tempList = MediaStoreUtil.getSongIdListByArg(arg,TYPE);
+                    ArrayList<Integer> tempList = MediaStoreUtil.getSongIdList(arg,TYPE);
                     if(tempList != null && tempList.size() > 0)
-                        idList.addAll(MediaStoreUtil.getSongIdListByArg(arg,TYPE));
+                        idList.addAll(MediaStoreUtil.getSongIdList(arg,TYPE));
                 }
                 break;
         }
-        num = XmlUtil.addSongsToPlayingList(idList);
+//        ArrayList<PlayListSongInfo> songs = new ArrayList<>();
+//        for(int i = 0 ; i < idList.size() ;i++){
+//            songs.add(new PlayListSongInfo(idList.get(i),Global.mPlayQueueId,Constants.PLAY_QUEUE));
+//        }
+
+        num = Global.AddSongToPlayQueue(idList);
+//        num = XmlUtil.addSongsToPlayingList(idList);
         Toast.makeText(mContext, mContext.getResources().getString(R.string.add_song_playinglist_success,num),Toast.LENGTH_SHORT).show();
         UpdateOptionMenu(false);
     }
@@ -117,29 +124,32 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.FOLDER:
             case Constants.PLAYLIST:
                 for(Object arg : mSelectedArg){
-                    ArrayList<Integer> tempList = MediaStoreUtil.getSongIdListByArg(arg,TYPE);
+                    ArrayList<Integer> tempList = MediaStoreUtil.getSongIdList(arg,TYPE);
                     if(tempList != null && tempList.size() > 0)
-                        idList.addAll(MediaStoreUtil.getSongIdListByArg(arg,TYPE));
+                        idList.addAll(MediaStoreUtil.getSongIdList(arg,TYPE));
                 }
                 break;
         }
 
-        //获得所有播放列表的名字
-        Iterator it = Global.mPlaylist.keySet().iterator();
-        ArrayList<String> playlistNameList = new ArrayList<>();
-        while (it.hasNext()){
-            playlistNameList.add(it.next().toString());
+        //获得所有播放列表的信息
+        final ArrayList<PlayListNewInfo> playListInfoList = PlayListUtil.getAllPlayListInfo();
+        final ArrayList<String> playlistNameList = new ArrayList<>();
+        if(playListInfoList == null)
+            return;
+        for(int i = 0 ; i < playListInfoList.size();i++){
+            playlistNameList.add(playListInfoList.get(i).Name);
         }
         new MaterialDialog.Builder(mContext)
                 .title(R.string.add_to_playlist)
                 .titleColorAttr(R.attr.text_color_primary)
-                .items(playlistNameList.toArray(new CharSequence[playlistNameList.size()]))
+                .items(playlistNameList)
                 .itemsColorAttr(R.attr.text_color_primary)
                 .itemsCallback(new MaterialDialog.ListCallback() {
                     @Override
                     public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                         final int num;
-                        num = XmlUtil.addSongsToPlayList(text.toString(), MediaStoreUtil.getPlayListItemListByIds(idList));
+//                        num = XmlUtil.addSongsToPlayList(text.toString(), MediaStoreUtil.getPlayListItemListByIds(idList));
+                        num = PlayListUtil.addMultiSongs(idList,playListInfoList.get(which).Name,playListInfoList.get(which)._Id);
                         Toast.makeText(mContext, mContext.getString(R.string.add_song_playlist_success, num)
                                 ,Toast.LENGTH_SHORT).show();
                         UpdateOptionMenu(false);
@@ -161,13 +171,16 @@ public class MultiChoice implements OnMultiItemClickListener {
                                 .content(R.string.input_playlist_name)
                                 .contentColor(ThemeStore.getTextColorPrimary())
                                 .inputRange(1,15)
-                                .input("", "本地歌单" + Global.mPlaylist.size(), new MaterialDialog.InputCallback() {
+                                .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
                                     @Override
                                     public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                                         if(!TextUtils.isEmpty(input)){
                                             XmlUtil.addPlaylist(mContext,input.toString());
                                             final int num;
-                                            num = XmlUtil.addSongsToPlayList(input.toString(), MediaStoreUtil.getPlayListItemListByIds(idList));
+//                                            num = XmlUtil.addSongsToPlayList(input.toString(), MediaStoreUtil.getPlayListItemListByIds(idList));
+
+                                            int newPlayListId = PlayListUtil.addPlayList(input.toString());
+                                            num = PlayListUtil.addMultiSongs(idList,input.toString(),newPlayListId);
                                             Toast.makeText(mContext, mContext.getString(R.string.add_song_playlist_success, num)
                                                     ,Toast.LENGTH_SHORT).show();
                                             UpdateOptionMenu(false);
@@ -193,27 +206,33 @@ public class MultiChoice implements OnMultiItemClickListener {
                 }
                 break;
             case Constants.PLAYLIST:
+//                for(Object arg : mSelectedArg){
+//                    if (arg instanceof Integer && MediaStoreUtil.delete((Integer) arg,Constants.PLAYLIST)){
+//                        num++;
+//                    }
+//                }
                 for(Object arg : mSelectedArg){
-                    if (arg instanceof Integer && MediaStoreUtil.delete((Integer) arg,Constants.PLAYLIST)){
-                        num++;
-                    }
+                    if (arg instanceof Integer)
+                        idList.add((Integer) arg);
                 }
+                num = PlayListUtil.deleteMultiPlayList(idList);
                 break;
             case Constants.ALBUM:
             case Constants.ARTIST:
             case Constants.FOLDER:
                 for(Object arg : mSelectedArg){
-                    ArrayList<Integer> tempList = MediaStoreUtil.getSongIdListByArg(arg,TYPE);
+                    ArrayList<Integer> tempList = MediaStoreUtil.getSongIdList(arg,TYPE);
                     if(tempList != null && tempList.size() > 0)
                         idList.addAll(tempList);
                 }
                 break;
         }
-        for(Integer id : idList){
-            if( MediaStoreUtil.delete(id,Constants.SONG))
-                num++;
+        if(TYPE != Constants.PLAYLIST) {
+            for (Integer id : idList) {
+                if (MediaStoreUtil.delete(id, Constants.SONG))
+                    num++;
+            }
         }
-
         if(num > 0){
             Toast.makeText(mContext, mContext.getString(R.string.delete_success),Toast.LENGTH_SHORT).show();
         } else {

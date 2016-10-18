@@ -24,7 +24,6 @@ import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.model.PlayListItem;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.Constants;
@@ -67,7 +66,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
     private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            if(msg.what == Constants.UPDATE_MULTI){
+            if(msg.what == Constants.CLEAR_MULTI){
                 mMultiChoice.clearSelectedViews();
             } else if(msg.what == Constants.UPDATE_ADAPTER){
                 if(mInfoList == null)
@@ -130,13 +129,13 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
                 if(songid > 0 && !mMultiChoice.itemAddorRemoveWithClick(view,position,songid,TAG)){
                     if (mInfoList != null && mInfoList.size() == 0)
                         return;
-                    ArrayList<Integer> ids = new ArrayList<>();
+                    ArrayList<Integer> idList = new ArrayList<>();
                     for (MP3Item info : mInfoList) {
                         if(info != null && info.getId() > 0)
-                            ids.add(info.getId());
+                            idList.add(info.getId());
                     }
                     //设置正在播放列表
-                    Global.setPlayQueue(ids);
+                    Global.setPlayQueue(idList);
 
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
@@ -199,12 +198,12 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 //            return;
         if(mType == Constants.PLAYLIST){
             //播放列表
-            if(!Global.mPlaylist.containsKey(mArg)){
-                mAdapter.setList(new ArrayList<MP3Item>());
-                mNum.setText("0首歌曲");
-            } else {
-                new UpdateThread().start();
-            }
+//            if(!Global.mPlayList.containsKey(mArg)){
+//                mAdapter.setList(new ArrayList<MP3Item>());
+//                mNum.setText("0首歌曲");
+//            } else {
+//                new UpdateThread().start();
+//            }
         } else if(mType == Constants.FOLDER){
             //文件夹
             mArg = getIntent().getStringExtra("Title");
@@ -252,7 +251,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
                 break;
             //播放列表名
             case Constants.PLAYLIST:
-//                ArrayList<PlayListItem> list = Global.mPlaylist.get(mArg);
+//                ArrayList<PlayListItem> list = Global.mPlayList.get(mArg);
 //                if(list == null)
 //                    break;
 //                for(PlayListItem item : list) {
@@ -299,13 +298,13 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         MobclickAgent.onPageEnd(ChildHolderActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
-            mRefreshHandler.sendEmptyMessageDelayed(Constants.UPDATE_MULTI,500);
+            mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
         }
     }
 
     @Override
     protected void onResume() {
-        MobclickAgent.onPageEnd(ChildHolderActivity.class.getSimpleName());
+        MobclickAgent.onPageStart(ChildHolderActivity.class.getSimpleName());
         super.onResume();
         mIsRunning = true;
         if(mMultiChoice.isShow()){

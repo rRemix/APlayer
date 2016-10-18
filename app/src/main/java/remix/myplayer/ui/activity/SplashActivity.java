@@ -12,6 +12,10 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SplashAdapter;
 import remix.myplayer.fragment.SplashFragment;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.Constants;
+import remix.myplayer.util.Global;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 
 /**
@@ -31,6 +35,28 @@ public class SplashActivity extends BaseAppCompatActivity {
 
 
         boolean isFirst = SPUtil.getValue(getApplicationContext(), "Setting", "First", true);
+        //第一次启动软件
+        if(isFirst){
+            //保存默认主题设置
+            SPUtil.putValue(this,"Setting","ThemeMode", ThemeStore.DAY);
+            SPUtil.putValue(this,"Setting","ThemeColor",ThemeStore.THEME_PINK);
+            //添加我的收藏列表
+//            XmlUtil.addPlaylist(this,"我的收藏");
+            Global.mPlayQueueId = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
+            SPUtil.putValue(this,"Setting","PlayQueueID",Global.mPlayQueueId);
+            Global.mMyLoveId = PlayListUtil.addPlayList(getString(R.string.my_favorite));
+            SPUtil.putValue(this,"Setting","MyLoveID",Global.mMyLoveId);
+        }else {
+            new Thread(){
+                @Override
+                public void run() {
+                    Global.mPlayQueueId = SPUtil.getValue(SplashActivity.this,"Setting","PlayQueueID",-1);
+                    Global.mMyLoveId = SPUtil.getValue(SplashActivity.this,"Setting","MyLoveID",-1);
+                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
+                    Global.mPlayList = PlayListUtil.getAllPlayListInfo();
+                }
+            }.start();
+        }
         if(!isFirst){
             startActivity(new Intent(this, MainActivity.class));
             finish();

@@ -7,19 +7,19 @@ package remix.myplayer.model;
 /**
  * 歌词信息
  */
-public class LrcItem {
+public class LrcInfo {
     private String mSentence;
     private int mStartTime;
     private int mEndTime;
     private int mDuration;
 
-    public LrcItem(String mSentence, int mStartTime, int mEndTime) {
+    public LrcInfo(String mSentence, int mStartTime, int mEndTime) {
         this.mSentence = mSentence;
         this.mStartTime = mStartTime;
         this.mEndTime = mEndTime;
     }
 
-    public LrcItem(String mSentence, int mStartTime) {
+    public LrcInfo(String mSentence, int mStartTime) {
         this.mSentence = mSentence;
         this.mStartTime = mStartTime;
     }
