@@ -28,17 +28,16 @@ public class DBContentProvider extends ContentProvider {
     public static final String AUTHORITY = "remix.myplayer";
     public static final String CONTENT_AUTHORITY_SLASH = "content://" + AUTHORITY + "/";
     public static final int PLAY_LIST_MULTIPLE = 1;
-//    public static final int PLAY_LIST_SINGLE = 2;
+    public static final int PLAY_LIST_SINGLE = 2;
     public static final int PLAY_LIST_SONG_MULTIPLE = 3;
-//    public static final int PLAY_LIST_SONG_SINGLE = 4;
-    private static UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-    private static DBOpenHelper mOpenHelper;
+    public static final int PLAY_LIST_SONG_SINGLE = 4;
+    public static UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        mUriMatcher.addURI(AUTHORITY, "/" + PlayLists.TABLE_NAME, PLAY_LIST_MULTIPLE);
-//        mUriMatcher.addURI(AUTHORITY, "/" + PlayLists.TABLE_NAME + "#", PLAY_LIST_SINGLE);
-        mUriMatcher.addURI(AUTHORITY, "/" + PlayListSongs.TABLE_NAME, PLAY_LIST_SONG_MULTIPLE);
-//        mUriMatcher.addURI(AUTHORITY, "/" + PlayListSongs.TABLE_NAME + "#", PLAY_LIST_SONG_SINGLE);
+        mUriMatcher.addURI(AUTHORITY, PlayLists.TABLE_NAME, PLAY_LIST_MULTIPLE);
+        mUriMatcher.addURI(AUTHORITY, PlayLists.TABLE_NAME + "/#", PLAY_LIST_SINGLE);
+        mUriMatcher.addURI(AUTHORITY, PlayListSongs.TABLE_NAME, PLAY_LIST_SONG_MULTIPLE);
+        mUriMatcher.addURI(AUTHORITY, PlayListSongs.TABLE_NAME + "/#", PLAY_LIST_SONG_SINGLE);
     }
 
     @Override
@@ -168,12 +167,12 @@ public class DBContentProvider extends ContentProvider {
         switch (mUriMatcher.match(uri)){
             case PLAY_LIST_MULTIPLE:
                 return PLAY_LIST_CONTENT_TYPE;
-//            case PLAY_LIST_SINGLE:
-//                return PLAY_LIST_ENTRY_CONTENT_TYPE;
+            case PLAY_LIST_SINGLE:
+                return PLAY_LIST_ENTRY_CONTENT_TYPE;
             case PLAY_LIST_SONG_MULTIPLE:
                 return PLAY_LIST_SONG_CONTENT_TYPE;
-//            case PLAY_LIST_SONG_SINGLE:
-//                return PLAY_LIST_SONG_ENTRY_CONTENT_TYPE;
+            case PLAY_LIST_SONG_SINGLE:
+                return PLAY_LIST_SONG_ENTRY_CONTENT_TYPE;
             default:
                 throw new IllegalArgumentException("未知uri:" + uri);
         }

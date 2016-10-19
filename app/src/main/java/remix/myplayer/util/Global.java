@@ -117,18 +117,6 @@ public class Global {
      * @return
      */
     public static int AddSongToPlayQueue(final ArrayList<Integer> rawAddList) {
-//        ArrayList<Integer> addList = new ArrayList<>();
-//        for (Integer id : rawAddList){
-//            if(!mPlayQueue.contains(id))
-//                addList.add(id);
-//        }
-//        mPlayQueue.addAll(addList);
-//        ArrayList<PlayListSongInfo> infos = new ArrayList<>();
-//        for(Integer id : addList){
-//            infos.add(new PlayListSongInfo(id,mPlayQueueId,Constants.PLAY_QUEUE));
-//        }
-//        return PlayListUtil.addMultiSongs(infos);
-
         ArrayList<PlayListSongInfo> infos = new ArrayList<>();
         for(Integer id : rawAddList){
             infos.add(new PlayListSongInfo(id,mPlayQueueId,Constants.PLAY_QUEUE));

@@ -26,6 +26,7 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * @ClassName
@@ -174,6 +175,13 @@ public class MultiChoice implements OnMultiItemClickListener {
                                         if(!TextUtils.isEmpty(input)){
                                             final int num;
                                             int newPlayListId = PlayListUtil.addPlayList(input.toString());
+                                            ToastUtil.show(mContext, newPlayListId > 0 ?
+                                                            R.string.add_playlist_success :
+                                                            newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
+                                                    Toast.LENGTH_SHORT);
+                                            if(newPlayListId < 0){
+                                                return;
+                                            }
                                             num = PlayListUtil.addMultiSongs(idList,input.toString(),newPlayListId);
                                             Toast.makeText(mContext, mContext.getString(R.string.add_song_playlist_success, num)
                                                     ,Toast.LENGTH_SHORT).show();

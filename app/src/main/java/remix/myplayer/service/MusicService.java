@@ -26,7 +26,10 @@ import java.util.List;
 import java.util.Random;
 
 import remix.myplayer.R;
+import remix.myplayer.db.PlayListSongs;
+import remix.myplayer.db.PlayLists;
 import remix.myplayer.model.MP3Item;
+import remix.myplayer.observer.DBObserver;
 import remix.myplayer.observer.MediaStoreObserver;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
 import remix.myplayer.ui.activity.EQActivity;
@@ -130,6 +133,8 @@ public class MusicService extends BaseService {
 
 
     private ContentObserver mMediaStoreObserver;
+    private DBObserver mPlayListObserver;
+    private DBObserver mPlayListSongObserver;
     private static Context mContext;
 
     public MusicService(){}
@@ -219,7 +224,7 @@ public class MusicService extends BaseService {
         mMediaStoreObserver = new MediaStoreObserver(new Handler(){
             @Override
             public void handleMessage(Message msg) {
-                //更新文件夹fragment
+                //更新文件夹
                 if(msg.what == Constants.UPDATE_FOLDER){
                     if(FolderActivity.mInstance != null){
                         FolderActivity.mInstance.UpdateAdapter();
@@ -227,8 +232,12 @@ public class MusicService extends BaseService {
                 }
             }
         });
+        //监听数据库变化
+        mPlayListObserver = new DBObserver(new Handler());
+        mPlayListSongObserver = new DBObserver(new Handler());
         getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,true, mMediaStoreObserver);
-
+        getContentResolver().registerContentObserver(PlayLists.CONTENT_URI,true,mPlayListObserver);
+        getContentResolver().registerContentObserver(PlayListSongs.CONTENT_URI,true,mPlayListSongObserver);
 
         //初始化MediaSesson 用于监听线控操作
         mMediaSession = new MediaSessionCompat(getApplicationContext(),"session");
@@ -311,6 +320,8 @@ public class MusicService extends BaseService {
         unregisterReceiver(mRecevier);
         unregisterReceiver(mHeadSetReceiver);
         getContentResolver().unregisterContentObserver(mMediaStoreObserver);
+        getContentResolver().unregisterContentObserver(mPlayListObserver);
+        getContentResolver().unregisterContentObserver(mPlayListSongObserver);
     }
 
 

@@ -34,11 +34,15 @@ public class PlayListUtil {
     /**
      * 新增播放列表
      * @param playListName
-     * @return 新增的播放列表id
+     * @return 新增的播放列表id -1:播放列表名字为空 -2:该播放列表已经存在
      */
     public static int addPlayList(String playListName) {
         if(TextUtils.isEmpty(playListName))
             return -1;
+        for(PlayListNewInfo info : Global.mPlayList){
+            if(info.Name.equals(playListName))
+                return -2;
+        }
         ContentValues cv = new ContentValues();
         cv.put(PlayLists.PlayListColumns.COUNT, 0);
         cv.put(PlayLists.PlayListColumns.NAME, playListName);
@@ -63,7 +67,6 @@ public class PlayListUtil {
     public static int deleteMultiPlayList(ArrayList<Integer> IdList){
         if(IdList == null || IdList.size() == 0)
             return 0;
-        int deleteNum = 0;
         String where = "";
         String[] whereArgs = new String[IdList.size()];
         for(int i = 0 ; i < IdList.size() ;i++){

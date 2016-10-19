@@ -38,6 +38,7 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * @ClassName
@@ -176,8 +177,11 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
                             @Override
                             public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                                 if(!TextUtils.isEmpty(input)){
-//                                    XmlUtil.addPlaylist(getActivity(),input.toString());
-                                    PlayListUtil.addPlayList(input.toString());
+                                    int newPlayListId = PlayListUtil.addPlayList(input.toString());
+                                    ToastUtil.show(getActivity(), newPlayListId > 0 ?
+                                                    R.string.add_playlist_success :
+                                                    newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
+                                            Toast.LENGTH_SHORT);
                                 }
                             }
                         })
