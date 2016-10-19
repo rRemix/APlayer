@@ -279,6 +279,11 @@ public class MusicService extends BaseService {
         }
     }
 
+    /**
+     * 初始化mediaplayer
+     * @param item
+     * @param pos
+     */
     public static void initDataSource(MP3Item item,int pos){
         if(item == null)
             return;

@@ -32,14 +32,13 @@ import remix.myplayer.util.Constants;
 /**
  * Created by taeja on 16-6-24.
  */
-public class ChildHolderAdapter extends RecyclerView.Adapter<ChildHolderAdapter.ViewHoler> {
+public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler> {
     private ArrayList<MP3Item> mInfoList;
-    private Context mContext;
     private int mType;
     private String mArg;
     private MultiChoice mMultiChoice ;
-    private OnItemClickListener mOnItemClickLitener;
     public ChildHolderAdapter(Context context, int type, String arg,MultiChoice multiChoice){
+        super(context);
         this.mContext = context;
         this.mType = type;
         this.mArg = arg;

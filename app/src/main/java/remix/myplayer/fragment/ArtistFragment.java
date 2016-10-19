@@ -60,8 +60,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        LoaderManager manager = getLoaderManager();
-        manager.initLoader(LOADER_ID++, null, this);
+        getLoaderManager().initLoader(LOADER_ID++, null, this);
     }
 
     @Override

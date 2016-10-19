@@ -57,8 +57,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        LoaderManager manager = getLoaderManager();
-        manager.initLoader(LOADER_ID++, null, this);
+        getLoaderManager().initLoader(LOADER_ID++, null, this);
     }
 
     @Override

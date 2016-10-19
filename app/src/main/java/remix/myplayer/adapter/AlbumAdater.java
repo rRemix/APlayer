@@ -43,25 +43,11 @@ import remix.myplayer.util.DensityUtil;
 /**
  * 专辑界面的适配器
  */
-public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  {
-    private Cursor mCursor;
-    private Context mContext;
-    private OnItemClickListener mOnItemClickLitener;
+public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
     private MultiChoice mMultiChoice;
-
     public AlbumAdater(Cursor cursor, Context context,MultiChoice multiChoice) {
-        this.mCursor = cursor;
-        this.mContext = context;
+        super(context,cursor);
         this.mMultiChoice = multiChoice;
-
-    }
-    public void setOnItemClickLitener(OnItemClickListener l)
-    {
-        this.mOnItemClickLitener = l;
-    }
-    public void setCursor(Cursor cursor) {
-        mCursor = cursor;
-        notifyDataSetChanged();
     }
 
     @Override
@@ -80,7 +66,6 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
     @Override
     public void onBindViewHolder(final AlbumHolder holder, final int position) {
         if(mCursor.moveToPosition(position)) {
-
             try {
                 //获得并设置专辑与艺术家
                 String artist = CommonUtil.processInfo(mCursor.getString(AlbumFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
@@ -157,10 +142,6 @@ public class AlbumAdater extends RecyclerView.Adapter<AlbumAdater.AlbumHolder>  
                 }
             }
         }
-    }
-    @Override
-    public int getItemCount() {
-        return mCursor != null ? mCursor.getCount() : 0;
     }
 
     public static class AlbumHolder extends BaseViewHolder {

@@ -70,8 +70,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     public void onAttach(Context context) {
         super.onAttach(context);
         //初始化LoaderManager
-        LoaderManager manager = getLoaderManager();
-        manager.initLoader(LOADER_ID++, null, this);
+        getLoaderManager().initLoader(LOADER_ID++, null, this);
     }
 
     @Nullable

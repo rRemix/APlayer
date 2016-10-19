@@ -38,6 +38,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
     public static PlayQueueDialog mInstance;
     Cursor mCursor = null;
     public static int mAudioIdIndex;
+    private static int LOADER_ID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +65,8 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        //初始化LoaderManager
+        getSupportLoaderManager().initLoader(LOADER_ID++,null,this);
 
         //改变播放列表高度，并置于底部
         Window w = getWindow();

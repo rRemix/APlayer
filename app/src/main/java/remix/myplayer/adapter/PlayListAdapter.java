@@ -44,26 +44,11 @@ import remix.myplayer.util.PlayListUtil;
 /**
  * 播放列表的适配器
  */
-public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayListHolder> {
-    private Context mContext;
-    private Cursor mCursor;
+public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder> {
     private MultiChoice mMultiChoice;
     public PlayListAdapter(Context context,MultiChoice multiChoice) {
-        this.mContext = context;
+        super(context);
         this.mMultiChoice = multiChoice;
-    }
-
-    private OnItemClickLitener mOnItemClickLitener;
-    public interface OnItemClickLitener {
-        void onItemClick(View view, int position);
-        void onItemLongClick(View view , int position);
-    }
-    public void setOnItemClickLitener(OnItemClickLitener mOnItemClickLitener) {
-        this.mOnItemClickLitener = mOnItemClickLitener;
-    }
-    public void setCursor(Cursor cursor){
-        mCursor = cursor;
-        notifyDataSetChanged();
     }
 
     @Override
@@ -145,93 +130,6 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.PlayLi
                 }
             }
         }
-
-//        String name = "";
-//        ArrayList<PlayListItem> items = new ArrayList<>();
-//        try {
-//            //根据当前索引，获得歌曲列表
-//            Iterator it = Global.mPlayList.keySet().iterator();
-//            for(int i = 0 ; i<= position ;i++) {
-//                it.hasNext();
-//                name = it.next().toString();
-//            }
-//        } catch (Exception e){
-//            e.toString();
-//        }
-//        //设置播放列表名字
-//        holder.mName.setText(name);
-//        if(!TextUtils.isEmpty(name)){
-//            items = Global.mPlayList.get(name);
-//        }
-//        holder.mOther.setText(items != null ? items.size() + "首" : "");
-//        //设置背景
-////        holder.mContainer.setBackgroundResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.art_bg_day : R.drawable.art_bg_night);
-//        //设置专辑封面
-//        new AsynLoadImage(holder.mImage).execute(name);
-//
-//        if(mOnItemClickLitener != null) {
-//            holder.mContainer.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    mOnItemClickLitener.onItemClick(holder.mContainer,holder.getAdapterPosition());
-//                }
-//            });
-//            //多选菜单
-//            holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
-//                @Override
-//                public boolean onLongClick(View v) {
-//                    mOnItemClickLitener.onItemLongClick(holder.mContainer,holder.getAdapterPosition());
-//                    return true;
-//                }
-//            });
-//        }
-//
-//        if(holder.mButton != null) {
-//            boolean isLove = name.equals(mContext.getString(R.string.my_favorite));
-////            Theme.TintDrawable(holder.mButton,
-////                    isLove ? R.drawable.playlist_love : R.drawable.list_icn_more,
-////                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
-//            Theme.TintDrawable(holder.mButton, R.drawable.list_icn_more,
-//                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
-////            if(!isLove){
-//                final String finalName = name;
-//                holder.mButton.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        if(mMultiChoice.isShow())
-//                            return;
-//                        Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
-//                        final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-//                        popupMenu.getMenuInflater().inflate(R.menu.playlist_menu, popupMenu.getMenu());
-//                        popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext, holder.getAdapterPosition(), Constants.PLAYLIST, finalName));
-//                        popupMenu.show();
-//                    }
-//                });
-////            }
-//        }
-//
-//        //是否处于选中状态
-//        if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&
-//                mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
-//            mMultiChoice.AddView(holder.mContainer);
-//        } else {
-//            holder.mContainer.setSelected(false);
-//        }
-//
-//        //设置padding
-//        if(PlayListFragment.ListModel == 2 && holder.mRoot != null){
-//            if(position % 2 == 0){
-//                holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),0,DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,8));
-//            } else {
-//                holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),0,DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,8));
-//            }
-//        }
-//
-    }
-
-    @Override
-    public int getItemCount() {
-        return mCursor != null ? mCursor.getCount() : 0;
     }
 
     public static class PlayListHolder extends BaseViewHolder {

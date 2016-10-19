@@ -5,27 +5,12 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/reslist_item"
+    android:id="@+id/item_root"
     android:background="?attr/background_list">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:background="@color/gray_8d8c8e"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:id="@+id/song_index_letter"
-        android:text="a"
-        android:textSize="@dimen/s14_size"
-        android:layout_gravity="center_vertical"
-        android:gravity="center_vertical"
-        android:paddingLeft="16dp"
-        android:visibility="gone"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/item_height"
-        android:layout_below="@id/song_index_letter">
+        android:layout_height="@dimen/item_height">
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="40dp"
             android:layout_height="40dp"

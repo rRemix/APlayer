@@ -3,24 +3,25 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fff">
-    <TextView
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:text="正在播放列表"
-        android:textSize="@dimen/s16_size"
-        android:textColor="#002"
-        android:background="#EFEEED"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="9">
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/bottom_actionbar_play_list"
+        android:layout_weight="1">
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/play_queue"
+            android:textSize="@dimen/s16_size"
+            android:textColor="#002"
+            android:background="#EFEEED"/>
+    </android.support.design.widget.AppBarLayout>
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/bottom_actionbar_play_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"/>
 </LinearLayout>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:background="#fff">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:gravity="center"
+        android:ellipsize="end"
+        android:textColor="#001"
+        android:text="添加到本地歌单"
+        android:textSize="17sp"
+        android:paddingTop="@dimen/d10_size" />
+
+    <TextView
+        android:id="@+id/playlist_addto_new"
+        android:gravity="center"
+        android:padding="@dimen/d8_size"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/d14_size"
+        android:text="新建歌单..."
+        android:textColor="@color/black_737373"/>
+    <!--<ImageView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1dp"-->
+        <!--android:background="#E6E6E6" />-->
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:layout_marginTop="1dp"
+        android:id="@+id/playlist_addto_list" />
+    <Button
+        android:id="@+id/playlist_addto_cancel"
+        android:layout_margin="20dp"
+        android:layout_width="130dp"
+        android:layout_weight="1"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:text="取消"
+        android:textSize="@dimen/s18_size"
+        android:textColor="@color/translucence"
+        android:background="@drawable/bg_boder"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+</LinearLayout>

@@ -20,7 +20,9 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
 import remix.myplayer.R;
+import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
@@ -48,12 +50,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
     private MultiChoice mMultiChoice;
     private OnItemClickListener mOnItemClickLitener;
     private ArrayList<MP3Item> mInfoList;
-    private ArrayList<String> mSortList;
     private int mType;
     public static final int ALLSONG = 0;
     public static final int RECENTLY = 1;
-    private static int mCurrentAnimPosition = 0;//当前播放高亮动画的索引
-    private static int mOldAnimPostion = 0;
 
     public SongAdapter(Context context, MultiChoice multiChoice,int type) {
         this.mContext = context;
@@ -103,8 +102,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
                     ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899):
                     ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
             holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.GONE);
-            if(highlight)
-                mCurrentAnimPosition = position;
             //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
             if(MusicService.getIsplay() && !holder.mColumnView.getStatus() && highlight){
                 holder.mColumnView.startAnim();
@@ -181,7 +178,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
         }
 
-
         if(mType == ALLSONG){
             if(MultiChoice.TAG.equals(SongFragment.TAG) &&
                     mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
@@ -227,24 +223,21 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         }
     }
 
-
-    public static class SongViewHolder extends RecyclerView.ViewHolder{
-        public TextView mName;
-        public TextView mOther;
-        public SimpleDraweeView mImage;
-        public ColumnView mColumnView;
-        public ImageButton mItemButton;
-        public TextView mIndex;
-        public View mContainer;
+    public static class SongViewHolder extends BaseViewHolder{
+        @BindView(R.id.song_title)
+        TextView mName;
+        @BindView(R.id.song_other)
+        TextView mOther;
+        @BindView(R.id.song_head_image)
+        SimpleDraweeView mImage;
+        @BindView(R.id.song_columnview)
+        ColumnView mColumnView;
+        @BindView(R.id.song_button)
+        ImageButton mItemButton;
+        @BindView(R.id.item_root)
+        View mContainer;
         public SongViewHolder(View itemView) {
             super(itemView);
-            mContainer = itemView;
-            mImage = (SimpleDraweeView)itemView.findViewById(R.id.song_head_image);
-            mName = (TextView)itemView.findViewById(R.id.song_title);
-            mOther = (TextView)itemView.findViewById(R.id.song_other);
-            mColumnView = (ColumnView)itemView.findViewById(R.id.song_columnview);
-            mItemButton = (ImageButton)itemView.findViewById(R.id.song_button);
-            mIndex = (TextView)itemView.findViewById(R.id.song_index_letter);
         }
     }
 }

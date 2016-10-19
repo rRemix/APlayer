@@ -51,10 +51,8 @@
     <attr name="background_grid_color" format="color|reference"/>
     <attr name="background_grid" format="reference"/>
     <attr name="background_list" format="reference"/>
-    <attr name="aboutus_background_color" format="color|reference"/>
+    <attr name="background_aboutus_color" format="color|reference"/>
     <attr name="material_color_primary" format="color|reference"/>
     <attr name="material_color_primary_dark" format="color|reference"/>
     <attr name="material_color_secondry" format="color|reference"/>
-    <attr name="bg_aboutus" format="reference"/>
-
 </resources>

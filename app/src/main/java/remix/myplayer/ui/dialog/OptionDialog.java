@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -67,8 +68,6 @@ public class OptionDialog extends BaseDialogActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //去掉标题
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_option);
         ButterKnife.bind(this);
@@ -83,7 +82,6 @@ public class OptionDialog extends BaseDialogActivity {
         //设置歌曲名与封面
         mTitle.setText(mInfo.getTitle() + "-" + mInfo.getArtist());
         mDraweeView.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId()));
-
         //置于底部
         Window w = getWindow();
         WindowManager wm = getWindowManager();
@@ -104,10 +102,7 @@ public class OptionDialog extends BaseDialogActivity {
                 MobclickAgent.onEvent(this,"AddtoPlayList");
                 Intent intentAdd = new Intent(OptionDialog.this,AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
-                ardAdd.putString("SongName",mInfo.getTitle());
-                ardAdd.putLong("Id",mInfo.getId());
-                ardAdd.putLong("AlbumId",mInfo.getAlbumId());
-                ardAdd.putString("Artist",mInfo.getArtist());
+                ardAdd.putInt("Id",mInfo.getId());
                 intentAdd.putExtras(ardAdd);
                 startActivity(intentAdd);
                 finish();

@@ -77,7 +77,8 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     private boolean mIsFirst = true;
     //是否是安装后第一次打开软件
     private boolean mIsFirstAfterInstall = true;
-
+    //是否是第一次创建activity
+    private static boolean mIsFirstCreateActivity = true;
     private static final int PERMISSIONCODE = 100;
     private static final String[] PERMISSIONS = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -206,7 +207,8 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mIsFirstAfterInstall = SPUtil.getValue(this, "Setting", "First", true);
         SPUtil.putValue(this, "Setting", "First", false);
 
-        initLastSong();
+        if(mIsFirstCreateActivity)
+            initLastSong();
 
 //        BmobUpdateAgent.setUpdateOnlyWifi(false);
 //        BmobUpdateAgent.update(this);
@@ -222,6 +224,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 //        if(mIsFirstAfterInstall){
 //            mBottomBar.UpdateBottomStatus(new MP3Item(),false);
 //        }
+        mIsFirstCreateActivity = false;
 
         if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
             return;

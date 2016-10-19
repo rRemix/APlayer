@@ -28,23 +28,9 @@ import remix.myplayer.ui.activity.SearchActivity;
 /**
  * 搜索结果的适配器
  */
-public class SearchResAdapter extends RecyclerView.Adapter<SearchResAdapter.SearchResHolder> {
-    private Cursor mCursor;
-    private Context mContext;
-    private OnItemClickListener mOnItemClickLitener;
-
+public class SearchResAdapter extends BaseAdapter<SearchResAdapter.SearchResHolder> {
     public SearchResAdapter(Context context){
-        mContext = context;
-    }
-
-    public void setCursor(Cursor cursor){
-        mCursor = cursor;
-        notifyDataSetChanged();
-    }
-
-    public void setOnItemClickLitener(OnItemClickListener l)
-    {
-        this.mOnItemClickLitener = l;
+        super(context);
     }
 
     @Override
@@ -77,11 +63,6 @@ public class SearchResAdapter extends RecyclerView.Adapter<SearchResAdapter.Sear
                 e.printStackTrace();
             }
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return mCursor != null  ? mCursor.getCount() : 0;
     }
 
     public static class SearchResHolder extends BaseViewHolder {

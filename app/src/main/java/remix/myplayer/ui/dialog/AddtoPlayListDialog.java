@@ -5,7 +5,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -23,12 +25,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.adapter.PlayListAddtoAdapter;
-import remix.myplayer.model.PlayListSongInfo;
+import remix.myplayer.adapter.AddtoPlayListAdapter;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
@@ -42,47 +45,31 @@ import remix.myplayer.util.ToastUtil;
  */
 public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     @BindView(R.id.playlist_addto_list)
-    RecyclerView mList;
+    RecyclerView mRecyclerView;
     @BindView(R.id.playlist_addto_new)
     TextView mNew;
 
-    private PlayListAddtoAdapter mAdapter;
+    private AddtoPlayListAdapter mAdapter;
     private Cursor mCursor;
     public static int mPlayListNameIndex;
     public static int mPlayListIdIndex;
 
-    private String mSongName;
     private int mAudioID;
-    private int mAlbumId;
-    private String mArtist;
 
     private boolean mAddAfterCreate = true;
+    private static int LOADER_ID = 0;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(Theme.getTheme());
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_playlist_addto);
+        setContentView(R.layout.dialog_addto_playlist);
         ButterKnife.bind(this);
 
         mAudioID = (int)getIntent().getExtras().getLong("Id");
-        mSongName = getIntent().getExtras().getString("SongName");
-        mAlbumId = (int)getIntent().getExtras().getLong("AlbumId");
-        mArtist = getIntent().getExtras().getString("Artist");
-        //改变高度，并置于底部
-        Window w = getWindow();
-        WindowManager wm = getWindowManager();
-        Display display = wm.getDefaultDisplay();
-        DisplayMetrics metrics = new DisplayMetrics();
-        display.getMetrics(metrics);
-        WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.height = 300 * metrics.densityDpi / 160;
-        lp.width = metrics.widthPixels;
-        w.setAttributes(lp);
-        w.setGravity(Gravity.BOTTOM);
 
-        mAdapter = new PlayListAddtoAdapter(this);
+        mAdapter = new AddtoPlayListAdapter(this);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -102,7 +89,22 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
 
             }
         });
-        mList.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        getSupportLoaderManager().initLoader(LOADER_ID++, null, this);
+
+        //改变高度，并置于底部
+        Window w = getWindow();
+        WindowManager wm = getWindowManager();
+        Display display = wm.getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getMetrics(metrics);
+        WindowManager.LayoutParams lp = getWindow().getAttributes();
+        lp.height = 300 * metrics.densityDpi / 160;
+        lp.width = metrics.widthPixels;
+        w.setAttributes(lp);
+        w.setGravity(Gravity.BOTTOM);
     }
 
     private int getPlayListId(int position){
@@ -162,7 +164,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
         }
     }
 
-    public PlayListAddtoAdapter getAdaper(){
+    public AddtoPlayListAdapter getAdaper(){
         return mAdapter;
     }
 
@@ -180,7 +182,8 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
+        return new CursorLoader(this,PlayLists.CONTENT_URI,null,
+                PlayLists.PlayListColumns.NAME + "!= ?",new String[]{Constants.PLAY_QUEUE},null);
     }
 
     @Override

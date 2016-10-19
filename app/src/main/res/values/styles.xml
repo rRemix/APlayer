@@ -26,11 +26,6 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <!--Audio_style-->
-    <style name="Audio_style">
-        <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
-        <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
-    </style>
 
     <style name="AudioHolderStyle" parent="AppTheme.NoActionBar.Translucent">
         <!--<item name="android:windowAnimationStyle">@style/Audio_style</item>-->
@@ -48,37 +43,6 @@
         <item name="textAllCaps">true</item>
     </style>
 
-    <style name="songlist_item_image">
-        <item name="android:layout_width">50dp</item>
-        <item name="android:layout_height">50dp</item>
-        <item name="android:layout_gravity">center_vertical</item>
-        <item name="android:layout_margin">4dp</item>
-        <item name="android:layout_centerVertical">true</item>
-    </style>
-
-    <style name="songlist_item_title">
-        <item name="android:lines">1</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:layout_width">150dp</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:textSize">16dp</item>
-        <item name="android:textColor">#1c1b19</item>
-
-    </style>
-
-    <!-- 底部actionbar的歌曲名 -->
-    <style name="BottomActionBarText">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:gravity">top|left|center</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:textSize">11dp</item>
-        <item name="android:textAllCaps">true</item>
-    </style>
-
     <!-- 播放时间 -->
     <style name="PlayTimeTextStyle">
 
@@ -90,16 +54,6 @@
     </style>
 
 
-    <!--专辑详情 标题-->
-    <style name="Album_Holder_Title">
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:textSize">18dp</item>
-        <item name="android:textColor">#1b1c19</item>
-        <item name="android:layout_centerVertical">true</item>
-    </style>
-
     <!-- 播放列表对话框的风格 -->
     <style name="AnimBottom" parent="@android:style/Animation">
         <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
@@ -107,7 +61,7 @@
     </style>
 
     <!--底部弹出 parent="@android:style/Theme.Dialog"-->
-    <style name="PopupBottomDialog" parent="@style/AppTheme" >
+    <style name="PopupBottomDialog" parent="@style/Theme.AppCompat.Dialog" >
         <item name="android:windowAnimationStyle">@style/AnimBottom</item>
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">true</item>
@@ -120,7 +74,7 @@
 
 
     <!--中心消失-->
-    <style name="PopupCenterDialog" parent="@style/AppTheme" >
+    <style name="PopupCenterDialog" parent="@style/Theme.AppCompat.Dialog" >
         <!--<item name="android:windowAnimationStyle">@style/popwin_anim_style</item>-->
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">true</item>
@@ -177,9 +131,9 @@
         <item name="background_grid_color">#f1f1f1</item>
         <item name="background_grid">@drawable/bg_grid_card_day</item>
         <item name="background_list">@drawable/bg_list_card_day</item>
+        <item name="background_aboutus_color">@color/white_f6f6f5</item>
         <item name="text_color_primary">@color/day_textcolor_primary</item>
         <item name="text_color">@color/day_textcolor</item>
-        <item name="bg_aboutus">@drawable/bg_aboutus_day</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Light</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
 
@@ -197,9 +151,9 @@
         <item name="background_grid_color">@color/background_color_main</item>
         <item name="background_grid">@drawable/bg_grid_card_night</item>
         <item name="background_list">@drawable/bg_list_card_night</item>
+        <item name="background_aboutus_color">@color/gray_323232</item>
         <item name="text_color_primary">@color/night_textcolor_primary</item>
         <item name="text_color">@color/night_textcolor</item>
-        <item name="bg_aboutus">@drawable/bg_aboutus_night</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Dark</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
         <item name="android:textColor">@color/md_brown_primary</item>

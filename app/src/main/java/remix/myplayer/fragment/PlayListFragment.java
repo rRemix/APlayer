@@ -28,6 +28,7 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.db.PlayLists;
+import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -70,8 +71,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     public void onAttach(Context context) {
         super.onAttach(context);
         mPageName = TAG;
-        LoaderManager manager = getLoaderManager();
-        manager.initLoader(LOADER_ID++, null, this);
+        getLoaderManager().initLoader(LOADER_ID++, null, this);
     }
 
     @Nullable
@@ -86,10 +86,9 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
         mAdapter = new PlayListAdapter(getActivity(),mMultiChoice);
-        mAdapter.setOnItemClickLitener(new PlayListAdapter.OnItemClickLitener() {
+        mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-//                String name = CommonUtil.getMapkeyByPosition(Global.mPlayList,position);
                 String name = getPlayListName(position);
                 //多选状态下我的收藏列表不能被选中
                 if(mMultiChoice.isShow() && name.equals(getString(R.string.my_favorite))){

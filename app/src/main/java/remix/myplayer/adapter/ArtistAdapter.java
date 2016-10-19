@@ -43,25 +43,12 @@ import remix.myplayer.util.DensityUtil;
 /**
  * 艺术家界面的适配器
  */
-public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHolder>{
-    private Cursor mCursor;
-    private Context mContext;
+public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
     private MultiChoice mMultiChoice;
-    public void setOnItemClickLitener(OnItemClickListener mOnItemClickLitener) {
-        this.mOnItemClickLitener = mOnItemClickLitener;
-    }
-
-    private OnItemClickListener mOnItemClickLitener;
 
     public ArtistAdapter(Cursor cursor, Context context,MultiChoice multiChoice) {
-        this.mCursor = cursor;
-        this.mContext = context;
+        super(context,cursor);
         this.mMultiChoice = multiChoice;
-    }
-
-    public void setCursor(Cursor mCursor) {
-        this.mCursor = mCursor;
-        notifyDataSetChanged();
     }
 
     @Override
@@ -149,11 +136,6 @@ public class ArtistAdapter extends RecyclerView.Adapter<ArtistAdapter.ArtistHold
                 holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),0,DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,8));
             }
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return mCursor != null ? mCursor.getCount() : 0;
     }
 
     public static class ArtistHolder extends BaseViewHolder {

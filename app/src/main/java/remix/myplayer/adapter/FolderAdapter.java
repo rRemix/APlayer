@@ -32,17 +32,11 @@ import remix.myplayer.util.Global;
 /**
  * Created by taeja on 16-6-23.
  */
-public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.FolderHolder> {
-    private Context mContext;
-    private OnItemClickListener mOnItemClickLitener;
+public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
     private MultiChoice mMultiChoice;
     public FolderAdapter(Context context,MultiChoice multiChoice) {
-        this.mContext = context;
+        super(context);
         this.mMultiChoice = multiChoice;
-    }
-    public void setOnItemClickLitener(OnItemClickListener l)
-    {
-        this.mOnItemClickLitener = l;
     }
 
     @Override

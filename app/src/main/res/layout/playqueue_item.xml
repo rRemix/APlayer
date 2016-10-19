@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?android:attr/selectableItemBackground">
+    android:layout_height="@dimen/d60_size"
+    android:background="?android:attr/selectableItemBackground"
+    android:id="@+id/item_root">
+    <RelativeLayout
+        android:layout_width="@dimen/d60_size"
+        android:layout_height="@dimen/d60_size"
+        android:id="@+id/button_container"
+        android:layout_alignParentRight="true">
+        <ImageView
+            android:layout_width="@dimen/d24_size"
+            android:layout_height="@dimen/d24_size"
+            android:id="@+id/playlist_item_button"
+            android:layout_centerInParent="true"
+            android:src="@drawable/playinglist_delete_normal" />
+    </RelativeLayout>
+
     <LinearLayout
-        android:layout_width="280dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center_vertical"
         android:layout_margin="10dp"
-        android:layout_centerVertical="true">
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/button_container"
+        android:layout_alignParentLeft="true">
         <TextView
             android:id="@+id/playlist_item_name"
             android:layout_width="wrap_content"
@@ -18,29 +33,19 @@
             android:textColor="#3C3C3C"
             android:textSize="@dimen/s18_size"
             android:lines="1"
-            android:ellipsize="end"
-            android:text="未知专辑"/>
+            android:ellipsize="end" />
         <TextView
             android:id="@+id/playlist_item_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#30000000"
-            android:textSize="@dimen/s12_size"
-            android:text="0首"/>
+            android:textSize="@dimen/s12_size" />
     </LinearLayout>
-    <ImageView
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="8dp"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:id="@+id/playlist_item_button"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:src="@drawable/bg_btn_playlist_delete"
-        android:background="@color/transparent"/>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:background="#E6E6E6"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="@dimen/d10_size"/>
 </RelativeLayout>

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import butterknife.BindView;
@@ -31,10 +32,7 @@ import remix.myplayer.util.PlayListUtil;
 /**
  * 正在播放列表的适配器
  */
-public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueAdapter.PlayQueueHolder> {
-    private Cursor mCursor;
-    private Context mContext;
-    private OnItemClickListener mOnItemClickLitener;
+public class PlayQueueAdapter extends BaseAdapter<PlayQueueAdapter.PlayQueueHolder> {
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -42,16 +40,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueAdapter.Play
         }
     };
     public PlayQueueAdapter(Context context) {
-        mContext = context;
-    }
-
-    public void setOnItemClickLitener(OnItemClickListener l)
-    {
-        this.mOnItemClickLitener = l;
-    }
-    public void setCursor(Cursor cursor) {
-        mCursor = cursor;
-        notifyDataSetChanged();
+        super(context);
     }
 
     @Override
@@ -60,7 +49,7 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueAdapter.Play
     }
 
     @Override
-    public void onBindViewHolder(PlayQueueHolder holder, int position) {
+    public void onBindViewHolder(final PlayQueueHolder holder, final int position) {
         if(mCursor.moveToPosition(position)){
             final MP3Item item = MediaStoreUtil.getMP3InfoById(mCursor.getInt(0));
             if(item == null) {
@@ -88,26 +77,28 @@ public class PlayQueueAdapter extends RecyclerView.Adapter<PlayQueueAdapter.Play
 //                    notifyDataSetChanged();
                 }
             });
-
+            if(mOnItemClickLitener != null){
+                holder.mContainer.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition());
+                    }
+                });
+            }
         }
     }
-
-    @Override
-    public int getItemCount() {
-        return mCursor != null ? mCursor.getCount() : 0;
-    }
-
 
     public static class PlayQueueHolder extends BaseViewHolder{
         @BindView(R.id.playlist_item_name)
-        public TextView mSong;
+        TextView mSong;
         @BindView(R.id.playlist_item_artist)
-        public TextView mArtist;
+        TextView mArtist;
         @BindView(R.id.playlist_item_button)
-        public ImageView mButton;
+        ImageView mButton;
+        @BindView(R.id.item_root)
+        RelativeLayout mContainer;
         public PlayQueueHolder(View v) {
             super(v);
         }
-
     }
 }
