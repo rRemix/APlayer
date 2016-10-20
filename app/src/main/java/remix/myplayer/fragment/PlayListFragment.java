@@ -31,6 +31,7 @@ import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
@@ -83,6 +84,9 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
 
         ListModel = SPUtil.getValue(getActivity(),"Setting","PlayListModel",2);
         mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+        if(ListModel == Constants.LIST_MODEL){
+            mRecycleView.addItemDecoration(new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST));
+        }
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
@@ -156,44 +160,9 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     }
 
     //打开添加播放列表的Dialog
-    @OnClick({R.id.list_model,R.id.grid_model,R.id.add})
+    @OnClick({R.id.list_model,R.id.grid_model})
     public void onClick(View v){
         switch (v.getId()){
-            case R.id.add:
-                if(mMultiChoice.isShow())
-                    return;
-                new MaterialDialog.Builder(getActivity())
-                        .title("新建播放列表")
-                        .titleColor(ThemeStore.getTextColorPrimary())
-                        .positiveText("创建")
-                        .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
-                        .negativeText("取消")
-                        .negativeColor(ThemeStore.getMaterialColorPrimaryColor())
-                        .backgroundColor(ThemeStore.getBackgroundColor3())
-                        .content(R.string.input_playlist_name)
-                        .contentColor(ThemeStore.getTextColorPrimary())
-                        .inputRange(1,15)
-                        .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
-                            @Override
-                            public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                                if(!TextUtils.isEmpty(input)){
-                                    int newPlayListId = PlayListUtil.addPlayList(input.toString());
-                                    ToastUtil.show(getActivity(), newPlayListId > 0 ?
-                                                    R.string.add_playlist_success :
-                                                    newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
-                                            Toast.LENGTH_SHORT);
-                                }
-                            }
-                        })
-                        .dismissListener(new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                if(mAdapter != null)
-                                    mAdapter.notifyDataSetChanged();
-                            }
-                        })
-                        .show();
-                break;
             case R.id.list_model:
             case R.id.grid_model:
                 int newModel = v.getId() == R.id.list_model ? Constants.LIST_MODEL : Constants.GRID_MODEL;
@@ -203,6 +172,9 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
                 mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
                 ListModel = newModel;
                 mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+                if(ListModel == Constants.LIST_MODEL){
+                    mRecycleView.addItemDecoration(new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST));
+                }
                 SPUtil.putValue(getActivity(),"Setting","PlayListModel",ListModel);
                 break;
 

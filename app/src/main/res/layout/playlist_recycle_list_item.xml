@@ -56,9 +56,9 @@
         android:src="@drawable/list_icn_more"
         android:background="@drawable/bg_common_ripple"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="?attr/background_grid_color"
-        android:layout_alignParentBottom="true"/>
+    <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1px"-->
+        <!--android:background="?attr/background_grid_color"-->
+        <!--android:layout_alignParentBottom="true"/>-->
 </RelativeLayout>

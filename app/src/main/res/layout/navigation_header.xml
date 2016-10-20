@@ -21,11 +21,9 @@
 
     <TextView
         android:id="@+id/header_txt"
-        android:layout_marginTop="@dimen/d16_size"
-        android:layout_marginBottom="@dimen/d16_size"
+        android:layout_margin="@dimen/d16_size"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:lines="1"
-        android:ellipsize="end"
-        android:text="歌曲名"/>
+        android:ellipsize="end" />
 </LinearLayout>

@@ -24,6 +24,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.ArtistAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.Theme;
+import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
@@ -77,9 +78,13 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
 
         ListModel = SPUtil.getValue(getActivity(),"Setting","ArtistModel",2);
         mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+        if(ListModel == Constants.LIST_MODEL){
+            mRecycleView.addItemDecoration(new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST));
+        }
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
+
         mAdapter = new ArtistAdapter(mCursor,getActivity(),mMultiChoice);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
@@ -142,6 +147,9 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
         ListModel = newModel;
         mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+        if(ListModel == Constants.LIST_MODEL){
+            mRecycleView.addItemDecoration(new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST));
+        }
         SPUtil.putValue(getActivity(),"Setting","ArtistModel",ListModel);
     }
 

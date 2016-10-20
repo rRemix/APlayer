@@ -46,6 +46,20 @@
                 android:id="@+id/ViewPager"
                 android:background="?attr/background_color_main"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/add"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_marginRight="@dimen/d30_size"
+                android:layout_marginBottom="@dimen/d20_size"
+                android:clickable="true"
+                android:src="@drawable/playlist_fab_btn_add"
+                app:backgroundTint="?attr/material_color_primary"
+                app:elevation="@dimen/d2_size"
+                app:pressedTranslationZ="@dimen/d6_size"/>
         </android.support.design.widget.CoordinatorLayout>
 
         <!-- 底部自定义ationbar -->

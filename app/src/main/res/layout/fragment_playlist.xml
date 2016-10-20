@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -33,29 +32,11 @@
         android:layout_height="@dimen/d12_size"
         android:background="?attr/background_color_2"/>
 
-    <FrameLayout
+    <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/playlist_recycleview">
-        </android.support.v7.widget.RecyclerView>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_marginLeft="@dimen/d40_size"
-            android:layout_marginRight="@dimen/d30_size"
-            android:layout_marginBottom="@dimen/d70_size"
-            android:clickable="true"
-            android:src="@drawable/playlist_fab_btn_add"
-            app:backgroundTint="?attr/material_color_primary"
-            app:elevation="@dimen/d2_size"
-            app:pressedTranslationZ="@dimen/d6_size"/>
-    </FrameLayout>
+        android:layout_height="match_parent"
+        android:id="@+id/playlist_recycleview">
+    </android.support.v7.widget.RecyclerView>
 
 
 </LinearLayout>

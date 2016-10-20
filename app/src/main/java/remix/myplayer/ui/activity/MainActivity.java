@@ -3,17 +3,22 @@ package remix.myplayer.ui.activity;
 
 import android.Manifest;
 import android.content.ContentUris;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -21,6 +26,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.soundcloud.android.crop.Crop;
@@ -30,6 +36,7 @@ import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.fragment.AlbumFragment;
@@ -49,8 +56,10 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  *
@@ -67,6 +76,8 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     NavigationView mNavigationView;
     @BindView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
+    @BindView(R.id.add)
+    FloatingActionButton mAddButton;
     private BottomActionBarFragment mBottomBar;
     private final static String TAG = "MainActivity";
 
@@ -330,8 +341,45 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         return mAdapter;
     }
 
-    public ViewPager getViewPager() {
-        return mViewPager;
+    @OnClick(R.id.add)
+    public void onClick(View v){
+        switch (v.getId()){
+            case R.id.add:
+                if(mMultiChoice.isShow())
+                    return;
+                new MaterialDialog.Builder(MainActivity.this)
+                        .title("新建播放列表")
+                        .titleColor(ThemeStore.getTextColorPrimary())
+                        .positiveText("创建")
+                        .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
+                        .negativeText("取消")
+                        .negativeColor(ThemeStore.getMaterialColorPrimaryColor())
+                        .backgroundColor(ThemeStore.getBackgroundColor3())
+                        .content(R.string.input_playlist_name)
+                        .contentColor(ThemeStore.getTextColorPrimary())
+                        .inputRange(1,15)
+                        .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
+                            @Override
+                            public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                                if(!TextUtils.isEmpty(input)){
+                                    int newPlayListId = PlayListUtil.addPlayList(input.toString());
+                                    ToastUtil.show(MainActivity.this, newPlayListId > 0 ?
+                                                    R.string.add_playlist_success :
+                                                    newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
+                                            Toast.LENGTH_SHORT);
+                                }
+                            }
+                        })
+                        .dismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                if(mAdapter != null)
+                                    mAdapter.notifyDataSetChanged();
+                            }
+                        })
+                        .show();
+                break;
+        }
     }
 
     //初始化ViewPager
@@ -348,6 +396,19 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(0);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mAddButton.setVisibility(position == 3 ? View.VISIBLE: View.GONE);
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
     }
 
     //初始化custontab
