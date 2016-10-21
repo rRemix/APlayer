@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +17,6 @@ import java.util.Iterator;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
@@ -41,7 +39,7 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
 
     @Override
     public FolderHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new FolderHolder(LayoutInflater.from(mContext).inflate(R.layout.folder_recycle_item,null,false));
+        return new FolderHolder(LayoutInflater.from(mContext).inflate(R.layout.item_folder_recycle,null,false));
     }
 
     @Override

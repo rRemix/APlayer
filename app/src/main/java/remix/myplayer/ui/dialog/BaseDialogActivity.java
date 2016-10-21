@@ -2,16 +2,15 @@ package remix.myplayer.ui.dialog;
 
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 
-import remix.myplayer.ui.activity.BaseAppCompatActivity;
+import remix.myplayer.ui.activity.BaseActivity;
 
 /**
  * Created by Remix on 2016/3/16.
  */
 
 
-public abstract class BaseDialogActivity extends BaseAppCompatActivity {
+public abstract class BaseDialogActivity extends BaseActivity {
     protected <T extends View> T findView(int id){
         return (T)findViewById(id);
     }

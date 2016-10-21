@@ -10,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -18,7 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
@@ -167,7 +165,7 @@ public class MediaStoreUtil {
 
     /**
      * 根据参数和类型获得专辑封面
-     * @param id 参数,包括歌曲id、歌手id、歌曲名、专辑id
+     * @param id 参数,包括歌曲id、歌手id、歌曲名、专辑id、播放列表id
      * @param type 查询类型
      * @return 专辑url
      */
@@ -175,11 +173,11 @@ public class MediaStoreUtil {
         if(id == null || id.equals(""))
             return null;
         //如果是专辑或者艺术家，先查找本地缓存
-        if(type == Constants.URL_ARTIST || type == Constants.URL_ALBUM){
-            boolean isAlbum = type == Constants.URL_ALBUM;
-            File img = isAlbum ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + "")) :
-                                 new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + ""));
-            if(img.exists()){
+        if(type == Constants.URL_ARTIST || type == Constants.URL_ALBUM || type == Constants.URL_PLAYLIST ){
+            File img = type == Constants.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + ""))
+                    : type == Constants.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + ""))
+                    : new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + ""));
+            if(img.exists() || type == Constants.URL_PLAYLIST){
                 return img.getAbsolutePath();
             }
         }
@@ -565,8 +563,8 @@ public class MediaStoreUtil {
 
     /**
      * 删除歌曲
-     * @param data 删除参数 包括歌曲路径、专辑id、艺术家id、文件夹或者播放列表索引
-     * @param type 删除类型 包括单个歌曲、专辑、艺术家、文件夹
+     * @param data 删除参数 包括歌曲路径、专辑id、艺术家id、文件夹索引
+     * @param type 删除类型 包括单个歌曲、专辑、艺术家
      * @return 是否删除成功
      */
     public static boolean delete(int data, int type) {
@@ -578,20 +576,7 @@ public class MediaStoreUtil {
         ArrayList<Integer> idList = new ArrayList<>();
 
         int deleteNumInMediaStore = 0;
-        int deleteNunInSD = 0;
-
-        //播放列表直接删除
-//        if(type == Constants.PLAYLIST){
-//            String playListName =  CommonUtil.getMapkeyByPosition(Global.mPlayList,data);
-//            if(!TextUtils.isEmpty(playListName)) {
-//                Global.mPlayList.remove(playListName);
-//                if(PlayListFragment.mInstance != null)
-//                    PlayListFragment.mInstance.UpdateAdapter();
-//                XmlUtil.updatePlaylist();
-//                return true;
-//            }
-//            return false;
-//        }
+        int deleteNumInSD = 0;
 
         //拼接参数
         switch (type) {
@@ -635,7 +620,7 @@ public class MediaStoreUtil {
                         idList.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
                         String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                         if(CommonUtil.deleteFile(path))
-                            deleteNunInSD++;
+                            deleteNumInSD++;
                     }
                 }
             }catch (Exception e){
@@ -655,7 +640,7 @@ public class MediaStoreUtil {
                     while (cursor.moveToNext()){
                         String path = cursor.getString(0);
                         if(CommonUtil.deleteFile(path))
-                            deleteNunInSD++;
+                            deleteNumInSD++;
                     }
                 }
             }catch (Exception e){
@@ -674,8 +659,6 @@ public class MediaStoreUtil {
         }else {
             //如果是文件夹
             //根据文件夹名获得对应所有歌曲列表,再根据每首歌曲id来删除
-            if (idList == null)
-                return false;
             deleteNumInMediaStore += resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,where,arg);
 //            for (Integer id : idList) {
 //                if(Global.mPlayQueue.contains(id)){
@@ -686,18 +669,19 @@ public class MediaStoreUtil {
 //            }
         }
         //删除正在播放列表中的歌曲
-        boolean deleteSuccess = deleteNumInMediaStore > 0 && deleteNunInSD > 0;
-        if(deleteSuccess){
-            ArrayList<Integer> deleteIdList = new ArrayList<>();
-            for(Integer deleteId : idList){
-                if(Global.mPlayQueue.contains(deleteId)){
-                    deleteIdList.add(deleteId);
-                }
-            }
-            return Global.mPlayQueue.removeAll(deleteIdList) && deleteSuccess;
-        } else {
-            return false;
-        }
+//        boolean deleteSuccess = deleteNumInMediaStore > 0 && deleteNumInSD > 0;
+//        if(deleteSuccess){
+//            ArrayList<Integer> deleteIdList = new ArrayList<>();
+//            for(Integer deleteId : idList){
+//                if(Global.mPlayQueue.contains(deleteId)){
+//                    deleteIdList.add(deleteId);
+//                }
+//            }
+//            return Global.mPlayQueue.removeAll(deleteIdList);
+//        } else {
+//            return false;
+//        }
+        return deleteNumInMediaStore > 0 && deleteNumInSD > 0;
     }
 
     /**
@@ -744,13 +728,6 @@ public class MediaStoreUtil {
         }
         //播放列表
         if(type == Constants.PLAYLIST){
-//            Iterator it = Global.mPlayList.keySet().iterator();
-//            String playlistName = "";
-//            for(int i = 0 ; i <= (int)arg ; i++) {
-//                playlistName = it.next().toString();
-//            }
-//            for(PlayListItem tmp : Global.mPlayList.get(playlistName))
-//                ids.add(tmp.getId());
             ids = PlayListUtil.getIDList((Integer) arg);
         }
 

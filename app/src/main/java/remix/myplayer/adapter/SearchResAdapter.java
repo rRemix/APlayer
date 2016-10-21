@@ -2,9 +2,7 @@ package remix.myplayer.adapter;
 
 import android.content.ContentUris;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +16,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.activity.SearchActivity;
 
 /**
@@ -35,7 +32,7 @@ public class SearchResAdapter extends BaseAdapter<SearchResAdapter.SearchResHold
 
     @Override
     public SearchResHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new SearchResHolder(LayoutInflater.from(mContext).inflate(R.layout.search_reulst_item,null));
+        return new SearchResHolder(LayoutInflater.from(mContext).inflate(R.layout.item_search_reulst,null));
     }
 
     @Override

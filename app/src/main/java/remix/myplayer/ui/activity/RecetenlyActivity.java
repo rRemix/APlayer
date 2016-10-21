@@ -90,7 +90,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
 
         }
     };
-    private LoaderManager mManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -101,8 +100,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         setContentView(R.layout.activity_recently);
         ButterKnife.bind(this);
         MusicService.addCallback(RecetenlyActivity.this);
-        mManager = getLoaderManager();
-        mManager.initLoader(LOADER_ID++, null, this);
 
         mMultiChoice.setOnUpdateOptionMenuListener(new OnUpdateOptionMenuListener() {
             @Override
@@ -155,6 +152,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
             }
         });
         mRecyclerView.setAdapter(mAdapter);
+        getLoaderManager().initLoader(LOADER_ID++, null, this);
 
         mMDDialog = new MaterialDialog.Builder(this)
                 .title("加载中")

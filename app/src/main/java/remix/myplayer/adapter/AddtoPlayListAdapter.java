@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -44,7 +43,7 @@ public class AddtoPlayListAdapter extends RecyclerView.Adapter<AddtoPlayListAdap
 
     @Override
     public PlayListAddToHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new PlayListAddToHolder(LayoutInflater.from(mContext).inflate(R.layout.playlist_addto_item,null));
+        return new PlayListAddToHolder(LayoutInflater.from(mContext).inflate(R.layout.item_playlist_addto,null));
     }
 
     @Override

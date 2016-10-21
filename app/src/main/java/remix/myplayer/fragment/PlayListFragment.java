@@ -186,12 +186,6 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
         return mAdapter;
     }
 
-    public void UpdateAdapter() {
-        if(mAdapter != null){
-            mAdapter.notifyDataSetChanged();
-        }
-    }
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), PlayLists.CONTENT_URI,

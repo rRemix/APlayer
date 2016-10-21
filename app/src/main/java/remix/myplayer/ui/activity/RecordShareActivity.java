@@ -40,7 +40,7 @@ import remix.myplayer.util.StatusBarUtil;
 /**
  * 将分享内容与专辑封面进行处理用于分享
  */
-public class RecordShareActivity extends BaseAppCompatActivity {
+public class RecordShareActivity extends BaseActivity {
     public static RecordShareActivity mInstance;
     @BindView(R.id.recordshare_image)
     ImageView mImage;

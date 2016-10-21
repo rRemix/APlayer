@@ -51,6 +51,7 @@
     <string name="add_playlist_error">新建播放列表失败</string>
     <string name="playlist_alread_exist">该播放列表已存在</string>
 
+    <string name="add_error">添加失败</string>
     <string name="add_to_playlist">添加到播放列表</string>
     <string name="add_song_playlist_success">添加%d首歌曲到播放列表</string>
     <string name="add_song_playinglist_success">添加%d首歌曲到播放队列</string>
@@ -79,4 +80,10 @@
     <string name="use_black_color">使用黑色底色</string>
 
     <string name="play_queue">播放队列</string>
+    <string name="choose_song">选择歌曲</string>
+    <string name="ignore">跳过</string>
+    <string name="choose_no_song">未选择任何歌曲</string>
+    <string name="set_album_cover_error">设置专辑封面失败</string>
+    <string name="set_artist_cover_error">设置艺术家封面失败</string>
+    <string name="set_playlist_cover_error">设置播放列表封面失败</string>
 </resources>

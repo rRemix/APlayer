@@ -208,11 +208,6 @@ public class MultiChoice implements OnMultiItemClickListener {
                 }
                 break;
             case Constants.PLAYLIST:
-//                for(Object arg : mSelectedArg){
-//                    if (arg instanceof Integer && MediaStoreUtil.delete((Integer) arg,Constants.PLAYLIST)){
-//                        num++;
-//                    }
-//                }
                 for(Object arg : mSelectedArg){
                     if (arg instanceof Integer)
                         idList.add((Integer) arg);

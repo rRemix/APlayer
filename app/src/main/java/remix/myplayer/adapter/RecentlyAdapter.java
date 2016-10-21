@@ -62,7 +62,7 @@
 //        RecentlyHolder holder;
 //        //检查缓存
 //        if(convertView == null) {
-//            convertView = LayoutInflater.from(mContext).inflate(R.layout.song_recycle_item,null);
+//            convertView = LayoutInflater.from(mContext).inflate(R.layout.item_song_recycle,null);
 //            holder = new RecentlyHolder(convertView);
 //            convertView.setTag(holder);
 //        } else

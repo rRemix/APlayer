@@ -70,7 +70,7 @@ public class SearchLRC {
         //获得输入流
         BufferedReader br = null;
 
-        //先判断该歌曲是否有缓存，没有才去下载
+        //先判断该歌曲是否有缓存
         try {
             DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(CommonUtil.hashKeyForDisk(mSongName + "/" + mArtistName));
             if(snapShot != null && (br = new BufferedReader(new InputStreamReader(snapShot.getInputStream(0)))) != null ){
@@ -86,6 +86,8 @@ public class SearchLRC {
                     e.printStackTrace();
                 }
         }
+
+        //查找本地目录
 
         //没有缓存，下载并解析歌词
         String lrcUrl = getLrcUrl();

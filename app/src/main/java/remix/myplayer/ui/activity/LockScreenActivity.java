@@ -47,7 +47,7 @@ import remix.myplayer.util.PlayListUtil;
  * 实际为将手机解锁并对Activity进行处理，使其看起来像锁屏界面
  */
 
-public class LockScreenActivity extends BaseAppCompatActivity implements MusicService.Callback{
+public class LockScreenActivity extends BaseActivity implements MusicService.Callback{
     private final static String TAG = "LockScreenActivity";
     public static LockScreenActivity mInstance;
     //当前播放的歌曲信息

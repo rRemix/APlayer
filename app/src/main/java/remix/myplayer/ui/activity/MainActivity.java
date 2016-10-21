@@ -3,11 +3,11 @@ package remix.myplayer.ui.activity;
 
 import android.Manifest;
 import android.content.ContentUris;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -17,22 +17,20 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.soundcloud.android.crop.Crop;
-import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,14 +46,13 @@ import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -96,7 +93,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             Manifest.permission.READ_PHONE_STATE};
 
     //更新主题
-    private final int UPDATE_THEME = 1;
+    private final int RESULT_UPDATE_THEME = 1;
     private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -141,10 +138,8 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         }
     };
 
-
     @Override
     protected void onResume() {
-        MobclickAgent.onPageStart(MainActivity.class.getSimpleName());
         super.onResume();
         if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
@@ -156,7 +151,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
     @Override
     protected void onPause() {
-        MobclickAgent.onPageStart(MainActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
@@ -169,8 +163,53 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mIsRunning = false;
     }
 
+    private ArrayList<HashMap<String,Object>> searchFile(String keyword,File filepath) {
+        int index = 0;
+        ArrayList<HashMap<String,Object>> bookList = new ArrayList<>();
+        //判断SD卡是否存在
+        if (Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) {
+            File[] files = filepath.listFiles();
+            if (files.length > 0) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        //如果目录可读就执行（一定要加，不然会挂掉）
+                        if(file.canRead()){
+                            searchFile(keyword,file);  //如果是目录，递归查找
+                        }
+                    } else {
+                        //判断是文件，则进行文件名判断
+                        try {
+                            if (file.getName().indexOf(keyword) > -1||file.getName().indexOf(keyword.toUpperCase()) > -1) {
+                                HashMap<String,Object> rowItem = new HashMap<>();
+                                rowItem.put("number", index);    // 加入序列号
+                                rowItem.put("bookName", file.getName());// 加入名称
+                                rowItem.put("path", file.getPath());  // 加入路径
+                                rowItem.put("size", file.length());   // 加入文件大小
+
+                                bookList.add(rowItem);
+                                index++;
+                            }
+                        } catch(Exception e) {
+                            Toast.makeText(this,"查找发生错误", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            }
+        }
+        return bookList;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                ArrayList<HashMap<String,Object>> list = searchFile("mp3",Environment.getExternalStorageDirectory());
+//                LogUtil.d("FileTest",(list != null) + "");
+//            }
+//        }.start();
+
         initTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -341,6 +380,10 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         return mAdapter;
     }
 
+    /**
+     * 新建播放列表
+     * @param v
+     */
     @OnClick(R.id.add)
     public void onClick(View v){
         switch (v.getId()){
@@ -367,14 +410,14 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                                                     R.string.add_playlist_success :
                                                     newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
                                             Toast.LENGTH_SHORT);
+                                    if(newPlayListId > 0){
+                                        //跳转到添加歌曲界面
+                                        Intent intent = new Intent(MainActivity.this,SongChooseActivity.class);
+                                        intent.putExtra("PlayListID",newPlayListId);
+                                        intent.putExtra("PlayListName",input.toString());
+                                        startActivity(intent);
+                                    }
                                 }
-                            }
-                        })
-                        .dismissListener(new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                if(mAdapter != null)
-                                    mAdapter.notifyDataSetChanged();
                             }
                         })
                         .show();
@@ -445,8 +488,8 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                         break;
                     case R.id.item_setting:
                         //设置
-                        startActivityForResult(new Intent(MainActivity.this,SettingActivity.class),UPDATE_THEME);
-//                        startActivityForResult(new Intent(MainActivity.this,ThemeActivity.class),UPDATE_THEME);
+                        startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), RESULT_UPDATE_THEME);
+//                        startActivityForResult(new Intent(MainActivity.this,ThemeActivity.class),RESULT_UPDATE_THEME);
                         break;
                     case R.id.item_exit:
                         sendBroadcast(new Intent(Constants.EXIT));
@@ -464,20 +507,20 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null){
-            boolean isAlbum = Global.mAlbunOrArtist == Constants.ALBUM;
-            String errorTxt = isAlbum ? "设置专辑封面失败" : "设置艺术家封面失败";
-            int id = Global.mAlbumArtistID; //专辑或艺术家封面
-            String name = Global.mAlbumArtistName;
+            String errorTxt = getString(
+                    Global.mSetCoverType == Constants.ALBUM ? R.string.set_album_cover_error : Global.mSetCoverType == Constants.ARTIST ? R.string.set_artist_cover_error : R.string.set_playlist_cover_error);
+            int id = Global.mSetCoverID; //专辑或艺术家封面
             switch (requestCode){
                 //重启activity
-                case UPDATE_THEME:
+                case RESULT_UPDATE_THEME:
                     if(data.getBooleanExtra("needRefresh",false))
                         mRefreshHandler.sendEmptyMessage(Constants.RECREATE_ACTIVITY);
                     break;
                 //图片选择
                 case Crop.REQUEST_PICK:
                     if(resultCode == RESULT_OK){
-                        File cacheDir = DiskCache.getDiskCacheDir(this,"thumbnail/" + (isAlbum ? "album" : "artist"));
+                        File cacheDir = DiskCache.getDiskCacheDir(this,
+                                "thumbnail/" + (Global.mSetCoverType == Constants.ALBUM ? "album" : Global.mSetCoverType == Constants.ARTIST ? "artist" : "playlist"));
                         if(!cacheDir.exists()){
                             if(!cacheDir.mkdir()){
                                 Toast.makeText(this,errorTxt,Toast.LENGTH_SHORT).show();
@@ -498,6 +541,9 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                         Toast.makeText(MainActivity.this, errorTxt, Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    //如果设置的封面是专辑或者艺术家的，清除fresco的缓存
+                    if(Global.mSetCoverType == Constants.PLAYLIST)
+                        return;
                     //清除fresco的缓存
                     ImagePipeline imagePipeline = Fresco.getImagePipeline();
                     Uri fileUri = Uri.parse("file:///" + path);
@@ -542,11 +588,11 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 //            }
 //        }
         mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ALLSONG_ADAPTER);
-        View headView = mNavigationView.getHeaderView(0);
-        if(headView != null && mp3Item != null){
-            TextView textView = (TextView) headView.findViewById(R.id.header_txt);
-            textView.setText(mp3Item.getArtist() + "-" + mp3Item.getTitle());
-        }
+//        View headView = mNavigationView.getHeaderView(0);
+//        if(headView != null && mp3Item != null){
+//            TextView textView = (TextView) headView.findViewById(R.id.header_txt);
+//            textView.setText(mp3Item.getArtist() + "-" + mp3Item.getTitle());
+//        }
     }
 
     @Override

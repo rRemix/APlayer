@@ -1,13 +1,11 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +21,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.model.PlayListNewInfo;
 import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
@@ -58,8 +57,8 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
     @Override
     public PlayListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return viewType == Constants.LIST_MODEL ?
-                new PlayListListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.playlist_recycle_list_item,parent,false)) :
-                new PlayListGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.playlist_recycle_grid_item,parent,false));
+                new PlayListListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_recycle_list,parent,false)) :
+                new PlayListGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_recycle_grid,parent,false));
     }
 
     @Override
@@ -71,7 +70,8 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
             holder.mName.setText(info.Name);
             holder.mOther.setText(info.Count + "首歌曲");
             //设置专辑封面
-            new AsynLoadImage(holder.mImage).execute(info._Id);
+
+            new AsynLoadImage(holder.mImage).execute(info._Id,Constants.URL_PLAYLIST,true);
 
             if(mOnItemClickLitener != null) {
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {
@@ -106,7 +106,7 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
                             Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                             popupMenu.getMenuInflater().inflate(R.menu.playlist_menu, popupMenu.getMenu());
-                            popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext, holder.getAdapterPosition(), Constants.PLAYLIST, info.Name));
+                            popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext, info._Id, Constants.PLAYLIST, info.Name));
                             popupMenu.show();
                         }
                     });
@@ -132,69 +132,69 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
         }
     }
 
-    public static class PlayListHolder extends BaseViewHolder {
+    static class PlayListHolder extends BaseViewHolder {
         @BindView(R.id.item_text1)
-        public TextView mName;
+        TextView mName;
         @BindView(R.id.item_text2)
-        public TextView mOther;
+        TextView mOther;
         @BindView(R.id.item_simpleiview)
-        public SimpleDraweeView mImage;
+        SimpleDraweeView mImage;
         @BindView(R.id.item_button)
-        public ImageView mButton;
+        ImageView mButton;
         @BindView(R.id.item_container)
-        public RelativeLayout mContainer;
+        RelativeLayout mContainer;
 
         @BindView(R.id.item_root)
         @Nullable
-        public View mRoot;
-        public PlayListHolder(View itemView) {
+        View mRoot;
+        PlayListHolder(View itemView) {
             super(itemView);
         }
     }
 
-    public static class PlayListListHolder extends PlayListHolder{
-        public PlayListListHolder(View itemView) {
+    static class PlayListListHolder extends PlayListHolder{
+        PlayListListHolder(View itemView) {
             super(itemView);
         }
     }
 
-    public static class PlayListGridHolder extends PlayListHolder{
-        public PlayListGridHolder(View itemView) {
+    static class PlayListGridHolder extends PlayListHolder{
+       PlayListGridHolder(View itemView) {
             super(itemView);
         }
     }
 
-    class AsynLoadImage extends AsyncTask<Integer,Integer,String> {
-        private final SimpleDraweeView mImage;
-        public AsynLoadImage(SimpleDraweeView imageView) {
-            mImage = imageView;
-        }
-        @Override
-        protected String doInBackground(Integer... params) {
-            ArrayList<Integer> list = PlayListUtil.getIDList(params[0]);
-            String url = null;
-            if(list != null && list.size() > 0) {
-                for(Integer id : list){
-                    MP3Item item = MediaStoreUtil.getMP3InfoById(id);
-                    if(item == null)
-                        return "";
-                    url = MediaStoreUtil.getImageUrl(item.getAlbumId() + "",Constants.URL_ALBUM);
-                    if(url != null && !url.equals("")) {
-                        File file = new File(url);
-                        if(file.exists()) {
-                            break;
-                        }
-                    }
-                }
-            }
-            return url;
-        }
-        @Override
-        protected void onPostExecute(String url) {
-            Uri uri = Uri.parse("file:///" + url);
-            if(mImage != null)
-                mImage.setImageURI(uri);
-        }
-    }
+//    class AsynLoadImage extends AsyncTask<Integer,Integer,String> {
+//        private final SimpleDraweeView mImage;
+//        public AsynLoadImage(SimpleDraweeView imageView) {
+//            mImage = imageView;
+//        }
+//        @Override
+//        protected String doInBackground(Integer... params) {
+//            ArrayList<Integer> list = PlayListUtil.getIDList(params[0]);
+//            String url = null;
+//            if(list != null && list.size() > 0) {
+//                for(Integer id : list){
+//                    MP3Item item = MediaStoreUtil.getMP3InfoById(id);
+//                    if(item == null)
+//                        return "";
+//                    url = MediaStoreUtil.getImageUrl(item.getAlbumId() + "",Constants.URL_ALBUM);
+//                    if(url != null && !url.equals("")) {
+//                        File file = new File(url);
+//                        if(file.exists()) {
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//            return url;
+//        }
+//        @Override
+//        protected void onPostExecute(String url) {
+//            Uri uri = Uri.parse("file:///" + url);
+//            if(mImage != null)
+//                mImage.setImageURI(uri);
+//        }
+//    }
 
 }

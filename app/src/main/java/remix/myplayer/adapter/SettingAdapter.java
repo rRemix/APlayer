@@ -38,7 +38,7 @@ public class SettingAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if(convertView == null){
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.setting_item,null);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.item_setting,null);
         }
         TextView mText = (TextView)convertView.findViewById(R.id.setting_item_text);
         mText.setText(getItem(position).toString());

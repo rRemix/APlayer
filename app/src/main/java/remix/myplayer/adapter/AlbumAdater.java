@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +24,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.fragment.AlbumFragment;
-import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
@@ -58,8 +56,8 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
     @Override
     public AlbumHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return viewType == Constants.LIST_MODEL ?
-                new AlbumListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.album_recycle_list_item,parent,false)) :
-                new AlbumGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.album_recycle_grid_item,parent,false));
+                new AlbumListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_album_recycle_list,parent,false)) :
+                new AlbumGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_album_recycle_grid,parent,false));
     }
 
 

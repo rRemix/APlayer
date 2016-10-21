@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
@@ -35,6 +36,7 @@ import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -76,7 +78,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
     @Override
     public SongViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new SongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.song_recycle_item,null,false));
+        return new SongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_song_recycle,null,false));
     }
 
     @Override
@@ -122,23 +124,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             holder.mOther.setText(artist + "-" + album);
             //封面
 //            holder.mImage.setImageURI(Uri.EMPTY);
-//            new AsynLoadImage(holder.mImage).execute((int)temp.getAlbumId(),Constants.URL_ALBUM);
-//            String urlPath = MediaStoreUtil.getImageUrl(temp.getAlbumId() + "", Constants.URL_ALBUM);
-//            if(!TextUtils.isEmpty(urlPath)){
-//                DraweeController controller = Fresco.newDraweeControllerBuilder()
-//                        .setUri(Uri.fromFile(new File(urlPath)))
-//                        .setOldController(holder.mImage.getController())
-//                        .setAutoPlayAnimations(false)
-//                        .build();
-//                holder.mImage.setController(controller);
-//            }
+            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(), Constants.ALBUM,false);
 
-            DraweeController controller = Fresco.newDraweeControllerBuilder()
-                    .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()))
-                    .setOldController(holder.mImage.getController())
-                    .setAutoPlayAnimations(false)
-                    .build();
-            holder.mImage.setController(controller);
+//            DraweeController controller = Fresco.newDraweeControllerBuilder()
+//                    .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()))
+//                    .setOldController(holder.mImage.getController())
+//                    .setAutoPlayAnimations(false)
+//                    .build();
+//            holder.mImage.setController(controller);
 
         } catch (Exception e){
             e.printStackTrace();
@@ -200,28 +193,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         return mCursor != null && !mCursor.isClosed() ? mCursor.getCount() : 0;
     }
 
-    class AsynLoadImage extends AsyncTask<Object,Integer,String> {
-        private final SimpleDraweeView mImage;
-        public AsynLoadImage(SimpleDraweeView imageView) {
-            mImage = imageView;
-        }
-        @Override
-        protected String doInBackground(Object... params) {
-            return MediaStoreUtil.getImageUrl(params[0].toString(), (int)params[1]);
-        }
-        @Override
-        protected void onPostExecute(String url) {
-            if(mImage != null && url != null) {
-                DraweeController controller = Fresco.newDraweeControllerBuilder()
-                        .setUri(Uri.parse("file:///" + url))
-                        .setOldController(mImage.getController())
-                        .setAutoPlayAnimations(false)
-                        .build();
-                mImage.setController(controller);
-
-            }
-        }
-    }
 
     public static class SongViewHolder extends BaseViewHolder{
         @BindView(R.id.song_title)

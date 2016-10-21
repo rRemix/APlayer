@@ -47,7 +47,6 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     public static int mAlbumIdIndex = -1;
     public static int mAlbumIndex = -1;
     public static int mArtistIndex = -1;
-    public static int mSongNumIndex=  -1;
     private AlbumAdater mAdapter;
     private static int LOADER_ID = 1;
     private MultiChoice mMultiChoice;

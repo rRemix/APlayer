@@ -21,7 +21,7 @@ import remix.myplayer.util.SPUtil;
 /**
  * Created by taeja on 16-6-8.
  */
-public class SplashActivity extends BaseAppCompatActivity {
+public class SplashActivity extends BaseActivity {
     @BindView(R.id.viewPager)
     ViewPager mViewPager;
 

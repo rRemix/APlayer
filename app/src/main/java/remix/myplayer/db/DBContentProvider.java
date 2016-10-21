@@ -26,7 +26,7 @@ import remix.myplayer.util.LogUtil;
  */
 public class DBContentProvider extends ContentProvider {
     public static final String AUTHORITY = "remix.myplayer";
-    public static final String CONTENT_AUTHORITY_SLASH = "content://" + AUTHORITY + "/";
+    public static final String CONTENT_AUTHORITY_SLASH = "content://" + AUTHORITY + "/db/";
     public static final int PLAY_LIST_MULTIPLE = 1;
     public static final int PLAY_LIST_SINGLE = 2;
     public static final int PLAY_LIST_SONG_MULTIPLE = 3;
@@ -34,10 +34,10 @@ public class DBContentProvider extends ContentProvider {
     public static UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        mUriMatcher.addURI(AUTHORITY, PlayLists.TABLE_NAME, PLAY_LIST_MULTIPLE);
-        mUriMatcher.addURI(AUTHORITY, PlayLists.TABLE_NAME + "/#", PLAY_LIST_SINGLE);
-        mUriMatcher.addURI(AUTHORITY, PlayListSongs.TABLE_NAME, PLAY_LIST_SONG_MULTIPLE);
-        mUriMatcher.addURI(AUTHORITY, PlayListSongs.TABLE_NAME + "/#", PLAY_LIST_SONG_SINGLE);
+        mUriMatcher.addURI(AUTHORITY, "/db/" + PlayLists.TABLE_NAME, PLAY_LIST_MULTIPLE);
+        mUriMatcher.addURI(AUTHORITY, "/db/" + PlayLists.TABLE_NAME + "/#", PLAY_LIST_SINGLE);
+        mUriMatcher.addURI(AUTHORITY, "/db/" + PlayListSongs.TABLE_NAME, PLAY_LIST_SONG_MULTIPLE);
+        mUriMatcher.addURI(AUTHORITY, "/db/" + PlayListSongs.TABLE_NAME + "/#", PLAY_LIST_SONG_SINGLE);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class DBContentProvider extends ContentProvider {
             int match = mUriMatcher.match(uri);
             cursor = db.query(match == PLAY_LIST_MULTIPLE  ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
                         projection,selection,selectionArgs,null,null,null);
-            cursor.setNotificationUri(Application.getContext().getContentResolver(), uri);
+            cursor.setNotificationUri(Application.getContext().getContentResolver(), Uri.parse(CONTENT_AUTHORITY_SLASH));
         } catch (Exception e){
             e.printStackTrace();
         } finally {

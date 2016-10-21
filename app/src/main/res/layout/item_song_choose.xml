@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/d56_size"
+    android:background="?attr/background_list"
+    android:id="@+id/item_root">
+    
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/item_img"
+        android:layout_width="@dimen/d42_size"
+        android:layout_height="@dimen/d42_size"
+        android:layout_margin="@dimen/d8_size"
+        android:layout_centerVertical="true"
+        fresco:actualImageScaleType="centerCrop"
+        fresco:placeholderImageScaleType="centerCrop"
+        fresco:placeholderImage="@drawable/song_artist_empty_bg"
+        fresco:failureImage="@drawable/song_artist_empty_bg"
+        fresco:failureImageScaleType="centerCrop"/>
+
+    <android.support.v7.widget.AppCompatCheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/checkbox"
+        android:layout_margin="@dimen/d16_size"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:text=""/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_centerVertical="true"
+        android:orientation="vertical"
+        android:layout_toRightOf="@id/item_img"
+        android:layout_toLeftOf="@id/checkbox">
+        <TextView
+            android:id="@+id/item_song"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s14_size"
+            android:textColor="?attr/text_color_primary"
+            android:lines="1"
+            android:ellipsize="end"/>
+        <TextView
+            android:id="@+id/item_album"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s12_size"
+            android:textColor="?attr/text_color"
+            android:lines="1"
+            android:ellipsize="end"/>
+    </LinearLayout>
+</RelativeLayout>

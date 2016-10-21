@@ -67,9 +67,9 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 break;
             //设置专辑封面
             case R.id.menu_album_thumb:
-                Global.mAlbumArtistID = mId;
-                Global.mAlbunOrArtist = mType;
-                Global.mAlbumArtistName = mKey;
+                Global.mSetCoverID = mId;
+                Global.mSetCoverType = mType;
+                Global.mSetCoverName = mKey;
                 Intent ori = ((Activity)mContext).getIntent();
                 ori.putExtra("ID",mId);
                 ((Activity)mContext).setIntent(ori);

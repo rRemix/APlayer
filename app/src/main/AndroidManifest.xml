@@ -93,6 +93,9 @@
         <activity android:name=".ui.activity.ThemeActivity"
             android:theme="@style/ActivityStyle"/>
 
+        <activity android:name=".ui.activity.SongChooseActivity"
+            android:theme="@style/ActivityStyle"/>
+
         <activity android:name=".ui.activity.LockScreenActivity"
             android:theme="@style/LockScreenActivity"
             android:excludeFromRecents="true"

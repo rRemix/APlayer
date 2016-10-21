@@ -20,7 +20,7 @@ import remix.myplayer.util.StatusBarUtil;
  */
 
 
-public class BaseAppCompatActivity extends AppCompatActivity {
+public class BaseActivity extends AppCompatActivity {
     protected <T extends View> T findView(int id){
         return (T)findViewById(id);
     }

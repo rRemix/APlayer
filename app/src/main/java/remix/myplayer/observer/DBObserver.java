@@ -27,7 +27,6 @@ public class DBObserver extends ContentObserver {
     @Override
     public void onChange(boolean selfChange, Uri uri) {
         if(!selfChange){
-            int match = DBContentProvider.mUriMatcher.match(uri);
             switch (DBContentProvider.mUriMatcher.match(uri)){
                 //更新播放列表
                 case DBContentProvider.PLAY_LIST_MULTIPLE:

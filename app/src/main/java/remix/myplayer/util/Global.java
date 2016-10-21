@@ -17,20 +17,19 @@ import remix.myplayer.model.PlayListItem;
  */
 public class Global {
     /**
-     * 当前正在设置封面的专辑或艺术家id
+     * 当前正在设置封面的专辑或艺术家或播放列表id
      */
-    public static int mAlbumArtistID = 0;
+    public static int mSetCoverID = 0;
 
     /**
-     * 当前正在设置封面的专辑或艺术家名字
+     * 当前正在设置封面的专辑或艺术家或播放列表的名字
      */
-    public static String mAlbumArtistName = "";
+    public static String mSetCoverName = "";
 
     /**
-     * 当前正在设置的是专辑还是艺术家封面
-     * 1:专辑 2:艺术家
+     * 当前正在设置的是专辑还是艺术家还是播放列表
      */
-    public static int mAlbunOrArtist = 1;
+    public static int mSetCoverType = 1;
 
     /**
      * 操作类型

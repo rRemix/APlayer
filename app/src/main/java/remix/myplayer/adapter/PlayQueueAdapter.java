@@ -2,10 +2,8 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +14,6 @@ import android.widget.TextView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.CommonUtil;
@@ -45,7 +42,7 @@ public class PlayQueueAdapter extends BaseAdapter<PlayQueueAdapter.PlayQueueHold
 
     @Override
     public PlayQueueHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new PlayQueueHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.playqueue_item,parent,false));
+        return new PlayQueueHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playqueue,parent,false));
     }
 
     @Override

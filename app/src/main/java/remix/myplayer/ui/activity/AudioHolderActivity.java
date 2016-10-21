@@ -67,7 +67,7 @@ import remix.myplayer.util.StatusBarUtil;
 /**
  * 播放界面
  */
-public class AudioHolderActivity extends BaseAppCompatActivity implements MusicService.Callback{
+public class AudioHolderActivity extends BaseActivity implements MusicService.Callback{
     private static final String TAG = "AudioHolderActivity";
     public static AudioHolderActivity mInstance = null;
     //是否正在运行
@@ -354,6 +354,11 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         mIsRunning = false;
@@ -527,7 +532,6 @@ public class AudioHolderActivity extends BaseAppCompatActivity implements MusicS
             mFromBack = false;
         }
     }
-
 
     //更新界面
     @Override

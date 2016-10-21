@@ -17,7 +17,7 @@ import remix.myplayer.theme.ThemeStore;
  * @Author Xiaoborui
  * @Date 2016/8/3 16:59
  */
-public class ThemeActivity extends BaseAppCompatActivity implements View.OnClickListener{
+public class ThemeActivity extends BaseActivity implements View.OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
