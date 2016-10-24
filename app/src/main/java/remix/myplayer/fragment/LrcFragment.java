@@ -79,16 +79,11 @@ public class LrcFragment extends BaseFragment {
     public void UpdateLrc(MP3Item mp3Item) {
         if(mp3Item == null)
             return;
-        new DownloadThread(mp3Item.getTitle(), mp3Item.getArtist()).start();
+        mInfo = mp3Item;
+        new DownloadThread().start();
     }
 
     class DownloadThread extends Thread {
-        private String mName;
-        private String mArtist;
-        public DownloadThread(String name,String artist) {
-            mName = name;
-            mArtist = artist;
-        }
         @Override
         public void run() {
             if(!CommonUtil.isNetWorkConnected()) {
@@ -96,14 +91,13 @@ public class LrcFragment extends BaseFragment {
                 return;
             }
             mHandler.sendEmptyMessage(SEARCHING);
-            mLrcList = new SearchLRC(mName,mArtist).getLrc();
+            mLrcList = new SearchLRC(mInfo).getLrc();
             if(mLrcList == null) {
                 mHandler.sendEmptyMessage(NO_LRC);
                 return;
             }
             mHandler.sendEmptyMessage(UPDATE_LRC);
         }
-
     }
 
 

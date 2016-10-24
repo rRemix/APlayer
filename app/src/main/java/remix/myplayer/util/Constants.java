@@ -117,4 +117,13 @@ public class Constants {
     public final static int CLEAR_MULTI = 101;
     //重建activity
     public final static int RECREATE_ACTIVITY = 102;
+
+    //开始处理
+    public final static int START_PROCESS = 0;
+    //处理中
+    public final static int PROCESSING = 1;
+    //错误
+    public final static int ERROR_PROCESS = 2;
+    //停止
+    public final static int STOP_PROCESS = 3;
 }

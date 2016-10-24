@@ -86,4 +86,10 @@
     <string name="set_album_cover_error">设置专辑封面失败</string>
     <string name="set_artist_cover_error">设置艺术家封面失败</string>
     <string name="set_playlist_cover_error">设置播放列表封面失败</string>
+
+    <string name="new_folder">新建目录</string>
+    <string name="choose_folder">选择</string>
+    <string name="setting_success">设置成功</string>
+    <string name="setting_error">设置失败</string>
+    <string name="search_error">查找失败</string>
 </resources>

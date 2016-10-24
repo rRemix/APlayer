@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,6 +26,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -609,5 +611,48 @@ public class CommonUtil {
             }
         }
         return "";
+    }
+
+    /**
+     * 查找歌曲的lrc文件
+     * @param context
+     * @param songName
+     * @param searchPath
+     */
+    public static void searchFile(Context context,String songName,String artistName,File searchPath) {
+        //判断SD卡是否存在
+        if (Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) {
+            File[] files = searchPath.listFiles();
+            if (files.length > 0) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        //如果目录可读就执行（一定要加，不然会挂掉）
+                        if(file.canRead()){
+                            searchFile(context,songName,artistName,file);  //如果是目录，递归查找
+                        }
+                    } else {
+                        //判断是文件，则进行文件名判断
+                        try {
+                            if((file.getName().contains(songName) || file.getName().contains(songName.toUpperCase()))
+                               && (file.getName().contains(artistName) || file.getName().contains(artistName.toUpperCase()))){
+                                Global.mCurrentLrcPath = file.getAbsolutePath();
+                                LogUtil.d("Lrc","LrcPath:" + Global.mCurrentLrcPath);
+                                return;
+//                                HashMap<String,Object> rowItem = new HashMap<>();
+//                                rowItem.put("number", index);    // 加入序列号
+//                                rowItem.put("name", file.getName());// 加入名称
+//                                rowItem.put("path", file.getPath());  // 加入路径
+//                                rowItem.put("size", file.length());   // 加入文件大小
+//                                mLrcList.add(rowItem);
+//                                index++;
+                            }
+                        } catch(Exception e) {
+                            ToastUtil.show(context,R.string.search_error);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

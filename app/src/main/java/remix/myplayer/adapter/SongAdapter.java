@@ -124,14 +124,16 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             holder.mOther.setText(artist + "-" + album);
             //封面
 //            holder.mImage.setImageURI(Uri.EMPTY);
-            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(), Constants.ALBUM,false);
+//            holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()));
 
-//            DraweeController controller = Fresco.newDraweeControllerBuilder()
-//                    .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()))
-//                    .setOldController(holder.mImage.getController())
-//                    .setAutoPlayAnimations(false)
-//                    .build();
-//            holder.mImage.setController(controller);
+//            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(), Constants.ALBUM,false);
+
+            DraweeController controller = Fresco.newDraweeControllerBuilder()
+                    .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()))
+                    .setOldController(holder.mImage.getController())
+                    .setAutoPlayAnimations(false)
+                    .build();
+            holder.mImage.setController(controller);
 
         } catch (Exception e){
             e.printStackTrace();

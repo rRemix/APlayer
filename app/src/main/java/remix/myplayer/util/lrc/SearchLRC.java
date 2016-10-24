@@ -1,8 +1,13 @@
 package remix.myplayer.util.lrc;
 
+import android.os.Environment;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -10,15 +15,20 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.EventListener;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
+import remix.myplayer.application.Application;
 import remix.myplayer.model.LrcInfo;
+import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.DiskLruCache;
+import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by Remix on 2015/12/7.
@@ -30,20 +40,15 @@ import remix.myplayer.util.LogUtil;
 public class SearchLRC {
     private static final String TAG = "SearchLRC";
     private static final String DEFAULT_LOCAL = "GB2312";
+    private boolean mIsFind = false;
+    private MP3Item mInfo;
     private String mSongName;
     private String mArtistName;
-    private boolean mIsFind = false;
 
-    public SearchLRC(String musicName, String singerName) {
-        //传进来的如果是汉字，那么就要进行编码转化
-        try {
-            mSongName = URLEncoder.encode(musicName, "utf-8");
-            mArtistName = URLEncoder.encode(singerName, "utf-8");
-
-        } catch (UnsupportedEncodingException e2) {
-            // TODO Auto-generated catch block
-            e2.printStackTrace();
-        }
+    public SearchLRC(MP3Item item) {
+        mInfo = item;
+        mSongName = mInfo.getTitle();
+        mArtistName = mInfo.getArtist();
     }
 
     /**
@@ -52,7 +57,9 @@ public class SearchLRC {
      */
     public String getLrcUrl(){
         try {
-            JSONObject lrcid = CommonUtil.getSongJsonObject(mSongName,mArtistName);
+            JSONObject lrcid = CommonUtil.getSongJsonObject(
+                    URLEncoder.encode(mInfo.getTitle(), "utf-8"),
+                    URLEncoder.encode(mInfo.getArtist(), "utf-8"));
             if(lrcid != null && lrcid.getInt("count") > 0 && lrcid.getInt("code") == 0){
                 return lrcid.getJSONArray("result").getJSONObject(0).getString("lrc");
             }
@@ -67,9 +74,7 @@ public class SearchLRC {
      * @return 歌词信息list
      */
     public LinkedList<LrcInfo> getLrc(){
-        //获得输入流
         BufferedReader br = null;
-
         //先判断该歌曲是否有缓存
         try {
             DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(CommonUtil.hashKeyForDisk(mSongName + "/" + mArtistName));
@@ -88,6 +93,35 @@ public class SearchLRC {
         }
 
         //查找本地目录
+        //没有设置歌词路径
+        String setLrcPath =  SPUtil.getValue(Application.getContext(),"Setting","LrcPath","");
+        if(setLrcPath.equals("")){
+            File file = new File(mInfo.getUrl());
+            //父目录
+            File parentfile = file.getParentFile();
+            if(parentfile.exists() && parentfile.isDirectory())
+                CommonUtil.searchFile(Application.getContext(),mSongName,mArtistName, parentfile);
+        } else {
+            //已设置歌词路径
+            CommonUtil.searchFile(Application.getContext(),mSongName,mArtistName, new File(setLrcPath));
+        }
+
+        if(!Global.mCurrentLrcPath.equals("")){
+            try {
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(Global.mCurrentLrcPath)));
+                return parseLrc(br,true);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                Global.mCurrentLrcPath = "";
+                if(br != null)
+                    try {
+                        br.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+            }
+        }
 
         //没有缓存，下载并解析歌词
         String lrcUrl = getLrcUrl();

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -163,53 +164,9 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mIsRunning = false;
     }
 
-    private ArrayList<HashMap<String,Object>> searchFile(String keyword,File filepath) {
-        int index = 0;
-        ArrayList<HashMap<String,Object>> bookList = new ArrayList<>();
-        //判断SD卡是否存在
-        if (Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED)) {
-            File[] files = filepath.listFiles();
-            if (files.length > 0) {
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        //如果目录可读就执行（一定要加，不然会挂掉）
-                        if(file.canRead()){
-                            searchFile(keyword,file);  //如果是目录，递归查找
-                        }
-                    } else {
-                        //判断是文件，则进行文件名判断
-                        try {
-                            if (file.getName().indexOf(keyword) > -1||file.getName().indexOf(keyword.toUpperCase()) > -1) {
-                                HashMap<String,Object> rowItem = new HashMap<>();
-                                rowItem.put("number", index);    // 加入序列号
-                                rowItem.put("bookName", file.getName());// 加入名称
-                                rowItem.put("path", file.getPath());  // 加入路径
-                                rowItem.put("size", file.length());   // 加入文件大小
-
-                                bookList.add(rowItem);
-                                index++;
-                            }
-                        } catch(Exception e) {
-                            Toast.makeText(this,"查找发生错误", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-            }
-        }
-        return bookList;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        new Thread(){
-//            @Override
-//            public void run() {
-//                ArrayList<HashMap<String,Object>> list = searchFile("mp3",Environment.getExternalStorageDirectory());
-//                LogUtil.d("FileTest",(list != null) + "");
-//            }
-//        }.start();
-
         initTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -262,7 +219,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
 //        BmobUpdateAgent.setUpdateOnlyWifi(false);
 //        BmobUpdateAgent.update(this);
-
     }
 
     /**

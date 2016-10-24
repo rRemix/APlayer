@@ -17,19 +17,19 @@ public class SPUtil {
             mInstance = this;
     }
 
-    public static void putValue(Context context,String name,String key,int value) {
+    public static boolean putValue(Context context,String name,String key,int value) {
         SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
-        editor.putInt(key,value).commit();
+        return editor.putInt(key,value).commit();
     }
 
-    public static void putValue(Context context,String name,String key,String value) {
+    public static boolean putValue(Context context,String name,String key,String value) {
         SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
-        editor.putString(key,value).commit();
+        return editor.putString(key,value).commit();
     }
 
-    public static void putValue(Context context,String name,String key,boolean value) {
+    public static boolean putValue(Context context,String name,String key,boolean value) {
         SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
-        editor.putBoolean(key,value).commit();
+        return editor.putBoolean(key,value).commit();
     }
 
     public static boolean getValue(Context context,String name,String key,boolean dft) {

@@ -4,13 +4,16 @@ package remix.myplayer.util;
  * Created by taeja on 16-4-15.
  */
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.SystemClock;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import remix.myplayer.model.PlayListNewInfo;
 import remix.myplayer.model.PlayListSongInfo;
-import remix.myplayer.model.PlayListItem;
 
 /**
  * 一些全局变量
@@ -86,28 +89,33 @@ public class Global {
     public static int mPlayQueueId = 0;
     /** 我的收藏id */
     public static int mMyLoveId;
+
     /**
-     * 设置正在播放列表
+     * 设置播放队列
      * @param newQueueIdList
      * @return
      */
-    public static int setPlayQueue(final ArrayList<Integer> newQueueIdList) {
-//        mPlayQueue = (ArrayList<Integer>) list.clone();
-//        XmlUtil.updatePlayQueue();
-        if (newQueueIdList.equals(mPlayQueue))
-            return 0;
-        long start = System.currentTimeMillis();
-        int deleteRow = PlayListUtil.deleteMultiSongs(mPlayQueue,mPlayQueueId);
-        mPlayQueue.clear();
-        mPlayQueue.addAll(newQueueIdList);
-        ArrayList<PlayListSongInfo> infos = new ArrayList<>();
-        for(Integer id : newQueueIdList){
-            infos.add(new PlayListSongInfo(id,mPlayQueueId,Constants.PLAY_QUEUE));
-        }
-        int addRow = PlayListUtil.addMultiSongs(infos);
-        LogUtil.d("DBTest","Time:" + (System.currentTimeMillis() - start) + "  addRow:" + addRow + "  deleteRow:" + deleteRow);
-        return addRow;
+    public static void setPlayQueue(final ArrayList<Integer> newQueueIdList) {
+        new Thread(){
+            @Override
+            public void run() {
+                if (newQueueIdList.equals(mPlayQueue))
+                    return;
+                ArrayList<Integer> oriPlayQueue = (ArrayList<Integer>) mPlayQueue.clone();
+                mPlayQueue.clear();
+                mPlayQueue.addAll(newQueueIdList);
 
+                int deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue,mPlayQueueId);
+//                int deleteRow = 0;
+//                for(Integer audioId : oriPlayQueue){
+//                    if(PlayListUtil.deleteSong(audioId,mPlayQueueId))
+//                        deleteRow++;
+//                }
+                long start = System.currentTimeMillis();
+                int addRow = PlayListUtil.addMultiSongs(mPlayQueue,Constants.PLAY_QUEUE,mPlayQueueId);
+                LogUtil.d("DeleteTest","Time:" + (System.currentTimeMillis() - start) + "  addRow:" + addRow + "  deleteRow:" + deleteRow);
+            }
+        }.start();
     }
 
     /**
@@ -121,7 +129,11 @@ public class Global {
             infos.add(new PlayListSongInfo(id,mPlayQueueId,Constants.PLAY_QUEUE));
         }
         return PlayListUtil.addMultiSongs(infos);
-
     }
+
+    /**
+     * 当前播放歌曲的lrc文件路径
+     */
+    public static String mCurrentLrcPath = "";
 
 }

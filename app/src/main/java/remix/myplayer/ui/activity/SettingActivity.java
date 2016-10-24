@@ -14,9 +14,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
 import com.umeng.analytics.MobclickAgent;
+
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,6 +36,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * @ClassName SettingActivity
@@ -38,13 +44,15 @@ import remix.myplayer.util.SPUtil;
  * @Author Xiaoborui
  * @Date 2016/8/23 13:51
  */
-public class SettingActivity extends ToolbarActivity {
+public class SettingActivity extends ToolbarActivity implements FolderChooserDialog.FolderCallback{
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.setting_mode_switch)
     SwitchCompat mModeSwitch;
     @BindView(R.id.setting_color_src)
     ImageView mColorSrc;
+    @BindView(R.id.setting_lrc_path)
+    TextView mLrcPath;
 
     //是否需要刷新
     private boolean mNeedRefresh = false;
@@ -86,6 +94,9 @@ public class SettingActivity extends ToolbarActivity {
             }
         });
 
+        if(!SPUtil.getValue(this,"Setting","LrcPath","").equals("")) {
+            mLrcPath.setText(SPUtil.getValue(this,"Setting","LrcPath",""));
+        }
         //初始化颜色
         final int color = ThemeStore.isDay() ? ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY) : ColorUtil.getColor(R.color.purple_782899);
         ((GradientDrawable)mColorSrc.getDrawable()).setColor(color);
@@ -135,15 +146,28 @@ public class SettingActivity extends ToolbarActivity {
         onBackPressed();
     }
 
+    @Override
+    public void onFolderSelection(@NonNull FolderChooserDialog dialog, @NonNull File folder) {
+        boolean success = SPUtil.putValue(this,"Setting","LrcPath",folder.getAbsolutePath());
+        ToastUtil.show(this, success ? R.string.setting_success : R.string.setting_error, Toast.LENGTH_SHORT);
+        mLrcPath.setText(folder.getAbsolutePath());
+    }
 
     @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_container,
                 R.id.setting_mode_container,R.id.setting_feedback_container,R.id.setting_about_container,
-                R.id.setting_update_container,R.id.setting_eq_container})
+                R.id.setting_update_container,R.id.setting_eq_container,R.id.setting_lrc_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
             case R.id.setting_filter_container:
                 startActivity(new Intent(SettingActivity.this,ScanActivity.class));
+                break;
+            //歌词扫描路径
+            case R.id.setting_lrc_container:
+                new FolderChooserDialog.Builder(this)
+                        .chooseButton(R.string.choose_folder)
+                        .allowNewFolder(true,R.string.new_folder)
+                        .show();
                 break;
             //选择主色调
             case R.id.setting_color_container:
