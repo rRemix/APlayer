@@ -135,14 +135,13 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
                             idList.add(info.getId());
                     }
                     //设置正在播放列表
-                    Global.setPlayQueue(idList);
-
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    sendBroadcast(intent);
+                    Global.setPlayQueue(idList,ChildHolderActivity.this,intent);
+//                    sendBroadcast(intent);
                 }
             }
 
@@ -248,8 +247,8 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         ArrayList<Integer> ids = new ArrayList<>();
         for (MP3Item info : mInfoList)
             ids.add(info.getId());
-        Global.setPlayQueue(ids);
-        sendBroadcast(intent);
+        Global.setPlayQueue(ids,this,intent);
+//        sendBroadcast(intent);
     }
 
     //更新界面

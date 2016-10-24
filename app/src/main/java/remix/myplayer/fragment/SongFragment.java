@@ -17,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
@@ -90,8 +92,8 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
                 MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 intent.putExtra("Control", Constants.NEXT);
-                Global.setPlayQueue(Global.mAllSongList);
-                getActivity().sendBroadcast(intent);
+                Global.setPlayQueue(Global.mAllSongList,getContext(),intent);
+//                getActivity().sendBroadcast(intent);
             }
         });
 
@@ -108,13 +110,13 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
             public void onItemClick(View view, int position) {
                 int id = getSongID(position);
                 if(id > 0 && !mMultiChoice.itemAddorRemoveWithClick(view,position,id,TAG)){
-                    Global.setPlayQueue(Global.mAllSongList);
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    getActivity().sendBroadcast(intent);
+                    Global.setPlayQueue(Global.mAllSongList,getActivity(),intent);
+//                    getActivity().sendBroadcast(intent);
                 }
             }
 

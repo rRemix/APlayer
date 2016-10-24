@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
 
@@ -34,6 +33,7 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-4-13.
@@ -85,7 +85,7 @@ public class EQActivity extends ToolbarActivity {
                 int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
                 LogUtil.d(TAG,"AudioSessionId:" + AudioSessionId);
                 if(AudioSessionId  == 0) {
-                    Toast.makeText(Application.getContext(),"均衡器初始化失败",Toast.LENGTH_SHORT).show();
+                    ToastUtil.show(Application.getContext(),R.string.eq_initial_failed);
                     return;
                 }
                 //是否启用音效设置
@@ -161,7 +161,7 @@ public class EQActivity extends ToolbarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if(!mHasInitial){
-            Toast.makeText(this,getString(R.string.eq_initial_failed),Toast.LENGTH_SHORT).show();
+            ToastUtil.show(this,R.string.eq_initial_failed);
             finish();
         }
 
@@ -192,7 +192,7 @@ public class EQActivity extends ToolbarActivity {
                     return;
 
                 if(!Global.getHeadsetOn()){
-                    Toast.makeText(EQActivity.this,getString(R.string.plz_earphone),Toast.LENGTH_SHORT).show();
+                    ToastUtil.show(EQActivity.this,R.string.plz_earphone);
                     mSwitch.setChecked(false);
                     return;
                 }
@@ -282,7 +282,7 @@ public class EQActivity extends ToolbarActivity {
                     if(fre == mCenterFres.get(i)){
                         short temp = (mBandLevels.get(position));
                         if(temp > mMaxEQLevel || temp < mMinEQLevel){
-                            Toast.makeText(EQActivity.this,"参数不合法: " + fre ,Toast.LENGTH_SHORT).show();
+                            ToastUtil.show(EQActivity.this,getString(R.string.arg_illegal),fre);
                             return;
                         }
                         //设置db值
@@ -316,7 +316,7 @@ public class EQActivity extends ToolbarActivity {
     //重置音效设置
     public void onReset(View v){
         if(!Global.getHeadsetOn()){
-            Toast.makeText(EQActivity.this,getString(R.string.plz_earphone),Toast.LENGTH_SHORT).show();
+            ToastUtil.show(EQActivity.this,R.string.plz_earphone);
             return;
         }
         mInitialEnable = true;

@@ -9,7 +9,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
 
@@ -19,6 +18,7 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-3-7.
@@ -57,7 +57,7 @@ public class FeedBakActivity extends ToolbarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Toast.makeText(this,resultCode == Activity.RESULT_OK ? "发送成功 感谢您的反馈!" : "发送失败 请重试!",Toast.LENGTH_SHORT).show();
+        ToastUtil.show(this,requestCode == Activity.RESULT_OK ? R.string.send_success : R.string.send_error);
         finish();
     }
 

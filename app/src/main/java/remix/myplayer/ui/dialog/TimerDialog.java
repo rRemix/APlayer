@@ -17,7 +17,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
 
@@ -33,6 +32,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-1-15.
@@ -163,15 +163,15 @@ public class TimerDialog extends BaseDialogActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     if (mTime > 0) {
-                        Toast.makeText(TimerDialog.this, getString(R.string.set_success), Toast.LENGTH_SHORT).show();
+                        ToastUtil.show(TimerDialog.this,R.string.set_success);
                         SPUtil.putValue(TimerDialog.this, "Setting", "TimerDefault", true);
                         SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", (int) mTime);
                     } else {
-                        Toast.makeText(TimerDialog.this, getString(R.string.plz_set_correct_time), Toast.LENGTH_SHORT).show();
+                        ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
                         mSwitch.setChecked(false);
                     }
                 } else {
-                    Toast.makeText(TimerDialog.this, getString(R.string.cancel_success), Toast.LENGTH_SHORT).show();
+                    ToastUtil.show(TimerDialog.this,R.string.cancel_success);
                     SPUtil.putValue(TimerDialog.this, "Setting", "TimerDefault", false);
                     SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", -1);
                 }
@@ -200,11 +200,11 @@ public class TimerDialog extends BaseDialogActivity {
      */
     private void Toggle(){
         if(mTime <= 0 && !misTiming) {
-            Toast.makeText(TimerDialog.this, getString(R.string.plz_set_correct_time), Toast.LENGTH_SHORT).show();
+            ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
             return;
         }
         String msg = misTiming ? "取消定时关闭" : "将在" + mTime + "分钟后关闭";
-        Toast.makeText(MainActivity.mInstance,msg,Toast.LENGTH_SHORT).show();
+        ToastUtil.show(MainActivity.mInstance,msg);
         misTiming = !misTiming;
         mSeekbar.setStart(misTiming);
         Intent intent = new Intent(Constants.CONTROL_TIMER);

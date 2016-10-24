@@ -479,14 +479,14 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                                 "thumbnail/" + (Global.mSetCoverType == Constants.ALBUM ? "album" : Global.mSetCoverType == Constants.ARTIST ? "artist" : "playlist"));
                         if(!cacheDir.exists()){
                             if(!cacheDir.mkdir()){
-                                Toast.makeText(this,errorTxt,Toast.LENGTH_SHORT).show();
+                                ToastUtil.show(this,errorTxt);
                                 return;
                             }
                         }
                         Uri destination = Uri.fromFile(new File(cacheDir, CommonUtil.hashKeyForDisk((id * 255 ) + "")));
                         Crop.of(data.getData(), destination).asSquare().start(this);
                     } else {
-                        Toast.makeText(this,errorTxt,Toast.LENGTH_SHORT).show();
+                        ToastUtil.show(this,errorTxt);
                     }
                     break;
                 //图片裁剪
@@ -494,7 +494,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                     //裁剪后的图片路径
                     String path = Crop.getOutput(data).getEncodedPath();
                     if(TextUtils.isEmpty(path) || id == -1){
-                        Toast.makeText(MainActivity.this, errorTxt, Toast.LENGTH_SHORT).show();
+                        ToastUtil.show(MainActivity.this,errorTxt);
                         return;
                     }
                     //如果设置的封面是专辑或者艺术家的，清除fresco的缓存

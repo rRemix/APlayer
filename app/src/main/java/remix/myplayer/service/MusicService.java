@@ -18,7 +18,6 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.view.KeyEvent;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,10 +36,11 @@ import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 
 /**
@@ -421,7 +421,7 @@ public class MusicService extends BaseService {
         mInfo = MediaStoreUtil.getMP3InfoById(mId);
         if(mInfo == null) {
             mInfo = temp;
-            Toast.makeText(mContext,getString(R.string.song_lose_effect),Toast.LENGTH_SHORT).show();
+            ToastUtil.show(mContext,R.string.song_lose_effect);
             return;
         }
 
@@ -486,7 +486,7 @@ public class MusicService extends BaseService {
                 if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
                     return;
                 if(CommonUtil.isFastDoubleClick()) {
-                    Toast.makeText(mContext,"请不要过快操作",Toast.LENGTH_SHORT).show();
+                    ToastUtil.show(mContext,R.string.not_operate_fast);
                     return;
                 }
             }
@@ -617,7 +617,7 @@ public class MusicService extends BaseService {
         mInfo = MediaStoreUtil.getMP3InfoById(mId);
         if(mInfo == null) {
             mInfo = temp;
-            Toast.makeText(mContext,getString(R.string.song_lose_effect),Toast.LENGTH_SHORT).show();
+            ToastUtil.show(mContext,R.string.song_lose_effect);
             return;
         }
         mIsplay = true;

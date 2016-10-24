@@ -103,7 +103,7 @@ public class MultiChoice implements OnMultiItemClickListener {
 //        }
 
         num = Global.AddSongToPlayQueue(idList);
-        Toast.makeText(mContext, mContext.getResources().getString(R.string.add_song_playinglist_success,num),Toast.LENGTH_SHORT).show();
+        ToastUtil.show(mContext,R.string.add_song_playinglist_success,num);
         UpdateOptionMenu(false);
     }
 
@@ -148,8 +148,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                     public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                         final int num;
                         num = PlayListUtil.addMultiSongs(idList,playListInfoList.get(which).Name,playListInfoList.get(which)._Id);
-                        Toast.makeText(mContext, mContext.getString(R.string.add_song_playlist_success, num)
-                                ,Toast.LENGTH_SHORT).show();
+                        ToastUtil.show(mContext,R.string.add_song_playlist_success,num);
                         UpdateOptionMenu(false);
                     }
                 })
@@ -183,8 +182,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                                                 return;
                                             }
                                             num = PlayListUtil.addMultiSongs(idList,input.toString(),newPlayListId);
-                                            Toast.makeText(mContext, mContext.getString(R.string.add_song_playlist_success, num)
-                                                    ,Toast.LENGTH_SHORT).show();
+                                            ToastUtil.show(mContext,R.string.add_song_playlist_success,num);
                                             UpdateOptionMenu(false);
                                         }
                                     }
@@ -230,11 +228,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                     num++;
             }
         }
-        if(num > 0){
-            Toast.makeText(mContext, mContext.getString(R.string.delete_success),Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(mContext,R.string.delete_error,Toast.LENGTH_SHORT).show();
-        }
+        ToastUtil.show(mContext,num > 0 ? R.string.delete_success : R.string.delete_error);
         UpdateOptionMenu(false);
     }
 

@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -17,7 +16,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -33,6 +31,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -146,7 +145,7 @@ public class OptionDialog extends BaseDialogActivity {
                                                 getString(R.string.delete_success):
                                                 getString(R.string.delete_error);
                                     }
-                                    Toast.makeText(OptionDialog.this,result,Toast.LENGTH_SHORT).show();
+                                    ToastUtil.show(OptionDialog.this,result);
                                     finish();
                                 }
                             })
@@ -184,10 +183,10 @@ public class OptionDialog extends BaseDialogActivity {
         if(getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cv, MediaStore.MediaColumns.DATA + "=?", new String[]{path}) > 0) {
             Uri newUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, Id);
             RingtoneManager.setActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE, newUri);
-            Toast.makeText( getApplicationContext (),getString(R.string.set_ringtone_success), Toast.LENGTH_SHORT ).show();
+            ToastUtil.show(this,R.string.set_ringtone_success);
         }
         else
-            Toast.makeText( getApplicationContext (),getString(R.string.set_ringtone_error), Toast.LENGTH_SHORT ).show();
+            ToastUtil.show(this,R.string.set_ringtone_error);
     }
 
     @Override

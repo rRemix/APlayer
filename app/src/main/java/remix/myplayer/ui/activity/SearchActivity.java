@@ -93,19 +93,19 @@ public class SearchActivity extends ToolbarActivity {
         mSearchResAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Intent intent = new Intent(Constants.CTL_ACTION);
-                Bundle arg = new Bundle();
-                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                arg.putInt("Position", position);
-                intent.putExtras(arg);
-                getApplicationContext().sendBroadcast(intent);
                 if (mCursor != null && mCursor.getCount() > 0 && mCursor.moveToFirst()) {
                     ArrayList<Integer> list = new ArrayList<>();
                     for(int i = 0 ; i < mCursor.getCount(); i++) {
                         mCursor.moveToPosition(i);
                         list.add(mCursor.getInt(mIdIndex));
                     }
-                    Global.setPlayQueue(list);
+                    Intent intent = new Intent(Constants.CTL_ACTION);
+                    Bundle arg = new Bundle();
+                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                    arg.putInt("Position", position);
+                    intent.putExtras(arg);
+//                    sendBroadcast(intent);
+                    Global.setPlayQueue(list,SearchActivity.this,intent);
                 }
             }
             @Override

@@ -9,13 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.RecordShareActivity;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2015/12/28.
@@ -62,7 +62,7 @@ public class RecordFragment extends BaseFragment{
             @Override
             public void onClick(View v) {
                 if (mEdit.getText().toString().equals("")) {
-                    Toast.makeText(getContext(), getString(R.string.plz_input_sharecontent), Toast.LENGTH_SHORT).show();
+                    ToastUtil.show(getActivity(),R.string.plz_input_sharecontent);
                     return;
                 }
                 Intent intent = new Intent(getActivity(), RecordShareActivity.class);

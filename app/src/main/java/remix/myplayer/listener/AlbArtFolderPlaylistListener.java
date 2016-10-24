@@ -14,8 +14,9 @@ import java.util.ArrayList;
 
 import remix.myplayer.R;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-1-25.
@@ -41,19 +42,20 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
         idList = MediaStoreUtil.getSongIdList(mId,mType);
 
         if(idList == null || idList.size() == 0){
-            Toast.makeText(mContext,mContext.getString(R.string.list_isempty),Toast.LENGTH_SHORT).show();
+            ToastUtil.show(mContext,R.string.list_isempty);
             return true;
         }
         switch (item.getItemId()) {
             //播放
             case R.id.menu_play:
-                Global.setPlayQueue(idList);
+
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 Bundle arg = new Bundle();
                 arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                 arg.putInt("Position", 0);
                 intent.putExtras(arg);
-                mContext.sendBroadcast(intent);
+                Global.setPlayQueue(idList,mContext,intent);
+//                mContext.sendBroadcast(intent);
                 break;
             //添加到播放队列
             case R.id.menu_add:
@@ -76,7 +78,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 Crop.pickImage((Activity) mContext, Crop.REQUEST_PICK);
                 break;
             default:
-                Toast.makeText(mContext, "Click " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                ToastUtil.show(mContext,"click " + item.getTitle());
         }
         return true;
     }

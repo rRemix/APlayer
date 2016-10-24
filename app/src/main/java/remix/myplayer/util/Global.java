@@ -4,6 +4,7 @@ package remix.myplayer.util;
  * Created by taeja on 16-4-15.
  */
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -106,14 +107,40 @@ public class Global {
                 mPlayQueue.addAll(newQueueIdList);
 
                 int deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue,mPlayQueueId);
-//                int deleteRow = 0;
-//                for(Integer audioId : oriPlayQueue){
-//                    if(PlayListUtil.deleteSong(audioId,mPlayQueueId))
-//                        deleteRow++;
-//                }
                 long start = System.currentTimeMillis();
                 int addRow = PlayListUtil.addMultiSongs(mPlayQueue,Constants.PLAY_QUEUE,mPlayQueueId);
                 LogUtil.d("DeleteTest","Time:" + (System.currentTimeMillis() - start) + "  addRow:" + addRow + "  deleteRow:" + deleteRow);
+            }
+        }.start();
+    }
+
+    /**
+     * 设置播放队列
+     * @param newQueueIdList
+     * @return
+     */
+    public static void setPlayQueue(final ArrayList<Integer> newQueueIdList, final Context context, final Intent intent) {
+        if (newQueueIdList.equals(mPlayQueue)) {
+            context.sendBroadcast(intent);
+            return;
+        }
+        final ArrayList<Integer> oriPlayQueue = (ArrayList<Integer>) mPlayQueue.clone();
+        mPlayQueue.clear();
+        mPlayQueue.addAll(newQueueIdList);
+        context.sendBroadcast(intent);
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    sleep(300);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                long start = System.currentTimeMillis();
+                int deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue,mPlayQueueId);
+                LogUtil.d("TimeTest","DeleteTime:" + (System.currentTimeMillis() - start) );
+                int addRow = PlayListUtil.addMultiSongs(mPlayQueue,Constants.PLAY_QUEUE,mPlayQueueId);
+                LogUtil.d("TimeTest","AddTime:" + (System.currentTimeMillis() - start) );
             }
         }.start();
     }

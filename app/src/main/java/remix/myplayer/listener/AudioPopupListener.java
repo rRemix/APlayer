@@ -14,7 +14,6 @@ import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -34,6 +33,7 @@ import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * @ClassName AudioPopupListener
@@ -111,7 +111,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                 String title = "",artist = "",album = "",genre = "",year = "";
                                 title = mSongLayout.getEditText() != null ? mSongLayout.getEditText().getText().toString() : mInfo.getTitle();
                                 if(TextUtils.isEmpty(title)){
-                                    Toast.makeText(mContext,"歌曲名不能为空",Toast.LENGTH_SHORT).show();
+                                    ToastUtil.show(mContext,R.string.song_not_empty);
                                     return;
                                 }
                                 artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString() : "未知歌手";
@@ -139,14 +139,14 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                     e.printStackTrace();
                                 }
                                 if(updateGenreRow > 0 && updateRow > 0){
-                                    Toast.makeText(mContext, "保存成功" ,Toast.LENGTH_SHORT).show();
+                                    ToastUtil.show(mContext,R.string.save_success);
                                     mInfo.setAlbum(album);
                                     mInfo.setArtist(artist);
                                     mInfo.setTitle(title);
                                     ((AudioHolderActivity)mContext).UpdateTopStatus(mInfo);
                                     ((AudioHolderActivity)mContext).setMP3Item(mInfo);
                                 } else {
-                                    Toast.makeText(mContext, "保存失败" ,Toast.LENGTH_SHORT).show();
+                                    ToastUtil.show(mContext,R.string.save_error);
                                 }
                             }
                         }).build();
@@ -236,7 +236,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                     result = MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) ?
                                             mContext.getString(R.string.delete_success) :
                                             mContext.getString(R.string.delete_error);
-                                    Toast.makeText(mContext,result,Toast.LENGTH_SHORT).show();
+                                    ToastUtil.show(mContext,result);
                                 }
                             })
                             .onNegative(new MaterialDialog.SingleButtonCallback() {

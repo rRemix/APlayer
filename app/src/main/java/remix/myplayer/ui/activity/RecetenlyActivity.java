@@ -15,7 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Window;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.umeng.analytics.MobclickAgent;
@@ -34,8 +33,9 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-3-4.
@@ -139,8 +139,8 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    Global.setPlayQueue(mIdList);
-                    sendBroadcast(intent);
+                    Global.setPlayQueue(mIdList,RecetenlyActivity.this,intent);
+//                    sendBroadcast(intent);
                 }
             }
 
@@ -198,14 +198,14 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
     //随机播放
     public void onPlayShuffle(View v){
         if(mIdList == null || mIdList.size() == 0){
-            Toast.makeText(RecetenlyActivity.this,getString(R.string.no_song),Toast.LENGTH_SHORT).show();
+            ToastUtil.show(RecetenlyActivity.this,R.string.no_song);
             return;
         }
         MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control", Constants.NEXT);
-        Global.setPlayQueue(mIdList);
-        sendBroadcast(intent);
+        Global.setPlayQueue(mIdList,this,intent);
+//        sendBroadcast(intent);
     }
 
 

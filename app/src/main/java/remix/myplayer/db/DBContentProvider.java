@@ -76,12 +76,14 @@ public class DBContentProvider extends ContentProvider {
         if(uri == null || values == null || values.length == 0)
             return 0;
         SQLiteDatabase db = DBManager.getInstance().openDataBase();
+        int match = mUriMatcher.match(uri);
         int lines = 0;
         try {
             db.beginTransaction(); //开始事务
             //数据库操作
             for (ContentValues cv : values) {
-                insert(uri, cv);
+//                insert(uri, cv);
+                db.insert(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,null,cv);
                 lines++;
             }
             db.setTransactionSuccessful(); // Commit

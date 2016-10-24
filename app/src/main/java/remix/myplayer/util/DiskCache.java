@@ -9,6 +9,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 
+import remix.myplayer.R;
+
 /**
  * Created by Remix on 2016/6/14.
  */
@@ -29,7 +31,7 @@ public class DiskCache {
             File thumbnailCacheDir = getDiskCacheDir(mContext,"thumbnail");
             if(!thumbnailCacheDir.exists()){
                 if(!thumbnailCacheDir.mkdir()){
-                    Toast.makeText(mContext,"创建缓存目录失败",Toast.LENGTH_SHORT).show();
+                    ToastUtil.show(mContext, R.string.create_dir_error);
                 }
             }
 

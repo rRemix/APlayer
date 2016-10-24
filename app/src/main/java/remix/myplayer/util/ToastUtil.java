@@ -1,6 +1,7 @@
 package remix.myplayer.util;
 
 import android.content.Context;
+import android.support.annotation.StringRes;
 import android.widget.Toast;
 
 /**
@@ -93,6 +94,11 @@ public class ToastUtil {
     public static void show(Context context, CharSequence message) {
         if (isShow)
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    public static void show(Context context, @StringRes int resId, Object... formatArgs){
+        if(isShow)
+            show(context,context.getString(resId,formatArgs));
     }
 
 }

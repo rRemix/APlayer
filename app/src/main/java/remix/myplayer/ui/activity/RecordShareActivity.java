@@ -16,7 +16,6 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
 
@@ -32,6 +31,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.ui.dialog.ShareDialog;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.StatusBarUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-3-14.
@@ -82,11 +82,11 @@ public class RecordShareActivity extends BaseActivity {
                 //处理完成
                 case COMPLETE:
                     if(mFile != null)
-                        Toast.makeText(RecordShareActivity.this, "截屏文件已保存至" + mFile.getAbsolutePath(),Toast.LENGTH_LONG).show();
+                        ToastUtil.show(RecordShareActivity.this,R.string.screenshot_save_at,mFile.getAbsoluteFile());
                     break;
                 //处理错误
                 case ERROR:
-                    Toast.makeText(RecordShareActivity.this,getString(R.string.share_error),Toast.LENGTH_SHORT).show();
+                    ToastUtil.show(RecordShareActivity.this,R.string.share_error);
                     break;
             }
         }

@@ -59,6 +59,7 @@ import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -277,7 +278,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
                 String msg = currentmodel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
                         currentmodel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
-                Toast.makeText(AudioHolderActivity.this, msg, Toast.LENGTH_SHORT).show();
+                ToastUtil.show(AudioHolderActivity.this,msg);
                 break;
             //打开正在播放列表
             case R.id.playbar_playinglist:

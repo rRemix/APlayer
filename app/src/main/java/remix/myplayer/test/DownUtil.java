@@ -6,7 +6,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,6 +13,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+
+import remix.myplayer.R;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2016/3/26.
@@ -34,7 +36,7 @@ public class DownUtil{
                     mProgressDialog = ProgressDialog.show(mContext,"请稍候","处理中",true,false);
                     break;
                 case NONETWORK:
-                    Toast.makeText(mContext,"请检查网络连接",Toast.LENGTH_SHORT).show();
+                    ToastUtil.show(mContext,"请检查网络连接");
                     break;
                 case STOP:
                     if(mProgressDialog != null) {
@@ -47,7 +49,7 @@ public class DownUtil{
                         mProgressDialog.dismiss();
                         mProgressDialog = null;
                     }
-                    Toast.makeText(mContext,"分享错误:" + msg.obj,Toast.LENGTH_SHORT).show();
+                    ToastUtil.show(mContext, R.string.share_error);
             }
 
         }

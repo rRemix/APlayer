@@ -3,7 +3,6 @@ package remix.myplayer.wxapi;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.tencent.mm.sdk.modelbase.BaseReq;
 import com.tencent.mm.sdk.modelbase.BaseResp;
@@ -13,6 +12,7 @@ import com.tencent.mm.sdk.openapi.WXAPIFactory;
 
 import remix.myplayer.ui.dialog.ShareDialog;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.ToastUtil;
 
 
 /**
@@ -56,7 +56,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler{
                     result = "未知错误";
                     break;
             }
-            Toast.makeText(this, result, Toast.LENGTH_LONG).show();
+            ToastUtil.show(this,result);
             ShareDialog.mInstance.finish();
             finish();
         }

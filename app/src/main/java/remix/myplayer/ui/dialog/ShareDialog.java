@@ -44,6 +44,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.ui.activity.RecordShareActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2015/12/9.
@@ -132,8 +133,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
                 break;
             case R.id.share_weibo:
                 if( !mWeiboApi.isWeiboAppInstalled()) {
-                    Toast.makeText(ShareDialog.this, "您还未安装微博客户端",
-                            Toast.LENGTH_SHORT).show();
+                    ToastUtil.show(ShareDialog.this,R.string.not_install_weibo);
                     return;
                 }
                 if(mType == Constants.SHARESONG)
@@ -269,14 +269,13 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     public void onResponse(BaseResponse baseResponse) {
         switch (baseResponse.errCode) {
             case WBConstants.ErrorCode.ERR_OK:
-                Toast.makeText(this,"分享成功", Toast.LENGTH_LONG).show();
+                ToastUtil.show(this,R.string.share_success);
                 break;
             case WBConstants.ErrorCode.ERR_CANCEL:
-                Toast.makeText(this, "分享取消", Toast.LENGTH_LONG).show();
+                ToastUtil.show(this,R.string.share_cancel);
                 break;
             case WBConstants.ErrorCode.ERR_FAIL:
-                Toast.makeText(this, "分享失败" + " Error Message: " + baseResponse.errMsg,
-                        Toast.LENGTH_LONG).show();
+                ToastUtil.show(this,"分享失败" + " Error Message: " + baseResponse.errMsg);
                 break;
         }
 //        if(RecordShareActivity.mInstance != null){
@@ -300,7 +299,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     private class BaseUiListener implements IUiListener {
         @Override
         public void onComplete(Object o) {
-            Toast.makeText(ShareDialog.this,getString(R.string.share_success),Toast.LENGTH_SHORT).show();
+            ToastUtil.show(ShareDialog.this, R.string.share_success);
 //            if(RecordShareActivity.mInstance != null){
 //                RecordShareActivity.mInstance.finish();
 //            }
@@ -309,7 +308,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
 
         @Override
         public void onError(UiError uiError) {
-            Toast.makeText(ShareDialog.this,getString(R.string.share_error),Toast.LENGTH_SHORT).show();
+            ToastUtil.show(ShareDialog.this,R.string.share_error);
 //            if(RecordShareActivity.mInstance != null){
 //                RecordShareActivity.mInstance.finish();
 //            }
@@ -317,7 +316,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         }
         @Override
         public void onCancel() {
-            Toast.makeText(ShareDialog.this,getString(R.string.share_cancel),Toast.LENGTH_SHORT).show();
+            ToastUtil.show(ShareDialog.this,R.string.share_cancel);
 //            if(RecordShareActivity.mInstance != null){
 //                RecordShareActivity.mInstance.finish();
 //            }

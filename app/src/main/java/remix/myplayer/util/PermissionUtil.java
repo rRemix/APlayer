@@ -13,7 +13,8 @@ import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.widget.Toast;
+
+import remix.myplayer.R;
 
 /**
  * 权限工具类
@@ -58,7 +59,7 @@ public class PermissionUtil {
     public static void RequestPermission(final Activity activity, String permission){
         if (!hasPermission(permission)) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-                Toast.makeText(activity,"应用需要必要的运行权限",Toast.LENGTH_SHORT);
+                ToastUtil.show(activity, R.string.need_permission);
 //                showMessageOKCancel(activity,"应用需要必要的运行权限",new DialogInterface.OnClickListener() {
 //                    @Override
 //                    public void onClick(DialogInterface dialog, int which) {

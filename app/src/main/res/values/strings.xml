@@ -92,4 +92,15 @@
     <string name="setting_success">设置成功</string>
     <string name="setting_error">设置失败</string>
     <string name="search_error">查找失败</string>
+    <string name="song_not_empty">歌曲名不能为空</string>
+    <string name="save_success">保存成功</string>
+    <string name="save_error">保存失败</string>
+    <string name="not_operate_fast">请不要过快操作</string>
+    <string name="arg_illegal">参数不合法: %d</string>
+    <string name="send_success">发送成功 感谢您的反馈!</string>
+    <string name="send_error">发送失败 请重试!</string>
+    <string name="screenshot_save_at">截屏文件已保存至%s</string>
+    <string name="not_install_weibo">您还未安装微博客户端</string>
+    <string name="create_dir_error">创建目录失败</string>
+    <string name="need_permission">应用需要必要的运行权限</string>
 </resources>

@@ -1,11 +1,9 @@
 package remix.myplayer.fragment;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -18,9 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
-
-import com.afollestad.materialdialogs.MaterialDialog;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,14 +25,11 @@ import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.Theme;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -101,7 +93,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
                 }
                 if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,getPlayListId(position),TAG)){
                     if(getPlayListSongCount(position) == 0) {
-                        Toast.makeText(getActivity(), getString(R.string.list_isempty), Toast.LENGTH_SHORT).show();
+                        ToastUtil.show(getActivity(),getString(R.string.list_isempty));
                         return;
                     }
                     Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
