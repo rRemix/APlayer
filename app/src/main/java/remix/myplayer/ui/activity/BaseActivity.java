@@ -73,7 +73,7 @@ public class BaseActivity extends AppCompatActivity {
 
     protected void setStatusBar() {
         StatusBarUtil.setColorNoTranslucent(this, ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
-//        StatusBarUtil.setColor(this, ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
+//        StatusBarUtil.setNormalColor(this, ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
     }
 
     @Override

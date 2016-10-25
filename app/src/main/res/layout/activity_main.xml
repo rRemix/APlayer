@@ -12,62 +12,59 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:id="@+id/layout_main">
-        <android.support.design.widget.CoordinatorLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="8">
-            <android.support.design.widget.AppBarLayout
+            android:layout_height="match_parent">
+            <!-- 底部自定义ationbar -->
+            <fragment android:name="remix.myplayer.fragment.BottomActionBarFragment"
+                android:id="@+id/bottom_actionbar_new"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <android.support.v7.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="?attr/material_color_primary"
-                    app:layout_scrollFlags="scroll|enterAlways"/>
-                <RelativeLayout
-                    android:id="@+id/multi_menu"
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@color/md_red_primary"
-                    android:visibility="gone"/>
-                <android.support.design.widget.TabLayout
-                    android:id="@+id/tabs"
-                    android:background="?attr/material_color_primary"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/tab_height"
-                    style="@style/CustomTabLayout" />
-            </android.support.design.widget.AppBarLayout>
-
-            <!--中间四个fragment-->
-            <android.support.v4.view.ViewPager
+                android:layout_height="@dimen/item_height"
+                android:layout_alignParentBottom="true"/>
+            <android.support.design.widget.CoordinatorLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/ViewPager"
-                android:background="?attr/background_color_main"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+                android:layout_above="@id/bottom_actionbar_new">
+                <android.support.design.widget.AppBarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <android.support.v7.widget.Toolbar
+                        android:id="@+id/toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="?attr/material_color_primary"
+                        app:layout_scrollFlags="scroll|enterAlways"/>
+                    <android.support.design.widget.TabLayout
+                        android:id="@+id/tabs"
+                        android:background="?attr/material_color_primary"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/tab_height"
+                        style="@style/CustomTabLayout" />
+                </android.support.design.widget.AppBarLayout>
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/add"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:layout_marginRight="@dimen/d30_size"
-                android:layout_marginBottom="@dimen/d20_size"
-                android:clickable="true"
-                android:src="@drawable/playlist_fab_btn_add"
-                app:backgroundTint="?attr/material_color_primary"
-                app:elevation="@dimen/d2_size"
-                app:pressedTranslationZ="@dimen/d6_size"/>
-        </android.support.design.widget.CoordinatorLayout>
+                <!--中间四个fragment-->
+                <android.support.v4.view.ViewPager
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/ViewPager"
+                    android:background="?attr/background_color_main"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-        <!-- 底部自定义ationbar -->
-        <fragment android:name="remix.myplayer.fragment.BottomActionBarFragment"
-            android:id="@+id/bottom_actionbar_new"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/add"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right"
+                    android:layout_marginRight="@dimen/d30_size"
+                    android:layout_marginBottom="@dimen/d20_size"
+                    android:clickable="true"
+                    android:src="@drawable/playlist_fab_btn_add"
+                    app:backgroundTint="?attr/material_color_primary"
+                    app:elevation="@dimen/d2_size"
+                    app:pressedTranslationZ="@dimen/d6_size"/>
+            </android.support.design.widget.CoordinatorLayout>
+        </RelativeLayout>
     </LinearLayout>
 
 

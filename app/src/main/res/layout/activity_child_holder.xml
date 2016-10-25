@@ -26,14 +26,6 @@
             android:layout_marginLeft="72dp"/>
     </RelativeLayout>
 
-
-    <!--<ImageView-->
-        <!--android:layout_marginLeft="5dp"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:src="@drawable/line"-->
-        <!--android:scaleType="fitXY"/>-->
-
     <LinearLayout
         android:background="?attr/background_color_main"
         android:layout_width="match_parent"
@@ -42,18 +34,8 @@
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="8"
-            android:id="@+id/child_holder_recyclerView"/>
-        <ListView
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
             android:layout_weight="10"
-            android:headerDividersEnabled="true"
-            android:footerDividersEnabled="true"
-            android:divider="@drawable/divider"
-            android:id="@+id/child_holder_list">
-        </ListView>
+            android:id="@+id/child_holder_recyclerView"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="0dp"
@@ -67,7 +49,7 @@
         <fragment android:name="remix.myplayer.fragment.BottomActionBarFragment"
             android:id="@+id/bottom_actionbar_new"
             android:layout_width="match_parent"
-            android:layout_height="72dp" />
+            android:layout_height="@dimen/item_height" />
     </LinearLayout>
 
 </LinearLayout>

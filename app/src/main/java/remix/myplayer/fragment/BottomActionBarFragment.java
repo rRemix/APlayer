@@ -113,10 +113,4 @@ public class BottomActionBarFragment extends BaseFragment{
         }
     }
 
-    class UpdateUIReceiver extends BroadcastReceiver{
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            UpdateBottomStatus(MusicService.getCurrentMP3(),MusicService.getIsplay());
-        }
-    }
 }

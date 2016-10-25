@@ -7,7 +7,7 @@
         android:id="@+id/lrc_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:textColor="#808080"
-        android:isScrollContainer="true"/>
+        android:paddingLeft="@dimen/d16_size"
+        android:paddingRight="@dimen/d16_size"
+        android:textColor="#808080" />
 </LinearLayout>

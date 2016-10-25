@@ -30,7 +30,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.umeng.analytics.MobclickAgent;
 
@@ -118,6 +117,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     @BindView(R.id.holder_pager)
     AudioViewPager mPager;
 
+    //歌词控件
+    private LrcView mLrcView;
     //背景渐变色
     @ColorInt
     private int mColorFrom;
@@ -355,11 +356,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         mIsRunning = false;
@@ -379,7 +375,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
         //初始化已播放时间与剩余时间
         mDuration = (int)mInfo.getDuration();
-        final int temp = MusicService.getCurrentTime();
+        final int temp = MusicService.getProgress();
         mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
         LogUtil.d(TAG,"Duration:" + mDuration + "  CurrentTime:" + mCurrentTime);
 
@@ -404,8 +400,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if(fromUser)
                     mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ONLY);
-                if(LrcView.mInstance != null)
-                    LrcView.mInstance.seekTo(progress,fromUser);
+                if(mLrcView != null)
+                    mLrcView.seekTo(progress,fromUser);
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
@@ -413,8 +409,11 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             }
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                //没有播放拖动进度条无效
+                if(!mIsPlay){
+                    seekBar.setProgress(0);
+                }
                 MusicService.setProgress(seekBar.getProgress());
-                seekBar.setProgress(seekBar.getProgress());
                 mIsDragSeekBar = false;
             }
         });
@@ -474,6 +473,19 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
     private void initLrcFragment() {
         LrcFragment fragment = new LrcFragment();
+        fragment.setOnFindListener(new LrcFragment.OnLrcViewFindListener() {
+            @Override
+            public void onLrcViewFind(LrcView lrcView) {
+                mLrcView = lrcView;
+                mLrcView.setInterface(new LrcView.LrcInterface() {
+                    @Override
+                    public void onSeek(int progress) {
+                        if(progress > 0 && progress < MusicService.getDuration())
+                            MusicService.setProgress(progress);
+                    }
+                });
+            }
+        });
         fragment.setArguments(mBundle);
         mAdapter.AddFragment(fragment);
     }
@@ -548,7 +560,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
 
             //更新进度条
-            int temp = MusicService.getCurrentTime();
+            int temp = MusicService.getProgress();
             mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
             mDuration = (int) mInfo.getDuration();
             mSeekBar.setMax(mDuration);
@@ -569,13 +581,12 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         return Constants.AUDIOHOLDERACTIVITY;
     }
 
-
     //更新进度条线程
     class ProgeressThread extends Thread {
         @Override
         public void run() {
             while (mIsRunning) {
-                int temp = MusicService.getCurrentTime();
+                int temp = MusicService.getProgress();
                 if (MusicService.getIsplay() && temp > 0 && temp < mDuration) {
                     mCurrentTime = temp;
                     mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
@@ -603,8 +614,13 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             mTopDetail.setTextColor(mColorDark);
 
             //锁屏界面字体颜色
-            mHColor =  mSwatch.getTitleTextColor();
-            mLColor = mSwatch.getBodyTextColor();
+            if(mLrcView != null){
+                mLrcView.setHightLightColor(ColorUtil.adjustAlpha(mSwatch.getRgb(),0.9f));
+                mLrcView.setNormalColor(ColorUtil.adjustAlpha(mSwatch.getRgb(),0.4f));
+                mLrcView.setHorizontalColor(ColorUtil.adjustAlpha(mSwatch.getRgb(),0.4f));
+            }
+//            mHColor =  mSwatch.getTitleTextColor();
+//            mLColor = mSwatch.getBodyTextColor();
 
             LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
             //修改track颜色

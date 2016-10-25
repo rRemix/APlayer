@@ -190,7 +190,7 @@ public class SearchLRC {
                     Integer time = getMill(s.substring(startIndex, endIndex));
                     String lrc = s.substring(s.lastIndexOf(']') + 1, s.length());
                     if (time != -1 && !lrc.equals(""))
-                        lrcMap.put(time, lrc);
+                        lrcMap.put(time, lrc +"\r\n");
                 }
             }
             if (needcache) {

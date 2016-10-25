@@ -196,12 +196,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receiver.ProcessReceiver">
-            <intent-filter>
-                <action android:name="remix.music.PROCESS"/>
-            </intent-filter>
-        </receiver>
-
         <service android:name=".service.MusicService"/>
         <service android:name=".service.TimerService"/>
 

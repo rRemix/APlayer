@@ -131,7 +131,6 @@ public class MusicService extends BaseService {
         }
     };
 
-
     private ContentObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
     private DBObserver mPlayListSongObserver;
@@ -561,7 +560,7 @@ public class MusicService extends BaseService {
                     AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
             if(!mAudioFouus)
                 return;
-//            mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING,getCurrentTime()));
+//            mMediaSession.setPlaybackState(getPlaybackStateCompat(PlaybackStateCompat.STATE_PLAYING,getProgress()));
             mIsIniting = true;
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(path);
@@ -729,12 +728,18 @@ public class MusicService extends BaseService {
      * 获得当前播放进度
      * @return
      */
-    public static int getCurrentTime() {
+    public static int getProgress() {
         if(mMediaPlayer != null && !mIsIniting)
             return mMediaPlayer.getCurrentPosition();
         return 0;
     }
 
+    public static long getDuration(){
+        if(mMediaPlayer != null && !mIsIniting){
+            return mMediaPlayer.getDuration();
+        }
+        return 0;
+    }
 
     /**
      * 获得当前播放索引
@@ -786,7 +791,6 @@ public class MusicService extends BaseService {
      * 记录在一秒中线控按下的次数
      */
     private static int mCount = 0;
-
     /**
      * 接受线控事件
      * 根据线控按下次数,做出相应操作
