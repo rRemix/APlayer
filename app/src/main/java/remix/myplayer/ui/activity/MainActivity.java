@@ -448,6 +448,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                         startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), RESULT_UPDATE_THEME);
                         break;
                 }
+                DrawerAdapter.mSelectIndex = position;
                 mDrawerAdapter.notifyDataSetChanged();
             }
             @Override
