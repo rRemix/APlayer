@@ -88,7 +88,7 @@
                             android:id="@+id/setting_lrc_path"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="默认扫描歌曲所在目录以及父目录"
+                            android:text="@string/default_lrc_path"
                             android:textColor="?attr/text_color"
                             android:textSize="@dimen/s14_size"/>
                     </LinearLayout>
@@ -189,6 +189,7 @@
                 </RelativeLayout>
 
                 <RelativeLayout
+                    android:visibility="gone"
                     android:id="@+id/setting_mode_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

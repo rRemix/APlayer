@@ -103,4 +103,7 @@
     <string name="not_install_weibo">您还未安装微博客户端</string>
     <string name="create_dir_error">创建目录失败</string>
     <string name="need_permission">应用需要必要的运行权限</string>
+    <string name="play_now">正在播放: %s</string>
+    <string name="default_lrc_path">默认扫描目录为歌曲父目录</string>
+    <string name="lrc_tip">%s(请确保歌词文件包含歌曲名和艺术家名)</string>
 </resources>

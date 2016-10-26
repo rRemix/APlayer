@@ -17,6 +17,7 @@ import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.CrashHandler;
@@ -126,6 +127,7 @@ public class Application extends android.app.Application {
         //异常捕获
         MobclickAgent.setCatchUncaughtExceptions(true);
         MobclickAgent.setDebugMode(true);
+        initTheme();
         initUtil();
         loadSong();
 
@@ -175,6 +177,18 @@ public class Application extends android.app.Application {
                 })
                 .build();
         Fresco.initialize(this,config);
+
+    }
+
+    /**
+     * 初始化主题
+     */
+    private void initTheme() {
+        ThemeStore.THEME_MODE = ThemeStore.loadThemeMode();
+        ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
+
+        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
+        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
     }
 
     public static Context getContext(){

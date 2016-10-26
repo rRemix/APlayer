@@ -129,16 +129,22 @@ public class Theme {
             return R.style.NightTheme;
         }
         switch (ThemeStore.THEME_COLOR) {
-            case ThemeStore.THEME_PURPLE:
-                return R.style.DayTheme_Purple;
             case ThemeStore.THEME_RED:
                 return R.style.DayTheme_Red;
-            case ThemeStore.THEME_PINK:
-                return R.style.DayTheme_Pink;
             case ThemeStore.THEME_BROWN:
                 return R.style.DayTheme_Brown;
+            case ThemeStore.THEME_NAVY:
+                return R.style.DayTheme_Navy;
+            case ThemeStore.THEME_GREEN:
+                return R.style.DayTheme_Green;
+            case ThemeStore.THEME_YELLOW:
+                return R.style.DayTheme_Yellow;
+            case ThemeStore.THEME_PURPLE:
+                return R.style.DayTheme_Purple;
             case ThemeStore.THEME_INDIGO:
-                return R.style.DayTheme_Ingido;
+                return R.style.DayTheme_Indigo;
+            case ThemeStore.THEME_PLUM:
+                return R.style.DayTheme_Plum;
             default:return -1;
         }
     }
@@ -243,8 +249,12 @@ public class Theme {
     }
 
     public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context,@DrawableRes int resId){
+        return getPressAndSelectedStateListDrawalbe(context,resId,ThemeStore.getMaterialColorPrimaryColor());
+    }
+
+    public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context,@DrawableRes int resId,@ColorInt int color){
         StateListDrawable stateListDrawable = new StateListDrawable();
-        Drawable drawable1 =  Theme.TintDrawable(Theme.getDrawable(context,resId), ThemeStore.getMaterialColorPrimaryColor());
+        Drawable drawable1 =  Theme.TintDrawable(Theme.getDrawable(context,resId), color);
         stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, drawable1);
         stateListDrawable.addState(new int[]{android.R.attr.state_selected}, drawable1);
         stateListDrawable.addState(new int[]{}, Theme.getDrawable(context,resId));

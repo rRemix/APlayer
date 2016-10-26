@@ -17,6 +17,7 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.StatusBarUtil;
 
 /**
  * Created by taeja on 16-6-8.
@@ -39,7 +40,7 @@ public class SplashActivity extends BaseActivity {
         if(isFirst){
             //保存默认主题设置
             SPUtil.putValue(this,"Setting","ThemeMode", ThemeStore.DAY);
-            SPUtil.putValue(this,"Setting","ThemeColor",ThemeStore.THEME_PINK);
+            SPUtil.putValue(this,"Setting","ThemeColor",ThemeStore.THEME_RED);
             //添加我的收藏列表
 //            XmlUtil.addPlaylist(this,"我的收藏");
             Global.mPlayQueueId = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
@@ -91,6 +92,12 @@ public class SplashActivity extends BaseActivity {
 
             }
         });
+    }
+
+
+    @Override
+    protected void setStatusBar() {
+        StatusBarUtil.setTransparent(this);
     }
 
     public void onResume() {

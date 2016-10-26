@@ -21,16 +21,19 @@ public class ThemeStore {
     /** 当前主题模式 0:白天 1:夜间 */
     public static int THEME_MODE = NIGHT;
 
-    public static final int THEME_PURPLE = 100;
-    public static final int THEME_RED = 101;
-    public static final int THEME_PINK = 102;
-    public static final int THEME_BROWN = 103;
-    public static final int THEME_INDIGO = 104;
+    public static final int THEME_RED = 100;
+    public static final int THEME_BROWN = 101;
+    public static final int THEME_NAVY = 102;
+    public static final int THEME_GREEN = 103;
+    public static final int THEME_YELLOW = 104;
+    public static final int THEME_PURPLE = 105;
+    public static final int THEME_INDIGO = 106;
+    public static final int THEME_PLUM = 107;
 
     /** 当前主题颜色 */
-    public static int THEME_COLOR = THEME_PINK;
+    public static int THEME_COLOR = THEME_RED;
 
-    public static int STATUS_BAR_ALPHA = 112;
+    public static int STATUS_BAR_ALPHA = 150;
     public static int MATERIAL_COLOR_PRIMARY = R.color.transparent;
     public static int MATERIAL_COLOR_PRIMARY_DARK = R.color.transparent;
 
@@ -54,20 +57,29 @@ public class ThemeStore {
         }
         int colorRes = -1;
         switch (THEME_COLOR){
-            case THEME_PURPLE:
-                colorRes =  R.color.md_purple_primary;
-                break;
             case THEME_RED:
                 colorRes =  R.color.md_red_primary;
-                break;
-            case THEME_PINK:
-                colorRes =  R.color.md_pink_primary;
                 break;
             case THEME_BROWN:
                 colorRes =  R.color.md_brown_primary;
                 break;
+            case THEME_NAVY:
+                colorRes =  R.color.md_navy_primary;
+                break;
+            case THEME_GREEN:
+                colorRes =  R.color.md_green_primary;
+                break;
+            case THEME_YELLOW:
+                colorRes =  R.color.md_yellow_primary;
+                break;
+            case THEME_PURPLE:
+                colorRes =  R.color.md_purple_primary;
+                break;
             case THEME_INDIGO:
                 colorRes =  R.color.md_indigo_primary;
+                break;
+            case THEME_PLUM:
+                colorRes =  R.color.md_plum_primary;
                 break;
         }
         return colorRes;
@@ -84,20 +96,29 @@ public class ThemeStore {
         }
         int colorRes = -1;
         switch (THEME_COLOR){
-            case THEME_PURPLE:
-                colorRes =  R.color.md_purple_primary_dark;
-                break;
             case THEME_RED:
                 colorRes =  R.color.md_red_primary_dark;
-                break;
-            case THEME_PINK:
-                colorRes =  R.color.md_pink_primary_dark;
                 break;
             case THEME_BROWN:
                 colorRes =  R.color.md_brown_primary_dark;
                 break;
+            case THEME_NAVY:
+                colorRes =  R.color.md_navy_primary_dark;
+                break;
+            case THEME_GREEN:
+                colorRes =  R.color.md_green_primay_dark;
+                break;
+            case THEME_YELLOW:
+                colorRes =  R.color.md_yellow_primay_dark;
+                break;
+            case THEME_PURPLE:
+                colorRes =  R.color.md_purple_primary_dark;
+                break;
             case THEME_INDIGO:
                 colorRes =  R.color.md_indigo_primary_dark;
+                break;
+            case THEME_PLUM:
+                colorRes =  R.color.md_plum_primary_dark;
                 break;
         }
         return colorRes;
@@ -116,7 +137,7 @@ public class ThemeStore {
      * @return
      */
     public static int loadThemeColor(){
-        return SPUtil.getValue(Application.getContext(),"Setting","ThemeColor",ThemeStore.THEME_PINK);
+        return SPUtil.getValue(Application.getContext(),"Setting","ThemeColor",ThemeStore.THEME_RED);
     }
 
     /**

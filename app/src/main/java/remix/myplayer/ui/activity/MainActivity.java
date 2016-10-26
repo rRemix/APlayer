@@ -4,13 +4,10 @@ package remix.myplayer.ui.activity;
 import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -18,31 +15,36 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
+import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.fragment.SongFragment;
+import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.interfaces.OnModeChangeListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
@@ -52,7 +54,6 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
@@ -76,9 +77,12 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     DrawerLayout mDrawerLayout;
     @BindView(R.id.add)
     FloatingActionButton mAddButton;
+    @BindView(R.id.recyclerview)
+    RecyclerView mRecyclerView;
+
     private BottomActionBarFragment mBottomBar;
     private final static String TAG = "MainActivity";
-
+    private DrawerAdapter mDrawerAdapter;
     private PagerAdapter mAdapter;
     //是否正在运行
     private static boolean mIsRunning = false;
@@ -167,7 +171,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        initTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -198,7 +201,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         });
 
         //播放的service
-        MusicService.addCallback(MainActivity.this);
+        MusicService.addCallback(this);
 
         //初始化toolbar
         initToolbar(mToolBar,"");
@@ -206,8 +209,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         initTab();
         //初始化测滑菜单
         initDrawerLayout();
-        //根据主题设置颜色
-        initColor();
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
 
@@ -240,6 +241,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             MP3Item item = MediaStoreUtil.getMP3InfoById(id);
             if(item != null){
                 mBottomBar.UpdateBottomStatus(item,false);
+                updateHeader(item,false);
                 SPUtil.putValue(this,"Setting","LastSongId",id);
                 MusicService.initDataSource(item,0);
             }
@@ -269,6 +271,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             //上次退出时保存的正在播放的歌曲未失效
             if(isLastSongExist && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
                 mBottomBar.UpdateBottomStatus(item, isPlay);
+                updateHeader(item,false);
                 MusicService.initDataSource(item,pos);
             }else {
                 if(Global.mPlayQueue.size() > 0){
@@ -281,6 +284,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                     }
                     item = MediaStoreUtil.getMP3InfoById(id);
                     mBottomBar.UpdateBottomStatus(item,isPlay);
+                    updateHeader(item,false);
                     SPUtil.putValue(this,"Setting","LastSongId",id);
                     MusicService.initDataSource(item,0);
                 }
@@ -288,25 +292,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         } else {
             mBottomBar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
         }
-    }
-
-    /**
-     * 初始化主题
-     */
-    private void initTheme() {
-        ThemeStore.THEME_MODE = ThemeStore.loadThemeMode();
-        ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
-
-        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
-        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
-        LogUtil.d(TAG,"primary:" + ThemeStore.MATERIAL_COLOR_PRIMARY + "\r\nprimary dark:" + ThemeStore.MATERIAL_COLOR_PRIMARY_DARK);
-//        int color = ThemeStore.getMaterialPrimaryColorRes(this);
-//        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryColorRes(ThemeStore.THEME_COLOR);
-    }
-
-    private void initColor() {
-        mToolBar.setBackgroundColor(ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY));
-        mTablayout.setBackgroundColor(ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY));
     }
 
 
@@ -421,41 +406,90 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mTablayout.setupWithViewPager(mViewPager);
     }
 
+    /**
+     * 设置夜间模式
+     * @param isNight
+     */
+    private void setNightMode(boolean isNight){
+        ThemeStore.THEME_MODE = isNight ? ThemeStore.NIGHT : ThemeStore.DAY;
+        ThemeStore.THEME_COLOR = ThemeStore.loadThemeColor();
+        ThemeStore.MATERIAL_COLOR_PRIMARY = ThemeStore.getMaterialPrimaryColorRes();
+        ThemeStore.MATERIAL_COLOR_PRIMARY_DARK = ThemeStore.getMaterialPrimaryDarkColorRes();
+        ThemeStore.saveThemeMode(ThemeStore.THEME_MODE);
+        mRefreshHandler.sendEmptyMessage(Constants.RECREATE_ACTIVITY);
+    }
+
+
     private void initDrawerLayout() {
-        mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
-        ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed},{android.R.attr.state_checked} ,{}},
-                new int[]{ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY), ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY),ColorUtil.getColor(R.color.black_737373)});
-        mNavigationView.setItemIconTintList(colorStateList);
-        mNavigationView.setItemTextColor(colorStateList);
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+        mDrawerAdapter = new DrawerAdapter(this);
+        mDrawerAdapter.setOnModeChangeListener(new OnModeChangeListener() {
             @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                item.setChecked(true);
-                switch (item.getItemId()) {
-                    case R.id.item_recently:
-                        //最近添加
-                        startActivity(new Intent(MainActivity.this, RecetenlyActivity.class));
-                        break;
-                    case R.id.item_folder:
-                        startActivity(new Intent(MainActivity.this, FolderActivity.class));
-                        break;
-                    case R.id.item_allsong:
-                        mDrawerLayout.closeDrawer(mNavigationView);
-                        break;
-                    case R.id.item_setting:
-                        //设置
-                        startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), RESULT_UPDATE_THEME);
-//                        startActivityForResult(new Intent(MainActivity.this,ThemeActivity.class),RESULT_UPDATE_THEME);
-                        break;
-                    case R.id.item_exit:
-                        sendBroadcast(new Intent(Constants.EXIT));
-                        break;
-                    default:
-                        break;
-                }
-                return true;
+            public void OnModeChange(boolean isNight) {
+                setNightMode(isNight);
             }
         });
+        mDrawerAdapter.setOnItemClickLitener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                switch (position){
+                    //歌曲库
+                    case 0:
+                        mDrawerLayout.closeDrawer(mNavigationView);
+                        break;
+                    //文件夹
+                    case 1:
+                        startActivity(new Intent(MainActivity.this, FolderActivity.class));
+                        break;
+                    //夜间模式
+                    case 2:
+                        break;
+                    //设置
+                    case 3:
+                        startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), RESULT_UPDATE_THEME);
+                        break;
+                }
+                mDrawerAdapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onItemLongClick(View view, int position) {
+            }
+        });
+        mRecyclerView.setAdapter(mDrawerAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+//        mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
+//        ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed},{android.R.attr.state_checked} ,{}},
+//                new int[]{ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY), ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY),ColorUtil.getColor(R.color.gray_34353a)});
+//        mNavigationView.setItemIconTintList(colorStateList);
+//        mNavigationView.setItemTextColor(colorStateList);
+//        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(MenuItem item) {
+//                item.setChecked(true);
+//                switch (item.getItemId()) {
+//                    case R.id.item_recently:
+//                        //最近添加
+//                        startActivity(new Intent(MainActivity.this, RecetenlyActivity.class));
+//                        break;
+//                    case R.id.item_folder:
+//                        startActivity(new Intent(MainActivity.this, FolderActivity.class));
+//                        break;
+//                    case R.id.item_allsong:
+//                        mDrawerLayout.closeDrawer(mNavigationView);
+//                        break;
+//                    case R.id.item_setting:
+//                        //设置
+//                        startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), RESULT_UPDATE_THEME);
+//                        break;
+//                    case R.id.item_exit:
+//                        sendBroadcast(new Intent(Constants.EXIT));
+//                        break;
+//                    default:
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
 
     }
 
@@ -544,11 +578,27 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 //            }
 //        }
         mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ALLSONG_ADAPTER);
-//        View headView = mNavigationView.getHeaderView(0);
-//        if(headView != null && mp3Item != null){
-//            TextView textView = (TextView) headView.findViewById(R.id.header_txt);
-//            textView.setText(mp3Item.getArtist() + "-" + mp3Item.getTitle());
-//        }
+        updateHeader(mp3Item,MusicService.getIsplay());
+    }
+
+    /**
+     * 更新侧滑菜单
+     * @param mp3Item
+     */
+    private void updateHeader(MP3Item mp3Item,boolean isPlay) {
+        View headView = findViewById(R.id.header);
+        if(headView != null && mp3Item != null){
+            TextView textView = (TextView) headView.findViewById(R.id.header_txt);
+            SimpleDraweeView simpleDraweeView = (SimpleDraweeView) headView.findViewById(R.id.header_img);
+//            textView.setVisibility(isPlay ? View.VISIBLE : View.INVISIBLE);
+//            simpleDraweeView.setVisibility(isPlay ? View.VISIBLE : View.INVISIBLE);
+//            if(!isPlay)
+//                return;
+            textView.setText(getString(R.string.play_now,mp3Item.getTitle()));
+            simpleDraweeView.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mp3Item.getAlbumId()));
+            simpleDraweeView.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.drawable.drawer_bg_album);
+
+        }
     }
 
     @Override

@@ -61,13 +61,15 @@
     <color name="black_5b5a58">#5b5a58</color>
     <color name="black_737373">#737373</color>
     <color name="black_80000000">#80000000</color>
+    <color name="gray_34353a">#34353a</color>
     <color name="black">#000000</color>
     <color name="gray_6d6c69">#6d6c69</color>
     <color name="gray_323232">#323232</color>
     <color name="white_f6f6f5">#f6f6f5</color>
     <color name="purple_782899">#782899</color>
     <color name="purple_8e24aa">#8e24aa</color>
-
+    <color name="drawer_header_bg">#dde3f4</color>
+    <color name="draer_header_text">#c6cce0</color>
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>
     <color name="day_textcolor">@color/gray_6d6c69</color>
@@ -110,20 +112,28 @@
     <color name="md_night_primary">@color/background_color_3</color>
     <color name="md_night_primary_dark">@color/background_color_3</color>
 
-    <color name="md_purple_primary">#9c27b0</color>
-    <color name="md_purple_primary_dark">#7b1fa2</color>
+    <color name="md_red_primary">#c91f37</color>
+    <color name="md_red_primary_dark">#b5162c</color>
 
-    <color name="md_red_primary">#e51c23</color>
-    <color name="md_red_primary_dark">#d01716</color>
+    <color name="md_brown_primary">#7d6b5d</color>
+    <color name="md_brown_primary_dark">#68574b</color>
 
+    <color name="md_navy_primary">#3a6960</color>
+    <color name="md_navy_primary_dark">#325d55</color>
 
-    <color name="md_pink_primary">#e91e63</color>
-    <color name="md_pink_primary_dark">#c2185b</color>
+    <color name="md_green_primary">#007b43</color>
+    <color name="md_green_primay_dark">#026c3c</color>
 
-    <color name="md_brown_primary">#795548</color>
-    <color name="md_brown_primary_dark">#5d4037</color>
+    <color name="md_yellow_primary">#ffb61e</color>
+    <color name="md_yellow_primay_dark">#eea91a</color>
 
-    <color name="md_indigo_primary">#3f51b5</color>
-    <color name="md_indigo_primary_dark">#303f9f</color>
+    <color name="md_purple_primary">#5d3f6a</color>
+    <color name="md_purple_primary_dark">#52355e</color>
+
+    <color name="md_indigo_primary">#6967ab</color>
+    <color name="md_indigo_primary_dark">#555393</color>
+
+    <color name="md_plum_primary">#db5a6b</color>
+    <color name="md_plum_primary_dark">#c74a5b</color>
 
 </resources>

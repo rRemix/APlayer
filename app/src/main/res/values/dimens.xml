@@ -40,6 +40,7 @@
     <dimen name="d30_size">30dp</dimen>
     <dimen name="d40_size">40dp</dimen>
     <dimen name="d42_size">42dp</dimen>
+    <dimen name="d44_size">44dp</dimen>
     <dimen name="d48_size">48dp</dimen>
     <dimen name="d50_size">50dp</dimen>
     <dimen name="d56_size">56dp</dimen>
@@ -50,4 +51,5 @@
     <dimen name="d100_size">100dp</dimen>
     <dimen name="d120_size">120dp</dimen>
     <dimen name="d150_size">150dp</dimen>
+    <dimen name="d170_size">170dp</dimen>
 </resources>

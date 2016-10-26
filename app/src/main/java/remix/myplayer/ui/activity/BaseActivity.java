@@ -35,20 +35,29 @@ public class BaseActivity extends AppCompatActivity {
             return;
         }
         switch (ThemeStore.THEME_COLOR){
-            case ThemeStore.THEME_PURPLE:
-                setTheme(R.style.DayTheme_Purple);
-                break;
             case ThemeStore.THEME_RED:
                 setTheme(R.style.DayTheme_Red);
-                break;
-            case ThemeStore.THEME_PINK:
-                setTheme(R.style.DayTheme_Pink);
                 break;
             case ThemeStore.THEME_BROWN:
                 setTheme(R.style.DayTheme_Brown);
                 break;
+            case ThemeStore.THEME_NAVY:
+                setTheme(R.style.DayTheme_Navy);
+                break;
+            case ThemeStore.THEME_GREEN:
+                setTheme(R.style.DayTheme_Green);
+                break;
+            case ThemeStore.THEME_YELLOW:
+                setTheme(R.style.DayTheme_Yellow);
+                break;
+            case ThemeStore.THEME_PURPLE:
+                setTheme(R.style.DayTheme_Purple);
+                break;
             case ThemeStore.THEME_INDIGO:
-                setTheme(R.style.DayTheme_Ingido);
+                setTheme(R.style.DayTheme_Indigo);
+                break;
+            case ThemeStore.THEME_PLUM:
+                setTheme(R.style.DayTheme_Plum);
                 break;
         }
     }
