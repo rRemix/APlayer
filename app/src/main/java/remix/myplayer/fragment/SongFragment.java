@@ -52,7 +52,6 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     RecyclerView mRecyclerView;
     private SongAdapter mAdapter;
     private static int LOADER_ID = 1;
-    public static boolean isFirstSelected = true;
     public static final String TAG = SongFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
 
@@ -98,8 +97,8 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         });
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.addItemDecoration(new ListItemDecoration(getContext(), ListItemDecoration.VERTICAL_LIST));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+//        mRecyclerView.addItemDecoration(new ListItemDecoration(getContext(), ListItemDecoration.VERTICAL_LIST));
+//        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();

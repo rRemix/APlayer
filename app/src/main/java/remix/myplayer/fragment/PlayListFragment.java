@@ -130,7 +130,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     private int getPlayListId(int position){
         int playListId = -1;
         if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
-            playListId = mCursor.getInt(PlayListFragment.mPlayListIDIndex);
+            playListId = mCursor.getInt(mPlayListIDIndex);
         }
         return playListId;
     }
@@ -138,7 +138,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     private String getPlayListName(int position){
         String playlistName = "";
         if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
-            playlistName = mCursor.getString(PlayListFragment.mPlayListNameIndex);
+            playlistName = mCursor.getString(mPlayListNameIndex);
         }
         return playlistName;
     }
@@ -146,7 +146,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     private int getPlayListSongCount(int position){
         int count = 0;
         if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
-            count = mCursor.getInt(PlayListFragment.mPlayListSongCountIndex);
+            count = mCursor.getInt(mPlayListSongCountIndex);
         }
         return count;
     }

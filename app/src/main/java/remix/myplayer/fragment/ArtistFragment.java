@@ -156,7 +156,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     private int getArtsitId(int position){
         int artistId = -1;
         if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
-            artistId = mCursor.getInt(ArtistFragment.mArtistIdIndex);
+            artistId = mCursor.getInt(mArtistIdIndex);
         }
         return artistId;
     }

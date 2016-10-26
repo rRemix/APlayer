@@ -5,27 +5,34 @@
     android:layout_height="208dp"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:background="@color/drawer_header_bg">
+    android:background="?attr/material_color_primary">
 
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:visibility="visible"
-        android:id="@+id/header_img"
+    <FrameLayout
         android:layout_marginTop="@dimen/d40_size"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@drawable/no_art_normal"
-        android:background="@drawable/drawer_bg_album"
-        fresco:actualImageScaleType="center"
-        fresco:placeholderImageScaleType="center"
-        fresco:placeholderImage="@drawable/album_empty_bg"/>
+        android:layout_width="@dimen/d100_size"
+        android:layout_height="@dimen/d100_size"
+        android:id="@+id/header_img_container">
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:visibility="visible"
+            android:id="@+id/header_img"
+            android:layout_width="@dimen/d100_size"
+            android:layout_height="@dimen/d100_size"
+            android:src="@drawable/no_art_normal"
+            android:background="@drawable/drawer_bg_album"
+            fresco:actualImageScaleType="center"
+            fresco:placeholderImageScaleType="center"
+            fresco:placeholderImage="@drawable/album_empty_bg"/>
+    </FrameLayout>
+
 
     <TextView
         android:visibility="visible"
         android:id="@+id/header_txt"
-        android:background="@color/draer_header_text"
         android:layout_margin="@dimen/d20_size"
+        android:paddingLeft="@dimen/d8_size"
+        android:paddingRight="@dimen/d8_size"
         android:layout_width="@dimen/d170_size"
-        android:layout_height="32dp"
+        android:layout_height="@dimen/d32_size"
         android:textColor="@color/white"
         android:textSize="@dimen/s14_size"
         android:text="正在播放"

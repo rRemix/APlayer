@@ -4,10 +4,12 @@ package remix.myplayer.ui.activity;
 import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -48,10 +50,12 @@ import remix.myplayer.interfaces.OnModeChangeListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -448,7 +452,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                         startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), RESULT_UPDATE_THEME);
                         break;
                 }
-                DrawerAdapter.mSelectIndex = position;
+                mDrawerAdapter.setSelectIndex(position);
                 mDrawerAdapter.notifyDataSetChanged();
             }
             @Override
@@ -458,6 +462,13 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mRecyclerView.setAdapter(mDrawerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        TextView textView = (TextView)findViewById(R.id.header_txt);
+        if(textView != null){
+            GradientDrawable bg = new GradientDrawable();
+            bg.setColor(ThemeStore.getMaterialColorPrimaryDarkColor());
+            bg.setCornerRadius(DensityUtil.dip2px(this,4));
+            textView.setBackground(bg);
+        }
 //        mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
 //        ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed},{android.R.attr.state_checked} ,{}},
 //                new int[]{ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY), ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY),ColorUtil.getColor(R.color.gray_34353a)});
@@ -587,14 +598,14 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
      * @param mp3Item
      */
     private void updateHeader(MP3Item mp3Item,boolean isPlay) {
-        View headView = findViewById(R.id.header);
-        if(headView != null && mp3Item != null){
-            TextView textView = (TextView) headView.findViewById(R.id.header_txt);
-            SimpleDraweeView simpleDraweeView = (SimpleDraweeView) headView.findViewById(R.id.header_img);
+        TextView textView = findView(R.id.header_txt);
+        SimpleDraweeView simpleDraweeView = findView(R.id.header_img);
+        if(textView != null && simpleDraweeView != null && mp3Item != null){
 //            textView.setVisibility(isPlay ? View.VISIBLE : View.INVISIBLE);
 //            simpleDraweeView.setVisibility(isPlay ? View.VISIBLE : View.INVISIBLE);
 //            if(!isPlay)
 //                return;
+
             textView.setText(getString(R.string.play_now,mp3Item.getTitle()));
             simpleDraweeView.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mp3Item.getAlbumId()));
             simpleDraweeView.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.drawable.drawer_bg_album);

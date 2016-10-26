@@ -99,7 +99,6 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.height = 200 * metrics.densityDpi / 160;
         lp.width = metrics.widthPixels;
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);

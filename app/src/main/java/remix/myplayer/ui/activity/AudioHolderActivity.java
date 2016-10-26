@@ -658,7 +658,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         @Override
         public void run() {
             if(mInfo != null){
-                mRawBitMap = MediaStoreUtil.getAlbumBitmapBySongId((int) mInfo.getId(),false);
+                mRawBitMap = MediaStoreUtil.getAlbumBitmapBySongId(mInfo.getId(),false);
                 if(mRawBitMap == null)
                     mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
 

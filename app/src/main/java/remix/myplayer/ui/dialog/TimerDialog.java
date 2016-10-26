@@ -16,6 +16,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.umeng.analytics.MobclickAgent;
@@ -128,8 +129,9 @@ public class TimerDialog extends BaseDialogActivity {
                 new int[]{ColorUtil.getColor(R.color.white),color}));
 
         //初始化switch
-        ContextThemeWrapper ctw = new ContextThemeWrapper(this, Theme.getTheme());
-        mSwitch = findView(R.id.popup_timer_switch);
+//        mSwitch = findView(R.id.popup_timer_switch);
+        mSwitch = new SwitchCompat(new ContextThemeWrapper(this, Theme.getTheme()));
+        ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
 //        int[] states_check = new int[]{android.R.attr.state_checked};
 //        int[] states_default = new int[]{};
 //        StateListDrawable trackDrawable = new StateListDrawable();

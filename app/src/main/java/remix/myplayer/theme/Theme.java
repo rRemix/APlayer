@@ -1,10 +1,13 @@
 package remix.myplayer.theme;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.support.annotation.ColorInt;
@@ -33,6 +36,7 @@ import remix.myplayer.util.ColorUtil;
  * @Date 2016/8/9 14:55
  */
 public class Theme {
+
     /**
      * 为drawable着色
      * @param oriDrawable
@@ -258,7 +262,33 @@ public class Theme {
         stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, drawable1);
         stateListDrawable.addState(new int[]{android.R.attr.state_selected}, drawable1);
         stateListDrawable.addState(new int[]{}, Theme.getDrawable(context,resId));
+
         return stateListDrawable;
     }
 
+    /**
+     * 侧滑菜单点击效果
+     * @param context
+     * @param resId
+     * @param color
+     * @return
+     */
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static StateListDrawable getPressAndSelectedStateListRippleDrawalbe(Context context,@DrawableRes int resId,@ColorInt int color){
+        StateListDrawable stateListDrawable = new StateListDrawable();
+        Drawable selectedDrawable = Theme.TintDrawable(context.getResources().getDrawable(R.drawable.bg_list_default_day),color);
+        Drawable oriDrawable = context.getResources().getDrawable(resId);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            RippleDrawable rippleDrawable = new RippleDrawable(ColorStateList.valueOf(color), oriDrawable,null);
+            stateListDrawable.addState(new int[]{android.R.attr.state_selected}, selectedDrawable);
+            stateListDrawable.addState(new int[]{}, rippleDrawable);
+            return stateListDrawable;
+        } else {
+            stateListDrawable.addState(new int[]{android.R.attr.state_selected}, selectedDrawable);
+            stateListDrawable.addState(new int[]{android.R.attr.state_pressed},selectedDrawable);
+            stateListDrawable.addState(new int[]{}, oriDrawable);
+            return stateListDrawable;
+        }
+
+    }
 }

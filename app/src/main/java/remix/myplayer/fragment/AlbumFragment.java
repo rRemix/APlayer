@@ -135,7 +135,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     private int getAlbumID(int position){
         int albumId = -1;
         if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
-            albumId = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
+            albumId = mCursor.getInt(mAlbumIdIndex);
         }
         return albumId;
     }

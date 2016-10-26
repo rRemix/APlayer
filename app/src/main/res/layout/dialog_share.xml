@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="200dp"
-    android:background="#fff">
+    android:layout_height="wrap_content"
+    android:background="@color/white">
     <TextView
         android:id="@+id/popup_title"
         android:gravity="center"
@@ -19,96 +19,98 @@
         android:background="#E6E6E6"/>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="90dp"
-        android:gravity="center_horizontal">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="@dimen/d12_size"
+        android:layout_marginBottom="@dimen/d12_size">
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="5dp">
+            android:gravity="center">
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/share_qq"
-                android:background="#ffff"
-                android:src="@drawable/bg_btn_qq"/>
+                android:background="@color/transparent"
+                android:src="@drawable/icon_qq"/>
             <TextView
+                android:layout_marginTop="@dimen/d2_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/s14_size"
-                android:text="QQ"/>
+                android:text="QQ"
+                android:textColor="@color/black_5b5a58"/>
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="5dp">
+            android:gravity="center">
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/share_weibo"
                 android:background="#ffff"
-                android:src="@drawable/bg_btn_weibo"/>
+                android:src="@drawable/icon_weibo"/>
             <TextView
+                android:layout_marginTop="@dimen/d2_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/s14_size"
-                android:text="微博"/>
+                android:text="微博"
+                android:textColor="@color/black_5b5a58"/>
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="5dp">
+            android:gravity="center">
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/share_wechat"
                 android:background="#ffff"
-                android:src="@drawable/bg_btn_wechat"/>
+                android:src="@drawable/icon_wechat"/>
             <TextView
+                android:layout_marginTop="@dimen/d2_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/s14_size"
-                android:text="微信"/>
+                android:text="微信"
+                android:textColor="@color/black_5b5a58"/>
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="5dp">
+            android:gravity="center">
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/share_circlefriend"
                 android:background="#ffff"
-                android:src="@drawable/bg_btn_circleoffriends"/>
+                android:src="@drawable/icon_moment"/>
             <TextView
+                android:layout_marginTop="@dimen/d2_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/s14_size"
-                android:text="朋友圈"/>
+                android:text="朋友圈"
+                android:textColor="@color/black_5b5a58"/>
         </LinearLayout>
 
     </LinearLayout>
 
     <Button
-        android:layout_marginTop="10dp"
         android:layout_width="130dp"
         android:layout_height="30dp"
         android:gravity="center"

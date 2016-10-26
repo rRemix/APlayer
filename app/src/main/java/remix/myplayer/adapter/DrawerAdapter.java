@@ -20,6 +20,7 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.interfaces.OnModeChangeListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 
 /**
  * @ClassName
@@ -30,7 +31,7 @@ import remix.myplayer.theme.ThemeStore;
 
 public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
     //当前选中项
-    public static int mSelectIndex = 0;
+    public int mSelectIndex = 0;
     private int[] mImgs = new int[]{R.drawable.drawer_icon_musicbox,R.drawable.darwer_icon_folder,
                                     R.drawable.darwer_icon_night,R.drawable.darwer_icon_set};
     private String[] mTitles = new String[]{"歌曲库","文件夹","夜间模式","设置"};
@@ -48,8 +49,12 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
         return new DrawerHolder(LayoutInflater.from(mContext).inflate(R.layout.item_drawer,parent,false));
     }
 
+    public void setSelectIndex(int index){
+        mSelectIndex = index;
+    }
+
     @Override
-    public void onBindViewHolder(DrawerHolder holder, final int position) {
+    public void onBindViewHolder(final DrawerHolder holder, final int position) {
 //        holder.mImg.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(mContext,mImgs[position]));
         holder.mImg.setImageResource(mImgs[position]);
         holder.mText.setText(mTitles[position]);
@@ -67,20 +72,12 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
         holder.mRoot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mOnItemClickLitener.onItemClick(v,position);
+                mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition());
             }
         });
         holder.mRoot.setSelected(mSelectIndex == position);
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            StateListDrawable stateListDrawable = new StateListDrawable();
-            RippleDrawable rippleDrawable = new RippleDrawable(ColorStateList.valueOf(Color.parseColor("#eff1f6")),
-                    mContext.getResources().getDrawable(R.drawable.bg_list_default_day),null);
-            stateListDrawable.addState(new int[]{android.R.attr.state_selected},
-                    Theme.TintDrawable(mContext.getResources().getDrawable(R.drawable.bg_list_default_day),Color.parseColor("#eff1f6")));
-            stateListDrawable.addState(new int[]{}, rippleDrawable);
-            holder.mRoot.setBackground(stateListDrawable);
-        }
+        holder.mRoot.setBackground(
+                Theme.getPressAndSelectedStateListRippleDrawalbe(mContext,R.drawable.bg_list_default_day,ColorUtil.getColor(R.color.drawer_selected)));
 
     }
 

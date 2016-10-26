@@ -57,8 +57,7 @@
             android:text="设为默认"
             android:layout_marginRight="8dp"/>
         <android.support.v7.widget.SwitchCompat
-            android:visibility="visible"
-            android:background="@color/transparent"
+            android:visibility="invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textOn=""

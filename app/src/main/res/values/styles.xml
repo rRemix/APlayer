@@ -165,6 +165,8 @@
         <item name="material_color_primary">@color/md_red_primary</item>
         <item name="material_color_secondry">@color/md_red_primary</item>
         <item name="material_color_primary_dark">@color/md_red_primary_dark</item>
+        <item name="colorPrimary">@color/md_red_primary</item>
+        <item name="colorPrimaryDark">@color/md_red_primary_dark</item>
         <item name="colorControlActivated">@color/md_red_primary</item>
         <item name="colorAccent">@color/md_red_primary</item>
         <item name="android:textColor">@color/md_red_primary</item>
@@ -174,6 +176,8 @@
         <item name="material_color_primary">@color/md_brown_primary</item>
         <item name="material_color_secondry">@color/md_brown_primary</item>
         <item name="material_color_primary_dark">@color/md_brown_primary_dark</item>
+        <item name="colorPrimary">@color/md_brown_primary</item>
+        <item name="colorPrimaryDark">@color/md_brown_primary_dark</item>
         <item name="colorControlActivated">@color/md_brown_primary</item>
         <item name="colorAccent">@color/md_brown_primary</item>
         <item name="android:textColor">@color/md_brown_primary</item>
@@ -183,6 +187,8 @@
         <item name="material_color_primary">@color/md_navy_primary</item>
         <item name="material_color_secondry">@color/md_navy_primary</item>
         <item name="material_color_primary_dark">@color/md_navy_primary_dark</item>
+        <item name="colorPrimary">@color/md_navy_primary</item>
+        <item name="colorPrimaryDark">@color/md_navy_primary_dark</item>
         <item name="colorControlActivated">@color/md_navy_primary</item>
         <item name="colorAccent">@color/md_navy_primary</item>
         <item name="android:textColor">@color/md_navy_primary</item>
@@ -191,7 +197,9 @@
     <style name="DayTheme.Green" parent="@style/DayTheme">
         <item name="material_color_primary">@color/md_green_primary</item>
         <item name="material_color_secondry">@color/md_green_primary</item>
-        <item name="material_color_primary_dark">@color/md_navy_primary_dark</item>
+        <item name="material_color_primary_dark">@color/md_green_primay_dark</item>
+        <item name="colorPrimary">@color/md_green_primary</item>
+        <item name="colorPrimaryDark">@color/md_green_primay_dark</item>
         <item name="colorControlActivated">@color/md_green_primary</item>
         <item name="colorAccent">@color/md_green_primary</item>
         <item name="android:textColor">@color/md_green_primary</item>
@@ -201,6 +209,8 @@
         <item name="material_color_primary">@color/md_yellow_primary</item>
         <item name="material_color_secondry">@color/md_yellow_primary</item>
         <item name="material_color_primary_dark">@color/md_yellow_primay_dark</item>
+        <item name="colorPrimary">@color/md_yellow_primary</item>
+        <item name="colorPrimaryDark">@color/md_yellow_primay_dark</item>
         <item name="colorControlActivated">@color/md_yellow_primary</item>
         <item name="colorAccent">@color/md_yellow_primary</item>
         <item name="android:textColor">@color/md_yellow_primary</item>
@@ -210,6 +220,8 @@
         <item name="material_color_primary">@color/md_purple_primary</item>
         <item name="material_color_secondry">@color/md_purple_primary</item>
         <item name="material_color_primary_dark">@color/md_purple_primary_dark</item>
+        <item name="colorPrimary">@color/md_purple_primary</item>
+        <item name="colorPrimaryDark">@color/md_purple_primary_dark</item>
         <item name="colorControlActivated">@color/md_purple_primary</item>
         <item name="colorAccent">@color/md_purple_primary</item>
         <item name="android:textColor">@color/md_purple_primary</item>
@@ -219,6 +231,8 @@
         <item name="material_color_primary">@color/md_indigo_primary</item>
         <item name="material_color_secondry">@color/md_indigo_primary</item>
         <item name="material_color_primary_dark">@color/md_indigo_primary_dark</item>
+        <item name="colorPrimary">@color/md_indigo_primary</item>
+        <item name="colorPrimaryDark">@color/md_indigo_primary_dark</item>
         <item name="colorControlActivated">@color/md_indigo_primary</item>
         <item name="colorAccent">@color/md_indigo_primary</item>
         <item name="android:textColor">@color/md_indigo_primary</item>
@@ -228,6 +242,8 @@
         <item name="material_color_primary">@color/md_plum_primary</item>
         <item name="material_color_secondry">@color/md_plum_primary</item>
         <item name="material_color_primary_dark">@color/md_plum_primary_dark</item>
+        <item name="colorPrimary">@color/md_plum_primary</item>
+        <item name="colorPrimaryDark">@color/md_plum_primary_dark</item>
         <item name="colorControlActivated">@color/md_plum_primary</item>
         <item name="colorAccent">@color/md_plum_primary</item>
         <item name="android:textColor">@color/md_plum_primary</item>
@@ -239,6 +255,8 @@
         <item name="material_color_primary">@color/md_indigo_primary</item>
         <item name="material_color_secondry">@color/md_indigo_primary</item>
         <item name="material_color_primary_dark">@color/md_indigo_primary_dark</item>
+        <item name="colorPrimary">@color/md_indigo_primary</item>
+        <item name="colorPrimaryDark">@color/md_indigo_primary_dark</item>
         <item name="colorControlActivated">@color/md_indigo_primary</item>
         <item name="colorAccent">@color/md_indigo_primary</item>
         <item name="android:textColor">@color/md_indigo_primary</item>

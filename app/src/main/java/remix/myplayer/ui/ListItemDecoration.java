@@ -9,6 +9,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import remix.myplayer.R;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.util.ColorUtil;
+
 /**
  * Created by taeja on 16-6-23.
  */
@@ -26,9 +30,9 @@ public class ListItemDecoration extends RecyclerView.ItemDecoration {
     private int mOrientation;
 
     public ListItemDecoration(Context context, int orientation) {
-        final TypedArray a = context.obtainStyledAttributes(ATTRS);
-        mDivider = a.getDrawable(0);
-        a.recycle();
+        final TypedArray typedArray = context.obtainStyledAttributes(ATTRS);
+        mDivider = Theme.TintDrawable(typedArray.getDrawable(0), ColorUtil.getColor(R.color.list_divider));
+        typedArray.recycle();
         setOrientation(orientation);
     }
 

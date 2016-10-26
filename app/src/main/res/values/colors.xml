@@ -30,7 +30,10 @@
 
 
     <!-- 分割线颜色-->
-    <color name="list_divider">#373237</color>
+    <color name="list_divider">#ededed</color>
+    <!--侧滑菜单选中颜色-->
+    <color name="drawer_selected">#f5f5f5</color>
+
     <!-- 点缀色-->
     <color name="intersperse_color">@color/purple_782899</color>
     <!-- 抽屉字体颜色-->
@@ -68,8 +71,7 @@
     <color name="white_f6f6f5">#f6f6f5</color>
     <color name="purple_782899">#782899</color>
     <color name="purple_8e24aa">#8e24aa</color>
-    <color name="drawer_header_bg">#dde3f4</color>
-    <color name="draer_header_text">#c6cce0</color>
+
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>
     <color name="day_textcolor">@color/gray_6d6c69</color>
