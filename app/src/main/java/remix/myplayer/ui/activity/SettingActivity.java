@@ -2,21 +2,27 @@ package remix.myplayer.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
+import com.afollestad.materialdialogs.util.DialogUtils;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
@@ -98,17 +104,46 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         if(!SPUtil.getValue(this,"Setting","LrcPath","").equals("")) {
             mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcPath","")));
         }
-        //初始化颜色
-        final int color = ThemeStore.isDay() ? ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY) : ColorUtil.getColor(R.color.purple_782899);
-        ((GradientDrawable)mColorSrc.getDrawable()).setColor(color);
+        //初始化箭头颜色
+        final int arrowColor = ThemeStore.isDay() ? ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY) : ColorUtil.getColor(R.color.purple_782899);
+        ((GradientDrawable)mColorSrc.getDrawable()).setColor(arrowColor);
         ButterKnife.apply( new ImageView[]{findView(R.id.setting_eq_arrow),findView(R.id.setting_feedback_arrow),
                 findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow)},
                 new ButterKnife.Action<ImageView>(){
                     @Override
                     public void apply(@NonNull ImageView view, int index) {
-                        Theme.TintDrawable(view,view.getBackground(),color);
+                        Theme.TintDrawable(view,view.getBackground(),arrowColor);
                     }
         });
+        //初始化点击效果
+        //默认的颜色
+//        final int defaultColor = ThemeStore.isDay() ? ColorUtil.getColor(R.color.white) : ColorUtil.getColor(R.color.night_background_color_3);
+
+//        //获得colorcontrolHighlight颜色
+//        int effectColor = Color.WHITE;
+//        try {
+//            effectColor = ThemeStore.isDay() ? DialogUtils.resolveColor(this, R.attr.colorControlHighlight) : ColorUtil.getColor(R.color.night_selected_color);
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        } finally {
+//            if(effectColor == Color.WHITE){
+//                effectColor = ColorUtil.getColor(R.color.default_control_highlight);
+//            }
+//        }
+//        //设置所有选项点击效果
+//        final Drawable containerDrawable = Theme.getPressDrawable(this,
+//                ThemeStore.isDay() ? R.drawable.bg_list_default_day : R.drawable.bg_list_1_default_night,effectColor);
+//        ButterKnife.apply(new View[]{findView(R.id.setting_filter_container),findView(R.id.setting_lrc_container),findView(R.id.setting_color_container),
+//                        findView(R.id.setting_notify_container),findView(R.id.setting_eq_container),findView(R.id.setting_feedback_container),
+//                        findView(R.id.setting_about_container),findView(R.id.setting_update_container),findView(R.id.setting_clear_container)},
+//                new ButterKnife.Action<View>() {
+//                    @Override
+//                    public void apply(@NonNull View view, int index) {
+//                        view.setBackground(containerDrawable);
+//                    }
+//        });
+
+
         //计算缓存大小
         new Thread(){
             @Override

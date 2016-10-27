@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
@@ -267,25 +268,69 @@ public class Theme {
     }
 
     /**
-     * 侧滑菜单点击效果
+     * 按下与选中触摸效果（波纹）
      * @param context
      * @param resId
-     * @param color
+     * @param effectColor 波纹颜色
      * @return
      */
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    public static StateListDrawable getPressStateListRippleDrawalbe(Context context, @DrawableRes int resId, @ColorInt int color){
+    public static StateListDrawable getPressAndSelectedStateListRippleDrawalbe(Context context, @DrawableRes int resId,@ColorInt int effectColor){
         StateListDrawable stateListDrawable = new StateListDrawable();
-        Drawable selectedDrawable = Theme.TintDrawable(context.getResources().getDrawable(R.drawable.bg_list_default_day),color);
-        Drawable oriDrawable = context.getResources().getDrawable(resId);
+        Drawable selectedDrawable = Theme.TintDrawable(context.getResources().getDrawable(R.drawable.bg_list_default_day),effectColor);
+        Drawable defaultDrawable = context.getResources().getDrawable(resId);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            RippleDrawable rippleDrawable = new RippleDrawable(ColorStateList.valueOf(color), oriDrawable,null);
+            RippleDrawable rippleDrawable = new RippleDrawable(ColorStateList.valueOf(effectColor), defaultDrawable,null);
+            stateListDrawable.addState(new int[]{android.R.attr.state_selected},selectedDrawable);
             stateListDrawable.addState(new int[]{}, rippleDrawable);
             return stateListDrawable;
         } else {
+            stateListDrawable.addState(new int[]{android.R.attr.state_selected},selectedDrawable);
             stateListDrawable.addState(new int[]{android.R.attr.state_pressed},selectedDrawable);
-            stateListDrawable.addState(new int[]{}, oriDrawable);
+            stateListDrawable.addState(new int[]{}, defaultDrawable);
             return stateListDrawable;
         }
+    }
+
+    /**
+     * 按下触摸效果（波纹）
+     * @param context
+     * @param resId
+     * @param effectColor 波纹颜色
+     * @return
+     */
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static Drawable getPressDrawable(Context context,@DrawableRes int resId,@ColorInt int effectColor){
+        Drawable defaultDrawable = context.getResources().getDrawable(resId);
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
+//            return new RippleDrawable(ColorStateList.valueOf(effectColor), defaultDrawable,null);
+            return  new RippleDrawable(getPressedColorSelector(Color.WHITE,effectColor),
+                    null,
+                    defaultDrawable);
+        } else {
+            StateListDrawable stateListDrawable = new StateListDrawable();
+            stateListDrawable.addState(new int[]{android.R.attr.state_pressed},TintDrawable(defaultDrawable,effectColor));
+            stateListDrawable.addState(new int[]{}, defaultDrawable);
+            return stateListDrawable;
+        }
+    }
+
+    public static ColorStateList getPressedColorSelector(int normalColor, int pressedColor) {
+        return new ColorStateList(
+                new int[][]
+                        {
+                                new int[]{android.R.attr.state_pressed},
+                                new int[]{android.R.attr.state_focused},
+                                new int[]{android.R.attr.state_activated},
+                                new int[]{}
+                        },
+                new int[]
+                        {
+                                pressedColor,
+                                pressedColor,
+                                pressedColor,
+                                normalColor
+                        }
+        );
     }
 }
