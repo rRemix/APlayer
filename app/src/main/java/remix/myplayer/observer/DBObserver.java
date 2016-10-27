@@ -26,21 +26,22 @@ public class DBObserver extends ContentObserver {
 
     @Override
     public void onChange(boolean selfChange, Uri uri) {
-        if(!selfChange){
-            switch (DBContentProvider.mUriMatcher.match(uri)){
-                //更新播放列表
-                case DBContentProvider.PLAY_LIST_MULTIPLE:
-                case DBContentProvider.PLAY_LIST_SINGLE:
-                    Global.mPlayList = PlayListUtil.getAllPlayListInfo();
-                    break;
-                //更新播放队列
-                case DBContentProvider.PLAY_LIST_SONG_MULTIPLE:
-                case DBContentProvider.PLAY_LIST_SONG_SINGLE:
-                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
-                    break;
-            }
-
-        }
+        Global.mPlayList = PlayListUtil.getAllPlayListInfo();
+        Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
+//        if(!selfChange){
+//            switch (DBContentProvider.mUriMatcher.match(uri)){
+//                //更新播放列表
+//                case DBContentProvider.PLAY_LIST_MULTIPLE:
+//                case DBContentProvider.PLAY_LIST_SINGLE:
+//                    Global.mPlayList = PlayListUtil.getAllPlayListInfo();
+//                    break;
+//                //更新播放队列
+//                case DBContentProvider.PLAY_LIST_SONG_MULTIPLE:
+//                case DBContentProvider.PLAY_LIST_SONG_SINGLE:
+//                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
+//                    break;
+//            }
+//        }
     }
 
 }

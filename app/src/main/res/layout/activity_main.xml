@@ -83,7 +83,7 @@
             <include layout="@layout/navigation_header"
                 android:id="@+id/header"/>
             <android.support.v7.widget.RecyclerView
-                android:layout_marginTop="@dimen/d8_size"
+                android:layout_marginTop="@dimen/d6_size"
                 android:id="@+id/recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>

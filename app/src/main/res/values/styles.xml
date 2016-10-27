@@ -129,8 +129,9 @@
         <item name="background_color_2">@color/day_background_color_2</item>
         <item name="background_color_3">@color/day_background_color_3</item>
         <item name="background_grid_color">#f1f1f1</item>
-        <item name="background_grid">@drawable/bg_grid_card_day</item>
-        <item name="background_list">@drawable/bg_list_card_day</item>
+        <item name="background_grid">@drawable/bg_grid_day</item>
+        <item name="background_list">@drawable/bg_list_day</item>
+        <item name="background_list_1">@drawable/bg_list_day</item>
         <item name="background_aboutus_color">@color/white_f6f6f5</item>
         <item name="text_color_primary">@color/day_textcolor_primary</item>
         <item name="text_color">@color/day_textcolor</item>
@@ -149,8 +150,9 @@
         <item name="background_color_2">@color/night_background_color_2</item>
         <item name="background_color_3">@color/night_background_color_3</item>
         <item name="background_grid_color">@color/background_color_main</item>
-        <item name="background_grid">@drawable/bg_grid_card_night</item>
-        <item name="background_list">@drawable/bg_list_card_night</item>
+        <item name="background_grid">@drawable/bg_grid_night</item>
+        <item name="background_list">@drawable/bg_list_night</item>
+        <item name="background_list_1">@drawable/bg_list_1_night</item>
         <item name="background_aboutus_color">@color/gray_323232</item>
         <item name="text_color_primary">@color/night_textcolor_primary</item>
         <item name="text_color">@color/night_textcolor</item>

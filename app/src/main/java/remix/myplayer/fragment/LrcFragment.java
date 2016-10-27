@@ -51,14 +51,14 @@ public class LrcFragment extends BaseFragment {
             if(msg.what == UPDATE_LRC) {
                 //更新歌词
                 if(mLrcList != null) {
-                    mLrcView.UpdateLrc(mLrcList);
+                    mLrcView.UpdateLrcList(mLrcList);
                 }
             } else if (msg.what == NO_LRC) {
                 //没有找到歌词
-                mLrcView.UpdateLrc(null);
+                mLrcView.UpdateLrcList(null);
             } else if (msg.what == NO_NETWORK) {
                 //没用网络
-                mLrcView.UpdateLrc(null);
+                mLrcView.UpdateLrcList(null);
             }
         }
     };

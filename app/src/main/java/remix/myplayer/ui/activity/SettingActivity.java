@@ -2,21 +2,19 @@ package remix.myplayer.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
 import com.umeng.analytics.MobclickAgent;
@@ -28,13 +26,18 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.R;
+import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.ColorChooseDialog;
+import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DiskCache;
+import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -51,17 +54,30 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     ImageView mColorSrc;
     @BindView(R.id.setting_lrc_path)
     TextView mLrcPath;
-
+    @BindView(R.id.setting_clear_text)
+    TextView mCache;
     //是否需要刷新
     private boolean mNeedRefresh = false;
     //是否从主题颜色选择对话框返回
     private boolean mFromColorChoose = false;
+    //缓存大小
+    private long mCacheSize = 0;
     private final int RECREATE = 100;
-    private Handler mRecreateHandler = new Handler(){
+    private final int CACHESIZE = 101;
+    private final int CLEARFINISH = 102;
+    private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == RECREATE)
                 recreate();
+            if(msg.what == CACHESIZE){
+                mCache.setText(getString(R.string.cache_szie,1.0 * mCacheSize / 1024 / 1024));
+            }
+            if(msg.what == CLEARFINISH){
+                ToastUtil.show(SettingActivity.this,"清除成功");
+                mCache.setText("0MB");
+                mLrcPath.setText(R.string.default_lrc_path);
+            }
         }
     };
 
@@ -93,6 +109,19 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         Theme.TintDrawable(view,view.getBackground(),color);
                     }
         });
+        //计算缓存大小
+        new Thread(){
+            @Override
+            public void run() {
+                mCacheSize = 0;
+                mCacheSize += CommonUtil.getFolderSize(DiskCache.getDiskCacheDir(SettingActivity.this,"lrc"));
+                mCacheSize += CommonUtil.getFolderSize(DiskCache.getDiskCacheDir(SettingActivity.this,"thumbnail"));
+                mCacheSize += CommonUtil.getFolderSize(getCacheDir());
+                mCacheSize += CommonUtil.getFolderSize(getFilesDir());
+                mCacheSize += CommonUtil.getFolderSize(new File("/data/data/" + getPackageName() + "/shared_prefs"));
+                mHandler.sendEmptyMessage(CACHESIZE);
+            }
+        }.start();
     }
 
     public void onResume() {
@@ -127,7 +156,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_container,
                 R.id.setting_mode_container,R.id.setting_feedback_container,R.id.setting_about_container,
-                R.id.setting_update_container,R.id.setting_eq_container,R.id.setting_lrc_container})
+                R.id.setting_update_container,R.id.setting_eq_container,R.id.setting_lrc_container,R.id.setting_clear_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -178,7 +207,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 //                break;
             //音效设置
             case R.id.setting_eq_container:
-
                 MobclickAgent.onEvent(this,"EQ");
                 Intent audioEffectIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
                 audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
@@ -200,6 +228,38 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             case R.id.setting_update_container:
                 MobclickAgent.onEvent(this,"CheckUpdate");
                 BmobUpdateAgent.forceUpdate(this);
+                break;
+            //清除缓存
+            case R.id.setting_clear_container:
+                new MaterialDialog.Builder(SettingActivity.this)
+                        .content(R.string.confirm_clear_cache)
+                        .positiveText(R.string.confirm)
+                        .negativeText(R.string.cancel)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                new Thread(){
+                                    @Override
+                                    public void run() {
+                                        //清除歌词，封面等缓存
+                                        CommonUtil.deleteFilesByDirectory(DiskCache.getDiskCacheDir(SettingActivity.this,"lrc"));
+                                        CommonUtil.deleteFilesByDirectory(DiskCache.getDiskCacheDir(SettingActivity.this,"thumbnail"));
+                                        //清除配置文件、数据库等缓存
+                                        CommonUtil.deleteFilesByDirectory(getCacheDir());
+                                        CommonUtil.deleteFilesByDirectory(getFilesDir());
+                                        CommonUtil.deleteFilesByDirectory(new File("/data/data/" + getPackageName() + "/shared_prefs"));
+                                        deleteDatabase(DBOpenHelper.DBNAME);
+                                        mHandler.sendEmptyMessage(CLEARFINISH);
+                                    }
+                                }.start();
+                            }
+                        })
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .negativeColorAttr(R.attr.text_color_primary)
+                        .contentColorAttr(R.attr.text_color_primary)
+                        .show();
+                break;
         }
     }
 
@@ -218,7 +278,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             mNeedRefresh = data.getBooleanExtra("needRefresh",false);
             mFromColorChoose = data.getBooleanExtra("fromColorChoose",false);
             if(mNeedRefresh){
-                mRecreateHandler.sendEmptyMessage(RECREATE);
+                mHandler.sendEmptyMessage(RECREATE);
 //                if(mFromColorChoose)
 //                    mModeSwitch.setChecked(false);
             }

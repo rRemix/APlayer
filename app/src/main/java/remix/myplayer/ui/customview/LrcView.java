@@ -12,10 +12,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Scroller;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import remix.myplayer.model.LrcInfo;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
 
@@ -24,11 +24,11 @@ import remix.myplayer.util.LogUtil;
  */
 public class LrcView extends View {
     private static final String TAG = LrcView.class.getSimpleName();
-    private LinkedList<LrcInfo> mlrcList;
+    private LinkedList<LrcInfo> mLrcList;
     //普通歌词画笔
-    private Paint mPaint;
+    private Paint mNormalPaint;
     //高亮歌词画笔
-    private Paint mHPaint;
+    private Paint mHightLightPaint;
     //拖动时水平线
     private Paint mHorizontalPaint;
     //高亮歌词
@@ -36,7 +36,7 @@ public class LrcView extends View {
     //总共多少行歌词
     private int mTotalRow;
     //上下了两行文字间隔
-    private int mSpacing = 50;
+    private int mSpacing = 40;
     //控件宽度
     private int mViewCenterX = 0;
     //控件高度
@@ -62,7 +62,8 @@ public class LrcView extends View {
     private int mNewProgress;
     //歌词滚动的动画时间
     private final int ANIM_DURATION = 1000;
-
+    //每次绘制需要绘制的歌词，因为歌词的长度可能比屏幕更宽，所以需要多行绘制
+    private ArrayList<String> mMultiLrc = new ArrayList<>();
 
     public LrcView(Context context) {
         super(context);
@@ -77,20 +78,19 @@ public class LrcView extends View {
 
     public LrcView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mPaint = new Paint();
-        mPaint.setColor(Color.GRAY);
+        mNormalPaint = new Paint();
+        mNormalPaint.setColor(Color.GRAY);
+        mNormalTextSize = DensityUtil.dip2px(context,12);
+        mNormalPaint.setTextSize(mNormalTextSize);
+        mNormalPaint.setTextAlign(Paint.Align.CENTER);
+        mNormalPaint.setAntiAlias(true);
 
-        mNormalTextSize = DensityUtil.dip2px(context,10);
-        mPaint.setTextSize(mNormalTextSize);
-        mPaint.setTextAlign(Paint.Align.CENTER);
-        mPaint.setAntiAlias(true);
-
-        mHPaint = new Paint();
-        mHightLightTextSize = DensityUtil.dip2px(context,16);
-        mHPaint.setTextSize(mHightLightTextSize);
-        mHPaint.setTextAlign(Paint.Align.CENTER);
-        mHPaint.setAntiAlias(true);
-        mHPaint.setFakeBoldText(true);
+        mHightLightPaint = new Paint();
+        mHightLightTextSize = DensityUtil.dip2px(context,18);
+        mHightLightPaint.setTextSize(mHightLightTextSize);
+        mHightLightPaint.setTextAlign(Paint.Align.CENTER);
+        mHightLightPaint.setAntiAlias(true);
+        mHightLightPaint.setFakeBoldText(true);
 
         mHorizontalPaint = new Paint();
         mHorizontalPaint.setStrokeWidth(2);
@@ -100,20 +100,24 @@ public class LrcView extends View {
         mScroller = new Scroller(getContext());
     }
 
-    public void UpdateLrc(LinkedList<LrcInfo> list){
-        mlrcList = list;
-        if(mlrcList != null)
-            mTotalRow = mlrcList.size();
+    /**
+     * 更新歌词列表
+     * @param list
+     */
+    public void UpdateLrcList(LinkedList<LrcInfo> list){
+        mLrcList = list;
+        if(mLrcList != null)
+            mTotalRow = mLrcList.size();
     }
 
     public void setHightLightColor(@ColorInt int color){
-        if(mHPaint != null)
-            mHPaint.setColor(color);
+        if(mHightLightPaint != null)
+            mHightLightPaint.setColor(color);
     }
 
     public void setNormalColor(@ColorInt int color){
-        if(mPaint != null)
-            mPaint.setColor(color);
+        if(mNormalPaint != null)
+            mNormalPaint.setColor(color);
     }
 
     public void setHorizontalColor(@ColorInt int color){
@@ -126,12 +130,12 @@ public class LrcView extends View {
         super.onDraw(canvas);
         if(mIsSearching){
             scrollTo(0,0);
-            canvas.drawText("正在搜索歌词", mViewCenterX, getHeight() / 2, mPaint);
+            canvas.drawText("正在搜索歌词", mViewCenterX, getHeight() / 2, mNormalPaint);
             return;
         }
-        if(mlrcList == null){
+        if(mLrcList == null){
             scrollTo(0,0);
-            canvas.drawText("暂无歌词", mViewCenterX, getHeight() / 2, mPaint);
+            canvas.drawText("暂无歌词", mViewCenterX, getHeight() / 2, mNormalPaint);
             return;
         }
         if(mHightLightRow == -1)
@@ -141,42 +145,81 @@ public class LrcView extends View {
             mTotalRow = (getHeight()/(mNormalTextSize + mSpacing)) + 4;
         }
 
-        mMinRow = mHightLightRow - (mTotalRow-1) / 2;
-        mMaxRow = mHightLightRow + (mTotalRow-1) / 2;
+        mMinRow = mHightLightRow - (mTotalRow - 1) / 2;
+        mMaxRow = mHightLightRow + (mTotalRow - 1) / 2;
         mMinRow = Math.max(mMinRow, 0); //处理上边界
-        mMaxRow = Math.min(mMaxRow, mlrcList.size() - 1); //处理下边界
+        mMaxRow = Math.min(mMaxRow, mLrcList.size() - 1); //处理下边界
 
         try {
+            int extraLine = 0;
             for(int i = mMinRow ;i < mMaxRow ;i++){
-                mCenterY = mViewCenterY + i * (mSpacing + mNormalTextSize);
-                if(i == mHightLightRow) {
-                    //高亮歌词
-                    canvas.drawText(mlrcList.get(i).getSentence(), mViewCenterX, mCenterY, mHPaint);
-                    //正在拖动画水平线
-                    if(mIsDragging){
-                        canvas.drawLine(getPaddingLeft(),
-                                mCenterY + mHightLightTextSize / 2,
-                                getWidth() - getPaddingRight(),
-                                mCenterY + mHightLightTextSize / 2,mHorizontalPaint);
+                mCenterY = mViewCenterY + i * (mSpacing + mNormalTextSize) + extraLine * mNormalTextSize;
+                boolean isHighLight = i == mHightLightRow;
+                String sentence = mLrcList.get(i).getSentence();
+                mMultiLrc.clear();
+                //判断歌词是否能显示完整
+                float textLegth = isHighLight ?
+                        mHightLightPaint.measureText(sentence) :
+                        mNormalPaint.measureText(sentence);
+                //字符串宽度大于屏幕宽度，分成两行绘制
+                int width = getWidth();
+                if(textLegth > getWidth()){
+                    //寻找到屏幕能显示的最后一个字符
+                    int end = sentence.length() - 1;
+                    if(isHighLight){
+                        while (mHightLightPaint.measureText(sentence,0,end) > getWidth() ){
+                            end--;
+                        }
+                        mMultiLrc.add(sentence.substring(0,end - 1));
+                        mMultiLrc.add(sentence.substring(end,sentence.length()));
+                    } else {
+                        while (mNormalPaint.measureText(sentence,0,end) > getWidth() ){
+                            end--;
+                        }
+                        mMultiLrc.add(sentence.substring(0,end - 1));
+                        mMultiLrc.add(sentence.substring(end,sentence.length()));
                     }
                 } else {
-                    //非高亮
-                    canvas.drawText(mlrcList.get(i).getSentence(), mViewCenterX, mCenterY, mPaint);
+                    //直接绘制
+                    mMultiLrc.add(mLrcList.get(i).getSentence());
+                }
+
+//                //高亮歌词
+//                canvas.drawText(mLrcList.get(i).getSentence(), mViewCenterX, mCenterY, mHightLightPaint);
+//                //非高亮
+//                canvas.drawText(mLrcList.get(i).getSentence(), mViewCenterX, mCenterY, mNormalPaint);
+                //绘制歌词
+                for(int j = 0 ; j < mMultiLrc.size() ;j++){
+                    canvas.drawText(mMultiLrc.get(j),
+                            mViewCenterX,
+                            mCenterY + j * (isHighLight ? mHightLightTextSize : mNormalTextSize) + j,
+                            isHighLight ? mHightLightPaint : mNormalPaint);
+                    if(j == 1)
+                        extraLine++;
+                }
+
+                if(i == mHightLightRow && mIsDragging) {
+                    //正在拖动画水平线
+                    canvas.drawLine(0,
+                            mCenterY + mHightLightTextSize / 2,
+                            getWidth(),
+                            mCenterY + mHightLightTextSize / 2,mHorizontalPaint);
+
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
+    /**
+     * 最后一次触摸时间的y坐标
+     */
     private float mLastMotionY = 0;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        LogUtil.d("LrcView","eventX:" + event.getX() + " eventY:" + event.getY());
-        LogUtil.d("LrcView","scrollX:" + getScrollX() + " scrollY:" + getScrollY());
-        if(mlrcList == null || mlrcList.size() == 0) {
+        if(mLrcList == null || mLrcList.size() == 0) {
             return super.onTouchEvent(event);
         }
         switch (event.getAction()){
@@ -195,7 +238,6 @@ public class LrcView extends View {
                 mIsDragging = false;
                 break;
         }
-        boolean ret = super.onTouchEvent(event);
         return true;
     }
 
@@ -203,11 +245,11 @@ public class LrcView extends View {
      * 根据滑动后的歌词高亮位置，计算歌曲播放进度
      */
     private void computeNewProgress() {
-        if(mHightLightRow < mlrcList.size() - 1)
-            mNewProgress = mlrcList.get(mHightLightRow).getStartTime();
-        LogUtil.d(TAG,"MusicProgress:" + MusicService.getProgress() + " NewProgress:" + mNewProgress);
+        if(mHightLightRow < mLrcList.size() - 1)
+            mNewProgress = mLrcList.get(mHightLightRow).getStartTime();
+        LogUtil.d(TAG,"highlight:" + mHightLightRow + "  size:" + mLrcList.size());
 //        for(int i = 0 ; i < mHightLightRow;i++){
-//            mNewProgress += mlrcList.get(i).getDuration();
+//            mNewProgress += mLrcList.get(i).getDuration();
 //        }
     }
 
@@ -229,14 +271,15 @@ public class LrcView extends View {
         //向上滑动，歌词向上移动
         if(offsetY > 0){
             mHightLightRow -= rowoffset;
+            mHightLightRow = Math.max(mHightLightRow,0);
         }
         //向下滑动,歌词向下移动
         if(offsetY < 0){
             mHightLightRow += rowoffset;
+            mHightLightRow = Math.min(mHightLightRow,mTotalRow - 1);
         }
 //        scrollTo(0,(mSpacing + mNormalTextSize) * mHightLightRow);
-        smoothScrollTo((mSpacing + mNormalTextSize) * mHightLightRow, 20);
-        invalidate();
+        smoothScrollTo((mSpacing + mNormalTextSize) * mHightLightRow, 150);
         mLastMotionY = event.getY();
     }
 
@@ -246,7 +289,7 @@ public class LrcView extends View {
      * @param fromuser
      */
     public void seekTo(long progress, boolean fromuser){
-        if(mlrcList == null || mlrcList.size() == 0){
+        if(mLrcList == null || mLrcList.size() == 0){
             invalidate();
             return;
         }
@@ -287,11 +330,11 @@ public class LrcView extends View {
     }
 
     public int selectIndex(long time) {
-        if(mlrcList == null)
+        if(mLrcList == null)
             return -1;
         int index=0;
-        for(int i = 0;i < mlrcList.size(); i++) {
-            LrcInfo temp = mlrcList.get(i);
+        for(int i = 0; i < mLrcList.size(); i++) {
+            LrcInfo temp = mLrcList.get(i);
             if(temp.getStartTime() < time)
                 ++index;
 

@@ -274,21 +274,18 @@ public class Theme {
      * @return
      */
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    public static StateListDrawable getPressAndSelectedStateListRippleDrawalbe(Context context,@DrawableRes int resId,@ColorInt int color){
+    public static StateListDrawable getPressStateListRippleDrawalbe(Context context, @DrawableRes int resId, @ColorInt int color){
         StateListDrawable stateListDrawable = new StateListDrawable();
         Drawable selectedDrawable = Theme.TintDrawable(context.getResources().getDrawable(R.drawable.bg_list_default_day),color);
         Drawable oriDrawable = context.getResources().getDrawable(resId);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             RippleDrawable rippleDrawable = new RippleDrawable(ColorStateList.valueOf(color), oriDrawable,null);
-            stateListDrawable.addState(new int[]{android.R.attr.state_selected}, selectedDrawable);
             stateListDrawable.addState(new int[]{}, rippleDrawable);
             return stateListDrawable;
         } else {
-            stateListDrawable.addState(new int[]{android.R.attr.state_selected}, selectedDrawable);
             stateListDrawable.addState(new int[]{android.R.attr.state_pressed},selectedDrawable);
             stateListDrawable.addState(new int[]{}, oriDrawable);
             return stateListDrawable;
         }
-
     }
 }

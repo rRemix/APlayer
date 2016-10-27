@@ -232,16 +232,9 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    String result = "";
-                                    result = MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) ?
+                                    ToastUtil.show(mContext,MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) ?
                                             mContext.getString(R.string.delete_success) :
-                                            mContext.getString(R.string.delete_error);
-                                    ToastUtil.show(mContext,result);
-                                }
-                            })
-                            .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                            mContext.getString(R.string.delete_error));
                                 }
                             })
                             .backgroundColor(ThemeStore.getBackgroundColor3())

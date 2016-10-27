@@ -48,30 +48,30 @@ public class PlayQueueAdapter extends BaseAdapter<PlayQueueAdapter.PlayQueueHold
     @Override
     public void onBindViewHolder(final PlayQueueHolder holder, final int position) {
         if(mCursor.moveToPosition(position)){
-            final MP3Item item = MediaStoreUtil.getMP3InfoById(mCursor.getInt(0));
+            final int audioId = mCursor.getInt(0);
+            final MP3Item item = MediaStoreUtil.getMP3InfoById(audioId);
             if(item == null) {
                 //歌曲已经失效
                 holder.mSong.setText(mContext.getString(R.string.song_lose_effect));
                 holder.mArtist.setVisibility(View.GONE);
-                return;
+            } else {
+                //设置歌曲与艺术家
+                holder.mSong.setText(CommonUtil.processInfo(item.getTitle(),CommonUtil.SONGTYPE));
+                holder.mArtist.setText(CommonUtil.processInfo(item.getArtist(),CommonUtil.ARTISTTYPE));
             }
-            //设置歌曲与艺术家
-            holder.mSong.setText(CommonUtil.processInfo(item.getTitle(),CommonUtil.SONGTYPE));
-            holder.mArtist.setText(CommonUtil.processInfo(item.getArtist(),CommonUtil.ARTISTTYPE));
+
             //删除按钮
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    XmlUtil.deleteSongFromPlayQueue(temp.getId());
-                    PlayListUtil.deleteSong(item.getId(),Global.mPlayQueueId);
-                    if(item.getId() == MusicService.getCurrentMP3().getId()) {
-                        Intent intent = new Intent(Constants.CTL_ACTION);
-                        intent.putExtra("Control", Constants.NEXT);
-                        mContext.sendBroadcast(intent);
-                    }
+                    PlayListUtil.deleteSong(audioId,Global.mPlayQueueId);
+//                    if(mCursor.getInt(0) == MusicService.getCurrentMP3().getId()) {
+//                        Intent intent = new Intent(Constants.CTL_ACTION);
+//                        intent.putExtra("Control", Constants.NEXT);
+//                        mContext.sendBroadcast(intent);
+//                    }
                     //更新界面
                     mHandler.sendEmptyMessage(Constants.NOTIFYDATACHANGED);
-//                    notifyDataSetChanged();
                 }
             });
             if(mOnItemClickLitener != null){

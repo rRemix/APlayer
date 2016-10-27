@@ -1,10 +1,6 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.graphics.drawable.RippleDrawable;
-import android.graphics.drawable.StateListDrawable;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,7 +73,7 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
         });
         holder.mRoot.setSelected(mSelectIndex == position);
         holder.mRoot.setBackground(
-                Theme.getPressAndSelectedStateListRippleDrawalbe(mContext,R.drawable.bg_list_default_day,ColorUtil.getColor(R.color.drawer_selected)));
+                Theme.getPressStateListRippleDrawalbe(mContext,R.drawable.bg_list_default_day,ColorUtil.getColor(R.color.drawer_selected)));
 
     }
 

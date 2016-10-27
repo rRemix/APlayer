@@ -62,7 +62,7 @@
 
     <string name="confirm_delete_playlist">确认从该播放列表移除?</string>
     <string name="confirm_delete_song">确认从曲库删除?</string>
-    <string name="confirm_delelte">确认删除</string>
+    <string name="confirm_delelte">确认删除?</string>
     <string name="delete_success">删除成功</string>
     <string name="delete_error">删除失败</string>
     <string name="set_ringtone_success">设置铃声成功</string>
@@ -106,4 +106,6 @@
     <string name="play_now">正在播放: %s</string>
     <string name="default_lrc_path">默认扫描目录为歌曲父目录</string>
     <string name="lrc_tip">%s(请确保歌词文件包含歌曲名和艺术家名)</string>
+    <string name="cache_szie">%1$2.2f MB</string>
+    <string name="confirm_clear_cache">确认清除缓存?</string>
 </resources>

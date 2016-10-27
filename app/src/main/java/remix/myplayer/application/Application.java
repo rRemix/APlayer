@@ -8,8 +8,6 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.umeng.analytics.MobclickAgent;
-import com.umeng.message.IUmengRegisterCallback;
-import com.umeng.message.PushAgent;
 
 import cn.bmob.v3.Bmob;
 import remix.myplayer.db.DBManager;
@@ -50,19 +48,19 @@ public class Application extends android.app.Application {
         Bmob.initialize(this, "0c070110fffa9e88a1362643fb9d4d64");
         //禁止默认的页面统计方式
         MobclickAgent.openActivityDurationTrack(false);
-        //初始化友盟推送
-        PushAgent mPushAgent = PushAgent.getInstance(this);
-        //注册推送服务，每次调用register方法都会回调该接口
-        mPushAgent.register(new IUmengRegisterCallback() {
-            @Override
-            public void onSuccess(String deviceToken) {
-                //注册成功会返回device token
-                LogUtil.d("DeviceToken","DeviceToker:" + deviceToken);
-            }
-            @Override
-            public void onFailure(String s, String s1) {
-            }
-        });
+//        //初始化友盟推送
+//        PushAgent mPushAgent = PushAgent.getInstance(this);
+////        注册推送服务，每次调用register方法都会回调该接口
+//        mPushAgent.register(new IUmengRegisterCallback() {
+//            @Override
+//            public void onSuccess(String deviceToken) {
+//                //注册成功会返回device token
+//                LogUtil.d("DeviceToken","DeviceToker:" + deviceToken);
+//            }
+//            @Override
+//            public void onFailure(String s, String s1) {
+//            }
+//        });
 
 //        UmengNotificationClickHandler notificationClickHandler = new UmengNotificationClickHandler() {
 //            @Override
