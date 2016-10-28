@@ -193,18 +193,33 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 if(mDetailRootView != null){
                     ButterKnife.bind(AudioPopupListener.this,mDetailRootView);
 
+                    //歌曲路径
                     if(mDetailPath != null)
                         mDetailPath.setText(mInfo.getUrl());
+                    //歌曲名称
                     if(mDetailName != null)
                         mDetailName.setText(mInfo.getDisplayname());
+                    //歌曲大小
                     if(mDetailSize != null)
                         mDetailSize.setText(mInfo.getSize() / 1024 / 1024 + "MB");
-                    if(mDetailMime != null)
-                        mDetailMime.setText(MusicService.getRateInfo(Constants.MIME));
+                    //歌曲格式
+                    if(mDetailMime != null){
+                        String path = mInfo.getUrl();
+                        String extension;
+                        if(path.lastIndexOf('.') > -1 && path.lastIndexOf('.') < path.length() - 1){
+                            extension = mInfo.getUrl().substring(mInfo.getUrl().lastIndexOf('.') + 1 ,mInfo.getUrl().length());
+                        } else {
+                            extension = CommonUtil.getType(MusicService.getRateInfo(Constants.MIME));
+                        }
+                        mDetailMime.setText(extension);
+                    }
+                    //歌曲时长
                     if(mDetailDuration != null)
                         mDetailDuration.setText(CommonUtil.getTime(mInfo.getDuration()));
+                    //歌曲码率
                     if(mDetailBitRate != null)
                         mDetailBitRate.setText(MusicService.getRateInfo(Constants.BIT_RATE) + " kb/s");
+                    //歌曲采样率
                     if(mDetailSampleRate != null)
                         mDetailSampleRate.setText(MusicService.getRateInfo(Constants.SAMPLE_RATE) + " Hz");
 

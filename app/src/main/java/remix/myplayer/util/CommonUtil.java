@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.media.MediaFormat;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -297,6 +298,32 @@ public class CommonUtil {
         return (bitmap);
     }
 
+    /**
+     * 获得歌曲格式
+     * @param mimeType
+     * @return
+     */
+    public static String getType(String mimeType){
+        if(mimeType.equals(MediaFormat.MIMETYPE_AUDIO_MPEG)){
+            return "mp3";
+        }
+        else if (mimeType.equals(MediaFormat.MIMETYPE_AUDIO_FLAC))
+            return "flac";
+        else if(mimeType.equals(MediaFormat.MIMETYPE_AUDIO_AAC))
+            return "aac";
+        else if(mimeType.contains("ape"))
+            return "ape";
+        else {
+            try {
+                if(mimeType.contains("audio/"))
+                    return mimeType.substring(6,mimeType.length() - 1);
+                else
+                    return mimeType;
+            } finally {
+                return mimeType;
+            }
+        }
+    }
 
     /**
      * 转换时间
@@ -689,5 +716,29 @@ public class CommonUtil {
                 }
             }
         }
+    }
+
+    /**
+     * 根据字符串形式的时间，得到毫秒值
+     * @param strTime 时间字符串
+     * @return
+     */
+    public static int getMill(String strTime) {
+        int min;
+        int sec;
+        int mill;
+        if(strTime.substring(1,3).matches("[0-9]*"))
+            min = Integer.parseInt(strTime.substring(1, 3));
+        else
+            return -1;
+        if(strTime.substring(4,6).matches("[0-9]*"))
+            sec = Integer.parseInt(strTime.substring(4, 6));
+        else
+            return -1;
+        if(strTime.substring(7,9).matches("[0-9]*"))
+            mill = Integer.parseInt(strTime.substring(7,9));
+        else
+            return -1;
+        return min * 60000 + sec * 1000 + mill;
     }
 }

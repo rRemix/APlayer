@@ -13,8 +13,8 @@ import android.view.View;
 import android.widget.Scroller;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
+import remix.myplayer.lrc.onSeekListener;
 import remix.myplayer.model.LrcInfo;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
@@ -24,7 +24,7 @@ import remix.myplayer.util.LogUtil;
  */
 public class LrcView extends View {
     private static final String TAG = LrcView.class.getSimpleName();
-    private LinkedList<LrcInfo> mLrcList;
+    private ArrayList<LrcInfo> mLrcList;
     //普通歌词画笔
     private Paint mNormalPaint;
     //高亮歌词画笔
@@ -55,13 +55,17 @@ public class LrcView extends View {
     private int mMaxRow;
     //是否正在搜索歌词
     private boolean mIsSearching = false;
-    //是否正在拖动
+    //是否正在滑动
     private boolean mIsDragging = false;
-    private LrcInterface mInterface;
+    //外部viewpager是否正在滑动
+    private boolean mIsViewPagerScroll = false;
+    private onSeekListener mLrcListener;
     //滑动后新的时间
     private int mNewProgress;
     //歌词滚动的动画时间
     private final int ANIM_DURATION = 1000;
+    //最小滑动距离
+    private final int MIN_OFFSET = 10;
     //每次绘制需要绘制的歌词，因为歌词的长度可能比屏幕更宽，所以需要多行绘制
     private ArrayList<String> mMultiLrc = new ArrayList<>();
 
@@ -69,11 +73,8 @@ public class LrcView extends View {
         super(context);
     }
 
-    public interface LrcInterface{
-        void onSeek(int progress);
-    }
-    public void setInterface(LrcInterface l){
-        mInterface = l;
+    public void setOnSeekListener(onSeekListener l){
+        mLrcListener = l;
     }
 
     public LrcView(Context context, AttributeSet attrs) {
@@ -104,10 +105,14 @@ public class LrcView extends View {
      * 更新歌词列表
      * @param list
      */
-    public void UpdateLrcList(LinkedList<LrcInfo> list){
+    public void UpdateLrcList(ArrayList<LrcInfo> list){
         mLrcList = list;
         if(mLrcList != null)
             mTotalRow = mLrcList.size();
+    }
+
+    public void setViewPagerScroll(boolean isScroll){
+        mIsViewPagerScroll = isScroll;
     }
 
     public void setHightLightColor(@ColorInt int color){
@@ -162,7 +167,6 @@ public class LrcView extends View {
                         mHightLightPaint.measureText(sentence) :
                         mNormalPaint.measureText(sentence);
                 //字符串宽度大于屏幕宽度，分成两行绘制
-                int width = getWidth();
                 if(textLegth > getWidth()){
                     //寻找到屏幕能显示的最后一个字符
                     int end = sentence.length() - 1;
@@ -184,10 +188,6 @@ public class LrcView extends View {
                     mMultiLrc.add(mLrcList.get(i).getSentence());
                 }
 
-//                //高亮歌词
-//                canvas.drawText(mLrcList.get(i).getSentence(), mViewCenterX, mCenterY, mHightLightPaint);
-//                //非高亮
-//                canvas.drawText(mLrcList.get(i).getSentence(), mViewCenterX, mCenterY, mNormalPaint);
                 //绘制歌词
                 for(int j = 0 ; j < mMultiLrc.size() ;j++){
                     canvas.drawText(mMultiLrc.get(j),
@@ -204,7 +204,6 @@ public class LrcView extends View {
                             mCenterY + mHightLightTextSize / 2,
                             getWidth(),
                             mCenterY + mHightLightTextSize / 2,mHorizontalPaint);
-
                 }
             }
         } catch (Exception e) {
@@ -222,6 +221,11 @@ public class LrcView extends View {
         if(mLrcList == null || mLrcList.size() == 0) {
             return super.onTouchEvent(event);
         }
+        //外部viewpager正在滑动，不响应滑动
+        LogUtil.d(TAG,"isViewPagerScroll:" + mIsViewPagerScroll);
+        if(mIsViewPagerScroll){
+            return super.onTouchEvent(event);
+        }
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
                 mLastMotionY = event.getY();
@@ -233,8 +237,6 @@ public class LrcView extends View {
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
                 computeNewProgress();
-                if(mInterface != null)
-                    mInterface.onSeek(mNewProgress);
                 mIsDragging = false;
                 break;
         }
@@ -245,25 +247,25 @@ public class LrcView extends View {
      * 根据滑动后的歌词高亮位置，计算歌曲播放进度
      */
     private void computeNewProgress() {
-        if(mHightLightRow < mLrcList.size() - 1)
+        if(mHightLightRow < mLrcList.size() - 1) {
             mNewProgress = mLrcList.get(mHightLightRow).getStartTime();
-        LogUtil.d(TAG,"highlight:" + mHightLightRow + "  size:" + mLrcList.size());
-//        for(int i = 0 ; i < mHightLightRow;i++){
-//            mNewProgress += mLrcList.get(i).getDuration();
-//        }
+            if(mLrcListener != null)
+                mLrcListener.onLrcSeek(mNewProgress);
+        }
     }
 
     /**
-     *
+     * 上下滑动歌词控件
      * @param event
      */
     public void seekTo(MotionEvent event){
         float y = event.getY();
         float offsetY = y - mLastMotionY;
         //滑动距离过小
-        if(Math.abs(offsetY) < 50){
+        if(Math.abs(offsetY) < MIN_OFFSET){
             return;
         }
+
         //计算滑动多少行
         int rowoffset = (int) (Math.abs(offsetY) / (mNormalTextSize + mSpacing));
         if(rowoffset == 0)
@@ -354,7 +356,7 @@ public class LrcView extends View {
         mViewCenterY = (int)(h * 0.5);
     }
 
-    public void setIsSearching(boolean searching){
+    public void setSearching(boolean searching){
         mIsSearching = searching;
     }
 }

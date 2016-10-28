@@ -112,6 +112,7 @@
 
     <color name="day_selected_color">#40000000</color>
     <color name="night_selected_color">#f1f1f1</color>
+    <!--<color name="night_selected_color">@color/default_control_highlight</color>-->
 
     <color name="md_night_primary">@color/background_color_3</color>
     <color name="md_night_primary_dark">@color/background_color_3</color>

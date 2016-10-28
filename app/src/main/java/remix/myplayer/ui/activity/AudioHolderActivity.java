@@ -44,6 +44,7 @@ import remix.myplayer.fragment.CoverFragment;
 import remix.myplayer.fragment.LrcFragment;
 import remix.myplayer.fragment.RecordFragment;
 import remix.myplayer.listener.AudioPopupListener;
+import remix.myplayer.lrc.onSeekListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -477,11 +478,14 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             @Override
             public void onLrcViewFind(LrcView lrcView) {
                 mLrcView = lrcView;
-                mLrcView.setInterface(new LrcView.LrcInterface() {
+                mLrcView.setOnSeekListener(new onSeekListener() {
                     @Override
-                    public void onSeek(int progress) {
-                        if(progress > 0 && progress < MusicService.getDuration())
-                            MusicService.setProgress(progress);
+                    public void onLrcSeek(int newProgress) {
+                        if(newProgress > 0 && newProgress < MusicService.getDuration()){
+                            MusicService.setProgress(newProgress);
+                            mCurrentTime = newProgress;
+                            mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
+                        }
                     }
                 });
             }
@@ -502,6 +506,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if(mLrcView != null){
+                    mLrcView.setViewPagerScroll(true);
+                }
             }
             @Override
             public void onPageSelected(int position) {
@@ -512,6 +519,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                     mPager.setIntercept(true);
                 else
                     mPager.setIntercept(false);
+                if(mLrcView != null)
+                    mLrcView.setViewPagerScroll(false);
             }
             @Override
             public void onPageScrollStateChanged(int state) {

@@ -158,17 +158,17 @@ public class ThemeStore {
 
     @ColorInt
     public static int getStressColor(){
-        return ColorUtil.getColor(isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899);
+        return ColorUtil.getColor(isDay() ? getMaterialPrimaryColorRes() : R.color.purple_782899);
     }
 
     @ColorInt
     public static int getMaterialColorPrimaryColor(){
-        return ColorUtil.getColor(ThemeStore.getMaterialPrimaryColorRes());
+        return ColorUtil.getColor(getMaterialPrimaryColorRes());
     }
 
     @ColorInt
     public static int getMaterialColorPrimaryDarkColor(){
-        return ColorUtil.getColor(ThemeStore.getMaterialPrimaryDarkColorRes());
+        return ColorUtil.getColor(getMaterialPrimaryDarkColorRes());
     }
 
 

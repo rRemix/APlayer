@@ -188,49 +188,8 @@
                     </LinearLayout>
                 </RelativeLayout>
 
-                <RelativeLayout
-                    android:visibility="gone"
-                    android:id="@+id/setting_mode_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/setting_notify_container"
-                    android:paddingTop="@dimen/d10_size"
-                    android:paddingBottom="@dimen/d10_size"
-                    android:background="?attr/background_list_1"
-                    android:clickable="true">
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center_vertical"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="@dimen/d16_size">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="夜间模式"
-                            android:textColor="?attr/text_color_primary"
-                            android:textSize="@dimen/s16_size"
-                            android:layout_marginBottom="@dimen/d4_size"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="保护你的眼睛"
-                            android:textColor="?attr/text_color"
-                            android:textSize="@dimen/s14_size"/>
-                    </LinearLayout>
-                    <android.support.v7.widget.SwitchCompat
-                        android:id="@+id/setting_mode_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginRight="@dimen/d6_size"/>
-                </RelativeLayout>
-
                 <View
-                    android:layout_below="@id/setting_mode_container"
+                    android:layout_below="@id/setting_notify_container"
                     android:layout_width="match_parent"
                     android:layout_height="1px"
                     android:background="@drawable/divider"/>

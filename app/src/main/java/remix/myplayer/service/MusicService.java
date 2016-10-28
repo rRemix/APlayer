@@ -686,6 +686,7 @@ public class MusicService extends BaseService {
         if(mInfo == null)
             return null;
         try {
+            mMediaExtractor = new MediaExtractor();
             mMediaExtractor.setDataSource(mInfo.getUrl());// the adresss location of the sound on sdcard.
         } catch (IOException e) {
             // TODO Auto-generated catch block

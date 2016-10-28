@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.support.annotation.ColorInt;
@@ -299,14 +300,13 @@ public class Theme {
      * @param effectColor 波纹颜色
      * @return
      */
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     public static Drawable getPressDrawable(Context context,@DrawableRes int resId,@ColorInt int effectColor){
         Drawable defaultDrawable = context.getResources().getDrawable(resId);
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
-//            return new RippleDrawable(ColorStateList.valueOf(effectColor), defaultDrawable,null);
-            return  new RippleDrawable(getPressedColorSelector(Color.WHITE,effectColor),
-                    null,
-                    defaultDrawable);
+//            StateListDrawable stateListDrawable = new StateListDrawable();
+            return  new RippleDrawable(ColorStateList.valueOf(effectColor),
+                    defaultDrawable,
+                    null);
         } else {
             StateListDrawable stateListDrawable = new StateListDrawable();
             stateListDrawable.addState(new int[]{android.R.attr.state_pressed},TintDrawable(defaultDrawable,effectColor));

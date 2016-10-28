@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -17,7 +17,7 @@ import remix.myplayer.model.LrcInfo;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.ui.customview.LrcView;
 import remix.myplayer.util.CommonUtil;
-import remix.myplayer.util.lrc.SearchLRC;
+import remix.myplayer.lrc.SearchLRC;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -37,14 +37,14 @@ public class LrcFragment extends BaseFragment {
     @BindView(R.id.lrc_view)
     LrcView mLrcView;
     //歌词列表
-    private LinkedList<LrcInfo> mLrcList;
+    private ArrayList<LrcInfo> mLrcList;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if(mLrcView == null)
                 return;
             //是否正在搜索
-            mLrcView.setIsSearching(msg.what == SEARCHING);
+            mLrcView.setSearching(msg.what == SEARCHING);
             if(msg.what == SEARCHING){
                 return;
             }

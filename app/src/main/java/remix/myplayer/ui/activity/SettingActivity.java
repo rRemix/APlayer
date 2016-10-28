@@ -1,15 +1,22 @@
 package remix.myplayer.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RippleDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
@@ -115,10 +122,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         Theme.TintDrawable(view,view.getBackground(),arrowColor);
                     }
         });
-        //初始化点击效果
-        //默认的颜色
-//        final int defaultColor = ThemeStore.isDay() ? ColorUtil.getColor(R.color.white) : ColorUtil.getColor(R.color.night_background_color_3);
 
+//        //初始化点击效果
+//        //默认的颜色
+//        final int defaultColor = ThemeStore.isDay() ? ColorUtil.getColor(R.color.white) : ColorUtil.getColor(R.color.night_background_color_3);
+//
 //        //获得colorcontrolHighlight颜色
 //        int effectColor = Color.WHITE;
 //        try {
@@ -131,6 +139,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 //            }
 //        }
 //        //设置所有选项点击效果
+//        final int[] colors = new int[]{ColorUtil.getColor(R.color.md_plum_primary),ColorUtil.getColor(R.color.md_indigo_primary),ColorUtil.getColor(R.color.md_purple_primary),
+//                ColorUtil.getColor(R.color.md_navy_primary),ColorUtil.getColor(R.color.md_brown_primary),ColorUtil.getColor(R.color.md_green_primary),
+//                ColorUtil.getColor(R.color.md_plum_primary),ColorUtil.getColor(R.color.md_indigo_primary),ColorUtil.getColor(R.color.md_purple_primary),
+//                ColorUtil.getColor(R.color.md_navy_primary),ColorUtil.getColor(R.color.md_brown_primary),ColorUtil.getColor(R.color.md_green_primary)};
+//        final ColorDrawable colorDrawable = new ColorDrawable(colors[1]);
 //        final Drawable containerDrawable = Theme.getPressDrawable(this,
 //                ThemeStore.isDay() ? R.drawable.bg_list_default_day : R.drawable.bg_list_1_default_night,effectColor);
 //        ButterKnife.apply(new View[]{findView(R.id.setting_filter_container),findView(R.id.setting_lrc_container),findView(R.id.setting_color_container),
@@ -142,7 +155,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 //                        view.setBackground(containerDrawable);
 //                    }
 //        });
-
 
         //计算缓存大小
         new Thread(){
@@ -190,8 +202,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     }
 
     @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_container,
-                R.id.setting_mode_container,R.id.setting_feedback_container,R.id.setting_about_container,
-                R.id.setting_update_container,R.id.setting_eq_container,R.id.setting_lrc_container,R.id.setting_clear_container})
+            R.id.setting_feedback_container,R.id.setting_about_container, R.id.setting_update_container,
+            R.id.setting_eq_container,R.id.setting_lrc_container,R.id.setting_clear_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤

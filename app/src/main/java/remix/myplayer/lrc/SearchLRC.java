@@ -1,6 +1,4 @@
-package remix.myplayer.util.lrc;
-
-import android.os.Environment;
+package remix.myplayer.lrc;
 
 import org.json.JSONObject;
 
@@ -11,11 +9,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.EventListener;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeMap;
@@ -40,6 +37,7 @@ import remix.myplayer.util.SPUtil;
 public class SearchLRC {
     private static final String TAG = "SearchLRC";
     private static final String DEFAULT_LOCAL = "GB2312";
+    private ILrcBuilder mLrcBuilder;
     private boolean mIsFind = false;
     private MP3Item mInfo;
     private String mSongName;
@@ -49,6 +47,7 @@ public class SearchLRC {
         mInfo = item;
         mSongName = mInfo.getTitle();
         mArtistName = mInfo.getArtist();
+        mLrcBuilder = new LrcBuilderImpl();
     }
 
     /**
@@ -73,13 +72,13 @@ public class SearchLRC {
      * 根据歌词id,发送请求并解析歌词
      * @return 歌词信息list
      */
-    public LinkedList<LrcInfo> getLrc(){
+    public ArrayList<LrcInfo> getLrc(){
         BufferedReader br = null;
         //先判断该歌曲是否有缓存
         try {
             DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(CommonUtil.hashKeyForDisk(mSongName + "/" + mArtistName));
             if(snapShot != null && (br = new BufferedReader(new InputStreamReader(snapShot.getInputStream(0)))) != null ){
-                return parseLrc(br,false);
+                return mLrcBuilder.getLrcRows(br,false,mSongName,mArtistName);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -109,7 +108,7 @@ public class SearchLRC {
         if(!Global.mCurrentLrcPath.equals("")){
             try {
                 br = new BufferedReader(new InputStreamReader(new FileInputStream(Global.mCurrentLrcPath)));
-                return parseLrc(br,true);
+                return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } finally {
@@ -137,7 +136,7 @@ public class SearchLRC {
 
         try {
             br = new BufferedReader(new InputStreamReader(url.openStream()));
-            return parseLrc(br,true);
+            return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
         } catch (IOException e1) {
             e1.printStackTrace();
         } finally {
@@ -187,7 +186,7 @@ public class SearchLRC {
                     int endIndex = s.indexOf("]", startIndex);
                     if (endIndex < 0)
                         continue;
-                    Integer time = getMill(s.substring(startIndex, endIndex));
+                    Integer time = CommonUtil.getMill(s.substring(startIndex, endIndex));
                     String lrc = s.substring(s.lastIndexOf(']') + 1, s.length());
                     if (time != -1 && !lrc.equals(""))
                         lrcMap.put(time, lrc +"\r\n");
@@ -228,30 +227,6 @@ public class SearchLRC {
         }
 
         return list;
-    }
-
-    /**
-     * 根据字符串形式的时间，得到毫秒值
-     * @param strTime 时间字符串
-     * @return
-     */
-    public int getMill(String strTime) {
-        int min;
-        int sec;
-        int mill;
-        if(strTime.substring(1,3).matches("[0-9]*"))
-            min = Integer.parseInt(strTime.substring(1, 3));
-        else
-            return -1;
-        if(strTime.substring(4,6).matches("[0-9]*"))
-            sec = Integer.parseInt(strTime.substring(4, 6));
-        else
-            return -1;
-        if(strTime.substring(7,9).matches("[0-9]*"))
-            mill = Integer.parseInt(strTime.substring(7,9));
-        else
-            return -1;
-        return min * 60000 + sec * 1000 + mill;
     }
 
     private void SetFindLRC(int number) {
