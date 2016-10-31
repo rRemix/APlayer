@@ -109,7 +109,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
             public void onItemLongClick(View view, int position) {
                 int artistId = getArtsitId(position);
                 if(getUserVisibleHint() && artistId > 0)
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,artistId,TAG);
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,artistId,TAG,Constants.ARTIST);
 
             }
         });

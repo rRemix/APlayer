@@ -23,6 +23,7 @@ public class Constants {
     public final static int ARTIST = 2;
     public final static int FOLDER = 3;
     public final static int PLAYLIST = 4;
+    public final static int PLAYLISTSONG = 5;
 
     public final static String THEME_ACTION = "remix.music.THEME_ACTION";
     public final static String CTL_ACTION = "remix.music.CTL_ACTION";

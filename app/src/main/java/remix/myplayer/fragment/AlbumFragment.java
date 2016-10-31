@@ -118,7 +118,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
             public void onItemLongClick(View view, int position) {
                 int albumId = getAlbumID(position);
                 if(getUserVisibleHint() && albumId > 0){
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,albumId,TAG);
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,albumId,TAG,Constants.ALBUM);
                 }
             }
         });

@@ -21,6 +21,7 @@ import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.PlayListNewInfo;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -29,8 +30,8 @@ import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
- * @ClassName
- * @Description
+ * @ClassName MultiChoice
+ * @Description 多选操作类
  * @Author Xiaoborui
  * @Date 2016/9/20 16:12
  */
@@ -39,6 +40,8 @@ public class MultiChoice implements OnMultiItemClickListener {
 
     /** 当前正在操作的activity或者fragment */
     public static String TAG = "";
+
+    /** 多选的操作类型，包括专辑、艺术家、播放列表、普通歌曲、播放列表下的歌曲 */
     public static int TYPE = -1;
 
     /** 多选菜单是否正在显示 */
@@ -81,6 +84,7 @@ public class MultiChoice implements OnMultiItemClickListener {
         ArrayList<Integer> idList = new ArrayList<>();
         switch (TYPE){
             case Constants.SONG:
+            case Constants.PLAYLISTSONG:
                 for(Object arg : mSelectedArg){
                     if (arg instanceof Integer)
                         idList.add((Integer) arg);
@@ -103,16 +107,16 @@ public class MultiChoice implements OnMultiItemClickListener {
 //        }
 
         num = Global.AddSongToPlayQueue(idList);
-        ToastUtil.show(mContext,R.string.add_song_playinglist_success,num);
+        ToastUtil.show(mContext,mContext.getString(R.string.add_song_playinglist_success,num));
         UpdateOptionMenu(false);
     }
 
     @Override
     public void OnAddToPlayList() {
-
         final ArrayList<Integer> idList = new ArrayList<>();
         switch (TYPE){
             case Constants.SONG:
+            case Constants.PLAYLISTSONG:
                 for(Object arg : mSelectedArg){
                     if (arg instanceof Integer)
                         idList.add((Integer) arg);
@@ -148,7 +152,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                     public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                         final int num;
                         num = PlayListUtil.addMultiSongs(idList,playListInfoList.get(which).Name,playListInfoList.get(which)._Id);
-                        ToastUtil.show(mContext,R.string.add_song_playlist_success,num);
+                        ToastUtil.show(mContext,mContext.getString(R.string.add_song_playlist_success,num));
                         UpdateOptionMenu(false);
                     }
                 })
@@ -182,7 +186,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                                                 return;
                                             }
                                             num = PlayListUtil.addMultiSongs(idList,input.toString(),newPlayListId);
-                                            ToastUtil.show(mContext,R.string.add_song_playlist_success,num);
+                                            ToastUtil.show(mContext,mContext.getString(R.string.add_song_playlist_success,num));
                                             UpdateOptionMenu(false);
                                         }
                                     }
@@ -211,6 +215,9 @@ public class MultiChoice implements OnMultiItemClickListener {
                         idList.add((Integer) arg);
                 }
                 num = PlayListUtil.deleteMultiPlayList(idList);
+                break;
+            case Constants.PLAYLISTSONG:
+                num = PlayListUtil.deleteMultiSongs(idList,ChildHolderActivity.mId);
                 break;
             case Constants.ALBUM:
             case Constants.ARTIST:
@@ -260,13 +267,13 @@ public class MultiChoice implements OnMultiItemClickListener {
      * @param view
      * @param position
      * @param arg
-     * @param tag
+     * @param newTag
      */
-    public void itemAddorRemoveWithLongClick(View view,int position,Object arg,String tag){
+    public void itemAddorRemoveWithLongClick(View view,int position,Object arg,String newTag,int type){
         //当前没有处于多选状态
         if(!mIsShow && TAG.equals("")){
-            TAG = tag;
-            TYPE = getType(TAG);
+            TAG = newTag;
+            TYPE = type;
             mIsShow = true;
             if(mUpdateOptionMenuListener != null)
                 mUpdateOptionMenuListener.onUpdate(true);
@@ -363,7 +370,6 @@ public class MultiChoice implements OnMultiItemClickListener {
     }
 
     public static int getType(String tag){
-
         if(tag.equals(SongFragment.TAG))
             return Constants.SONG;
         else if(tag.equals(AlbumFragment.TAG))
@@ -374,6 +380,10 @@ public class MultiChoice implements OnMultiItemClickListener {
             return Constants.FOLDER;
         else if(tag.equals(PlayListFragment.TAG))
             return Constants.PLAYLIST;
+        else if(tag.equals(ChildHolderActivity.TAG))
+            return Constants.SONG;
+        else if(tag.equals(ChildHolderActivity.TAG_PLAYLIST_SONG))
+            return Constants.PLAYLISTSONG;
         else
             return -1;
     }

@@ -10,7 +10,7 @@ import java.io.Serializable;
  * 歌曲信息
  */
 public class MP3Item implements Serializable,Cloneable {
-    private int Id;
+    public int Id;
     private String Title;
     private String Displayname;
     private String Album;

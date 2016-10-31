@@ -148,7 +148,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
             public void onItemLongClick(View view, int position) {
                 int id = getSongId(position);
                 if(id > 0)
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG);
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG,Constants.SONG);
             }
         });
         mRecyclerView.setAdapter(mAdapter);

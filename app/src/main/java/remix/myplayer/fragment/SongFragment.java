@@ -123,7 +123,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
             public void onItemLongClick(View view, int position) {
                 int id = getSongID(position);
                 if(getUserVisibleHint() && id > 0)
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG);
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG,Constants.SONG);
             }
         });
         mRecyclerView.setAdapter(mAdapter);

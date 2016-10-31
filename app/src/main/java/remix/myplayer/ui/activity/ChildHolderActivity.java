@@ -40,10 +40,10 @@ import remix.myplayer.util.PlayListUtil;
  */
 public class ChildHolderActivity extends MultiChoiceActivity implements MusicService.Callback{
     public final static String TAG = ChildHolderActivity.class.getSimpleName();
-
+    public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";
     private static boolean mIsRunning = false;
     //获得歌曲信息列表的参数
-    private int mId;
+    public static int mId;
     private int mType;
     private String mArg;
     private ArrayList<MP3Item> mInfoList;
@@ -125,8 +125,8 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                long songid = mInfoList.get(position).getId();
-                if(songid > 0 && !mMultiChoice.itemAddorRemoveWithClick(view,position,songid,TAG)){
+                int songid = mInfoList.get(position).getId();
+                if( !mMultiChoice.itemAddorRemoveWithClick(view,position,songid,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
                     if (mInfoList != null && mInfoList.size() == 0)
                         return;
                     ArrayList<Integer> idList = new ArrayList<>();
@@ -147,9 +147,11 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
             @Override
             public void onItemLongClick(View view, int position) {
-                long songid = mInfoList.get(position).getId();
-                if(songid > 0)
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,songid,TAG);
+                int songid = mInfoList.get(position).getId();
+//                if(songid > 0)
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,songid,
+                            TAG,
+                            mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
             }
 
 

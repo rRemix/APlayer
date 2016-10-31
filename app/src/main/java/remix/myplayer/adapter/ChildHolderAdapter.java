@@ -64,50 +64,54 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
     @Override
     public void onBindViewHolder(final ViewHoler holder, int position) {
         final MP3Item temp = mInfoList.get(position);
-        if(temp == null)
-            return;
+        if(temp == null || temp.getId() < 0) {
+            holder.mTitle.setText(R.string.song_lose_effect);
+            holder.mColumnView.setVisibility(View.INVISIBLE);
+            holder.mButton.setVisibility(View.INVISIBLE);
+        } else {
+            holder.mColumnView.setVisibility(View.VISIBLE);
+            holder.mButton.setVisibility(View.VISIBLE);
+            //获得正在播放的歌曲
+            final MP3Item currentMP3 = MusicService.getCurrentMP3();
+            //判断该歌曲是否是正在播放的歌曲
+            //如果是,高亮该歌曲，并显示动画
+            if(currentMP3 != null){
+                boolean highlight = temp.getId() == currentMP3.getId();
+                holder.mTitle.setTextColor(highlight ?
+                        ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899) :
+                        ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+                holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.GONE);
 
-        //获得正在播放的歌曲
-        final MP3Item currentMP3 = MusicService.getCurrentMP3();
-        //判断该歌曲是否是正在播放的歌曲
-        //如果是,高亮该歌曲，并显示动画
-        if(currentMP3 != null){
-            boolean highlight = temp.getId() == currentMP3.getId();
-            holder.mTitle.setTextColor(highlight ?
-                    ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899) :
-                    ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-            holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.GONE);
-
-            //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
-            if(MusicService.getIsplay() && !holder.mColumnView.getStatus() && highlight){
-                holder.mColumnView.startAnim();
-            }
-            else if(!MusicService.getIsplay() && holder.mColumnView.getStatus()){
-                holder.mColumnView.stopAnim();
-            }
-        }
-
-        //设置标题
-        holder.mTitle.setText(CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE));
-
-        if(holder.mButton != null) {
-            //设置按钮着色
-            int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
-            Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
-            holder.mButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(mMultiChoice.isShow())
-                        return;
-                    Intent intent = new Intent(mContext, OptionDialog.class);
-                    intent.putExtra("MP3Item", temp);
-                    if (mType == Constants.PLAYLIST) {
-                        intent.putExtra("IsDeletePlayList", true);
-                        intent.putExtra("PlayListName", mArg);
-                    }
-                    mContext.startActivity(intent);
+                //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
+                if(MusicService.getIsplay() && !holder.mColumnView.getStatus() && highlight){
+                    holder.mColumnView.startAnim();
                 }
-            });
+                else if(!MusicService.getIsplay() && holder.mColumnView.getStatus()){
+                    holder.mColumnView.stopAnim();
+                }
+            }
+            //设置标题
+            holder.mTitle.setText(CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE));
+
+            if(holder.mButton != null) {
+                //设置按钮着色
+                int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+                Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
+                holder.mButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(mMultiChoice.isShow())
+                            return;
+                        Intent intent = new Intent(mContext, OptionDialog.class);
+                        intent.putExtra("MP3Item", temp);
+                        if (mType == Constants.PLAYLIST) {
+                            intent.putExtra("IsDeletePlayList", true);
+                            intent.putExtra("PlayListName", mArg);
+                        }
+                        mContext.startActivity(intent);
+                    }
+                });
+            }
         }
 
         if(holder.mContainer != null && mOnItemClickLitener != null){

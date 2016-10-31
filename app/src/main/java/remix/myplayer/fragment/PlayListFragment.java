@@ -109,7 +109,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
             public void onItemLongClick(View view, int position) {
                 String name = getPlayListName(position);
                 if(!TextUtils.isEmpty(name) && !name.equals(getString(R.string.my_favorite)))
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,getPlayListId(position),TAG);
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,getPlayListId(position),TAG,Constants.PLAYLIST);
             }
         });
         mRecycleView.setAdapter(mAdapter);

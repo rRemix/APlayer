@@ -26,8 +26,8 @@ public class DBObserver extends ContentObserver {
 
     @Override
     public void onChange(boolean selfChange, Uri uri) {
-        Global.mPlayList = PlayListUtil.getAllPlayListInfo();
-        Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
+//        Global.mPlayList = PlayListUtil.getAllPlayListInfo();
+//        Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
 //        if(!selfChange){
 //            switch (DBContentProvider.mUriMatcher.match(uri)){
 //                //更新播放列表

@@ -365,9 +365,16 @@ public class MediaStoreUtil {
         Cursor cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null,where,arg,null,null);
         ArrayList<MP3Item> list = new ArrayList<>();
         if(cursor != null && cursor.getCount() > 0){
-
             while (cursor.moveToNext()){
                 list.add(getMP3Info(cursor));
+            }
+            //如果本地删除了某些歌曲 添加一些空的歌曲信息，保证点击播放列表前后歌曲数目一致
+            if(cursor.getCount() < idList.size()){
+                for(int i = cursor.getCount(); i < idList.size() ;i++){
+                    MP3Item item = new MP3Item();
+                    item.Id = -1;
+                    list.add(item);
+                }
             }
         }
         return list;

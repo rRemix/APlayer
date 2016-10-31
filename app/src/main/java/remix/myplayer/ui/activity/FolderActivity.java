@@ -108,7 +108,7 @@ public class FolderActivity extends MultiChoiceActivity {
             public void onItemLongClick(View view, int position) {
                 String path = CommonUtil.getMapkeyByPosition(Global.mFolderMap,position);
                 if(!TextUtils.isEmpty(path))
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG);
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG,Constants.FOLDER);
             }
         });
         mRecyclerView.setAdapter(mAdapter);

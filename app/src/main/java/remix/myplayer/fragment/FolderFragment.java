@@ -1,5 +1,6 @@
 package remix.myplayer.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -73,7 +74,7 @@ public class FolderFragment extends BaseFragment {
             public void onItemLongClick(View view, int position) {
                 String path = CommonUtil.getMapkeyByPosition(Global.mFolderMap,position);
                 if(getUserVisibleHint() && !TextUtils.isEmpty(path))
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG);
+                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG,Constants.FOLDER);
             }
         });
         mRecyclerView.setAdapter(mAdapter);
