@@ -116,7 +116,7 @@ public class FolderActivity extends MultiChoiceActivity {
         initToolbar(mToolBar,"文件夹");
     }
 
-    public void UpdateAdapter() {
+    public void UpdateList() {
         if(mAdapter != null){
             mAdapter.notifyDataSetChanged();
         }

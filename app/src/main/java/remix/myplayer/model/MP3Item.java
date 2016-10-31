@@ -11,17 +11,17 @@ import java.io.Serializable;
  */
 public class MP3Item implements Serializable,Cloneable {
     public int Id;
-    private String Title;
-    private String Displayname;
-    private String Album;
-    private int AlbumId;
-    private String Artist;
-    private String AlbumArt;
-    private long Duration;
-    private String ReailTime;
-    private String Url;
-    private long Size;
-    private String Year;
+    public String Title;
+    public String Displayname;
+    public String Album;
+    public int AlbumId;
+    public String Artist;
+    public String AlbumArt;
+    public long Duration;
+    public String ReailTime;
+    public String Url;
+    public long Size;
+    public String Year;
     public MP3Item(){}
 
     public MP3Item(int id, String displayname, String title, String album, int albumid, String artist, long duration, String reailTime, String url, long size, String albumart) {

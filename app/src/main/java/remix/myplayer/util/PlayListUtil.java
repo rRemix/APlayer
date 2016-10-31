@@ -105,8 +105,6 @@ public class PlayListUtil {
      * @return
      */
     public static int addMultiSongs(ArrayList<PlayListSongInfo> infos){
-        if(infos == null || infos.size() == 0 )
-            return 0;
         //不重复添加
         ArrayList<Integer> rawIDList = getIDList(infos.get(0).PlayListID);
         for(int i = 0 ; i < rawIDList.size() ;i++){
@@ -115,6 +113,9 @@ public class PlayListUtil {
                     infos.remove(j);
             }
         }
+        if(infos == null || infos.size() == 0 )
+            return 0;
+
 
         ContentValues[] values = new ContentValues[infos.size()];
         for(int i = 0 ; i < infos.size() ;i++){
@@ -143,8 +144,6 @@ public class PlayListUtil {
      * @return
      */
     public static int addMultiSongs(ArrayList<Integer> IDList,String playListName,int playListId){
-        if(IDList == null || IDList.size() == 0 )
-            return 0;
         //不重复添加
         ArrayList<Integer> rawIDList = getIDList(playListName);
         for(int i = 0 ; i < rawIDList.size() ;i++){
@@ -153,6 +152,9 @@ public class PlayListUtil {
                     IDList.remove(j);
             }
         }
+        if(IDList == null || IDList.size() == 0 )
+            return 0;
+
 
         ContentValues[] values = new ContentValues[IDList.size()];
         for(int i = 0 ; i < IDList.size() ;i++){
@@ -219,6 +221,7 @@ public class PlayListUtil {
         }
         return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI,where,whereArgs);
     }
+
 
     /**
      * 根据播放列表id获得对应的名字
@@ -293,11 +296,11 @@ public class PlayListUtil {
         ArrayList<Integer> IDList = new ArrayList<>();
         Cursor cursor = null;
         try {
-            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI,new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
-                    PlayLists.PlayListColumns.NAME + "=?",new String[]{playlistName},null,null);
+            cursor = mContext.getContentResolver().query(PlayListSongs.CONTENT_URI,new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
+                    PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME + "=?",new String[]{playlistName},null,null);
             if(cursor != null && cursor.getCount() > 0){
                 while (cursor.moveToNext()){
-                    IDList.add(cursor.getInt(cursor.getInt(cursor.getColumnIndex(PlayListSongs.PlayListSongColumns.AUDIO_ID))));
+                    IDList.add(cursor.getInt(cursor.getColumnIndex(PlayListSongs.PlayListSongColumns.AUDIO_ID)));
                 }
             }
         } catch (Exception e){

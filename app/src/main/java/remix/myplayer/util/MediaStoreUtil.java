@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import remix.myplayer.R;
 import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListItem;
@@ -372,7 +373,8 @@ public class MediaStoreUtil {
             if(cursor.getCount() < idList.size()){
                 for(int i = cursor.getCount(); i < idList.size() ;i++){
                     MP3Item item = new MP3Item();
-                    item.Id = -1;
+                    item.Title = mContext.getString(R.string.song_lose_effect);
+                    item.Id = idList.get(i);
                     list.add(item);
                 }
             }

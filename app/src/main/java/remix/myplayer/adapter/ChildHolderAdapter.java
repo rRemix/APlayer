@@ -64,7 +64,7 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
     @Override
     public void onBindViewHolder(final ViewHoler holder, int position) {
         final MP3Item temp = mInfoList.get(position);
-        if(temp == null || temp.getId() < 0) {
+        if(temp == null || temp.getId() < 0 || temp.Title.equals(mContext.getString(R.string.song_lose_effect))) {
             holder.mTitle.setText(R.string.song_lose_effect);
             holder.mColumnView.setVisibility(View.INVISIBLE);
             holder.mButton.setVisibility(View.INVISIBLE);

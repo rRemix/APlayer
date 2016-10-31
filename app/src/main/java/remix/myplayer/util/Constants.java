@@ -53,7 +53,7 @@ public class Constants {
     //更新已播放时间、未播放时间
     public final static int UPDATE_TIME_ONLY = 0x011;
     //更新播放信息
-    public final static int UPDATE_INFORMATION = 0x101;
+    public final static int UPDATE_UI = 0x101;
     //更新音量
     public final static int UPDATE_VOL = 0x102;
     //更新背景
@@ -97,10 +97,11 @@ public class Constants {
     public final static int SHARESONG = 1;
     public final static int SHARERECORD = 0;
 
-    //更新文件夹与文件夹详情
+    //更新
     public final static int UPDATE_FOLDER = 0;
-    public final static int UPDATE_PLAYINGLIST = 1;
+    public final static int UPDATE_PLAYQUEUE = 1;
     public final static int UPDATE_PLAYLIST = 2;
+    public final static int UPDATE_CHILDHOLDER = 3;
 
 
     //码率

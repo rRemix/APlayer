@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
@@ -31,6 +30,8 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.observer.DBObserver;
 import remix.myplayer.observer.MediaStoreObserver;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
+import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.ui.activity.MainActivity;
@@ -55,7 +56,7 @@ import remix.myplayer.util.ToastUtil;
  */
 public class MusicService extends BaseService {
     private final static String TAG = "MusicService";
-    public static MusicService mInstance;
+    private static MusicService mInstance;
     /** 是否第一次启动*/
     private static boolean mFirstFlag = true;
 
@@ -115,7 +116,7 @@ public class MusicService extends BaseService {
     private static Handler mUpdateUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            if(msg.what == Constants.UPDATE_INFORMATION) {
+            if(msg.what == Constants.UPDATE_UI) {
                 for (int i = 0; i < mCallBacklist.size(); i++) {
                     if(mCallBacklist.get(i) != null){
                         try {
@@ -124,14 +125,12 @@ public class MusicService extends BaseService {
                             e.printStackTrace();
                         }
                     }
-
                 }
-
             }
         }
     };
 
-    private ContentObserver mMediaStoreObserver;
+    private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
     private DBObserver mPlayListSongObserver;
     private static Context mContext;
@@ -140,6 +139,11 @@ public class MusicService extends BaseService {
     public MusicService(Context context) {
         mContext = context;
     }
+
+    public static MusicService getInstance(){
+        return mInstance;
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -201,7 +205,7 @@ public class MusicService extends BaseService {
                     }
                 }
                 //通知更新ui
-                mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
+                mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
                 sendBroadcast(new Intent(Constants.NOTIFY));
             }
         };
@@ -220,22 +224,39 @@ public class MusicService extends BaseService {
         registerReceiver(mHeadSetReceiver,new IntentFilter(Intent.ACTION_HEADSET_PLUG));
 
         //监听媒体库变化
-        mMediaStoreObserver = new MediaStoreObserver(new Handler(){
+        Handler updateHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
-                //更新文件夹
-                if(msg.what == Constants.UPDATE_FOLDER){
-                    if(FolderActivity.mInstance != null){
-                        FolderActivity.mInstance.UpdateAdapter();
+                //更新adapter
+//                if (msg.what == Constants.UPDATE_FOLDER ) {
+//                    if (FolderActivity.mInstance != null) {
+//                        FolderActivity.mInstance.UpdateList();
+//                    }
+//
+//                }
+//                if(msg.what == Constants.UPDATE_CHILDHOLDER ){
+//                    if(ChildHolderActivity.mInstance != null){
+//                        ChildHolderActivity.mInstance.UpdateList();
+//                    }
+//                }
+                //外部删除歌曲，或者删除播放列表中某一首歌曲
+                if(msg.what == Constants.UPDATE_ADAPTER ){
+                    if (FolderActivity.mInstance != null ) {
+                        FolderActivity.mInstance.UpdateList();
+                    }
+                    if(ChildHolderActivity.mInstance != null ){
+                        ChildHolderActivity.mInstance.UpdateList();
                     }
                 }
             }
-        });
+        };
+        mMediaStoreObserver = new MediaStoreObserver(updateHandler);
         //监听数据库变化
-        mPlayListObserver = new DBObserver(new Handler());
-        mPlayListSongObserver = new DBObserver(new Handler());
+
+        mPlayListObserver = new DBObserver(updateHandler);
+        mPlayListSongObserver = new DBObserver(updateHandler);
         getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,true, mMediaStoreObserver);
-        getContentResolver().registerContentObserver(PlayLists.CONTENT_URI,true,mPlayListObserver);
+        getContentResolver().registerContentObserver(PlayLists.CONTENT_URI,true, mPlayListObserver);
         getContentResolver().registerContentObserver(PlayListSongs.CONTENT_URI,true,mPlayListSongObserver);
 
         //初始化MediaSesson 用于监听线控操作
@@ -258,7 +279,7 @@ public class MusicService extends BaseService {
             public void onCompletion(MediaPlayer mp) {
                 PlayNextOrPrev(true, true);
                 Global.setOperation(Constants.NEXT);
-                mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
+                mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
                 //更新通知栏
                 sendBroadcast(new Intent(Constants.NOTIFY));
             }
@@ -544,7 +565,7 @@ public class MusicService extends BaseService {
                 control != Constants.PLAY_SHUFFLE &&
                 control != Constants.PLAY_REPEATONE) {
             //更新相关activity
-            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_INFORMATION);
+            mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
             //更新通知栏
             sendBroadcast(new Intent(Constants.NOTIFY));
         }

@@ -5,6 +5,9 @@ import android.net.Uri;
 import android.os.Handler;
 
 import remix.myplayer.db.DBContentProvider;
+import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.activity.ChildHolderActivity;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
 
@@ -13,7 +16,7 @@ import remix.myplayer.util.PlayListUtil;
  */
 
 public class DBObserver extends ContentObserver {
-
+    private Handler mHandler;
     /**
      * Creates a content observer.
      *
@@ -21,13 +24,27 @@ public class DBObserver extends ContentObserver {
      */
     public DBObserver(Handler handler) {
         super(handler);
+        mHandler = handler;
+    }
 
+    @Override
+    public void onChange(boolean selfChange) {
+        if(!selfChange){
+            new Thread(){
+                @Override
+                public void run() {
+                    Global.mPlayList = PlayListUtil.getAllPlayListInfo();
+                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
+                    mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+                }
+            }.start();
+        }
     }
 
     @Override
     public void onChange(boolean selfChange, Uri uri) {
-//        Global.mPlayList = PlayListUtil.getAllPlayListInfo();
-//        Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
+
+
 //        if(!selfChange){
 //            switch (DBContentProvider.mUriMatcher.match(uri)){
 //                //更新播放列表

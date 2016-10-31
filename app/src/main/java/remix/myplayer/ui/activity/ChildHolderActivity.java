@@ -47,6 +47,8 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
     private int mType;
     private String mArg;
     private ArrayList<MP3Item> mInfoList;
+    /** 播放列表歌曲id列表 */
+    private ArrayList<Integer> mPlayListSongIDList;
 
     //歌曲数目与标题
     @BindView(R.id.album_holder_item_num)
@@ -113,13 +115,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         mType = getIntent().getIntExtra("Type", -1);
         mArg = getIntent().getStringExtra("Title");
 
-        new Thread(){
-            @Override
-            public void run() {
-                mInfoList = getMP3List();
-                mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-            }
-        }.start();
+        new UpdateThread().start();
 
         mAdapter = new ChildHolderAdapter(this,mType,mArg,mMultiChoice);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
@@ -198,7 +194,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         @Override
         public void run() {
             mInfoList = getMP3List();
-            mRefreshHandler.sendEmptyMessage(0);
+            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
     }
 
@@ -222,19 +218,12 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
             //文件夹名
             case Constants.FOLDER:
                 mInfoList = MediaStoreUtil.getMP3ListByIds(Global.mFolderMap.get(mArg));
-                mArg = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
+//                mArg = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
                 break;
             //播放列表名
             case Constants.PLAYLIST:
-//                ArrayList<PlayListItem> list = Global.mPlayList.get(mArg);
-//                if(list == null)
-//                    break;
-//                for(PlayListItem item : list) {
-//                    MP3Item temp = new MP3Item(item.getId(),item.getSongame(),item.getSongame(),"",item.getAlbumId(),
-//                            item.getArtist(),0,"","",0,"");
-//                    mInfoList.add(temp);
-//                }
-                mInfoList = MediaStoreUtil.getMP3ListByIds(PlayListUtil.getIDList(mId));
+                mPlayListSongIDList = PlayListUtil.getIDList(mId);
+                mInfoList = MediaStoreUtil.getMP3ListByIds(mPlayListSongIDList);
                 break;
         }
         return mInfoList;
@@ -291,6 +280,10 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
     protected void onStop() {
         super.onStop();
         mIsRunning = false;
+    }
+
+    public void UpdateList() {
+        new UpdateThread().start();
     }
 
 }

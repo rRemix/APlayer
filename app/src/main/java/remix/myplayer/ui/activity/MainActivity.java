@@ -439,6 +439,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                     //歌曲库
                     case 0:
                         mDrawerLayout.closeDrawer(mNavigationView);
+                        mDrawerAdapter.setSelectIndex(0);
                         break;
                     //文件夹
                     case 1:
@@ -453,7 +454,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                         break;
                 }
                 mDrawerAdapter.setSelectIndex(position);
-                mDrawerAdapter.notifyDataSetChanged();
             }
             @Override
             public void onItemLongClick(View view, int position) {
@@ -563,6 +563,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
             mDrawerLayout.closeDrawer(mNavigationView);
+            mDrawerAdapter.setSelectIndex(0);
         } else if(mMultiChoice.isShow()) {
 //            updateOptionsMenu(false);
             mMultiChoice.UpdateOptionMenu(false);

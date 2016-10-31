@@ -37,7 +37,7 @@ public class MediaStoreObserver extends ContentObserver {
                 @Override
                 public void run() {
                     Global.mAllSongList = MediaStoreUtil.getAllSongsId();
-                    mHandler.sendEmptyMessage(Constants.UPDATE_FOLDER);
+                    mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                 }
             }.start();
         }

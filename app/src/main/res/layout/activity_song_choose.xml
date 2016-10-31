@@ -8,14 +8,15 @@
         android:background="?attr/material_color_primary">
         <TextView
             android:id="@+id/cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/d70_size"
+            android:layout_height="match_parent"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="@dimen/d16_size"
+            android:gravity="center"
             android:text="@string/cancel"
             android:textSize="@dimen/s14_size"
-            android:textColor="@color/night_textcolor_primary"/>
+            android:textColor="@color/night_textcolor_primary"
+            android:background="?android:attr/selectableItemBackground"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,15 +26,16 @@
             android:textSize="@dimen/s16_size"
             android:textColor="@color/night_textcolor_primary"/>
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/d70_size"
+            android:layout_height="match_parent"
             android:id="@+id/confirm"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/d16_size"
+            android:gravity="center"
             android:text="@string/confirm"
             android:textSize="@dimen/s14_size"
-            android:textColor="@color/night_textcolor_primary" />
+            android:textColor="@color/night_textcolor_primary"
+            android:background="?android:attr/selectableItemBackground"/>
     </RelativeLayout>
 
     <View

@@ -51,6 +51,7 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
 
     public void setSelectIndex(int index){
         mSelectIndex = index;
+        notifyDataSetChanged();
     }
 
     @Override
