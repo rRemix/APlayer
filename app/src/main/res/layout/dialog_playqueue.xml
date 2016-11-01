@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fff">
+    android:background="@color/white">
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -15,7 +15,7 @@
             android:layout_gravity="center_horizontal"
             android:text="@string/play_queue"
             android:textSize="@dimen/s16_size"
-            android:textColor="#002"
+            android:textColor="@color/black"
             android:background="#EFEEED"/>
     </android.support.design.widget.AppBarLayout>
 

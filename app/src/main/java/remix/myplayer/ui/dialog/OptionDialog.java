@@ -130,6 +130,7 @@ public class OptionDialog extends BaseDialogActivity {
                     String title = mIsDeletePlayList ? getString(R.string.confirm_delete_playlist) :getString(R.string.confirm_delete_song);
                     new MaterialDialog.Builder(OptionDialog.this)
                             .content(title)
+                            .buttonRippleColor(ThemeStore.getRippleColor())
                             .positiveText(R.string.confirm)
                             .negativeText(R.string.cancel)
                             .onPositive(new MaterialDialog.SingleButtonCallback() {

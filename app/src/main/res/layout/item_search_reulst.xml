@@ -11,8 +11,8 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/d16_size"
         android:layout_marginRight="@dimen/d16_size"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="@dimen/d45_size"
+        android:layout_height="@dimen/d45_size"
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImageScaleType="centerCrop"
         fresco:placeholderImage="@drawable/song_artist_empty_bg"
@@ -28,18 +28,18 @@
         android:orientation="vertical"
         android:layout_toRightOf="@id/search_image">
         <TextView
-            android:layout_width="200dp"
+            android:layout_width="@dimen/d200_size"
             android:layout_height="wrap_content"
             android:id="@+id/search_name"
             android:textColor="?attr/text_color_primary"
             android:textSize="@dimen/s14_size"
             android:text="歌曲名"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="@dimen/d5_szie"
             android:lines="1"
             android:ellipsize="end"/>
         <TextView
             android:id="@+id/search_detail"
-            android:layout_width="200dp"
+            android:layout_width="@dimen/d200_size"
             android:layout_height="wrap_content"
             android:textColor="?attr/text_color"
             android:textSize="@dimen/s12_size"

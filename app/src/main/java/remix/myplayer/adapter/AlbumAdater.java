@@ -22,6 +22,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
@@ -73,12 +74,12 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
                 holder.mText2.setText(artist);
                 //设置封面
                 int albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
-//                holder.mImage.setImageURI(Uri.EMPTY);
-//                new AsynLoadImage(holder.mImage).execute(albumid,Constants.URL_ALBUM,true);
+                holder.mImage.setImageURI(Uri.EMPTY);
+                new AsynLoadImage(holder.mImage).execute(albumid,Constants.URL_ALBUM,true);
                 if(holder instanceof AlbumListHolder){
                     new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);
                 }
-                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
+//                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
             } catch (Exception e){
                 e.printStackTrace();
             }

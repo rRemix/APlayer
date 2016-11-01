@@ -17,12 +17,12 @@
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_marginLeft="@dimen/d10_size"
-        android:background="#E6E6E6"
+        android:background="@color/gray_e6e6e6"
         android:layout_alignParentTop="true"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_marginLeft="@dimen/d10_size"
-        android:background="#E6E6E6"
+        android:background="@color/gray_e6e6e6"
         android:layout_alignParentBottom="true"/>
 </RelativeLayout>

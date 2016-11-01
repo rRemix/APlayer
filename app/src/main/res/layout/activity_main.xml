@@ -72,7 +72,7 @@
     <!--<include layout="@layout/slide_menu"/>-->
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation_view"
-        android:layout_width="264dp"
+        android:layout_width="@dimen/d264_size"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@color/white">

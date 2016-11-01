@@ -22,7 +22,7 @@
                 android:textOff=""
                 android:id="@+id/eq_switch"
                 android:layout_gravity="right"
-                android:layout_marginRight="16dp"/>
+                android:layout_marginRight="@dimen/d16_size"/>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
@@ -37,8 +37,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="5"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginTop="@dimen/d20_size"
+            android:layout_marginBottom="@dimen/d20_size"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
         </LinearLayout>
@@ -48,7 +48,7 @@
             android:layout_weight="1"
             android:gravity="center">
             <Button
-                android:layout_width="200dp"
+                android:layout_width="@dimen/d200_size"
                 android:layout_height="wrap_content"
                 android:onClick="onReset"
                 android:id="@+id/eq_reset"

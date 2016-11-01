@@ -96,6 +96,7 @@ public class ColorChooseDialog extends BaseDialogActivity {
             if(!ThemeStore.isDay()){
                 new MaterialDialog.Builder(ColorChooseDialog.this)
                         .content("当前为夜间模式，是否切换主题颜色?")
+                        .buttonRippleColor(ThemeStore.getRippleColor())
                         .backgroundColor(ThemeStore.getBackgroundColor3())
                         .positiveColor(ThemeStore.getTextColorPrimary())
                         .negativeColor(ThemeStore.getTextColorPrimary())

@@ -34,7 +34,11 @@
     <!--侧滑菜单选中颜色-->
     <color name="drawer_selected">#f5f5f5</color>、
     <!--默认的colorControlHighLight-->
-    <color name="default_control_highlight">#1f000000</color>
+    <color name="day_ripple_color">#1f000000</color>
+    <color name="day_selected_color">#40000000</color>
+    <color name="night_selected_color">#f1f1f1</color>
+    <color name="night_ripple_color">#f1f1f1</color>
+    <!--<color name="night_selected_color">@color/default_control_highlight</color>-->
 
     <!-- 点缀色-->
     <color name="intersperse_color">@color/purple_782899</color>
@@ -71,8 +75,15 @@
     <color name="gray_6d6c69">#6d6c69</color>
     <color name="gray_323232">#323232</color>
     <color name="white_f6f6f5">#f6f6f5</color>
+    <color name="white_f4f4f5">#f4f4f5</color>
     <color name="purple_782899">#782899</color>
     <color name="purple_8e24aa">#8e24aa</color>
+    <color name="gray_d3d2d3">#d3d2d3</color>
+    <color name="gray_272628">#272628</color>
+    <color name="gray_b2b1b2">#b2b1b2</color>
+    <color name="gray_e6e6e6">#e6e6e6</color>
+    <color name="gray_3c3c3c">#3c3c3c</color>
+    <color name="black_30000000">#30000000</color>
 
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>
@@ -109,10 +120,6 @@
     <color name="night_nonenable_text_color">@color/white</color>
     <color name="night_enable_track_color">@color/white</color>
     <color name="night_enable_text_color">@color/white</color>
-
-    <color name="day_selected_color">#40000000</color>
-    <color name="night_selected_color">#f1f1f1</color>
-    <!--<color name="night_selected_color">@color/default_control_highlight</color>-->
 
     <color name="md_night_primary">@color/background_color_3</color>
     <color name="md_night_primary_dark">@color/background_color_3</color>

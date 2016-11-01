@@ -7,8 +7,8 @@
     android:id="@+id/item_root"
     android:background="?attr/background_list">
     <com.facebook.drawee.view.SimpleDraweeView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="@dimen/d40_size"
+        android:layout_height="@dimen/d40_size"
         android:id="@+id/song_head_image"
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImageScaleType="centerCrop"
@@ -17,13 +17,13 @@
         fresco:failureImageScaleType="centerCrop"
         fresco:roundAsCircle="true"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="16dp"/>
+        android:layout_marginLeft="@dimen/d16_size"/>
     <!--歌曲名、歌手、专辑-->
     <LinearLayout
-        android:layout_width="180dp"
+        android:layout_width="@dimen/d180_size"
         android:layout_height="@dimen/item_height"
         android:layout_toRightOf="@id/song_head_image"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="@dimen/d16_size"
         android:orientation="vertical"
         android:id="@+id/song_text_container">
         <TextView
@@ -34,7 +34,7 @@
             android:textSize="@dimen/s14_size"
             android:textColor="?attr/text_color_primary"
             android:id="@+id/song_title"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/d16_size"
             android:text="歌曲名" />
         <TextView
             android:id="@+id/song_other"
@@ -45,14 +45,14 @@
             android:textSize="@dimen/s12_size"
             android:textColor="?attr/text_color"
             android:text="歌手与专辑"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="@dimen/d4_size"/>
     </LinearLayout>
     <!--结尾处按钮-->
     <ImageButton
         android:layout_alignParentRight="true"
-        android:layout_marginRight="16dp"
+        android:layout_marginRight="@dimen/d16_size"
         android:id="@+id/song_button"
-        android:layout_width="60dp"
+        android:layout_width="@dimen/d60_size"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:src="@drawable/list_icn_more"
@@ -60,14 +60,14 @@
 
     <remix.myplayer.ui.customview.ColumnView
         android:layout_centerVertical="true"
-        android:layout_width="18dp"
-        android:layout_height="16dp"
-        app:columnwidth="2dp"
-        app:columncolor="#782899"
+        android:layout_width="@dimen/d18_size"
+        android:layout_height="@dimen/d16_size"
+        app:columnwidth="@dimen/d2_size"
+        app:columncolor="@color/purple_782899"
         app:columnnum="4"
         android:id="@+id/song_columnview"
         android:layout_toRightOf="@id/song_text_container"
-        android:layout_marginLeft="16dp" />
+        android:layout_marginLeft="@dimen/d16_size" />
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"

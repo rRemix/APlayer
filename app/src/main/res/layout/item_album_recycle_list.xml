@@ -3,23 +3,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
-    android:minHeight="56dp"
+    android:layout_height="@dimen/d56_size"
+    android:minHeight="@dimen/d56_size"
     android:background="?attr/background_list">
     <com.facebook.drawee.view.SimpleDraweeView
-        android:layout_width="42dp"
-        android:layout_height="42dp"
+        android:layout_width="@dimen/d42_size"
+        android:layout_height="@dimen/d42_size"
         android:id="@+id/item_simpleiview"
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImageScaleType="centerCrop"
-        fresco:placeholderImage="@drawable/album_empty_bg"
-        fresco:failureImage="@drawable/album_empty_bg"
+        fresco:placeholderImage="?attr/default_album"
         fresco:failureImageScaleType="centerCrop"
         android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/d8_size"/>
 
     <LinearLayout
-        android:layout_width="180dp"
+        android:layout_width="@dimen/d180_size"
         android:layout_height="match_parent"
         android:layout_toRightOf="@id/item_simpleiview"
         android:layout_margin="@dimen/d8_size"
@@ -42,14 +41,14 @@
             android:ellipsize="end"
             android:textSize="@dimen/s12_size"
             android:textColor="?attr/text_color"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="@dimen/d4_size"/>
     </LinearLayout>
     <!--结尾处按钮-->
     <ImageButton
         android:layout_alignParentRight="true"
-        android:layout_marginRight="16dp"
+        android:layout_marginRight="@dimen/d16_size"
         android:id="@+id/item_button"
-        android:layout_width="60dp"
+        android:layout_width="@dimen/d40_size"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:src="@drawable/list_icn_more"

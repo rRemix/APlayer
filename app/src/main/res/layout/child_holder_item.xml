@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
+    android:layout_height="@dimen/d72_size"
     android:gravity="center_vertical"
     android:background="?attr/background_list">
     <LinearLayout
@@ -11,10 +11,10 @@
         android:orientation="vertical"
         android:layout_alignParentLeft="true"
         android:gravity="center_vertical"
-        android:layout_marginLeft="16dp">
+        android:layout_marginLeft="@dimen/d16_size">
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/d70_size"
             android:gravity="center_vertical"
             android:id="@+id/album_holder_item_title"
             android:lines="1"
@@ -38,9 +38,9 @@
     <!--结尾处按钮-->
     <ImageButton
         android:layout_alignParentRight="true"
-        android:layout_marginRight="18dp"
+        android:layout_marginRight="@dimen/d18_size"
         android:id="@+id/song_item_button"
-        android:layout_width="60dp"
+        android:layout_width="@dimen/d60_size"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:scaleType="center"
@@ -50,11 +50,11 @@
     <remix.myplayer.ui.customview.ColumnView
         android:layout_toLeftOf="@id/song_item_button"
         android:layout_centerVertical="true"
-        android:layout_width="18dp"
-        android:layout_height="16dp"
-        app:columnwidth="2dp"
-        app:columncolor="#782899"
+        android:layout_width="@dimen/d18_size"
+        android:layout_height="@dimen/d16_size"
+        app:columnwidth="@dimen/d2_size"
+        app:columncolor="@color/purple_782899"
         app:columnnum="4"
         android:id="@+id/song_columnview"
-        android:layout_marginRight="10dp" />
+        android:layout_marginRight="@dimen/d10_size" />
 </RelativeLayout>

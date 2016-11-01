@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <include layout="@layout/toolbar"/>
 
     <RelativeLayout
         android:id="@+id/recently_shuffle"
         android:layout_width="match_parent"
-        android:layout_height="38dp"
+        android:layout_height="@dimen/d38_size"
         android:background="@color/night_interval_color"
         android:orientation="horizontal"
         android:onClick="onPlayShuffle">
@@ -18,13 +17,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_btn_common_play_shuffle"
-            android:layout_marginLeft="16dp" />
+            android:layout_marginLeft="@dimen/d16_size" />
         <TextView
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/play_random"
-            android:layout_marginLeft="72dp"/>
+            android:layout_marginLeft="@dimen/d72_size"/>
     </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView

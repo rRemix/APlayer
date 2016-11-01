@@ -16,7 +16,7 @@
         android:layout_height="match_parent">
         <!-- 播放界面按钮 -->
         <ImageView
-            android:layout_marginLeft="19dp"
+            android:layout_marginLeft="@dimen/d19_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/home_btn_back"
@@ -24,8 +24,8 @@
             android:layout_centerVertical="true"/>
         <!-- 歌曲名与歌手 -->
         <LinearLayout
-            android:layout_marginLeft="72dp"
-            android:layout_width="180dp"
+            android:layout_marginLeft="@dimen/d72_size"
+            android:layout_width="@dimen/d180_size"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center_vertical">
@@ -50,7 +50,7 @@
 
         <ImageButton
             android:layout_alignParentRight="true"
-            android:layout_marginRight="16dp"
+            android:layout_marginRight="@dimen/d16_size"
             android:layout_centerVertical="true"
             android:id="@+id/playbar_play"
             android:layout_width="wrap_content"

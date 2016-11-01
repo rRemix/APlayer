@@ -12,9 +12,9 @@
         android:id="@+id/splash_btn"
         android:gravity="center"
         android:visibility="gone"
-        android:layout_width="100dp"
-        android:layout_height="24dp"
+        android:layout_width="@dimen/d100_size"
+        android:layout_height="@dimen/d24_size"
         android:text="立即体验"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="2dp"/>
+        android:layout_marginBottom="@dimen/d10_size"/>
 </FrameLayout>

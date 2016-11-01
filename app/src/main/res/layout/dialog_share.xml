@@ -7,12 +7,12 @@
         android:id="@+id/popup_title"
         android:gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="@dimen/d50_size"
         android:lines="1"
         android:ellipsize="end"
-        android:textColor="#001"
+        android:textColor="@color/black_1b1c19"
         android:text="分享到"
-        android:textSize="17sp"/>
+        android:textSize="@dimen/s17_size"/>
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="1px"
@@ -111,8 +111,8 @@
     </LinearLayout>
 
     <Button
-        android:layout_width="130dp"
-        android:layout_height="30dp"
+        android:layout_width="@dimen/d130_size"
+        android:layout_height="@dimen/d30_size"
         android:gravity="center"
         android:id="@+id/popup_share_cancel"
         android:layout_gravity="center_horizontal"

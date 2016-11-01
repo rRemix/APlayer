@@ -201,4 +201,9 @@ public class ThemeStore {
     public static int getBackgroundColor3(){
         return ColorUtil.getColor(isDay() ? R.color.day_background_color_3 : R.color.night_background_color_3);
     }
+
+    @ColorInt
+    public static int getRippleColor(){
+        return ColorUtil.getColor(isDay() ? R.color.day_ripple_color : R.color.night_ripple_color);
+    }
 }

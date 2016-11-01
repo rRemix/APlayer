@@ -131,6 +131,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
             new MaterialDialog.Builder(this)
                     .title(R.string.new_playlist)
                     .titleColor(ThemeStore.getTextColorPrimary())
+                    .buttonRippleColor(ThemeStore.getRippleColor())
                     .positiveText(R.string.create)
                     .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
                     .negativeText(R.string.cancel)

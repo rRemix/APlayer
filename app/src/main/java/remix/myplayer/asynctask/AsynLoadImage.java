@@ -2,10 +2,13 @@ package remix.myplayer.asynctask;
 
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.annotation.DrawableRes;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import remix.myplayer.util.MediaStoreUtil;
 

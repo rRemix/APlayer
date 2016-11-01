@@ -22,7 +22,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center_vertical"
-        android:layout_margin="10dp"
+        android:layout_margin="@dimen/d10_size"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/button_container"
         android:layout_alignParentLeft="true">
@@ -30,7 +30,7 @@
             android:id="@+id/playlist_item_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#3C3C3C"
+            android:textColor="@color/gray_3c3c3c"
             android:textSize="@dimen/s18_size"
             android:lines="1"
             android:ellipsize="end" />
@@ -38,14 +38,14 @@
             android:id="@+id/playlist_item_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#30000000"
+            android:textColor="@color/black_30000000"
             android:textSize="@dimen/s12_size" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#E6E6E6"
+        android:background="@color/gray_e6e6e6"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="@dimen/d10_size"/>
 </RelativeLayout>

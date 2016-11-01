@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <com.facebook.drawee.view.SimpleDraweeView
-        android:layout_margin="15dp"
-        android:layout_marginTop="25dp"
+        android:layout_margin="@dimen/d15_size"
+        android:layout_marginTop="@dimen/d25_size"
         android:layout_centerInParent="true"
         android:id="@+id/cover_image"
-        android:layout_width="328dp"
-        android:layout_height="328dp"
+        android:layout_width="@dimen/d328_size"
+        android:layout_height="@dimen/d328_size"
         android:src="@drawable/no_art_normal"
         fresco:failureImage="@drawable/no_art_normal"
         fresco:failureImageScaleType="centerCrop"
-        fresco:roundedCornerRadius="8dp"/>
+        fresco:roundedCornerRadius="@dimen/d8_size"/>
 </RelativeLayout>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
+    android:layout_height="@dimen/d56_size"
     android:background="?android:selectableItemBackground"
     android:id="@+id/item_root">
     <ImageView
@@ -26,6 +26,6 @@
         android:textOn=""
         android:textOff=""
         android:id="@+id/item_switch"
-        android:layout_marginLeft="211dp"
+        android:layout_marginLeft="@dimen/d210_size"
         android:layout_centerVertical="true"/>
 </RelativeLayout>

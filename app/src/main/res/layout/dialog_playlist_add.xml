@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="254dp"
-    android:layout_height="174dp"
+    android:orientation="vertical" android:layout_width="@dimen/d254_size"
+    android:layout_height="@dimen/d174_size"
     android:background="@drawable/creatlist_bg"
     style="@style/PopupCenterDialog">
     <TextView
         android:layout_gravity="center"
-        android:textColor="#1b1c19"
+        android:textColor="@color/black_1b1c19"
         android:textSize="@dimen/s16_size"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="@dimen/d15_size"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/create_playlist"/>
     <EditText
         android:id="@+id/playlist_add_edit"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
-        android:layout_marginTop="18dp"
+        android:layout_height="@dimen/d50_size"
+        android:layout_marginLeft="@dimen/d2_size"
+        android:layout_marginRight="@dimen/d2_size"
+        android:layout_marginTop="@dimen/d18_size"
         android:lines="1"
         android:ellipsize="end" />
     <LinearLayout
@@ -26,14 +26,14 @@
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:gravity="right"
-        android:layout_marginTop="40dp">
+        android:layout_marginTop="@dimen/d40_size">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:id="@+id/playlist_cancel"
             android:textSize="@dimen/s16_size"
-            android:layout_marginRight="24dp"
+            android:layout_marginRight="@dimen/d24_size"
             android:text="取消" />
         <TextView
             android:layout_width="wrap_content"
@@ -41,7 +41,7 @@
             android:layout_gravity="center_vertical"
             android:id="@+id/playlist_continue"
             android:textSize="@dimen/s16_size"
-            android:layout_marginRight="16dp"
+            android:layout_marginRight="@dimen/d16_size"
             android:text="继续" />
     </LinearLayout>
 </LinearLayout>

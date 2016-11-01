@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
+    android:layout_height="@dimen/d120_size"
     android:orientation="horizontal">
 
     <ImageView
@@ -17,9 +17,9 @@
         android:id="@+id/notify_container">
         <ImageView
             android:id="@+id/notify_image"
-            android:layout_margin="4dp"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_margin="@dimen/d4_size"
+            android:layout_width="@dimen/d120_size"
+            android:layout_height="@dimen/d12_size"
             android:layout_centerVertical="true"
             android:src="@drawable/song_artist_empty_bg"
             android:scaleType="centerCrop"/>
@@ -28,14 +28,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingLeft="10dp"
+            android:paddingLeft="@dimen/d10_size"
             android:gravity="center_vertical">
             <!--歌曲名与关闭按钮-->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="10dp">
+                android:layout_marginLeft="@dimen/d5_szie"
+                android:layout_marginTop="@dimen/d10_size">
                 <ImageButton
                     android:id="@+id/notify_close"
                     android:layout_centerVertical="true"
@@ -43,8 +43,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
-                    android:layout_marginRight="12dp"
-                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="@dimen/d12_size"
+                    android:layout_marginLeft="@dimen/d12_size"
                     android:src="@drawable/notify_btn_close_white"/>
                 <TextView
                     android:id="@+id/notify_song"
@@ -66,9 +66,9 @@
                 android:text="歌手名"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="@dimen/d5_szie"
+                android:layout_marginTop="@dimen/d5_szie"
+                android:layout_marginBottom="@dimen/d12_size"
                 android:lines="1"
                 android:ellipsize="end"
                 android:textSize="@dimen/s14_size"
@@ -81,8 +81,8 @@
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:weightSum="3"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp">
+                android:paddingTop="@dimen/d4_size"
+                android:paddingBottom="@dimen/d4_size">
                 <ImageButton
                     android:id="@+id/notify_prev"
                     android:layout_weight="1"

@@ -7,7 +7,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="6dp"
+        android:padding="@dimen/d6_size"
         android:paddingTop="0dp"
         android:id="@+id/recordshare_container">
         <FrameLayout
@@ -23,63 +23,62 @@
             <LinearLayout
                 android:id="@+id/recordshare_content_container"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="@dimen/d200_size"
                 android:layout_gravity="bottom|center_horizontal"
                 android:orientation="vertical"
-                android:background="#000000">
+                android:background="@color/black">
                 <TextView
-                    android:layout_width="260dp"
+                    android:layout_width="@dimen/d260_size"
                     android:layout_height="56dp"
                     android:lines="1"
                     android:ellipsize="end"
-                    android:layout_marginLeft="18dp"
+                    android:layout_marginLeft="@dimen/d187_size"
                     android:id="@+id/recordshare_name"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/s20_size"
                     android:textColor="@color/white"
                     android:gravity="center_vertical"/>
                 <ImageView
-                    android:layout_marginLeft="18dp"
+                    android:layout_marginLeft="@dimen/d18_size"
                     android:layout_width="wrap_content"
                     android:layout_height="1px"
                     android:src="@drawable/divider2"/>
                 <TextView
-                    android:layout_marginLeft="18dp"
-                    android:paddingTop="20dp"
+                    android:layout_marginLeft="@dimen/d18_size"
+                    android:paddingTop="@dimen/d20_size"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/recordshare_content"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/s14_size"
                     android:textColor="@color/white"/>
             </LinearLayout>
         </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="34dp"
+            android:layout_height="@dimen/d34_size"
             android:orientation="horizontal"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:background="#f4f4f5">
+            android:background="@color/white_f4f4f5">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/share_player_icon"/>
             <TextView
-                android:layout_marginLeft="12dp"
+                android:layout_marginLeft="@dimen/d12_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/from_aplayer"
                 android:layout_gravity="center_vertical"
-                android:textColor="#a09f9d"
                 android:textSize="@dimen/s14_size"/>
         </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="#000000"
+        android:layout_height="@dimen/d48_size"
+        android:background="@color/black"
         android:orientation="horizontal"
         android:id="@+id/recordshare_button_container"
         android:layout_gravity="bottom">
@@ -93,14 +92,14 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="12dp"
+                android:layout_marginRight="@dimen/d12_size"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/bg_btn_activity_share"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="@dimen/s14_size"
                 android:text="分享"/>
         </LinearLayout>
 
@@ -119,20 +118,16 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="12dp"
+                android:layout_marginRight="@dimen/d12_size"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/bg_btn_activity_cancel"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="@dimen/s16_size"
                 android:text="取消"/>
         </LinearLayout>
-
     </LinearLayout>
-
-
-
 
 </FrameLayout>

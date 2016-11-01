@@ -18,7 +18,7 @@
             <!-- 顶部自定义actionbar、-->
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="@dimen/d60_size"
                 android:id="@+id/top_actionbar">
                 <ImageButton
                     android:layout_width="@dimen/d40_size"
@@ -40,7 +40,7 @@
                     android:layout_alignParentRight="true"/>
                 <LinearLayout
                     android:layout_centerInParent="true"
-                    android:layout_width="240dp"
+                    android:layout_width="@dimen/d240_size"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:gravity="center">
@@ -52,7 +52,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="@dimen/s16_size"
-                        android:textColor="#1b1c19"
                         android:gravity="center"/>
                     <TextView
                         android:id="@+id/top_detail"
@@ -91,8 +90,8 @@
                         android:layout_centerInParent="true"
                         android:src="@drawable/play_icon_selected_dot"
                         android:id="@+id/guide_02"
-                        android:layout_marginLeft="2dp"
-                        android:layout_marginRight="2dp"/>
+                        android:layout_marginLeft="@dimen/d2_size"
+                        android:layout_marginRight="@dimen/d2_size"/>
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -121,12 +120,12 @@
             <TextView
                 android:id="@+id/text_hasplay"
                 android:text="00:00"
-                android:layout_marginLeft="4dp"
+                android:layout_marginLeft="@dimen/d4_size"
                 style="@style/PlayTimeTextStyle"
                 android:textColor="@color/day_textcolor_primary"/>
             <SeekBar
                 android:id="@+id/seekbar"
-                android:maxHeight="2dp"
+                android:maxHeight="@dimen/d2_size"
                 android:progressDrawable="@drawable/bg_progress"
                 android:layout_width="0dp"
                 android:layout_weight="6"
@@ -135,7 +134,7 @@
             <TextView
                 android:id="@+id/text_remain"
                 android:text="00:00"
-                android:layout_marginRight="4dp"
+                android:layout_marginRight="@dimen/d4_size"
                 style="@style/PlayTimeTextStyle"
                 android:textColor="@color/day_textcolor_primary"/>
         </LinearLayout>
@@ -145,25 +144,25 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1.5"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="@dimen/d10_size">
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="@dimen/d60_size"
                 android:layout_centerVertical="true"
                 android:background="@color/transparent">
                 <ImageButton
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="@dimen/d50_size"
+                    android:layout_height="@dimen/d50_size"
                     android:id="@+id/playbar_model"
                     android:layout_alignParentLeft="true"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/play_btn_loop"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="16dp"/>
+                    android:layout_marginLeft="@dimen/d16_size"/>
                 <ImageButton
                     android:id="@+id/playbar_play"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="@dimen/d60_size"
+                    android:layout_height="@dimen/d60_size"
                     android:scaleType="center"
                     android:layout_centerInParent="true"
                     android:src="@drawable/play_btn_play"
@@ -171,30 +170,30 @@
                 <ImageButton
                     android:id="@+id/playbar_prev"
                     android:layout_toLeftOf="@id/playbar_play"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_marginRight="16dp"
+                    android:layout_width="@dimen/d60_size"
+                    android:layout_height="@dimen/d60_size"
+                    android:layout_marginRight="@dimen/d16_size"
                     android:layout_centerVertical="true"
                     android:src="@drawable/play_btn_pre"
                     android:background="?android:attr/selectableItemBackgroundBorderless"/>
                 <ImageButton
                     android:id="@+id/playbar_next"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="@dimen/d60_size"
+                    android:layout_height="@dimen/d60_size"
                     android:layout_toRightOf="@id/playbar_play"
                     android:layout_marginLeft="16dp"
                     android:layout_centerVertical="true"
                     android:src="@drawable/play_btn_next"
                     android:background="?android:attr/selectableItemBackgroundBorderless"/>
                 <ImageButton
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="@dimen/d50_size"
+                    android:layout_height="@dimen/d50_size"
                     android:id="@+id/playbar_playinglist"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:src="@drawable/play_btn_normal_list"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:layout_marginRight="16dp"/>
+                    android:layout_marginRight="@dimen/d16_size"/>
             </RelativeLayout>
         </RelativeLayout>
     </LinearLayout>

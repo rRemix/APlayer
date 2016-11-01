@@ -9,5 +9,5 @@
         android:layout_height="match_parent"
         android:paddingLeft="@dimen/d16_size"
         android:paddingRight="@dimen/d16_size"
-        android:textColor="#808080" />
+        android:textColor="@color/day_enable_text_color" />
 </LinearLayout>

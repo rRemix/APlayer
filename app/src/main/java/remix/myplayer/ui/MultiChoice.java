@@ -145,6 +145,7 @@ public class MultiChoice implements OnMultiItemClickListener {
         new MaterialDialog.Builder(mContext)
                 .title(R.string.add_to_playlist)
                 .titleColorAttr(R.attr.text_color_primary)
+                .buttonRippleColorAttr(R.attr.ripple_color)
                 .items(playlistNameList)
                 .itemsColorAttr(R.attr.text_color_primary)
                 .itemsCallback(new MaterialDialog.ListCallback() {
@@ -164,6 +165,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                         new MaterialDialog.Builder(mContext)
                                 .title(R.string.new_playlist)
                                 .titleColor(ThemeStore.getTextColorPrimary())
+                                .buttonRippleColorAttr(R.attr.ripple_color)
                                 .positiveText(R.string.create)
                                 .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
                                 .negativeText(R.string.cancel)

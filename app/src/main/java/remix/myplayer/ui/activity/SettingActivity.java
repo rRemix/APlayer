@@ -227,6 +227,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     MobclickAgent.onEvent(this,"NotifyColor");
                     new MaterialDialog.Builder(this)
                             .title("通知栏底色")
+                            .buttonRippleColorAttr(R.attr.ripple_color)
                             .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
                             .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"Setting","IsSystemColor",true) ? 0 : 1,
                                     new MaterialDialog.ListCallbackSingleChoice() {

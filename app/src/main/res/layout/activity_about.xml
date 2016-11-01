@@ -17,12 +17,12 @@
             android:orientation="vertical"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
-            android:layout_width="323dp"
-            android:layout_height="187dp"
+            android:layout_width="@dimen/d323_size"
+            android:layout_height="@dimen/d187_size"
             app:cardBackgroundColor="?attr/background_aboutus_color"
             app:cardCornerRadius="@dimen/d4_size"
             app:cardElevation="@dimen/d4_size"
-            android:layout_marginTop="28dp">
+            android:layout_marginTop="@dimen/d28_size">
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_gravity="center_horizontal"
@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <TextView
-                    android:layout_marginTop="28dp"
+                    android:layout_marginTop="@dimen/d28_size"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/s18_size"
@@ -40,18 +40,18 @@
                     android:layout_width="@dimen/d30_size"
                     android:layout_height="@dimen/d1_size"
                     android:background="?attr/text_color_primary"
-                    android:layout_marginTop="21dp"/>
+                    android:layout_marginTop="@dimen/d21_size"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/s14_size"
                     android:textColor="?attr/text_color_primary"
                     android:text="我们的第一个应用"
-                    android:layout_marginTop="20dp"/>
+                    android:layout_marginTop="@dimen/d20_size"/>
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="50dp"
+                    android:layout_marginTop="@dimen/d50_size"
                     android:orientation="horizontal"
                     android:gravity="center">
                     <ImageView
@@ -64,8 +64,8 @@
                         android:textSize="@dimen/s12_size"
                         android:textColor="?attr/text_color"
                         android:text="@string/version"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="5dp"/>
+                        android:layout_marginLeft="@dimen/d5_szie"
+                        android:layout_marginRight="@dimen/d5_szie"/>
                     <ImageView
                         android:layout_width="@dimen/d18_size"
                         android:layout_height="@dimen/d1_size"

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="300dp"
-    android:background="#fff">
+    android:layout_height="@dimen/d300_size"
+    android:background="@color/white">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:lines="1"
         android:gravity="center"
         android:ellipsize="end"
-        android:textColor="#001"
+        android:textColor="@color/black"
         android:text="添加到本地歌单"
-        android:textSize="17sp"
+        android:textSize="@dimen/s17_size"
         android:paddingTop="@dimen/d10_size" />
 
     <TextView
@@ -34,12 +34,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="7"
-        android:layout_marginTop="1dp"
+        android:layout_marginTop="@dimen/d1_size"
         android:id="@+id/playlist_addto_list" />
     <Button
         android:id="@+id/playlist_addto_cancel"
-        android:layout_margin="20dp"
-        android:layout_width="130dp"
+        android:layout_margin="@dimen/d20_size"
+        android:layout_width="@dimen/d130_size"
         android:layout_weight="1"
         android:layout_height="0dp"
         android:gravity="center"

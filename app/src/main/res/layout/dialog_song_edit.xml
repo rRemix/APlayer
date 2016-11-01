@@ -13,7 +13,7 @@
             android:id="@+id/song_edt"
             android:hint="请输入歌曲名"
             android:imeOptions="actionNext"
-            android:singleLine="true"
+            android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </android.support.design.widget.TextInputLayout>
@@ -27,7 +27,7 @@
             android:hint="请输入专辑"
             android:id="@+id/album_edt"
             android:imeOptions="actionNext"
-            android:singleLine="true"
+            android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </android.support.design.widget.TextInputLayout>
@@ -41,7 +41,7 @@
             android:hint="请输入艺术家"
             android:id="@+id/artist_edt"
             android:imeOptions="actionNext"
-            android:singleLine="true"
+            android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </android.support.design.widget.TextInputLayout>
@@ -55,7 +55,7 @@
             android:hint="请输入年代"
             android:id="@+id/year_edt"
             android:imeOptions="actionNext"
-            android:singleLine="true"
+            android:maxLines="1"
             android:inputType="number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

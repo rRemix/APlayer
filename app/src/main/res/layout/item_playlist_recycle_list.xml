@@ -13,8 +13,7 @@
         android:id="@+id/item_simpleiview"
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImageScaleType="centerCrop"
-        fresco:placeholderImage="@drawable/album_empty_bg"
-        fresco:failureImage="@drawable/album_empty_bg"
+        fresco:placeholderImage="?attr/default_album"
         fresco:failureImageScaleType="centerCrop"
         android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/d8_size"/>
@@ -48,9 +47,9 @@
     <!--结尾处按钮-->
     <ImageButton
         android:layout_alignParentRight="true"
-        android:layout_marginRight="16dp"
+        android:layout_marginRight="@dimen/d16_size"
         android:id="@+id/item_button"
-        android:layout_width="60dp"
+        android:layout_width="@dimen/d40_size"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:src="@drawable/list_icn_more"

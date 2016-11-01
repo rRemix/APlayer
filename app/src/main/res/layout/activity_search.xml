@@ -44,7 +44,7 @@
                 android:textSize="@dimen/s16_size"
                 android:textColor="#EAEAEA"
                 android:textColorHint="#EAEAEA"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:hint="@string/search_song_artist_album"
                 android:imeOptions="actionSearch"
                 android:textCursorDrawable="@drawable/bg_cursor_gray"/>

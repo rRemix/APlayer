@@ -1,6 +1,7 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar"/>
+    <style name="BaseDialogTheme" parent="Theme.AppCompat.Dialog">
 
     </style>
 
@@ -45,7 +46,6 @@
 
     <!-- 播放时间 -->
     <style name="PlayTimeTextStyle">
-
         <item name="android:layout_weight">1</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
@@ -135,6 +135,10 @@
         <item name="background_aboutus_color">@color/white_f6f6f5</item>
         <item name="text_color_primary">@color/day_textcolor_primary</item>
         <item name="text_color">@color/day_textcolor</item>
+        <item name="default_album">@drawable/album_empty_bg_day</item>
+        <item name="default_artist">@drawable/artist_empty_bg_day</item>
+        <item name="colorControlHighlight">@color/day_ripple_color</item>
+        <item name="ripple_color">@color/day_ripple_color</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Light</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
 
@@ -156,6 +160,10 @@
         <item name="background_aboutus_color">@color/gray_323232</item>
         <item name="text_color_primary">@color/night_textcolor_primary</item>
         <item name="text_color">@color/night_textcolor</item>
+        <item name="default_album">@drawable/album_empty_bg_night</item>
+        <item name="default_artist">@drawable/artist_empty_bg_night</item>
+        <item name="ripple_color">@color/night_ripple_color</item>
+        <item name="colorControlHighlight">@color/night_ripple_color</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Dark</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
         <item name="android:textColor">@color/md_brown_primary</item>

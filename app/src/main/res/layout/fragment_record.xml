@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="15dp">
+    android:padding="@dimen/d15_size">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -10,23 +10,23 @@
         android:background="@drawable/note_bg">
         <remix.myplayer.ui.customview.PagerEditText
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="@dimen/d200_size"
             android:id="@+id/edit_record"
             android:maxLength="140"
             android:gravity="left"
             android:textColor="#50452f"
             android:textSize="@dimen/s14_size"
             android:hint="写点什么吧"
-            android:padding="15dp"
+            android:padding="@dimen/d15_size"
             android:textCursorDrawable="@null"
             android:background="@null"/>
 
         <remix.myplayer.ui.customview.PagerButton
             android:layout_width="wrap_content"
-            android:layout_height="32dp"
+            android:layout_height="@dimen/d32_size"
             android:layout_gravity="bottom|right"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginRight="@dimen/d16_size"
+            android:layout_marginBottom="@dimen/d16_size"
             android:background="@drawable/bg_btn_record_share"
             android:id="@+id/sharebtn"
             android:text="以海报分享"

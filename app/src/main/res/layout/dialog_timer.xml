@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:CircleSeekBar="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="274dp"
-    android:layout_height="410dp"
+    android:orientation="vertical" android:layout_width="@dimen/d274_size"
+    android:layout_height="@dimen/d410_size"
     android:background="@drawable/timer_bg" >
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="@dimen/d48_size"
         android:text="伴着音乐入睡"
-        android:textColor="#1c1b19"
-        android:textSize="20sp"
-        android:paddingLeft="32dp"
+        android:textColor="@color/black_1c1b19"
+        android:textSize="@dimen/s20_size"
+        android:paddingLeft="@dimen/d32_size"
         android:gravity="left|center_vertical" />
 
     <LinearLayout
-        android:layout_marginLeft="23dp"
-        android:layout_marginRight="23dp"
+        android:layout_marginLeft="@dimen/d23_size"
+        android:layout_marginRight="@dimen/d23_size"
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#d3d2d3"/>
+        android:background="@color/gray_d3d2d3"/>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="238dp"
+        android:layout_height="@dimen/d238_size"
         android:gravity="center">
         <remix.myplayer.ui.customview.CircleSeekBar
             android:layout_gravity="center"
             android:id="@+id/close_seekbar"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="@dimen/d200_size"
+            android:layout_height="@dimen/d200_size"
             CircleSeekBar:progress_max="60"
-            CircleSeekBar:progress_width="4dp" />
+            CircleSeekBar:progress_width="@dimen/d4_size" />
         <TextView
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/close_time"
-            android:textSize="24sp"
-            android:textColor="#1b1c19"
+            android:textSize="@dimen/s24_size"
+            android:textColor="@color/black_1b1c19"
             android:text="00:00min"/>
     </FrameLayout>
 
@@ -47,15 +47,15 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="@dimen/d10_size"
         android:id="@+id/popup_timer_container">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#272628"
-            android:textSize="13sp"
+            android:textColor="@color/gray_272628"
+            android:textSize="@dimen/s13_size"
             android:text="设为默认"
-            android:layout_marginRight="8dp"/>
+            android:layout_marginRight="@dimen/d8_size"/>
         <android.support.v7.widget.SwitchCompat
             android:visibility="invisible"
             android:layout_width="wrap_content"
@@ -70,36 +70,36 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
         <LinearLayout
-            android:layout_marginLeft="55dp"
-            android:layout_marginRight="55dp"
+            android:layout_marginLeft="@dimen/d55_size"
+            android:layout_marginRight="@dimen/d55_size"
             android:layout_gravity="center_horizontal"
             android:layout_width="match_parent"
             android:layout_height="1px"
-            android:background="#d3d2d3"
-            android:layout_marginBottom="5dp"/>
+            android:background="@color/gray_d3d2d3"
+            android:layout_marginBottom="@dimen/d5_szie"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="@dimen/d5_szie"
             android:gravity="center"
             android:text="设为默认后下次点击'定时停止'按钮将直接开始计时"
             android:textSize="8sp"
-            android:textColor="#b2b1b2"/>
+            android:textColor="@color/gray_b2b1b2"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="@dimen/d5_szie"
             android:gravity="center"
             android:text="在开始计时时点击'定时停止'按钮可重新设置"
             android:textSize="8sp"
-            android:textColor="#b2b1b2"/>
+            android:textColor="@color/gray_b2b1b2"/>
     </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginTop="@dimen/d10_size"
+        android:layout_marginBottom="@dimen/d16_size">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
             android:layout_marginRight="@dimen/d20_size"
             android:layout_marginLeft="@dimen/d16_size"
             android:gravity="center"
-            android:padding="2dp"
+            android:padding="@dimen/d2_size"
             android:textSize="@dimen/s16_size"
             android:text="开始计时" />
         <Button
@@ -118,7 +118,7 @@
             android:id="@+id/close_stop"
             android:layout_toLeftOf="@id/close_toggle"
             android:gravity="center"
-            android:padding="2dp"
+            android:padding="@dimen/d2_size"
             android:textSize="@dimen/s16_size"
             android:text="关闭"/>
     </RelativeLayout>
