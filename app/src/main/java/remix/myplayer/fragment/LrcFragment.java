@@ -15,7 +15,7 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.model.LrcInfo;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.ui.customview.LrcView;
+import remix.myplayer.lrc.LrcView;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.lrc.SearchLRC;
 

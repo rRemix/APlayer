@@ -49,7 +49,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.customview.AudioViewPager;
-import remix.myplayer.ui.customview.LrcView;
+import remix.myplayer.lrc.LrcView;
 import remix.myplayer.ui.dialog.PlayQueueDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -333,7 +333,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             }
         });
 
-        new BitmapThread().start();
+        new SwatchThread().start();
     }
 
 
@@ -349,8 +349,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     public void onResume() {
         super.onResume();
         //更新界面
-        if(MusicService.getCurrentMP3() != mInfo)
-            UpdateUI(MusicService.getCurrentMP3(),MusicService.getIsplay());
+        if(MusicService.getCurrentMP3().getId() != mInfo.getId()) {
+            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
+        }
         mIsRunning = true;
         //更新进度条
         new ProgeressThread().start();
@@ -362,6 +363,12 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         mIsRunning = false;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mRawBitMap != null && !mRawBitMap.isRecycled())
+            mRawBitMap.recycle();
+    }
 
     private void initGuide() {
         mGuideList = new ArrayList<>();
@@ -378,7 +385,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         mDuration = (int)mInfo.getDuration();
         final int temp = MusicService.getProgress();
         mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
-        LogUtil.d(TAG,"Duration:" + mDuration + "  CurrentTime:" + mCurrentTime);
 
         if(mDuration > 0 && mCurrentTime >= 0 && (mDuration - mCurrentTime) > 0){
             mHasPlay.setText(CommonUtil.getTime(mCurrentTime));
@@ -574,7 +580,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             mDuration = (int) mInfo.getDuration();
             mSeekBar.setMax(mDuration);
 
-            new BitmapThread().start();
+            new SwatchThread().start();
         }
         //操作为播放选中歌曲时不更新背景
         //只更新按钮状态
@@ -662,8 +668,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     }
 
 
-    //高斯模糊线程
-    class BitmapThread extends Thread{
+    class SwatchThread extends Thread{
         @Override
         public void run() {
             if(mInfo != null){

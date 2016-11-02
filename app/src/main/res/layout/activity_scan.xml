@@ -31,7 +31,7 @@
 
         <remix.myplayer.ui.customview.FilterSizeSeekBar
             android:layout_marginTop="@dimen/d32_size"
-            android:layout_marginLeft="@dimen/d323_size"
+            android:layout_marginLeft="@dimen/d32_size"
             android:layout_marginRight="@dimen/d32_size"
             android:layout_width="match_parent"
             android:layout_height="@dimen/d50_size"

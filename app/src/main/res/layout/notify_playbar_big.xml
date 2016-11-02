@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/d120_size"
+    android:layout_height="120dp"
     android:orientation="horizontal">
 
     <ImageView
@@ -19,7 +19,7 @@
             android:id="@+id/notify_image"
             android:layout_margin="@dimen/d4_size"
             android:layout_width="@dimen/d120_size"
-            android:layout_height="@dimen/d12_size"
+            android:layout_height="@dimen/d120_size"
             android:layout_centerVertical="true"
             android:src="@drawable/song_artist_empty_bg"
             android:scaleType="centerCrop"/>

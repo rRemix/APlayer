@@ -1,8 +1,6 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -15,25 +13,20 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
-import java.io.File;
-import java.util.ArrayList;
-
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadImage;
-import remix.myplayer.model.PlayListNewInfo;
 import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
-import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.MultiPosition;
+import remix.myplayer.model.PlayListNewInfo;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 
 /**
@@ -95,8 +88,6 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
                 Theme.TintDrawable(holder.mButton,
                         isLove ? R.drawable.playlist_love : R.drawable.list_icn_more,
                         ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
-//                Theme.TintDrawable(holder.mButton, R.drawable.list_icn_more,
-//                        ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
                 if(!isLove){
                     holder.mButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -111,6 +102,9 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
                         }
                     });
                 }
+                holder.mButton.setBackgroundResource(isLove ? R.color.transparent : R.drawable.bg_common_ripple);
+                holder.mButton.setClickable(!isLove);
+
             }
 
             //是否处于选中状态
@@ -164,6 +158,9 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
         }
     }
 
+    /**
+     * 先查找是否设置过封面，没有再查找播放列表下所有歌曲，直到有一首歌曲存在封面
+     */
 //    class AsynLoadImage extends AsyncTask<Integer,Integer,String> {
 //        private final SimpleDraweeView mImage;
 //        public AsynLoadImage(SimpleDraweeView imageView) {
@@ -171,8 +168,13 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
 //        }
 //        @Override
 //        protected String doInBackground(Integer... params) {
-//            ArrayList<Integer> list = PlayListUtil.getIDList(params[0]);
+//            int playListId = params[0];
+//            ArrayList<Integer> list = PlayListUtil.getIDList(playListId);
 //            String url = null;
+//            File imgFile =  new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(playListId) * 255 + ""));
+//            if(imgFile != null && imgFile.exists())
+//                return imgFile.getAbsolutePath();
+//
 //            if(list != null && list.size() > 0) {
 //                for(Integer id : list){
 //                    MP3Item item = MediaStoreUtil.getMP3InfoById(id);

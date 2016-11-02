@@ -1,4 +1,4 @@
-package remix.myplayer.ui.customview;
+package remix.myplayer.lrc;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -14,7 +14,6 @@ import android.widget.Scroller;
 
 import java.util.ArrayList;
 
-import remix.myplayer.lrc.onSeekListener;
 import remix.myplayer.model.LrcInfo;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
@@ -219,13 +218,13 @@ public class LrcView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(mLrcList == null || mLrcList.size() == 0) {
-            return super.onTouchEvent(event);
+            return true;
         }
         //外部viewpager正在滑动，不响应滑动
         LogUtil.d(TAG,"isViewPagerScroll:" + mIsViewPagerScroll);
-        if(mIsViewPagerScroll){
-            return super.onTouchEvent(event);
-        }
+//        if(mIsViewPagerScroll){
+//            return true;
+//        }
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
                 mLastMotionY = event.getY();
@@ -281,7 +280,7 @@ public class LrcView extends View {
             mHightLightRow = Math.min(mHightLightRow,mTotalRow - 1);
         }
 //        scrollTo(0,(mSpacing + mNormalTextSize) * mHightLightRow);
-        smoothScrollTo((mSpacing + mNormalTextSize) * mHightLightRow, 150);
+        smoothScrollTo((mSpacing + mNormalTextSize) * mHightLightRow, 100);
         mLastMotionY = event.getY();
     }
 

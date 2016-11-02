@@ -3,6 +3,7 @@ package remix.myplayer.ui.dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +15,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -27,7 +27,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -43,13 +45,13 @@ import remix.myplayer.util.ToastUtil;
 public class OptionDialog extends BaseDialogActivity {
     //添加 设置铃声 分享 删除按钮
     @BindView(R.id.popup_add)
-    ImageView mAdd;
+    View mAdd;
     @BindView(R.id.popup_ring)
-    ImageView mRing;
+    View mRing;
     @BindView(R.id.popup_share)
-    ImageView mShare;
+    View mShare;
     @BindView(R.id.popup_delete)
-    ImageView mDelete;
+    View mDelete;
 
     //标题
     @BindView(R.id.popup_title)
@@ -91,6 +93,10 @@ public class OptionDialog extends BaseDialogActivity {
         lp.width = (metrics.widthPixels);
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
+
+        Drawable bg = Theme.getPressDrawable(this,R.drawable.bg_list_default_day, ColorUtil.getColor(R.color.day_ripple_color));
+//        mAdd.setBackground(bg);
+//        mRing.setBackground(bg);
     }
 
     @OnClick({R.id.popup_add,R.id.popup_share,R.id.popup_delete,R.id.popup_ring})
@@ -109,7 +115,7 @@ public class OptionDialog extends BaseDialogActivity {
             //设置铃声
             case R.id.popup_ring:
                 MobclickAgent.onEvent(this,"Ring");
-                setRing(mInfo.getUrl(), mInfo.getId());
+                setRing(mInfo.getId());
                 finish();
                 break;
             //分享
@@ -171,18 +177,17 @@ public class OptionDialog extends BaseDialogActivity {
 
     /**
      * 设置铃声
-     * @param path
-     * @param Id
+     * @param audioId
      */
-    private void setRing(String path, int Id) {
+    private void setRing(int audioId) {
         ContentValues cv = new ContentValues();
         cv.put(MediaStore.Audio.Media.IS_RINGTONE, true);
         cv.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);
         cv.put(MediaStore.Audio.Media.IS_ALARM, false);
         cv.put(MediaStore.Audio.Media.IS_MUSIC, false);
         // 把需要设为铃声的歌曲更新铃声库
-        if(getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cv, MediaStore.MediaColumns.DATA + "=?", new String[]{path}) > 0) {
-            Uri newUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, Id);
+        if(getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cv, MediaStore.MediaColumns._ID + "=?", new String[]{audioId + ""}) > 0) {
+            Uri newUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, audioId);
             RingtoneManager.setActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE, newUri);
             ToastUtil.show(this,R.string.set_ringtone_success);
         }

@@ -3,10 +3,12 @@ package remix.myplayer.ui.activity;
 import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.ColorInt;
 import android.support.v7.graphics.Palette;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -32,6 +34,7 @@ import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
@@ -80,42 +83,34 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     //是否正在运行
     private static boolean mIsRunning = false;
 
-
     //高斯模糊后的bitmap
     private Bitmap mNewBitMap;
     //高斯模糊之前的bitmap
     private Bitmap mRawBitMap;
     private int mWidth;
     private int mHeight;
+    //歌曲名字体颜色
+    @ColorInt
+    private int mSongColor;
+    //艺术家字体颜色
+    @ColorInt
+    private int mArtistColor;
     //是否添加到收藏列表
     private boolean mIsLove = false;
     //是否正在播放
     private static boolean mIsPlay = false;
     //是否第一次打开
     private boolean mIsFirst = true;
+    private Palette.Swatch mSwatch;
     private Handler mBlurHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             //设置背景
-//            mImageBackground.setImageBitmap(mNewBitMap);
             mImageBackground.setImageBitmap(mNewBitMap);
-
-//            mImageBackground.setImageBitmap(mRawBitMap);
-//            mBlurringView.invalidate();
             //变化字体颜色
-            if(mSong != null && mArtist != null && mRawBitMap != null){
-                Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
-                    @Override
-                    public void onGenerated(Palette palette) {
-                        Palette.Swatch e = palette.getDarkMutedSwatch();//柔和 暗色
-                        if(e != null){
-                            LogUtil.d(TAG,"mill: population --" + e.getPopulation());
-                            mSong.setTextColor(e.getBodyTextColor());
-                            mArtist.setTextColor(e.getTitleTextColor());
-
-                        }
-                    }
-                });
+            if(mSong != null && mArtist != null ){
+                mSong.setTextColor(mSongColor);
+                mArtist.setTextColor(mArtistColor);
             }
         }
     };
@@ -229,6 +224,15 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mRawBitMap != null && !mRawBitMap.isRecycled())
+            mRawBitMap.recycle();
+        if(mNewBitMap != null && !mNewBitMap.isRecycled())
+            mNewBitMap.recycle();
+    }
+
+    @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
         LogUtil.d(TAG,this.toString());
         mInfo = MP3Item;
@@ -253,10 +257,9 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         mIsLove = false;
         try {
             ArrayList<Integer> list = PlayListUtil.getIDList(Global.mMyLoveId);
-            if(list == null || list.size() == 0)
-                return;
-            if(list.contains(mInfo.getId()))
+            if(list != null && list.size() != 0 && list.contains(mInfo.getId())){
                 mIsLove = true;
+            }
         } catch (Exception e){
             LogUtil.d(TAG,"list error:" + e.toString());
             e.printStackTrace();
@@ -287,10 +290,8 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
             return;
         if(!mIsLove){
             PlayListUtil.addSong(new PlayListSongInfo(mInfo.getId(),Global.mMyLoveId,getString(R.string.my_favorite)));
-//            XmlUtil.addSongToPlayList(getString(R.string.my_favorite),mInfo.getTitle(),mInfo.getId(),mInfo.getAlbumId(),mInfo.getArtist(),true);
         } else {
             PlayListUtil.deleteSong(mInfo.getId(),Global.mMyLoveId);
-//            XmlUtil.deleteSongFromPlayList(getString(R.string.my_favorite),new PlayListItem(mInfo.getTitle(),mInfo.getId(),mInfo.getAlbumId(),mInfo.getArtist()));
         }
         mIsLove = !mIsLove;
         mLoveButton.setImageResource(mIsLove ? R.drawable.lock_btn_loved : R.drawable.lock_btn_love);
@@ -304,17 +305,29 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     class BlurThread extends Thread{
         @Override
         public void run() {
-            if (mWidth > 0 && mHeight > 0 ) {
-                if (mInfo == null) return;
-                mRawBitMap = MediaStoreUtil.getAlbumBitmapBySongId((int) mInfo.getId(),false);
-                if(mRawBitMap == null)
-                    mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.artist_empty_bg_night);
+            if (mInfo == null)
+                return;
+            mRawBitMap = MediaStoreUtil.getAlbumBitmapBySongId(mInfo.getId(),false);
+            if(mRawBitMap == null)
+                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_day);
 
+            StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
+            mStackBlurManager.process(40);
+            mNewBitMap = mStackBlurManager.returnBlurredImage();
 
-                StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
-                mStackBlurManager.process(40);
-                mNewBitMap = mStackBlurManager.returnBlurredImage();
-            }
+            Palette.from(mNewBitMap).generate(new Palette.PaletteAsyncListener() {
+                @Override
+                public void onGenerated(Palette palette) {
+                    mSwatch = palette.getDarkMutedSwatch();//柔和 暗色
+                    if(mSwatch == null)
+                        mSwatch = new Palette.Swatch(Color.GRAY,100);
+
+//                    mSongColor = ColorUtil.shiftColor(mSwatch.getRgb(),0.7f);
+//                    mArtistColor = ColorUtil.shiftColor(mSwatch.getRgb(),0.7f);
+                    mSongColor = mSwatch.getBodyTextColor();
+                    mArtistColor = mSwatch.getTitleTextColor();
+                }
+            });
             mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
         }
     }

@@ -46,11 +46,11 @@ public class CoverFragment extends BaseFragment {
     private static final int NOCOVER = 2;
     private Uri mUri = Uri.EMPTY;
     private final int WITH_ANIM =  1;
-    private final int NO_ANIM = 0;
+    private final int WITHOUT_ANIM = 0;
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            if(msg.what == NO_ANIM) {
+            if(msg.what == WITHOUT_ANIM) {
                 mImage.setImageURI(mUri);
             }
             if(msg.what == WITH_ANIM){
@@ -123,7 +123,7 @@ public class CoverFragment extends BaseFragment {
             return;
         if (mImage == null || (mInfo = info) == null)
             return;
-        new UpdateCoverThread(mInfo.getAlbumId(),withAnim ? WITH_ANIM : NO_ANIM).start();
+        new UpdateCoverThread(mInfo.getAlbumId(),withAnim ? WITH_ANIM : WITHOUT_ANIM).start();
 //        mUri = Uri.parse("file://" + MediaStoreUtil.getImageUrl(mInfo.getAlbumId() + "",Constants.URL_ALBUM));
 //        if(withAnim){
 //            //根据操作是上一首还是下一首播放动画
@@ -140,15 +140,15 @@ public class CoverFragment extends BaseFragment {
     }
 
     class UpdateCoverThread extends Thread{
-        private long mAlbumId;
+        private int mAlbumId;
         private int mWithAnim = 0;
-        public UpdateCoverThread(long id,int withAnim){
+        public UpdateCoverThread(int id,int withAnim){
             mAlbumId = id;
             mWithAnim = withAnim;
         }
         @Override
         public void run() {
-            mUri = Uri.parse("file://" + MediaStoreUtil.getImageUrl(mAlbumId + "",Constants.URL_ALBUM));
+            mUri = Uri.parse("file://" +  MediaStoreUtil.getAlbumUrlByAlbumId(mAlbumId));
             Message msg = new Message();
             msg.what = mWithAnim;
             mHandler.sendMessage(msg);

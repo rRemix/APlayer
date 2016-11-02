@@ -38,26 +38,30 @@
         android:layout_below="@id/lockscreen_image">
         <TextView
             android:id="@+id/lockscreen_song"
-            android:layout_width="@dimen/d300_size"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:lines="1"
+            android:maxLines="1"
             android:ellipsize="end"
             android:layout_marginTop="@dimen/d12_size"
             android:textSize="@dimen/s18_size"
             android:textColor="@color/black_1b1a1c"
-            android:text="歌曲"/>
+            android:text="歌曲"
+            android:layout_marginLeft="@dimen/d10_size"
+            android:layout_marginRight="@dimen/d10_size"/>
         <TextView
             android:id="@+id/lockscreen_artist"
-            android:layout_width="@dimen/d300_size"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:lines="1"
+            android:maxLines="1"
             android:ellipsize="end"
             android:layout_marginTop="@dimen/d12_size"
             android:textSize="@dimen/s16_size"
             android:textColor="@color/gray_8d8c8e"
-            android:text="歌手"/>
+            android:text="歌手"
+            android:layout_marginLeft="@dimen/d10_size"
+            android:layout_marginRight="@dimen/d10_size"/>
     </LinearLayout>
 
     <LinearLayout

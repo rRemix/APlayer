@@ -119,9 +119,13 @@
             <!--已播放时间-->
             <TextView
                 android:id="@+id/text_hasplay"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textSize="@dimen/s11_size"
                 android:text="00:00"
                 android:layout_marginLeft="@dimen/d4_size"
-                style="@style/PlayTimeTextStyle"
                 android:textColor="@color/day_textcolor_primary"/>
             <SeekBar
                 android:id="@+id/seekbar"
@@ -133,9 +137,13 @@
             <!--剩余播放时间-->
             <TextView
                 android:id="@+id/text_remain"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textSize="@dimen/s11_size"
                 android:text="00:00"
                 android:layout_marginRight="@dimen/d4_size"
-                style="@style/PlayTimeTextStyle"
                 android:textColor="@color/day_textcolor_primary"/>
         </LinearLayout>
 

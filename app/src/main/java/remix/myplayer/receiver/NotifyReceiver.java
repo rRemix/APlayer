@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -34,17 +35,16 @@ public class NotifyReceiver extends BroadcastReceiver {
     private NotificationManager mNotificationManager;
     @Override
     public void onReceive(Context context, Intent intent) {
-        UpdateNotify(context,intent.getBooleanExtra("FromMainActivity",false));
+        UpdateNotify(context);
     }
 
-    private void UpdateNotify(Context context,boolean frommainactivity) {
-        boolean isBig = context.getResources().getDisplayMetrics().widthPixels >= 1000;
+    private void UpdateNotify(Context context) {
+        boolean isBig = (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_NORMAL;
 
         mRemoteView = new RemoteViews(context.getPackageName(), isBig ? R.layout.notify_playbar_big : R.layout.notify_playbar);
 
         mIsplay = MusicService.getIsplay();
-//        if(frommainactivity && !mIsplay)
-//            return;
+
         if(!Global.isNotifyShowing() && !mIsplay)
             return;
         

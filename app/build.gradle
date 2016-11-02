@@ -12,8 +12,21 @@ android {
         versionCode 6
         versionName "1.1.2"
     }
+
+    signingConfigs{
+        release {
+            storeFile file("keystore.jks")
+            storePassword "xbr19921010"
+            keyAlias "remix"
+            keyPassword "xbr19921010"
+        }
+        debug {
+        }
+    }
+
     buildTypes {
         debug {
+            signingConfig signingConfigs.release
             debuggable true
             minifyEnabled false
         }
@@ -23,6 +36,7 @@ android {
             buildConfigField "boolean", "LOG_DEBUG", "false"
             zipAlignEnabled true
             shrinkResources true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

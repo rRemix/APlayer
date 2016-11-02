@@ -3,7 +3,7 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="176dp"
+    android:layout_height="wrap_content"
     android:background="@color/white"
     android:layout_gravity="bottom">
     <LinearLayout
@@ -43,19 +43,22 @@
         android:background="#d9d9d9"/>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical">
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="@dimen/d8_size"
+        android:layout_marginBottom="@dimen/d8_size">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center">
-            <ImageButton
+            android:gravity="center"
+            android:id="@+id/popup_add"
+            android:background="?attr/selectableItemBackground">
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/d8_size"
-                android:id="@+id/popup_add"
                 android:background="@color/white"
                 android:src="@drawable/bg_btn_popup_add"/>
             <TextView
@@ -72,12 +75,12 @@
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center">
-            <ImageButton
+            android:gravity="center"
+            android:id="@+id/popup_ring">
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/d8_size"
-                android:id="@+id/popup_ring"
                 android:background="@color/white"
                 android:src="@drawable/bg_btn_popup_ring"/>
             <TextView
@@ -94,12 +97,12 @@
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center">
-            <ImageButton
+            android:gravity="center"
+            android:id="@+id/popup_share">
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/d8_size"
-                android:id="@+id/popup_share"
                 android:background="@color/white"
                 android:src="@drawable/bg_btn_popup_share"/>
             <TextView
@@ -116,12 +119,12 @@
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center">
-            <ImageButton
+            android:gravity="center"
+            android:id="@+id/popup_delete">
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/d8_size"
-                android:id="@+id/popup_delete"
                 android:background="@color/white"
                 android:src="@drawable/bg_btn_popup_delete"/>
             <TextView
@@ -135,15 +138,4 @@
 
     </LinearLayout>
 
-    <!--<PagerButton-->
-        <!--android:layout_marginTop="10dp"-->
-        <!--android:layout_width="130dp"-->
-        <!--android:layout_height="30dp"-->
-        <!--android:gravity="center"-->
-        <!--android:id="@+id/popup_cancel"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:text="取消"-->
-        <!--android:textSize="18dp"-->
-        <!--android:textColor="@color/translucence"-->
-        <!--android:background="@drawable/bg_boder"/>-->
 </LinearLayout>

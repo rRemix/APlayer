@@ -159,27 +159,43 @@ public class MediaStoreUtil {
             if(cursor != null && !cursor.isClosed())
                 cursor.close();
         }
-
         return mp3Infolist;
     }
 
 
     /**
      * 根据参数和类型获得专辑封面
-     * @param id 参数,包括歌曲id、歌手id、歌曲名、专辑id、播放列表id
+     * @param arg 参数,包括歌曲id、歌曲名、专辑id、播放列表id
      * @param type 查询类型
      * @return 专辑url
      */
-    public static String getImageUrl(String id,int type) {
-        if(id == null || id.equals(""))
+    public static String getImageUrl(String arg,int type) {
+        if(arg == null || arg.equals(""))
             return null;
         //如果是专辑或者艺术家，先查找本地缓存
         if(type == Constants.URL_ARTIST || type == Constants.URL_ALBUM || type == Constants.URL_PLAYLIST ){
-            File img = type == Constants.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + ""))
-                    : type == Constants.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + ""))
-                    : new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(id) * 255 + ""));
-            if(img.exists() || type == Constants.URL_PLAYLIST){
+            File img = type == Constants.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(arg) * 255 + ""))
+                    : type == Constants.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(arg) * 255 + ""))
+                    : new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(arg) * 255 + ""));
+            if(img.exists()){
                 return img.getAbsolutePath();
+            }
+            //没有设置过封面，对于播放列表类型的查找播放列表下所有歌曲，直到有一首歌曲存在封面
+            if(type == Constants.URL_PLAYLIST){
+                ArrayList<Integer> songIdList = PlayListUtil.getIDList(Integer.valueOf(arg));
+                for (Integer songId : songIdList){
+                    MP3Item item = MediaStoreUtil.getMP3InfoById(songId);
+                    if(item == null)
+                        continue;
+                    String imgUrl = getAlbumUrlByAlbumId(item.getAlbumId());
+                    if(imgUrl != null && !imgUrl.equals("")) {
+                        File playlistImgFile = new File(imgUrl);
+                        if(playlistImgFile.exists()) {
+                            return playlistImgFile.getAbsolutePath();
+                        }
+                    }
+                }
+                return "";
             }
         }
 
@@ -190,19 +206,15 @@ public class MediaStoreUtil {
 
         switch (type) {
             case Constants.URL_ARTIST:
-                selection = MediaStore.Audio.Media.ARTIST_ID + "=" + id;
-                selectionArg = null;
-                break;
-            case Constants.URL_SONGID:
-                selection = MediaStore.Audio.Media._ID + "=" + id;
+                selection = MediaStore.Audio.Media.ARTIST_ID + "=" + arg;
                 selectionArg = null;
                 break;
             case Constants.URL_NAME:
                 selection = MediaStore.Audio.Media.TITLE + "=?";
-                selectionArg = new String[]{id};
+                selectionArg = new String[]{arg};
                 break;
             case Constants.URL_ALBUM:
-                selection = MediaStore.Audio.Albums._ID + "=" + id;
+                selection = MediaStore.Audio.Albums._ID + "=" + arg;
                 selectionArg = null;
         }
         String album_art = "";
@@ -224,16 +236,16 @@ public class MediaStoreUtil {
 
     /**
      * 根据专辑id查询图片url
-     * @param Id 专辑id
-     * @return 专辑url
+     * @param albumid 专辑id
+     * @return 专辑图片路径
      */
-    public static String getAlbumUrlByAlbumId(int Id) {
+    public static String getAlbumUrlByAlbumId(int albumid) {
         Cursor cursor = null;
         String url = "";
         try {
             ContentResolver resolver = mContext.getContentResolver();
             cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{"album_art"},
-                    MediaStore.Audio.Albums._ID + "=" + Id,
+                    MediaStore.Audio.Albums._ID + "=" + albumid,
                     null, null);
             if(cursor != null && cursor.getCount() > 0) {
                 cursor.moveToNext();
@@ -242,7 +254,7 @@ public class MediaStoreUtil {
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            if(cursor != null && cursor.isClosed())
+            if(cursor != null && !cursor.isClosed())
                 cursor.close();
         }
 
@@ -655,7 +667,7 @@ public class MediaStoreUtil {
             }catch (Exception e){
                 e.printStackTrace();
             }finally {
-                if(cursor != null && cursor.isClosed())
+                if(cursor != null && !cursor.isClosed())
                     cursor.close();
             }
 
@@ -703,7 +715,6 @@ public class MediaStoreUtil {
         Cursor cursor = null;
         ContentResolver resolver = mContext.getContentResolver();
         ArrayList<Integer> ids = new ArrayList<>();
-        ArrayList<MP3Item> mp3Items = new ArrayList<>();
         //专辑或者艺术家
         if(type == Constants.ALBUM || type == Constants.ARTIST){
             try {

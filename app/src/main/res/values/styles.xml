@@ -44,14 +44,6 @@
         <item name="textAllCaps">true</item>
     </style>
 
-    <!-- 播放时间 -->
-    <style name="PlayTimeTextStyle">
-        <item name="android:layout_weight">1</item>
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:gravity">center</item>
-        <item name="android:textSize">11dp</item>
-    </style>
 
 
     <!-- 播放列表对话框的风格 -->
@@ -60,7 +52,7 @@
         <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
     </style>
 
-    <!--底部弹出 parent="@android:style/Theme.Dialog"-->
+    <!--底部弹出 -->
     <style name="PopupBottomDialog" parent="@style/Theme.AppCompat.Dialog" >
         <item name="android:windowAnimationStyle">@style/AnimBottom</item>
         <item name="android:windowFrame">@null</item>

@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center">
-    <remix.myplayer.ui.customview.LrcView
+    <remix.myplayer.lrc.LrcView
         android:id="@+id/lrc_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
