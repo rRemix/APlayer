@@ -2,14 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="@dimen/d300_size"
-    android:background="@color/white">
+    android:background="?attr/background_color_3">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:lines="1"
         android:gravity="center"
         android:ellipsize="end"
-        android:textColor="@color/black"
+        android:textColor="?attr/text_color_primary"
         android:text="添加到本地歌单"
         android:textSize="@dimen/s17_size"
         android:paddingTop="@dimen/d10_size" />
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/d14_size"
         android:text="新建歌单..."
-        android:textColor="@color/black_737373"/>
+        android:textColor="?attr/text_color"/>
     <!--<ImageView-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="1dp"-->
@@ -36,18 +36,5 @@
         android:layout_weight="7"
         android:layout_marginTop="@dimen/d1_size"
         android:id="@+id/playlist_addto_list" />
-    <Button
-        android:id="@+id/playlist_addto_cancel"
-        android:layout_margin="@dimen/d20_size"
-        android:layout_width="@dimen/d130_size"
-        android:layout_weight="1"
-        android:layout_height="0dp"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        android:text="取消"
-        android:textSize="@dimen/s18_size"
-        android:textColor="@color/translucence"
-        android:background="@drawable/bg_boder"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+
 </LinearLayout>

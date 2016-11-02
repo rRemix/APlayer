@@ -10,7 +10,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -64,9 +63,6 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     ImageView mWechat;
     @BindView(R.id.share_circlefriend)
     ImageView mCircleFrient;
-    //取消按钮
-    @BindView(R.id.popup_share_cancel)
-    Button mCancel;
 
     private MP3Item mInfo;
     //Api
@@ -118,12 +114,9 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         }
     }
 
-    @OnClick({R.id.share_qq,R.id.share_weibo,R.id.share_wechat,R.id.share_circlefriend,R.id.popup_share_cancel})
+    @OnClick({R.id.share_qq,R.id.share_weibo,R.id.share_wechat,R.id.share_circlefriend})
     public void onShare(View v){
         switch (v.getId()){
-            case R.id.popup_share_cancel:
-                finish();
-                break;
             case R.id.share_qq:
                 if(mType == Constants.SHARESONG)
                     shareSongtoQQ();
@@ -177,7 +170,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         bundle.putString(QQShare.SHARE_TO_QQ_TARGET_URL, "http://music.baidu.com/" + "search?key=" + URLEncoder.encode(mInfo.getTitle()));
 //        if (album_url != null && !album_url.equals(""))
 //            bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, album_url);
-        bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, album_url != null ? album_url : Uri.parse("res://remix.myplayer/" + R.drawable.song_artist_empty_bg).toString());
+        bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, album_url != null ? album_url : Uri.parse("res://remix.myplayer/" + R.drawable.song_artist_empty_bg_night).toString());
         bundle.putString(QQShare.SHARE_TO_QQ_APP_NAME, getResources().getString(R.string.app_name));
         mTencentApi.shareToQQ(ShareDialog.this, bundle, mQQListener);
     }

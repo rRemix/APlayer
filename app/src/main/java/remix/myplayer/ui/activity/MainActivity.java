@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -22,7 +21,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,7 +48,6 @@ import remix.myplayer.interfaces.OnModeChangeListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -113,7 +110,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                 mMultiChoice.clearSelectedViews();
             }
             else if (msg.what == Constants.UPDATE_ADAPTER || msg.what == Constants.UPDATE_ALLSONG_ADAPTER){
-                boolean isAllSongOnly = msg.what == Constants.UPDATE_ADAPTER;
+                boolean isAllSongOnly = msg.what == Constants.UPDATE_ALLSONG_ADAPTER;
                 //刷新适配器
                 for(Fragment temp : getSupportFragmentManager().getFragments()){
                     if(temp instanceof SongFragment){
@@ -339,13 +336,13 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                         .title(R.string.new_playlist)
                         .titleColorAttr(R.attr.text_color_primary)
                         .positiveText(R.string.create)
-                        .positiveColor(ThemeStore.getStressColor())
+                        .positiveColorAttr(R.attr.text_color_primary)
                         .negativeText(R.string.cancel)
-                        .negativeColor(ThemeStore.getStressColor())
+                        .negativeColorAttr(R.attr.text_color_primary)
                         .buttonRippleColorAttr(R.attr.ripple_color)
                         .backgroundColorAttr(R.attr.background_color_3)
                         .content(R.string.input_playlist_name)
-                        .contentColor(ThemeStore.getTextColorPrimary())
+                        .contentColorAttr(R.attr.text_color_primary)
                         .inputRange(1,15)
                         .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
                             @Override
@@ -466,44 +463,10 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         TextView textView = (TextView)findViewById(R.id.header_txt);
         if(textView != null){
             GradientDrawable bg = new GradientDrawable();
-            bg.setColor(ThemeStore.getMaterialColorPrimaryDarkColor());
+            bg.setColor(ThemeStore.getMaterialPrimaryDarkColor());
             bg.setCornerRadius(DensityUtil.dip2px(this,4));
             textView.setBackground(bg);
         }
-//        mNavigationView.setItemTextAppearance(R.style.Drawer_text_style);
-//        ColorStateList colorStateList = new ColorStateList(new int[][]{{android.R.attr.state_pressed},{android.R.attr.state_checked} ,{}},
-//                new int[]{ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY), ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY),ColorUtil.getColor(R.color.gray_34353a)});
-//        mNavigationView.setItemIconTintList(colorStateList);
-//        mNavigationView.setItemTextColor(colorStateList);
-//        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-//            @Override
-//            public boolean onNavigationItemSelected(MenuItem item) {
-//                item.setChecked(true);
-//                switch (item.getItemId()) {
-//                    case R.id.item_recently:
-//                        //最近添加
-//                        startActivity(new Intent(MainActivity.this, RecetenlyActivity.class));
-//                        break;
-//                    case R.id.item_folder:
-//                        startActivity(new Intent(MainActivity.this, FolderActivity.class));
-//                        break;
-//                    case R.id.item_allsong:
-//                        mDrawerLayout.closeDrawer(mNavigationView);
-//                        break;
-//                    case R.id.item_setting:
-//                        //设置
-//                        startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), RESULT_UPDATE_THEME);
-//                        break;
-//                    case R.id.item_exit:
-//                        sendBroadcast(new Intent(Constants.EXIT));
-//                        break;
-//                    default:
-//                        break;
-//                }
-//                return true;
-//            }
-//        });
-
     }
 
     @Override

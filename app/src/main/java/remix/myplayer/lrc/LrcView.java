@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.PathEffect;
 import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Scroller;
@@ -62,9 +63,9 @@ public class LrcView extends View {
     //滑动后新的时间
     private int mNewProgress;
     //歌词滚动的动画时间
-    private final int ANIM_DURATION = 1000;
+    private final int ANIMDURATION = 1000;
     //最小滑动距离
-    private final int MIN_OFFSET = 10;
+    private final int MINOFFSET = 100;
     //每次绘制需要绘制的歌词，因为歌词的长度可能比屏幕更宽，所以需要多行绘制
     private ArrayList<String> mMultiLrc = new ArrayList<>();
 
@@ -212,23 +213,25 @@ public class LrcView extends View {
     }
 
     /**
-     * 最后一次触摸时间的y坐标
+     * 最后一次触摸的坐标
      */
     private float mLastMotionY = 0;
+    /**
+     * 是否需要刷新
+     */
+    private boolean mNeedUpdate = false;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(mLrcList == null || mLrcList.size() == 0) {
             return true;
         }
         //外部viewpager正在滑动，不响应滑动
-        LogUtil.d(TAG,"isViewPagerScroll:" + mIsViewPagerScroll);
-//        if(mIsViewPagerScroll){
-//            return true;
-//        }
+        if(mIsViewPagerScroll){
+            return true;
+        }
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
                 mLastMotionY = event.getY();
-                mIsDragging = true;
                 break;
             case MotionEvent.ACTION_MOVE:
                 seekTo(event);
@@ -243,45 +246,51 @@ public class LrcView extends View {
     }
 
     /**
-     * 根据滑动后的歌词高亮位置，计算歌曲播放进度
-     */
-    private void computeNewProgress() {
-        if(mHightLightRow < mLrcList.size() - 1) {
-            mNewProgress = mLrcList.get(mHightLightRow).getStartTime();
-            if(mLrcListener != null)
-                mLrcListener.onLrcSeek(mNewProgress);
-        }
-    }
-
-    /**
      * 上下滑动歌词控件
      * @param event
      */
     public void seekTo(MotionEvent event){
         float y = event.getY();
         float offsetY = y - mLastMotionY;
+
         //滑动距离过小
-        if(Math.abs(offsetY) < MIN_OFFSET){
+        if(Math.abs(offsetY) < MINOFFSET){
             return;
         }
 
+        mNeedUpdate = true;
+        mIsDragging = true;
         //计算滑动多少行
         int rowoffset = (int) (Math.abs(offsetY) / (mNormalTextSize + mSpacing));
         if(rowoffset == 0)
             return;
         //向上滑动，歌词向上移动
         if(offsetY > 0){
-            mHightLightRow -= rowoffset;
+            mHightLightRow -= (rowoffset );
             mHightLightRow = Math.max(mHightLightRow,0);
         }
         //向下滑动,歌词向下移动
         if(offsetY < 0){
-            mHightLightRow += rowoffset;
+            mHightLightRow += (rowoffset );
             mHightLightRow = Math.min(mHightLightRow,mTotalRow - 1);
         }
-//        scrollTo(0,(mSpacing + mNormalTextSize) * mHightLightRow);
-        smoothScrollTo((mSpacing + mNormalTextSize) * mHightLightRow, 100);
+
+        smoothScrollTo((mSpacing + mNormalTextSize) * mHightLightRow, 150);
+//        scrollBy(0, (int) offsetY);
+//        invalidate();
         mLastMotionY = event.getY();
+    }
+
+    /**
+     * 根据滑动后的歌词高亮位置，计算歌曲播放进度
+     */
+    private void computeNewProgress() {
+        if(mHightLightRow < mLrcList.size() - 1 && mNeedUpdate) {
+            mNeedUpdate = false;
+            mNewProgress = mLrcList.get(mHightLightRow).getStartTime();
+            if(mLrcListener != null)
+                mLrcListener.onLrcSeek(mNewProgress);
+        }
     }
 
     /**
@@ -298,7 +307,7 @@ public class LrcView extends View {
             return;
         if(!fromuser) {
             mHightLightRow = selectIndex(progress);
-            smoothScrollTo((mSpacing + mNormalTextSize) * mHightLightRow, ANIM_DURATION);
+            smoothScrollTo((mSpacing + mNormalTextSize) * mHightLightRow, ANIMDURATION);
             invalidate();
         }
 

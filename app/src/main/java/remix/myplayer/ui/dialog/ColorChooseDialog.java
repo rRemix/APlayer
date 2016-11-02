@@ -69,6 +69,7 @@ public class ColorChooseDialog extends BaseDialogActivity {
         check.setVisibility(isColorChoose(mdColor) ? View.VISIBLE : View.GONE);
         TextView colorTextView = (TextView) colorItem.findViewById(R.id.color_choose_item_text);
         colorTextView.setText(colorText);
+        colorTextView.setTextColor(ThemeStore.getTextColorPrimary());
 
         colorItem.setOnClickListener(new ColorLisener(themeColor));
         mColorContainer.addView(colorItem);
@@ -97,10 +98,10 @@ public class ColorChooseDialog extends BaseDialogActivity {
                 new MaterialDialog.Builder(ColorChooseDialog.this)
                         .content("当前为夜间模式，是否切换主题颜色?")
                         .buttonRippleColor(ThemeStore.getRippleColor())
-                        .backgroundColor(ThemeStore.getBackgroundColor3())
-                        .positiveColor(ThemeStore.getTextColorPrimary())
-                        .negativeColor(ThemeStore.getTextColorPrimary())
-                        .contentColor(ThemeStore.getTextColorPrimary())
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .negativeColorAttr(R.attr.text_color_primary)
+                        .contentColorAttr(R.attr.text_color_primary)
                         .positiveText("是")
                         .negativeText("否")
                         .onPositive(new MaterialDialog.SingleButtonCallback() {

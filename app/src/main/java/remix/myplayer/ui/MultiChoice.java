@@ -158,21 +158,21 @@ public class MultiChoice implements OnMultiItemClickListener {
                     }
                 })
                 .neutralText(R.string.create_playlist)
-                .neutralColorAttr(R.attr.material_color_primary)
+                .neutralColorAttr(R.attr.text_color_primary)
                 .onNeutral(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         new MaterialDialog.Builder(mContext)
                                 .title(R.string.new_playlist)
-                                .titleColor(ThemeStore.getTextColorPrimary())
+                                .titleColorAttr(R.attr.text_color_primary)
                                 .buttonRippleColorAttr(R.attr.ripple_color)
                                 .positiveText(R.string.create)
-                                .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
+                                .positiveColorAttr(R.attr.text_color_primary)
                                 .negativeText(R.string.cancel)
-                                .negativeColor(ThemeStore.getTextColorPrimary())
-                                .backgroundColor(ThemeStore.getBackgroundColor3())
+                                .negativeColorAttr(R.attr.text_color_primary)
+                                .backgroundColorAttr(R.attr.background_color_3)
                                 .content(R.string.input_playlist_name)
-                                .contentColor(ThemeStore.getTextColorPrimary())
+                                .contentColorAttr(R.attr.text_color_primary)
                                 .inputRange(1,15)
                                 .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
                                     @Override

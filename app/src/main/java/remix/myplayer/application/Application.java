@@ -86,7 +86,7 @@ public class Application extends android.app.Application {
 //                                .backgroundColor(ThemeStore.getBackgroundColor3())
 //                                .customView(R.layout.dialog_update,true)
 //                                .positiveText("立即更新")
-//                                .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
+//                                .positiveColor(ThemeStore.getMaterialPrimaryColor())
 //                                .onPositive(new MaterialDialog.SingleButtonCallback() {
 //                                    @Override
 //                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {

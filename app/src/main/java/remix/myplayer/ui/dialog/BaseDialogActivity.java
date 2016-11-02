@@ -3,6 +3,8 @@ package remix.myplayer.ui.dialog;
 import android.os.Bundle;
 import android.view.View;
 
+import remix.myplayer.R;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.BaseActivity;
 
 /**
@@ -17,6 +19,7 @@ public abstract class BaseDialogActivity extends BaseActivity {
 
     @Override
     protected void setUpTheme() {
+        setTheme(ThemeStore.isDay() ? R.style.Dialog_DayTheme : R.style.Dialog_NightTheme);
     }
 
     @Override

@@ -62,7 +62,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(Theme.getTheme());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_addto_playlist);
         ButterKnife.bind(this);
@@ -123,22 +123,20 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
         return playlistName;
     }
 
-    @OnClick({R.id.playlist_addto_cancel,R.id.playlist_addto_new})
+    @OnClick({R.id.playlist_addto_new})
     public void onClick(View v) {
-        if(v.getId() == R.id.playlist_addto_cancel)
-            finish();
         if(v.getId() == R.id.playlist_addto_new){
             new MaterialDialog.Builder(this)
                     .title(R.string.new_playlist)
-                    .titleColor(ThemeStore.getTextColorPrimary())
+                    .titleColorAttr(R.attr.text_color_primary)
                     .buttonRippleColor(ThemeStore.getRippleColor())
                     .positiveText(R.string.create)
-                    .positiveColor(ThemeStore.getMaterialColorPrimaryColor())
+                    .positiveColor(ThemeStore.getMaterialPrimaryColor())
                     .negativeText(R.string.cancel)
-                    .negativeColor(ThemeStore.getTextColorPrimary())
-                    .backgroundColor(ThemeStore.getBackgroundColor3())
+                    .negativeColorAttr(R.attr.text_color_primary)
+                    .backgroundColorAttr(R.attr.background_color_3)
                     .content(R.string.input_playlist_name)
-                    .contentColor(ThemeStore.getTextColorPrimary())
+                    .contentColorAttr(R.attr.text_color_primary)
                     .inputRange(1,15)
                     .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
                         @Override

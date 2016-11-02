@@ -15,8 +15,8 @@
         android:layout_height="@dimen/d45_size"
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImageScaleType="centerCrop"
-        fresco:placeholderImage="@drawable/song_artist_empty_bg"
-        fresco:failureImage="@drawable/song_artist_empty_bg"
+        fresco:placeholderImage="@drawable/song_artist_empty_bg_night"
+        fresco:failureImage="@drawable/song_artist_empty_bg_night"
         fresco:failureImageScaleType="centerCrop"
         fresco:roundAsCircle="true"/>
     <!--歌曲名、歌手、专辑-->

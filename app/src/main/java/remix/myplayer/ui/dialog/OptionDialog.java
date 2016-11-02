@@ -3,7 +3,7 @@ package remix.myplayer.ui.dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -94,9 +95,23 @@ public class OptionDialog extends BaseDialogActivity {
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
 
-        Drawable bg = Theme.getPressDrawable(this,R.drawable.bg_list_default_day, ColorUtil.getColor(R.color.day_ripple_color));
-//        mAdd.setBackground(bg);
-//        mRing.setBackground(bg);
+        //为按钮着色
+        final int tintColor = ThemeStore.isDay() ?
+                ColorUtil.getColor(R.color.day_textcolor_primary ) :
+                ColorUtil.getColor(R.color.white_f4f4f5);
+        ((ImageView)findViewById(R.id.popup_add_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_add2list),tintColor));
+        ((ImageView)findViewById(R.id.popup_ring_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_ring),tintColor));
+        ((ImageView)findViewById(R.id.popup_share_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_share),tintColor));
+        ((ImageView)findViewById(R.id.popup_delete_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_delete),tintColor));
+
+        ButterKnife.apply( new TextView[]{findView(R.id.popup_add_text),findView(R.id.popup_ring_text),
+                        findView(R.id.popup_share_text),findView(R.id.popup_delete_text)},
+                new ButterKnife.Action<TextView>(){
+                    @Override
+                    public void apply(@NonNull TextView textView, int index) {
+                        textView.setTextColor(tintColor);
+                    }
+                });
     }
 
     @OnClick({R.id.popup_add,R.id.popup_share,R.id.popup_delete,R.id.popup_ring})
@@ -161,10 +176,10 @@ public class OptionDialog extends BaseDialogActivity {
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 }
                             })
-                            .backgroundColor(ThemeStore.getBackgroundColor3())
-                            .positiveColor(ThemeStore.getTextColorPrimary())
-                            .negativeColor(ThemeStore.getTextColorPrimary())
-                            .contentColor(ThemeStore.getTextColorPrimary())
+                            .backgroundColorAttr(R.attr.background_color_3)
+                            .positiveColorAttr(R.attr.text_color_primary)
+                            .negativeColorAttr(R.attr.text_color_primary)
+                            .contentColorAttr(R.attr.text_color_primary)
                             .show();
                 } catch (Exception e){
                     e.printStackTrace();

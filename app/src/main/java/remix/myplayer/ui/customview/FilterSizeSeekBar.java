@@ -236,8 +236,8 @@ public class FilterSizeSeekBar extends View {
         if(thumbPress == null)
             thumbPress = getResources().getDrawable(R.drawable.thumb);
 
-        Theme.TintDrawable(thumb,ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899));
-        Theme.TintDrawable(thumbPress,ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899));
+        Theme.TintDrawable(thumb,ThemeStore.getStressColor());
+        Theme.TintDrawable(thumbPress,ThemeStore.getStressColor());
 
         mThumbNormal = new int[]{-android.R.attr.state_focused, -android.R.attr.state_pressed,
                 -android.R.attr.state_selected, -android.R.attr.state_checked};

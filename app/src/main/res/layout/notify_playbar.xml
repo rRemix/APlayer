@@ -19,7 +19,7 @@
             android:id="@+id/notify_image"
             android:layout_width="@dimen/d64_size"
             android:layout_height="match_parent"
-            android:src="@drawable/song_artist_empty_bg"
+            android:src="@drawable/song_artist_empty_bg_night"
             android:scaleType="centerCrop"/>
 
         <LinearLayout

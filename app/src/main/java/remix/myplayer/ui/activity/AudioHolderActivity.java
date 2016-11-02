@@ -512,9 +512,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                if(mLrcView != null){
-                    mLrcView.setViewPagerScroll(true);
-                }
+
             }
             @Override
             public void onPageSelected(int position) {
@@ -530,7 +528,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             }
             @Override
             public void onPageScrollStateChanged(int state) {
-
+                if(mLrcView != null)
+                    mLrcView.setViewPagerScroll(state != ViewPager.SCROLL_STATE_IDLE);
             }
         });
         mPager.setCurrentItem(1);

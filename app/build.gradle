@@ -15,7 +15,7 @@ android {
 
     signingConfigs{
         release {
-            storeFile file("keystore.jks")
+            storeFile file("/../keystore.jks")
             storePassword "xbr19921010"
             keyAlias "remix"
             keyPassword "xbr19921010"
@@ -64,7 +64,6 @@ dependencies {
     compile 'com.facebook.fresco:fresco:0.13.0'
     compile 'com.umeng.analytics:analytics:latest.integration'
     compile 'com.afollestad.material-dialogs:core:0.9.0.1'
-    compile 'com.afollestad.material-dialogs:commons:0.9.0.1'
     compile 'com.soundcloud.android:android-crop:1.0.1@aar'
     compile 'cn.bmob.android:bmob-sdk:3.5.0'
     compile 'com.jakewharton:butterknife:8.4.0'

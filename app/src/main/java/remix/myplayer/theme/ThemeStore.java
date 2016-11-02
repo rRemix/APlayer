@@ -162,12 +162,12 @@ public class ThemeStore {
     }
 
     @ColorInt
-    public static int getMaterialColorPrimaryColor(){
+    public static int getMaterialPrimaryColor(){
         return ColorUtil.getColor(getMaterialPrimaryColorRes());
     }
 
     @ColorInt
-    public static int getMaterialColorPrimaryDarkColor(){
+    public static int getMaterialPrimaryDarkColor(){
         return ColorUtil.getColor(getMaterialPrimaryDarkColorRes());
     }
 

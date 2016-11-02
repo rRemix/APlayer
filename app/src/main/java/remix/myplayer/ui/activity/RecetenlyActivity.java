@@ -156,8 +156,11 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
 
         mMDDialog = new MaterialDialog.Builder(this)
                 .title("加载中")
+                .titleColorAttr(R.attr.text_color_primary)
                 .content("请稍等")
+                .contentColorAttr(R.attr.text_color_primary)
                 .progress(true, 0)
+                .backgroundColorAttr(R.attr.background_color_3)
                 .progressIndeterminateStyle(false).build();
 
         initToolbar(mToolBar,getString(R.string.recently));

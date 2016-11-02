@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +22,6 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
@@ -36,8 +34,6 @@ import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
-import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * 全部歌曲和最近添加页面所用adapter
@@ -101,7 +97,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         if(currentMP3 != null){
             boolean highlight = temp.getId() == MusicService.getCurrentMP3().getId();
             holder.mName.setTextColor(highlight ?
-                    ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899):
+                    ThemeStore.getStressColor():
                     ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
             holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.GONE);
             //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画

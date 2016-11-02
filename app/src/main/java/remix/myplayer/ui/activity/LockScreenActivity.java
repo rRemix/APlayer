@@ -234,7 +234,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
 
     @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
-        LogUtil.d(TAG,this.toString());
         mInfo = MP3Item;
         if(!mIsRunning )
             return;
@@ -242,16 +241,18 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         if(mPlayButton != null){
             mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.lock_btn_pause : R.drawable.lock_btn_play));
         }
-        if(Global.getOperation() == Constants.PLAYORPAUSE && mIsFirst){
-            mIsFirst = false;
-            return;
-        }
+
         //标题
         if(mSong != null) {
             mSong.setText(mInfo.getTitle());
         }
+        //艺术家
         if(mArtist != null) {
             mArtist.setText(mInfo.getArtist());
+        }
+        //封面
+        if(mSimpleImage != null) {
+            mSimpleImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
         }
         //判断是否收藏
         mIsLove = false;
@@ -266,10 +267,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         }
         if(mLoveButton != null) {
             mLoveButton.setImageResource(mIsLove ? R.drawable.lock_btn_loved : R.drawable.lock_btn_love);
-        }
-
-        if(mSimpleImage != null) {
-            mSimpleImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
         }
 
         new BlurThread().start();
@@ -322,10 +319,10 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
                     if(mSwatch == null)
                         mSwatch = new Palette.Swatch(Color.GRAY,100);
 
-//                    mSongColor = ColorUtil.shiftColor(mSwatch.getRgb(),0.7f);
-//                    mArtistColor = ColorUtil.shiftColor(mSwatch.getRgb(),0.7f);
-                    mSongColor = mSwatch.getBodyTextColor();
-                    mArtistColor = mSwatch.getTitleTextColor();
+                    mSongColor = ColorUtil.shiftColor(mSwatch.getRgb(),1.2f);
+                    mArtistColor = ColorUtil.shiftColor(mSwatch.getRgb(),1.1f);
+//                    mSongColor = mSwatch.getBodyTextColor();
+//                    mArtistColor = mSwatch.getTitleTextColor();
                 }
             });
             mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);

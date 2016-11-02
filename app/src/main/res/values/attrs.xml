@@ -51,6 +51,7 @@
     <attr name="background_grid_color" format="color|reference"/>
     <attr name="background_grid" format="reference"/>
     <attr name="background_list" format="reference"/>
+    <attr name="stress_color" format="color|reference"/>
     <!--默认专辑和艺术家封面-->
     <attr name="default_album" format="reference"/>
     <attr name="default_artist" format="reference"/>

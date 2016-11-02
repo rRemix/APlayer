@@ -108,4 +108,6 @@
     <string name="lrc_tip">%s(请确保歌词文件包含歌曲名和艺术家名)</string>
     <string name="cache_szie">%1$2.2f MB</string>
     <string name="confirm_clear_cache">确认清除缓存?</string>
+
+    <string name="error">错误</string>
 </resources>

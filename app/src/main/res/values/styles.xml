@@ -2,7 +2,37 @@
     <!-- Base application theme. -->
     <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar"/>
     <style name="BaseDialogTheme" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="colorControlHighlight">?android:attr/colorControlHighlight</item>
+    </style>
 
+    <!--dialog白天模式-->
+    <style name="Dialog.DayTheme" parent="BaseDialogTheme">
+        <item name="background_color_main">@color/day_background_color_main</item>
+        <item name="background_color_1">@color/day_background_color_1</item>
+        <item name="background_color_2">@color/day_background_color_2</item>
+        <item name="background_color_3">@color/day_background_color_3</item>
+        <item name="text_color_primary">@color/day_textcolor_primary</item>
+        <item name="text_color">@color/day_textcolor</item>
+        <item name="colorControlHighlight">@color/day_ripple_color</item>
+    </style>
+
+
+    <!--dialog夜间模式-->
+    <style name="Dialog.NightTheme" parent="BaseDialogTheme">
+        <item name="background_color_main">@color/night_background_color_main</item>
+        <item name="background_color_1">@color/night_background_color_1</item>
+        <item name="background_color_2">@color/night_background_color_2</item>
+        <item name="background_color_3">@color/night_background_color_3</item>
+        <item name="text_color_primary">@color/night_textcolor_primary</item>
+        <item name="text_color">@color/night_textcolor</item>
+        <item name="colorControlHighlight">@color/night_ripple_color</item>
     </style>
 
 
@@ -28,9 +58,7 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 
-    <style name="AudioHolderStyle" parent="AppTheme.NoActionBar.Translucent">
-        <!--<item name="android:windowAnimationStyle">@style/Audio_style</item>-->
-    </style>
+    <style name="AudioHolderStyle" parent="AppTheme.NoActionBar.Translucent"/>
 
     <style name="CustomTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorColor">@color/white</item>
@@ -45,37 +73,18 @@
     </style>
 
 
-
-    <!-- 播放列表对话框的风格 -->
     <style name="AnimBottom" parent="@android:style/Animation">
         <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
         <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
     </style>
 
-    <!--底部弹出 -->
-    <style name="PopupBottomDialog" parent="@style/Theme.AppCompat.Dialog" >
-        <item name="android:windowAnimationStyle">@style/AnimBottom</item>
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:windowCloseOnTouchOutside">true</item>
-    </style>
-
-
-    <!--中心消失-->
-    <style name="PopupCenterDialog" parent="@style/Theme.AppCompat.Dialog" >
-        <!--<item name="android:windowAnimationStyle">@style/popwin_anim_style</item>-->
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:windowCloseOnTouchOutside">true</item>
-    </style>
+    <!--&lt;!&ndash;底部弹出 &ndash;&gt;-->
+    <!--<style name="PopupBottomDialog" parent="BaseDialogTheme" >-->
+        <!--<item name="android:windowAnimationStyle">@style/AnimBottom</item>-->
+    <!--</style>-->
+    <!---->
+    <!--&lt;!&ndash;中心消失&ndash;&gt;-->
+    <!--<style name="PopupCenterDialog" parent="BaseDialogTheme" />-->
 
     <!--锁屏-->
     <style name="LockScreenActivity" parent="AppTheme.NoActionBar.Translucent">
@@ -120,7 +129,7 @@
         <item name="background_color_1">@color/day_background_color_1</item>
         <item name="background_color_2">@color/day_background_color_2</item>
         <item name="background_color_3">@color/day_background_color_3</item>
-        <item name="background_grid_color">#f1f1f1</item>
+        <item name="background_grid_color">@color/night_selected_color</item>
         <item name="background_grid">@drawable/bg_grid_day</item>
         <item name="background_list">@drawable/bg_list_day</item>
         <item name="background_list_1">@drawable/bg_list_1_day</item>
@@ -133,7 +142,6 @@
         <item name="ripple_color">@color/day_ripple_color</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Light</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
-
     </style>
 
     <!--夜间模式-->
@@ -142,7 +150,7 @@
         <item name="material_color_primary_dark">@color/night_background_color_3</item>
         <item name="material_color_secondry">@color/purple_782899</item>
         <item name="background_color_main">@color/night_background_color_main</item>
-        <item name="background_color_1">@color/night_background_color_3</item>
+        <item name="background_color_1">@color/night_background_color_1</item>
         <item name="background_color_2">@color/night_background_color_2</item>
         <item name="background_color_3">@color/night_background_color_3</item>
         <item name="background_grid_color">@color/background_color_main</item>
@@ -155,6 +163,7 @@
         <item name="default_album">@drawable/album_empty_bg_night</item>
         <item name="default_artist">@drawable/artist_empty_bg_night</item>
         <item name="ripple_color">@color/night_ripple_color</item>
+        <item name="stress_color">@color/purple_782899</item>
         <item name="colorControlHighlight">@color/night_ripple_color</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Dark</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
@@ -167,6 +176,7 @@
         <item name="material_color_primary">@color/md_red_primary</item>
         <item name="material_color_secondry">@color/md_red_primary</item>
         <item name="material_color_primary_dark">@color/md_red_primary_dark</item>
+        <item name="stress_color">@color/md_red_primary</item>
         <item name="colorPrimary">@color/md_red_primary</item>
         <item name="colorPrimaryDark">@color/md_red_primary_dark</item>
         <item name="colorControlActivated">@color/md_red_primary</item>
@@ -178,6 +188,7 @@
         <item name="material_color_primary">@color/md_brown_primary</item>
         <item name="material_color_secondry">@color/md_brown_primary</item>
         <item name="material_color_primary_dark">@color/md_brown_primary_dark</item>
+        <item name="stress_color">@color/md_brown_primary</item>
         <item name="colorPrimary">@color/md_brown_primary</item>
         <item name="colorPrimaryDark">@color/md_brown_primary_dark</item>
         <item name="colorControlActivated">@color/md_brown_primary</item>
@@ -189,6 +200,7 @@
         <item name="material_color_primary">@color/md_navy_primary</item>
         <item name="material_color_secondry">@color/md_navy_primary</item>
         <item name="material_color_primary_dark">@color/md_navy_primary_dark</item>
+        <item name="stress_color">@color/md_navy_primary</item>
         <item name="colorPrimary">@color/md_navy_primary</item>
         <item name="colorPrimaryDark">@color/md_navy_primary_dark</item>
         <item name="colorControlActivated">@color/md_navy_primary</item>
@@ -200,6 +212,7 @@
         <item name="material_color_primary">@color/md_green_primary</item>
         <item name="material_color_secondry">@color/md_green_primary</item>
         <item name="material_color_primary_dark">@color/md_green_primay_dark</item>
+        <item name="stress_color">@color/md_green_primary</item>
         <item name="colorPrimary">@color/md_green_primary</item>
         <item name="colorPrimaryDark">@color/md_green_primay_dark</item>
         <item name="colorControlActivated">@color/md_green_primary</item>
@@ -211,6 +224,7 @@
         <item name="material_color_primary">@color/md_yellow_primary</item>
         <item name="material_color_secondry">@color/md_yellow_primary</item>
         <item name="material_color_primary_dark">@color/md_yellow_primay_dark</item>
+        <item name="stress_color">@color/md_yellow_primary</item>
         <item name="colorPrimary">@color/md_yellow_primary</item>
         <item name="colorPrimaryDark">@color/md_yellow_primay_dark</item>
         <item name="colorControlActivated">@color/md_yellow_primary</item>
@@ -222,6 +236,7 @@
         <item name="material_color_primary">@color/md_purple_primary</item>
         <item name="material_color_secondry">@color/md_purple_primary</item>
         <item name="material_color_primary_dark">@color/md_purple_primary_dark</item>
+        <item name="stress_color">@color/md_purple_primary</item>
         <item name="colorPrimary">@color/md_purple_primary</item>
         <item name="colorPrimaryDark">@color/md_purple_primary_dark</item>
         <item name="colorControlActivated">@color/md_purple_primary</item>
@@ -233,6 +248,7 @@
         <item name="material_color_primary">@color/md_indigo_primary</item>
         <item name="material_color_secondry">@color/md_indigo_primary</item>
         <item name="material_color_primary_dark">@color/md_indigo_primary_dark</item>
+        <item name="stress_color">@color/md_indigo_primary</item>
         <item name="colorPrimary">@color/md_indigo_primary</item>
         <item name="colorPrimaryDark">@color/md_indigo_primary_dark</item>
         <item name="colorControlActivated">@color/md_indigo_primary</item>
@@ -244,6 +260,7 @@
         <item name="material_color_primary">@color/md_plum_primary</item>
         <item name="material_color_secondry">@color/md_plum_primary</item>
         <item name="material_color_primary_dark">@color/md_plum_primary_dark</item>
+        <item name="stress_color">@color/md_plum_primary</item>
         <item name="colorPrimary">@color/md_plum_primary</item>
         <item name="colorPrimaryDark">@color/md_plum_primary_dark</item>
         <item name="colorControlActivated">@color/md_plum_primary</item>
@@ -251,22 +268,4 @@
         <item name="android:textColor">@color/md_plum_primary</item>
     </style>
 
-
-
-    <style name="DayTheme.Ingido" parent="@style/DayTheme">
-        <item name="material_color_primary">@color/md_indigo_primary</item>
-        <item name="material_color_secondry">@color/md_indigo_primary</item>
-        <item name="material_color_primary_dark">@color/md_indigo_primary_dark</item>
-        <item name="colorPrimary">@color/md_indigo_primary</item>
-        <item name="colorPrimaryDark">@color/md_indigo_primary_dark</item>
-        <item name="colorControlActivated">@color/md_indigo_primary</item>
-        <item name="colorAccent">@color/md_indigo_primary</item>
-        <item name="android:textColor">@color/md_indigo_primary</item>
-    </style>
-
-
-    <!--侧滑菜单文字-->
-    <style name="Drawer_text_style">
-        <item name="android:textStyle">bold</item>
-    </style>
 </resources>

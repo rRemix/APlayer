@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:background="?attr/background_color_3"
     android:layout_gravity="bottom">
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,8 +19,8 @@
             android:layout_marginRight="@dimen/d16_size"
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImageScaleType="centerCrop"
-            fresco:placeholderImage="@drawable/song_artist_empty_bg"
-            fresco:failureImage="@drawable/song_artist_empty_bg"
+            fresco:placeholderImage="@drawable/song_artist_empty_bg_night"
+            fresco:failureImage="@drawable/song_artist_empty_bg_night"
             fresco:failureImageScaleType="centerCrop"
             fresco:roundAsCircle="true"
             fresco:roundingBorderWidth="1px"
@@ -33,20 +33,21 @@
             android:lines="1"
             android:ellipsize="end"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_1b1c19"
+            android:textColor="?attr/text_color_primary"
             android:text="歌曲名-歌手"/>
     </LinearLayout>
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#d9d9d9"/>
+        android:background="@color/gray_d9d9d9"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:layout_marginTop="@dimen/d8_size"
-        android:layout_marginBottom="@dimen/d8_size">
+        android:layout_marginTop="@dimen/d1_size"
+        android:layout_marginBottom="@dimen/d2_size">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -54,18 +55,20 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/popup_add"
-            android:background="?attr/selectableItemBackground">
+            android:background="?android:attr/selectableItemBackground">
             <ImageView
+                android:id="@+id/popup_add_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/d8_size"
-                android:background="@color/white"
-                android:src="@drawable/bg_btn_popup_add"/>
+                android:background="@color/transparent"
+                android:src="@drawable/pop_btn_add2list"/>
             <TextView
+                android:id="@+id/popup_add_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="@color/black_1b1c19"
+                android:textColor="?attr/text_color"
                 android:textSize="@dimen/s15_size"
                 android:text="加入"/>
         </LinearLayout>
@@ -76,18 +79,20 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:id="@+id/popup_ring">
+            android:id="@+id/popup_ring"
+            android:background="?attr/selectableItemBackground">
             <ImageView
+                android:id="@+id/popup_ring_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/d8_size"
-                android:background="@color/white"
-                android:src="@drawable/bg_btn_popup_ring"/>
+                android:background="@color/transparent"
+                android:src="@drawable/pop_btn_ring"/>
             <TextView
+                android:id="@+id/popup_ring_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="@color/black_1b1c19"
                 android:textSize="@dimen/s15_size"
                 android:text="铃声"/>
         </LinearLayout>
@@ -98,19 +103,21 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:id="@+id/popup_share">
+            android:id="@+id/popup_share"
+            android:background="?attr/selectableItemBackground">
             <ImageView
+                android:id="@+id/popup_share_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/d8_size"
-                android:background="@color/white"
-                android:src="@drawable/bg_btn_popup_share"/>
+                android:background="@color/transparent"
+                android:src="@drawable/pop_btn_share"/>
             <TextView
+                android:id="@+id/popup_share_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="@dimen/s15_size"
-                android:textColor="@color/black_1b1c19"
                 android:text="分享"/>
         </LinearLayout>
 
@@ -120,19 +127,21 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:id="@+id/popup_delete">
+            android:id="@+id/popup_delete"
+            android:background="?attr/selectableItemBackground">
             <ImageView
+                android:id="@+id/popup_delete_img"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/d8_size"
-                android:background="@color/white"
-                android:src="@drawable/bg_btn_popup_delete"/>
+                android:background="@color/transparent"
+                android:src="@drawable/pop_btn_delete"/>
             <TextView
+                android:id="@+id/popup_delete_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="@dimen/s15_size"
-                android:textColor="@color/black_1b1c19"
                 android:text="删除"/>
         </LinearLayout>
 

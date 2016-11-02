@@ -2,8 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="@dimen/d254_size"
     android:layout_height="@dimen/d174_size"
-    android:background="@drawable/creatlist_bg"
-    style="@style/PopupCenterDialog">
+    android:background="@drawable/creatlist_bg">
     <TextView
         android:layout_gravity="center"
         android:textColor="@color/black_1b1c19"

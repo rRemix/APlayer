@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
@@ -27,11 +26,11 @@ import butterknife.OnClick;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.R;
 import remix.myplayer.db.DBOpenHelper;
+import remix.myplayer.ui.dialog.FolderChooserDialog;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.ColorChooseDialog;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DiskCache;
@@ -96,7 +95,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcPath","")));
         }
         //初始化箭头颜色
-        final int arrowColor = ThemeStore.isDay() ? ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY) : ColorUtil.getColor(R.color.purple_782899);
+        final int arrowColor = ThemeStore.getStressColor();
         ((GradientDrawable)mColorSrc.getDrawable()).setColor(arrowColor);
         ButterKnife.apply( new ImageView[]{findView(R.id.setting_eq_arrow),findView(R.id.setting_feedback_arrow),
                 findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow)},
@@ -211,6 +210,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     MobclickAgent.onEvent(this,"NotifyColor");
                     new MaterialDialog.Builder(this)
                             .title("通知栏底色")
+                            .titleColorAttr(R.attr.text_color_primary)
+                            .positiveText("选择")
+                            .positiveColorAttr(R.attr.text_color_primary)
                             .buttonRippleColorAttr(R.attr.ripple_color)
                             .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
                             .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"Setting","IsSystemColor",true) ? 0 : 1,
@@ -223,9 +225,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 }
                             })
                             .backgroundColorAttr(R.attr.background_color_3)
-                            .positiveColorAttr(R.attr.text_color_primary)
-                            .positiveText("选择")
-                            .titleColorAttr(R.attr.text_color_primary)
                             .itemsColorAttr(R.attr.text_color_primary)
                             .show();
                 } catch (Exception e){

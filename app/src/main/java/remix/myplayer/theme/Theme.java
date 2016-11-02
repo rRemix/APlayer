@@ -3,13 +3,10 @@ package remix.myplayer.theme;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
-import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.support.annotation.ColorInt;
@@ -96,7 +93,7 @@ public class Theme {
      * @return
      */
     public static GradientDrawable getMaterialBgCorner(@FloatRange(from=0.0D, to=1.0D) float alpah, float corner, int stroke){
-        return getBgCorner(alpah,corner,stroke,ThemeStore.getMaterialColorPrimaryColor());
+        return getBgCorner(alpah,corner,stroke,ThemeStore.getMaterialPrimaryColor());
     }
 
     /**
@@ -255,7 +252,7 @@ public class Theme {
     }
 
     public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context,@DrawableRes int resId){
-        return getPressAndSelectedStateListDrawalbe(context,resId,ThemeStore.getMaterialColorPrimaryColor());
+        return getPressAndSelectedStateListDrawalbe(context,resId,ThemeStore.getMaterialPrimaryColor());
     }
 
     public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context,@DrawableRes int resId,@ColorInt int color){

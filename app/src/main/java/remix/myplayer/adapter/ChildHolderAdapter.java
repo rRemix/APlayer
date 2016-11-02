@@ -3,7 +3,6 @@ package remix.myplayer.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,7 +77,7 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
             if(currentMP3 != null){
                 boolean highlight = temp.getId() == currentMP3.getId();
                 holder.mTitle.setTextColor(highlight ?
-                        ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899) :
+                        ThemeStore.getStressColor() :
                         ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
                 holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.GONE);
 

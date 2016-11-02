@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white">
+    android:background="?attr/background_color_3">
     <TextView
         android:id="@+id/popup_title"
         android:gravity="center"
@@ -10,13 +10,13 @@
         android:layout_height="@dimen/d50_size"
         android:lines="1"
         android:ellipsize="end"
-        android:textColor="@color/black_1b1c19"
+        android:textColor="?attr/text_color_primary"
         android:text="分享到"
         android:textSize="@dimen/s17_size"/>
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#E6E6E6"/>
+        android:background="@color/gray_e6e6e6"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/share_weibo"
-                android:background="#ffff"
+                android:background="@color/transparent"
                 android:src="@drawable/icon_weibo"/>
             <TextView
                 android:layout_marginTop="@dimen/d2_size"
@@ -76,7 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/share_wechat"
-                android:background="#ffff"
+                android:background="@color/transparent"
                 android:src="@drawable/icon_wechat"/>
             <TextView
                 android:layout_marginTop="@dimen/d2_size"
@@ -97,7 +97,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/share_circlefriend"
-                android:background="#ffff"
+                android:background="@color/transparent"
                 android:src="@drawable/icon_moment"/>
             <TextView
                 android:layout_marginTop="@dimen/d2_size"
@@ -110,14 +110,4 @@
 
     </LinearLayout>
 
-    <Button
-        android:layout_width="@dimen/d130_size"
-        android:layout_height="@dimen/d30_size"
-        android:gravity="center"
-        android:id="@+id/popup_share_cancel"
-        android:layout_gravity="center_horizontal"
-        android:text="取消"
-        android:textSize="@dimen/s18_size"
-        android:textColor="@color/translucence"
-        android:background="@drawable/bg_boder"/>
 </LinearLayout>
