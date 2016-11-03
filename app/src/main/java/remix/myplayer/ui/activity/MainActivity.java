@@ -21,6 +21,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,7 +72,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     @BindView(R.id.tabs)
     TabLayout mTablayout;
     @BindView(R.id.ViewPager)
-    android.support.v4.view.ViewPager mViewPager;
+    ViewPager mViewPager;
     @BindView(R.id.navigation_view)
     NavigationView mNavigationView;
     @BindView(R.id.drawer_layout)
@@ -84,7 +85,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     private BottomActionBarFragment mBottomBar;
     private final static String TAG = "MainActivity";
     private DrawerAdapter mDrawerAdapter;
-    private PagerAdapter mAdapter;
+    private PagerAdapter mPagerAdapter;
     //是否正在运行
     private static boolean mIsRunning = false;
     //是否第一次启动
@@ -319,7 +320,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
 
     public PagerAdapter getAdapter() {
-        return mAdapter;
+        return mPagerAdapter;
     }
 
     /**
@@ -370,17 +371,17 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
     //初始化ViewPager
     private void initPager() {
-        mAdapter = new PagerAdapter(getSupportFragmentManager());
-        mAdapter.setTitles(new String[]{getResources().getString(R.string.tab_song),
+        mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
+        mPagerAdapter.setTitles(new String[]{getResources().getString(R.string.tab_song),
                 getResources().getString(R.string.tab_album),
                 getResources().getString(R.string.tab_artist),
                 getResources().getString(R.string.tab_playlist)});
-        mAdapter.AddFragment(new SongFragment());
-        mAdapter.AddFragment(new AlbumFragment());
-        mAdapter.AddFragment(new ArtistFragment());
-        mAdapter.AddFragment(new PlayListFragment());
+        mPagerAdapter.AddFragment(new SongFragment());
+        mPagerAdapter.AddFragment(new AlbumFragment());
+        mPagerAdapter.AddFragment(new ArtistFragment());
+        mPagerAdapter.AddFragment(new PlayListFragment());
 
-        mViewPager.setAdapter(mAdapter);
+        mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(0);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -437,7 +438,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                     //歌曲库
                     case 0:
                         mDrawerLayout.closeDrawer(mNavigationView);
-                        mDrawerAdapter.setSelectIndex(0);
                         break;
                     //文件夹
                     case 1:
@@ -445,6 +445,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                         break;
                     //夜间模式
                     case 2:
+                        setNightMode(ThemeStore.isDay());
                         break;
                     //设置
                     case 3:
@@ -460,6 +461,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mRecyclerView.setAdapter(mDrawerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        //正在播放文字的背景
         TextView textView = (TextView)findViewById(R.id.header_txt);
         if(textView != null){
             GradientDrawable bg = new GradientDrawable();
@@ -467,6 +469,23 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             bg.setCornerRadius(DensityUtil.dip2px(this,4));
             textView.setBackground(bg);
         }
+
+        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+            }
+            @Override
+            public void onDrawerOpened(View drawerView) {
+            }
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                if(mDrawerAdapter != null)
+                    mDrawerAdapter.setSelectIndex(0);
+            }
+            @Override
+            public void onDrawerStateChanged(int newState) {
+            }
+        });
     }
 
     @Override
@@ -527,7 +546,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
             mDrawerLayout.closeDrawer(mNavigationView);
-            mDrawerAdapter.setSelectIndex(0);
         } else if(mMultiChoice.isShow()) {
 //            updateOptionsMenu(false);
             mMultiChoice.UpdateOptionMenu(false);
@@ -565,17 +583,19 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     private void updateHeader(MP3Item mp3Item,boolean isPlay) {
         TextView textView = findView(R.id.header_txt);
         SimpleDraweeView simpleDraweeView = findView(R.id.header_img);
-        if(textView != null && simpleDraweeView != null && mp3Item != null){
-//            textView.setVisibility(isPlay ? View.VISIBLE : View.INVISIBLE);
-//            simpleDraweeView.setVisibility(isPlay ? View.VISIBLE : View.INVISIBLE);
-//            if(!isPlay)
-//                return;
-
+        View shadow = findView(R.id.header_shadow);
+        if(mp3Item == null)
+            return;
+        if(textView != null){
             textView.setText(getString(R.string.play_now,mp3Item.getTitle()));
-            simpleDraweeView.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mp3Item.getAlbumId()));
-            simpleDraweeView.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.drawable.drawer_bg_album);
-
         }
+        if(simpleDraweeView != null){
+            simpleDraweeView.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mp3Item.getAlbumId()));
+        }
+        if(shadow != null){
+            shadow.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.drawable.drawer_bg_album);
+        }
+
     }
 
     @Override

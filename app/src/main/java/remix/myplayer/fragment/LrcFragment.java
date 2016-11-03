@@ -8,16 +8,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.model.LrcInfo;
-import remix.myplayer.model.MP3Item;
-import remix.myplayer.lrc.LrcView;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.lrc.SearchLRC;
+import remix.myplayer.lrc.LrcRow;
+import remix.myplayer.lrc.LrcView;
+import remix.myplayer.model.MP3Item;
+import remix.myplayer.util.CommonUtil;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -37,7 +37,7 @@ public class LrcFragment extends BaseFragment {
     @BindView(R.id.lrc_view)
     LrcView mLrcView;
     //歌词列表
-    private ArrayList<LrcInfo> mLrcList;
+    private List<LrcRow> mLrcList;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -51,14 +51,14 @@ public class LrcFragment extends BaseFragment {
             if(msg.what == UPDATE_LRC) {
                 //更新歌词
                 if(mLrcList != null) {
-                    mLrcView.UpdateLrcList(mLrcList);
+                    mLrcView.setLrcRows(mLrcList);
                 }
             } else if (msg.what == NO_LRC) {
                 //没有找到歌词
-                mLrcView.UpdateLrcList(null);
+                mLrcView.setLrcRows(null);
             } else if (msg.what == NO_NETWORK) {
                 //没用网络
-                mLrcView.UpdateLrcList(null);
+                mLrcView.setLrcRows(null);
             }
         }
     };

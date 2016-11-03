@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sina.weibo.sdk.api.ImageObject;
@@ -40,7 +42,10 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.RecordShareActivity;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.ToastUtil;
@@ -56,13 +61,13 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     public static ShareDialog mInstance;
     //四个分享按钮
     @BindView(R.id.share_qq)
-    ImageView mQQ;
+    View mQQ;
     @BindView(R.id.share_weibo)
-    ImageView mWeibo;
+    View mWeibo;
     @BindView(R.id.share_wechat)
-    ImageView mWechat;
+    View mWechat;
     @BindView(R.id.share_circlefriend)
-    ImageView mCircleFrient;
+    View mCircleFrient;
 
     private MP3Item mInfo;
     //Api
@@ -112,6 +117,27 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         if (savedInstanceState != null) {
             mWeiboApi.handleWeiboResponse(getIntent(), this);
         }
+        //为所有按钮着色
+        //为按钮着色
+        final int tintColor = ThemeStore.isDay() ?
+                ColorUtil.getColor(R.color.day_textcolor_primary ) :
+                ColorUtil.getColor(R.color.white_f4f4f5);
+
+        if(!ThemeStore.isDay()){
+            ((ImageView)findViewById(R.id.share_qq_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.icon_qq),tintColor));
+            ((ImageView)findViewById(R.id.share_weibo_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.icon_weibo),tintColor));
+            ((ImageView)findViewById(R.id.share_wechat_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.icon_wechat),tintColor));
+            ((ImageView)findViewById(R.id.share_circlefriend_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.icon_moment),tintColor));
+        }
+
+        ButterKnife.apply( new TextView[]{findView(R.id.share_circlefriend_text),findView(R.id.share_wechat_text),
+                        findView(R.id.share_qq_text),findView(R.id.share_weibo_text)},
+                new ButterKnife.Action<TextView>(){
+                    @Override
+                    public void apply(@NonNull TextView textView, int index) {
+                        textView.setTextColor(tintColor);
+                    }
+                });
     }
 
     @OnClick({R.id.share_qq,R.id.share_weibo,R.id.share_wechat,R.id.share_circlefriend})

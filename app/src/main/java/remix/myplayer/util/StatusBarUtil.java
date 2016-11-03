@@ -5,13 +5,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.annotation.ColorInt;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
+import remix.myplayer.R;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.StatusBarView;
 
@@ -165,8 +169,14 @@ public class StatusBarUtil {
         contentLayout.setFitsSystemWindows(false);
         contentLayout.setClipToPadding(true);
         drawer.setFitsSystemWindows(false);
+        // 側滑添加statusbarView
+        LinearLayout headerContainer = (LinearLayout) drawer.findViewById(R.id.header);
+        if(headerContainer != null){
+            headerContainer.addView(createStatusBarView(activity,color),0);
+        }
 
-        addTranslucentView(activity, statusBarAlpha);
+//        addTranslucentView(activity, statusBarAlpha);
+
     }
 
 

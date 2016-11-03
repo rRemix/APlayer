@@ -1,370 +1,535 @@
 package remix.myplayer.lrc;
 
+import android.animation.ValueAnimator;
+import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.DashPathEffect;
 import android.graphics.Paint;
-import android.graphics.PathEffect;
 import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.Scroller;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import remix.myplayer.model.LrcInfo;
-import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
+import remix.myplayer.application.Application;
 
-/**
- * Created by Remix on 2015/12/8.
+/***
+ * 
+ * 须知：
+ * 在ViewGroup里面 scrollTo，scrollBy方法移动的是子View
+ * 在View里面scrollTo，scrollBy方法移动的是View里面绘制的内容
+ * 要点：
+ * 1:歌词的上下平移用什么实现？
+ *    用Scroller实现，Scroller只是一个工具而已，
+ *    真正实现滚动效果的还是View的scrollTo方法
+ * 2：歌词的水平滚动怎么实现？
+ *    通过属性动画ValueAnimator控制高亮歌词绘制的x轴起始坐标
+ * 
+ * @author Ligang  2014/8/19
+ *
  */
-public class LrcView extends View {
-    private static final String TAG = LrcView.class.getSimpleName();
-    private ArrayList<LrcInfo> mLrcList;
-    //普通歌词画笔
-    private Paint mNormalPaint;
-    //高亮歌词画笔
-    private Paint mHightLightPaint;
-    //拖动时水平线
-    private Paint mHorizontalPaint;
-    //高亮歌词
-    private int mHightLightRow;
-    //总共多少行歌词
-    private int mTotalRow;
-    //上下了两行文字间隔
-    private int mSpacing = 40;
-    //控件宽度
-    private int mViewCenterX = 0;
-    //控件高度
-    private int mViewHeight = 0;
-    //控件高度中心点
-    private int mViewCenterY;
-    //辅助滑动类
-    private Scroller mScroller;
-    //高亮与非高亮歌词字体大小
-    private int mHightLightTextSize = 45;
-    private int mNormalTextSize = 30;
-    //当前绘制歌词的高度
-    private int mCenterY;
-    //当前绘制的最小和最大行数
-    private int mMinRow;
-    private int mMaxRow;
-    //是否正在搜索歌词
-    private boolean mIsSearching = false;
-    //是否正在滑动
-    private boolean mIsDragging = false;
-    //外部viewpager是否正在滑动
-    private boolean mIsViewPagerScroll = false;
-    private onSeekListener mLrcListener;
-    //滑动后新的时间
-    private int mNewProgress;
-    //歌词滚动的动画时间
-    private final int ANIMDURATION = 1000;
-    //最小滑动距离
-    private final int MINOFFSET = 100;
-    //每次绘制需要绘制的歌词，因为歌词的长度可能比屏幕更宽，所以需要多行绘制
-    private ArrayList<String> mMultiLrc = new ArrayList<>();
+public class LrcView extends View implements ILrcView{
+	/**所有的歌词***/
+	private List<LrcRow> mLrcRows;
+	/**无歌词数据的时候 显示的默认文字**/
+	private static final String DEFAULT_TEXT = "暂无歌词";
+    /**正在搜索的提示文字*/
+    private static final String SEARCHING = "正在搜索";
+	/**默认文字的字体大小**/
+	private static final float SIZE_FOR_DEFAULT_TEXT = 35;
 
-    public LrcView(Context context) {
-        super(context);
-    }
+	/**画高亮歌词的画笔***/
+	private Paint mPaintForHighLightLrc;
+	/**高亮歌词的默认字体大小***/
+	private static final float DEFAULT_SIZE_FOR_HIGHT_LIGHT_LRC = 40;
+	/**高亮歌词当前的字体大小***/
+	private float mCurSizeForHightLightLrc = DEFAULT_SIZE_FOR_HIGHT_LIGHT_LRC;
+	/**高亮歌词的默认字体颜色**/
+	private static final int DEFAULT_COLOR_FOR_HIGHT_LIGHT_LRC = Color.BLACK;
+	/**高亮歌词当前的字体颜色**/
+	private int mCurColorForHightLightLrc = DEFAULT_COLOR_FOR_HIGHT_LIGHT_LRC;
 
-    public void setOnSeekListener(onSeekListener l){
-        mLrcListener = l;
-    }
+	/**画其他歌词的画笔***/
+	private Paint mPaintForOtherLrc;
+	/**其他歌词的默认字体大小***/
+	private static final float DEFAULT_SIZE_FOR_OTHER_LRC = 30;
+	/**其他歌词当前的字体大小***/
+	private float mCurSizeForOtherLrc = DEFAULT_SIZE_FOR_OTHER_LRC;
+	/**其他歌词的默认字体颜色**/
+	private static final int DEFAULT_COLOR_FOR_OTHER_LRC = Color.GRAY;
+	/**高亮歌词当前的字体颜色**/
+	private int mCurColorForOtherLrc = DEFAULT_COLOR_FOR_OTHER_LRC;
 
-    public LrcView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        mNormalPaint = new Paint();
-        mNormalPaint.setColor(Color.GRAY);
-        mNormalTextSize = DensityUtil.dip2px(context,12);
-        mNormalPaint.setTextSize(mNormalTextSize);
-        mNormalPaint.setTextAlign(Paint.Align.CENTER);
-        mNormalPaint.setAntiAlias(true);
 
-        mHightLightPaint = new Paint();
-        mHightLightTextSize = DensityUtil.dip2px(context,18);
-        mHightLightPaint.setTextSize(mHightLightTextSize);
-        mHightLightPaint.setTextAlign(Paint.Align.CENTER);
-        mHightLightPaint.setAntiAlias(true);
-        mHightLightPaint.setFakeBoldText(true);
+	/**画时间线的画笔***/
+	private Paint mPaintForTimeLine;
+	/***时间线的颜色**/
+	private int mTimeLineColor = Color.GRAY;
+	/**时间文字大小**/
+	private float mCurSizeForTimeLine = 30;
+	/**是否画时间线**/
+	private boolean mIsDrawTimeLine = false;
 
-        mHorizontalPaint = new Paint();
-        mHorizontalPaint.setStrokeWidth(2);
-        PathEffect effects = new DashPathEffect(new float[] { 1, 2,4,8}, 1);
-        mHorizontalPaint.setPathEffect(effects);
+	/**歌词间默认的行距**/
+	private static final float DEFAULT_PADDING = 50;
+	/**歌词当前的行距**/
+	private float mCurPadding = DEFAULT_PADDING;
 
-        mScroller = new Scroller(getContext());
-    }
+	/**歌词的最大缩放比例**/
+	public static final float MAX_SCALING_FACTOR = 1.5f;
+	/**歌词的最小缩放比例**/
+	public static final float MIN_SCALING_FACTOR = 0.5f;
+	/**默认缩放比例**/
+	private static final float DEFAULT_SCALING_FACTOR = 1.0f;
+	/**歌词的当前缩放比例**/
+	private float mCurScalingFactor = DEFAULT_SCALING_FACTOR;
 
-    /**
-     * 更新歌词列表
-     * @param list
-     */
-    public void UpdateLrcList(ArrayList<LrcInfo> list){
-        mLrcList = list;
-        if(mLrcList != null)
-            mTotalRow = mLrcList.size();
-    }
+	/**实现歌词竖直方向平滑滚动的辅助对象**/
+	private Scroller mScroller;
+	/***移动一句歌词的持续时间**/
+	private static final int DURATION_FOR_LRC_SCROLL = 650;
+	/***停止触摸时 如果View需要滚动 时的持续时间**/
+	private static final int DURATION_FOR_ACTION_UP = 400;
 
-    public void setViewPagerScroll(boolean isScroll){
-        mIsViewPagerScroll = isScroll;
-    }
+	/**控制文字缩放的因子**/
+	private float mCurFraction = 0;
+	private int mTouchSlop;
 
-    public void setHightLightColor(@ColorInt int color){
-        if(mHightLightPaint != null)
-            mHightLightPaint.setColor(color);
-    }
+	/**外部viewpager是否正在滑动*/
+	private boolean mIsViewPagerScroll = false;
 
-    public void setNormalColor(@ColorInt int color){
-        if(mNormalPaint != null)
-            mNormalPaint.setColor(color);
-    }
+    /**是否正在搜索*/
+    private boolean mSearching = false;
 
-    public void setHorizontalColor(@ColorInt int color){
-        if(mHorizontalPaint != null)
-            mHorizontalPaint.setColor(color);
-    }
+	public LrcView(Context context) {
+		super(context);
+		init();
+	}
+	public LrcView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		init();
+	}
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        if(mIsSearching){
-            scrollTo(0,0);
-            canvas.drawText("正在搜索歌词", mViewCenterX, getHeight() / 2, mNormalPaint);
+
+	/**
+	 * 初始化画笔等
+	 */
+	@Override
+	public void init() {
+		mScroller = new Scroller(getContext());
+		mPaintForHighLightLrc = new Paint();
+		mPaintForHighLightLrc.setColor(mCurColorForHightLightLrc);
+        mCurSizeForHightLightLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,18, Application.getContext().getResources().getDisplayMetrics());
+		mPaintForHighLightLrc.setTextSize(mCurSizeForHightLightLrc);
+		mPaintForHighLightLrc.setFakeBoldText(true);
+
+		mPaintForOtherLrc = new Paint();
+		mPaintForOtherLrc.setColor(mCurColorForOtherLrc);
+
+        mCurSizeForOtherLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,12, Application.getContext().getResources().getDisplayMetrics());
+		mPaintForOtherLrc.setTextSize(mCurSizeForOtherLrc);
+
+		mPaintForTimeLine = new Paint();
+        mCurSizeForTimeLine = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,12, Application.getContext().getResources().getDisplayMetrics());
+        mPaintForTimeLine.setTextSize(mCurSizeForTimeLine);
+		mPaintForTimeLine.setColor(mTimeLineColor);
+
+
+		mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+	}
+
+	private int mTotleDrawRow;
+	@Override
+	protected void onDraw(Canvas canvas) {
+		super.onDraw(canvas);
+        if(mSearching){
+            float textWidth = mPaintForOtherLrc.measureText(SEARCHING);
+            float textX = (getWidth() - textWidth) / 2;
+            canvas.drawText(SEARCHING, textX, getHeight() / 2, mPaintForOtherLrc);
             return;
         }
-        if(mLrcList == null){
-            scrollTo(0,0);
-            canvas.drawText("暂无歌词", mViewCenterX, getHeight() / 2, mNormalPaint);
-            return;
-        }
-        if(mHightLightRow == -1)
-            return;
-        if(mTotalRow == 0){
-            //初始化将要绘制的歌词行数
-            mTotalRow = (getHeight()/(mNormalTextSize + mSpacing)) + 4;
-        }
+		if(mLrcRows == null || mLrcRows.size() == 0){
+			//画默认的显示文字
+			float textWidth = mPaintForOtherLrc.measureText(DEFAULT_TEXT);
+			float textX = (getWidth() - textWidth ) / 2;
+			canvas.drawText(DEFAULT_TEXT, textX, getHeight() / 2, mPaintForOtherLrc);
+			return;
+		}
+		if(mTotleDrawRow == 0){
+			//初始化将要绘制的歌词行数
+			mTotleDrawRow = (int) (getHeight() / (mCurSizeForOtherLrc + mCurPadding)) + 4;
+		}
+		//因为不需要将所有歌词画出来
+		int minRaw = mCurRow - (mTotleDrawRow-1) / 2;
+		int maxRaw = mCurRow + (mTotleDrawRow-1) / 2;
+		minRaw = Math.max(minRaw, 0); //处理上边界
+		maxRaw = Math.min(maxRaw, mLrcRows.size() - 1); //处理下边界
+		//实现渐变的最大歌词行数
+		int count = Math.max(maxRaw - mCurRow, mCurRow - minRaw);
+		//两行歌词间字体颜色变化的透明度
+		int alpha = (0xFF - 0x10) / count;
+		//画出来的第一行歌词的y坐标
+		float rowY = getHeight() / 2 + minRaw*(mCurSizeForOtherLrc + mCurPadding);
+		for (int i = minRaw; i <= maxRaw; i++) {
 
-        mMinRow = mHightLightRow - (mTotalRow - 1) / 2;
-        mMaxRow = mHightLightRow + (mTotalRow - 1) / 2;
-        mMinRow = Math.max(mMinRow, 0); //处理上边界
-        mMaxRow = Math.min(mMaxRow, mLrcList.size() - 1); //处理下边界
+			if(i == mCurRow){//画高亮歌词
+				//因为有缩放效果，所有需要动态设置歌词的字体大小
+				float textSize = mCurSizeForOtherLrc + (mCurSizeForHightLightLrc - mCurSizeForOtherLrc) * mCurFraction;
+				mPaintForHighLightLrc.setTextSize(textSize);
 
-        try {
-            int extraLine = 0;
-            for(int i = mMinRow ;i < mMaxRow ;i++){
-                mCenterY = mViewCenterY + i * (mSpacing + mNormalTextSize) + extraLine * mNormalTextSize;
-                boolean isHighLight = i == mHightLightRow;
-                String sentence = mLrcList.get(i).getSentence();
-                mMultiLrc.clear();
-                //判断歌词是否能显示完整
-                float textLegth = isHighLight ?
-                        mHightLightPaint.measureText(sentence) :
-                        mNormalPaint.measureText(sentence);
-                //字符串宽度大于屏幕宽度，分成两行绘制
-                if(textLegth > getWidth()){
-                    //寻找到屏幕能显示的最后一个字符
-                    int end = sentence.length() - 1;
-                    if(isHighLight){
-                        while (mHightLightPaint.measureText(sentence,0,end) > getWidth() ){
-                            end--;
-                        }
-                        mMultiLrc.add(sentence.substring(0,end - 1));
-                        mMultiLrc.add(sentence.substring(end,sentence.length()));
-                    } else {
-                        while (mNormalPaint.measureText(sentence,0,end) > getWidth() ){
-                            end--;
-                        }
-                        mMultiLrc.add(sentence.substring(0,end - 1));
-                        mMultiLrc.add(sentence.substring(end,sentence.length()));
-                    }
-                } else {
-                    //直接绘制
-                    mMultiLrc.add(mLrcList.get(i).getSentence());
-                }
+				String text = mLrcRows.get(i).getContent();//获取到高亮歌词
+				float textWidth = mPaintForHighLightLrc.measureText(text);//用画笔测量歌词的宽度
+				if(textWidth > getWidth()){
+					//如果歌词宽度大于view的宽，则需要动态设置歌词的起始x坐标，以实现水平滚动
+					canvas.drawText(text, mCurTextXForHighLightLrc, rowY, mPaintForHighLightLrc);
+				}else{
+					//如果歌词宽度小于view的宽，则让歌词居中显示
+					float textX =  (getWidth()-textWidth) / 2;
+					canvas.drawText(text, textX, rowY, mPaintForHighLightLrc);
+				}
+			}else{
+				if(i == mLastRow){//画高亮歌词的上一句
+					//因为有缩放效果，所有需要动态设置歌词的字体大小
+					float textSize = mCurSizeForHightLightLrc - (mCurSizeForHightLightLrc - mCurSizeForOtherLrc) * mCurFraction;
+					mPaintForOtherLrc.setTextSize(textSize);
+				}else{//画其他的歌词
+					mPaintForOtherLrc.setTextSize(mCurSizeForOtherLrc);
+				}
+				String text = mLrcRows.get(i).getContent();
+				float textWidth = mPaintForOtherLrc.measureText(text);
+				float textX = (getWidth() - textWidth) / 2;
+				//如果计算出的textX为负数，将textX置为0(实现：如果歌词宽大于view宽，则居左显示，否则居中显示)
+				textX = Math.max(textX, 0);
+				//实现颜色渐变  从0xFFFFFFFF 逐渐变为 0x11FFFFFF(颜色还是白色，只是透明度变化)
+				int curAlpha = 255 - (Math.abs(i - mCurRow) - 1 ) * alpha; //求出当前歌词颜色的透明度
+//				mPaintForOtherLrc.setColor(0x1000000 * curAlpha + 0xffffff);
+				canvas.drawText(text, textX, rowY, mPaintForOtherLrc);
+			}
+			//计算出下一行歌词绘制的y坐标
+			rowY += mCurSizeForOtherLrc + mCurPadding;
+		}
 
-                //绘制歌词
-                for(int j = 0 ; j < mMultiLrc.size() ;j++){
-                    canvas.drawText(mMultiLrc.get(j),
-                            mViewCenterX,
-                            mCenterY + j * (isHighLight ? mHightLightTextSize : mNormalTextSize) + j,
-                            isHighLight ? mHightLightPaint : mNormalPaint);
-                    if(j == 1)
-                        extraLine++;
-                }
+		//画时间线和时间
+		if(mIsDrawTimeLine){
+			float y = getHeight() / 2 + getScrollY();
+			canvas.drawText(mLrcRows.get(mCurRow).getTimeStr(), 0, y - 5, mPaintForTimeLine);
+			canvas.drawLine(0, y, getWidth(), y, mPaintForTimeLine);
+		}
 
-                if(i == mHightLightRow && mIsDragging) {
-                    //正在拖动画水平线
-                    canvas.drawLine(0,
-                            mCenterY + mHightLightTextSize / 2,
-                            getWidth(),
-                            mCenterY + mHightLightTextSize / 2,mHorizontalPaint);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+	}
+	
+	/**是否可拖动歌词**/
+	private boolean canDrag = false;
+	/**事件的第一次的y坐标**/
+	private float firstY;
+	/**事件的上一次的y坐标**/
+	private float lastY;
+	private float lastX;
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		if(mLrcRows == null || mLrcRows.size() == 0){
+			return false;
+		}
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			firstY = event.getRawY();
+			lastX = event.getRawX();
+			break;
+		case MotionEvent.ACTION_MOVE:
+			if(!canDrag){
+				if(Math.abs(event.getRawY() - firstY) > mTouchSlop && Math.abs(event.getRawY()-firstY) > Math.abs(event.getRawX()-lastX)){
+					canDrag = true;
+					mIsDrawTimeLine = true;
+					mScroller.forceFinished(true);
+					stopScrollLrc();
+					mCurFraction = 1;
+				}
+				lastY = event.getRawY();
+			}
 
+			if(canDrag){
+				float offset = event.getRawY() - lastY;//偏移量
+				if( getScrollY() - offset < 0){ 
+					if(offset > 0){
+						offset = offset/3;
+					}
+				}else if(getScrollY() - offset >mLrcRows.size()*(mCurSizeForOtherLrc+mCurPadding)-mCurPadding){
+					if(offset < 0 ){
+						offset = offset/3;
+					}
+				}
+				scrollBy(getScrollX(), -(int) offset);
+				lastY = event.getRawY();
+				int currentRow = (int) (getScrollY()/(mCurSizeForOtherLrc+mCurPadding));
+				currentRow = Math.min(currentRow, mLrcRows.size()-1);
+				currentRow = Math.max(currentRow, 0);
+				seekTo(mLrcRows.get(currentRow).getTime(), false,false);
+				return true;
+			}
+			lastY = event.getRawY();
+			break;
+		case MotionEvent.ACTION_UP:
+		case MotionEvent.ACTION_CANCEL:
+			if(!canDrag){
+				if(onLrcClickListener != null){
+					onLrcClickListener.onClick();
+				}
+			}else{
+				if(onSeekToListener!= null && mCurRow != -1){
+					onSeekToListener.onSeekTo(mLrcRows.get(mCurRow).getTime());
+				}
+				if(getScrollY() < 0){
+					smoothScrollTo(0,DURATION_FOR_ACTION_UP);
+				}else if(getScrollY() > mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding){
+					smoothScrollTo((int) (mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding),DURATION_FOR_ACTION_UP);
+				}
+
+				canDrag = false;
+				mIsDrawTimeLine = false;
+				invalidate();
+			}
+			break;
+		}
+		return true;
+	}
+	/**
+	 * 为LrcView设置歌词List集合数据
+	 */
+	@Override
+	public void setLrcRows(List<LrcRow> lrcRows) {
+		reset();
+		this.mLrcRows = lrcRows;
+		invalidate();
+	}
+
+	/**当前高亮歌词的行号**/
+	private int mCurRow =-1;
+	/**上一次的高亮歌词的行号**/
+	private int mLastRow = -1;
+	
+	@Override
+	public void seekTo(int progress,boolean fromSeekBar,boolean fromSeekBarByUser) {
+		if(mLrcRows == null || mLrcRows.size() == 0){
+			return;
+		} 
+		//如果是由seekbar的进度改变触发 并且这时候处于拖动状态，则返回
+		if(fromSeekBar && canDrag){
+			return;
+		}
+		for (int i = mLrcRows.size()-1; i >= 0; i--) {
+
+			if(progress >= mLrcRows.get(i).getTime()){
+				if(mCurRow != i){
+					mLastRow = mCurRow;
+					mCurRow = i;
+					log("mCurRow=i="+mCurRow);
+					if(fromSeekBarByUser){
+						if(!mScroller.isFinished()){
+							mScroller.forceFinished(true);
+						}
+						scrollTo(getScrollX(), (int) (mCurRow * (mCurSizeForOtherLrc+mCurPadding)));
+					}else{
+						smoothScrollTo( (int) (mCurRow * (mCurSizeForOtherLrc+mCurPadding)), DURATION_FOR_LRC_SCROLL);
+					}
+					//如果高亮歌词的宽度大于View的宽，就需要开启属性动画，让它水平滚动
+					float textWidth = mPaintForHighLightLrc.measureText(mLrcRows.get(mCurRow).getContent());
+					log("textWidth="+textWidth+"getWidth()=" + getWidth());
+					if(textWidth > getWidth()){
+						if(fromSeekBarByUser){
+							mScroller.forceFinished(true);
+						}
+						log("开始水平滚动歌词:" + mLrcRows.get(mCurRow).getContent());
+						startScrollLrc(getWidth()-textWidth, (long) (mLrcRows.get(mCurRow).getTotalTime() * 0.6));
+					}
+					invalidate();
+				}
+				break;
+			}
+		}
+
+	}
+
+	/**控制歌词水平滚动的属性动画***/
+	private ValueAnimator mAnimator;
+	/**
+	 * 开始水平滚动歌词
+	 * @param endX 歌词第一个字的最终的x坐标
+	 * @param duration 滚动的持续时间
+	 */
+	private void startScrollLrc(float endX,long duration){
+		if(mAnimator == null){
+			mAnimator = ValueAnimator.ofFloat(0,endX);
+			mAnimator.addUpdateListener(updateListener);
+		}else{
+			mCurTextXForHighLightLrc = 0;
+			mAnimator.cancel();
+			mAnimator.setFloatValues(0,endX);
+		}
+		mAnimator.setDuration(duration);
+		mAnimator.setStartDelay((long) (duration*0.3)); //延迟执行属性动画
+		mAnimator.start();
+	}
+
+	/**
+	 * 停止歌词的滚动
+	 */
+	private void stopScrollLrc(){
+		if(mAnimator != null){
+			mAnimator.cancel();
+		}
+		mCurTextXForHighLightLrc = 0;
+	}
+	/**高亮歌词当前的其实x轴绘制坐标**/
+	private float mCurTextXForHighLightLrc;
+	/***
+	 * 监听属性动画的数值值的改变
+	 */
+	AnimatorUpdateListener updateListener = new AnimatorUpdateListener() {
+
+		@Override
+		public void onAnimationUpdate(ValueAnimator animation) {
+			//TODO
+			mCurTextXForHighLightLrc = (Float) animation.getAnimatedValue();
+			log("mCurTextXForHighLightLrc="+mCurTextXForHighLightLrc);
+			invalidate();
+		}
+	};
+	/**
+	 * 设置歌词的缩放比例
+	 */
+	@Override
+	public void setLrcScalingFactor(float scalingFactor) {
+		mCurScalingFactor = scalingFactor;
+		mCurSizeForHightLightLrc = DEFAULT_SIZE_FOR_HIGHT_LIGHT_LRC * mCurScalingFactor;
+		mCurSizeForOtherLrc = DEFAULT_SIZE_FOR_OTHER_LRC * mCurScalingFactor;
+		mCurPadding = DEFAULT_PADDING * mCurScalingFactor;
+		mTotleDrawRow = (int) (getHeight() / (mCurSizeForOtherLrc+mCurPadding)) + 3;
+		log("mRowTotal="+mTotleDrawRow);
+		scrollTo(getScrollX(), (int) (mCurRow * (mCurSizeForOtherLrc + mCurPadding)));
+		invalidate();
+		mScroller.forceFinished(true);
+	}
+	/**
+	 * 重置
+	 */
+	@Override
+	public void reset() {
+		if(!mScroller.isFinished()){
+			mScroller.forceFinished(true);
+		}
+		mLrcRows = null;
+		scrollTo(getScrollX(), 0);
+		invalidate();
+	}
+
+
+	/**
+	 * 平滑的移动到某处
+	 * @param dstY
+	 */
+	private void smoothScrollTo(int dstY,int duration){
+		int oldScrollY = getScrollY();
+		int offset = dstY - oldScrollY;
+		mScroller.startScroll(getScrollX(), oldScrollY, getScrollX(), offset, duration);
+		invalidate();
+	}
+
+	@Override
+	public void computeScroll() {
+		if (!mScroller.isFinished()) {
+			if (mScroller.computeScrollOffset()) {
+				int oldY = getScrollY();
+				int y = mScroller.getCurrY();
+				if (oldY != y && !canDrag) {
+					scrollTo(getScrollX(), y);
+				}
+				mCurFraction = mScroller.timePassed() * 3f / DURATION_FOR_LRC_SCROLL;
+				mCurFraction = Math.min(mCurFraction, 1F);
+				invalidate();
+			}
+		} 
+	}
+	/**
+	 * 返回当前的歌词缩放比例
+	 * @return
+	 */
+	public float getCurScalingFactor() {
+		return mCurScalingFactor;
+	}
+	
+	private OnSeekToListener onSeekToListener;
+	public void setOnSeekToListener(OnSeekToListener onSeekToListener) {
+		this.onSeekToListener = onSeekToListener;
+	}
+
+    public interface OnSeekToListener{
+		void onSeekTo(int progress);
+	}
+
+	private OnLrcClickListener onLrcClickListener;
+	public void setOnLrcClickListener(OnLrcClickListener onLrcClickListener) {
+		this.onLrcClickListener = onLrcClickListener;
+	}
+
+	public interface OnLrcClickListener{
+		void onClick();
+	}
+
+	public void log(Object o){
+		Log.d("LrcView", o+"");
+	}
+
+    /**
+     * 外部viewpager是否正在滑动
+     * @param scrolling
+     */
+    public void setViewPagerScroll(boolean scrolling){
+        mIsViewPagerScroll = scrolling;
     }
 
     /**
-     * 最后一次触摸的坐标
+     * 是否正在搜索
+     * @param searching
      */
-    private float mLastMotionY = 0;
-    /**
-     * 是否需要刷新
-     */
-    private boolean mNeedUpdate = false;
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if(mLrcList == null || mLrcList.size() == 0) {
-            return true;
-        }
-        //外部viewpager正在滑动，不响应滑动
-        if(mIsViewPagerScroll){
-            return true;
-        }
-        switch (event.getAction()){
-            case MotionEvent.ACTION_DOWN:
-                mLastMotionY = event.getY();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                seekTo(event);
-                break;
-            case MotionEvent.ACTION_CANCEL:
-            case MotionEvent.ACTION_UP:
-                computeNewProgress();
-                mIsDragging = false;
-                break;
-        }
-        return true;
-    }
-
-    /**
-     * 上下滑动歌词控件
-     * @param event
-     */
-    public void seekTo(MotionEvent event){
-        float y = event.getY();
-        float offsetY = y - mLastMotionY;
-
-        //滑动距离过小
-        if(Math.abs(offsetY) < MINOFFSET){
-            return;
-        }
-
-        mNeedUpdate = true;
-        mIsDragging = true;
-        //计算滑动多少行
-        int rowoffset = (int) (Math.abs(offsetY) / (mNormalTextSize + mSpacing));
-        if(rowoffset == 0)
-            return;
-        //向上滑动，歌词向上移动
-        if(offsetY > 0){
-            mHightLightRow -= (rowoffset );
-            mHightLightRow = Math.max(mHightLightRow,0);
-        }
-        //向下滑动,歌词向下移动
-        if(offsetY < 0){
-            mHightLightRow += (rowoffset );
-            mHightLightRow = Math.min(mHightLightRow,mTotalRow - 1);
-        }
-
-        smoothScrollTo((mSpacing + mNormalTextSize) * mHightLightRow, 150);
-//        scrollBy(0, (int) offsetY);
-//        invalidate();
-        mLastMotionY = event.getY();
-    }
-
-    /**
-     * 根据滑动后的歌词高亮位置，计算歌曲播放进度
-     */
-    private void computeNewProgress() {
-        if(mHightLightRow < mLrcList.size() - 1 && mNeedUpdate) {
-            mNeedUpdate = false;
-            mNewProgress = mLrcList.get(mHightLightRow).getStartTime();
-            if(mLrcListener != null)
-                mLrcListener.onLrcSeek(mNewProgress);
-        }
-    }
-
-    /**
-     *
-     * @param progress
-     * @param fromuser
-     */
-    public void seekTo(long progress, boolean fromuser){
-        if(mLrcList == null || mLrcList.size() == 0){
-            invalidate();
-            return;
-        }
-        if(mIsDragging)
-            return;
-        if(!fromuser) {
-            mHightLightRow = selectIndex(progress);
-            smoothScrollTo((mSpacing + mNormalTextSize) * mHightLightRow, ANIMDURATION);
-            invalidate();
-        }
-
-    }
-
-    /**
-     * 计算滚动距离
-     * @param dstY
-     * @param duration
-     */
-    private void smoothScrollTo(int dstY,int duration){
-        int oldScrollY = getScrollY();
-        int offset = dstY - oldScrollY;
-        mScroller.startScroll(getScrollX(), oldScrollY, getScrollX(), offset, duration);
-    }
-
-    /**
-     * 平滑滚动到某个位置
-     */
-    @Override
-    public void computeScroll() {
-       if(mScroller.computeScrollOffset()){
-           int oldY = getScrollY();
-           int y = mScroller.getCurrY();
-           if (oldY != y) {
-               scrollTo(getScrollX(), y);
-           }
-           invalidate();
-       }
-    }
-
-    public int selectIndex(long time) {
-        if(mLrcList == null)
-            return -1;
-        int index=0;
-        for(int i = 0; i < mLrcList.size(); i++) {
-            LrcInfo temp = mLrcList.get(i);
-            if(temp.getStartTime() < time)
-                ++index;
-
-        }
-        index -= 1;
-        if(index < 0){
-            index = 0;
-        }
-        return index;
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        mViewCenterX = (int)(w * 0.5);
-        mViewHeight = h;
-        mViewCenterY = (int)(h * 0.5);
-    }
-
     public void setSearching(boolean searching){
-        mIsSearching = searching;
+        mSearching = searching;
     }
+
+    /**
+     * 设置高亮歌词颜色
+     * @param color
+     */
+    public void setHighLightColor(@ColorInt int color){
+        mCurColorForHightLightLrc = color;
+        if(mPaintForHighLightLrc != null){
+            mPaintForHighLightLrc.setColor(mCurColorForHightLightLrc);
+        }
+    }
+
+    /**
+     * 设置非高亮歌词颜色
+     * @param color
+     */
+    public void setOtherColor(@ColorInt int color){
+        mCurColorForOtherLrc = color;
+        if(mPaintForOtherLrc != null)
+            mPaintForOtherLrc.setColor(mCurColorForOtherLrc);
+    }
+
+    /**
+     * 设置时间线颜色
+     * @param color
+     */
+    public void setTimeLineColor(@ColorInt int color){
+        mTimeLineColor = color;
+        if(mPaintForTimeLine != null)
+            mPaintForTimeLine.setColor(color);
+    }
+
 }

@@ -110,4 +110,9 @@
     <string name="confirm_clear_cache">确认清除缓存?</string>
 
     <string name="error">错误</string>
+    <string name="share_to">分享到</string>
+    <string name="qq">QQ</string>
+    <string name="weibo">微博</string>
+    <string name="wechat">微信</string>
+    <string name="circlefriend">朋友圈</string>
 </resources>

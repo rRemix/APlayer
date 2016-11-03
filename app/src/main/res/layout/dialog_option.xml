@@ -46,8 +46,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:layout_marginTop="@dimen/d1_size"
-        android:layout_marginBottom="@dimen/d2_size">
+        android:paddingTop="@dimen/d1_size"
+        android:paddingBottom="@dimen/d2_size">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"

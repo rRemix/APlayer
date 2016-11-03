@@ -32,7 +32,9 @@ import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -247,9 +249,15 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    ToastUtil.show(mContext,MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) ?
-                                            mContext.getString(R.string.delete_success) :
-                                            mContext.getString(R.string.delete_error));
+
+                                    if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG)){
+                                        if(PlayListUtil.deleteSong(mInfo.getId(), Global.mPlayQueueId)){
+                                            ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
+
+                                        }
+                                    } else {
+                                        ToastUtil.show(mContext, mContext.getString(R.string.delete_error));
+                                    }
                                 }
                             })
                             .backgroundColor(ThemeStore.getBackgroundColor3())

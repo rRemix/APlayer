@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="@dimen/d264_size"
-    android:layout_height="@dimen/d208_size"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:background="?attr/material_color_primary">
 
     <FrameLayout
-        android:layout_marginTop="@dimen/d40_size"
-        android:layout_width="@dimen/d100_size"
+        android:layout_width="match_parent"
         android:layout_height="@dimen/d100_size"
-        android:id="@+id/header_img_container">
+        android:id="@+id/header_img_container"
+        android:layout_marginTop="@dimen/d20_size">
+        <View
+            android:visibility="gone"
+            android:id="@+id/header_shadow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
         <com.facebook.drawee.view.SimpleDraweeView
-            android:visibility="visible"
             android:id="@+id/header_img"
             android:layout_width="@dimen/d100_size"
             android:layout_height="@dimen/d100_size"
-            android:src="@drawable/no_art_normal"
-            android:background="@drawable/drawer_bg_album"
+            android:layout_gravity="center"
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImageScaleType="centerCrop"
-            fresco:placeholderImage="?attr/default_album"/>
+            fresco:placeholderImage="?attr/default_album"
+            fresco:roundedCornerRadius="@dimen/d2_size" />
     </FrameLayout>
-
 
     <TextView
         android:visibility="visible"

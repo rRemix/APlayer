@@ -8,23 +8,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.TreeMap;
+import java.util.List;
 
 import remix.myplayer.application.Application;
-import remix.myplayer.model.LrcInfo;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.DiskLruCache;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 
 /**
@@ -37,8 +31,7 @@ import remix.myplayer.util.SPUtil;
 public class SearchLRC {
     private static final String TAG = "SearchLRC";
     private static final String DEFAULT_LOCAL = "GB2312";
-    private ILrcBuilder mLrcBuilder;
-    private boolean mIsFind = false;
+    private ILrcParser mLrcBuilder;
     private MP3Item mInfo;
     private String mSongName;
     private String mArtistName;
@@ -47,7 +40,7 @@ public class SearchLRC {
         mInfo = item;
         mSongName = mInfo.getTitle();
         mArtistName = mInfo.getArtist();
-        mLrcBuilder = new LrcBuilderImpl();
+        mLrcBuilder = new DefaultLrcParser();
     }
 
     /**
@@ -72,7 +65,7 @@ public class SearchLRC {
      * 根据歌词id,发送请求并解析歌词
      * @return 歌词信息list
      */
-    public ArrayList<LrcInfo> getLrc(){
+    public List<LrcRow> getLrc(){
         BufferedReader br = null;
         //先判断该歌曲是否有缓存
         try {
@@ -151,89 +144,4 @@ public class SearchLRC {
         return null;
     }
 
-
-    /**
-     * 解析并缓存歌词
-     * @param br 输入流
-     * @param needcache 是否需要缓存
-     * @return
-     */
-    public LinkedList<LrcInfo> parseLrc(BufferedReader br, boolean needcache){
-        //解析歌词
-        TreeMap<Integer,String> lrcMap = new TreeMap<>();
-        lrcMap.clear();
-        String s = "";
-        DiskLruCache.Editor editor = null;
-        OutputStream lrcCachaStream = null;
-        if (br == null)
-            return null;
-
-        try {
-            if (needcache) {
-                editor = DiskCache.getLrcDiskCache().edit(CommonUtil.hashKeyForDisk(mSongName + "/" + mArtistName));
-                lrcCachaStream = editor.newOutputStream(0);
-            }
-            while ((s = br.readLine()) != null) {
-
-                if (needcache)
-                    lrcCachaStream.write((s + "\r\n").getBytes());
-                //判断是否是歌词内容
-                if (s.startsWith("[ti") || s.startsWith("[ar") || s.startsWith("[al") ||
-                        s.startsWith("[by") || s.startsWith("[off"))
-                    continue;
-                int startIndex = -1;
-                while ((startIndex = s.indexOf("[", startIndex + 1)) != -1) {
-                    int endIndex = s.indexOf("]", startIndex);
-                    if (endIndex < 0)
-                        continue;
-                    Integer time = CommonUtil.getMill(s.substring(startIndex, endIndex));
-                    String lrc = s.substring(s.lastIndexOf(']') + 1, s.length());
-                    if (time != -1 && !lrc.equals(""))
-                        lrcMap.put(time, lrc +"\r\n");
-                }
-            }
-            if (needcache) {
-                lrcCachaStream.flush();
-                editor.commit();
-                DiskCache.getLrcDiskCache().flush();
-            }
-
-        } catch (Exception e) {
-            LogUtil.d(TAG, s);
-            e.printStackTrace();
-        } finally {
-            try {
-                if (br != null)
-                    br.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        //将解析后的歌词封装
-        LinkedList<LrcInfo> list = new LinkedList();
-        Iterator it = lrcMap.keySet().iterator();
-        while (it.hasNext()) {
-            int startime = (int)it.next();
-            String sentence = lrcMap.get(startime);
-            list.add(new LrcInfo(sentence,startime));
-        }
-        //设置每句歌词开始与结束时间
-        for(int i = 0 ; i < list.size() - 1 ;i++) {
-            LrcInfo cur = list.get(i);
-            LrcInfo nxt = list.get(i + 1);
-            list.get(i).setEndTime(nxt.getStartTime());
-            list.get(i).setDuration(cur.getEndTime() - cur.getStartTime());
-        }
-
-        return list;
-    }
-
-    private void SetFindLRC(int number) {
-        mIsFind = number != 0;
-    }
-
-    public boolean GetFindLRC(){
-        return mIsFind;
-    }
 }
