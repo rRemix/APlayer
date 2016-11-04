@@ -148,7 +148,7 @@ public class OptionDialog extends BaseDialogActivity {
             case R.id.popup_delete:
                 MobclickAgent.onEvent(this,"Delete");
                 try {
-                    String title = mIsDeletePlayList ? getString(R.string.confirm_delete_playlist) :getString(R.string.confirm_delete_song);
+                    String title = getString(R.string.confirm_delete_playlist,mIsDeletePlayList ? mPlayListName : "曲库");
                     new MaterialDialog.Builder(OptionDialog.this)
                             .content(title)
                             .buttonRippleColor(ThemeStore.getRippleColor())

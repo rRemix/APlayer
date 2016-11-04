@@ -20,7 +20,6 @@ import java.util.Iterator;
 import remix.myplayer.R;
 import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.model.PlayListItem;
 
 /**
  * Created by taeja on 16-2-17.
@@ -58,7 +57,7 @@ public class MediaStoreUtil {
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DATA},
-                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                    Constants.MEDIASTORE_WHERE_SIZE, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
             if(cursor != null) {
                 Global.mFolderMap.clear();
                 while (cursor.moveToNext()) {
@@ -75,37 +74,6 @@ public class MediaStoreUtil {
             if(cursor != null && !cursor.isClosed())
                 cursor.close();
         }
-
-//        ContentValues cv = new ContentValues();
-//        cv.put(MediaStore.Audio.Playlists.NAME,"AA99");
-//        Uri uri = mContext.getContentResolver().insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,cv);
-//        long playListId = 0;
-//        cursor = mContext.getContentResolver().query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,null,null,null,null);
-//        if(cursor != null){
-//            if(cursor.moveToFirst())
-//                playListId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Playlists._ID));
-//        }
-//
-//        for(int i = 0 ; i < 2 ;i++){
-//            ContentValues cv1 = new ContentValues();
-//            cv1.put(MediaStore.Audio.Playlists.Members.AUDIO_ID,mAllSongList.get(i));
-//            Uri newUri =  mContext.getContentResolver().insert(MediaStore.Audio.Playlists.Members.getContentUri("external",playListId),cv1);
-//        }
-//        try {
-//            cursor = mContext.getContentResolver()
-//                    .query(MediaStore.Audio.Playlists.Members.getContentUri("external",playListId),
-//                            new String[]{MediaStore.Audio.Playlists.Members.TITLE,MediaStore.Audio.Playlists.Members.ARTIST},
-//                            null,null,null);
-//            if(cursor != null){
-//                while (cursor.moveToNext()){
-//                    for(int i = 0 ; i < cursor.getColumnCount();i++){
-//                        LogUtil.d("DBTest","name:" + cursor.getColumnName(i) + " value:" + cursor.getString(i));
-//                    }
-//                }
-//            }
-//        } catch (Exception e){
-//            e.toString();
-//        }
 
         return mAllSongList;
     }
@@ -141,11 +109,11 @@ public class MediaStoreUtil {
         try {
             if (type == Constants.ALBUM) {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                        MediaStore.Audio.Media.ALBUM_ID + "=" + id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
+                        MediaStore.Audio.Media.ALBUM_ID + "=" + id + " and " + Constants.MEDIASTORE_WHERE_SIZE, null, null);
             }
             if (type == Constants.ARTIST) {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                        MediaStore.Audio.Media.ARTIST_ID + "=" + id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
+                        MediaStore.Audio.Media.ARTIST_ID + "=" + id + " and " + Constants.MEDIASTORE_WHERE_SIZE, null, null);
             }
 
             if(cursor != null && cursor.getCount() > 0) {
@@ -244,7 +212,7 @@ public class MediaStoreUtil {
         String url = "";
         try {
             ContentResolver resolver = mContext.getContentResolver();
-            cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{"album_art"},
+            cursor = resolver.query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.AlbumColumns.ALBUM_ART},
                     MediaStore.Audio.Albums._ID + "=" + albumid,
                     null, null);
             if(cursor != null && cursor.getCount() > 0) {
@@ -372,12 +340,12 @@ public class MediaStoreUtil {
                 where += " or ";
             }
             if(i == idList.size() - 1)
-                where += (" and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE);
+                where += (" and " + Constants.MEDIASTORE_WHERE_SIZE);
         }
 
         Cursor cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null,where,arg,null,null);
         ArrayList<MP3Item> list = new ArrayList<>();
-        if(cursor != null && cursor.getCount() > 0){
+        if(cursor != null ){
             while (cursor.moveToNext()){
                 list.add(getMP3Info(cursor));
             }
@@ -396,24 +364,6 @@ public class MediaStoreUtil {
     }
 
     /**
-     * 根据多个歌曲id返回多个播放列表详细信息
-     * @param idList 歌曲id列表
-     * @return 对应所有歌曲信息列表
-     */
-    public static ArrayList<PlayListItem> getPlayListItemListByIds(ArrayList<Integer> idList) {
-        if(idList == null)
-            return new ArrayList<>();
-        ArrayList<PlayListItem> list = new ArrayList<>();
-        for (Integer id : idList) {
-            PlayListItem item = getPlayListItemInfoById(id);
-            if(item != null && item.getId() > 0)
-                list.add(item);
-        }
-        return list;
-    }
-
-
-    /**
      * 根据歌曲id查询歌曲详细信息
      * @param id  歌曲id
      * @return 对应歌曲信息
@@ -426,7 +376,7 @@ public class MediaStoreUtil {
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
                     MediaStore.Audio.Media._ID + "=" + id +
-                            " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
+                            " and " + Constants.MEDIASTORE_WHERE_SIZE, null, null);
             if(cursor == null || cursor.getCount() == 0)
                 return null;
             if(cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()){
@@ -443,39 +393,6 @@ public class MediaStoreUtil {
         return mp3Item;
     }
 
-    /**
-     * 根据歌曲id查询歌曲详细信息
-     * @param id  歌曲id
-     * @return 对应歌曲信息
-     */
-    public static PlayListItem getPlayListItemInfoById(int id) {
-        PlayListItem mp3Item = new PlayListItem();
-        ContentResolver resolver = mContext.getContentResolver();
-        Cursor cursor = null;
-        try {
-            cursor = resolver.query(
-                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                    MediaStore.Audio.Media._ID + "=" + id +
-                            " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
-            if(cursor == null || cursor.getCount() == 0)
-                return null;
-            if(cursor.moveToFirst()){
-                for(int i = 0 ; i < cursor.getColumnCount();i++){
-                    mp3Item.SongName = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                    mp3Item.SongId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
-                    mp3Item.AlbumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                    mp3Item.Artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                }
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            if(cursor != null && !cursor.isClosed())
-                cursor.close();
-        }
-
-        return mp3Item;
-    }
 
     /**
      * 建立genreId与audioId的映射
@@ -584,8 +501,8 @@ public class MediaStoreUtil {
 
     /**
      * 删除歌曲
-     * @param data 删除参数 包括歌曲路径、专辑id、艺术家id、文件夹索引
-     * @param type 删除类型 包括单个歌曲、专辑、艺术家
+     * @param data 删除参数 包括歌曲路径、专辑id、艺术家id、播放列表id、文件夹索引
+     * @param type 删除类型 包括单个歌曲、专辑、艺术家、、文件夹、播放列表
      * @return 是否删除成功
      */
     public static boolean delete(int data, int type) {
@@ -721,7 +638,7 @@ public class MediaStoreUtil {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                         new String[]{MediaStore.Audio.Media._ID},
                         (type == Constants.ALBUM ? MediaStore.Audio.Media.ALBUM_ID : MediaStore.Audio.Media.ARTIST_ID) + "=" + arg +
-                                " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,
+                                " and " + Constants.MEDIASTORE_WHERE_SIZE,
                         null, null);
                 if(cursor != null){
                     while (cursor.moveToNext()){

@@ -1,11 +1,19 @@
 package remix.myplayer.ui.activity;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
+import android.telephony.gsm.GsmCellLocation;
 import android.view.View;
 
 import com.umeng.analytics.MobclickAgent;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -15,6 +23,7 @@ import remix.myplayer.fragment.SplashFragment;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -34,30 +43,67 @@ public class SplashActivity extends BaseActivity {
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
 
+        final boolean isFirst = SPUtil.getValue(getApplicationContext(), "Setting", "First", true);
 
-        boolean isFirst = SPUtil.getValue(getApplicationContext(), "Setting", "First", true);
-        //第一次启动软件
-        if(isFirst){
-            //保存默认主题设置
-            SPUtil.putValue(this,"Setting","ThemeMode", ThemeStore.DAY);
-            SPUtil.putValue(this,"Setting","ThemeColor",ThemeStore.THEME_RED);
-            //添加我的收藏列表
-//            XmlUtil.addPlaylist(this,"我的收藏");
-            Global.mPlayQueueId = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
-            SPUtil.putValue(this,"Setting","PlayQueueID",Global.mPlayQueueId);
-            Global.mMyLoveId = PlayListUtil.addPlayList(getString(R.string.my_favorite));
-            SPUtil.putValue(this,"Setting","MyLoveID",Global.mMyLoveId);
-        }else {
-            new Thread(){
-                @Override
-                public void run() {
-                    Global.mPlayQueueId = SPUtil.getValue(SplashActivity.this,"Setting","PlayQueueID",-1);
-                    Global.mMyLoveId = SPUtil.getValue(SplashActivity.this,"Setting","MyLoveID",-1);
-                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
+        new Thread(){
+            @Override
+            public void run() {
+                //第一次启动软件
+                if(isFirst){
+                    //保存默认主题设置
+                    SPUtil.putValue(SplashActivity.this,"Setting","ThemeMode", ThemeStore.DAY);
+                    SPUtil.putValue(SplashActivity.this,"Setting","ThemeColor",ThemeStore.THEME_RED);
+                    //添加我的收藏列表
+                    Global.mPlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
+                    SPUtil.putValue(SplashActivity.this,"Setting","PlayQueueID",Global.mPlayQueueID);
+                    Global.mMyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
+                    SPUtil.putValue(SplashActivity.this,"Setting","MyLoveID",Global.mMyLoveID);
+                }else {
+                    Global.mPlayQueueID = SPUtil.getValue(SplashActivity.this,"Setting","PlayQueueID",-1);
+                    Global.mMyLoveID = SPUtil.getValue(SplashActivity.this,"Setting","MyLoveID",-1);
+                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueID);
                     Global.mPlayList = PlayListUtil.getAllPlayListInfo();
+                    Global.mRecentlyID = SPUtil.getValue(SplashActivity.this,"Setting","RecentlyID",-1);
                 }
-            }.start();
-        }
+//                /** 更新最近添加列表 */
+//                //不是第一次打开软件，先删除原来的数据
+//                if(!isFirst){
+//                    long start = System.currentTimeMillis();
+//                    PlayListUtil.deleteMultiSongs(PlayListUtil.getIDList(Global.mRecentlyID),Global.mRecentlyID);
+//                    PlayListUtil.deletePlayList(SPUtil.getValue(SplashActivity.this,"Setting","RecentlyID",-1));
+//                    long time = System.currentTimeMillis() - start;
+//                    LogUtil.d("DELETE","time:" + time);
+//                }
+//                //新建最近添加列表
+//                Global.mRecentlyID = PlayListUtil.addPlayList(Constants.RECENTLY);
+//                SPUtil.putValue(SplashActivity.this,"Setting","RecentlyID", Global.mRecentlyID);
+//                //获得今天日期
+//                Calendar today = Calendar.getInstance();
+//                today.setTime(new Date());
+//                //查询最近七天添加的歌曲
+//                Cursor cursor = null;
+//                try {
+//                    cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+//                            new String[]{MediaStore.Audio.Media._ID},
+//                            MediaStore.Audio.Media.DATE_ADDED + ">=" + (today.getTimeInMillis() / 1000 - (3600 * 24 * 7)),
+//                            null,
+//                            null);
+//                    if(cursor != null && cursor.getCount() > 0){
+//                        ArrayList<Integer> IDList = new ArrayList<>();
+//                        while (cursor.moveToNext()){
+//                            IDList.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
+//                        }
+//                        PlayListUtil.addMultiSongs(IDList,Constants.RECENTLY,Global.mRecentlyID);
+//                    }
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                } finally {
+//                    if(cursor != null && !cursor.isClosed())
+//                        cursor.close();
+//                }
+            }
+        }.start();
+
         if(!isFirst){
             startActivity(new Intent(this, MainActivity.class));
             finish();

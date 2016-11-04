@@ -6,12 +6,12 @@ package remix.myplayer.model;
  * @Author Xiaoborui
  * @Date 2016/10/13 11:22
  */
-public class PlayListNewInfo {
+public class PlayListInfo {
     public int _Id;
     public String Name;
     public int Count;
-    public PlayListNewInfo(){}
-    public PlayListNewInfo(String name, int count) {
+    public PlayListInfo(){}
+    public PlayListInfo(String name, int count) {
         Name = name;
         Count = count;
     }

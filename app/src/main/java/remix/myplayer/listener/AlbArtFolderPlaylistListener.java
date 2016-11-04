@@ -16,6 +16,7 @@ import remix.myplayer.R;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -59,15 +60,15 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 break;
             //添加到播放队列
             case R.id.menu_add:
-                Global.AddSongToPlayQueue(idList);
+                ToastUtil.show(mContext,mContext.getString(R.string.add_song_playinglist_success,Global.AddSongToPlayQueue(idList)));
                 break;
             //删除
             case R.id.menu_delete:
-                Toast.makeText(mContext,
-                        MediaStoreUtil.delete(mId , mType) ? R.string.delete_success : R.string.delete_error ,
-                        Toast.LENGTH_SHORT).show();
+                ToastUtil.show(mContext,(mType != Constants.PLAYLIST ? MediaStoreUtil.delete(mId , mType) : PlayListUtil.deletePlayList(mId)) ?
+                        R.string.delete_success :
+                        R.string.delete_error);
                 break;
-            //设置专辑封面
+            //设置封面
             case R.id.menu_album_thumb:
                 Global.mSetCoverID = mId;
                 Global.mSetCoverType = mType;

@@ -243,7 +243,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
             case R.id.menu_delete:
                 try {
                     new MaterialDialog.Builder(mContext)
-                            .content(R.string.confirm_delete_song)
+                            .content(mContext.getString(R.string.confirm_delete_playlist,"曲库"))
                             .positiveText(R.string.confirm)
                             .negativeText(R.string.cancel)
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -251,7 +251,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
                                     if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG)){
-                                        if(PlayListUtil.deleteSong(mInfo.getId(), Global.mPlayQueueId)){
+                                        if(PlayListUtil.deleteSong(mInfo.getId(), Global.mPlayQueueID)){
                                             ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
 
                                         }

@@ -73,11 +73,10 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(view != null && view.getTag() instanceof Integer) {
+                if(view != null ) {
                     PlayListSongInfo info = new PlayListSongInfo(mAudioID,getPlayListId(position),getPlayListName(position));
                     ToastUtil.show(AddtoPlayListDialog.this,
-                            PlayListUtil.addSong(info) > 0 ? getString(R.string.add_song_playlist_success, 1) : getString(R.string.add_song_playlist_error),
-                            Toast.LENGTH_SHORT);
+                            PlayListUtil.addSong(info) > 0 ? getString(R.string.add_song_playlist_success, 1,getPlayListName(position)) : getString(R.string.add_song_playlist_error));
                 } else {
                     ToastUtil.show(AddtoPlayListDialog.this,R.string.add_song_playlist_error,Toast.LENGTH_SHORT);
                 }
@@ -153,7 +152,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                                 }
                                 if(mAddAfterCreate){
                                     ToastUtil.show(AddtoPlayListDialog.this,
-                                            PlayListUtil.addSong(new PlayListSongInfo(mAudioID,newPlayListId,input.toString())) > 0 ? getString(R.string.add_song_playlist_success, 1) : getString(R.string.add_song_playlist_error),
+                                            PlayListUtil.addSong(new PlayListSongInfo(mAudioID,newPlayListId,input.toString())) > 0 ? getString(R.string.add_song_playlist_success, 1,input.toString()) : getString(R.string.add_song_playlist_error),
                                             Toast.LENGTH_SHORT);
                                 }
                             }

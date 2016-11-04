@@ -1,7 +1,6 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
@@ -15,7 +14,6 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
@@ -64,7 +62,7 @@ public class PlayQueueAdapter extends BaseAdapter<PlayQueueAdapter.PlayQueueHold
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PlayListUtil.deleteSong(audioId,Global.mPlayQueueId);
+                    PlayListUtil.deleteSong(audioId,Global.mPlayQueueID);
 //                    if(mCursor.getInt(0) == MusicService.getCurrentMP3().getId()) {
 //                        Intent intent = new Intent(Constants.CTL_ACTION);
 //                        intent.putExtra("Control", Constants.NEXT);

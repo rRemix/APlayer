@@ -223,7 +223,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
             //播放列表名
             case Constants.PLAYLIST:
                 mPlayListSongIDList = PlayListUtil.getIDList(mId);
-                mInfoList = MediaStoreUtil.getMP3ListByIds(mPlayListSongIDList);
+                mInfoList = PlayListUtil.getMP3ListByIds(mPlayListSongIDList);
                 break;
         }
         return mInfoList;

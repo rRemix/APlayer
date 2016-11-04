@@ -257,7 +257,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         //判断是否收藏
         mIsLove = false;
         try {
-            ArrayList<Integer> list = PlayListUtil.getIDList(Global.mMyLoveId);
+            ArrayList<Integer> list = PlayListUtil.getIDList(Global.mMyLoveID);
             if(list != null && list.size() != 0 && list.contains(mInfo.getId())){
                 mIsLove = true;
             }
@@ -286,9 +286,9 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         if(mInfo == null)
             return;
         if(!mIsLove){
-            PlayListUtil.addSong(new PlayListSongInfo(mInfo.getId(),Global.mMyLoveId,getString(R.string.my_favorite)));
+            PlayListUtil.addSong(new PlayListSongInfo(mInfo.getId(),Global.mMyLoveID,getString(R.string.my_favorite)));
         } else {
-            PlayListUtil.deleteSong(mInfo.getId(),Global.mMyLoveId);
+            PlayListUtil.deleteSong(mInfo.getId(),Global.mMyLoveID);
         }
         mIsLove = !mIsLove;
         mLoveButton.setImageResource(mIsLove ? R.drawable.lock_btn_loved : R.drawable.lock_btn_love);

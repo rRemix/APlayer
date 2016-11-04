@@ -23,9 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingTop="@dimen/d8_size"
-        android:paddingBottom="@dimen/d4_size">
+        android:gravity="center_vertical">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -33,6 +31,8 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/share_qq"
+            android:paddingTop="@dimen/d8_size"
+            android:paddingBottom="@dimen/d4_size"
             android:background="?android:attr/selectableItemBackground">
             <ImageView
                 android:id="@+id/share_qq_img"
@@ -57,6 +57,8 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/share_weibo"
+            android:paddingTop="@dimen/d8_size"
+            android:paddingBottom="@dimen/d4_size"
             android:background="?android:attr/selectableItemBackground">
             <ImageView
                 android:layout_width="wrap_content"
@@ -81,6 +83,8 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/share_wechat"
+            android:paddingTop="@dimen/d8_size"
+            android:paddingBottom="@dimen/d4_size"
             android:background="?android:attr/selectableItemBackground">
             <ImageView
                 android:layout_width="wrap_content"
@@ -105,8 +109,10 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/share_circlefriend"
+            android:paddingTop="@dimen/d8_size"
+            android:paddingBottom="@dimen/d4_size"
             android:background="?android:attr/selectableItemBackground">
-            <ImageButton
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/share_circlefriend_img"

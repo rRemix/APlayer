@@ -15,6 +15,7 @@ import butterknife.Unbinder;
  */
 public class BaseFragment extends Fragment {
     protected Unbinder mUnBinder;
+    protected static int LOADER_ID = 1;
     protected String mPageName = BaseFragment.class.getSimpleName();
     @Override
     public void onDestroyView() {

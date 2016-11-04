@@ -51,7 +51,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
     private SongAdapter mAdapter;
-    private static int LOADER_ID = 1;
+
     public static final String TAG = SongFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
 
@@ -144,7 +144,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         //查询所有歌曲
         return  new CursorLoader(getActivity(),
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                null,MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                null,Constants.MEDIASTORE_WHERE_SIZE,null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
     }
 
     @Override

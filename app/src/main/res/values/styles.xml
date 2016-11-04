@@ -78,14 +78,6 @@
         <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
     </style>
 
-    <!--&lt;!&ndash;底部弹出 &ndash;&gt;-->
-    <!--<style name="PopupBottomDialog" parent="BaseDialogTheme" >-->
-        <!--<item name="android:windowAnimationStyle">@style/AnimBottom</item>-->
-    <!--</style>-->
-    <!---->
-    <!--&lt;!&ndash;中心消失&ndash;&gt;-->
-    <!--<style name="PopupCenterDialog" parent="BaseDialogTheme" />-->
-
     <!--锁屏-->
     <style name="LockScreenActivity" parent="AppTheme.NoActionBar.Translucent">
         <item name="android:windowFrame">@null</item>

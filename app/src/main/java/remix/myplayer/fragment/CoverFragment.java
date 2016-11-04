@@ -76,8 +76,8 @@ public class CoverFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_cover,container,false);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-        if(mInfo != null)
-            mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
+//        if(mInfo != null)
+//            mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
 
         if(mLeftAnimation == null || mScaleAnimation == null || mRightAnimation == null) {
             //往左侧消失的动画
@@ -148,7 +148,7 @@ public class CoverFragment extends BaseFragment {
         }
         @Override
         public void run() {
-            mUri = Uri.parse("file://" +  MediaStoreUtil.getAlbumUrlByAlbumId(mAlbumId));
+            mUri = Uri.parse("file:///" +  MediaStoreUtil.getImageUrl(mAlbumId + "",Constants.URL_ALBUM));
             Message msg = new Message();
             msg.what = mWithAnim;
             mHandler.sendMessage(msg);

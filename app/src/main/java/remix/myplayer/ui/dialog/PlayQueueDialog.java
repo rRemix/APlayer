@@ -107,7 +107,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(this,PlayListSongs.CONTENT_URI,new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
-                PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?",new String[]{Global.mPlayQueueId + ""},null);
+                PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?",new String[]{Global.mPlayQueueID + ""},null);
     }
 
     @Override

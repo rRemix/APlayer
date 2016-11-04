@@ -11,8 +11,8 @@
         android:id="@+id/cover_image"
         android:layout_width="@dimen/d328_size"
         android:layout_height="@dimen/d328_size"
-        android:src="@drawable/no_art_normal"
-        fresco:failureImage="@drawable/no_art_normal"
+        fresco:actualImageScaleType="centerCrop"
+        fresco:failureImage="@drawable/album_empty_bg_day"
         fresco:failureImageScaleType="centerCrop"
         fresco:roundedCornerRadius="@dimen/d8_size"/>
 </RelativeLayout>

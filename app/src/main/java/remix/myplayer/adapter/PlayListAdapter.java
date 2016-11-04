@@ -20,7 +20,7 @@ import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
-import remix.myplayer.model.PlayListNewInfo;
+import remix.myplayer.model.PlayListInfo;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -57,7 +57,7 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
     @Override
     public void onBindViewHolder(final PlayListHolder holder, final int position) {
         if(mCursor.moveToPosition(position)){
-            final PlayListNewInfo info = PlayListUtil.getPlayListInfo(mCursor);
+            final PlayListInfo info = PlayListUtil.getPlayListInfo(mCursor);
             if(info == null)
                 return;
             holder.mName.setText(info.Name);

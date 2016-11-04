@@ -238,17 +238,17 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
             return;
         //如果是第一次打开，设置第一首歌曲为正在播放
-        if(mIsFirstAfterInstall){
-            int id =  Global.mPlayQueue.get(0);
-            MP3Item item = MediaStoreUtil.getMP3InfoById(id);
-            if(item != null){
-                mBottomBar.UpdateBottomStatus(item,false);
-                updateHeader(item,false);
-                SPUtil.putValue(this,"Setting","LastSongId",id);
-                MusicService.initDataSource(item,0);
-            }
-            return;
-        }
+//        if(mIsFirstAfterInstall){
+//            int id =  Global.mPlayQueue.get(0);
+//            MP3Item item = MediaStoreUtil.getMP3InfoById(id);
+//            if(item != null){
+//                mBottomBar.UpdateBottomStatus(item,false);
+//                updateHeader(item,false);
+//                SPUtil.putValue(this,"Setting","LastSongId",id);
+//                MusicService.initDataSource(item,0);
+//            }
+//            return;
+//        }
 
         //读取上次退出时正在播放的歌曲的id
         int lastId = SPUtil.getValue(this,"Setting","LastSongId",0);

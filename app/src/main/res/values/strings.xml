@@ -53,14 +53,15 @@
 
     <string name="add_error">添加失败</string>
     <string name="add_to_playlist">添加到播放列表</string>
-    <string name="add_song_playlist_success">添加%d首歌曲到播放列表</string>
+    <string name="add_song_playlist_success">添加%1$d首歌曲到%2$s</string>
+    <string name="delete_multi_song">删除%d首歌曲</string>
     <string name="add_song_playinglist_success">添加%d首歌曲到播放队列</string>
     <string name="add_song_playinglist_error">添加歌曲到播放队列失败</string>
     <string name="add_song_playlist_error">添加歌曲到播放列表失败</string>
 
     <string name="load_playlist_error">加载播放列表失败</string>
 
-    <string name="confirm_delete_playlist">确认从该播放列表移除?</string>
+    <string name="confirm_delete_playlist">确认从%s移除?</string>
     <string name="confirm_delete_song">确认从曲库删除?</string>
     <string name="confirm_delelte">确认删除?</string>
     <string name="delete_success">删除成功</string>

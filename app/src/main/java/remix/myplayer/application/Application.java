@@ -143,8 +143,8 @@ public class Application extends android.app.Application {
 
                 //读取播放队列
 //                if(!SPUtil.getValue(mContext, "Setting", "First", true)){
-//                    Global.mPlayQueueId = SPUtil.getValue(mContext,"Setting","PlayQueueID",Global.mPlayQueueId);
-//                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
+//                    Global.mPlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",Global.mPlayQueueID);
+//                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueID);
 //                }
 //                Global.mPlayQueue = XmlUtil.getPlayQueue();
 //                Global.setPlayQueue(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0 ?
@@ -165,12 +165,12 @@ public class Application extends android.app.Application {
         DiskCache.init(mContext);
         ColorUtil.setContext(mContext);
         PlayListUtil.setContext(mContext);
-        final int CacheSize = (int)(Runtime.getRuntime().maxMemory() / 8);
+        final int cacheSize = (int)(Runtime.getRuntime().maxMemory() / 8);
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
                 .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {
                     @Override
                     public MemoryCacheParams get() {
-                        return new MemoryCacheParams(CacheSize, Integer.MAX_VALUE,CacheSize, Integer.MAX_VALUE, Integer.MAX_VALUE);
+                        return new MemoryCacheParams(cacheSize, Integer.MAX_VALUE,cacheSize, Integer.MAX_VALUE, Integer.MAX_VALUE);
                     }
                 })
                 .build();

@@ -3,17 +3,21 @@ package remix.myplayer.util;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
 
-import remix.myplayer.model.PlayListNewInfo;
+import remix.myplayer.R;
+import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.PlayListInfo;
 import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
+
+
 
 /**
  * @ClassName
@@ -39,7 +43,7 @@ public class PlayListUtil {
     public static int addPlayList(String playListName) {
         if(TextUtils.isEmpty(playListName))
             return -1;
-        for(PlayListNewInfo info : Global.mPlayList){
+        for(PlayListInfo info : Global.mPlayList){
             if(info.Name.equals(playListName))
                 return -2;
         }
@@ -189,7 +193,7 @@ public class PlayListUtil {
     public static boolean deleteSong(int audioId,String playListName){
         return audioId > 0 && !TextUtils.isEmpty(playListName) &&
                 mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI,
-                        PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME + "=?" + " and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME + "=?",
+                        PlayListSongs.PlayListSongColumns.AUDIO_ID + "=?" + " and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME + "=?",
                         new String[]{audioId + "",playListName}) > 0;
     }
 
@@ -263,15 +267,15 @@ public class PlayListUtil {
      * 返回系统中除播放队列所有播放列表
      * @return
      */
-    public static ArrayList<PlayListNewInfo> getAllPlayListInfo(){
-        ArrayList<PlayListNewInfo> playList = new ArrayList<>();
+    public static ArrayList<PlayListInfo> getAllPlayListInfo(){
+        ArrayList<PlayListInfo> playList = new ArrayList<>();
         Cursor cursor = null;
         try {
             cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI,null,PlayLists.PlayListColumns.NAME + "!= ?",
                     new String[]{Constants.PLAY_QUEUE},null);
             if(cursor != null && cursor.getCount() > 0){
                 while (cursor.moveToNext()){
-                    PlayListNewInfo info = new PlayListNewInfo();
+                    PlayListInfo info = new PlayListInfo();
                     info._Id = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns._ID));
                     info.Count = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
                     info.Name = cursor.getString(cursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
@@ -344,8 +348,8 @@ public class PlayListUtil {
      * @param cursor
      * @return
      */
-    public static PlayListNewInfo getPlayListInfo(Cursor cursor){
-        PlayListNewInfo info = new PlayListNewInfo();
+    public static PlayListInfo getPlayListInfo(Cursor cursor){
+        PlayListInfo info = new PlayListInfo();
         try {
             info.Count = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
             info._Id = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns._ID));
@@ -354,5 +358,32 @@ public class PlayListUtil {
             e.printStackTrace();
         }
         return info;
+    }
+
+    /**
+     * 根据多个歌曲id返回多个歌曲详细信息
+     * @param idList 歌曲id列表
+     * @return 对应所有歌曲信息列表
+     */
+    public static ArrayList<MP3Item> getMP3ListByIds(ArrayList<Integer> idList) {
+        if(idList == null || idList.size() == 0)
+            return new ArrayList<>();
+
+        ArrayList<MP3Item> mp3list = new ArrayList<>();
+
+        for(Integer id : idList){
+            MP3Item temp = MediaStoreUtil.getMP3InfoById(id);
+            if(temp != null && temp.getId() == id){
+                mp3list.add(temp);
+            } else {
+                //如果外部删除了某些歌曲 手动添加歌曲信息，保证点击播放列表前后歌曲数目一致
+                MP3Item item = new MP3Item();
+                item.Title = mContext.getString(R.string.song_lose_effect);
+                item.Id = id;
+                mp3list.add(item);
+            }
+        }
+        return mp3list;
+
     }
 }

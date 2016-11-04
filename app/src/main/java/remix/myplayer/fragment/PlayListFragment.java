@@ -41,7 +41,6 @@ import remix.myplayer.util.ToastUtil;
  */
 public class PlayListFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>{
     public static final String TAG = PlayListFragment.class.getSimpleName();
-    private static int LOADER_ID = 0;
     public static PlayListFragment mInstance = null;
     public static int mPlayListIDIndex;
     public static int mPlayListNameIndex;

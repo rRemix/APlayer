@@ -4,6 +4,8 @@ package remix.myplayer.util;
  * Created by taeja on 16-2-17.
  */
 
+import android.provider.MediaStore;
+
 /**
  * 常量值
  */
@@ -12,6 +14,8 @@ public class Constants {
     public final static String PACKAGE_NAME = "remix.myplayer";
     //播放队列
     public final static String PLAY_QUEUE = "播放队列";
+    //最近添加
+    public final static String RECENTLY = "最近添加";
 
     //显示模式 1:列表 2:网格
     public final static int LIST_MODEL = 1;
@@ -120,12 +124,6 @@ public class Constants {
     //重建activity
     public final static int RECREATE_ACTIVITY = 102;
 
-    //开始处理
-    public final static int START_PROCESS = 0;
-    //处理中
-    public final static int PROCESSING = 1;
-    //错误
-    public final static int ERROR_PROCESS = 2;
-    //停止
-    public final static int STOP_PROCESS = 3;
+    //查询数据库大小判断
+    public final static String MEDIASTORE_WHERE_SIZE = MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE;
 }

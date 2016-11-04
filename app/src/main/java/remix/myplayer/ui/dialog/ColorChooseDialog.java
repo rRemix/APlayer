@@ -139,12 +139,12 @@ public class ColorChooseDialog extends BaseDialogActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        overridePendingTransition(R.anim.popup_in,0);
+        overridePendingTransition(android.R.anim.fade_in,0);
     }
 
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(0, R.anim.popup_out);
+        overridePendingTransition(0, android.R.anim.fade_out);
     }
 }

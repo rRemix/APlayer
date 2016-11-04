@@ -95,7 +95,7 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
                 }
                 final int num;
                 num = PlayListUtil.addMultiSongs(mCheckSongIdList,mPlayListName,mPlayListID);
-                ToastUtil.show(this,getString(R.string.add_song_playlist_success, num));
+                ToastUtil.show(this,getString(R.string.add_song_playlist_success, num,mPlayListName));
                 finish();
         }
     }
@@ -108,7 +108,7 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
                 new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.ARTIST,
                         MediaStore.Audio.Media.ARTIST_ID, MediaStore.Audio.Media.TITLE,
                         MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.DISPLAY_NAME,MediaStore.Audio.Media.ALBUM_ID},
-                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                Constants.MEDIASTORE_WHERE_SIZE,null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
     }
 
     @Override

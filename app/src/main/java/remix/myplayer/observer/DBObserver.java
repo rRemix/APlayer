@@ -4,9 +4,6 @@ import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Handler;
 
-import remix.myplayer.db.DBContentProvider;
-import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
@@ -29,21 +26,21 @@ public class DBObserver extends ContentObserver {
 
     @Override
     public void onChange(boolean selfChange) {
+
+    }
+
+    @Override
+    public void onChange(boolean selfChange, Uri uri) {
         if(!selfChange){
             new Thread(){
                 @Override
                 public void run() {
                     Global.mPlayList = PlayListUtil.getAllPlayListInfo();
-                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
+                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueID);
                     mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                 }
             }.start();
         }
-    }
-
-    @Override
-    public void onChange(boolean selfChange, Uri uri) {
-
 
 //        if(!selfChange){
 //            switch (DBContentProvider.mUriMatcher.match(uri)){
@@ -55,7 +52,7 @@ public class DBObserver extends ContentObserver {
 //                //更新播放队列
 //                case DBContentProvider.PLAY_LIST_SONG_MULTIPLE:
 //                case DBContentProvider.PLAY_LIST_SONG_SINGLE:
-//                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueId);
+//                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueID);
 //                    break;
 //            }
 //        }

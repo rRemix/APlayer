@@ -6,14 +6,12 @@ package remix.myplayer.util;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.SystemClock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import remix.myplayer.model.PlayListNewInfo;
+import remix.myplayer.model.PlayListInfo;
 import remix.myplayer.model.PlayListSongInfo;
 
 /**
@@ -54,8 +52,7 @@ public class Global {
     /**
      * 播放列表
      */
-//    public static Map<String,ArrayList<PlayListItem>> mPlayList = new HashMap<>();
-    public static ArrayList<PlayListNewInfo> mPlayList = new ArrayList<>();
+    public static ArrayList<PlayListInfo> mPlayList = new ArrayList<>();
 
     public static void setOperation(int operation){
         mOperation = operation;
@@ -87,9 +84,11 @@ public class Global {
     }
 
     /** 播放队列id */
-    public static int mPlayQueueId = 0;
+    public static int mPlayQueueID = 0;
     /** 我的收藏id */
-    public static int mMyLoveId;
+    public static int mMyLoveID = 0;
+    /** 最近添加id */
+    public static int mRecentlyID = 0;
 
     /**
      * 设置播放队列
@@ -106,9 +105,9 @@ public class Global {
                 mPlayQueue.clear();
                 mPlayQueue.addAll(newQueueIdList);
 
-                int deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue,mPlayQueueId);
+                int deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue, mPlayQueueID);
                 long start = System.currentTimeMillis();
-                int addRow = PlayListUtil.addMultiSongs(mPlayQueue,Constants.PLAY_QUEUE,mPlayQueueId);
+                int addRow = PlayListUtil.addMultiSongs(mPlayQueue,Constants.PLAY_QUEUE, mPlayQueueID);
                 LogUtil.d("DeleteTest","Time:" + (System.currentTimeMillis() - start) + "  addRow:" + addRow + "  deleteRow:" + deleteRow);
             }
         }.start();
@@ -137,9 +136,9 @@ public class Global {
                     e.printStackTrace();
                 }
                 long start = System.currentTimeMillis();
-                int deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue,mPlayQueueId);
+                int deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue, mPlayQueueID);
                 LogUtil.d("TimeTest","DeleteTime:" + (System.currentTimeMillis() - start) );
-                int addRow = PlayListUtil.addMultiSongs(mPlayQueue,Constants.PLAY_QUEUE,mPlayQueueId);
+                int addRow = PlayListUtil.addMultiSongs(mPlayQueue,Constants.PLAY_QUEUE, mPlayQueueID);
                 LogUtil.d("TimeTest","AddTime:" + (System.currentTimeMillis() - start) );
             }
         }.start();
@@ -153,7 +152,7 @@ public class Global {
     public static int AddSongToPlayQueue(final ArrayList<Integer> rawAddList) {
         ArrayList<PlayListSongInfo> infos = new ArrayList<>();
         for(Integer id : rawAddList){
-            infos.add(new PlayListSongInfo(id,mPlayQueueId,Constants.PLAY_QUEUE));
+            infos.add(new PlayListSongInfo(id, mPlayQueueID,Constants.PLAY_QUEUE));
         }
         return PlayListUtil.addMultiSongs(infos);
     }

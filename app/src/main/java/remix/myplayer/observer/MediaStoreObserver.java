@@ -26,11 +26,6 @@ public class MediaStoreObserver extends ContentObserver {
 
     @Override
     public void onChange(boolean selfChange, Uri uri) {
-        super.onChange(selfChange, uri);
-    }
-
-    @Override
-    public void onChange(boolean selfChange) {
         LogUtil.d("ThreadId","id in observer: " + Thread.currentThread().getId());
         if(!selfChange){
             new Thread(){
@@ -41,6 +36,11 @@ public class MediaStoreObserver extends ContentObserver {
                 }
             }.start();
         }
+    }
+
+    @Override
+    public void onChange(boolean selfChange) {
+       super.onChange(selfChange);
     }
 
     @Override

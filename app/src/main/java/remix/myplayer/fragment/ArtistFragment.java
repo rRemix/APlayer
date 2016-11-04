@@ -46,7 +46,6 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     public static int mArtistIdIndex = -1;
     public static int mArtistIndex = -1;
     private ArtistAdapter mAdapter;
-    private static int LOADER_ID = 1;
     public static final String TAG = ArtistFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
 
@@ -129,7 +128,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
 //                new String[]{BaseColumns._ID,MediaStore.Audio.ArtistColumns.ARTIST},null,null,null);
         return new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 new String[]{"distinct " + MediaStore.Audio.Media.ARTIST_ID,MediaStore.Audio.Media.ARTIST},
-                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
+                Constants.MEDIASTORE_WHERE_SIZE + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
                 null,
                 null);
     }

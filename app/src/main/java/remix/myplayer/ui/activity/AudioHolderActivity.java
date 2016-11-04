@@ -1,5 +1,8 @@
 package remix.myplayer.ui.activity;
 
+import android.animation.Animator;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,7 +25,6 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
@@ -80,7 +82,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     private boolean mFistStart = true;
     //是否正在拖动进度条
     public static boolean mIsDragSeekBar = false;
-    private Palette.Swatch mSwatch = null;
+    private Palette.Swatch mNewSwatch = null;
+    private Palette.Swatch mOldSwatch = null;
     //顶部信息
     @BindView(R.id.top_title)
     TextView mTopTitle;
@@ -147,8 +150,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     //高斯模糊之前的bitmap
     private Bitmap mRawBitMap;
     //背景消失与现实的动画
-    private AlphaAnimation mAnimIn;
-    private AlphaAnimation mAnimOut;
+    private Animation mAnimIn;
+    private Animation mAnimOut;
     //是否从通知栏启动
     private boolean mFromNotify = false;
     //是否从MainActivity启动
@@ -163,10 +166,51 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             if(msg.what == Constants.UPDATE_BG) {
                 long start = System.currentTimeMillis();
                 //第一次更新不启用动画
-                if(!mFistStart)
+                if(!mFistStart) {
                     mContainer.startAnimation(mAnimOut);
-                else
+//                    ObjectAnimator objectAnimatorIn = ObjectAnimator.ofInt(mContainer,"backgroundColor",
+//                            ColorUtil.adjustAlpha(mOldSwatch.getRgb(),0.2f),ColorUtil.adjustAlpha(mNewSwatch.getRgb(),1)).setDuration(300);
+//                    objectAnimatorIn.setEvaluator(new ArgbEvaluator());
+//                    objectAnimatorIn.addListener(new Animator.AnimatorListener() {
+//                        @Override
+//                        public void onAnimationStart(Animator animation) {
+//                        }
+//                        @Override
+//                        public void onAnimationEnd(Animator animation) {
+//                            changeColor();
+//                            ObjectAnimator objectAnimatorOut = ObjectAnimator.ofInt(mContainer,"backgroundColor",
+//                                    ColorUtil.adjustAlpha(mNewSwatch.getRgb(),1),ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.2f)).setDuration(300);
+//                            objectAnimatorOut.setEvaluator(new ArgbEvaluator());
+//                            objectAnimatorOut.addListener(new Animator.AnimatorListener() {
+//                                @Override
+//                                public void onAnimationStart(Animator animation) {
+//                                }
+//
+//                                @Override
+//                                public void onAnimationEnd(Animator animation) {
+//                                    //修改背景颜色
+//                                    mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{mColorFrom, mColorTo}));
+//                                }
+//                                @Override
+//                                public void onAnimationCancel(Animator animation) {
+//                                }
+//                                @Override
+//                                public void onAnimationRepeat(Animator animation) {
+//                                }
+//                            });
+//                            objectAnimatorOut.start();
+//                        }
+//                        @Override
+//                        public void onAnimationCancel(Animator animation) {
+//                        }
+//                        @Override
+//                        public void onAnimationRepeat(Animator animation) {
+//                        }
+//                    });
+//                    objectAnimatorIn.start();
+                } else {
                     changeColor();
+                }
                 LogUtil.d(TAG,"duration:" + (System.currentTimeMillis() - start));
                 //更新专辑封面
                 ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
@@ -248,7 +292,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 break;
             case R.id.playbar_play:
                 intent.putExtra("Control", Constants.PLAYORPAUSE);
-                if(mSwatch != null)
+                if(mNewSwatch != null)
                     Theme.TintDrawable(mPlayBarPlay,!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,mColorDraken);
 
                 break;
@@ -307,9 +351,10 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
         mWidth = metrics.widthPixels;
         mHeight = metrics.heightPixels;
-        mAnimIn = (AlphaAnimation)AnimationUtils.loadAnimation(this,R.anim.audio_bg_in);
+
+        mAnimIn = AnimationUtils.loadAnimation(this,R.anim.audio_bg_in);
         mAnimIn.setFillAfter(true);
-        mAnimOut = (AlphaAnimation)AnimationUtils.loadAnimation(this,R.anim.audio_bg_out);
+        mAnimOut = AnimationUtils.loadAnimation(this,R.anim.audio_bg_out);
         mAnimOut.setFillAfter(true);
         mAnimOut.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -319,10 +364,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             public void onAnimationEnd(Animation animation) {
                 changeColor();
                 mContainer.startAnimation(mAnimIn);
-//                if(mNewBitMap != null){
-//                    mContainer.setBackground(new BitmapDrawable(getResources(), mNewBitMap));
-//                    mContainer.startAnimation(mAnimIn);
-//                }
             }
             @Override
             public void onAnimationRepeat(Animation animation) {
@@ -625,15 +666,15 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
             //锁屏界面字体颜色
             if(mLrcView != null){
-                mLrcView.setHighLightColor(ColorUtil.adjustAlpha(mSwatch.getRgb(),1.0f));
-                mLrcView.setOtherColor(ColorUtil.adjustAlpha(mSwatch.getRgb(),0.6f));
-                mLrcView.setTimeLineColor(ColorUtil.adjustAlpha(mSwatch.getRgb(),0.6f));
+                mLrcView.setHighLightColor(ColorUtil.adjustAlpha(mNewSwatch.getRgb(),1.0f));
+                mLrcView.setOtherColor(ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.6f));
+                mLrcView.setTimeLineColor(ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.6f));
                 mLrcView.invalidate();
             }
 
             LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
             //修改track颜色
-            ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f));
+            ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.3f));
             //修改progress颜色
             (layerDrawable.getDrawable(1)).setColorFilter(mColorDraken, PorterDuff.Mode.SRC_IN);
             mSeekBar.setProgressDrawable(layerDrawable);
@@ -672,15 +713,16 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
                 /** start*/
                 Palette palette = new Palette.Builder(mRawBitMap).generate();
-                mSwatch = palette.getMutedSwatch();
-                if(mSwatch == null)
-                    mSwatch = new Palette.Swatch(Color.GRAY,100);
-                mColorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.4f);
-                mColorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
-//                mColorDraken = ColorUtil.shiftColor(mSwatch.getRgb(),0.8f);
-//                mColorDark = mSwatch.getRgb();
-                mColorDraken = mSwatch.getRgb();
-                mColorDark = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.8f);
+                mOldSwatch = mNewSwatch;
+                mNewSwatch = palette.getMutedSwatch();
+                if(mNewSwatch == null)
+                    mNewSwatch = new Palette.Swatch(Color.GRAY,100);
+                mColorFrom = ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.4f);
+                mColorTo = ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.05f);
+//                mColorDraken = ColorUtil.shiftColor(mNewSwatch.getRgb(),0.8f);
+//                mColorDark = mNewSwatch.getRgb();
+                mColorDraken = mNewSwatch.getRgb();
+                mColorDark = ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.8f);
 
                 /** end */
                 mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
