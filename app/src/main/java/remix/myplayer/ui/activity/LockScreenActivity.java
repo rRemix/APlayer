@@ -304,7 +304,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         public void run() {
             if (mInfo == null)
                 return;
-            mRawBitMap = MediaStoreUtil.getAlbumBitmapBySongId(mInfo.getId(),false);
+            mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
             if(mRawBitMap == null)
                 mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_day);
 
@@ -312,7 +312,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
             mStackBlurManager.process(40);
             mNewBitMap = mStackBlurManager.returnBlurredImage();
 
-            Palette.from(mNewBitMap).generate(new Palette.PaletteAsyncListener() {
+            Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
                 @Override
                 public void onGenerated(Palette palette) {
                     mSwatch = palette.getDarkMutedSwatch();//柔和 暗色

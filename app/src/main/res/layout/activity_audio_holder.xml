@@ -183,7 +183,7 @@
                android:layout_width="@dimen/d60_size"
                android:layout_height="@dimen/d60_size"
                android:layout_toRightOf="@id/playbar_play"
-               android:layout_marginLeft="@dimen/d60_size"
+               android:layout_marginLeft="@dimen/d16_size"
                android:layout_centerVertical="true"
                android:src="@drawable/play_btn_next"
                android:background="@color/transparent"/>

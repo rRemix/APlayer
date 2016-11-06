@@ -8,7 +8,7 @@
         android:id="@+id/folder_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/scan_icn_folder"
+        android:src="@drawable/icon_folder"
         android:layout_margin="@dimen/d15_size"/>
     <LinearLayout
         android:layout_toRightOf="@id/folder_image"

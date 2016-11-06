@@ -6,19 +6,19 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
-import android.util.AttributeSet;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.generic.GenericDraweeHierarchy;
-import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -38,6 +38,7 @@ import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * 全部歌曲和最近添加页面所用adapter
@@ -124,10 +125,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             holder.mOther.setText(artist + "-" + album);
             //封面
 //            holder.mImage.setImageURI(Uri.EMPTY);
-            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(), Constants.ALBUM,false);
+//            new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,temp.getAlbumId(), Constants.URL_ALBUM,false);
 
 //            holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()));
-//
 
 //            DraweeController controller = Fresco.newDraweeControllerBuilder()
 //                    .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()))
@@ -135,6 +135,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 //                    .setAutoPlayAnimations(false)
 //                    .build();
 //            holder.mImage.setController(controller);
+
+            File imgFile = MediaStoreUtil.getImageUrlInCache(temp.getAlbumId(),Constants.URL_ALBUM);
+            if(imgFile.exists()) {
+                holder.mImage.setImageURI(Uri.parse("file:///" + imgFile));
+            } else {
+                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), temp.getAlbumId()));
+            }
 
         } catch (Exception e){
             e.printStackTrace();
@@ -194,29 +201,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
     @Override
     public int getItemCount() {
         return mCursor != null && !mCursor.isClosed() ? mCursor.getCount() : 0;
-    }
-
-    class MyImg extends SimpleDraweeView{
-
-        public MyImg(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-            super(context, attrs, defStyleAttr, defStyleRes);
-        }
-
-        public MyImg(Context context, GenericDraweeHierarchy hierarchy) {
-            super(context, hierarchy);
-        }
-
-        public MyImg(Context context) {
-            super(context);
-        }
-
-        public MyImg(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        public MyImg(Context context, AttributeSet attrs, int defStyle) {
-            super(context, attrs, defStyle);
-        }
     }
 
 

@@ -130,6 +130,19 @@ public class MediaStoreUtil {
         return mp3Infolist;
     }
 
+    /**
+     * 查找设置的专辑、艺术家、播放列表封面
+     * @param id
+     * @param type
+     * @return
+     */
+    public static File getImageUrlInCache(int id,int type){
+        //如果是专辑或者艺术家，先查找本地缓存
+        File img = type == Constants.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(id * 255 + ""))
+                : type == Constants.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + ""))
+                : new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + ""));
+        return img;
+    }
 
     /**
      * 根据参数和类型获得专辑封面
@@ -174,16 +187,13 @@ public class MediaStoreUtil {
 
         switch (type) {
             case Constants.URL_ARTIST:
-                selection = MediaStore.Audio.Media.ARTIST_ID + "=" + arg;
-                selectionArg = null;
-                break;
-            case Constants.URL_NAME:
-                selection = MediaStore.Audio.Media.TITLE + "=?";
-                selectionArg = new String[]{arg};
+                selection = MediaStore.Audio.Media.ARTIST_ID + "=?";
+                selectionArg = new String[]{arg + ""};
                 break;
             case Constants.URL_ALBUM:
-                selection = MediaStore.Audio.Albums._ID + "=" + arg;
-                selectionArg = null;
+                selection = MediaStore.Audio.Albums._ID + "=?";
+                selectionArg = new String[]{arg + ""};
+                break;
         }
         String album_art = "";
         try {
@@ -258,31 +268,35 @@ public class MediaStoreUtil {
 
     /**
      * 根据歌曲id查询图片
-     * @param id 歌曲id
+     * @param albumId 专辑id
      * @param isthumb 是否是缩略图
      * @return 专辑图片的bitmap
      */
-    public static Bitmap getAlbumBitmapBySongId(int id, boolean isthumb) {
+    public static Bitmap getAlbumBitmap(int albumId, boolean isthumb) {
         ParcelFileDescriptor pfd = null;
         try {
-            Uri uri = Uri.parse("content://media/external/audio/media/" + id + "/albumart");
-            pfd = mContext.getContentResolver().openFileDescriptor(uri, "r");
-            if (pfd != null) {
+            Bitmap bm = null;
+            File imgFile = getImageUrlInCache(albumId,Constants.URL_ALBUM);
+            if(imgFile.exists()){
+                bm = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            } else {
+                Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), albumId);
+                pfd = mContext.getContentResolver().openFileDescriptor(uri, "r");
                 FileDescriptor fd = pfd.getFileDescriptor();
-                Bitmap bm = BitmapFactory.decodeFileDescriptor(fd);
-                if(bm == null)
-                    return null;
-                Bitmap thumb = null;
-                if(isthumb)
-                    thumb = Bitmap.createScaledBitmap(bm, 150, 150, true);
-                else
-                    thumb = Bitmap.createScaledBitmap(bm, 350, 350, true);
-                if(bm != null && !bm.isRecycled()) {
-                    bm = null;
-                }
-
-                return thumb;
+                bm = BitmapFactory.decodeFileDescriptor(fd);
             }
+//            Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), id);
+            if(bm == null)
+                return null;
+            Bitmap thumb = null;
+            if(isthumb && bm.getWidth() > 150 && bm.getHeight() > 150)
+                thumb = Bitmap.createScaledBitmap(bm, 150, 150, true);
+            else
+                thumb = Bitmap.createScaledBitmap(bm, 350, 350, true);
+            if(bm != null && !bm.isRecycled()) {
+                bm = null;
+            }
+            return thumb;
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

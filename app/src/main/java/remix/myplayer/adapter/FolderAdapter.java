@@ -59,7 +59,7 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
         }
         //根据主题模式 设置图片
         if(holder.mImg != null) {
-            holder.mImg.setImageResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.scan_icn_folder_day : R.drawable.scan_icn_folder);
+            holder.mImg.setImageResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.icon_folder_day : R.drawable.icon_folder);
         }
 
         final String full_path = temp;

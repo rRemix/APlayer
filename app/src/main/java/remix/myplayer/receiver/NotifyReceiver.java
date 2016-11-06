@@ -64,7 +64,7 @@ public class NotifyReceiver extends BroadcastReceiver {
             mRemoteView.setImageViewResource(R.id.notify_bg,isSystemColor ? R.drawable.bg_system : R.drawable.bg_black);
 
             //设置封面
-            Bitmap bitmap = MediaStoreUtil.getAlbumBitmapBySongId(temp.getId(), true);
+            Bitmap bitmap = MediaStoreUtil.getAlbumBitmap(temp.getAlbumId(), true);
             if(bitmap != null)
                 mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
             else

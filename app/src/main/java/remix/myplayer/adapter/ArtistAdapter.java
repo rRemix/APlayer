@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -33,6 +34,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2015/12/22.
@@ -74,6 +76,7 @@ public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
                 //设置封面
                 holder.mImage.setImageURI(Uri.EMPTY);
                 new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId,Constants.URL_ARTIST,true);
+
             } catch (Exception e){
                 e.printStackTrace();
             }

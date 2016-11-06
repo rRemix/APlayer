@@ -222,6 +222,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
 //        BmobUpdateAgent.setUpdateOnlyWifi(false);
 //        BmobUpdateAgent.update(this);
+
     }
 
     /**

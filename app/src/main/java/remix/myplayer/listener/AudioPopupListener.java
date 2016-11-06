@@ -145,6 +145,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                     mInfo.setAlbum(album);
                                     mInfo.setArtist(artist);
                                     mInfo.setTitle(title);
+                                    mInfo.setYear(year);
                                     ((AudioHolderActivity)mContext).UpdateTopStatus(mInfo);
                                     ((AudioHolderActivity)mContext).setMP3Item(mInfo);
                                 } else {

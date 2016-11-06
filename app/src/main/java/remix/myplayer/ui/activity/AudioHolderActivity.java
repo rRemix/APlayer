@@ -1,8 +1,5 @@
 package remix.myplayer.ui.activity;
 
-import android.animation.Animator;
-import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -707,7 +704,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         @Override
         public void run() {
             if(mInfo != null){
-                mRawBitMap = MediaStoreUtil.getAlbumBitmapBySongId(mInfo.getId(),false);
+                mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
                 if(mRawBitMap == null)
                     mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
 

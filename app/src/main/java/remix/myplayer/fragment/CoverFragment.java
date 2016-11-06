@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,8 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -148,7 +151,14 @@ public class CoverFragment extends BaseFragment {
         }
         @Override
         public void run() {
-            mUri = Uri.parse("file:///" +  MediaStoreUtil.getImageUrl(mAlbumId + "",Constants.URL_ALBUM));
+//            mUri = Uri.parse("file:///" +  MediaStoreUtil.getImageUrl(mAlbumId + "",Constants.URL_ALBUM));
+            String img = MediaStoreUtil.getImageUrl(mAlbumId + "",Constants.URL_ALBUM);
+            File imgFile = MediaStoreUtil.getImageUrlInCache(mAlbumId,Constants.URL_ALBUM);
+            if(imgFile.exists()) {
+                mUri = Uri.parse("file:///" +  img);
+            } else {
+                mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mAlbumId);
+            }
             Message msg = new Message();
             msg.what = mWithAnim;
             mHandler.sendMessage(msg);
