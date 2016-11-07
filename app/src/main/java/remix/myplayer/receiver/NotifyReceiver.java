@@ -68,7 +68,7 @@ public class NotifyReceiver extends BroadcastReceiver {
             if(bitmap != null)
                 mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
             else
-                mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.song_artist_empty_bg_night);
+                mRemoteView.setImageViewResource(R.id.notify_image,R.drawable.album_empty_bg_day);
             //设置播放按钮
             if(!mIsplay){
                 mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notify_play);

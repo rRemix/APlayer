@@ -13,10 +13,12 @@
         android:orientation="horizontal"
         android:onClick="onPlayShuffle">
         <ImageButton
+            android:id="@+id/play_shuffle_button"
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_btn_common_play_shuffle"
+            android:src="@drawable/common_btn_normal_shuffle"
+            android:background="@color/transparent"
             android:layout_marginLeft="@dimen/d16_size" />
         <TextView
             android:layout_centerVertical="true"

@@ -25,6 +25,8 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -182,6 +184,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
         mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
 
+        Theme.TintDrawable(findViewById(R.id.play_shuffle_button),R.drawable.common_btn_normal_shuffle, ThemeStore.getMaterialPrimaryColor());
     }
 
     @Override

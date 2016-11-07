@@ -16,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import java.util.ArrayList;
 
@@ -25,6 +26,8 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
@@ -127,6 +130,9 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
             }
         });
         mRecyclerView.setAdapter(mAdapter);
+
+//        rootView.findViewById(R.id.paly_shuffle).setBackground(Theme.TintDrawable(getResources().getDrawable(R.drawable.bg_btn_common_play_shuffle),ThemeStore.getMaterialPrimaryColor()));
+        Theme.TintDrawable(rootView.findViewById(R.id.play_shuffle_button),R.drawable.common_btn_normal_shuffle, ThemeStore.getMaterialPrimaryColor());
 
         return rootView;
     }
