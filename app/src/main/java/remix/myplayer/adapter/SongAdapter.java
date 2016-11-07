@@ -3,13 +3,10 @@ package remix.myplayer.adapter;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.provider.MediaStore;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,9 +21,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.fragment.SongFragment;
-import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.service.MusicService;
@@ -38,6 +33,8 @@ import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -47,29 +44,22 @@ import remix.myplayer.util.MediaStoreUtil;
 /**
  * Created by Remix on 2016/4/11.
  */
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder>{
-    private Cursor mCursor;
-    private Context mContext;
+public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
     private MultiChoice mMultiChoice;
-    private OnItemClickListener mOnItemClickLitener;
     private ArrayList<MP3Item> mInfoList;
     private int mType;
     public static final int ALLSONG = 0;
     public static final int RECENTLY = 1;
+    private Drawable mDefaultDrawable;
+    private Drawable mSelectDrawable;
 
     public SongAdapter(Context context, MultiChoice multiChoice,int type) {
-        this.mContext = context;
+        super(context);
         this.mMultiChoice = multiChoice;
         this.mType = type;
-    }
-    public void setOnItemClickLitener(OnItemClickListener l)
-    {
-        this.mOnItemClickLitener = l;
-    }
-
-    public void setCursor(Cursor mCursor) {
-        this.mCursor = mCursor;
-        notifyDataSetChanged();
+        int size = DensityUtil.dip2px(mContext,60);
+        mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
+        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getRippleColor(),size,size);
     }
 
     public void setInfoList(ArrayList<MP3Item> list){
@@ -148,11 +138,18 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         }
 
         //选项Dialog
-        if(holder.mItemButton != null) {
+        if(holder.mButton != null) {
             //设置按钮着色
             int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
-            Theme.TintDrawable(holder.mItemButton,R.drawable.list_icn_more,tintColor);
-            holder.mItemButton.setOnClickListener(new View.OnClickListener() {
+            Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
+
+            holder.mButton.setBackground(Theme.getPressDrawable(
+                    mDefaultDrawable,
+                    mSelectDrawable,
+                    ThemeStore.getRippleColor(),
+                    null,null));
+
+            holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(mMultiChoice.isShow())
@@ -196,6 +193,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 //                holder.mContainer.setSelected(false);
 //            }
         }
+
     }
 
     @Override
@@ -214,7 +212,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         @BindView(R.id.song_columnview)
         ColumnView mColumnView;
         @BindView(R.id.song_button)
-        ImageButton mItemButton;
+        ImageButton mButton;
         @BindView(R.id.item_root)
         View mContainer;
         public SongViewHolder(View itemView) {

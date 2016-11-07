@@ -35,7 +35,7 @@
     <color name="drawer_selected">#f5f5f5</color>、
     <!--默认的colorControlHighLight-->
     <color name="day_ripple_color">#1f000000</color>
-    <color name="day_selected_color">#40000000</color>
+    <color name="day_selected_color">#1f000000</color>
     <color name="night_selected_color">#f1f1f1</color>
     <color name="night_ripple_color">#f1f1f1</color>
     <!--<color name="night_selected_color">@color/default_control_highlight</color>-->

@@ -13,6 +13,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.StyleRes;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;
@@ -25,7 +26,10 @@ import java.lang.reflect.Field;
 
 import remix.myplayer.R;
 import remix.myplayer.application.Application;
+import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.util.ColorUtil;
+import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 
 
 /**
@@ -92,8 +96,8 @@ public class Theme {
      * @param stroke
      * @return
      */
-    public static GradientDrawable getMaterialBgCorner(@FloatRange(from=0.0D, to=1.0D) float alpah, float corner, int stroke){
-        return getBgCorner(alpah,corner,stroke,ThemeStore.getMaterialPrimaryColor());
+    public static GradientDrawable getMDCorner(@FloatRange(from=0.0D, to=1.0D) float alpah, float corner, int stroke){
+        return getCorner(alpah,corner,stroke,ThemeStore.getMaterialPrimaryColor());
     }
 
     /**
@@ -101,8 +105,8 @@ public class Theme {
      * @param corner
      * @return
      */
-    public static GradientDrawable getMaterialBgCorner(float corner){
-        return getMaterialBgCorner(1.0f,corner,0);
+    public static GradientDrawable getMDCorner(float corner){
+        return getMDCorner(1.0f,corner,0);
     }
 
     /**
@@ -113,13 +117,29 @@ public class Theme {
      * @param color
      * @return
      */
-    public static GradientDrawable getBgCorner(@FloatRange(from=0.0D, to=1.0D)float alpha,float corner,int stroke,@ColorInt int color){
+    public static GradientDrawable getCorner(@FloatRange(from=0.0D, to=1.0D)float alpha, float corner, int stroke, @ColorInt int color){
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(ColorUtil.adjustAlpha(color,alpha));
         bg.setCornerRadius(corner);
         bg.setStroke(stroke,color);
         bg.setShape(GradientDrawable.RECTANGLE);
         return bg;
+    }
+
+    /**
+     * 生成圆形或者矩形背景
+     * @param shape
+     * @param color
+     * @param width
+     * @param height
+     * @return
+     */
+    public static GradientDrawable getShape(int shape,@ColorInt int color,int width,int height){
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setColor(color);
+        gradientDrawable.setSize(width,height);
+        gradientDrawable.setShape(shape);
+        return gradientDrawable;
     }
 
     /**
@@ -251,34 +271,51 @@ public class Theme {
         }
     }
 
+    /**
+     *
+     * @param context
+     * @param resId
+     * @return
+     */
     public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context,@DrawableRes int resId){
         return getPressAndSelectedStateListDrawalbe(context,resId,ThemeStore.getMaterialPrimaryColor());
     }
 
+    /**
+     *
+     * @param context
+     * @param resId
+     * @param color
+     * @return
+     */
     public static StateListDrawable getPressAndSelectedStateListDrawalbe(Context context,@DrawableRes int resId,@ColorInt int color){
         StateListDrawable stateListDrawable = new StateListDrawable();
-        Drawable drawable1 =  Theme.TintDrawable(Theme.getDrawable(context,resId), color);
-        stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, drawable1);
-        stateListDrawable.addState(new int[]{android.R.attr.state_selected}, drawable1);
+        Drawable drawable = TintDrawable(Theme.getDrawable(context,resId), color);
+        stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, drawable);
+        stateListDrawable.addState(new int[]{android.R.attr.state_selected}, drawable);
         stateListDrawable.addState(new int[]{}, Theme.getDrawable(context,resId));
 
         return stateListDrawable;
     }
 
     /**
-     * 按下与选中触摸效果（波纹）
+     * 按下与选中触摸效果
      * @param context
-     * @param resId
-     * @param effectColor 波纹颜色
+     * @param selectId
+     * @param selectColor 波纹颜色
      * @return
      */
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    public static StateListDrawable getPressAndSelectedStateListRippleDrawalbe(Context context, @DrawableRes int resId,@ColorInt int effectColor){
+    public static StateListDrawable getPressAndSelectedStateListRippleDrawable(Context context,
+                                                                               @DrawableRes int selectId,
+                                                                               @DrawableRes int defaultId,
+                                                                               @ColorInt int selectColor,
+                                                                               @ColorInt int defaultColor){
         StateListDrawable stateListDrawable = new StateListDrawable();
-        Drawable selectedDrawable = Theme.TintDrawable(context.getResources().getDrawable(R.drawable.bg_list_default_day),effectColor);
-        Drawable defaultDrawable = context.getResources().getDrawable(resId);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            RippleDrawable rippleDrawable = new RippleDrawable(ColorStateList.valueOf(effectColor), defaultDrawable,null);
+        Drawable selectedDrawable = TintDrawable(context.getResources().getDrawable(selectId),selectColor);
+        Drawable defaultDrawable = TintDrawable(getDrawable(context,defaultId),defaultColor);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            RippleDrawable rippleDrawable = new RippleDrawable(ColorStateList.valueOf(ThemeStore.getRippleColor()), defaultDrawable,null);
             stateListDrawable.addState(new int[]{android.R.attr.state_selected},selectedDrawable);
             stateListDrawable.addState(new int[]{}, rippleDrawable);
             return stateListDrawable;
@@ -291,22 +328,50 @@ public class Theme {
     }
 
     /**
-     * 按下触摸效果（波纹）
+     *
      * @param context
-     * @param resId
-     * @param effectColor 波纹颜色
      * @return
      */
-    public static Drawable getPressDrawable(Context context,@DrawableRes int resId,@ColorInt int effectColor){
-        Drawable defaultDrawable = context.getResources().getDrawable(resId);
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
-//            StateListDrawable stateListDrawable = new StateListDrawable();
-            return  new RippleDrawable(ColorStateList.valueOf(effectColor),
-                    defaultDrawable,
-                    null);
+    public static StateListDrawable getPressAndSelectedStateListRippleDrawable(int model,Context context){
+        int defaultColor = ThemeStore.isDay() ?
+                ThemeStore.getBackgroundColorMain() :
+                ColorUtil.getColor(model == Constants.LIST_MODEL ? R.color.night_background_color_main : R.color.night_background_color_2);
+        return getPressAndSelectedStateListRippleDrawable(context,
+                R.drawable.bg_list_default_day,
+                model == Constants.GRID_MODEL ? R.drawable.bg_corner_grid_day : R.drawable.bg_list_default_day,
+                ThemeStore.getSelectColor(),
+                defaultColor);
+    }
+
+    /**
+     *
+     * @param color
+     * @param contentDrawable
+     * @param maskDrawable
+     * @return
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static RippleDrawable getRippleDrawable(@ColorInt int color, Drawable contentDrawable, Drawable maskDrawable){
+        return new RippleDrawable(ColorStateList.valueOf(color),contentDrawable,maskDrawable);
+    }
+
+    /**
+     * 按下触摸效果
+     * @param defaultDrawable
+     * @param effectDrawable
+     * @param rippleColor
+     * @param contentDrawable
+     * @param maskDrawable
+     * @return
+     */
+    public static Drawable getPressDrawable(Drawable defaultDrawable,Drawable effectDrawable,@ColorInt int rippleColor,Drawable contentDrawable,Drawable maskDrawable){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            return  new RippleDrawable(ColorStateList.valueOf(rippleColor),
+                    contentDrawable,
+                    maskDrawable);
         } else {
             StateListDrawable stateListDrawable = new StateListDrawable();
-            stateListDrawable.addState(new int[]{android.R.attr.state_pressed},TintDrawable(defaultDrawable,effectColor));
+            stateListDrawable.addState(new int[]{android.R.attr.state_pressed},effectDrawable);
             stateListDrawable.addState(new int[]{}, defaultDrawable);
             return stateListDrawable;
         }

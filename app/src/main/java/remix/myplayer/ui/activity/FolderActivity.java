@@ -49,6 +49,7 @@ public class FolderActivity extends MultiChoiceActivity {
             }
         }
     };
+    private ListItemDecoration mItemDecoration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +87,8 @@ public class FolderActivity extends MultiChoiceActivity {
         });
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.addItemDecoration(new ListItemDecoration(this, ListItemDecoration.VERTICAL_LIST));
+        mItemDecoration = new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST);
+        mRecyclerView.addItemDecoration(mItemDecoration);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mAdapter = new FolderAdapter(this,mMultiChoice);

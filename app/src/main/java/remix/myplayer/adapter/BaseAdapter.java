@@ -2,10 +2,19 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 
 /**
  * @ClassName
@@ -26,6 +35,18 @@ public abstract class BaseAdapter<T extends BaseViewHolder> extends RecyclerView
         this.mContext = context;
         this.mCursor = cursor;
     }
+
+    protected void setButtonBg(View view, int size, Drawable defaultDrawable, Drawable selectDrawable){
+        Theme.getShape(AlbumFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT,size,size);
+        Theme.getShape(AlbumFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getRippleColor(),size,size);
+        view.setBackground(Theme.getPressDrawable(
+                defaultDrawable,
+                selectDrawable,
+                ThemeStore.getRippleColor(),
+                null,
+                null));
+    }
+
 
     public void setOnItemClickLitener(OnItemClickListener l) {
         this.mOnItemClickLitener = l;

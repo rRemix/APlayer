@@ -495,7 +495,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         if(data != null){
             String errorTxt = getString(
                     Global.mSetCoverType == Constants.ALBUM ? R.string.set_album_cover_error : Global.mSetCoverType == Constants.ARTIST ? R.string.set_artist_cover_error : R.string.set_playlist_cover_error);
-            int id = Global.mSetCoverID; //专辑或艺术家封面
+            final int id = Global.mSetCoverID; //专辑、艺术家、播放列表封面
             switch (requestCode){
                 //重启activity
                 case RESULT_UPDATE_THEME:
@@ -522,21 +522,34 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                 //图片裁剪
                 case Crop.REQUEST_CROP:
                     //裁剪后的图片路径
-                    String path = Crop.getOutput(data).getEncodedPath();
+                    final String path = Crop.getOutput(data).getEncodedPath();
                     if(TextUtils.isEmpty(path) || id == -1){
                         ToastUtil.show(MainActivity.this,errorTxt);
                         return;
                     }
-                    //如果设置的封面是专辑或者艺术家的，清除fresco的缓存
-                    if(Global.mSetCoverType == Constants.PLAYLIST)
-                        return;
                     //清除fresco的缓存
-                    ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                    Uri fileUri = Uri.parse("file:///" + path);
-                    Uri providerUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), id);
-                    imagePipeline.evictFromCache(fileUri);
-                    imagePipeline.evictFromCache(providerUri);
-                    mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+                    new Thread(){
+                        @Override
+                        public void run() {
+                            ImagePipeline imagePipeline = Fresco.getImagePipeline();
+                            if(Global.mSetCoverType != Constants.PLAYLIST){
+                                if(new File(path).exists()){
+                                    Uri fileUri = Uri.parse("file://" + path);
+                                    imagePipeline.evictFromCache(fileUri);
+                                } else {
+                                    Uri providerUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), id);
+                                    imagePipeline.evictFromCache(providerUri);
+                                }
+                            } else {
+                                imagePipeline.clearCaches();
+//                                Uri fileUri = Uri.parse("file://" + MediaStoreUtil.getImageUrl(Global.mSetCoverID + "",Constants.URL_ALBUM));
+//                                imagePipeline.evictFromCache(fileUri);
+                            }
+
+                            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+                        }
+                    }.start();
+
                     break;
             }
         }

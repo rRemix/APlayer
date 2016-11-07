@@ -90,6 +90,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
 
         }
     };
+    private ListItemDecoration mItemDecoration;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -125,6 +126,8 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         });
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mItemDecoration = new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST);
+        mRecyclerView.addItemDecoration(mItemDecoration);
         mRecyclerView.addItemDecoration(new ListItemDecoration(this, ListItemDecoration.VERTICAL_LIST,getResources().getDrawable(R.drawable.divider)));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 

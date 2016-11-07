@@ -121,8 +121,8 @@ public class TimerDialog extends BaseDialogActivity {
         int[] state_non_focus = new int[]{-android.R.attr.state_focused};
         int color = ThemeStore.getStressColor();
         StateListDrawable bg = new StateListDrawable();
-        bg.addState(state_prs,Theme.getBgCorner(1.0f,4,0,color));
-        bg.addState(state_non_focus,Theme.getBgCorner(0.01f,4,1,color));
+        bg.addState(state_prs,Theme.getCorner(1.0f,4,0,color));
+        bg.addState(state_non_focus,Theme.getCorner(0.01f,4,1,color));
 
         mToggle.setBackground(bg);
         mToggle.setTextColor(new ColorStateList(new int[][]{state_prs,state_non_focus},

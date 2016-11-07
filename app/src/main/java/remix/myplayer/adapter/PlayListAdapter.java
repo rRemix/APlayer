@@ -1,6 +1,9 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -17,6 +20,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadImage;
+import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
@@ -38,6 +42,7 @@ import remix.myplayer.util.PlayListUtil;
  */
 public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder> {
     private MultiChoice mMultiChoice;
+
     public PlayListAdapter(Context context,MultiChoice multiChoice) {
         super(context);
         this.mMultiChoice = multiChoice;
@@ -101,11 +106,25 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
                             popupMenu.show();
                         }
                     });
+                    holder.mButton.setClickable(true);
+                    int size = DensityUtil.dip2px(mContext,45);
+                    Drawable defaultDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+                    Drawable selectDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getRippleColor(), size, size);
+                    holder.mButton.setBackground(Theme.getPressDrawable(
+                            defaultDrawable,
+                            selectDrawable,
+                            ThemeStore.getRippleColor(),
+                            null,
+                            null));
+                } else {
+                    holder.mButton.setBackgroundResource(R.color.transparent);
+                    holder.mButton.setClickable(false);
                 }
-                holder.mButton.setBackgroundResource(isLove ? R.color.transparent : R.drawable.bg_common_ripple);
-                holder.mButton.setClickable(!isLove);
-
             }
+
+            //item点击效果
+            holder.mContainer.setBackground(
+                    Theme.getPressAndSelectedStateListRippleDrawable(PlayListFragment.getModel(),mContext));
 
             //是否处于选中状态
             if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&
@@ -124,6 +143,7 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
                 }
             }
         }
+
     }
 
     static class PlayListHolder extends BaseViewHolder {

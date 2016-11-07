@@ -40,6 +40,7 @@ public class FolderFragment extends BaseFragment {
     private FolderAdapter mAdapter;
     public static final String TAG = FolderFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
+    private ListItemDecoration mItemDecoration;
 
 
     @Nullable
@@ -49,7 +50,8 @@ public class FolderFragment extends BaseFragment {
         mUnBinder = ButterKnife.bind(this,rootView);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.addItemDecoration(new ListItemDecoration(getContext(), ListItemDecoration.VERTICAL_LIST));
+        mItemDecoration = new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST);
+        mRecyclerView.addItemDecoration(mItemDecoration);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();

@@ -11,7 +11,7 @@
         android:id="@+id/item_container"
         android:layout_width="match_parent"
         android:layout_height="@dimen/d188_size"
-        android:background="?attr/background_grid">
+      >
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="@dimen/d123_size"
             android:layout_height="@dimen/d123_size"
@@ -37,7 +37,7 @@
 
         <ImageButton
             android:layout_width="@dimen/d32_size"
-            android:layout_height="@dimen/d32_size"
+            android:layout_height="match_parent"
             android:id="@+id/item_button"
             android:src="@drawable/list_icn_more"
             android:background="@drawable/bg_common_ripple"

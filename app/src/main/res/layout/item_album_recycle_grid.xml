@@ -11,8 +11,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/d210_size"
-        android:id="@+id/item_container"
-        android:background="?attr/background_grid">
+        android:id="@+id/item_container">
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="@dimen/d124_size"
             android:layout_height="@dimen/d123_size"
@@ -38,7 +37,7 @@
 
         <ImageButton
             android:layout_width="@dimen/d40_size"
-            android:layout_height="@dimen/d4_size"
+            android:layout_height="match_parent"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"

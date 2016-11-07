@@ -2,8 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <selector>
-            <item android:state_selected="true"
-                android:drawable="@drawable/bg_list_selected_night" />
+            <item android:state_selected="true" android:drawable="@drawable/bg_list_selected_night" />
             <item android:drawable="@drawable/bg_corner_grid_night" />
         </selector>
     </item>

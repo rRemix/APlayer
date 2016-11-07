@@ -3,8 +3,10 @@ package remix.myplayer.ui;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -39,6 +41,10 @@ public class ListItemDecoration extends RecyclerView.ItemDecoration {
     public ListItemDecoration(Context context, int orientation, Drawable divider){
         this(context,orientation);
         mDivider = divider;
+    }
+
+    public void setDividerColor(@ColorInt int color){
+        mDivider = Theme.TintDrawable(mDivider, color);
     }
 
     public void setOrientation(int orientation) {

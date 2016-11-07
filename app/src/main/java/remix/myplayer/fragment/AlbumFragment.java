@@ -3,6 +3,7 @@ package remix.myplayer.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -25,10 +26,12 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.AlbumAdater;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.Theme;
+import remix.myplayer.ui.GridItemDecoration;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 
@@ -42,14 +45,6 @@ import remix.myplayer.util.SPUtil;
 public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     @BindView(R.id.album_recycleview)
     RecyclerView mRecycleView;
-    Cursor mCursor = null;
-    //专辑名 专辑id 艺术家对应的索引
-    public static int mAlbumIdIndex = -1;
-    public static int mAlbumIndex = -1;
-    public static int mArtistIndex = -1;
-    private AlbumAdater mAdapter;
-    private static int LOADER_ID = 1;
-    private MultiChoice mMultiChoice;
     //列表显示与网格显示切换
     @BindView(R.id.list_model)
     ImageView mListModelBtn;
@@ -57,6 +52,16 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     ImageView mGridModelBtn;
     //当前列表模式 1:列表 2:网格
     public static int ListModel = 2;
+    private Cursor mCursor = null;
+    private ListItemDecoration mItemDecoration;
+    //专辑名 专辑id 艺术家对应的索引
+    public static int mAlbumIdIndex = -1;
+    public static int mAlbumIndex = -1;
+    public static int mArtistIndex = -1;
+    private AlbumAdater mAdapter;
+    private static int LOADER_ID = 1;
+    private MultiChoice mMultiChoice;
+
 
     public static final String TAG = AlbumFragment.class.getSimpleName();
 
@@ -81,12 +86,9 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
 
         ListModel = SPUtil.getValue(getActivity(),"Setting","AlbumModel",2);
         mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-        if(ListModel == Constants.LIST_MODEL){
-            mRecycleView.addItemDecoration(new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST));
-        }
-//        mRecycleView.addItemDecoration(ListModel == 1 ?
-//                new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST) :
-//                new GridItemDecoration(getActivity(),12, Color.RED));
+        mItemDecoration = new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST);
+        mItemDecoration.setDividerColor(ColorUtil.getColor(ListModel == Constants.LIST_MODEL ? R.color.list_divider : R.color.transparent));
+        mRecycleView.addItemDecoration(mItemDecoration);
 
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
@@ -152,11 +154,12 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         mListModelBtn.setSelected(v.getId() == R.id.list_model);
         mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
         ListModel = newModel;
+        mItemDecoration.setDividerColor(ColorUtil.getColor(ListModel == Constants.LIST_MODEL ? R.color.list_divider : R.color.transparent));
         mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-        if(ListModel == Constants.LIST_MODEL){
-            mRecycleView.addItemDecoration(new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST));
-        }
-//        mRecycleView.addItemDecoration(ListModel == 1 ?
+
+//        mRecyclerView.addItemDecoration(ListModel == Constants.LIST_MODEL ? new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST) : new GridItemDecoration(),1);
+
+//        mRecyclerView.addItemDecoration(ListModel == 1 ?
 //                new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST) :
 //                new GridItemDecoration(getActivity(),12, Color.rgb(0xef,0xef,0xef)));
         SPUtil.putValue(getActivity(),"Setting","AlbumModel",ListModel);

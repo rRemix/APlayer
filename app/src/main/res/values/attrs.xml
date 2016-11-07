@@ -49,16 +49,12 @@
     <attr name="background_color_2" format="color|reference"/>
     <attr name="background_color_3" format="color|reference"/>
     <attr name="background_grid_color" format="color|reference"/>
-    <attr name="background_grid" format="reference"/>
-    <attr name="background_list" format="reference"/>
     <attr name="stress_color" format="color|reference"/>
     <!--默认专辑和艺术家封面-->
     <attr name="default_album" format="reference"/>
     <attr name="default_artist" format="reference"/>
     <!--波纹颜色-->
     <attr name="ripple_color" format="reference|color"/>
-    <!--设置界面选项点击效果-->
-    <attr name="background_list_1" format="reference"/>
     <attr name="background_aboutus_color" format="color|reference"/>
     <attr name="material_color_primary" format="color|reference"/>
     <attr name="material_color_primary_dark" format="color|reference"/>

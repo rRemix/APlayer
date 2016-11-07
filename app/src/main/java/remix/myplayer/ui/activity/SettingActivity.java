@@ -2,6 +2,9 @@ package remix.myplayer.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
@@ -16,6 +19,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.util.DialogUtils;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
@@ -31,6 +35,7 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.ColorChooseDialog;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DiskCache;
@@ -106,38 +111,25 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     }
         });
 
-//        //初始化点击效果
-//        //默认的颜色
-//        final int defaultColor = ThemeStore.isDay() ? ColorUtil.getColor(R.color.white) : ColorUtil.getColor(R.color.night_background_color_3);
-//
-//        //获得colorcontrolHighlight颜色
-//        int effectColor = Color.WHITE;
-//        try {
-//            effectColor = ThemeStore.isDay() ? DialogUtils.resolveColor(this, R.attr.colorControlHighlight) : ColorUtil.getColor(R.color.night_selected_color);
-//        } catch (Exception e){
-//            e.printStackTrace();
-//        } finally {
-//            if(effectColor == Color.WHITE){
-//                effectColor = ColorUtil.getColor(R.color.default_control_highlight);
-//            }
-//        }
-//        //设置所有选项点击效果
-//        final int[] colors = new int[]{ColorUtil.getColor(R.color.md_plum_primary),ColorUtil.getColor(R.color.md_indigo_primary),ColorUtil.getColor(R.color.md_purple_primary),
-//                ColorUtil.getColor(R.color.md_navy_primary),ColorUtil.getColor(R.color.md_brown_primary),ColorUtil.getColor(R.color.md_green_primary),
-//                ColorUtil.getColor(R.color.md_plum_primary),ColorUtil.getColor(R.color.md_indigo_primary),ColorUtil.getColor(R.color.md_purple_primary),
-//                ColorUtil.getColor(R.color.md_navy_primary),ColorUtil.getColor(R.color.md_brown_primary),ColorUtil.getColor(R.color.md_green_primary)};
-//        final ColorDrawable colorDrawable = new ColorDrawable(colors[1]);
-//        final Drawable containerDrawable = Theme.getPressDrawable(this,
-//                ThemeStore.isDay() ? R.drawable.bg_list_default_day : R.drawable.bg_list_1_default_night,effectColor);
-//        ButterKnife.apply(new View[]{findView(R.id.setting_filter_container),findView(R.id.setting_lrc_container),findView(R.id.setting_color_container),
-//                        findView(R.id.setting_notify_container),findView(R.id.setting_eq_container),findView(R.id.setting_feedback_container),
-//                        findView(R.id.setting_about_container),findView(R.id.setting_update_container),findView(R.id.setting_clear_container)},
-//                new ButterKnife.Action<View>() {
-//                    @Override
-//                    public void apply(@NonNull View view, int index) {
-//                        view.setBackground(containerDrawable);
-//                    }
-//        });
+        //初始化点击效果
+        ButterKnife.apply(new View[]{findView(R.id.setting_filter_container),findView(R.id.setting_lrc_container),findView(R.id.setting_color_container),
+                        findView(R.id.setting_notify_container),findView(R.id.setting_eq_container),findView(R.id.setting_feedback_container),
+                        findView(R.id.setting_about_container),findView(R.id.setting_update_container),findView(R.id.setting_clear_container)},
+                new ButterKnife.Action<View>() {
+                    @Override
+                    public void apply(@NonNull View view, int index) {
+                        final Drawable oriDrawable = getResources().getDrawable(R.drawable.bg_list_default_day);
+                        final Drawable defaultDrawable = Theme.TintDrawable(getResources().getDrawable(R.drawable.bg_list_default_day),ThemeStore.getBackgroundColor3());
+                        final Drawable selectDrawable = Theme.TintDrawable(getResources().getDrawable(R.drawable.bg_list_default_day), ThemeStore.getRippleColor());
+                        final Drawable containerDrawable = Theme.getPressDrawable(
+                                defaultDrawable,
+                                selectDrawable,
+                                ThemeStore.getRippleColor(),
+                                defaultDrawable,
+                                null);
+                        view.setBackground(containerDrawable);
+                    }
+        });
 
         //计算缓存大小
         new Thread(){

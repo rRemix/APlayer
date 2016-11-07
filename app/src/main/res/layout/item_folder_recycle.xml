@@ -2,8 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="@dimen/d56_size"
-    android:gravity="center_vertical"
-    android:background="?attr/background_list">
+    android:gravity="center_vertical">
     <ImageView
         android:id="@+id/folder_image"
         android:layout_width="wrap_content"
@@ -38,8 +37,8 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="@dimen/d18_size"
         android:id="@+id/folder_button"
-        android:layout_width="@dimen/d60_size"
-        android:layout_height="match_parent"
+        android:layout_width="@dimen/d45_size"
+        android:layout_height="@dimen/d45_size"
         android:layout_centerVertical="true"
         android:src="@drawable/list_icn_more"
         android:background="@drawable/bg_common_ripple"/>

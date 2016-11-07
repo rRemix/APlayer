@@ -1,9 +1,10 @@
 package remix.myplayer.adapter;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
@@ -25,6 +26,7 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.fragment.AlbumFragment;
+import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
@@ -44,6 +46,7 @@ import remix.myplayer.util.DensityUtil;
  */
 public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
     private MultiChoice mMultiChoice;
+
     public AlbumAdater(Cursor cursor, Context context,MultiChoice multiChoice) {
         super(context,cursor);
         this.mMultiChoice = multiChoice;
@@ -80,6 +83,13 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
                     new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);
                 }
 //                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
+                //item点击效果
+                int defaultColor = ThemeStore.isDay() ?
+                        ThemeStore.getBackgroundColorMain() :
+                        ColorUtil.getColor(AlbumFragment.getModel() == Constants.LIST_MODEL ? R.color.night_background_color_main : R.color.night_background_color_2);
+                holder.mContainer.setBackground(
+                        Theme.getPressAndSelectedStateListRippleDrawable(AlbumFragment.getModel(), mContext));
+
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -102,10 +112,22 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
 
             }
 
-            //popupmenu
             if(holder.mButton != null) {
+                //着色
                 int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
                 Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
+
+                //点击效果
+                int size = DensityUtil.dip2px(mContext,45);
+                Drawable defaultDrawable = Theme.getShape(AlbumFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+                Drawable selectDrawable = Theme.getShape(AlbumFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getRippleColor(), size, size);
+                holder.mButton.setBackground(Theme.getPressDrawable(
+                        defaultDrawable,
+                        selectDrawable,
+                        ThemeStore.getRippleColor(),
+                        null,
+                        null));
+
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

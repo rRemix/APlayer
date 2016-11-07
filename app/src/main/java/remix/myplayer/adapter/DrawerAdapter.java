@@ -2,7 +2,6 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +10,6 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.afollestad.materialdialogs.util.DialogUtils;
 
 import butterknife.BindView;
 import remix.myplayer.R;
@@ -56,7 +53,6 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
 
     @Override
     public void onBindViewHolder(final DrawerHolder holder, final int position) {
-//        holder.mImg.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(mContext,mImgs[position]));
         holder.mImg.setImageResource(mImgs[position]);
         holder.mText.setText(mTitles[position]);
         if(position == 2){
@@ -78,10 +74,12 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
         });
         holder.mRoot.setSelected(mSelectIndex == position);
         holder.mRoot.setBackground(
-                Theme.getPressAndSelectedStateListRippleDrawalbe(
+                Theme.getPressAndSelectedStateListRippleDrawable(
                         mContext,
                         R.drawable.bg_list_default_day,
-                        ColorUtil.getColor(R.color.drawer_selected)));
+                        R.drawable.bg_list_default_day,
+                        ColorUtil.getColor(R.color.drawer_selected),
+                        Color.WHITE));
 
     }
 

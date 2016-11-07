@@ -42,7 +42,7 @@ public class FeedBakActivity extends ToolbarActivity {
         ButterKnife.bind(this);
         initToolbar(mToolBar,getString(R.string.back));
 
-        mSubmit.setBackground(Theme.getBgCorner(1.0f,5,0,ThemeStore.getStressColor()));
+        mSubmit.setBackground(Theme.getCorner(1.0f,5,0,ThemeStore.getStressColor()));
     }
 
     @OnClick(R.id.feedback_submit)

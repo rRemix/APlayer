@@ -3,6 +3,8 @@ package remix.myplayer.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,7 @@ import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 
 /**
  * Created by taeja on 16-6-24.
@@ -35,13 +38,18 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
     private ArrayList<MP3Item> mInfoList;
     private int mType;
     private String mArg;
-    private MultiChoice mMultiChoice ;
+    private MultiChoice mMultiChoice;
+    private Drawable mDefaultDrawable;
+    private Drawable mSelectDrawable;
     public ChildHolderAdapter(Context context, int type, String arg,MultiChoice multiChoice){
         super(context);
         this.mContext = context;
         this.mType = type;
         this.mArg = arg;
         this.mMultiChoice = multiChoice;
+        int size = DensityUtil.dip2px(mContext,60);
+        mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
+        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getRippleColor(),size,size);
     }
 
     public void setList(ArrayList<MP3Item> list){
@@ -57,7 +65,7 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
 
     @Override
     public ViewHoler onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHoler(LayoutInflater.from(mContext).inflate(R.layout.child_holder_item,null,false));
+        return new ViewHoler(LayoutInflater.from(mContext).inflate(R.layout.item_child_holder,null,false));
     }
 
     @Override
@@ -92,10 +100,20 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
             //设置标题
             holder.mTitle.setText(CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE));
 
+            //item点击效果
+            Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext);
+
             if(holder.mButton != null) {
                 //设置按钮着色
                 int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
                 Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
+
+                holder.mButton.setBackground(Theme.getPressDrawable(
+                        mDefaultDrawable,
+                        mSelectDrawable,
+                        ThemeStore.getRippleColor(),
+                        null,null));
+
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -110,6 +128,8 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
                         mContext.startActivity(intent);
                     }
                 });
+
+
             }
         }
 

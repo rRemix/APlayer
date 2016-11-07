@@ -29,6 +29,7 @@ import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -47,7 +48,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     public static int mPlayListSongCountIndex;
     private Cursor mCursor;
     @BindView(R.id.playlist_recycleview)
-    RecyclerView mRecycleView;
+    RecyclerView mRecyclerView;
 
     //列表显示与网格显示切换
     @BindView(R.id.list_model)
@@ -59,6 +60,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
 
     private PlayListAdapter mAdapter;
     private MultiChoice mMultiChoice;
+    private ListItemDecoration mItemDecoration;
 
     @Override
     public void onAttach(Context context) {
@@ -74,10 +76,11 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
         mUnBinder = ButterKnife.bind(this,rootView);
 
         ListModel = SPUtil.getValue(getActivity(),"Setting","PlayListModel",2);
-        mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-        if(ListModel == Constants.LIST_MODEL){
-            mRecycleView.addItemDecoration(new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST));
-        }
+        mItemDecoration = new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST);
+        mItemDecoration.setDividerColor(ColorUtil.getColor(ListModel == Constants.LIST_MODEL ? R.color.list_divider : R.color.transparent));
+        mRecyclerView.addItemDecoration(mItemDecoration);
+        mRecyclerView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
@@ -111,7 +114,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,getPlayListId(position),TAG,Constants.PLAYLIST);
             }
         });
-        mRecycleView.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(mAdapter);
 
         mListModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list2));
         mListModelBtn.setSelected(ListModel == Constants.LIST_MODEL);
@@ -162,10 +165,8 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
                 mListModelBtn.setSelected(v.getId() == R.id.list_model);
                 mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
                 ListModel = newModel;
-                mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-                if(ListModel == Constants.LIST_MODEL){
-                    mRecycleView.addItemDecoration(new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST));
-                }
+                mRecyclerView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+                mItemDecoration.setDividerColor(ColorUtil.getColor(ListModel == Constants.LIST_MODEL ? R.color.list_divider : R.color.transparent));
                 SPUtil.putValue(getActivity(),"Setting","PlayListModel",ListModel);
                 break;
 

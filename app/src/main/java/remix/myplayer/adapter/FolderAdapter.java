@@ -2,6 +2,8 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
@@ -17,6 +19,7 @@ import java.util.Iterator;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
@@ -25,6 +28,7 @@ import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 
 /**
@@ -32,9 +36,14 @@ import remix.myplayer.util.Global;
  */
 public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
     private MultiChoice mMultiChoice;
+    private Drawable mDefaultDrawable;
+    private Drawable mSelectDrawable;
     public FolderAdapter(Context context,MultiChoice multiChoice) {
         super(context);
         this.mMultiChoice = multiChoice;
+        int size = DensityUtil.dip2px(mContext,45);
+        mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
+        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getRippleColor(),size,size);
     }
 
     @Override
@@ -62,10 +71,21 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
             holder.mImg.setImageResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.icon_folder_day : R.drawable.icon_folder);
         }
 
+        //item点击效果
+        holder.mContainer.setBackground(
+                Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
+
         final String full_path = temp;
         if(holder.mButton != null) {
             int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
             Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
+
+            holder.mButton.setBackground(Theme.getPressDrawable(
+                    mDefaultDrawable,
+                    mSelectDrawable,
+                    ThemeStore.getRippleColor(),
+                    null,null));
+
             holder.mButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

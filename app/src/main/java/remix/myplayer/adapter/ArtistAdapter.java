@@ -3,9 +3,10 @@ package remix.myplayer.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -24,6 +25,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.asynctask.AsynLoadSongNum;
+import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
@@ -34,7 +36,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2015/12/22.
@@ -76,6 +77,9 @@ public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
                 //设置封面
                 holder.mImage.setImageURI(Uri.EMPTY);
                 new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId,Constants.URL_ARTIST,true);
+                //item点击效果
+                holder.mContainer.setBackground(
+                        Theme.getPressAndSelectedStateListRippleDrawable(ArtistFragment.getModel(),mContext));
 
             } catch (Exception e){
                 e.printStackTrace();
@@ -101,6 +105,17 @@ public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
             if(holder.mButton != null) {
                 int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
                 Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
+
+                int size = DensityUtil.dip2px(mContext,45);
+                Drawable defaultDrawable = Theme.getShape(ArtistFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+                Drawable selectDrawable = Theme.getShape(ArtistFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getRippleColor(), size, size);
+                holder.mButton.setBackground(Theme.getPressDrawable(
+                        defaultDrawable,
+                        selectDrawable,
+                        ThemeStore.getRippleColor(),
+                        null,
+                        null));
+
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

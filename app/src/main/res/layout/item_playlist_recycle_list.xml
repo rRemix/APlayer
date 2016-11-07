@@ -4,12 +4,11 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item_container"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
-    android:minHeight="56dp"
-    android:background="?attr/background_list">
+    android:layout_height="@dimen/d56_size"
+    android:minHeight="@dimen/d56_size">
     <com.facebook.drawee.view.SimpleDraweeView
-        android:layout_width="42dp"
-        android:layout_height="42dp"
+        android:layout_width="@dimen/d42_size"
+        android:layout_height="@dimen/d42_size"
         android:id="@+id/item_simpleiview"
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImageScaleType="centerCrop"
@@ -49,8 +48,8 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="@dimen/d16_size"
         android:id="@+id/item_button"
-        android:layout_width="@dimen/d40_size"
-        android:layout_height="match_parent"
+        android:layout_width="@dimen/d45_size"
+        android:layout_height="@dimen/d45_size"
         android:layout_centerVertical="true"
         android:src="@drawable/list_icn_more"
         android:background="@drawable/bg_common_ripple"/>

@@ -28,6 +28,7 @@ import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 
@@ -56,6 +57,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     ImageView mGridModelBtn;
     //当前列表模式 1:列表 2:网格
     public static int ListModel = 2;
+    private ListItemDecoration mItemDecoration;
 
     @Override
     public void onAttach(Context context) {
@@ -77,9 +79,9 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
 
         ListModel = SPUtil.getValue(getActivity(),"Setting","ArtistModel",2);
         mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-        if(ListModel == Constants.LIST_MODEL){
-            mRecycleView.addItemDecoration(new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST));
-        }
+        mItemDecoration = new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST);
+        mItemDecoration.setDividerColor(ColorUtil.getColor(ListModel == Constants.LIST_MODEL ? R.color.list_divider : R.color.transparent));
+        mRecycleView.addItemDecoration(mItemDecoration);
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
@@ -146,9 +148,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
         ListModel = newModel;
         mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-        if(ListModel == Constants.LIST_MODEL){
-            mRecycleView.addItemDecoration(new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST));
-        }
+        mItemDecoration.setDividerColor(ColorUtil.getColor(ListModel == Constants.LIST_MODEL ? R.color.list_divider : R.color.transparent));
         SPUtil.putValue(getActivity(),"Setting","ArtistModel",ListModel);
     }
 

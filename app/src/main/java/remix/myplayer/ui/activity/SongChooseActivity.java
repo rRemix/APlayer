@@ -50,6 +50,8 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
     private SongChooseAdaper mAdapter;
+    private ListItemDecoration mItemDecoration;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +80,8 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
         getLoaderManager().initLoader(LOADER_ID++, null, this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addItemDecoration(new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST));
+        mItemDecoration = new ListItemDecoration(this, ListItemDecoration.VERTICAL_LIST);
+        mRecyclerView.addItemDecoration(mItemDecoration);
         mConfirm.setAlpha(0.6f);
     }
 
