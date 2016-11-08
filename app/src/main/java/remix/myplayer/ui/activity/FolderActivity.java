@@ -19,6 +19,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.FolderAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -37,8 +38,8 @@ public class FolderActivity extends MultiChoiceActivity {
     Toolbar mToolBar;
 
     public static FolderActivity mInstance;
-
     private FolderAdapter mAdapter;
+
     public static final String TAG = FolderActivity.class.getSimpleName();
     //更新
     private Handler mRefreshHandler = new Handler(){

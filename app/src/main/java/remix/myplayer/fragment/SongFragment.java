@@ -10,24 +10,18 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cn.bmob.v3.b.The;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
@@ -55,6 +49,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
     private SongAdapter mAdapter;
+    private ListItemDecoration mItemDecoration;
 
     public static final String TAG = SongFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
@@ -101,7 +96,8 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         });
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-//        mRecyclerView.addItemDecoration(new ListItemDecoration(getContext(), ListItemDecoration.VERTICAL_LIST));
+        mItemDecoration = new ListItemDecoration(getContext(),ListItemDecoration.VERTICAL_LIST);
+        mRecyclerView.addItemDecoration(mItemDecoration);
 //        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         if(getActivity() instanceof MultiChoiceActivity){

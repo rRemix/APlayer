@@ -42,7 +42,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="@dimen/d54_size"
-        android:id="@+id/song_index_view"
         android:layout_width="@dimen/d20_size"
         android:layout_height="match_parent" />
 </RelativeLayout>

@@ -5,17 +5,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
 
 import remix.myplayer.R;
+import remix.myplayer.db.PlayListSongs;
+import remix.myplayer.db.PlayLists;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListInfo;
 import remix.myplayer.model.PlayListSongInfo;
-import remix.myplayer.db.PlayListSongs;
-import remix.myplayer.db.PlayLists;
 
 
 

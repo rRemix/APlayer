@@ -28,10 +28,9 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.ListItemDecoration;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 
 /**
@@ -158,6 +157,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         });
         mRecyclerView.setAdapter(mAdapter);
         mItemDecoration = new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST);
+        mItemDecoration.setDividerColor(ThemeStore.getDividerColor());
         mRecyclerView.addItemDecoration(mItemDecoration);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());

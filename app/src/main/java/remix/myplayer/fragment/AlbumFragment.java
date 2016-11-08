@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -18,7 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,9 +25,7 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.AlbumAdater;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.GridItemDecoration;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
@@ -49,9 +46,9 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     RecyclerView mRecycleView;
     //列表显示与网格显示切换
     @BindView(R.id.list_model)
-    ImageView mListModelBtn;
+    ImageButton mListModelBtn;
     @BindView(R.id.grid_model)
-    ImageView mGridModelBtn;
+    ImageButton mGridModelBtn;
     //当前列表模式 1:列表 2:网格
     public static int ListModel = 2;
     private Cursor mCursor = null;
@@ -89,7 +86,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         ListModel = SPUtil.getValue(getActivity(),"Setting","AlbumModel",2);
         mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
         mItemDecoration = new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST);
-        mItemDecoration.setDividerColor(ColorUtil.getColor(ListModel == Constants.LIST_MODEL ? R.color.list_divider : R.color.transparent));
+        mItemDecoration.setDividerColor(ListModel == Constants.LIST_MODEL ? ThemeStore.getDividerColor() : Color.TRANSPARENT);
         mRecycleView.addItemDecoration(mItemDecoration);
 
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
@@ -128,11 +125,14 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         });
         mRecycleView.setAdapter(mAdapter);
 
-        mListModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list2));
-        mListModelBtn.setSelected(ListModel == Constants.LIST_MODEL);
+//        mListModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list2));
+//        mListModelBtn.setSelected(ListModel == Constants.LIST_MODEL);
+//
+//        mGridModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list1));
+//        mGridModelBtn.setSelected(ListModel == Constants.GRID_MODEL);
 
-        mGridModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list1));
-        mGridModelBtn.setSelected(ListModel == Constants.GRID_MODEL);
+        mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+        mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         return rootView;
     }
 
@@ -153,28 +153,21 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         int newModel = v.getId() == R.id.list_model ? Constants.LIST_MODEL : Constants.GRID_MODEL;
         if(newModel == ListModel)
             return;
-        mListModelBtn.setSelected(v.getId() == R.id.list_model);
-        mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
         ListModel = newModel;
-        mItemDecoration.setDividerColor(ColorUtil.getColor(ListModel == Constants.LIST_MODEL ? R.color.list_divider : R.color.transparent));
+        mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+        mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+//        mListModelBtn.setSelected(v.getId() == R.id.list_model);
+//        mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
+
+        mItemDecoration.setDividerColor(ListModel == Constants.LIST_MODEL ? ThemeStore.getDividerColor() : Color.TRANSPARENT);
         mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
 
-//        mRecyclerView.addItemDecoration(ListModel == Constants.LIST_MODEL ? new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST) : new GridItemDecoration(),1);
-
-//        mRecyclerView.addItemDecoration(ListModel == 1 ?
-//                new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST) :
-//                new GridItemDecoration(getActivity(),12, Color.rgb(0xef,0xef,0xef)));
         SPUtil.putValue(getActivity(),"Setting","AlbumModel",ListModel);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         //根据专辑id 创建Loader
-//        CursorLoader loader = new CursorLoader(getActivity(), MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-//                new String[]{BaseColumns._ID,MediaStore.Audio.AlbumColumns.ALBUM,
-//                        MediaStore.Audio.AlbumColumns.ARTIST,
-//                        MediaStore.Audio.AlbumColumns.ALBUM_ART,
-//                        MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS}, null,null,null);
         try {
             return  new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,

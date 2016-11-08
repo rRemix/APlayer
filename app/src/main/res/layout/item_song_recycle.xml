@@ -71,9 +71,5 @@
         android:id="@+id/song_columnview"
         android:layout_toRightOf="@id/song_text_container"
         android:layout_marginLeft="@dimen/d16_size" />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/list_divider"
-        android:layout_alignParentBottom="true"/>
+
 </RelativeLayout>

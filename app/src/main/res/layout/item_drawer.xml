@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/d56_size"
-    android:background="?android:selectableItemBackground"
+    android:background="@drawable/bg_drawer_day"
     android:id="@+id/item_root">
     <ImageView
         android:layout_width="@dimen/d44_size"

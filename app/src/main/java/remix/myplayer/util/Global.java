@@ -6,8 +6,6 @@ package remix.myplayer.util;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.provider.MediaStore;
 
 import java.util.ArrayList;
 import java.util.HashMap;

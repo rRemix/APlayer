@@ -49,6 +49,12 @@ public class Theme {
         return wrappedDrawable;
     }
 
+    public static Drawable TintListDrawable(Drawable oriDrawable,@ColorInt int color){
+        final Drawable wrappedDrawable = DrawableCompat.wrap(oriDrawable.mutate());
+        DrawableCompat.setTint(oriDrawable,color);
+        return wrappedDrawable;
+    }
+
     /**
      * 为drawable着色
      * @param oriDrawable

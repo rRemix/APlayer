@@ -13,8 +13,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:id="@+id/notify_container">
+        android:orientation="horizontal">
         <ImageView
             android:id="@+id/notify_image"
             android:layout_margin="@dimen/d4_size"

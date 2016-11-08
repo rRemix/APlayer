@@ -10,8 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:id="@+id/layout_main">
+        android:orientation="vertical">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -60,9 +59,9 @@
                     android:layout_marginBottom="@dimen/d20_size"
                     android:clickable="true"
                     android:src="@drawable/playlist_fab_btn_add"
-                    app:backgroundTint="?attr/material_color_primary"
-                    app:elevation="@dimen/d2_size"
-                    app:pressedTranslationZ="@dimen/d6_size"/>
+                    app:backgroundTint="@color/select_model_button_color"
+                    app:elevation="@dimen/d4_size"
+                    app:pressedTranslationZ="@dimen/d4_size"/>
             </android.support.design.widget.CoordinatorLayout>
         </RelativeLayout>
     </LinearLayout>

@@ -1,5 +1,6 @@
 package remix.myplayer.util;
 
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,8 +11,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +28,6 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -43,11 +43,22 @@ import remix.myplayer.util.thumb.SearchCover;
  * 通用工具类
  */
 public class CommonUtil {
-    public static CommonUtil mInstace = null;
     private static Context mContext;
 
     public static void setContext(Context context) {
         mContext = context;
+    }
+
+    /**
+     * 震动
+     * @param context
+     * @param milliseconds
+     */
+    public static void Vibrate(final Context context,final long milliseconds) {
+        if(context == null)
+            return;
+        Vibrator vibrator = (Vibrator) context.getSystemService(Service.VIBRATOR_SERVICE);
+        vibrator.vibrate(milliseconds);
     }
 
     /**

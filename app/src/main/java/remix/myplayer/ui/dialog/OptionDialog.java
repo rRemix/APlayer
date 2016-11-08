@@ -3,7 +3,6 @@ package remix.myplayer.ui.dialog;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;

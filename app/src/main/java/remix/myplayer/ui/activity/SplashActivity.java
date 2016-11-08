@@ -1,19 +1,11 @@
 package remix.myplayer.ui.activity;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
-import android.telephony.gsm.GsmCellLocation;
 import android.view.View;
 
 import com.umeng.analytics.MobclickAgent;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,7 +15,6 @@ import remix.myplayer.fragment.SplashFragment;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;

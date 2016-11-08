@@ -211,4 +211,9 @@ public class ThemeStore {
     public static int getSelectColor(){
         return ColorUtil.getColor(isDay() ? R.color.day_selected_color : R.color.night_selected_color);
     }
+
+    @ColorInt
+    public static int getDividerColor(){
+        return ColorUtil.getColor(isDay() ? R.color.day_list_divider : R.color.night_list_divier);
+    }
 }

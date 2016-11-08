@@ -16,13 +16,9 @@
 
     <dimen name="item_height">72dp</dimen>
     <dimen name="item_text_width">230dp</dimen>
-    <dimen name="interval_white_height">12dp</dimen>
 
-    <dimen name="toolbar_padding_top">0dp</dimen>
     <dimen name="activity_padding_top">24dp</dimen>
 
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="slidingmenu_offset">100dp</dimen>
     <dimen name="tab_height">40dp</dimen>
     <dimen name="d1_size">1dp</dimen>
     <dimen name="d2_size">2dp</dimen>
@@ -61,35 +57,27 @@
     <dimen name="d64_size">64dp</dimen>
     <dimen name="d70_size">70dp</dimen>
     <dimen name="d72_size">72dp</dimen>
-    <dimen name="d80_size">80dp</dimen>
-    <dimen name="d90_size">90dp</dimen>
     <dimen name="d100_size">100dp</dimen>
     <dimen name="d110_size">110dp</dimen>
     <dimen name="d120_size">120dp</dimen>
     <dimen name="d123_size">123dp</dimen>
     <dimen name="d124_size">124dp</dimen>
-    <dimen name="d130_size">130dp</dimen>
-    <dimen name="d150_size">150dp</dimen>
     <dimen name="d160_size">160dp</dimen>
     <dimen name="d170_size">170dp</dimen>
-    <dimen name="d174_size">174dp</dimen>
     <dimen name="d180_size">180dp</dimen>
     <dimen name="d187_size">187dp</dimen>
     <dimen name="d188_size">188dp</dimen>
     <dimen name="d198_size">198dp</dimen>
     <dimen name="d200_size">200dp</dimen>
-    <dimen name="d208_size">208dp</dimen>
     <dimen name="d210_size">210dp</dimen>
     <dimen name="d218_size">218dp</dimen>
     <dimen name="d238_size">238dp</dimen>
     <dimen name="d240_size">240dp</dimen>
-    <dimen name="d254_size">254dp</dimen>
     <dimen name="d260_size">260dp</dimen>
     <dimen name="d264_size">264dp</dimen>
     <dimen name="d274_size">274dp</dimen>
     <dimen name="d300_size">300dp</dimen>
     <dimen name="d323_size">323dp</dimen>
     <dimen name="d328_size">328dp</dimen>
-    <dimen name="d352_size">352dp</dimen>
     <dimen name="d410_size">410dp</dimen>
 </resources>

@@ -3,9 +3,9 @@ package remix.myplayer.ui;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.NinePatchDrawable;
 import android.support.annotation.ColorInt;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +13,7 @@ import android.view.View;
 
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 
 /**
@@ -32,9 +33,7 @@ public class ListItemDecoration extends RecyclerView.ItemDecoration {
     private int mOrientation;
 
     public ListItemDecoration(Context context, int orientation) {
-        final TypedArray typedArray = context.obtainStyledAttributes(ATTRS);
-        mDivider = Theme.TintDrawable(typedArray.getDrawable(0), ColorUtil.getColor(R.color.list_divider));
-        typedArray.recycle();
+        mDivider = Theme.TintDrawable(context.getResources().getDrawable(R.drawable.bg_divider), ThemeStore.getDividerColor());
         setOrientation(orientation);
     }
 

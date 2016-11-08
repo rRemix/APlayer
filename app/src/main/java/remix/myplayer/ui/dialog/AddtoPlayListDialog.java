@@ -29,7 +29,6 @@ import remix.myplayer.adapter.AddtoPlayListAdapter;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.PlayListSongInfo;
-import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;

@@ -12,7 +12,6 @@
        android:orientation="vertical">
        <RelativeLayout
            android:layout_width="match_parent"
-           android:id="@+id/blur_container"
            android:layout_height="0dp"
            android:layout_weight="7">
            <!-- 顶部自定义actionbar、-->

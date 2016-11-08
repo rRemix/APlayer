@@ -1,7 +1,6 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +16,6 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.interfaces.OnModeChangeListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.ColorUtil;
 
 /**
  * @ClassName
@@ -74,13 +72,13 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
             }
         });
         holder.mRoot.setSelected(mSelectIndex == position);
-        holder.mRoot.setBackground(
-                Theme.getPressAndSelectedStateListRippleDrawable(
-                        mContext,
-                        R.drawable.bg_list_default_day,
-                        R.drawable.bg_list_default_day,
-                        ColorUtil.getColor(R.color.drawer_selected),
-                        Color.WHITE));
+//        holder.mRoot.setBackground(
+//                Theme.getPressAndSelectedStateListRippleDrawable(
+//                        mContext,
+//                        R.drawable.bg_drawer_default,
+//                        R.drawable.bg_drawer_default,
+//                        ColorUtil.getColor(R.color.drawer_selected),
+//                        Color.WHITE));
 
     }
 

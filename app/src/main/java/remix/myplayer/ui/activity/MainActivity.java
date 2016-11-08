@@ -4,6 +4,7 @@ package remix.myplayer.ui.activity;
 import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,7 +22,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -491,6 +491,9 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             public void onDrawerStateChanged(int newState) {
             }
         });
+
+        mAddButton.setBackgroundTintList(ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? R.color.select_model_button_color : R.color.purple_782899)));
+        mAddButton.setRippleColor(ColorUtil.getColor(R.color.day_ripple_color));
     }
 
     @Override

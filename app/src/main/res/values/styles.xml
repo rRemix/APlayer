@@ -68,7 +68,7 @@
     </style>
     <style name="CustomTabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">@dimen/s16_size</item>
-        <item name="android:textColor">@color/list_divider</item>
+        <item name="android:textColor">@color/day_list_divider</item>
         <item name="textAllCaps">true</item>
     </style>
 
@@ -100,10 +100,6 @@
     </style>
 
     <!--popup_style-->
-    <style name="popwin_anim_style">
-        <item name="android:windowEnterAnimation">@anim/popup_in</item>
-        <item name="android:windowExitAnimation">@anim/popup_out</item>
-    </style>
 
     <style name="ActivityAnim">
         <item name="android:activityOpenExitAnimation">@anim/slide_left_out</item>

@@ -18,11 +18,11 @@ import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
-import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.PlayListInfo;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.FolderActivity;
+import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -151,8 +151,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                 .itemsCallback(new MaterialDialog.ListCallback() {
                     @Override
                     public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                        final int num;
-                        num = PlayListUtil.addMultiSongs(idList,playListInfoList.get(which).Name,playListInfoList.get(which)._Id);
+                        final int num = PlayListUtil.addMultiSongs(idList,playListInfoList.get(which).Name,playListInfoList.get(which)._Id);
                         ToastUtil.show(mContext,mContext.getString(R.string.add_song_playlist_success,num,playListInfoList.get(which).Name));
                         UpdateOptionMenu(false);
                     }
@@ -223,7 +222,6 @@ public class MultiChoice implements OnMultiItemClickListener {
                     if (arg instanceof Integer)
                         idList.add((Integer) arg);
                 }
-                MP3Item temp = MediaStoreUtil.getMP3InfoById(idList.get(0));
                 num = PlayListUtil.deleteMultiSongs(idList,ChildHolderActivity.mId);
                 break;
             case Constants.ALBUM:
@@ -279,6 +277,7 @@ public class MultiChoice implements OnMultiItemClickListener {
     public void itemAddorRemoveWithLongClick(View view,int position,Object arg,String newTag,int type){
         //当前没有处于多选状态
         if(!mIsShow && TAG.equals("")){
+            CommonUtil.Vibrate(mContext,200);
             TAG = newTag;
             TYPE = type;
             mIsShow = true;

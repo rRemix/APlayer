@@ -34,7 +34,6 @@ import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;

@@ -3,17 +3,11 @@ package remix.myplayer.db;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.UriMatcher;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.Handler;
 import android.support.annotation.Nullable;
-
-import java.util.ArrayList;
-import java.util.Objects;
 
 import remix.myplayer.application.Application;
 import remix.myplayer.util.LogUtil;

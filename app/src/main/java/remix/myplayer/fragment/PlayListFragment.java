@@ -3,6 +3,7 @@ package remix.myplayer.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -24,7 +25,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
@@ -77,7 +78,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
 
         ListModel = SPUtil.getValue(getActivity(),"Setting","PlayListModel",2);
         mItemDecoration = new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST);
-        mItemDecoration.setDividerColor(ColorUtil.getColor(ListModel == Constants.LIST_MODEL ? R.color.list_divider : R.color.transparent));
+        mItemDecoration.setDividerColor(ListModel == Constants.LIST_MODEL ? ThemeStore.getDividerColor() : Color.TRANSPARENT);
         mRecyclerView.addItemDecoration(mItemDecoration);
         mRecyclerView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
 
@@ -116,12 +117,13 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
         });
         mRecyclerView.setAdapter(mAdapter);
 
-        mListModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list2));
-        mListModelBtn.setSelected(ListModel == Constants.LIST_MODEL);
+//        mListModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list2));
+//        mListModelBtn.setSelected(ListModel == Constants.LIST_MODEL);
+//        mGridModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list1));
+//        mGridModelBtn.setSelected(ListModel == Constants.GRID_MODEL);
 
-        mGridModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list1));
-        mGridModelBtn.setSelected(ListModel == Constants.GRID_MODEL);
-
+        mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+        mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         return rootView;
     }
 
@@ -162,11 +164,14 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
                 int newModel = v.getId() == R.id.list_model ? Constants.LIST_MODEL : Constants.GRID_MODEL;
                 if(newModel == ListModel)
                     return;
-                mListModelBtn.setSelected(v.getId() == R.id.list_model);
-                mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
                 ListModel = newModel;
+                mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+                mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+//                mListModelBtn.setSelected(v.getId() == R.id.list_model);
+//                mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
+
                 mRecyclerView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-                mItemDecoration.setDividerColor(ColorUtil.getColor(ListModel == Constants.LIST_MODEL ? R.color.list_divider : R.color.transparent));
+                mItemDecoration.setDividerColor(ListModel == Constants.LIST_MODEL ? ThemeStore.getDividerColor() : Color.TRANSPARENT);
                 SPUtil.putValue(getActivity(),"Setting","PlayListModel",ListModel);
                 break;
 

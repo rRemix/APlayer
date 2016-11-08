@@ -2,7 +2,6 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="64dp"
-    android:id="@+id/notify_container"
     android:orientation="horizontal">
 
     <ImageView
@@ -23,7 +22,6 @@
             android:scaleType="centerCrop"/>
 
         <LinearLayout
-            android:id="@+id/notify_info_container"
             android:layout_marginLeft="@dimen/d12_size"
             android:layout_width="@dimen/d120_size"
             android:layout_height="match_parent"

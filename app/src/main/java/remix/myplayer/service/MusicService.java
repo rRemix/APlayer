@@ -30,7 +30,6 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.observer.DBObserver;
 import remix.myplayer.observer.MediaStoreObserver;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
-import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.FolderActivity;

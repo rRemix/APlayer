@@ -13,9 +13,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.lrc.SearchLRC;
 import remix.myplayer.lrc.LrcRow;
 import remix.myplayer.lrc.LrcView;
+import remix.myplayer.lrc.SearchLRC;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
 

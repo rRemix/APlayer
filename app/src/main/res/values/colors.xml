@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
     <!-- A semi-transparent dark Holo shade of blue -->
-    <color name="holo_blue_dark">#ff0099cc</color>
-    <color name="holo_dark">#ffffffff</color>
 
     <!-- Transparent -->
     <color name="transparent">#00000000</color>
-    <color name="translucence">#30000000</color>
     <!--分割线-->
-    <color name="divider">#c0c0c0</color>
     <!-- 轨道背景-->
-    <color name="progress_bg">#d1d0ce</color>
     <!-- 已完成轨道背景-->
-    <color name="progress_complete">#8e24aa</color>
 
     <!-- 主色-->
     <color name="background_color_main">#242428</color>
@@ -26,11 +17,11 @@
     <!-- 背景色3-->
     <color name="background_color_3">#1d1a1d</color>
     <!--statusbar color-->
-    <color name="statusbar_color">#1d1a1d</color>
 
 
     <!-- 分割线颜色-->
-    <color name="list_divider">#ededed</color>
+    <color name="day_list_divider">#ededed</color>
+    <color name="night_list_divier">#322f33</color>
     <!--侧滑菜单选中颜色-->
     <color name="drawer_selected">#f5f5f5</color>、
     <!--默认的colorControlHighLight-->
@@ -38,12 +29,12 @@
     <color name="day_selected_color">#1f000000</color>
     <color name="night_selected_color">#f1f1f1</color>
     <color name="night_ripple_color">#f1f1f1</color>
+    <color name="default_model_button_color">#e2e4e8</color>
+    <color name="select_model_button_color">#ffce64</color>
     <!--<color name="night_selected_color">@color/default_control_highlight</color>-->
 
     <!-- 点缀色-->
-    <color name="intersperse_color">@color/purple_782899</color>
     <!-- 抽屉字体颜色-->
-    <color name="drawer_text_color">#929092</color>
     <!-- 抽屉ListView背景颜色-->
     <color name="drawer_list_color">#1d1a1d</color>
 
@@ -57,19 +48,12 @@
     <!--黑色字体-->
     <color name="black_1b1a1c">#1b1a1c</color>
     <!-- 歌曲库标题选中与未选中-->
-    <color name="text_allsong_unsel">#666466</color>
-    <color name="text_allsong_sel">#ffffffff</color>
     <!-- 定时器背景色-->
-    <color name="background_timer_color">#efeef0</color>
     <!--光标颜色(灰))-->
-    <color name="cursor_color_gray">#484746</color>
     <!--光标颜色(紫)-->
-    <color name="cursor_color_purple">@color/purple_782899</color>
     <color name="black_1c1b19">#1c1b19</color>
     <color name="black_1b1c19">#1b1c19</color>
-    <color name="black_5b5a58">#5b5a58</color>
     <color name="black_737373">#737373</color>
-    <color name="black_80000000">#80000000</color>
     <color name="gray_34353a">#34353a</color>
     <color name="black">#000000</color>
     <color name="gray_6d6c69">#6d6c69</color>
@@ -77,7 +61,6 @@
     <color name="white_f6f6f5">#f6f6f5</color>
     <color name="white_f4f4f5">#f4f4f5</color>
     <color name="purple_782899">#782899</color>
-    <color name="purple_8e24aa">#8e24aa</color>
     <color name="gray_d3d2d3">#d3d2d3</color>
     <color name="gray_272628">#272628</color>
     <color name="gray_b2b1b2">#b2b1b2</color>
@@ -93,13 +76,9 @@
     <color name="day_background_color_1">@color/white</color>
     <color name="day_background_color_2">#f7f7f6</color>
     <color name="day_background_color_3">@color/white</color>
-    <color name="day_card_color">#f7f7f7</color>
-    <color name="day_interval_color">#edeceb</color>
-    <color name="day_aboutus_background_color">@color/background_color_3</color>
     <color name="day_scan_track_color">#edeceb</color>
     <color name="day_nonenable_track_color">#ececec</color>
     <color name="day_nonenable_progress_color">#d2d2d2</color>
-    <color name="day_nonenable_thumb_color">#bbbbbb</color>
     <color name="day_nonenable_text_color">#afafaf</color>
     <color name="day_enable_track_color">#d8d8d8</color>
     <color name="day_enable_text_color">#808080</color>
@@ -110,14 +89,10 @@
     <color name="night_background_color_1">@color/background_color_1</color>
     <color name="night_background_color_2">@color/background_color_2</color>
     <color name="night_background_color_3">@color/background_color_3</color>
-    <color name="night_card_color">@color/background_color_2</color>
     <color name="night_interval_color">#e2e1e2</color>
-    <color name="night_aboutus_background_color">#cccccc</color>
     <color name="night_scan_track_color">@color/gray_6d6c69</color>
-    <color name="night_dot_color">@color/white</color>
     <color name="night_nonenable_track_color">@color/white</color>
     <color name="night_nonenable_progress_color">@color/purple_782899</color>
-    <color name="night_nonenable_thumb_color">@color/purple_782899</color>
     <color name="night_nonenable_text_color">@color/white</color>
     <color name="night_enable_track_color">@color/white</color>
     <color name="night_enable_text_color">@color/white</color>

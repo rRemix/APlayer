@@ -8,20 +8,22 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/d48_size"
         android:background="@color/white">
-        <ImageView
+        <ImageButton
             android:id="@+id/list_model"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/btn_list2"
+            android:background="@color/transparent"
             android:layout_alignParentRight="true"
             android:layout_marginLeft="@dimen/d18_size"
             android:layout_marginRight="@dimen/d18_size"
             android:layout_centerVertical="true"/>
-        <ImageView
+        <ImageButton
             android:id="@+id/grid_model"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/btn_list1"
+            android:background="@color/transparent"
             android:layout_toLeftOf="@id/list_model"
             android:layout_centerVertical="true"/>
     </RelativeLayout>

@@ -14,7 +14,6 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 
 /**
  * @ClassName

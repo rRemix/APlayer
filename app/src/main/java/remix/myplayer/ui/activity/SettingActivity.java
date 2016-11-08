@@ -3,8 +3,6 @@ package remix.myplayer.ui.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
@@ -20,7 +18,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.util.DialogUtils;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
@@ -31,12 +28,11 @@ import butterknife.OnClick;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.R;
 import remix.myplayer.db.DBOpenHelper;
-import remix.myplayer.ui.dialog.FolderChooserDialog;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.ColorChooseDialog;
-import remix.myplayer.util.ColorUtil;
+import remix.myplayer.ui.dialog.FolderChooserDialog;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DiskCache;
@@ -112,32 +108,39 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     }
         });
 
-        //初始化点击效果
-        TypedArray a = getTheme().obtainStyledAttributes(new int[]{R.attr.selectableItemBackground});
-        try {
-            final Drawable drawable = a.getDrawable(0);
-            ButterKnife.apply(new View[]{findView(R.id.setting_filter_container),findView(R.id.setting_lrc_container),findView(R.id.setting_color_container),
-                            findView(R.id.setting_notify_container),findView(R.id.setting_eq_container),findView(R.id.setting_feedback_container),
-                            findView(R.id.setting_about_container),findView(R.id.setting_update_container),findView(R.id.setting_clear_container)},
-                    new ButterKnife.Action<View>() {
-                        @Override
-                        public void apply(@NonNull View view, int index) {
-                            final Drawable defaultDrawable = Theme.TintDrawable(getResources().getDrawable(R.drawable.bg_list_default_day),ThemeStore.getBackgroundColor3());
-                            final Drawable selectDrawable = Theme.TintDrawable(getResources().getDrawable(R.drawable.bg_list_default_day), ThemeStore.getRippleColor());
-                            final Drawable containerDrawable = Theme.getPressDrawable(
-                                    defaultDrawable,
-                                    selectDrawable,
-                                    ThemeStore.getRippleColor(),
-                                    defaultDrawable,
-                                    null);
+        ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),findView(R.id.setting_divider_3)},
+                new ButterKnife.Action<View>() {
+                    @Override
+                    public void apply(@NonNull View view, int index) {
+                        view.setBackgroundColor(ThemeStore.getDividerColor());
+                    }
+                });
 
-//                            view.setBackground(drawable);
-                        }
-                    });
-        } finally {
-            a.recycle();
-        }
-
+//        //初始化点击效果
+//        TypedArray a = getTheme().obtainStyledAttributes(new int[]{R.attr.selectableItemBackground});
+//        try {
+//            final Drawable drawable = a.getDrawable(0);
+//            ButterKnife.apply(new View[]{findView(R.id.setting_filter_container),findView(R.id.setting_lrc_container),findView(R.id.setting_color_container),
+//                            findView(R.id.setting_notify_container),findView(R.id.setting_eq_container),findView(R.id.setting_feedback_container),
+//                            findView(R.id.setting_about_container),findView(R.id.setting_update_container),findView(R.id.setting_clear_container)},
+//                    new ButterKnife.Action<View>() {
+//                        @Override
+//                        public void apply(@NonNull View view, int index) {
+//                            final Drawable defaultDrawable = Theme.TintDrawable(getResources().getDrawable(R.drawable.bg_list_default_day),ThemeStore.getBackgroundColor3());
+//                            final Drawable selectDrawable = Theme.TintDrawable(getResources().getDrawable(R.drawable.bg_list_default_day), ThemeStore.getRippleColor());
+//                            final Drawable containerDrawable = Theme.getPressDrawable(
+//                                    defaultDrawable,
+//                                    selectDrawable,
+//                                    ThemeStore.getRippleColor(),
+//                                    defaultDrawable,
+//                                    null);
+//                            view.setBackground(containerDrawable);
+//                        }
+//                    });
+//
+//        } finally {
+//            a.recycle();
+//        }
 
         //计算缓存大小
         new Thread(){

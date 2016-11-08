@@ -92,10 +92,10 @@
                 </RelativeLayout>
 
                 <View
+                    android:id="@+id/setting_divider_1"
                     android:layout_below="@id/setting_lrc_container"
                     android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:background="@drawable/divider"/>
+                    android:layout_height="1px" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -184,10 +184,10 @@
                 </RelativeLayout>
 
                 <View
+                    android:id="@+id/setting_divider_2"
                     android:layout_below="@id/setting_notify_container"
                     android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:background="@drawable/divider"/>
+                    android:layout_height="1px" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -340,10 +340,10 @@
                 </RelativeLayout>
 
                 <View
+                    android:id="@+id/setting_divider_3"
                     android:layout_below="@id/setting_clear_container"
                     android:layout_width="match_parent"
-                    android:layout_height="1px"
-                    android:background="@drawable/divider"/>
+                    android:layout_height="1px" />
             </RelativeLayout>
         </LinearLayout>
     </ScrollView>

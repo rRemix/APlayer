@@ -11,7 +11,6 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/d100_size"
-        android:id="@+id/header_img_container"
         android:layout_marginTop="@dimen/d20_size">
         <View
             android:visibility="gone"
