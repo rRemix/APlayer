@@ -68,7 +68,6 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
             holder.mName.setText(info.Name);
             holder.mOther.setText(info.Count + "首歌曲");
             //设置专辑封面
-
             new AsynLoadImage(holder.mImage).execute(info._Id,Constants.URL_PLAYLIST,true);
 
             if(mOnItemClickLitener != null) {
@@ -122,9 +121,9 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
                 }
             }
 
-            //item点击效果
-            holder.mContainer.setBackground(
-                    Theme.getPressAndSelectedStateListRippleDrawable(PlayListFragment.getModel(),mContext));
+//            //背景点击效果
+//            holder.mContainer.setBackground(
+//                    Theme.getPressAndSelectedStateListRippleDrawable(PlayListFragment.getModel(),mContext));
 
             //是否处于选中状态
             if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&

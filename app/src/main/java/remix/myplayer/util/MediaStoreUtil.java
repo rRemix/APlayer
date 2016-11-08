@@ -693,7 +693,7 @@ public class MediaStoreUtil {
      */
     public static ArrayList<Integer> getSongIdListByCursor(Cursor cursor){
         ArrayList<Integer> ids = new ArrayList<>();
-        if(cursor != null && !cursor.isClosed() && cursor.moveToFirst()){
+        if(cursor != null && !cursor.isClosed() && cursor.getCount() > 0){
             while (cursor.moveToNext()){
                 ids.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
             }

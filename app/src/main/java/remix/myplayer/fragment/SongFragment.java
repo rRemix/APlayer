@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.bmob.v3.b.The;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
@@ -131,8 +132,9 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         });
         mRecyclerView.setAdapter(mAdapter);
 
-//        rootView.findViewById(R.id.paly_shuffle).setBackground(Theme.TintDrawable(getResources().getDrawable(R.drawable.bg_btn_common_play_shuffle),ThemeStore.getMaterialPrimaryColor()));
-        Theme.TintDrawable(rootView.findViewById(R.id.play_shuffle_button),R.drawable.common_btn_normal_shuffle, ThemeStore.getMaterialPrimaryColor());
+//        ((ImageButton)rootView.findViewById(R.id.play_shuffle_button)).setImageDrawable(
+//                Theme.TintDrawable(getResources().getDrawable(R.drawable.common_btn_normal_shuffle),ThemeStore.getMaterialPrimaryColor()));
+//        Theme.TintDrawable(rootView.findViewById(R.id.play_shuffle_button),R.drawable.common_btn_normal_shuffle, ThemeStore.getMaterialPrimaryColor());
 
         return rootView;
     }

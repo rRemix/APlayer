@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +30,7 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.activity.RecetenlyActivity;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
@@ -78,12 +81,12 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
             return;
         }
 
-        final MP3Item temp = new MP3Item(mCursor.getInt(SongFragment.mSongId),
-                mCursor.getString(SongFragment.mDisPlayNameIndex),
-                mCursor.getString(SongFragment.mTitleIndex),
-                mCursor.getString(SongFragment.mAlbumIndex),
-                mCursor.getInt(SongFragment.mAlbumIdIndex),
-                mCursor.getString(SongFragment.mArtistIndex),0,"","",0,"");
+        final MP3Item temp = new MP3Item(mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media._ID)),
+                mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
+                mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)),
+                mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)),
+                mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
+                mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),0,"","",0,"");
 
         //获得当前播放的歌曲
         final MP3Item currentMP3 = MusicService.getCurrentMP3();
@@ -126,9 +129,12 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
 //                    .build();
 //            holder.mImage.setController(controller);
 
+//            //背景点击效果
+//            holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
+
             File imgFile = MediaStoreUtil.getImageUrlInCache(temp.getAlbumId(),Constants.URL_ALBUM);
             if(imgFile.exists()) {
-                holder.mImage.setImageURI(Uri.parse("file:///" + imgFile));
+                holder.mImage.setImageURI(Uri.parse("file://" + imgFile));
             } else {
                 holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), temp.getAlbumId()));
             }
@@ -143,6 +149,7 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
             int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
             Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
 
+            //按钮点击效果
             holder.mButton.setBackground(Theme.getPressDrawable(
                     mDefaultDrawable,
                     mSelectDrawable,
@@ -185,13 +192,13 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
             } else {
                 holder.mContainer.setSelected(false);
             }
-//        } else {
-//            if(MultiChoice.TAG.equals(RecetenlyActivity.TAG) &&
-//                    RecetenlyActivity.MultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
-//                RecetenlyActivity.MultiChoice.AddView(holder.mContainer);
-//            } else {
-//                holder.mContainer.setSelected(false);
-//            }
+        } else {
+            if(MultiChoice.TAG.equals(RecetenlyActivity.TAG) &&
+                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+                mMultiChoice.AddView(holder.mContainer);
+            } else {
+                holder.mContainer.setSelected(false);
+            }
         }
 
     }
@@ -200,7 +207,6 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
     public int getItemCount() {
         return mCursor != null && !mCursor.isClosed() ? mCursor.getCount() : 0;
     }
-
 
     public static class SongViewHolder extends BaseViewHolder{
         @BindView(R.id.song_title)

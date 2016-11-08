@@ -77,9 +77,10 @@ public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
                 //设置封面
                 holder.mImage.setImageURI(Uri.EMPTY);
                 new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId,Constants.URL_ARTIST,true);
-                //item点击效果
-                holder.mContainer.setBackground(
-                        Theme.getPressAndSelectedStateListRippleDrawable(ArtistFragment.getModel(),mContext));
+
+//                //item点击效果
+//                holder.mContainer.setBackground(
+//                        Theme.getPressAndSelectedStateListRippleDrawable(ArtistFragment.getModel(),mContext));
 
             } catch (Exception e){
                 e.printStackTrace();
@@ -106,6 +107,7 @@ public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
                 int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
                 Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
 
+                //按钮点击效果
                 int size = DensityUtil.dip2px(mContext,45);
                 Drawable defaultDrawable = Theme.getShape(ArtistFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
                 Drawable selectDrawable = Theme.getShape(ArtistFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getRippleColor(), size, size);

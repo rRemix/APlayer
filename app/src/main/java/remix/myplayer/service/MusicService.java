@@ -437,10 +437,10 @@ public class MusicService extends BaseService {
         if((mCurrent = position) == -1 || (mCurrent > Global.mPlayQueue.size() - 1))
             return;
         mId = Global.mPlayQueue.get(mCurrent);
-        MP3Item temp = mInfo;
+
         mInfo = MediaStoreUtil.getMP3InfoById(mId);
         if(mInfo == null) {
-            mInfo = temp;
+
             ToastUtil.show(mContext,R.string.song_lose_effect);
             return;
         }

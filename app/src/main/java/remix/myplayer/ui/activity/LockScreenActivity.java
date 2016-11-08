@@ -319,10 +319,10 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
                     if(mSwatch == null)
                         mSwatch = new Palette.Swatch(Color.GRAY,100);
 
-                    mSongColor = ColorUtil.shiftColor(mSwatch.getRgb(),1.2f);
-                    mArtistColor = ColorUtil.shiftColor(mSwatch.getRgb(),1.1f);
-//                    mSongColor = mSwatch.getBodyTextColor();
-//                    mArtistColor = mSwatch.getTitleTextColor();
+//                    mSongColor = ColorUtil.shiftColor(mSwatch.getRgb(),1.2f);
+//                    mArtistColor = ColorUtil.shiftColor(mSwatch.getRgb(),1.1f);
+                    mSongColor = mSwatch.getBodyTextColor();
+                    mArtistColor = mSwatch.getTitleTextColor();
                 }
             });
             mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);

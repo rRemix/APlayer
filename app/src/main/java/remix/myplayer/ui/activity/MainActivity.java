@@ -440,16 +440,20 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                     case 0:
                         mDrawerLayout.closeDrawer(mNavigationView);
                         break;
-                    //文件夹
+                    //最近添加
                     case 1:
+                        startActivity(new Intent(MainActivity.this,RecetenlyActivity.class));
+                        break;
+                    //文件夹
+                    case 2:
                         startActivity(new Intent(MainActivity.this, FolderActivity.class));
                         break;
                     //夜间模式
-                    case 2:
+                    case 3:
                         setNightMode(ThemeStore.isDay());
                         break;
                     //设置
-                    case 3:
+                    case 4:
                         startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), RESULT_UPDATE_THEME);
                         break;
                 }

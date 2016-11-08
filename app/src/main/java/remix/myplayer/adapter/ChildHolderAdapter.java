@@ -48,8 +48,8 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
         this.mArg = arg;
         this.mMultiChoice = multiChoice;
         int size = DensityUtil.dip2px(mContext,60);
-        mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
-        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getRippleColor(),size,size);
+        mDefaultDrawable = Theme.getShape(GradientDrawable.RECTANGLE,Color.TRANSPARENT,size,size);
+        mSelectDrawable = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getRippleColor(),size,size);
     }
 
     public void setList(ArrayList<MP3Item> list){
@@ -100,14 +100,12 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
             //设置标题
             holder.mTitle.setText(CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE));
 
-            //item点击效果
-            Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext);
-
             if(holder.mButton != null) {
                 //设置按钮着色
                 int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
                 Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
 
+                //item点击效果
                 holder.mButton.setBackground(Theme.getPressDrawable(
                         mDefaultDrawable,
                         mSelectDrawable,
@@ -128,10 +126,11 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
                         mContext.startActivity(intent);
                     }
                 });
-
-
             }
         }
+
+//        //背景点击效果
+//        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 
         if(holder.mContainer != null && mOnItemClickLitener != null){
             holder.mContainer.setOnClickListener(new View.OnClickListener() {

@@ -10,8 +10,7 @@
         android:id="@+id/shuffle_container"
         android:layout_width="match_parent"
         android:layout_height="@dimen/d38_size"
-        android:background="@color/night_interval_color"
-        android:orientation="horizontal">
+        android:background="@color/night_interval_color">
         <ImageButton
             android:id="@+id/play_shuffle_button"
             android:layout_centerVertical="true"
@@ -19,13 +18,16 @@
             android:layout_height="wrap_content"
             android:src="@drawable/common_btn_normal_shuffle"
             android:background="@color/transparent"
-            android:layout_marginLeft="@dimen/d16_size" />
+            android:layout_marginLeft="@dimen/d16_size"
+            android:layout_alignParentLeft="true"/>
         <TextView
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/day_textcolor"
             android:text="@string/play_random"
-            android:layout_marginLeft="@dimen/d72_size"/>
+            android:layout_toRightOf="@id/play_shuffle_button"
+            android:layout_marginLeft="@dimen/d16_size" />
     </RelativeLayout>
 
     <LinearLayout

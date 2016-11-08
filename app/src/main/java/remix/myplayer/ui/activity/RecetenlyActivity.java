@@ -97,8 +97,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         MobclickAgent.onEvent(this,"RecentlyAdd");
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recently);
         ButterKnife.bind(this);
@@ -108,7 +106,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
             @Override
             public void onUpdate(boolean multiShow) {
                 mMultiChoice.setShowing(multiShow);
-                mToolBar.setNavigationIcon(mMultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+                mToolBar.setNavigationIcon(mMultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.common_btn_back);
                 mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -130,7 +128,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mItemDecoration = new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST);
         mRecyclerView.addItemDecoration(mItemDecoration);
-        mRecyclerView.addItemDecoration(new ListItemDecoration(this, ListItemDecoration.VERTICAL_LIST,getResources().getDrawable(R.drawable.divider)));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mAdapter = new SongAdapter(RecetenlyActivity.this, mMultiChoice,SongAdapter.RECENTLY);
@@ -234,12 +231,15 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         //获得今天日期
         Calendar today = Calendar.getInstance();
         today.setTime(new Date());
+        //最近七天
+
         return new android.content.CursorLoader(this,
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DISPLAY_NAME,MediaStore.Audio.Media.TITLE,
+                                MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ALBUM_ID,MediaStore.Audio.Media.ARTIST},
+                MediaStore.Audio.Media.DATE_ADDED + " >= " + (today.getTimeInMillis() / 1000 - (3600 * 24 * 7)) +  " and " + Constants.MEDIASTORE_WHERE_SIZE,
                 null,
-                MediaStore.Audio.Media.DATE_ADDED + ">=" + (today.getTimeInMillis() / 1000 - (3600 * 24 * 7)),
-                null,
-                null);
+                MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
     }
 
     @Override

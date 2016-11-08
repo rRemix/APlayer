@@ -6,6 +6,8 @@ package remix.myplayer.util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.provider.MediaStore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -123,6 +125,7 @@ public class Global {
             context.sendBroadcast(intent);
             return;
         }
+
         final ArrayList<Integer> oriPlayQueue = (ArrayList<Integer>) mPlayQueue.clone();
         mPlayQueue.clear();
         mPlayQueue.addAll(newQueueIdList);
@@ -130,11 +133,11 @@ public class Global {
         new Thread(){
             @Override
             public void run() {
-                try {
-                    sleep(300);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    sleep(300);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
                 long start = System.currentTimeMillis();
                 int deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue, mPlayQueueID);
                 LogUtil.d("TimeTest","DeleteTime:" + (System.currentTimeMillis() - start) );

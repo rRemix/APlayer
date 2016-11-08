@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/item_height"
-    android:id="@+id/item_root">
+    android:id="@+id/item_root"
+    android:background="?attr/background_list">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:visibility="visible"

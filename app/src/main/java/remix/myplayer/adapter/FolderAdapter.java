@@ -71,15 +71,16 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
             holder.mImg.setImageResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.icon_folder_day : R.drawable.icon_folder);
         }
 
-        //item点击效果
-        holder.mContainer.setBackground(
-                Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
+        //背景点击效果
+//        holder.mContainer.setBackground(
+//                Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 
         final String full_path = temp;
         if(holder.mButton != null) {
             int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
             Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
 
+            //item点击效果
             holder.mButton.setBackground(Theme.getPressDrawable(
                     mDefaultDrawable,
                     mSelectDrawable,

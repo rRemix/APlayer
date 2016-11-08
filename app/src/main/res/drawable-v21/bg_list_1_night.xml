@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?attr/colorControlHighlight">
+    <item android:drawable="@drawable/bg_list_1_default_night"/>
+</ripple>
+<!--<selector xmlns:android="http://schemas.android.com/apk/res/android">-->
+    <!--<item android:state_selected="true" android:drawable="@drawable/bg_list_1_select_night"/>-->
+    <!--<item>-->
+        <!--<ripple android:color="@color/night_selected_color">-->
+            <!--<item android:drawable="@drawable/bg_list_1_default_night"/>-->
+        <!--</ripple>-->
+    <!--</item>-->
+
+<!--</selector>-->

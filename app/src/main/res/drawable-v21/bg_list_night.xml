@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_selected="true" android:drawable="@drawable/bg_list_selected_night"/>
     <item>
-        <ripple android:color="@color/night_ripple_color">
+        <ripple android:color="?android:attr/colorControlHighlight">
             <item android:drawable="@drawable/bg_list_default_night"/>
         </ripple>
     </item>

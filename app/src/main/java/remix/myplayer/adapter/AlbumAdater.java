@@ -83,16 +83,14 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
                     new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);
                 }
 //                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
-                //item点击效果
-                int defaultColor = ThemeStore.isDay() ?
-                        ThemeStore.getBackgroundColorMain() :
-                        ColorUtil.getColor(AlbumFragment.getModel() == Constants.LIST_MODEL ? R.color.night_background_color_main : R.color.night_background_color_2);
-                holder.mContainer.setBackground(
-                        Theme.getPressAndSelectedStateListRippleDrawable(AlbumFragment.getModel(), mContext));
 
             } catch (Exception e){
                 e.printStackTrace();
             }
+
+//            //背景点击效果
+//            holder.mContainer.setBackground(
+//                    Theme.getPressAndSelectedStateListRippleDrawable(AlbumFragment.getModel(), mContext));
 
             if(mOnItemClickLitener != null) {
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {

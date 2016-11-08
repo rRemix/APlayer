@@ -50,6 +50,11 @@
     <attr name="background_color_3" format="color|reference"/>
     <attr name="background_grid_color" format="color|reference"/>
     <attr name="stress_color" format="color|reference"/>
+    <!--点击效果-->
+    <attr name="background_grid" format="reference"/>
+    <attr name="background_list" format="reference"/>
+    <!--设置界面选项点击效果-->
+    <attr name="background_list_1" format="reference"/>
     <!--默认专辑和艺术家封面-->
     <attr name="default_album" format="reference"/>
     <attr name="default_artist" format="reference"/>

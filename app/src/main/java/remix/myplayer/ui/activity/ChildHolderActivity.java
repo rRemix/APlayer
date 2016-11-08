@@ -95,7 +95,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
             @Override
             public void onUpdate(final boolean multiShow) {
                 mMultiChoice.setShowing(multiShow);
-                mToolBar.setNavigationIcon(mMultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
+                mToolBar.setNavigationIcon(mMultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.common_btn_back);
                 mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

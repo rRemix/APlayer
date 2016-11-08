@@ -29,9 +29,9 @@ import remix.myplayer.util.ColorUtil;
 public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
     //当前选中项
     public int mSelectIndex = 0;
-    private int[] mImgs = new int[]{R.drawable.drawer_icon_musicbox,R.drawable.darwer_icon_folder,
+    private int[] mImgs = new int[]{R.drawable.drawer_icon_musicbox,R.drawable.drawer_icon_musicbox,R.drawable.darwer_icon_folder,
                                     R.drawable.darwer_icon_night,R.drawable.darwer_icon_set};
-    private String[] mTitles = new String[]{"歌曲库","文件夹","夜间模式","设置"};
+    private String[] mTitles = new String[]{"歌曲库","最近添加","文件夹","夜间模式","设置"};
     public DrawerAdapter(Context Context) {
         super(Context);
     }
@@ -56,7 +56,7 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
         holder.mImg.setImageResource(mImgs[position]);
         Theme.TintDrawable(holder.mImg,mImgs[position],ThemeStore.getMaterialPrimaryColor());
         holder.mText.setText(mTitles[position]);
-        if(position == 2){
+        if(position == 3){
             holder.mSwitch.setVisibility(View.VISIBLE);
             holder.mSwitch.setChecked(!ThemeStore.isDay());
             holder.mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -86,7 +86,7 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
 
     @Override
     public int getItemCount() {
-        return 4;
+        return 5;
     }
 
     class DrawerHolder extends BaseViewHolder{

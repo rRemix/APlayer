@@ -32,7 +32,7 @@
                     android:layout_below="@id/setting_common_title"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
-                    android:clickable="true">
+                    android:background="?android:attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
                     android:layout_below="@id/setting_filter_container"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
-                    android:clickable="true">
+                    android:background="?android:attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -118,7 +118,7 @@
                     android:layout_below="@id/setting_color_title"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
-                    android:clickable="true">
+                    android:background="?android:attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -158,7 +158,7 @@
                     android:layout_below="@id/setting_color_container"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
-                    android:clickable="true">
+                    android:background="?android:attr/selectableItemBackground">
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -210,7 +210,7 @@
                     android:layout_below="@id/setting_other_title"
                     android:paddingTop="@dimen/d14_size"
                     android:paddingBottom="@dimen/d14_size"
-                    android:clickable="true">
+                    android:background="?android:attr/selectableItemBackground">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -237,7 +237,7 @@
                     android:layout_below="@id/setting_eq_container"
                     android:paddingTop="@dimen/d14_size"
                     android:paddingBottom="@dimen/d14_size"
-                    android:clickable="true">
+                    android:background="?android:attr/selectableItemBackground">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -264,7 +264,7 @@
                     android:layout_below="@id/setting_feedback_container"
                     android:paddingTop="@dimen/d14_size"
                     android:paddingBottom="@dimen/d14_size"
-                    android:clickable="true">
+                    android:background="?android:attr/selectableItemBackground">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -291,7 +291,7 @@
                     android:layout_below="@id/setting_about_container"
                     android:paddingTop="@dimen/d14_size"
                     android:paddingBottom="@dimen/d14_size"
-                    android:clickable="true">
+                    android:background="?android:attr/selectableItemBackground">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -318,7 +318,7 @@
                     android:layout_below="@id/setting_update_container"
                     android:paddingTop="@dimen/d14_size"
                     android:paddingBottom="@dimen/d14_size"
-                    android:clickable="true">
+                    android:background="?android:attr/selectableItemBackground">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

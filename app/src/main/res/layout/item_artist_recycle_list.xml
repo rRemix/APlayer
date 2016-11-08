@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/d56_size"
     android:minHeight="@dimen/d56_size"
-    >
+    android:background="?attr/background_list">
     <com.facebook.drawee.view.SimpleDraweeView
         android:layout_width="@dimen/d42_size"
         android:layout_height="@dimen/d42_size"
