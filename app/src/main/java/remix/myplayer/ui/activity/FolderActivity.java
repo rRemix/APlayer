@@ -19,7 +19,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.FolderAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -50,7 +49,6 @@ public class FolderActivity extends MultiChoiceActivity {
             }
         }
     };
-    private ListItemDecoration mItemDecoration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +86,7 @@ public class FolderActivity extends MultiChoiceActivity {
         });
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mItemDecoration = new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST);
-        mRecyclerView.addItemDecoration(mItemDecoration);
+        mRecyclerView.addItemDecoration(new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mAdapter = new FolderAdapter(this,mMultiChoice);

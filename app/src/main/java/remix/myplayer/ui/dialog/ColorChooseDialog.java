@@ -36,8 +36,8 @@ public class ColorChooseDialog extends BaseDialogActivity {
     LinearLayout mColorContainer;
     private final int[] mColors = new int[]{R.color.md_red_primary,R.color.md_brown_primary,R.color.md_navy_primary,
             R.color.md_green_primary,R.color.md_yellow_primary,R.color.md_purple_primary,R.color.md_indigo_primary,R.color.md_plum_primary};
-    private final String[] mColorTexts = new String[]{"韩红色","灰汁色","青碧色","常盤色","藤黄色",
-                                                        "结梗色","色","红梅色"};
+    private final String[] mColorTexts = new String[]{"韓紅色","灰汁色","青碧色","常盤色","藤黄色",
+                                                        "桔梗色","竜膽色","红梅色"};
     private final int[] mThemeColors = new int[]{ThemeStore.THEME_RED,ThemeStore.THEME_BROWN,ThemeStore.THEME_NAVY,
             ThemeStore.THEME_GREEN,ThemeStore.THEME_YELLOW,ThemeStore.THEME_PURPLE,ThemeStore.THEME_INDIGO,ThemeStore.THEME_PLUM};
 

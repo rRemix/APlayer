@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -68,6 +69,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
 
         mAudioID = (int)getIntent().getExtras().getLong("Id");
 
+
         mAdapter = new AddtoPlayListAdapter(this);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
@@ -88,6 +90,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
             }
         });
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         getSupportLoaderManager().initLoader(LOADER_ID++, null, this);

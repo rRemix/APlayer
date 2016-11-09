@@ -152,12 +152,12 @@
         <item name="default_artist">@drawable/artist_empty_bg_night</item>
         <item name="ripple_color">@color/night_ripple_color</item>
         <item name="stress_color">@color/purple_782899</item>
-        <item name="colorControlHighlight">@color/night_ripple_color</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Dark</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
         <item name="android:textColor">@color/md_brown_primary</item>
         <item name="colorControlActivated">@color/purple_782899</item>
         <item name="colorAccent">@color/purple_782899</item>
+        <item name="colorControlHighlight">@color/night_ripple_color</item>
     </style>
 
     <style name="DayTheme.Red" parent="@style/DayTheme">

@@ -88,8 +88,8 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
             }
 
 //            //背景点击效果
-//            holder.mContainer.setBackground(
-//                    Theme.getPressAndSelectedStateListRippleDrawable(AlbumFragment.getModel(), mContext));
+            holder.mContainer.setBackground(
+                    Theme.getPressAndSelectedStateListRippleDrawable(AlbumFragment.getModel(), mContext));
 
             if(mOnItemClickLitener != null) {
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {
@@ -106,7 +106,6 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
                         return true;
                     }
                 });
-
             }
 
             if(holder.mButton != null) {

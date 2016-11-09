@@ -105,6 +105,7 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
                         }
                     });
                     holder.mButton.setClickable(true);
+                    //点击效果
                     int size = DensityUtil.dip2px(mContext,45);
                     Drawable defaultDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
                     Drawable selectDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getRippleColor(), size, size);
@@ -120,9 +121,9 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
                 }
             }
 
-//            //背景点击效果
-//            holder.mContainer.setBackground(
-//                    Theme.getPressAndSelectedStateListRippleDrawable(PlayListFragment.getModel(),mContext));
+            //背景点击效果
+            holder.mContainer.setBackground(
+                    Theme.getPressAndSelectedStateListRippleDrawable(PlayListFragment.getModel(),mContext));
 
             //是否处于选中状态
             if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&

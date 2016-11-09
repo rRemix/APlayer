@@ -4,14 +4,12 @@ package remix.myplayer.ui.activity;
 import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -22,6 +20,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,7 +77,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     @BindView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
     @BindView(R.id.add)
-    FloatingActionButton mAddButton;
+    ImageView mAddButton;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
 
@@ -492,8 +491,8 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             }
         });
 
-        mAddButton.setBackgroundTintList(ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? R.color.select_model_button_color : R.color.purple_782899)));
-        mAddButton.setRippleColor(ColorUtil.getColor(R.color.day_ripple_color));
+//        mAddButton.setBackgroundTintList(ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? R.color.select_model_button_color : R.color.purple_782899)));
+//        mAddButton.setRippleColor(ColorUtil.getColor(R.color.day_ripple_color));
     }
 
     @Override
@@ -613,9 +612,9 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         if(simpleDraweeView != null){
             simpleDraweeView.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mp3Item.getAlbumId()));
         }
-        if(shadow != null){
-            shadow.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.drawable.drawer_bg_album);
-        }
+//        if(shadow != null){
+//            shadow.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.drawable.drawer_bg_album);
+//        }
 
     }
 

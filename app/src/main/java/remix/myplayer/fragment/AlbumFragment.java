@@ -88,7 +88,6 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         mItemDecoration = new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST);
         mItemDecoration.setDividerColor(ListModel == Constants.LIST_MODEL ? ThemeStore.getDividerColor() : Color.TRANSPARENT);
         mRecycleView.addItemDecoration(mItemDecoration);
-
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
 
         if(getActivity() instanceof MultiChoiceActivity){

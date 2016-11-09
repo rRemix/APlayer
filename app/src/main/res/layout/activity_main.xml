@@ -49,19 +49,28 @@
                     android:background="?attr/background_color_main"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-                <android.support.design.widget.FloatingActionButton
+                <ImageView
                     android:id="@+id/add"
                     android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/icon_floatingbtn"
                     android:layout_gravity="bottom|right"
                     android:layout_marginRight="@dimen/d30_size"
-                    android:layout_marginBottom="@dimen/d20_size"
-                    android:clickable="true"
-                    android:src="@drawable/playlist_fab_btn_add"
-                    app:backgroundTint="@color/select_model_button_color"
-                    app:elevation="@dimen/d4_size"
-                    app:pressedTranslationZ="@dimen/d4_size"/>
+                    android:layout_marginBottom="@dimen/d20_size"/>
+                <!--<android.support.design.widget.FloatingActionButton-->
+                    <!--android:id="@+id/add"-->
+                    <!--android:visibility="gone"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="bottom|right"-->
+                    <!--android:layout_marginRight="@dimen/d30_size"-->
+                    <!--android:layout_marginBottom="@dimen/d20_size"-->
+                    <!--android:clickable="true"-->
+                    <!--android:src="@drawable/playlist_fab_btn_add"-->
+                    <!--app:backgroundTint="@color/select_model_button_color"-->
+                    <!--app:elevation="@dimen/d4_size"-->
+                    <!--app:pressedTranslationZ="@dimen/d4_size"/>-->
             </android.support.design.widget.CoordinatorLayout>
         </RelativeLayout>
     </LinearLayout>

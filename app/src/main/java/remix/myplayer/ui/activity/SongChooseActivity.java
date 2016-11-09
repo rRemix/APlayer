@@ -4,6 +4,7 @@ import android.content.CursorLoader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -50,7 +51,6 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
     private SongChooseAdaper mAdapter;
-    private ListItemDecoration mItemDecoration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +80,8 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
         getLoaderManager().initLoader(LOADER_ID++, null, this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAdapter);
-        mItemDecoration = new ListItemDecoration(this, ListItemDecoration.VERTICAL_LIST);
-        mRecyclerView.addItemDecoration(mItemDecoration);
+        mRecyclerView.addItemDecoration(new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mConfirm.setAlpha(0.6f);
     }
 

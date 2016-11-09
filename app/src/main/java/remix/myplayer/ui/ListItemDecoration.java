@@ -1,50 +1,43 @@
 package remix.myplayer.ui;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.NinePatchDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.ColorInt;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import remix.myplayer.R;
-import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.ColorUtil;
 
 /**
  * Created by taeja on 16-6-23.
  */
 public class ListItemDecoration extends RecyclerView.ItemDecoration {
-    private static final int[] ATTRS = new int[]{
-            android.R.attr.listDivider,
-    };
+    private Context mContext;
 
     public static final int HORIZONTAL_LIST = LinearLayoutManager.HORIZONTAL;
 
     public static final int VERTICAL_LIST = LinearLayoutManager.VERTICAL;
 
-    private Drawable mDivider;
+    private GradientDrawable mDivider;
 
     private int mOrientation;
 
     public ListItemDecoration(Context context, int orientation) {
-        mDivider = Theme.TintDrawable(context.getResources().getDrawable(R.drawable.bg_divider), ThemeStore.getDividerColor());
+        mContext = context;
+        mDivider = (GradientDrawable) mContext.getResources().getDrawable(R.drawable.bg_divider_day);
+        mDivider.setColor(ThemeStore.getDividerColor());
         setOrientation(orientation);
     }
 
-    public ListItemDecoration(Context context, int orientation, Drawable divider){
-        this(context,orientation);
-        mDivider = divider;
-    }
 
     public void setDividerColor(@ColorInt int color){
-        mDivider = Theme.TintDrawable(mDivider, color);
+        mDivider.setColor(color);
     }
+
 
     public void setOrientation(int orientation) {
         if (orientation != HORIZONTAL_LIST && orientation != VERTICAL_LIST) {

@@ -114,28 +114,17 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
             String artist = CommonUtil.processInfo(temp.getArtist(),CommonUtil.ARTISTTYPE);
             String album = CommonUtil.processInfo(temp.getAlbum(),CommonUtil.ALBUMTYPE);
             holder.mOther.setText(artist + "-" + album);
+
             //封面
-//            holder.mImage.setImageURI(Uri.EMPTY);
-//            new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,temp.getAlbumId(), Constants.URL_ALBUM,false);
-
-//            holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()));
-
-//            DraweeController controller = Fresco.newDraweeControllerBuilder()
-//                    .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId()))
-//                    .setOldController(holder.mImage.getController())
-//                    .setAutoPlayAnimations(false)
-//                    .build();
-//            holder.mImage.setController(controller);
-
-//            //背景点击效果
-//            holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
-
             File imgFile = MediaStoreUtil.getImageUrlInCache(temp.getAlbumId(),Constants.URL_ALBUM);
-            if(imgFile.exists()) {
+            if(imgFile != null && imgFile.exists()) {
                 holder.mImage.setImageURI(Uri.parse("file://" + imgFile));
             } else {
                 holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), temp.getAlbumId()));
             }
+
+            //背景点击效果
+            holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 
         } catch (Exception e){
             e.printStackTrace();

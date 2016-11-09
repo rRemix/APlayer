@@ -14,6 +14,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.PlayListInfo;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.PlayListUtil;
 
 /**
@@ -64,7 +65,7 @@ public class AddtoPlayListAdapter extends RecyclerView.Adapter<AddtoPlayListAdap
                     }
                 });
             }
-
+            holder.mDivider.setBackgroundColor(ThemeStore.getDividerColor());
         }
     }
 
@@ -78,6 +79,8 @@ public class AddtoPlayListAdapter extends RecyclerView.Adapter<AddtoPlayListAdap
         TextView mText;
         @BindView(R.id.item_root)
         RelativeLayout mContainer;
+        @BindView(R.id.divider)
+        View mDivider;
         public PlayListAddToHolder(View itemView){
            super(itemView);
         }

@@ -27,6 +27,7 @@ import remix.myplayer.R;
 import remix.myplayer.application.Application;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 
 
 /**
@@ -316,34 +317,40 @@ public class Theme {
     /**
      * 按下与选中触摸效果
      * @param context
-     * @param selectId
-     * @param selectColor 波纹颜色
+     * @param selectDrawable
+     * @param defaultDrawable
      * @return
      */
     public static StateListDrawable getPressAndSelectedStateListRippleDrawable(Context context,
-                                                                               @DrawableRes int selectId,
-                                                                               @DrawableRes int defaultId,
-                                                                               @ColorInt int selectColor,
-                                                                               @ColorInt int defaultColor){
-
+                                                                               Drawable selectDrawable,
+                                                                               Drawable defaultDrawable,
+                                                                               @ColorInt int rippleColor){
         StateListDrawable stateListDrawable = new StateListDrawable();
-        Drawable selectedDrawable = TintDrawable(context.getResources().getDrawable(selectId),selectColor);
-        Drawable defaultDrawable = TintDrawable(context.getResources().getDrawable(defaultId),defaultColor);
-
-//        Drawable selectedDrawable = TintDrawable(getShape(GradientDrawable.RECTANGLE,selectColor),ThemeStore.getMaterialPrimaryColor());
-//        Drawable defaultDrawable = getShape(GradientDrawable.RECTANGLE,defaultColor);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            RippleDrawable rippleDrawable = new RippleDrawable(ColorStateList.valueOf(ThemeStore.getRippleColor()), defaultDrawable,null);
-            stateListDrawable.addState(new int[]{android.R.attr.state_selected},selectedDrawable);
+            RippleDrawable rippleDrawable = new RippleDrawable(ColorStateList.valueOf(rippleColor), defaultDrawable,null);
+            stateListDrawable.addState(new int[]{android.R.attr.state_selected},selectDrawable);
             stateListDrawable.addState(new int[]{}, rippleDrawable);
             return stateListDrawable;
         } else {
-            stateListDrawable.addState(new int[]{android.R.attr.state_selected},selectedDrawable);
-            stateListDrawable.addState(new int[]{android.R.attr.state_pressed},selectedDrawable);
+            stateListDrawable.addState(new int[]{android.R.attr.state_selected},selectDrawable);
+            stateListDrawable.addState(new int[]{android.R.attr.state_pressed},selectDrawable);
             stateListDrawable.addState(new int[]{}, defaultDrawable);
             return stateListDrawable;
         }
+    }
+
+    /**
+     * 按下与选中触摸效果
+     * @param context
+     * @param selectDrawable
+     * @param defaultDrawable
+     * @return
+     */
+    public static StateListDrawable getPressAndSelectedStateListRippleDrawable(Context context,
+                                                                               Drawable selectDrawable,
+                                                                               Drawable defaultDrawable){
+        return getPressAndSelectedStateListRippleDrawable(context,selectDrawable,defaultDrawable,ThemeStore.getRippleColor());
     }
 
     /**
@@ -355,11 +362,10 @@ public class Theme {
         int defaultColor = ThemeStore.isDay() ?
                 ThemeStore.getBackgroundColorMain() :
                 ColorUtil.getColor(model == Constants.LIST_MODEL ? R.color.night_background_color_main : R.color.night_background_color_2);
+
         return getPressAndSelectedStateListRippleDrawable(context,
-                model == Constants.GRID_MODEL ? R.drawable.bg_corner_default_day : R.drawable.bg_list_default_day,
-                model == Constants.GRID_MODEL ? R.drawable.bg_corner_default_day : R.drawable.bg_list_default_day,
-                ThemeStore.getSelectColor(),
-                defaultColor);
+                model == Constants.GRID_MODEL ? getCorner(1, DensityUtil.dip2px(context,2),0,ThemeStore.getSelectColor()) : getShape(GradientDrawable.RECTANGLE,ThemeStore.getSelectColor()),
+                model == Constants.GRID_MODEL ? getCorner(1, DensityUtil.dip2px(context,2),0,defaultColor) : getShape(GradientDrawable.RECTANGLE,defaultColor));
     }
 
     /**

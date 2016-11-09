@@ -129,8 +129,8 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
             }
         }
 
-//        //背景点击效果
-//        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
+        //背景点击效果
+        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 
         if(holder.mContainer != null && mOnItemClickLitener != null){
             holder.mContainer.setOnClickListener(new View.OnClickListener() {

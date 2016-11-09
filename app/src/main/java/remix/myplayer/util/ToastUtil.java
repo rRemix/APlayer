@@ -82,23 +82,33 @@ public class ToastUtil {
      * @param duration
      */
     public static void show(Context context, int message, int duration) {
-        if (isShow)
-            Toast.makeText(context, message, duration).show();
+        if (isShow) {
+            Toast toast = Toast.makeText(context, message, duration);
+            toast.getView().setAlpha(0.8f);
+            toast.show();
+        }
     }
 
     public static void show(Context context, int message) {
-        if (isShow)
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        if (isShow) {
+            Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+            toast.getView().setAlpha(0.8f);
+            toast.show();
+        }
     }
 
     public static void show(Context context, CharSequence message) {
-        if (isShow)
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        if (isShow) {
+            Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+            toast.getView().setAlpha(0.8f);
+            toast.show();
+        }
     }
 
     public static void show(Context context, @StringRes int resId, Object... formatArgs){
-        if(isShow)
-            show(context,context.getString(resId,formatArgs));
+        if(isShow) {
+            show(context, context.getString(resId, formatArgs));
+        }
     }
 
 }

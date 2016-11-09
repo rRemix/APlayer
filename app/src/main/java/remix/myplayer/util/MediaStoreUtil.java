@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 import remix.myplayer.R;
@@ -67,6 +68,7 @@ public class MediaStoreUtil {
                     String full_path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
                     SortWithFolder(id,full_path);
                 }
+
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -138,10 +140,9 @@ public class MediaStoreUtil {
      */
     public static File getImageUrlInCache(int id,int type){
         //如果是专辑或者艺术家，先查找本地缓存
-        File img = type == Constants.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(id * 255 + ""))
-                : type == Constants.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + ""))
-                : new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + ""));
-        return img;
+        return type == Constants.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(id * 255 + "")) :
+               type == Constants.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + "")) :
+               new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + ""));
     }
 
     /**
@@ -357,21 +358,27 @@ public class MediaStoreUtil {
                 where += (" and " + Constants.MEDIASTORE_WHERE_SIZE);
         }
 
-        Cursor cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null,where,arg,null,null);
+        Cursor cursor = null;
         ArrayList<MP3Item> list = new ArrayList<>();
-        if(cursor != null ){
-            while (cursor.moveToNext()){
-                list.add(getMP3Info(cursor));
-            }
-            //如果本地删除了某些歌曲 添加一些空的歌曲信息，保证点击播放列表前后歌曲数目一致
-            if(cursor.getCount() < idList.size()){
-                for(int i = cursor.getCount(); i < idList.size() ;i++){
-                    MP3Item item = new MP3Item();
-                    item.Title = mContext.getString(R.string.song_lose_effect);
-                    item.Id = idList.get(i);
-                    list.add(item);
+        try {
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null,where,arg,null,null);
+            if(cursor != null ){
+                while (cursor.moveToNext()){
+                    list.add(getMP3Info(cursor));
+                }
+                //如果本地删除了某些歌曲 添加一些空的歌曲信息，保证点击播放列表前后歌曲数目一致
+                if(cursor.getCount() < idList.size()){
+                    for(int i = cursor.getCount(); i < idList.size() ;i++){
+                        MP3Item item = new MP3Item();
+                        item.Title = mContext.getString(R.string.song_lose_effect);
+                        item.Id = idList.get(i);
+                        list.add(item);
+                    }
                 }
             }
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
         }
         return list;
 

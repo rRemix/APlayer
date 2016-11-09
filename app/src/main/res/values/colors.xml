@@ -33,8 +33,8 @@
     <color name="select_model_button_color">#ffce64</color>
     <!--<color name="night_selected_color">@color/default_control_highlight</color>-->
 
-    <!-- 点缀色-->
-    <!-- 抽屉字体颜色-->
+    <!--默认textview颜色-->
+    <color name="default_textview_color">#727273</color>
     <!-- 抽屉ListView背景颜色-->
     <color name="drawer_list_color">#1d1a1d</color>
 

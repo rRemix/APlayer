@@ -18,7 +18,7 @@
                 android:layout_centerVertical="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/common_btn_normal_shuffle"
+                android:src="@drawable/btn_shuffle"
                 android:background="@color/transparent"
                 android:layout_marginLeft="@dimen/d16_size"
                 android:layout_alignParentLeft="true" />
@@ -27,6 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/play_random"
+                android:textColor="@color/default_textview_color"
                 android:layout_toRightOf="@id/play_shuffle_button"
                 android:layout_marginLeft="@dimen/d16_size" />
         </RelativeLayout>

@@ -77,9 +77,9 @@ public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
                 holder.mImage.setImageURI(Uri.EMPTY);
                 new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId,Constants.URL_ARTIST,true);
 
-//                //item点击效果
-//                holder.mContainer.setBackground(
-//                        Theme.getPressAndSelectedStateListRippleDrawable(ArtistFragment.getModel(),mContext));
+                //item点击效果
+                holder.mContainer.setBackground(
+                        Theme.getPressAndSelectedStateListRippleDrawable(ArtistFragment.getModel(),mContext));
 
             } catch (Exception e){
                 e.printStackTrace();

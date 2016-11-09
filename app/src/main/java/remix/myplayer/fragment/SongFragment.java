@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -22,7 +23,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
@@ -49,7 +49,6 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
     private SongAdapter mAdapter;
-    private ListItemDecoration mItemDecoration;
 
     public static final String TAG = SongFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
@@ -95,10 +94,9 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
             }
         });
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mItemDecoration = new ListItemDecoration(getContext(),ListItemDecoration.VERTICAL_LIST);
-        mRecyclerView.addItemDecoration(mItemDecoration);
-//        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.addItemDecoration(new ListItemDecoration(getContext(),ListItemDecoration.VERTICAL_LIST));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
@@ -128,9 +126,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         });
         mRecyclerView.setAdapter(mAdapter);
 
-//        ((ImageButton)rootView.findViewById(R.id.play_shuffle_button)).setImageDrawable(
-//                Theme.TintDrawable(getResources().getDrawable(R.drawable.common_btn_normal_shuffle),ThemeStore.getMaterialPrimaryColor()));
-//        Theme.TintDrawable(rootView.findViewById(R.id.play_shuffle_button),R.drawable.common_btn_normal_shuffle, ThemeStore.getMaterialPrimaryColor());
+//        Theme.TintDrawable(rootView.findViewById(R.id.play_shuffle_button),R.drawable.btn_shuffle, ThemeStore.getMaterialPrimaryColor());
 
         return rootView;
     }

@@ -715,7 +715,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 if(mNewSwatch == null)
                     mNewSwatch = new Palette.Swatch(Color.GRAY,100);
                 mColorFrom = ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.4f);
-                mColorTo = ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.05f);
+                mColorTo = ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.1f);
 //                mColorDraken = ColorUtil.shiftColor(mNewSwatch.getRgb(),0.8f);
 //                mColorDark = mNewSwatch.getRgb();
                 mColorDraken = mNewSwatch.getRgb();

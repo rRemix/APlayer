@@ -30,8 +30,6 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.theme.Theme;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -91,7 +89,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
 
         }
     };
-    private ListItemDecoration mItemDecoration;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -125,8 +122,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         });
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mItemDecoration = new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST);
-        mRecyclerView.addItemDecoration(mItemDecoration);
+        mRecyclerView.addItemDecoration(new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mAdapter = new SongAdapter(RecetenlyActivity.this, mMultiChoice,SongAdapter.RECENTLY);
@@ -166,7 +162,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
 
         initToolbar(mToolBar,getString(R.string.recently));
 
-        Theme.TintDrawable(findViewById(R.id.play_shuffle_button),R.drawable.common_btn_normal_shuffle, ThemeStore.getMaterialPrimaryColor());
+//        Theme.TintDrawable(findViewById(R.id.play_shuffle_button),R.drawable.btn_shuffle, ThemeStore.getMaterialPrimaryColor());
 //        new Thread(){
 //            @Override
 //            public void run() {

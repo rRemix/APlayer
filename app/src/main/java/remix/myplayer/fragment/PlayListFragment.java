@@ -86,6 +86,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
         mAdapter = new PlayListAdapter(getActivity(),mMultiChoice);
+
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {

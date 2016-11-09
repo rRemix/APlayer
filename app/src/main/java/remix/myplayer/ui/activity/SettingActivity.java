@@ -2,8 +2,6 @@ package remix.myplayer.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
@@ -108,6 +106,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     }
         });
 
+        //分根线颜色
         ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),findView(R.id.setting_divider_3)},
                 new ButterKnife.Action<View>() {
                     @Override

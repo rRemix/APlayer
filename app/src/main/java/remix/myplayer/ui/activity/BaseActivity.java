@@ -2,11 +2,13 @@ package remix.myplayer.ui.activity;
 
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.umeng.analytics.MobclickAgent;
 
+import remix.myplayer.BuildConfig;
 import remix.myplayer.R;
 import remix.myplayer.manager.ActivityManager;
 import remix.myplayer.service.MusicService;
@@ -63,6 +65,24 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //严格模式
+        if(BuildConfig.DEBUG){
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()
+//                    .detectCustomSlowCalls()
+                    .penaltyLog()
+                    .penaltyFlashScreen()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .penaltyDropBox()
+                    .build());
+
+        }
+
         setUpTheme();
         super.onCreate(savedInstanceState);
         //静止横屏

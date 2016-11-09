@@ -15,8 +15,8 @@
         android:layout_centerVertical="true"
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImageScaleType="centerCrop"
-        fresco:placeholderImage="@drawable/song_artist_empty_bg_night"
-        fresco:failureImage="@drawable/song_artist_empty_bg_night"
+        fresco:placeholderImage="@drawable/album_empty_bg_day"
+        fresco:failureImage="@drawable/album_empty_bg_day"
         fresco:failureImageScaleType="centerCrop"/>
 
     <android.support.v7.widget.AppCompatCheckBox

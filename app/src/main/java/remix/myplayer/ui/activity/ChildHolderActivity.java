@@ -25,8 +25,6 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.theme.Theme;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -80,7 +78,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
             }
         }
     };
-    private ListItemDecoration mItemDecoration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,9 +153,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
         });
         mRecyclerView.setAdapter(mAdapter);
-        mItemDecoration = new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST);
-        mItemDecoration.setDividerColor(ThemeStore.getDividerColor());
-        mRecyclerView.addItemDecoration(mItemDecoration);
+        mRecyclerView.addItemDecoration(new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -184,7 +179,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
         mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
 
-        Theme.TintDrawable(findViewById(R.id.play_shuffle_button),R.drawable.common_btn_normal_shuffle, ThemeStore.getMaterialPrimaryColor());
+//        Theme.TintDrawable(findViewById(R.id.play_shuffle_button),R.drawable.btn_shuffle, ThemeStore.getMaterialPrimaryColor());
     }
 
     @Override

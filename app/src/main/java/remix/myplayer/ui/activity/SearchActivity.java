@@ -57,7 +57,6 @@ public class SearchActivity extends ToolbarActivity {
     TextView mSearchResBlank;
     @BindView(R.id.search_result_container)
     FrameLayout mSearchResContainer;
-    private ListItemDecoration mItemDecoration;
 
 
     @Override
@@ -115,8 +114,7 @@ public class SearchActivity extends ToolbarActivity {
         });
         mSearchResRecyclerView.setAdapter(mSearchResAdapter);
         mSearchResRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mItemDecoration = new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST);
-        mSearchResRecyclerView.addItemDecoration(mItemDecoration);
+        mSearchResRecyclerView.addItemDecoration(new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST));
         mSearchResRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         UpdateUI();

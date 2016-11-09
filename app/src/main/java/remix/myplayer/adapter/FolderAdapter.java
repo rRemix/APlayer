@@ -57,8 +57,10 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
         //根据当前索引 获得对应的歌曲列表
         Iterator it = Global.mFolderMap.keySet().iterator();
         String temp = null;
-        for(int i = 0 ; i <= position ; i++)
-            temp = it.next().toString();
+        for(int i = 0 ; i <= position ; i++) {
+            if(it.hasNext())
+                temp = it.next().toString();
+        }
         //设置文件夹名字 路径名 歌曲数量
         if(temp != null){
             holder.mName.setText(temp.substring(temp.lastIndexOf("/")+ 1,temp.length()));
@@ -67,12 +69,13 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
         }
         //根据主题模式 设置图片
         if(holder.mImg != null) {
-            holder.mImg.setImageResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.icon_folder_day : R.drawable.icon_folder);
+            holder.mImg.setImageDrawable(Theme.TintDrawable(mContext.getResources().getDrawable(R.drawable.icon_folder),ThemeStore.isDay() ? Color.BLACK : Color.WHITE));
+//            holder.mImg.setImageResource(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.drawable.icon_folder_day : R.drawable.icon_folder);
         }
 
         //背景点击效果
-//        holder.mContainer.setBackground(
-//                Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
+        holder.mContainer.setBackground(
+                Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 
         final String full_path = temp;
         if(holder.mButton != null) {

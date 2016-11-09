@@ -17,13 +17,14 @@
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/common_btn_normal_shuffle"
+            android:src="@drawable/btn_shuffle"
             android:background="@color/transparent"
             android:layout_marginLeft="@dimen/d16_size" />
         <TextView
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/default_textview_color"
             android:text="@string/play_random"
             android:layout_marginLeft="@dimen/d72_size"/>
     </RelativeLayout>
