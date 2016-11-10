@@ -60,7 +60,7 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
         this.mType = type;
         int size = DensityUtil.dip2px(mContext,60);
         mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
-        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getRippleColor(),size,size);
+        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getSelectColor(),size,size);
     }
 
     public void setInfoList(ArrayList<MP3Item> list){

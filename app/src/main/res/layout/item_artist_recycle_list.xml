@@ -53,7 +53,7 @@
         android:layout_height="@dimen/d45_size"
         android:layout_centerVertical="true"
         android:src="@drawable/list_icn_more"
-        android:background="@drawable/bg_common_ripple"/>
+        android:background="@color/transparent"/>
 
     <!--<View-->
         <!--android:layout_width="match_parent"-->

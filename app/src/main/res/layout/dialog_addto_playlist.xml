@@ -18,7 +18,7 @@
         android:id="@+id/playlist_addto_new"
         android:gravity="center"
         android:padding="@dimen/d8_size"
-        android:background="?android:attr/selectableItemBackground"
+        android:background="?attr/background_common"
         android:clickable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -18,6 +18,10 @@
         <item name="background_color_1">@color/day_background_color_1</item>
         <item name="background_color_2">@color/day_background_color_2</item>
         <item name="background_color_3">@color/day_background_color_3</item>
+        <item name="background_grid">@drawable/bg_grid_day</item>
+        <item name="background_list">@drawable/bg_list_day</item>
+        <item name="background_list_1">@drawable/bg_list_1_day</item>
+        <item name="background_common">@drawable/bg_common_ripple_day</item>
         <item name="text_color_primary">@color/day_textcolor_primary</item>
         <item name="text_color">@color/day_textcolor</item>
         <item name="colorControlHighlight">@color/day_ripple_color</item>
@@ -30,6 +34,10 @@
         <item name="background_color_1">@color/night_background_color_1</item>
         <item name="background_color_2">@color/night_background_color_2</item>
         <item name="background_color_3">@color/night_background_color_3</item>
+        <item name="background_grid">@drawable/bg_grid_night</item>
+        <item name="background_list">@drawable/bg_list_night</item>
+        <item name="background_list_1">@drawable/bg_list_1_night</item>
+        <item name="background_common">@drawable/bg_common_ripple_night</item>
         <item name="text_color_primary">@color/night_textcolor_primary</item>
         <item name="text_color">@color/night_textcolor</item>
         <item name="colorControlHighlight">@color/night_ripple_color</item>
@@ -122,6 +130,7 @@
         <item name="background_grid">@drawable/bg_grid_day</item>
         <item name="background_list">@drawable/bg_list_day</item>
         <item name="background_list_1">@drawable/bg_list_1_day</item>
+        <item name="background_common">@drawable/bg_common_ripple_day</item>
         <item name="text_color_primary">@color/day_textcolor_primary</item>
         <item name="text_color">@color/day_textcolor</item>
         <item name="default_album">@drawable/album_empty_bg_day</item>
@@ -146,6 +155,7 @@
         <item name="background_grid">@drawable/bg_grid_night</item>
         <item name="background_list">@drawable/bg_list_night</item>
         <item name="background_list_1">@drawable/bg_list_1_night</item>
+        <item name="background_common">@drawable/bg_common_ripple_night</item>
         <item name="text_color_primary">@color/night_textcolor_primary</item>
         <item name="text_color">@color/night_textcolor</item>
         <item name="default_album">@drawable/album_empty_bg_night</item>

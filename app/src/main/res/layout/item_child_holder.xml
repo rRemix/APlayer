@@ -44,8 +44,7 @@
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:scaleType="center"
-        android:src="@drawable/list_icn_more"
-        android:background="@drawable/bg_common_ripple"/>
+        android:src="@drawable/list_icn_more" />
 
     <remix.myplayer.ui.customview.ColumnView
         android:layout_toLeftOf="@id/song_item_button"

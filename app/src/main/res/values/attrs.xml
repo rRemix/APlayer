@@ -53,6 +53,7 @@
     <!--点击效果-->
     <attr name="background_grid" format="reference"/>
     <attr name="background_list" format="reference"/>
+    <attr name="background_common" format="reference"/>
     <!--设置界面选项点击效果-->
     <attr name="background_list_1" format="reference"/>
     <!--默认专辑和艺术家封面-->

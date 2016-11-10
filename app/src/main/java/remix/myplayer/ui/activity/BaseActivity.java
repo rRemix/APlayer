@@ -73,7 +73,7 @@ public class BaseActivity extends AppCompatActivity {
                     .detectNetwork()
 //                    .detectCustomSlowCalls()
                     .penaltyLog()
-                    .penaltyFlashScreen()
+//                    .penaltyFlashScreen()
                     .build());
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
                     .detectAll()

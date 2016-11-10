@@ -16,7 +16,7 @@
             android:text="@string/play_queue"
             android:textSize="@dimen/s16_size"
             android:textColor="@color/black"
-            android:background="#EFEEED"/>
+            android:background="@color/gray_efeeed" />
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView

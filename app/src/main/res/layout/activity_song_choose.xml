@@ -17,7 +17,7 @@
             android:text="@string/cancel"
             android:textSize="@dimen/s14_size"
             android:textColor="@color/night_textcolor_primary"
-            android:background="?android:attr/selectableItemBackground"/>
+            android:background="?attr/background_common"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
             android:text="@string/confirm"
             android:textSize="@dimen/s14_size"
             android:textColor="@color/night_textcolor_primary"
-            android:background="?android:attr/selectableItemBackground"/>
+            android:background="?attr/background_common"/>
     </RelativeLayout>
 
     <View

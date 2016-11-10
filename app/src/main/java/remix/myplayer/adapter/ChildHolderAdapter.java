@@ -49,7 +49,7 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
         this.mMultiChoice = multiChoice;
         int size = DensityUtil.dip2px(mContext,60);
         mDefaultDrawable = Theme.getShape(GradientDrawable.RECTANGLE,Color.TRANSPARENT,size,size);
-        mSelectDrawable = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getRippleColor(),size,size);
+        mSelectDrawable = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getSelectColor(),size,size);
     }
 
     public void setList(ArrayList<MP3Item> list){

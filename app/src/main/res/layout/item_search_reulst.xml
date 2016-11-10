@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/item_height"
     android:id="@+id/reslist_item"
-    android:background="?android:attr/selectableItemBackground">
+    android:background="?attr/background_common">
     <com.facebook.drawee.view.SimpleDraweeView
         android:layout_alignParentLeft="true"
         android:id="@+id/search_image"

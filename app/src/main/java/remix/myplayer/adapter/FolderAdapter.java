@@ -42,7 +42,7 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
         this.mMultiChoice = multiChoice;
         int size = DensityUtil.dip2px(mContext,45);
         mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
-        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getRippleColor(),size,size);
+        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getSelectColor(),size,size);
     }
 
     @Override

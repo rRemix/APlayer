@@ -33,7 +33,7 @@
             android:id="@+id/share_qq"
             android:paddingTop="@dimen/d8_size"
             android:paddingBottom="@dimen/d4_size"
-            android:background="?android:attr/selectableItemBackground">
+            android:background="?attr/background_common">
             <ImageView
                 android:id="@+id/share_qq_img"
                 android:layout_width="wrap_content"
@@ -59,7 +59,7 @@
             android:id="@+id/share_weibo"
             android:paddingTop="@dimen/d8_size"
             android:paddingBottom="@dimen/d4_size"
-            android:background="?android:attr/selectableItemBackground">
+            android:background="?attr/background_common">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
             android:id="@+id/share_wechat"
             android:paddingTop="@dimen/d8_size"
             android:paddingBottom="@dimen/d4_size"
-            android:background="?android:attr/selectableItemBackground">
+            android:background="?attr/background_common">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -111,7 +111,7 @@
             android:id="@+id/share_circlefriend"
             android:paddingTop="@dimen/d8_size"
             android:paddingBottom="@dimen/d4_size"
-            android:background="?android:attr/selectableItemBackground">
+            android:background="?attr/background_common">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

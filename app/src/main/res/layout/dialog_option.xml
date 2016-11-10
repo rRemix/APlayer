@@ -55,7 +55,7 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/popup_add"
-            android:background="?android:attr/selectableItemBackground">
+            android:background="?attr/background_common">
             <ImageView
                 android:id="@+id/popup_add_img"
                 android:layout_width="wrap_content"
@@ -80,7 +80,7 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/popup_ring"
-            android:background="?attr/selectableItemBackground">
+            android:background="?attr/background_common">
             <ImageView
                 android:id="@+id/popup_ring_img"
                 android:layout_width="wrap_content"
@@ -104,7 +104,7 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/popup_share"
-            android:background="?attr/selectableItemBackground">
+            android:background="?attr/background_common">
             <ImageView
                 android:id="@+id/popup_share_img"
                 android:layout_width="wrap_content"
@@ -128,7 +128,7 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/popup_delete"
-            android:background="?attr/selectableItemBackground">
+            android:background="?attr/background_common">
             <ImageView
                 android:id="@+id/popup_delete_img"
                 android:layout_width="wrap_content"

@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/d60_size"
-    android:background="?android:attr/selectableItemBackground"
+    android:background="?attr/background_common"
     android:id="@+id/item_root">
     <RelativeLayout
         android:layout_width="@dimen/d60_size"
@@ -14,7 +14,7 @@
             android:layout_height="@dimen/d24_size"
             android:id="@+id/playlist_item_button"
             android:layout_centerInParent="true"
-            android:src="@drawable/playinglist_delete_normal" />
+            android:src="@drawable/playqueue_delete" />
     </RelativeLayout>
 
     <LinearLayout

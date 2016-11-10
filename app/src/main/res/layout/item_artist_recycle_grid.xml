@@ -40,7 +40,7 @@
             android:layout_height="match_parent"
             android:id="@+id/item_button"
             android:src="@drawable/list_icn_more"
-            android:background="@drawable/bg_common_ripple"
+            android:background="@color/transparent"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"

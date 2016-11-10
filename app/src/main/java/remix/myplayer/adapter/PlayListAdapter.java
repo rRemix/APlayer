@@ -105,10 +105,11 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
                         }
                     });
                     holder.mButton.setClickable(true);
+
                     //点击效果
                     int size = DensityUtil.dip2px(mContext,45);
                     Drawable defaultDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-                    Drawable selectDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getRippleColor(), size, size);
+                    Drawable selectDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
                     holder.mButton.setBackground(Theme.getPressDrawable(
                             defaultDrawable,
                             selectDrawable,

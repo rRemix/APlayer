@@ -18,8 +18,7 @@
         android:layout_width="@dimen/d45_size"
         android:layout_height="@dimen/d45_size"
         android:layout_centerVertical="true"
-        android:src="@drawable/list_icn_more"
-        android:background="@drawable/bg_common_ripple"/>
+        android:src="@drawable/list_icn_more" />
     <TextView
         android:layout_centerVertical="true"
         android:layout_width="wrap_content"

@@ -2,6 +2,9 @@ package remix.myplayer.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
@@ -115,31 +118,26 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     }
                 });
 
-//        //初始化点击效果
-//        TypedArray a = getTheme().obtainStyledAttributes(new int[]{R.attr.selectableItemBackground});
-//        try {
-//            final Drawable drawable = a.getDrawable(0);
-//            ButterKnife.apply(new View[]{findView(R.id.setting_filter_container),findView(R.id.setting_lrc_container),findView(R.id.setting_color_container),
-//                            findView(R.id.setting_notify_container),findView(R.id.setting_eq_container),findView(R.id.setting_feedback_container),
-//                            findView(R.id.setting_about_container),findView(R.id.setting_update_container),findView(R.id.setting_clear_container)},
-//                    new ButterKnife.Action<View>() {
-//                        @Override
-//                        public void apply(@NonNull View view, int index) {
-//                            final Drawable defaultDrawable = Theme.TintDrawable(getResources().getDrawable(R.drawable.bg_list_default_day),ThemeStore.getBackgroundColor3());
-//                            final Drawable selectDrawable = Theme.TintDrawable(getResources().getDrawable(R.drawable.bg_list_default_day), ThemeStore.getRippleColor());
-//                            final Drawable containerDrawable = Theme.getPressDrawable(
-//                                    defaultDrawable,
-//                                    selectDrawable,
-//                                    ThemeStore.getRippleColor(),
-//                                    defaultDrawable,
-//                                    null);
-//                            view.setBackground(containerDrawable);
-//                        }
-//                    });
-//
-//        } finally {
-//            a.recycle();
-//        }
+        //初始化点击效果
+        final TypedArray ta = getTheme().obtainStyledAttributes(new int[]{R.attr.background_common});
+        try {
+            ButterKnife.apply(new View[]{findView(R.id.setting_filter_container),findView(R.id.setting_lrc_container),findView(R.id.setting_color_container),
+                            findView(R.id.setting_notify_container),findView(R.id.setting_eq_container),findView(R.id.setting_feedback_container),
+                            findView(R.id.setting_about_container),findView(R.id.setting_update_container),findView(R.id.setting_clear_container)},
+                    new ButterKnife.Action<View>() {
+                        @Override
+                        public void apply(@NonNull View view, int index) {
+                            if(ta != null)
+                                view.setBackground(ta.getDrawable(0));
+//                            Drawable defaultDrawable = Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT);
+//                            Drawable selectDrawable = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getSelectColor());
+//                            view.setBackground(Theme.getPressDrawable(defaultDrawable,selectDrawable,ThemeStore.getRippleColor(),null,selectDrawable));
+                        }
+                    });
+        } finally {
+            ta.recycle();
+        }
+
 
         //计算缓存大小
         new Thread(){
