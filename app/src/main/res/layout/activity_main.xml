@@ -26,19 +26,18 @@
                 android:layout_above="@id/bottom_actionbar_new">
                 <android.support.design.widget.AppBarLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <android.support.v7.widget.Toolbar
-                        android:id="@+id/toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize"
-                        android:background="?attr/material_color_primary"
-                        app:layout_scrollFlags="scroll|enterAlways"/>
+                    android:layout_height="wrap_content"
+                    android:background="?attr/material_color_primary">
+
+                    <include layout="@layout/toolbar"/>
+                    <include layout="@layout/toolbar_multi"/>
+
                     <android.support.design.widget.TabLayout
                         android:id="@+id/tabs"
-                        android:background="?attr/material_color_primary"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/tab_height"
                         style="@style/CustomTabLayout" />
+
                 </android.support.design.widget.AppBarLayout>
 
                 <!--中间四个fragment-->

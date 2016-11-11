@@ -38,6 +38,7 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
+import remix.myplayer.application.Application;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
@@ -49,6 +50,7 @@ import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.customview.TipPopupwindow;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -66,8 +68,7 @@ import remix.myplayer.util.ToastUtil;
  */
 public class MainActivity extends MultiChoiceActivity implements MusicService.Callback {
     public static MainActivity mInstance = null;
-    @BindView(R.id.toolbar)
-    Toolbar mToolBar;
+
     @BindView(R.id.tabs)
     TabLayout mTablayout;
     @BindView(R.id.ViewPager)
@@ -174,32 +175,9 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         ButterKnife.bind(this);
-        mInstance = this;
 
-        mMultiChoice.setOnUpdateOptionMenuListener(new OnUpdateOptionMenuListener() {
-            @Override
-            public void onUpdate(boolean multiShow) {
-                mMultiChoice.setShowing(multiShow);
-                mToolBar.setNavigationIcon(mMultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.actionbar_menu);
-                mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(mMultiChoice.isShow()){
-                            mMultiChoice.UpdateOptionMenu(false);
-                            mMultiChoice.clear();
-                        } else {
-                            mDrawerLayout.openDrawer(mNavigationView);
-                        }
-                    }
-                });
-                if(!mMultiChoice.isShow()){
-                    mMultiChoice.clear();
-                }
-                invalidateOptionsMenu();
-            }
-        });
+        mInstance = this;
 
         //播放的service
         MusicService.addCallback(this);
@@ -327,7 +305,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
      * 新建播放列表
      * @param v
      */
-    @OnClick(R.id.add)
+    @OnClick({R.id.add,R.id.multi_close})
     public void onClick(View v){
         switch (v.getId()){
             case R.id.add:
@@ -365,6 +343,14 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                             }
                         })
                         .show();
+                break;
+            case R.id.multi_close:
+                mMultiToolBar.setVisibility(View.GONE);
+                mToolBar.setVisibility(View.VISIBLE);
+                if(mMultiChoice.isShow()){
+                    mMultiChoice.UpdateOptionMenu(false);
+                    mMultiChoice.clear();
+                }
                 break;
         }
     }

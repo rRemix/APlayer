@@ -3,7 +3,13 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/toolbar"/>
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/material_color_primary">
+        <include layout="@layout/toolbar"/>
+        <include layout="@layout/toolbar_multi"/>
+    </android.support.design.widget.AppBarLayout>
 
     <RelativeLayout
         android:id="@+id/recently_shuffle"

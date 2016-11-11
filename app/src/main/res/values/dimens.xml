@@ -20,7 +20,7 @@
 
     <dimen name="activity_padding_top">24dp</dimen>
 
-    <dimen name="tab_height">40dp</dimen>
+    <dimen name="tab_height">48dp</dimen>
     <dimen name="d1_size">1dp</dimen>
     <dimen name="d2_size">2dp</dimen>
     <dimen name="d4_size">4dp</dimen>
@@ -44,6 +44,7 @@
     <dimen name="d30_size">30dp</dimen>
     <dimen name="d32_size">32dp</dimen>
     <dimen name="d34_size">34dp</dimen>
+    <dimen name="d36_size">36dp</dimen>
     <dimen name="d38_size">38dp</dimen>
     <dimen name="d40_size">40dp</dimen>
     <dimen name="d42_size">42dp</dimen>
@@ -58,6 +59,7 @@
     <dimen name="d64_size">64dp</dimen>
     <dimen name="d70_size">70dp</dimen>
     <dimen name="d72_size">72dp</dimen>
+    <dimen name="d96_size">96dp</dimen>
     <dimen name="d100_size">100dp</dimen>
     <dimen name="d110_size">110dp</dimen>
     <dimen name="d120_size">120dp</dimen>
