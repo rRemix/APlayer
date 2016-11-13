@@ -235,7 +235,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         //上次退出时正在播放的歌曲的pos
         int pos = 0;
         //查找上次退出时的歌曲是否还存在
-
         for(int i = 0 ; i < Global.mAllSongList.size();i++){
             if(lastId == Global.mAllSongList.get(i)){
                 isLastSongExist = true;
@@ -553,8 +552,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
             mDrawerLayout.closeDrawer(mNavigationView);
         } else if(mMultiChoice.isShow()) {
-//            updateOptionsMenu(false);
-            mMultiChoice.UpdateOptionMenu(false);
+            onBackPress();
         } else {
             Intent home = new Intent(Intent.ACTION_MAIN);
             home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

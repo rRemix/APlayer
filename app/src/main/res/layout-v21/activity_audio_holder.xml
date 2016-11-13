@@ -152,6 +152,12 @@
             android:layout_height="0dp"
             android:layout_weight="1.5"
             android:layout_marginBottom="@dimen/d10_size">
+            <TextView
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/next_song"/>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/d60_size"

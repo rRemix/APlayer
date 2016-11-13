@@ -185,7 +185,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
     @Override
     public void onBackPressed() {
         if(mMultiChoice.isShow()) {
-            mMultiChoice.UpdateOptionMenu(false);
+            onBackPress();
         } else {
             finish();
         }

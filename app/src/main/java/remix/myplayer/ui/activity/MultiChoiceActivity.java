@@ -2,16 +2,13 @@ package remix.myplayer.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+import android.view.ViewGroup;
+import android.widget.PopupWindow;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
@@ -22,10 +19,7 @@ import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.customview.TipPopupwindow;
 import remix.myplayer.ui.dialog.TimerDialog;
-import remix.myplayer.util.Global;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
-import remix.myplayer.util.ToastUtil;
 
 /**
  * @ClassName
@@ -37,9 +31,9 @@ public class MultiChoiceActivity extends ToolbarActivity {
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
     @BindView(R.id.toolbar_multi)
-    View mMultiToolBar;
+    ViewGroup mMultiToolBar;
     protected MultiChoice mMultiChoice = null;
-    private TipPopupwindow mPopupWindow;
+    private TipPopupwindow mTipPopupWindow;
     public MultiChoice getMultiChoice(){
         return mMultiChoice;
     }
@@ -55,28 +49,30 @@ public class MultiChoiceActivity extends ToolbarActivity {
 
                 mToolBar.setVisibility(multiShow ? View.GONE : View.VISIBLE);
                 mMultiToolBar.setVisibility(multiShow ? View.VISIBLE : View.GONE);
-                if(true /**SPUtil.getValue(Application.getContext(),"Setting","IsFirstMulti",true)*/){
-                    SPUtil.putValue(Application.getContext(),"Setting","IsFirstMulti",false);
-                    if(mPopupWindow == null){
-                        mPopupWindow = new TipPopupwindow(MultiChoiceActivity.this,mMultiToolBar,R.drawable.tip_delete,R.drawable.tip_playlist,R.drawable.tip_playqueue);
-                    }
-                    if(!mPopupWindow.isShowing() && multiShow){
-                        mPopupWindow.show(mMultiToolBar);
-                    }
-
-//                    new Handler().postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            findView(R.id.multi_delete_tip).setVisibility(View.GONE);
-//                            findView(R.id.multi_playlist_tip).setVisibility(View.GONE);
-//                            findView(R.id.multi_playqueue_tip).setVisibility(View.GONE);
-//                        }
-//                    },2000);
-                }
-
+                //清空
                 if(!mMultiChoice.isShow()){
                     mMultiChoice.clear();
                 }
+                //只有主界面显示分割线
+                mMultiToolBar.findViewById(R.id.multi_divider).setVisibility(MultiChoiceActivity.this instanceof MainActivity ? View.VISIBLE : View.GONE);
+                //第一次长按操作显示提示框
+                if(true /**SPUtil.getValue(Application.getContext(),"Setting","IsFirstMulti",true)*/){
+                    SPUtil.putValue(Application.getContext(),"Setting","IsFirstMulti",false);
+                    if(mTipPopupWindow == null){
+                        mTipPopupWindow = new TipPopupwindow(MultiChoiceActivity.this);
+                        mTipPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                            @Override
+                            public void onDismiss() {
+                                mTipPopupWindow = null;
+                            }
+                        });
+                    }
+                    if(!mTipPopupWindow.isShowing() && multiShow){
+                        mTipPopupWindow.show(new View(MultiChoiceActivity.this));
+                    }
+                }
+
+
             }
         });
     }
@@ -123,6 +119,33 @@ public class MultiChoiceActivity extends ToolbarActivity {
         return true;
     }
 
+    public void onBackPress(){
+        mMultiChoice.UpdateOptionMenu(false);
+        if(mTipPopupWindow != null && mTipPopupWindow.isShowing()){
+            mTipPopupWindow.dismiss();
+            mTipPopupWindow = null;
+        }
+    }
 
 
+    @OnClick({R.id.multi_delete,R.id.multi_playlist,R.id.multi_playqueue})
+    public void onMutltiClick(View v){
+        switch (v.getId()){
+            case R.id.multi_delete:
+                MobclickAgent.onEvent(MultiChoiceActivity.this,"Delete");
+                if(mMultiChoice != null)
+                    mMultiChoice.OnDelete();
+                break;
+            case R.id.multi_playqueue:
+                MobclickAgent.onEvent(MultiChoiceActivity.this,"AddtoPlayingList");
+                if(mMultiChoice != null)
+                    mMultiChoice.OnAddToPlayQueue();
+                break;
+            case R.id.multi_playlist:
+                MobclickAgent.onEvent(MultiChoiceActivity.this,"AddtoPlayList");
+                if(mMultiChoice != null)
+                    mMultiChoice.OnAddToPlayList();
+                break;
+        }
+    }
 }

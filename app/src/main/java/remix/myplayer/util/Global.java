@@ -131,11 +131,6 @@ public class Global {
         new Thread(){
             @Override
             public void run() {
-//                try {
-//                    sleep(300);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
                 long start = System.currentTimeMillis();
                 int deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue, mPlayQueueID);
                 LogUtil.d("TimeTest","DeleteTime:" + (System.currentTimeMillis() - start) );

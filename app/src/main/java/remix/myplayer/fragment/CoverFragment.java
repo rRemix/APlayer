@@ -151,10 +151,9 @@ public class CoverFragment extends BaseFragment {
         @Override
         public void run() {
 //            mUri = Uri.parse("file:///" +  MediaStoreUtil.getImageUrl(mAlbumId + "",Constants.URL_ALBUM));
-            String img = MediaStoreUtil.getImageUrl(mAlbumId + "",Constants.URL_ALBUM);
             File imgFile = MediaStoreUtil.getImageUrlInCache(mAlbumId,Constants.URL_ALBUM);
             if(imgFile.exists()) {
-                mUri = Uri.parse("file:///" +  img);
+                mUri = Uri.parse("file:///" +  imgFile);
             } else {
                 mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mAlbumId);
             }

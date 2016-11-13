@@ -123,7 +123,7 @@ public class FolderActivity extends MultiChoiceActivity {
     @Override
     public void onBackPressed() {
         if(mMultiChoice.isShow()) {
-            mMultiChoice.UpdateOptionMenu(false);
+            onBackPress();
         } else {
             finish();
         }

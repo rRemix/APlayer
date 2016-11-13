@@ -116,7 +116,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     FrameLayout mContainer;
     @BindView(R.id.holder_pager)
     AudioViewPager mPager;
-
+    //下一首歌曲
+    @BindView(R.id.next_song)
+    TextView mNextSong;
     //歌词控件
     private LrcView mLrcView;
     //背景渐变色
@@ -165,48 +167,13 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 //第一次更新不启用动画
                 if(!mFistStart) {
                     mContainer.startAnimation(mAnimOut);
-//                    ObjectAnimator objectAnimatorIn = ObjectAnimator.ofInt(mContainer,"backgroundColor",
-//                            ColorUtil.adjustAlpha(mOldSwatch.getRgb(),0.2f),ColorUtil.adjustAlpha(mNewSwatch.getRgb(),1)).setDuration(300);
-//                    objectAnimatorIn.setEvaluator(new ArgbEvaluator());
-//                    objectAnimatorIn.addListener(new Animator.AnimatorListener() {
-//                        @Override
-//                        public void onAnimationStart(Animator animation) {
-//                        }
-//                        @Override
-//                        public void onAnimationEnd(Animator animation) {
-//                            changeColor();
-//                            ObjectAnimator objectAnimatorOut = ObjectAnimator.ofInt(mContainer,"backgroundColor",
-//                                    ColorUtil.adjustAlpha(mNewSwatch.getRgb(),1),ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.2f)).setDuration(300);
-//                            objectAnimatorOut.setEvaluator(new ArgbEvaluator());
-//                            objectAnimatorOut.addListener(new Animator.AnimatorListener() {
-//                                @Override
-//                                public void onAnimationStart(Animator animation) {
-//                                }
-//
-//                                @Override
-//                                public void onAnimationEnd(Animator animation) {
-//                                    //修改背景颜色
-//                                    mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{mColorFrom, mColorTo}));
-//                                }
-//                                @Override
-//                                public void onAnimationCancel(Animator animation) {
-//                                }
-//                                @Override
-//                                public void onAnimationRepeat(Animator animation) {
-//                                }
-//                            });
-//                            objectAnimatorOut.start();
-//                        }
-//                        @Override
-//                        public void onAnimationCancel(Animator animation) {
-//                        }
-//                        @Override
-//                        public void onAnimationRepeat(Animator animation) {
-//                        }
-//                    });
-//                    objectAnimatorIn.start();
                 } else {
                     changeColor();
+                }
+                if(MusicService.getNextMP3() != null){
+                    MP3Item currentMP3 = MusicService.getCurrentMP3();
+                    MP3Item nextMP3 = MusicService.getNextMP3();
+                    mNextSong.setText(MusicService.getNextMP3().getTitle());
                 }
                 LogUtil.d(TAG,"duration:" + (System.currentTimeMillis() - start));
                 //更新专辑封面
@@ -317,6 +284,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
                 String msg = currentmodel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
                         currentmodel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
+                if(currentmodel == Constants.PLAY_REPEATONE){
+                    mNextSong.setText(mInfo.getTitle());
+                }
                 ToastUtil.show(AudioHolderActivity.this,msg);
                 break;
             //打开正在播放列表
@@ -606,7 +576,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             UpdateTopStatus(mInfo);
             //更新歌词
             ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
-
             //更新进度条
             int temp = MusicService.getProgress();
             mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
@@ -660,6 +629,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             //修改顶部字体颜色
             mTopTitle.setTextColor(mColorDraken);
             mTopDetail.setTextColor(mColorDark);
+
+            //修改一首歌曲字体颜色
+            mNextSong.setTextColor(mColorDark);
 
             //锁屏界面字体颜色
             if(mLrcView != null){

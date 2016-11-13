@@ -188,7 +188,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
     @Override
     public void onBackPressed() {
         if(mMultiChoice.isShow()) {
-            mMultiChoice.UpdateOptionMenu(false);
+            onBackPress();
         } else {
             finish();
         }
