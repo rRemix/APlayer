@@ -60,29 +60,6 @@ public class FolderActivity extends MultiChoiceActivity {
         setContentView(R.layout.activity_folder);
         ButterKnife.bind(this);
 
-//        mMultiChoice.setOnUpdateOptionMenuListener(new OnUpdateOptionMenuListener() {
-//            @Override
-//            public void onUpdate(final boolean multiShow) {
-//                mMultiChoice.setShowing(multiShow);
-//                mToolBar.setNavigationIcon(mMultiChoice.isShow() ? R.drawable.actionbar_delete : R.drawable.common_btn_back);
-//                mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        if(mMultiChoice.isShow()){
-//                            mMultiChoice.UpdateOptionMenu(false);
-//                            mMultiChoice.clear();
-//                        } else {
-//                            finish();
-//                        }
-//                    }
-//                });
-//                if(!mMultiChoice.isShow()){
-//                    mMultiChoice.clear();
-//                }
-//                invalidateOptionsMenu();
-//            }
-//        });
-
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.addItemDecoration(new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());

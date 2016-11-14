@@ -18,6 +18,8 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -42,7 +44,9 @@ public class FeedBakActivity extends ToolbarActivity {
         ButterKnife.bind(this);
         initToolbar(mToolBar,getString(R.string.back));
 
-        mSubmit.setBackground(Theme.getCorner(1.0f,5,0,ThemeStore.getStressColor()));
+        mSubmit.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0,ThemeStore.getStressColor()));
+        mEditText.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0, ColorUtil.getColor(R.color.gray_e2e2e2)));
+        Theme.setTint(mEditText,ThemeStore.getMaterialPrimaryColor(),false);
     }
 
     @OnClick(R.id.feedback_submit)

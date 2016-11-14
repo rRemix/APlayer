@@ -22,10 +22,10 @@ public class DiskCache {
     public static void init(Context context){
         mContext = context;
         try {
-            File lrc_cacheDir = getDiskCacheDir(mContext, "lrc");
-            if (!lrc_cacheDir.exists())
-                lrc_cacheDir.mkdir();
-            mLrcCache = DiskLruCache.open(lrc_cacheDir, getAppVersion(mContext), 1, 2 * 1024 * 1024);
+            File lrcCacheDir = getDiskCacheDir(mContext, "lrc");
+            if (!lrcCacheDir.exists())
+                lrcCacheDir.mkdir();
+            mLrcCache = DiskLruCache.open(lrcCacheDir, getAppVersion(mContext), 1, 2 * 1024 * 1024);
 
             File thumbnailCacheDir = getDiskCacheDir(mContext,"thumbnail");
             if(!thumbnailCacheDir.exists()){

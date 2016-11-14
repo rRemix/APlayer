@@ -2,6 +2,7 @@ package remix.myplayer.ui.dialog;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -180,7 +181,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     //分享心情到qq
     private void shareMindtoQQ() {
         Bundle params = new Bundle();
-        params.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, Uri.parse(mImageUrl.toString()).toString());
+        params.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, Uri.parse(mImageUrl).toString());
         params.putString(QQShare.SHARE_TO_QQ_APP_NAME, getResources().getString(R.string.app_name));
         params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
         mTencentApi.shareToQQ(ShareDialog.this, params, mQQListener);
@@ -230,9 +231,8 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         mWeiboApi.sendRequest(ShareDialog.this, request);
     }
 
-    //分享心情到微信
+    //分享心情到微信或者朋友圈
     private void shareMindtoWeChat(View v) {
-
         WXImageObject imgObj = new WXImageObject();
         imgObj.setImagePath(mImageUrl);
 
@@ -242,7 +242,6 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         //设置缩略图
         if(RecordShareActivity.getBg() != null){
             Bitmap thumbBmp = Bitmap.createScaledBitmap(RecordShareActivity.getBg(), 150, 150, true);
-//            msg.thumbData = CommonUtil.bmpToByteArray(thumbBmp, true);
             msg.setThumbImage(thumbBmp);
         }
 
@@ -254,7 +253,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         mWechatApi.sendReq(req);
     }
 
-    //分享歌曲到微信
+    //分享歌曲到微信或者朋友圈
     private void shareSongtoWechat(View v) {
         WXTextObject textObject = new WXTextObject();
         textObject.text = "推荐一首好歌：" + mInfo.getArtist() +

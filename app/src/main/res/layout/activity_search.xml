@@ -42,12 +42,12 @@
                 android:id="@+id/search_text"
                 android:background="@null"
                 android:textSize="@dimen/s16_size"
-                android:textColor="#EAEAEA"
-                android:textColorHint="#EAEAEA"
+                android:textColor="@color/gray_eaeaea"
+                android:textColorHint="@color/gray_eaeaea"
                 android:maxLines="1"
                 android:hint="@string/search_song_artist_album"
                 android:imeOptions="actionSearch"
-                android:textCursorDrawable="@drawable/bg_cursor_gray"/>
+                android:textCursorDrawable="@drawable/bg_cursor_white"/>
 
         </remix.myplayer.ui.customview.SearchToolBar>
     </android.support.design.widget.AppBarLayout>

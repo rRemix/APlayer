@@ -10,14 +10,18 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.provider.Settings;
 
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Random;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import remix.myplayer.R;
 import remix.myplayer.model.Genre;
@@ -62,14 +66,31 @@ public class MediaStoreUtil {
                     Constants.MEDIASTORE_WHERE_SIZE, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
             if(cursor != null) {
                 Global.mFolderMap.clear();
+
                 while (cursor.moveToNext()) {
                     int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
                     mAllSongList.add(id);
                     //根据歌曲路径对歌曲按文件夹分类
-                    String full_path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                    SortWithFolder(id,full_path);
+                    String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                    SortWithFolder(id,path);
                 }
-
+                //对文件夹名排序
+//                List<Map.Entry<String,ArrayList<Integer>>> entrylist = new ArrayList<>(tmpMap.entrySet());
+//                Collections.sort(entrylist, new Comparator<Map.Entry<String, ArrayList<Integer>>>() {
+//                    @Override
+//                    public int compare(Map.Entry<String, ArrayList<Integer>> o1, Map.Entry<String, ArrayList<Integer>> o2) {
+//                        return o1.getKey().compareToIgnoreCase(o2.getKey());
+//                    }
+//                });
+//                Global.mFolderMap.clear();
+//                Map.Entry<String,ArrayList<Integer>> tmpEntry = null;
+//                Iterator<Map.Entry<String,ArrayList<Integer>>> it = entrylist.iterator();
+//                while (it.hasNext()){
+//                    tmpEntry = it.next();
+//                    if(tmpEntry != null){
+//                        Global.mFolderMap.put(tmpEntry.getKey(),tmpEntry.getValue());
+//                    }
+//                }
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -284,6 +305,8 @@ public class MediaStoreUtil {
             } else {
                 Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), albumId);
                 pfd = mContext.getContentResolver().openFileDescriptor(uri, "r");
+                if(pfd == null)
+                    return null;
                 FileDescriptor fd = pfd.getFileDescriptor();
                 bm = BitmapFactory.decodeFileDescriptor(fd);
             }

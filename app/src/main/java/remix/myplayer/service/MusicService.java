@@ -722,12 +722,16 @@ public class MusicService extends BaseService {
     public static void setPlayModel(int playModel) {
         mPlayModel = playModel;
         SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
+        //其他模式切换到单曲循环
         if(mPlayModel == Constants.PLAY_REPEATONE){
             mNextId = mCurrentId;
             mNextIndex = mCurrentIndex;
             mNextInfo = mInfo;
         }
-        //根据当前播放模式，重置播放队列
+//        //单曲循环切换到顺序播放
+//        if(mPlayModel == Constants.PLAY_LOOP){
+//            updateNextSong(true);
+//        }
     }
 
     /**

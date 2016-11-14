@@ -27,7 +27,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
     private int mId;
     //0:专辑 1:歌手 2:文件夹 3:播放列表
     private int mType;
-    //专辑名 艺术家名 文件夹或者播放列表position
+    //专辑名 艺术家名 文件夹position或者播放列表id
     private String mKey;
     public AlbArtFolderPlaylistListener(Context Context, int id, int type, String key) {
         this.mContext = Context;
@@ -41,14 +41,14 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
         //根据不同参数获得歌曲id列表
         idList = MediaStoreUtil.getSongIdList(mId,mType);
 
-        if(idList == null || idList.size() == 0){
-            ToastUtil.show(mContext,R.string.list_isempty);
-            return true;
-        }
+
         switch (item.getItemId()) {
             //播放
             case R.id.menu_play:
-
+                if((idList == null || idList.size() == 0)){
+                    ToastUtil.show(mContext,R.string.list_isempty);
+                    return true;
+                }
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 Bundle arg = new Bundle();
                 arg.putInt("Control", Constants.PLAYSELECTEDSONG);
@@ -59,6 +59,10 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 break;
             //添加到播放队列
             case R.id.menu_add:
+                if((idList == null || idList.size() == 0)){
+                    ToastUtil.show(mContext,R.string.list_isempty);
+                    return true;
+                }
                 ToastUtil.show(mContext,mContext.getString(R.string.add_song_playinglist_success,Global.AddSongToPlayQueue(idList)));
                 break;
             //删除

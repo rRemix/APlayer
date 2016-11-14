@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal">
 
-    <include layout="@layout/toolbar"/>
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/material_color_primary"
+            app:layout_scrollFlags="scroll|enterAlways" />
+    </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,13 +25,13 @@
         android:gravity="center_horizontal">
         <EditText
             android:id="@+id/feedback_edittext"
-
+            android:background="@drawable/set_submit_input_bg"
             android:gravity="left|top"
             android:textSize="@dimen/s16_size"
             android:textColor="@color/drawer_list_color"
-            android:textCursorDrawable="@null"
+            android:textCursorDrawable="@drawable/bg_cursor_white"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/d180_size"
             android:layout_marginLeft="@dimen/d8_size"
             android:layout_marginRight="@dimen/d8_size"
             android:layout_marginTop="@dimen/d23_size"/>
@@ -33,7 +44,9 @@
             android:layout_marginTop="@dimen/d16_size"
             android:id="@+id/feedback_submit"
             android:textColor="@color/white"
+            android:textSize="@dimen/d14_size"
             android:text="提交"/>
+
     </LinearLayout>
 
 </LinearLayout>
