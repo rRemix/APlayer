@@ -116,12 +116,7 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
             holder.mOther.setText(artist + "-" + album);
 
             //封面
-            File imgFile = MediaStoreUtil.getImageUrlInCache(temp.getAlbumId(),Constants.URL_ALBUM);
-            if(imgFile != null && imgFile.exists()) {
-                holder.mImage.setImageURI(Uri.parse("file://" + imgFile));
-            } else {
-                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), temp.getAlbumId()));
-            }
+            MediaStoreUtil.setImageUrl(holder.mImage,temp.getAlbumId());
 
             //背景点击效果
             holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));

@@ -594,7 +594,8 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             textView.setText(getString(R.string.play_now,mp3Item.getTitle()));
         }
         if(simpleDraweeView != null){
-            simpleDraweeView.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mp3Item.getAlbumId()));
+            //封面
+            MediaStoreUtil.setImageUrl(simpleDraweeView,mp3Item.getAlbumId());
         }
 //        if(shadow != null){
 //            shadow.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.drawable.drawer_bg_album);

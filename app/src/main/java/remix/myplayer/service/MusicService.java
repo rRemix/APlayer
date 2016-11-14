@@ -332,7 +332,7 @@ public class MusicService extends BaseService {
             e.printStackTrace();
         }
         //初始化下一首歌曲
-        mNextId = SPUtil.getValue(Application.getContext(),"Setting","LastSongId",-1);
+        mNextId = SPUtil.getValue(Application.getContext(),"Setting","NextSongId",-1);
         if(mNextId == -1)
             return;
         //查找上次退出时保存的下一首歌曲是否还存在
@@ -728,6 +728,12 @@ public class MusicService extends BaseService {
             mNextInfo = mInfo;
         }
         //根据当前播放模式，重置播放队列
+        if(mPlayModel == Constants.PLAY_LOOP){
+            updateNextSong(true);
+        }
+        //保存正在播放和下一首歌曲
+        SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
+        SPUtil.putValue(mContext,"Setting","LastSongId",mCurrentId);
     }
 
     /**

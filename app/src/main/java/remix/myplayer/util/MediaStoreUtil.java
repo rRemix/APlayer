@@ -12,6 +12,8 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.Settings;
 
+import com.facebook.drawee.view.SimpleDraweeView;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -144,6 +146,15 @@ public class MediaStoreUtil {
         return type == Constants.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(id * 255 + "")) :
                type == Constants.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + "")) :
                new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + ""));
+    }
+
+    public static void setImageUrl(SimpleDraweeView simpleDraweeView,int albumId){
+        File imgFile = MediaStoreUtil.getImageUrlInCache(albumId,Constants.URL_ALBUM);
+        if(imgFile != null && imgFile.exists()) {
+            simpleDraweeView.setImageURI(Uri.parse("file://" + imgFile));
+        } else {
+            simpleDraweeView.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), albumId));
+        }
     }
 
     /**

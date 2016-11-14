@@ -284,8 +284,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
                 String msg = currentmodel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
                         currentmodel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
-                if(currentmodel == Constants.PLAY_REPEATONE){
-                    mNextSong.setText(mInfo.getTitle());
+                //刷新下一首
+                if(currentmodel != Constants.PLAY_SHUFFLE && MusicService.getNextMP3() != null){
+                    mNextSong.setText(MusicService.getNextMP3().getTitle());
                 }
                 ToastUtil.show(AudioHolderActivity.this,msg);
                 break;
