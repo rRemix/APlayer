@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f4f4f5">
+    android:background="@color/white_f4f4f5">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -28,10 +28,10 @@
                 android:background="@color/black">
                 <TextView
                     android:layout_width="@dimen/d260_size"
-                    android:layout_height="56dp"
+                    android:layout_height="@dimen/d56_size"
                     android:lines="1"
                     android:ellipsize="end"
-                    android:layout_marginLeft="@dimen/d187_size"
+                    android:layout_marginLeft="@dimen/d18_size"
                     android:id="@+id/recordshare_name"
                     android:textSize="@dimen/s20_size"
                     android:textColor="@color/white"

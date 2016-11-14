@@ -79,6 +79,7 @@
     <dimen name="d260_size">260dp</dimen>
     <dimen name="d264_size">264dp</dimen>
     <dimen name="d274_size">274dp</dimen>
+    <dimen name="d280_size">280dp</dimen>
     <dimen name="d300_size">300dp</dimen>
     <dimen name="d323_size">323dp</dimen>
     <dimen name="d328_size">328dp</dimen>

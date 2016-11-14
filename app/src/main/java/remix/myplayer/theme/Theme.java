@@ -130,6 +130,8 @@ public class Theme {
         return bg;
     }
 
+
+
     /**
      * 生成圆形或者矩形背景
      * @param shape
@@ -243,7 +245,7 @@ public class Theme {
      * @param editText
      * @param color
      */
-    public static void setTinit(EditText editText, int color,boolean underline) {
+    public static void setTint(EditText editText, int color, boolean underline) {
         try {
             final Field drawableResField = TextView.class.getDeclaredField("mCursorDrawableRes");
             drawableResField.setAccessible(true);

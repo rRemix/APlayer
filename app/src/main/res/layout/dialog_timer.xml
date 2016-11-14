@@ -52,7 +52,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/gray_272628"
+            android:textColor="@color/black_272628"
             android:textSize="@dimen/s13_size"
             android:text="设为默认"
             android:layout_marginRight="@dimen/d8_size"/>

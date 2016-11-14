@@ -62,13 +62,15 @@
     <color name="white_f4f4f5">#f4f4f5</color>
     <color name="purple_782899">#782899</color>
     <color name="gray_d3d2d3">#d3d2d3</color>
-    <color name="gray_272628">#272628</color>
+    <color name="black_272628">#272628</color>
     <color name="gray_b2b1b2">#b2b1b2</color>
     <color name="gray_e6e6e6">#e6e6e6</color>
     <color name="gray_3c3c3c">#3c3c3c</color>
     <color name="black_30000000">#30000000</color>
     <color name="gray_d9d9d9">#d9d9d9</color>
     <color name="gray_efeeed">#efeeed</color>
+    <color name="gray_eaeaea">#eaeaea</color>
+    <color name="gray_e2e2e2">#e2e2e2</color>
 
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>

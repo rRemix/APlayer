@@ -305,7 +305,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
                 return;
             mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
             if(mRawBitMap == null)
-                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_day);
+                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
 
             StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
             mStackBlurManager.process(40);

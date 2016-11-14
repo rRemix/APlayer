@@ -1,5 +1,6 @@
 package remix.myplayer.application;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 
@@ -12,6 +13,7 @@ import com.umeng.analytics.MobclickAgent;
 import cn.bmob.v3.Bmob;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
+import remix.myplayer.db.PlayLists;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;

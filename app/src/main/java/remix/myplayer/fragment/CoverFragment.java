@@ -96,9 +96,7 @@ public class CoverFragment extends BaseFragment {
                 @Override
                 public void onAnimationEnd(Animation animation) {
                     //当消失的动画播放完毕后，设置新的封面背景，并播放中心放大的动画
-//                    mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
                     mImage.setImageURI(mUri);
-//                    new UpdateCoverThread(mInfo.getAlbumId());
                     mImage.startAnimation(mScaleAnimation);
                 }
 
@@ -125,41 +123,34 @@ public class CoverFragment extends BaseFragment {
             return;
         if (mImage == null || (mInfo = info) == null)
             return;
-        new UpdateCoverThread(mInfo.getAlbumId(),withAnim ? WITH_ANIM : WITHOUT_ANIM).start();
-//        mUri = Uri.parse("file://" + MediaStoreUtil.getImageUrl(mInfo.getAlbumId() + "",Constants.URL_ALBUM));
-//        if(withAnim){
-//            //根据操作是上一首还是下一首播放动画
-//            int operation = Global.getOperation();
-//            if(operation == Constants.PREV)
-//                mImage.startAnimation(mRightAnimation);
-//            else if (operation == Constants.NEXT || operation == Constants.PLAYSELECTEDSONG)
-//                mImage.startAnimation(mLeftAnimation);
-//        } else {
-//            //如果不需要动画，直接设置背景
-//            mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
-////            mImage.setImageURI(mUri);
-//        }
-    }
 
-    class UpdateCoverThread extends Thread{
-        private int mAlbumId;
-        private int mWithAnim = 0;
-        public UpdateCoverThread(int id,int withAnim){
-            mAlbumId = id;
-            mWithAnim = withAnim;
+//        try {
+//            MP3File mp3File = new MP3File(mInfo.getUrl());
+//            AbstractID3v2Tag tag = mp3File.getID3v2Tag();
+//            AbstractID3v2Frame frame = (AbstractID3v2Frame) tag.getFrame("APIC");
+//            FrameBodyAPIC frameBodyAPIC = (FrameBodyAPIC) frame.getBody();
+//            byte[] imgBytes = frameBodyAPIC.getImageData();
+//            String imgUrl = frameBodyAPIC.getImageUrl();
+//            Bitmap bitmap = BitmapFactory.decodeByteArray(imgBytes,0,imgBytes.length);
+//            mImage.setImageBitmap(bitmap);
+//        }  catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+        File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(),Constants.URL_ALBUM);
+        if(imgFile.exists()) {
+            mUri = Uri.parse("file:///" +  imgFile);
+        } else {
+            mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
         }
-        @Override
-        public void run() {
-//            mUri = Uri.parse("file:///" +  MediaStoreUtil.getImageUrl(mAlbumId + "",Constants.URL_ALBUM));
-            File imgFile = MediaStoreUtil.getImageUrlInCache(mAlbumId,Constants.URL_ALBUM);
-            if(imgFile.exists()) {
-                mUri = Uri.parse("file:///" +  imgFile);
-            } else {
-                mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mAlbumId);
-            }
-            Message msg = new Message();
-            msg.what = mWithAnim;
-            mHandler.sendMessage(msg);
+        if(withAnim){
+            int operation = Global.getOperation();
+            if(operation == Constants.PREV)
+                mImage.startAnimation(mRightAnimation);
+            else if (operation == Constants.NEXT || operation == Constants.PLAYSELECTEDSONG)
+                mImage.startAnimation(mLeftAnimation);
+        } else {
+            mImage.setImageURI(mUri);
         }
     }
 

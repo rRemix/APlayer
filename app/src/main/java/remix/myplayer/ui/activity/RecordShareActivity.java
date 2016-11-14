@@ -27,9 +27,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
+import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.ui.dialog.ShareDialog;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DiskCache;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -116,7 +119,13 @@ public class RecordShareActivity extends BaseActivity {
         if(mInfo == null)
             return;
         //设置专辑封面
-        mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
+        File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(),Constants.URL_ALBUM);
+        if(imgFile != null && imgFile.exists()) {
+            mImage.setImageURI(Uri.parse("file://" + imgFile));
+        } else {
+            mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId()));
+        }
+
         //设置歌曲名与分享内容
         mContent.setText(getIntent().getExtras().getString("Content"));
         mSong.setText(" " + mInfo.getTitle() + " ");
@@ -127,7 +136,7 @@ public class RecordShareActivity extends BaseActivity {
     }
 
     @OnClick({R.id.recordshare_cancel,R.id.recordshare_share})
-    public void onClikc(View v){
+    public void onClick(View v){
         switch (v.getId()){
             case R.id.recordshare_cancel:
                 finish();
@@ -147,17 +156,18 @@ public class RecordShareActivity extends BaseActivity {
         public void run() {
             //开始处理,显示进度条
             mHandler.sendEmptyMessage(START);
+
             mBackgroudCache = mContainer.getDrawingCache(true);
             mFile = null;
             try {
                 //将截屏内容保存到文件
-                mFile = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + getPackageName() + "/record.png");
+                mFile = new File(DiskCache.getDiskCacheDir(RecordShareActivity.this,"thumbnail/album")  + "/mind.png");
                 if (!mFile.exists()) {
                     mFile.createNewFile();
                 }
                 fos = new FileOutputStream(mFile);
                 if (null != fos) {
-                    mBackgroudCache.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                    mBackgroudCache.compress(Bitmap.CompressFormat.JPEG, 80, fos);
                     fos.flush();
                     fos.close();
                 }
@@ -176,6 +186,7 @@ public class RecordShareActivity extends BaseActivity {
                         e.printStackTrace();
                     }
             }
+
             //打开分享的Dialog
             Intent intent = new Intent(RecordShareActivity.this, ShareDialog.class);
             Bundle arg = new Bundle();

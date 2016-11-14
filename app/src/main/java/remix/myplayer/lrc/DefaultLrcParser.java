@@ -48,6 +48,7 @@ public class DefaultLrcParser implements ILrcParser {
             }
             //为歌词排序
             Collections.sort(lrcRows);
+
             for (int i = 0; i < lrcRows.size() - 1; i++) {
                 lrcRows.get(i).setTotalTime(lrcRows.get(i + 1).getTime() - lrcRows.get(i).getTime());
             }
