@@ -1,6 +1,7 @@
 package remix.myplayer.lrc;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,6 +68,12 @@ public class DefaultLrcParser implements ILrcParser {
                 if (bufferedReader != null)
                     bufferedReader.close();
             } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                if(lrcCachaStream != null)
+                    lrcCachaStream.close();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

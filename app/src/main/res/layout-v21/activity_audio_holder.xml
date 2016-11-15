@@ -3,6 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/transparent"
     android:id="@+id/audio_holder_container"
     android:paddingTop="@dimen/activity_padding_top">
 
@@ -13,11 +14,11 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="7">
+            android:layout_weight="8">
             <!-- 顶部自定义actionbar、-->
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/d60_size"
+                android:layout_height="@dimen/d56_size"
                 android:id="@+id/top_actionbar">
                 <ImageButton
                     android:layout_width="@dimen/d40_size"
@@ -50,18 +51,18 @@
                         android:lines="1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/black_333333"
                         android:textSize="@dimen/s16_size"
                         android:gravity="center"/>
                     <TextView
                         android:id="@+id/top_detail"
-                        android:text="歌手-专辑"
                         android:ellipsize="end"
                         android:lines="1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:layout_below="@id/top_title"
-                        android:textColor="#4D4D4D"
+                        android:textColor="@color/gray_7e7e7e"
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
             </RelativeLayout>
@@ -87,7 +88,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
-                        android:src="@drawable/play_icon_selected_dot"
                         android:id="@+id/guide_02"
                         android:layout_marginLeft="@dimen/d2_size"
                         android:layout_marginRight="@dimen/d2_size"/>
@@ -96,14 +96,12 @@
                         android:layout_height="wrap_content"
                         android:layout_toLeftOf="@id/guide_02"
                         android:layout_alignTop="@id/guide_02"
-                        android:src="@drawable/play_icon_unselected_dot"
                         android:id="@+id/guide_01" />
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_toRightOf="@id/guide_02"
                         android:layout_alignTop="@id/guide_02"
-                        android:src="@drawable/play_icon_unselected_dot"
                         android:id="@+id/guide_03"/>
                 </RelativeLayout>
             </LinearLayout>
@@ -124,15 +122,16 @@
                 android:gravity="center"
                 android:textSize="@dimen/s11_size"
                 android:text="00:00"
-                android:layout_marginLeft="@dimen/d4_size"
-                android:textColor="@color/day_textcolor_primary"/>
+                android:layout_marginLeft="@dimen/d2_size"
+                android:textColor="@color/gay_cecece"/>
             <SeekBar
                 android:id="@+id/seekbar"
-                android:maxHeight="@dimen/d2_size"
-                android:progressDrawable="@drawable/bg_progress"
                 android:layout_width="0dp"
-                android:layout_weight="6"
-                android:layout_height="wrap_content" />
+                android:layout_weight="8"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/d2_size"
+                android:maxHeight="@dimen/d2_size"
+                android:progressDrawable="@drawable/bg_progress"/>
             <!--剩余播放时间-->
             <TextView
                 android:id="@+id/text_remain"
@@ -142,22 +141,15 @@
                 android:gravity="center"
                 android:textSize="@dimen/s11_size"
                 android:text="00:00"
-                android:layout_marginRight="@dimen/d4_size"
-                android:textColor="@color/day_textcolor_primary"/>
+                android:layout_marginRight="@dimen/d2_size"
+                android:textColor="@color/gay_cecece"/>
         </LinearLayout>
 
         <!-- 三个播放控制按钮和两个控制播放模式 -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1.5"
-            android:layout_marginBottom="@dimen/d10_size">
-            <TextView
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/next_song"/>
+            android:layout_weight="1.5">
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/d60_size"
@@ -208,6 +200,22 @@
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:layout_marginRight="@dimen/d16_size"/>
             </RelativeLayout>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.5">
+            <TextView
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/d8_size"
+                android:layout_marginRight="@dimen/d8_size"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textSize="@dimen/s14_size"
+                android:textColor="@color/gray_a8a8a8"
+                android:id="@+id/next_song"/>
         </RelativeLayout>
     </LinearLayout>
 

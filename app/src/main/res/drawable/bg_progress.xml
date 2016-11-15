@@ -3,17 +3,16 @@
     <!-- 轨道背景-->
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="#F4F4F4"/>
+            <solid android:color="@color/transparent"/>
+            <size android:height="@dimen/d1_size"/>
         </shape>
-        <!--<shape>-->
-            <!--<solid android:color="#d1d0ce"/>-->
-        <!--</shape>-->
     </item>
     <!-- 已完成轨道背景-->
     <item android:id="@android:id/progress">
         <clip>
             <shape>
-                <solid android:color="#8e24aa"/>
+                <solid android:color="@color/md_red_primary"/>
+                <size android:height="@dimen/d1_size"/>
             </shape>
         </clip>
     </item>

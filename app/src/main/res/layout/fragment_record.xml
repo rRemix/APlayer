@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/d15_size">
+    android:layout_height="match_parent">
 
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/note_bg">
+        android:layout_width="@dimen/d264_size"
+        android:layout_height="@dimen/d264_size"
+        android:layout_marginTop="@dimen/d28_size"
+        android:background="@drawable/note_bg"
+        android:layout_gravity="center">
         <remix.myplayer.ui.customview.PagerEditText
             android:layout_width="match_parent"
             android:layout_height="@dimen/d200_size"
             android:id="@+id/edit_record"
-            android:maxLength="140"
+            android:maxLength="200"
             android:gravity="left"
             android:textColor="#50452f"
             android:textSize="@dimen/s14_size"
@@ -26,11 +27,11 @@
             android:layout_height="@dimen/d32_size"
             android:layout_gravity="bottom|right"
             android:layout_marginRight="@dimen/d16_size"
-            android:layout_marginBottom="@dimen/d16_size"
-            android:background="@drawable/bg_btn_record_share"
+            android:layout_marginBottom="@dimen/d8_size"
+            android:background="@color/transparent"
             android:id="@+id/sharebtn"
-            android:text="以海报分享"
-            android:textColor="#b5a979"
+            android:text="@string/record_share"
+            android:textColor="@color/gray_e6dccb"
             android:textSize="@dimen/s16_size"/>
     </FrameLayout>
 

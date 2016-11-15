@@ -71,6 +71,11 @@
     <color name="gray_efeeed">#efeeed</color>
     <color name="gray_eaeaea">#eaeaea</color>
     <color name="gray_e2e2e2">#e2e2e2</color>
+    <color name="black_333333">#333333</color>
+    <color name="gray_7e7e7e">#7e7e7e</color>
+    <color name="gray_a8a8a8">#a8a8a8</color>
+    <color name="gay_cecece">#cecece</color>
+    <color name="gray_e6dccb">#e6dccb</color>
 
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>

@@ -251,7 +251,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         }
         //封面
         if(mSimpleImage != null) {
-            mSimpleImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
+            MediaStoreUtil.setImageUrl(mSimpleImage,mInfo.getAlbumId());
         }
         //判断是否收藏
         mIsLove = false;

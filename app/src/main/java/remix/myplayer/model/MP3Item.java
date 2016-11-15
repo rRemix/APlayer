@@ -44,6 +44,8 @@ public class MP3Item implements Serializable,Cloneable {
     }
 
     public MP3Item(MP3Item info) {
+        if(info == null)
+            return;
         this.Id = info.getId();
         this.Title = info.getTitle();
         this.Displayname = info.getDisplayname();

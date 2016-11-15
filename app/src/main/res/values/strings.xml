@@ -99,4 +99,5 @@
     <string name="weibo">微博</string>
     <string name="wechat">微信</string>
     <string name="circlefriend">朋友圈</string>
+    <string name="record_share">以海报分享</string>
 </resources>

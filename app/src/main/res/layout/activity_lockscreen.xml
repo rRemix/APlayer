@@ -18,8 +18,9 @@
         android:layout_width="@dimen/d200_size"
         android:layout_height="@dimen/d200_size"
         android:id="@+id/lockscreen_image"
-        fresco:placeholderImage="?attr/default_album"
-        fresco:placeholderImageScaleType="centerCrop"
+
+        fresco:failureImage="@drawable/album_empty_bg_night"
+        fresco:failureImageScaleType="centerCrop"
         fresco:actualImageScaleType="centerCrop"
         android:scaleType="centerCrop"
         fresco:roundAsCircle="true"

@@ -6,13 +6,12 @@
     android:layout_height="match_parent">
     <com.facebook.drawee.view.SimpleDraweeView
         android:layout_margin="@dimen/d15_size"
-        android:layout_marginTop="@dimen/d25_size"
+        android:layout_marginTop="@dimen/d28_size"
         android:layout_centerInParent="true"
         android:id="@+id/cover_image"
-        android:layout_width="@dimen/d328_size"
-        android:layout_height="@dimen/d328_size"
+        android:layout_width="@dimen/d264_size"
+        android:layout_height="@dimen/d264_size"
         fresco:actualImageScaleType="centerCrop"
         fresco:failureImage="@drawable/album_empty_bg_day"
-        fresco:failureImageScaleType="centerCrop"
-        fresco:roundedCornerRadius="@dimen/d8_size"/>
+        fresco:failureImageScaleType="centerCrop" />
 </RelativeLayout>

@@ -173,6 +173,8 @@ public class LrcView extends View implements ILrcView{
 		//实现渐变的最大歌词行数
 		int count = Math.max(maxRaw - mCurRow, mCurRow - minRaw);
 		//两行歌词间字体颜色变化的透明度
+		if(count == 0)
+			count = 1;
 		int alpha = (0xFF - 0x10) / count;
 		//画出来的第一行歌词的y坐标
 		float rowY = getHeight() / 2 + minRaw*(mCurSizeForOtherLrc + mCurPadding);
