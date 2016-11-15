@@ -19,7 +19,7 @@
                 android:id="@+id/multi_playlist"
                 android:layout_width="@dimen/d56_size"
                 android:layout_height="match_parent"
-                android:src="@drawable/btn_tip_playlist"
+                android:src="@drawable/btn_tip_delete"
                 android:background="?attr/background_common"
                 android:layout_centerInParent="true" />
             <ImageButton
@@ -41,7 +41,7 @@
                 android:id="@+id/multi_playqueue"
                 android:layout_width="@dimen/d56_size"
                 android:layout_height="match_parent"
-                android:src="@drawable/btn_tip_playqueue"
+                android:src="@drawable/btn_tip_playlist"
                 android:background="?attr/background_common"
                 android:layout_centerInParent="true"/>
         </RelativeLayout>
@@ -54,7 +54,7 @@
                 android:id="@+id/multi_delete"
                 android:layout_width="@dimen/d56_size"
                 android:layout_height="match_parent"
-                android:src="@drawable/btn_tip_delete"
+                android:src="@drawable/btn_tip_playqueue"
                 android:background="?attr/background_common"
                 android:layout_centerInParent="true"/>
         </RelativeLayout>

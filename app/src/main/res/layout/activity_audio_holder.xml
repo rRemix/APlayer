@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:id="@+id/audio_holder_container"
     android:fitsSystemWindows="true"
-    android:background="@color/transparent">
+    android:background="@color/white">
 
    <LinearLayout
        android:layout_width="match_parent"
@@ -56,7 +56,6 @@
                        android:gravity="center"/>
                    <TextView
                        android:id="@+id/top_detail"
-                       android:text="歌手-专辑"
                        android:ellipsize="end"
                        android:lines="1"
                        android:layout_width="match_parent"
@@ -159,17 +158,29 @@
                android:background="@color/transparent"
                android:layout_centerVertical="true"
                android:layout_marginLeft="@dimen/d16_size"/>
-           <ImageButton
-               android:id="@+id/playbar_play"
+           <FrameLayout
                android:layout_width="@dimen/d60_size"
                android:layout_height="@dimen/d60_size"
-               android:scaleType="center"
-               android:layout_centerInParent="true"
-               android:src="@drawable/play_btn_play"
-               android:background="@color/transparent"/>
+               android:id="@+id/playbar_play_container"
+               android:layout_centerInParent="true">
+               <ImageView
+                   android:id="@+id/playbar_play_bg"
+                   android:layout_width="@dimen/d60_size"
+                   android:layout_height="@dimen/d60_size"
+                   android:src="@drawable/play_bg_play"
+                   android:layout_gravity="center"/>
+               <ImageView
+                   android:id="@+id/playbar_play"
+                   android:layout_gravity="center"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:src="@drawable/play_btn_play"
+                   android:background="@color/transparent"/>
+           </FrameLayout>
+
            <ImageButton
                android:id="@+id/playbar_prev"
-               android:layout_toLeftOf="@id/playbar_play"
+               android:layout_toLeftOf="@id/playbar_play_container"
                android:layout_width="@dimen/d60_size"
                android:layout_height="@dimen/d60_size"
                android:layout_marginRight="@dimen/d16_size"
@@ -180,7 +191,7 @@
                android:id="@+id/playbar_next"
                android:layout_width="@dimen/d60_size"
                android:layout_height="@dimen/d60_size"
-               android:layout_toRightOf="@id/playbar_play"
+               android:layout_toRightOf="@id/playbar_play_container"
                android:layout_marginLeft="@dimen/d16_size"
                android:layout_centerVertical="true"
                android:src="@drawable/play_btn_next"

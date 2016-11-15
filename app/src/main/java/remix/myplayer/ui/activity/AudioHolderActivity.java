@@ -98,7 +98,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     @BindView(R.id.playbar_prev)
     ImageButton mPlayBarPrev;
     @BindView(R.id.playbar_play)
-    ImageButton mPlayBarPlay;
+    ImageView mPlayBarPlay;
     @BindView(R.id.playbar_next)
     ImageButton mPlayBarNext;
     @BindView(R.id.playbar_model)
@@ -205,7 +205,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
     @Override
     protected void setStatusBar() {
-        StatusBarUtil.setTransparent(this);
+        StatusBarUtil.setColor(this,Color.WHITE,0);
     }
 
     @Override
@@ -247,7 +247,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
      * 上一首 下一首 播放、暂停
      * @param v
      */
-    @OnClick({R.id.playbar_next,R.id.playbar_prev,R.id.playbar_play})
+    @OnClick({R.id.playbar_next,R.id.playbar_prev,R.id.playbar_play_container})
     public void onCtrlClick(View v){
         Intent intent = new Intent(Constants.CTL_ACTION);
         switch (v.getId()) {
@@ -257,14 +257,15 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             case R.id.playbar_next:
                 intent.putExtra("Control", Constants.NEXT);
                 break;
-            case R.id.playbar_play:
+            case R.id.playbar_play_container:
                 intent.putExtra("Control", Constants.PLAYORPAUSE);
-                if(mNewSwatch != null)
-                    Theme.TintDrawable(mPlayBarPlay,!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,ThemeStore.getMaterialPrimaryColor());
-
+//                if(mNewSwatch != null) {
+//                    Theme.TintDrawable(mPlayBarPlay, !mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop, ThemeStore.getMaterialPrimaryColor());
+//                }
+                mPlayBarPlay.setImageResource(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
                 break;
         }
-        MobclickAgent.onEvent(this,v.getId() == R.id.playbar_prev ? "Prev" : v.getId() == R.id.playbar_next ? "Next" : "Play");
+        MobclickAgent.onEvent(this,v.getId() == R.id.playbar_play_container ? "Prev" : v.getId() == R.id.playbar_next ? "Next" : "Play");
         sendBroadcast(intent);
     }
 
@@ -486,7 +487,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     public void UpdatePlayButton(boolean isPlay) {
         if(mPlayBarPlay != null) {
 //            Theme.TintDrawable(mPlayBarPlay,!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,ThemeStore.getMaterialPrimaryColor());
-            mPlayBarPlay.setImageResource(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
+            mPlayBarPlay.setImageResource(!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
         }
     }
 
@@ -647,10 +648,10 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
      */
     private void initColor() {
         int stressColor = ThemeStore.getStressColor();
-
+        int garyColor = ColorUtil.getColor(R.color.gray_6c6a6c);
         //修改顶部按钮颜色
-        Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,ColorUtil.getColor(R.color.gray_6c6a6c));
-        Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,ColorUtil.getColor(R.color.gray_6c6a6c));
+        Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,garyColor);
+        Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,garyColor);
 
         LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
         //修改progress颜色
@@ -659,19 +660,21 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         mSeekBar.setProgressDrawable(layerDrawable);
         //修改thumb颜色
         mSeekBar.setThumb(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,stressColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),stressColor));
-
+//        mSeekBar.setThumb(Theme.TintDrawable(getResources().getDrawable(R.drawable.icon_thumb),stressColor));
 
         //修改控制按钮颜色
-//        Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,stressColor);
-//        Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,stressColor);
+        Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,stressColor);
+        Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,stressColor);
 
         int currentmodel = MusicService.getPlayModel();
-//        Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-//                currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-//                        R.drawable.play_btn_loop_one,stressColor);
+        Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+                        R.drawable.play_btn_loop_one,garyColor);
+        Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,garyColor);
+
 //        Theme.TintDrawable(mPlayBarPlay,!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,mColorDraken);
         mPlayBarPlay.setImageResource(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
-//        Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,stressColor);
+        Theme.TintDrawable(findView(R.id.playbar_play_bg),getResources().getDrawable(R.drawable.play_bg_play),stressColor);
     }
 
     /**
@@ -681,7 +684,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         //修改颜色
         if(mTopDetail != null && mTopTitle != null && mRawBitMap != null){
             //修改背景颜色
-            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{mColorFrom, mColorTo}));
+//            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{mColorFrom, mColorTo}));
 //            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{mColorTo, mColorTo}));
 
 //            //修改顶部字体颜色
