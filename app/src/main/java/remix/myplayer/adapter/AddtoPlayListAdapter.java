@@ -65,7 +65,7 @@ public class AddtoPlayListAdapter extends RecyclerView.Adapter<AddtoPlayListAdap
                     }
                 });
             }
-            holder.mDivider.setBackgroundColor(ThemeStore.getDividerColor());
+
         }
     }
 
@@ -79,8 +79,7 @@ public class AddtoPlayListAdapter extends RecyclerView.Adapter<AddtoPlayListAdap
         TextView mText;
         @BindView(R.id.item_root)
         RelativeLayout mContainer;
-        @BindView(R.id.divider)
-        View mDivider;
+
         public PlayListAddToHolder(View itemView){
            super(itemView);
         }

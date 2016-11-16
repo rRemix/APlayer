@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/d60_size"
+    android:layout_height="wrap_content"
     android:background="?attr/background_common"
     android:id="@+id/item_root">
-    <RelativeLayout
-        android:layout_width="@dimen/d60_size"
-        android:layout_height="@dimen/d60_size"
-        android:id="@+id/button_container"
-        android:layout_alignParentRight="true">
-        <ImageView
-            android:layout_width="@dimen/d24_size"
-            android:layout_height="@dimen/d24_size"
-            android:id="@+id/playlist_item_button"
-            android:layout_centerInParent="true"
-            android:src="@drawable/playqueue_delete" />
-    </RelativeLayout>
+    <ImageView
+        android:layout_width="@dimen/d24_size"
+        android:layout_height="@dimen/d24_size"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:id="@+id/playqueue_delete"
+        android:layout_centerInParent="true"
+        android:src="@drawable/playqueue_delete"
+        android:layout_marginRight="@dimen/d8_size"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,7 +21,7 @@
         android:gravity="center_vertical"
         android:layout_margin="@dimen/d10_size"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/button_container"
+        android:layout_toLeftOf="@id/playqueue_delete"
         android:layout_alignParentLeft="true">
         <TextView
             android:id="@+id/playlist_item_name"
@@ -32,14 +29,16 @@
             android:layout_height="wrap_content"
             android:textColor="@color/gray_3c3c3c"
             android:textSize="@dimen/s18_size"
-            android:lines="1"
+            android:maxLines="1"
             android:ellipsize="end" />
         <TextView
             android:id="@+id/playlist_item_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black_30000000"
-            android:textSize="@dimen/s12_size" />
+            android:textSize="@dimen/s12_size"
+            android:maxLines="1"
+            android:ellipsize="end"/>
     </LinearLayout>
 
     <View

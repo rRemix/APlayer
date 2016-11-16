@@ -274,6 +274,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         } else {
             mBottomBar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
         }
+
     }
 
 
@@ -369,6 +370,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mPagerAdapter.AddFragment(new ArtistFragment());
         mPagerAdapter.AddFragment(new PlayListFragment());
 
+        mAddButton.setImageResource(ThemeStore.isDay() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(0);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

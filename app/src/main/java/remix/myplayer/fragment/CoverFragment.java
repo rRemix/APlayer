@@ -26,6 +26,7 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.thumb.SearchCover;
 
 /**
@@ -86,9 +87,14 @@ public class CoverFragment extends BaseFragment {
             mLeftAnimation = (TranslateAnimation) AnimationUtils.loadAnimation(getContext(),R.anim.cover_left_out);
             //往右侧消失的动画
             mRightAnimation = (TranslateAnimation)AnimationUtils.loadAnimation(getContext(),R.anim.cover_right_out);
-            //中心方法的动画
+            //中心放大的动画
             mScaleAnimation = (ScaleAnimation) AnimationUtils.loadAnimation(getContext(),R.anim.cover_center_in);
 
+            //背景是否开启渐变决定动画时间
+            boolean grident = SPUtil.getValue(getContext(),"Setting","Grident",false);
+            mLeftAnimation.setDuration(getResources().getInteger(grident ? R.integer.CoverOutFast : R.integer.CoverOutSlow));
+            mRightAnimation.setDuration(getResources().getInteger(grident ? R.integer.CoverOutFast : R.integer.CoverOutSlow));
+            mScaleAnimation.setDuration(getResources().getInteger(grident ? R.integer.CoverCenterInDurationFast : R.integer.CoverCenterInDurationSlow));
             Animation.AnimationListener listener = new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
@@ -123,19 +129,6 @@ public class CoverFragment extends BaseFragment {
             return;
         if (mImage == null || (mInfo = info) == null)
             return;
-
-//        try {
-//            MP3File mp3File = new MP3File(mInfo.getUrl());
-//            AbstractID3v2Tag tag = mp3File.getID3v2Tag();
-//            AbstractID3v2Frame frame = (AbstractID3v2Frame) tag.getFrame("APIC");
-//            FrameBodyAPIC frameBodyAPIC = (FrameBodyAPIC) frame.getBody();
-//            byte[] imgBytes = frameBodyAPIC.getImageData();
-//            String imgUrl = frameBodyAPIC.getImageUrl();
-//            Bitmap bitmap = BitmapFactory.decodeByteArray(imgBytes,0,imgBytes.length);
-//            mImage.setImageBitmap(bitmap);
-//        }  catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
         File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(),Constants.URL_ALBUM);
         if(imgFile.exists()) {

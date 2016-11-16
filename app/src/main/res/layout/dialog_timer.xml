@@ -83,7 +83,7 @@
             android:layout_marginBottom="@dimen/d5_szie"
             android:gravity="center"
             android:text="设为默认后下次点击'定时停止'按钮将直接开始计时"
-            android:textSize="8sp"
+            android:textSize="@dimen/s8_size"
             android:textColor="@color/gray_b2b1b2"/>
         <TextView
             android:layout_width="match_parent"
@@ -108,8 +108,8 @@
             android:layout_marginRight="@dimen/d20_size"
             android:layout_marginLeft="@dimen/d16_size"
             android:gravity="center"
-            android:padding="@dimen/d2_size"
-            android:textSize="@dimen/s16_size"
+            android:padding="@dimen/d1_size"
+            android:textSize="@dimen/s14_size"
             android:text="开始计时" />
         <Button
             android:visibility="gone"
@@ -118,8 +118,8 @@
             android:id="@+id/close_stop"
             android:layout_toLeftOf="@id/close_toggle"
             android:gravity="center"
-            android:padding="@dimen/d2_size"
-            android:textSize="@dimen/s16_size"
+            android:padding="@dimen/d1_size"
+            android:textSize="@dimen/s14_size"
             android:text="关闭"/>
     </RelativeLayout>
 </LinearLayout>

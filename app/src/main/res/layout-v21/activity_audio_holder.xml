@@ -183,7 +183,7 @@
                         android:layout_height="wrap_content"
                         android:scaleType="center"
                         android:layout_gravity="center"
-                        app:srcCompat="@drawable/ic_pause_vector"/>
+                        app:srcCompat="@drawable/play_btn_play"/>
                 </FrameLayout>
 
                 <ImageButton

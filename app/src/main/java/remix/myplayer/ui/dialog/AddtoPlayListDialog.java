@@ -62,13 +62,11 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_addto_playlist);
         ButterKnife.bind(this);
 
         mAudioID = (int)getIntent().getExtras().getLong("Id");
-
 
         mAdapter = new AddtoPlayListAdapter(this);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
@@ -86,7 +84,6 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
 
             @Override
             public void onItemLongClick(View view, int position) {
-
             }
         });
         mRecyclerView.setAdapter(mAdapter);
@@ -132,7 +129,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                     .titleColorAttr(R.attr.text_color_primary)
                     .buttonRippleColor(ThemeStore.getRippleColor())
                     .positiveText(R.string.create)
-                    .positiveColor(ThemeStore.getMaterialPrimaryColor())
+                    .positiveColorAttr(R.attr.text_color_primary)
                     .negativeText(R.string.cancel)
                     .negativeColorAttr(R.attr.text_color_primary)
                     .backgroundColorAttr(R.attr.background_color_3)

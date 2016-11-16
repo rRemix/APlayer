@@ -22,6 +22,15 @@
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:background="?attr/background_color_3">
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="@dimen/d240_size"
+            android:layout_height="@dimen/d240_size"
+            android:background="@color/md_brown_primary"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/d20_size"/>
+
         <android.support.v7.widget.CardView
             android:orientation="vertical"
             android:layout_gravity="center_horizontal"

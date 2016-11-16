@@ -3,6 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="s8_size">8sp</dimen>
     <dimen name="s10_size">10sp</dimen>
     <dimen name="s11_size">11sp</dimen>
     <dimen name="s12_size">12sp</dimen>

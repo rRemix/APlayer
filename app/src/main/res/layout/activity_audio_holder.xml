@@ -175,7 +175,7 @@
                    android:layout_gravity="center"
                    android:layout_width="wrap_content"
                    android:layout_height="wrap_content"
-                   app:srcCompat="@drawable/ic_pause_vector"
+                   app:srcCompat="@drawable/play_btn_play"
                    android:background="@color/transparent"/>
            </FrameLayout>
 

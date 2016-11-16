@@ -307,7 +307,7 @@ public class MusicService extends BaseService {
         //初始化音效设置
         Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
-        if(CommonUtil.isIntentAvailable(this,i)){
+        if(!CommonUtil.isIntentAvailable(this,i)){
             EQActivity.Init();
         }
     }

@@ -108,8 +108,8 @@
 ////        ImageLoader.getInstance().displayImage("content://media/external/audio/albumart/" + temp.getAlbumId(),
 ////                holder.mImage);
 //        //选项Dialog
-//        final ImageView mButton = (ImageView)convertView.findViewById(R.id.song_button);
-//        mButton.setOnClickListener(new View.OnClickListener() {
+//        final ImageView mDelete = (ImageView)convertView.findViewById(R.id.song_button);
+//        mDelete.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
 //                if(RecetenlyActivity.MultiChoice.isShow()){

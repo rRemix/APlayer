@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Animatable;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -15,7 +14,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.ColorInt;
-import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.view.ContextThemeWrapper;
@@ -33,6 +31,11 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.facebook.rebound.SimpleSpringListener;
+import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringConfig;
+import com.facebook.rebound.SpringSystem;
+import com.tumblr.backboard.performer.Performer;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
@@ -137,9 +140,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     //高亮与非高亮指示器
     private Drawable mHighLightIndicator;
     private Drawable mNormalIndicator;
-    //播放按钮动画
-    private AnimatedVectorDrawable mPlayToPauseAnim;
-    private AnimatedVectorDrawable mPauseToPlayAnim;
     //Viewpager
     private PagerAdapter mAdapter;
     private Bundle mBundle;
@@ -166,6 +166,10 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     private boolean mFromMainActivity = false;
     //是否是后退按钮
     private boolean mFromBack = false;
+    //是否需要更新
+    private boolean mNeedUpdateUI = true;
+    //是否开启背景渐变
+    private boolean mGradient = false;
 
     //更新背景与专辑封面的Handler
     private Handler mBlurHandler = new Handler() {
@@ -173,16 +177,12 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         public void handleMessage(Message msg) {
             if(msg.what == Constants.UPDATE_BG) {
                 //第一次更新不启用动画
-//                if(!mFistStart) {
-//                    mContainer.startAnimation(mAnimOut);
-//                } else {
-//                    updateColor();
-//                }
-                updateColor();
-
-                if(MusicService.getNextMP3() != null){
-                    mNextSong.setText("下一首：" + MusicService.getNextMP3().getTitle());
+                if(!mFistStart) {
+                    mContainer.startAnimation(mAnimOut);
+                } else {
+                    updateViewColor();
                 }
+
                 //更新专辑封面
                 ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
                 if(mFistStart)
@@ -210,7 +210,12 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
     @Override
     protected void setStatusBar() {
-        StatusBarUtil.setColor(this,Color.WHITE,0);
+        if(mGradient){
+            StatusBarUtil.setTransparent(this);
+        } else {
+            StatusBarUtil.setColor(this,Color.WHITE,0);
+        }
+//        StatusBarUtil.setTransparent(this);
     }
 
     @Override
@@ -220,13 +225,15 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mFromNotify = getIntent().getBooleanExtra("Notify",false);
+        mFromMainActivity =  getIntent().getBooleanExtra("FromMainActivity",false);
+        mGradient = SPUtil.getValue(this,"Setting","Gradient",false);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_audio_holder);
         ButterKnife.bind(this);
         mInstance = this;
 
-        mFromNotify = getIntent().getBooleanExtra("Notify",false);
-        mFromMainActivity =  getIntent().getBooleanExtra("FromMainActivity",false);
         //获是否正在播放和正在播放的歌曲
         mInfo = MusicService.getCurrentMP3();
         mIsPlay = MusicService.getIsplay();
@@ -243,7 +250,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         //初始化seekbar以及播放时间
         initSeekBar();
         //初始化主题颜色
-        initColor();
+        initViewColor();
     }
 
     /**
@@ -260,37 +267,14 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             case R.id.playbar_next:
                 intent.putExtra("Control", Constants.NEXT);
                 break;
-            case R.id.playbar_play:
+            case R.id.playbar_play_container:
                 intent.putExtra("Control", Constants.PLAYORPAUSE);
-//                mPlayBarPlay.setImageResource(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
-//                mPlayBarPlay.setImageDrawable(mIsPlay ? mPauseToPlayAnim : mPlayToPauseAnim);
-//                if(mIsPlay){
-//                    mPlayToPauseAnim.start();
-//                } else {
-//                    mPauseToPlayAnim.start();
-//                }
-//                Drawable drawable1 = AnimatedVectorDrawableCompat.create(this,R.drawable.ic_play_to_pause);
-//                Drawable drawable2 = AnimatedVectorDrawableCompat.create(this,R.drawable.ic_pause_to_play);
-//                if(mIsPlay){
-//                    if(drawable1 instanceof Animatable)
-//                        ((Animatable) drawable1).start();
-//                }
-//                else {
-//                    if(drawable2 instanceof Animatable)
-//                        ((Animatable) drawable2).start();
-//                }
-//                mPlayBarPlay.setImageDrawable(mIsPlay ? drawable1 : drawable1);
-//                mPlayBarPlay.setImageResource(mIsPlay ? R.drawable.ic_pause_to_play : R.drawable.ic_play_to_pause);
-//                Drawable drawable = mPlayBarPlay.getDrawable();
-//                if(drawable instanceof Animatable){
-//                    ((Animatable) drawable).start();
-//                }
+                if(mGradient){
+                    Theme.TintDrawable(mPlayBarPlay,!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,mColorDraken);
+                } else {
+                    mPlayBarPlay.setImageResource(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
+                }
 
-//                if(mIsPlay){
-//                    mPauseToPlayAnim.start();
-//                } else {
-//                    mPlayToPauseAnim.start();
-//                }
                 break;
         }
         MobclickAgent.onEvent(this,v.getId() == R.id.playbar_play_container ? "Prev" : v.getId() == R.id.playbar_next ? "Next" : "Play");
@@ -310,12 +294,15 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 int currentmodel = MusicService.getPlayModel();
                 currentmodel = (currentmodel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentmodel);
                 MusicService.setPlayModel(currentmodel);
-//                Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-//                        currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-//                                R.drawable.play_btn_loop_one,ThemeStore.getMaterialPrimaryColor());
-                mPlayModel.setImageResource(currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                if(mGradient){
+                    Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                         currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-                                R.drawable.play_btn_loop_one);
+                                R.drawable.play_btn_loop_one,mColorDraken);
+                } else {
+                    mPlayModel.setImageResource(currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                            currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+                                    R.drawable.play_btn_loop_one);
+                }
 
                 String msg = currentmodel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
                         currentmodel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
@@ -368,7 +355,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             }
             @Override
             public void onAnimationEnd(Animation animation) {
-                updateColor();
+                updateViewColor();
                 mContainer.startAnimation(mAnimIn);
             }
             @Override
@@ -376,10 +363,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             }
         });
 
-        mPlayToPauseAnim = (AnimatedVectorDrawable) getResources().getDrawable(R.drawable.ic_play_to_pause);
-        mPauseToPlayAnim = (AnimatedVectorDrawable) getResources().getDrawable(R.drawable.ic_pause_to_play);
-
-        new SwatchThread().start();
     }
 
 
@@ -387,10 +370,15 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     public void onResume() {
         super.onResume();
         //更新界面
-        if(MusicService.getCurrentMP3().getId() != mInfo.getId()) {
-            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
-        }
+//        if(MusicService.getCurrentMP3().getId() != mInfo.getId()) {
+//            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
+//        }
         mIsRunning = true;
+        if(mNeedUpdateUI){
+            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
+            mNeedUpdateUI = false;
+        }
+
         //更新进度条
         new ProgeressThread().start();
     }
@@ -512,8 +500,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     public void UpdatePlayButton(boolean isPlay) {
         if(mPlayBarPlay != null) {
 //            Theme.TintDrawable(mPlayBarPlay,!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,ThemeStore.getMaterialPrimaryColor());
-//            mPlayBarPlay.setImageResource(!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
-
+            mPlayBarPlay.setImageResource(!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
         }
     }
 
@@ -522,20 +509,19 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         UpdateTopStatus(mInfo);
     }
 
-    private void initRecordFragment() {
-        RecordFragment fragment = new RecordFragment();
-        mAdapter.AddFragment(fragment);
-    }
-
-    private void initCoverFragment() {
-        CoverFragment fragment = new CoverFragment();
-        fragment.setArguments(mBundle);
-        mAdapter.AddFragment(fragment);
-    }
-
-    private void initLrcFragment() {
-        LrcFragment fragment = new LrcFragment();
-        fragment.setOnFindListener(new LrcFragment.OnLrcViewFindListener() {
+    private void initPager() {
+        //初始化Viewpager
+        mAdapter = new PagerAdapter(getSupportFragmentManager());
+        mBundle = new Bundle();
+        mBundle.putSerializable("MP3Item", mInfo);
+        //初始化所有fragment
+        RecordFragment recordFragment = new RecordFragment();
+        mAdapter.AddFragment(recordFragment);
+        CoverFragment coverFragment = new CoverFragment();
+        coverFragment.setArguments(mBundle);
+        mAdapter.AddFragment(coverFragment);
+        LrcFragment lrcFragment = new LrcFragment();
+        lrcFragment.setOnFindListener(new LrcFragment.OnLrcViewFindListener() {
             @Override
             public void onLrcViewFind(LrcView lrcView) {
                 mLrcView = lrcView;
@@ -551,18 +537,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 });
             }
         });
-        fragment.setArguments(mBundle);
-        mAdapter.AddFragment(fragment);
-    }
-
-    private void initPager() {
-        //初始化Viewpager
-        mAdapter = new PagerAdapter(getSupportFragmentManager());
-        mBundle = new Bundle();
-        mBundle.putSerializable("MP3Item", mInfo);
-        initRecordFragment();
-        initCoverFragment();
-        initLrcFragment();
+        lrcFragment.setArguments(mBundle);
+        mAdapter.AddFragment(lrcFragment);
 
         mPager.setAdapter(mAdapter);
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -618,29 +594,44 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
     //更新界面
     @Override
-    public void UpdateUI(MP3Item MP3Item, boolean isplay){
-        mInfo = MP3Item;
+    public void UpdateUI(MP3Item mp3Item, boolean isplay){
+        mInfo = mp3Item;
         mIsPlay = isplay;
-
-        //当操作不为播放或者暂停且正在运行时，更新界面
-        if(Global.getOperation() != Constants.PLAYORPAUSE && mInfo != null ) {
-            //更新顶部信息
-            UpdateTopStatus(mInfo);
-            //更新歌词
-            ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
-            //更新进度条
-            int temp = MusicService.getProgress();
-            mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
-            mDuration = (int) mInfo.getDuration();
-            mSeekBar.setMax(mDuration);
-
-            new SwatchThread().start();
+        //两种情况下更新ui
+        //一是activity在前台  二是activity暂停后有更新的动作，当activity重新回到前台后更新ui
+        if(!mIsRunning){
+            mNeedUpdateUI = true;
+            return;
         }
-        //操作为播放选中歌曲时不更新背景
-        //只更新按钮状态
-        else{
-            //更新按钮状态
-            UpdatePlayButton(isplay);
+        if(mNeedUpdateUI || mIsRunning){
+            //当操作不为播放或者暂停且正在运行时，更新所有控件
+            if((Global.getOperation() != Constants.PLAYORPAUSE  || mFistStart) && mInfo != null ) {
+                //更新顶部信息
+                UpdateTopStatus(mInfo);
+                //更新歌词
+                ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
+                //更新进度条
+                int temp = MusicService.getProgress();
+                mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
+                mDuration = (int) mInfo.getDuration();
+                mSeekBar.setMax(mDuration);
+                //更新下一首歌曲
+                if(MusicService.getNextMP3() != null){
+                    mNextSong.setText("下一首：" + MusicService.getNextMP3().getTitle());
+                }
+                //背景开启渐变
+                if(mGradient){
+                    new SwatchThread().start();
+                } else {
+                    //更新专辑封面
+                    ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
+                    mFistStart = false;
+                }
+            }
+            if(!mGradient) {
+                //更新按钮状态
+                UpdatePlayButton(isplay);
+            }
         }
 
     }
@@ -666,14 +657,15 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                     }
                 }
             }
-
         }
     }
 
     /**
      * 根据主题颜色修改按钮颜色
      */
-    private void initColor() {
+    private void initViewColor() {
+        if(mGradient)
+            return;
         int stressColor = ThemeStore.getStressColor();
         int garyColor = ColorUtil.getColor(R.color.gray_6c6a6c);
         //修改顶部按钮颜色
@@ -683,7 +675,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
         //修改progress颜色
         (layerDrawable.getDrawable(1)).setColorFilter(stressColor, PorterDuff.Mode.SRC_IN);
-
         mSeekBar.setProgressDrawable(layerDrawable);
         //修改thumb颜色
         mSeekBar.setThumb(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,stressColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),stressColor));
@@ -699,8 +690,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,garyColor);
 
 //        Theme.TintDrawable(mPlayBarPlay,!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,mColorDraken);
-//        mPlayBarPlay.setImageResource(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
-
+        mPlayBarPlay.setImageResource(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
 
         Theme.TintDrawable(findView(R.id.playbar_play_bg),getResources().getDrawable(R.drawable.play_bg_play),stressColor);
     }
@@ -708,20 +698,10 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     /**
      * 修改所有控件颜色
      */
-    private void updateColor(){
-        //修改颜色
+    private void updateViewColor(){
         if(mTopDetail != null && mTopTitle != null && mRawBitMap != null){
             //修改背景颜色
-//            if(SPUtil.getValue(this,"Setting","GridentBackground",false))
-//                mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{mColorFrom, mColorTo}));
-
-//            //修改顶部字体颜色
-//            mTopTitle.setTextColor(mColorDraken);
-//            mTopDetail.setTextColor(mColorDark);
-//
-//            //修改下一首歌曲字体颜色
-//            mNextSong.setTextColor(mColorDark);
-//
+            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{mColorFrom, mColorTo}));
             //歌词字体颜色
             if(mLrcView != null){
                 mLrcView.setHighLightColor(ColorUtil.adjustAlpha(mNewSwatch.getRgb(),1.0f));
@@ -729,35 +709,39 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 mLrcView.setTimeLineColor(ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.6f));
                 mLrcView.invalidate();
             }
+            //修改顶部字体颜色
+            mTopTitle.setTextColor(mColorDraken);
+            mTopDetail.setTextColor(mColorDark);
 
-//            mPlayBarPlay.setImageResource(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
+            //修改顶部按钮颜色
+            Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,mColorDraken);
+            Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,mColorDraken);
 
-//            LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
-//            //修改track颜色
-//            ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.3f));
-//            //修改progress颜色
-//            (layerDrawable.getDrawable(1)).setColorFilter(mColorDraken, PorterDuff.Mode.SRC_IN);
-//            mSeekBar.setProgressDrawable(layerDrawable);
-//
-//            //修改thumb颜色
-//            Drawable drawable = getResources().getDrawable(R.drawable.thumb);
-//            Theme.TintDrawable(drawable,mColorDraken);
-//            mSeekBar.setThumb(drawable);
-//
-//            //修改顶部按钮颜色
-//            Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,mColorDraken);
-//            Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,mColorDraken);
-//
-//            //修改控制按钮颜色
-//            Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,mColorDraken);
-//            Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,mColorDraken);
-//
-//            int currentmodel = MusicService.getPlayModel();
-//            Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-//                    currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-//                            R.drawable.play_btn_loop_one,mColorDraken);
-//            Theme.TintDrawable(mPlayBarPlay,!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,mColorDraken);
-//            Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,mColorDraken);
+            LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
+            //修改progress颜色
+            (layerDrawable.getDrawable(1)).setColorFilter(mColorDraken, PorterDuff.Mode.SRC_IN);
+            mSeekBar.setProgressDrawable(layerDrawable);
+            //修改thumb颜色
+            mSeekBar.setThumb(
+                    Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,mColorDraken, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),mColorDraken));
+            //三个指示器
+            int width = DensityUtil.dip2px(this,5);
+            int height = DensityUtil.dip2px(this,2);
+            mHighLightIndicator = Theme.getShape(GradientDrawable.RECTANGLE,mColorDraken,width,height);
+            mNormalIndicator = Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.adjustAlpha(mColorDraken,0.3f),width,height);
+            //修改控制按钮颜色
+            Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,mColorDraken);
+            Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,mColorDraken);
+            //播放按钮
+            mPlayBarPlay.setImageResource(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
+            int currentmodel = MusicService.getPlayModel();
+            Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                    currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+                            R.drawable.play_btn_loop_one,mColorDraken);
+            //播放按钮背景
+            Theme.TintDrawable(findView(R.id.playbar_play_bg),getResources().getDrawable(R.drawable.play_bg_play),mColorDraken);
+            //播放队列按钮
+            Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,mColorDraken);
         }
     }
 
@@ -782,9 +766,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 mColorDraken = mNewSwatch.getRgb();
                 mColorDark = ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.8f);
 
-                /** end */
                 mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
-
+                /** end */
             }
         }
     }

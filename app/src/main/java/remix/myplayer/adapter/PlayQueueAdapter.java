@@ -59,7 +59,7 @@ public class PlayQueueAdapter extends BaseAdapter<PlayQueueAdapter.PlayQueueHold
             }
 
             //删除按钮
-            holder.mButton.setOnClickListener(new View.OnClickListener() {
+            holder.mDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     PlayListUtil.deleteSong(audioId,Global.mPlayQueueID);
@@ -88,8 +88,8 @@ public class PlayQueueAdapter extends BaseAdapter<PlayQueueAdapter.PlayQueueHold
         TextView mSong;
         @BindView(R.id.playlist_item_artist)
         TextView mArtist;
-        @BindView(R.id.playlist_item_button)
-        ImageView mButton;
+        @BindView(R.id.playqueue_delete)
+        ImageView mDelete;
         @BindView(R.id.item_root)
         RelativeLayout mContainer;
         public PlayQueueHolder(View v) {
