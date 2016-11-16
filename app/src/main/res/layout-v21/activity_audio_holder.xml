@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -167,7 +169,8 @@
                     android:layout_width="@dimen/d60_size"
                     android:layout_height="@dimen/d60_size"
                     android:id="@+id/playbar_play_container"
-                    android:layout_centerInParent="true">
+                    android:layout_centerInParent="true"
+                    android:background="?android:attr/selectableItemBackgroundBorderless">
                     <ImageView
                         android:id="@+id/playbar_play_bg"
                         android:layout_width="@dimen/d60_size"
@@ -180,8 +183,7 @@
                         android:layout_height="wrap_content"
                         android:scaleType="center"
                         android:layout_gravity="center"
-                        android:src="@drawable/play_btn_play"
-                        android:background="?android:attr/selectableItemBackgroundBorderless"/>
+                        app:srcCompat="@drawable/ic_pause_vector"/>
                 </FrameLayout>
 
                 <ImageButton

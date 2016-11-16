@@ -28,6 +28,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.rebound.SimpleSpringListener;
+import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringSystem;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
@@ -376,6 +379,17 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             @Override
             public void onPageSelected(int position) {
                 mAddButton.setVisibility(position == 3 ? View.VISIBLE: View.GONE);
+                if(position == 3){
+                    SpringSystem.create().createSpring()
+                            .addListener(new SimpleSpringListener(){
+                                @Override
+                                public void onSpringUpdate(Spring spring) {
+                                    mAddButton.setScaleX((float) spring.getCurrentValue());
+                                    mAddButton.setScaleY((float) spring.getCurrentValue());
+                                }
+                            })
+                            .setEndValue(1);
+                }
             }
             @Override
             public void onPageScrollStateChanged(int state) {
