@@ -1,14 +1,14 @@
 package remix.myplayer.ui.activity;
 
-import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.net.Uri;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.ColorInt;
+import android.support.v4.widget.ScrollerCompat;
 import android.support.v7.graphics.Palette;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -18,27 +18,31 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Scroller;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.enrique.stackblur.StackBlurManager;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringSystem;
+import com.tumblr.backboard.Actor;
+import com.tumblr.backboard.MotionProperty;
+import com.tumblr.backboard.imitator.Imitator;
+import com.tumblr.backboard.performer.Performer;
 import com.umeng.analytics.MobclickAgent;
-
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2016/3/9.
@@ -62,15 +66,16 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     TextView mSong;
     @BindView(R.id.lockscreen_artist)
     TextView mArtist;
+    //下一首歌曲
+    @BindView(R.id.lockscreen_next_song)
+    TextView mNextSong;
     //控制按钮
-    @BindView(R.id.playbar_prev)
+    @BindView(R.id.lockscreen_prev)
     ImageButton mPrevButton;
-    @BindView(R.id.playbar_next)
+    @BindView(R.id.lockscreen_next)
     ImageButton mNextButton;
-    @BindView(R.id.playbar_play)
+    @BindView(R.id.lockscreen_play)
     ImageButton mPlayButton;
-    @BindView(R.id.lockscreen_love)
-    ImageButton mLoveButton;
     @BindView(R.id.lockscreen_image)
     SimpleDraweeView mSimpleImage;
     //背景
@@ -81,7 +86,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     private View mView;
     //是否正在运行
     private static boolean mIsRunning = false;
-
     //高斯模糊后的bitmap
     private Bitmap mNewBitMap;
     //高斯模糊之前的bitmap
@@ -90,16 +94,12 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     private int mHeight;
     //歌曲名字体颜色
     @ColorInt
-    private int mSongColor;
+    private int mSongColor = Color.WHITE;
     //艺术家字体颜色
     @ColorInt
-    private int mArtistColor;
-    //是否添加到收藏列表
-    private boolean mIsLove = false;
+    private int mArtistColor = Color.WHITE;
     //是否正在播放
     private static boolean mIsPlay = false;
-    //是否第一次打开
-    private boolean mIsFirst = true;
     private Palette.Swatch mSwatch;
     private Handler mBlurHandler = new Handler(){
         @Override
@@ -110,7 +110,10 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
             if(mSong != null && mArtist != null ){
                 mSong.setTextColor(mSongColor);
                 mArtist.setTextColor(mArtistColor);
+                mNextSong.setTextColor(mSongColor);
+                mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT,0,2,mSongColor,0,0,1));
             }
+
         }
     };
 
@@ -144,7 +147,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
         //初始化按钮
-
         CtrlButtonListener listener = new CtrlButtonListener(this);
         mPrevButton.setOnClickListener(listener);
         mNextButton.setOnClickListener(listener);
@@ -152,11 +154,10 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
 
         //初始化控件
         mImageBackground.setAlpha(0.75f);
-
         mArrowContainer.startAnimation(AnimationUtils.loadAnimation(this,R.anim.arrow_left_to_right));
-
         mView = getWindow().getDecorView();
         mView.setBackgroundColor(getResources().getColor(R.color.transparent));
+
     }
 
     //前后两次触摸的X
@@ -167,7 +168,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int action = event.getAction();
-
         switch (action){
             case MotionEvent.ACTION_DOWN:
                 mScrollX1 = event.getX();
@@ -192,7 +192,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
                 mDistance = mScrollX1 = 0;
                 break;
         }
-
         return true;
     }
 
@@ -234,13 +233,17 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
         mInfo = MP3Item;
-        if(!mIsRunning )
-            return;
-        //只更新播放按钮
-        if(mPlayButton != null){
-            mPlayButton.setBackground(getResources().getDrawable(MusicService.getIsplay() ? R.drawable.lock_btn_pause : R.drawable.lock_btn_play));
+        if(mInfo == null){
+            ToastUtil.show(this,"mp3Info:null", Toast.LENGTH_LONG);
         }
-
+        if(!mIsRunning ) {
+            ToastUtil.show(this,"isRunning:false", Toast.LENGTH_LONG);
+            return;
+        }
+        //更新播放按钮
+        if(mPlayButton != null){
+            mPlayButton.setImageResource(MusicService.getIsplay() ? R.drawable.lock_btn_pause : R.drawable.lock_btn_play);
+        }
         //标题
         if(mSong != null) {
             mSong.setText(mInfo.getTitle());
@@ -253,20 +256,9 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         if(mSimpleImage != null) {
             MediaStoreUtil.setImageUrl(mSimpleImage,mInfo.getAlbumId());
         }
-        //判断是否收藏
-        mIsLove = false;
-        try {
-            ArrayList<Integer> list = PlayListUtil.getIDList(Global.mMyLoveID);
-            if(list != null && list.size() != 0 && list.contains(mInfo.getId())){
-                mIsLove = true;
-            }
-        } catch (Exception e){
-            LogUtil.d(TAG,"list error:" + e.toString());
-            e.printStackTrace();
-        }
-        if(mLoveButton != null) {
-            mLoveButton.setImageResource(mIsLove ? R.drawable.lock_btn_loved : R.drawable.lock_btn_love);
-        }
+        //下一首
+        if(mNextSong != null && MusicService.getNextMP3() != null)
+            mNextSong.setText("下一首：" + MusicService.getNextMP3().getTitle());
 
         new BlurThread().start();
     }
@@ -277,21 +269,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         return Constants.LOCKSCREENACTIIVITY;
     }
 
-    /**
-     * 添加或取消收藏
-     */
-    @OnClick(R.id.lockscreen_love)
-    public void onLove(){
-        if(mInfo == null)
-            return;
-        if(!mIsLove){
-            PlayListUtil.addSong(new PlayListSongInfo(mInfo.getId(),Global.mMyLoveID,getString(R.string.my_favorite)));
-        } else {
-            PlayListUtil.deleteSong(mInfo.getId(),Global.mMyLoveID);
-        }
-        mIsLove = !mIsLove;
-        mLoveButton.setImageResource(mIsLove ? R.drawable.lock_btn_loved : R.drawable.lock_btn_love);
-    }
 
     @Override
     public void onBackPressed() {
@@ -317,14 +294,14 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
                     mSwatch = palette.getDarkMutedSwatch();//柔和 暗色
                     if(mSwatch == null)
                         mSwatch = new Palette.Swatch(Color.GRAY,100);
-
 //                    mSongColor = ColorUtil.shiftColor(mSwatch.getRgb(),1.2f);
 //                    mArtistColor = ColorUtil.shiftColor(mSwatch.getRgb(),1.1f);
                     mSongColor = mSwatch.getBodyTextColor();
                     mArtistColor = mSwatch.getTitleTextColor();
+                    mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
                 }
             });
-            mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
+
         }
     }
 

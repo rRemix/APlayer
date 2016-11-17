@@ -15,6 +15,10 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.rebound.SimpleSpringListener;
+import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringConfig;
+import com.facebook.rebound.SpringSystem;
 
 import java.io.File;
 
@@ -24,6 +28,7 @@ import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
@@ -40,31 +45,10 @@ import remix.myplayer.util.thumb.SearchCover;
 public class CoverFragment extends BaseFragment {
     @BindView(R.id.cover_image)
     SimpleDraweeView mImage;
+
     private MP3Item mInfo;
-    private TranslateAnimation mLeftAnimation;
-    private ScaleAnimation mScaleAnimation;
-    private TranslateAnimation mRightAnimation;
-    private static final int COVERINDB = 0;
-    private static final int COVERINCACHE =1;
-    private static final int NOCOVER = 2;
+    private int mWidth;
     private Uri mUri = Uri.EMPTY;
-    private final int WITH_ANIM =  1;
-    private final int WITHOUT_ANIM = 0;
-    private Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            if(msg.what == WITHOUT_ANIM) {
-                mImage.setImageURI(mUri);
-            }
-            if(msg.what == WITH_ANIM){
-                int operation = Global.getOperation();
-                if(operation == Constants.PREV)
-                    mImage.startAnimation(mRightAnimation);
-                else if (operation == Constants.NEXT || operation == Constants.PLAYSELECTEDSONG)
-                    mImage.startAnimation(mLeftAnimation);
-            }
-        }
-    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,44 +60,10 @@ public class CoverFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mInfo = (MP3Item)getArguments().getSerializable("MP3Item");
+        mWidth = getArguments().getInt("Width");
         View rootView = inflater.inflate(R.layout.fragment_cover,container,false);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-//        if(mInfo != null)
-//            mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId()));
-
-        if(mLeftAnimation == null || mScaleAnimation == null || mRightAnimation == null) {
-            //往左侧消失的动画
-            mLeftAnimation = (TranslateAnimation) AnimationUtils.loadAnimation(getContext(),R.anim.cover_left_out);
-            //往右侧消失的动画
-            mRightAnimation = (TranslateAnimation)AnimationUtils.loadAnimation(getContext(),R.anim.cover_right_out);
-            //中心放大的动画
-            mScaleAnimation = (ScaleAnimation) AnimationUtils.loadAnimation(getContext(),R.anim.cover_center_in);
-
-            //背景是否开启渐变决定动画时间
-            boolean grident = SPUtil.getValue(getContext(),"Setting","Grident",false);
-            mLeftAnimation.setDuration(getResources().getInteger(grident ? R.integer.CoverOutFast : R.integer.CoverOutSlow));
-            mRightAnimation.setDuration(getResources().getInteger(grident ? R.integer.CoverOutFast : R.integer.CoverOutSlow));
-            mScaleAnimation.setDuration(getResources().getInteger(grident ? R.integer.CoverCenterInDurationFast : R.integer.CoverCenterInDurationSlow));
-            Animation.AnimationListener listener = new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    //当消失的动画播放完毕后，设置新的封面背景，并播放中心放大的动画
-                    mImage.setImageURI(mUri);
-                    mImage.startAnimation(mScaleAnimation);
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            };
-            mLeftAnimation.setAnimationListener(listener);
-            mRightAnimation.setAnimationListener(listener);
-
-        }
         return rootView;
 
     }
@@ -136,12 +86,40 @@ public class CoverFragment extends BaseFragment {
         } else {
             mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
         }
+
+
         if(withAnim){
             int operation = Global.getOperation();
-            if(operation == Constants.PREV)
-                mImage.startAnimation(mRightAnimation);
-            else if (operation == Constants.NEXT || operation == Constants.PLAYSELECTEDSONG)
-                mImage.startAnimation(mLeftAnimation);
+            final double startValue = (mWidth - DensityUtil.dip2px(getActivity(),264)) / 2;
+            final double endValue = operation == Constants.PREV ? mWidth : -(DensityUtil.dip2px(getActivity(),264));
+
+            final Spring outAnim = SpringSystem.create().createSpring();
+            outAnim.addListener(new SimpleSpringListener(){
+                @Override
+                public void onSpringUpdate(Spring spring) {
+                    mImage.setX((float) spring.getCurrentValue());
+                }
+
+                @Override
+                public void onSpringAtRest(Spring spring) {
+                    mImage.setX((float) startValue);
+                    mImage.setImageURI(mUri);
+                    final Spring inAnim = SpringSystem.create().createSpring();
+                    inAnim.addListener(new SimpleSpringListener(){
+                        @Override
+                        public void onSpringUpdate(Spring spring) {
+                            mImage.setScaleX((float) spring.getCurrentValue());
+                            mImage.setScaleY((float) spring.getCurrentValue());
+                        }
+                    });
+                    inAnim.setCurrentValue(0.85);
+                    inAnim.setEndValue(1);
+                }
+            });
+            outAnim.setRestDisplacementThreshold(40);
+            outAnim.setRestSpeedThreshold(40);
+            outAnim.setCurrentValue(startValue);
+            outAnim.setEndValue(endValue);
         } else {
             mImage.setImageURI(mUri);
         }

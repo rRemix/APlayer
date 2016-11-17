@@ -511,6 +511,8 @@ public class MusicService extends BaseService {
     public class ControlReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if(intent.getExtras() == null)
+                return;
             int Control = intent.getIntExtra("Control",-1);
             //保存控制命令,用于播放界面判断动画
             Global.setOperation(Control);

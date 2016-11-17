@@ -58,6 +58,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
                 arg.putInt("Position", position);
                 intent.putExtras(arg);
                 sendBroadcast(intent);
+                finish();
             }
             @Override
             public void onItemLongClick(View view, int position) {

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <com.facebook.drawee.view.SimpleDraweeView
+        android:visibility="visible"
         android:layout_margin="@dimen/d15_size"
         android:layout_marginTop="@dimen/d28_size"
         android:layout_centerInParent="true"

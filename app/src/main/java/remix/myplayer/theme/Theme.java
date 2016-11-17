@@ -95,13 +95,13 @@ public class Theme {
 
     /**
      * * 根据当前主题生成背景色为md_color_material的圆角矩形
-     * @param alpah
+     * @param alpha
      * @param corner
      * @param stroke
      * @return
      */
-    public static GradientDrawable getMDCorner(@FloatRange(from=0.0D, to=1.0D) float alpah, float corner, int stroke){
-        return getCorner(alpah,corner,stroke,ThemeStore.getMaterialPrimaryColor());
+    public static GradientDrawable getMDCorner(@FloatRange(from=0.0D, to=1.0D) float alpha, float corner, int stroke){
+        return getCorner(alpha,corner,stroke,ThemeStore.getMaterialPrimaryColor());
     }
 
     /**
@@ -122,15 +122,34 @@ public class Theme {
      * @return
      */
     public static GradientDrawable getCorner(@FloatRange(from=0.0D, to=1.0D)float alpha, float corner, int stroke, @ColorInt int color){
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(ColorUtil.adjustAlpha(color,alpha));
-        bg.setCornerRadius(corner);
-        bg.setStroke(stroke,color);
-        bg.setShape(GradientDrawable.RECTANGLE);
-        return bg;
+        return getShape(GradientDrawable.RECTANGLE,color,corner,stroke,color,0,0,alpha);
     }
 
+    /**
+     *
+     * @param shape
+     * @param corner
+     * @param color
+     * @param strokeSize
+     * @param strokeColor
+     * @param width
+     * @param height
+     * @return
+     */
+    public static GradientDrawable getShape(int shape,@ColorInt int color,float corner,int strokeSize,@ColorInt int strokeColor,int width,int height,@FloatRange(from=0.0D, to=1.0D)float alpha){
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(ColorUtil.adjustAlpha(color,alpha));
+        bg.setShape(shape);
+        if(corner > 0)
+            bg.setCornerRadius(corner);
+        if(strokeSize > 0)
+            bg.setStroke(strokeSize,strokeColor);
 
+        if(width > 0 && height > 0)
+            bg.setSize(width,height);
+
+        return bg;
+    }
 
     /**
      * 生成圆形或者矩形背景
@@ -141,11 +160,7 @@ public class Theme {
      * @return
      */
     public static GradientDrawable getShape(int shape,@ColorInt int color,int width,int height){
-        GradientDrawable gradientDrawable = new GradientDrawable();
-        gradientDrawable.setColor(color);
-        gradientDrawable.setSize(width,height);
-        gradientDrawable.setShape(shape);
-        return gradientDrawable;
+        return getShape(shape,color,0,0,color,width,height,1);
     }
 
     /**
@@ -155,10 +170,7 @@ public class Theme {
      * @return
      */
     public static GradientDrawable getShape(int shape,@ColorInt int color){
-        GradientDrawable gradientDrawable = new GradientDrawable();
-        gradientDrawable.setColor(color);
-        gradientDrawable.setShape(shape);
-        return gradientDrawable;
+        return getShape(shape,color,0,0,color,0,0,1);
     }
 
     /**

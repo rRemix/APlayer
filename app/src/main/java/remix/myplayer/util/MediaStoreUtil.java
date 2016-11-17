@@ -169,7 +169,13 @@ public class MediaStoreUtil {
                new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + ""));
     }
 
+    /**
+     * 设置专辑封面
+     * @param simpleDraweeView
+     * @param albumId
+     */
     public static void setImageUrl(SimpleDraweeView simpleDraweeView,int albumId){
+        //先判断是否设置过封面
         File imgFile = MediaStoreUtil.getImageUrlInCache(albumId,Constants.URL_ALBUM);
         if(imgFile != null && imgFile.exists()) {
             simpleDraweeView.setImageURI(Uri.parse("file://" + imgFile));

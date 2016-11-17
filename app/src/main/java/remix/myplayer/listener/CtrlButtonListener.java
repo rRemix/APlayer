@@ -23,12 +23,15 @@ public class CtrlButtonListener implements View.OnClickListener {
     public void onClick(View v) {
         Intent intent = new Intent(Constants.CTL_ACTION);
         switch (v.getId()) {
+            case R.id.lockscreen_prev:
             case R.id.playbar_prev:
                 intent.putExtra("Control", Constants.PREV);
                 break;
+            case R.id.lockscreen_next:
             case R.id.playbar_next:
                 intent.putExtra("Control", Constants.NEXT);
                 break;
+            case R.id.lockscreen_play:
             case R.id.playbar_play:
                 intent.putExtra("Control", Constants.PLAYORPAUSE);
                 break;
