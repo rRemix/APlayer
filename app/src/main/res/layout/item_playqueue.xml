@@ -27,7 +27,7 @@
             android:id="@+id/playlist_item_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/gray_3c3c3c"
+            android:textColor="@color/day_textcolor_primary"
             android:textSize="@dimen/s18_size"
             android:maxLines="1"
             android:ellipsize="end" />
@@ -35,7 +35,7 @@
             android:id="@+id/playlist_item_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/black_30000000"
+            android:textColor="@color/day_textcolor"
             android:textSize="@dimen/s12_size"
             android:maxLines="1"
             android:ellipsize="end"/>

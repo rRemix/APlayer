@@ -74,9 +74,11 @@
     <color name="black_333333">#333333</color>
     <color name="gray_7e7e7e">#7e7e7e</color>
     <color name="gray_a8a8a8">#a8a8a8</color>
-    <color name="gay_cecece">#cecece</color>
+    <color name="gray_cecece">#cecece</color>
     <color name="gray_e6dccb">#e6dccb</color>
 
+    <color name="lrc_normal">#e8e8e8</color>
+    <color name="lrc_hight">#4a4a4a</color>
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>
     <color name="day_textcolor">@color/gray_6d6c69</color>

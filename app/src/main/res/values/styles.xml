@@ -1,4 +1,4 @@
-<resources>
+<resources >
     <!-- Base application theme. -->
     <style name="BaseTheme" parent="Theme.AppCompat.Light.NoActionBar"/>
     <style name="BaseDialogTheme" parent="Theme.AppCompat.Dialog">

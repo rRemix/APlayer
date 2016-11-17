@@ -1,8 +1,11 @@
 package remix.myplayer.fragment;
 
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v13.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +14,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.kogitune.activity_transition.ActivityTransitionLauncher;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,6 +28,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.AudioHolderActivity;
 import remix.myplayer.util.ColorUtil;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -44,7 +51,7 @@ public class BottomActionBarFragment extends BaseFragment{
     @BindView(R.id.bottom_actionbar_container)
     LinearLayout mRootView;
     @BindView(R.id.bottom_action_bar_cover)
-    ImageView mCover;
+    SimpleDraweeView mCover;
 
     public static BottomActionBarFragment mInstance;
     @Override
@@ -85,7 +92,22 @@ public class BottomActionBarFragment extends BaseFragment{
                 intent.putExtras(bundle);
                 intent.putExtra("Isplay",MusicService.getIsplay());
                 intent.putExtra("FromMainActivity",true);
-                getContext().startActivity(intent);
+                Rect rect = new Rect();
+                // 获取元素位置信息
+                mCover.getGlobalVisibleRect(rect);
+                intent.setSourceBounds(rect);
+//                getContext().startActivity(intent);
+                ActivityTransitionLauncher
+                        .with(getActivity())
+                        .from(mCover)
+                        .image(MediaStoreUtil.getAlbumBitmap(MusicService.getCurrentMP3().getAlbumId(),false))
+                        .launch(intent);
+                // 这里指定了共享的视图元素
+//                ActivityOptionsCompat options = ActivityOptionsCompat
+//                        .makeSceneTransitionAnimation(getActivity(), mCover, "image");
+//
+//                ActivityCompat.startActivity(getActivity(), intent, options.toBundle());
+
             }
         });
         CtrlButtonListener listener = new CtrlButtonListener(getContext());
@@ -95,10 +117,11 @@ public class BottomActionBarFragment extends BaseFragment{
     }
     //更新界面
     public void UpdateBottomStatus(MP3Item mp3Item, boolean isPlaying) {
-        if(mp3Item != null) {
-            mTitle.setText(mp3Item.getTitle());
-            mArtist.setText(mp3Item.getArtist());
-        }
+        if(mp3Item == null)
+            return;
+        //歌曲名 艺术家
+        mTitle.setText(mp3Item.getTitle());
+        mArtist.setText(mp3Item.getArtist());
         //设置按钮着色
         if(isPlaying) {
             Theme.TintDrawable(mPlayButton,
@@ -109,6 +132,8 @@ public class BottomActionBarFragment extends BaseFragment{
                     R.drawable.bf_btn_play,
                     ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
         }
+        //封面
+        MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
     }
 
 }

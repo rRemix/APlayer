@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -8,243 +8,246 @@
     android:id="@+id/audio_holder_container"
     android:fitsSystemWindows="true"
     android:background="@color/white">
-    <RelativeLayout
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="8">
-        <!-- 顶部自定义actionbar、-->
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/d56_size"
-            android:id="@+id/top_actionbar">
-            <ImageButton
-                android:layout_width="@dimen/d40_size"
-                android:layout_height="@dimen/d40_size"
-                android:layout_marginLeft="@dimen/d16_size"
-                android:layout_centerVertical="true"
-                android:background="@color/transparent"
-                android:src="@drawable/play_btn_back"
-                android:id="@+id/top_hide"
-                android:layout_alignParentLeft="true"/>
+            android:layout_height="0dp"
+            android:layout_weight="8">
+            <!-- 顶部自定义actionbar、-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/d56_size"
+                android:id="@+id/top_actionbar">
+                <ImageButton
+                    android:layout_width="@dimen/d40_size"
+                    android:layout_height="@dimen/d40_size"
+                    android:layout_marginLeft="@dimen/d16_size"
+                    android:layout_centerVertical="true"
+                    android:background="@color/transparent"
+                    android:src="@drawable/play_btn_back"
+                    android:id="@+id/top_hide"
+                    android:layout_alignParentLeft="true" />
 
-            <ImageButton
-                android:layout_width="@dimen/d40_size"
-                android:layout_height="@dimen/d40_size"
-                android:layout_marginRight="@dimen/d16_size"
-                android:layout_centerVertical="true"
-                android:background="@color/transparent"
-                android:src="@drawable/list_icn_more"
-                android:id="@+id/top_more"
-                android:layout_alignParentRight="true"/>
+                <ImageButton
+                    android:layout_width="@dimen/d40_size"
+                    android:layout_height="@dimen/d40_size"
+                    android:layout_marginRight="@dimen/d16_size"
+                    android:layout_centerVertical="true"
+                    android:background="@color/transparent"
+                    android:src="@drawable/list_icn_more"
+                    android:id="@+id/top_more"
+                    android:layout_alignParentRight="true"/>
+                <LinearLayout
+                    android:layout_centerInParent="true"
+                    android:layout_width="@dimen/d240_size"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <TextView
+                        android:id="@+id/top_title"
+                        android:ellipsize="end"
+                        android:lines="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/s16_size"
+                        android:textColor="@color/black_333333"
+                        android:gravity="center"/>
+                    <TextView
+                        android:id="@+id/top_detail"
+                        android:ellipsize="end"
+                        android:lines="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textSize="@dimen/s14_size"
+                        android:textColor="@color/gray_7e7e7e"/>
+                </LinearLayout>
+            </RelativeLayout>
             <LinearLayout
-                android:layout_centerInParent="true"
-                android:layout_width="@dimen/d240_size"
+                android:layout_below="@id/top_actionbar"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center">
-                <TextView
-                    android:id="@+id/top_title"
-                    android:ellipsize="end"
-                    android:lines="1"
+                android:orientation="vertical">
+                <!-- 中间三个页面 -->
+                <remix.myplayer.ui.customview.AudioViewPager
+                    android:id="@+id/holder_pager"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/s16_size"
-                    android:textColor="@color/black_333333"
-                    android:gravity="center"/>
-                <TextView
-                    android:id="@+id/top_detail"
-                    android:ellipsize="end"
-                    android:lines="1"
+                    android:layout_height="0dp"
+                    android:layout_weight="10"/>
+                <!--三个导航图标-->
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_below="@id/top_title"
-                    android:textSize="@dimen/s14_size"
-                    android:textColor="@color/gray_7e7e7e"/>
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:id="@+id/guide_02"
+                        android:layout_marginLeft="@dimen/d2_size"
+                        android:layout_marginRight="@dimen/d2_size"/>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toLeftOf="@id/guide_02"
+                        android:layout_alignTop="@id/guide_02"
+                        android:id="@+id/guide_01" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/guide_02"
+                        android:layout_alignTop="@id/guide_02"
+                        android:id="@+id/guide_03"/>
+                </RelativeLayout>
             </LinearLayout>
         </RelativeLayout>
-        <LinearLayout
-            android:layout_below="@id/top_actionbar"
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            <!-- 中间三个页面 -->
-            <remix.myplayer.ui.customview.AudioViewPager
-                android:layout_below="@id/top_actionbar"
-                android:id="@+id/holder_pager"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <!--已播放时间-->
+            <TextView
+                android:id="@+id/text_hasplay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textSize="@dimen/s12_size"
+                android:text="00:00"
+                android:layout_marginLeft="@dimen/d4_size"
+                android:layout_alignParentLeft="true"
+                android:textColor="@color/gray_cecece"/>
+            <!--剩余播放时间-->
+            <TextView
+                android:id="@+id/text_remain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textSize="@dimen/s12_size"
+                android:text="00:00"
+                android:layout_marginRight="@dimen/d4_size"
+                android:layout_alignParentRight="true"
+                android:textColor="@color/gray_cecece"/>
+            <SeekBar
+                android:id="@+id/seekbar"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="10"/>
-            <!--三个导航图标-->
-            <RelativeLayout
-                android:layout_below="@id/holder_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:id="@+id/guide_02"
-                    android:layout_marginLeft="@dimen/d2_size"
-                    android:layout_marginRight="@dimen/d2_size"/>
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toLeftOf="@id/guide_02"
-                    android:layout_alignTop="@id/guide_02"
-                    android:id="@+id/guide_01" />
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/guide_02"
-                    android:layout_alignTop="@id/guide_02"
-                    android:id="@+id/guide_03"/>
-            </RelativeLayout>
-        </LinearLayout>
-    </RelativeLayout>
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/d2_size"
+                android:maxHeight="@dimen/d2_size"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:progressDrawable="@drawable/bg_progress"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/text_remain"
+                android:layout_toRightOf="@id/text_hasplay"
+                android:layout_marginStart="@dimen/d12_size"
+                android:layout_marginEnd="@dimen/d12_size"/>
+        </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-        <!--已播放时间-->
-        <TextView
-            android:id="@+id/text_hasplay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:textSize="@dimen/s12_size"
-            android:text="00:00"
-            android:layout_marginLeft="@dimen/d2_size"
-            android:layout_alignParentLeft="true"
-            android:textColor="@color/gay_cecece"/>
-        <!--剩余播放时间-->
-        <TextView
-            android:id="@+id/text_remain"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:textSize="@dimen/s12_size"
-            android:text="00:00"
-            android:layout_marginRight="@dimen/d2_size"
-            android:layout_alignParentRight="true"
-            android:textColor="@color/gay_cecece"/>
-        <SeekBar
-            android:id="@+id/seekbar"
+        <!-- 三个播放控制按钮和两个控制播放模式 -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/d2_size"
-            android:maxHeight="@dimen/d2_size"
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
-            android:progressDrawable="@drawable/bg_progress"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/text_remain"
-            android:layout_toRightOf="@id/text_hasplay"
-            android:layout_marginStart="@dimen/d12_size"
-            android:layout_marginEnd="@dimen/d12_size"/>
-    </RelativeLayout>
+            android:layout_height="0dp"
+            android:layout_weight="1.5">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center">
+                <ImageButton
+                    android:layout_width="@dimen/d50_size"
+                    android:layout_height="@dimen/d50_size"
+                    android:id="@+id/playbar_model"
+                    android:src="@drawable/play_btn_loop"
+                    android:background="@color/transparent" />
+            </LinearLayout>
 
-    <!-- 三个播放控制按钮和两个控制播放模式 -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1.5">
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center">
-            <ImageButton
-                android:layout_width="@dimen/d50_size"
-                android:layout_height="@dimen/d50_size"
-                android:id="@+id/playbar_model"
-                android:src="@drawable/play_btn_loop"
-                android:background="@color/transparent" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center">
-            <ImageButton
-                android:id="@+id/playbar_prev"
-                android:layout_width="@dimen/d60_size"
-                android:layout_height="@dimen/d60_size"
-                android:src="@drawable/play_btn_pre"
-                android:background="@color/transparent"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center">
-            <FrameLayout
-                android:layout_width="@dimen/d60_size"
-                android:layout_height="@dimen/d60_size"
-                android:id="@+id/playbar_play_container">
-                <ImageView
-                    android:id="@+id/playbar_play_bg"
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/playbar_prev"
                     android:layout_width="@dimen/d60_size"
                     android:layout_height="@dimen/d60_size"
-                    android:src="@drawable/play_bg_play"
-                    android:layout_gravity="center"/>
-                <ImageView
-                    android:id="@+id/playbar_play"
-                    android:layout_gravity="center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srcCompat="@drawable/play_btn_play"
+                    android:src="@drawable/play_btn_pre"
                     android:background="@color/transparent"/>
-            </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center">
+                <FrameLayout
+                    android:layout_width="@dimen/d60_size"
+                    android:layout_height="@dimen/d60_size"
+                    android:id="@+id/playbar_play_container">
+                    <ImageView
+                        android:id="@+id/playbar_play_bg"
+                        android:layout_width="@dimen/d60_size"
+                        android:layout_height="@dimen/d60_size"
+                        android:src="@drawable/play_bg_play"
+                        android:layout_gravity="center"/>
+                    <ImageView
+                        android:id="@+id/playbar_play"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/play_btn_play"
+                        android:background="@color/transparent"/>
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/playbar_next"
+                    android:layout_width="@dimen/d60_size"
+                    android:layout_height="@dimen/d60_size"
+                    android:src="@drawable/play_btn_next"
+                    android:background="@color/transparent"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center">
+                <ImageButton
+                    android:layout_width="@dimen/d50_size"
+                    android:layout_height="@dimen/d50_size"
+                    android:id="@+id/playbar_playinglist"
+                    android:src="@drawable/play_btn_normal_list"
+                    android:background="@color/transparent" />
+            </LinearLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center">
-            <ImageButton
-                android:id="@+id/playbar_next"
-                android:layout_width="@dimen/d60_size"
-                android:layout_height="@dimen/d60_size"
-                android:src="@drawable/play_btn_next"
-                android:background="@color/transparent"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center">
-            <ImageButton
-                android:layout_width="@dimen/d50_size"
-                android:layout_height="@dimen/d50_size"
-                android:id="@+id/playbar_playinglist"
-                android:src="@drawable/play_btn_normal_list"
-                android:background="@color/transparent" />
-        </LinearLayout>
-
-
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.5">
+            <TextView
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/d8_size"
+                android:layout_marginRight="@dimen/d8_size"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textSize="@dimen/s14_size"
+                android:textColor="@color/gray_a8a8a8"
+                android:id="@+id/next_song"/>
+        </RelativeLayout>
     </LinearLayout>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1.5">
-        <TextView
-            android:layout_centerInParent="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/d8_size"
-            android:layout_marginRight="@dimen/d8_size"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:textSize="@dimen/s14_size"
-            android:textColor="@color/gray_a8a8a8"
-            android:id="@+id/next_song"/>
-    </RelativeLayout>
-</LinearLayout>
+</FrameLayout>

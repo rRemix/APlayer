@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
@@ -22,16 +23,17 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.facebook.rebound.SimpleSpringListener;
-import com.facebook.rebound.Spring;
-import com.facebook.rebound.SpringSystem;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.kogitune.activity_transition.ActivityTransition;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
@@ -84,6 +86,11 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     public static boolean mIsDragSeekBar = false;
     private Palette.Swatch mNewSwatch = null;
     private Palette.Swatch mOldSwatch = null;
+    //动画的重点
+    @BindView(R.id.audio_cover_placeholder)
+    SimpleDraweeView mAnimPlaceHolder;
+    @BindView(R.id.audio_cover_img)
+    SimpleDraweeView mAnimCover;
     //顶部信息
     @BindView(R.id.top_title)
     TextView mTopTitle;
@@ -116,7 +123,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     SeekBar mSeekBar;
     //背景
     @BindView(R.id.audio_holder_container)
-    View mContainer;
+    FrameLayout mContainer;
     @BindView(R.id.holder_pager)
     AudioViewPager mPager;
     //下一首歌曲
@@ -167,6 +174,30 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     //是否开启背景渐变
     private boolean mGradient = false;
 
+    private static final String SCALE_WIDTH = "SCALE_WIDTH";
+    private static final String SCALE_HEIGHT = "SCALE_HEIGHT";
+    private static final String TRANSITION_X = "TRANSITION_X";
+    private static final String TRANSITION_Y = "TRANSITION_Y";
+    /**
+     * 存储图片缩放比例和位移距离
+     */
+    private Bundle mScaleBundle = new Bundle();
+    private Bundle mTransitionBundle = new Bundle();
+    /**
+     * 屏幕宽度和高度
+     */
+    private int mScreenWidth;
+    private int mScreenHeight;
+    /**
+     * 上一个界面图片的宽度和高度
+     */
+    private int mOriginWidth;
+    private int mOriginHeight;
+    /**
+     * 上一个界面图片的位置信息
+     */
+    private Rect mOriginRect;
+
     //更新背景与专辑封面的Handler
     private Handler mBlurHandler = new Handler() {
         @Override
@@ -209,7 +240,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         if(mGradient){
             StatusBarUtil.setTransparent(this);
         } else {
-            StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.gray_d3d2d3));
+            StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.white_f2f2f2));
         }
     }
 
@@ -248,6 +279,82 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         initSeekBar();
         //初始化主题颜色
         initViewColor();
+        ActivityTransition.with(getIntent()).to(mAnimCover).start(savedInstanceState);
+//        ViewCompat.setTransitionName(mAnimCover, "image");
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        Rect rect = new Rect();
+        // 获取元素位置信息
+        mAnimPlaceHolder.getGlobalVisibleRect(rect);
+        //初始化共享元素动画
+//        initiShareAnim(rect);
+    }
+
+    /**
+     * 初始化场景
+     */
+    private void initiShareAnim(Rect newRect) {
+        //取消动画
+        overridePendingTransition(0,0);
+        // 获取上一个界面传入的信息
+        mOriginRect = getIntent().getSourceBounds();
+
+        // 获取上一个界面中，图片的宽度和高度
+        mOriginWidth = mOriginRect.width();
+        mOriginHeight = mOriginRect.height();
+
+        // 设置 ImageView 的位置，使其和上一个界面中图片的位置重合
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mOriginWidth, mOriginHeight);
+        params.setMargins(mOriginRect.left, mOriginRect.top - StatusBarUtil.getStatusBarHeight(this), mOriginRect.right, mOriginRect.bottom);
+//        mAnimCover.setLayoutParams(params);
+
+        // 设置封面
+        MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
+
+        // 计算图片缩放比例和位移距离
+        getBundleInfo(newRect);
+
+        //模拟入场动画
+        mAnimCover.animate()
+                .withStartAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAnimCover.setVisibility(View.VISIBLE);
+                        overridePendingTransition(0,0);
+                    }
+                })
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        overridePendingTransition(0,0);
+//                        mAnimCover.setVisibility(View.GONE);
+                    }
+                })
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .setDuration(300)
+                .scaleX(mScaleBundle.getFloat(SCALE_WIDTH))
+                .scaleY(mScaleBundle.getFloat(SCALE_HEIGHT))
+                .translationX(mTransitionBundle.getFloat(TRANSITION_X))
+                .translationY(mTransitionBundle.getFloat(TRANSITION_Y))
+                .start();
+
+    }
+
+    /**
+     * 计算图片缩放比例，以及位移距离
+     *
+     */
+    private void getBundleInfo(Rect rect) {
+        // 计算图片缩放比例，并存储在 bundle 中
+        mScaleBundle.putFloat(SCALE_WIDTH, (float) rect.width() / mOriginWidth);
+        mScaleBundle.putFloat(SCALE_HEIGHT, (float) rect.height() / mOriginHeight);
+
+        // 计算位移距离，并将数据存储到 bundle 中
+        mTransitionBundle.putFloat(TRANSITION_X, 100);
+        mTransitionBundle.putFloat(TRANSITION_Y, -300);
     }
 
     /**
@@ -497,24 +604,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     public void UpdatePlayButton(final boolean isPlay) {
         if(mPlayBarPlay != null) {
             mPlayBarPlay.setImageResource(!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
-
-//            final Spring anim = SpringSystem.create().createSpring();
-//            anim.addListener(new SimpleSpringListener(){
-//                @Override
-//                public void onSpringUpdate(Spring spring) {
-//                    mPlayBarPlay.setRotation((float) spring.getCurrentValue());
-//                }
-//
-//                @Override
-//                public void onSpringAtRest(Spring spring) {
-//                    mPlayBarPlay.setRotation(0);
-//                    mPlayBarPlay.setImageResource(!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
-//                }
-//            });
-//            anim.setRestDisplacementThreshold(85);
-//            anim.setRestSpeedThreshold(85);
-//            anim.setCurrentValue(0);
-//            anim.setEndValue(90);
         }
     }
 
@@ -586,7 +675,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         super.onStart();
         //只有从Mactivity启动，才使用动画
         if(!mFromNotify && mFromMainActivity) {
-            overridePendingTransition(R.anim.slide_bottom_in, 0);
+//            overridePendingTransition(R.anim.slide_bottom_in, 0);
+            overridePendingTransition(0,0);
             mFromMainActivity = false;
         }
     }
@@ -596,7 +686,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         super.finish();
         //只有后退到MainActivity,才使用动画
         if(mFromBack) {
-            overridePendingTransition(0, R.anim.slide_bottom_out);
+//            overridePendingTransition(0, R.anim.slide_bottom_out);
+            overridePendingTransition(0,0);
             mFromBack = false;
         }
     }
@@ -692,6 +783,13 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         //修改顶部按钮颜色
         Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,garyColor);
         Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,garyColor);
+        //歌词颜色
+        if(mLrcView != null){
+            mLrcView.setHighLightColor(ColorUtil.getColor(R.color.lrc_hight));
+            mLrcView.setOtherColor(ColorUtil.getColor(R.color.lrc_normal));
+            mLrcView.setTimeLineColor(ColorUtil.getColor(R.color.lrc_normal));
+            mLrcView.invalidate();
+        }
 
         LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
         //修改progress颜色
