@@ -96,12 +96,11 @@ public class BottomActionBarFragment extends BaseFragment{
                 // 获取元素位置信息
                 mCover.getGlobalVisibleRect(rect);
                 intent.setSourceBounds(rect);
-//                getContext().startActivity(intent);
-                ActivityTransitionLauncher
-                        .with(getActivity())
-                        .from(mCover)
-                        .image(MediaStoreUtil.getAlbumBitmap(MusicService.getCurrentMP3().getAlbumId(),false))
-                        .launch(intent);
+                getContext().startActivity(intent);
+//                ActivityTransitionLauncher
+//                        .with(getActivity())
+//                        .from(mCover)
+//                        .launch(intent);
                 // 这里指定了共享的视图元素
 //                ActivityOptionsCompat options = ActivityOptionsCompat
 //                        .makeSceneTransitionAnimation(getActivity(), mCover, "image");

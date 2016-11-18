@@ -10,6 +10,7 @@
     android:id="@+id/audio_holder_container">
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/audio_cover_img"
+        android:visibility="visible"
         android:layout_width="@dimen/d48_size"
         android:layout_height="@dimen/d48_size"
         fresco:actualImageScaleType="centerCrop"
@@ -92,7 +93,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center" />
                     <com.facebook.drawee.view.SimpleDraweeView
-                        android:visibility="invisible"
+                        android:visibility="visible"
                         android:layout_margin="@dimen/d15_size"
                         android:layout_marginTop="@dimen/d28_size"
                         android:layout_gravity="center"
