@@ -4,16 +4,12 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.facebook.rebound.SimpleSpringListener;
-import com.facebook.rebound.Spring;
-import com.facebook.rebound.SpringConfig;
-import com.facebook.rebound.SpringSystem;
 import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.util.DensityUtil;
+import remix.myplayer.ui.customview.playpause.PlayPauseView;
 
 /**
  * Created by Remix on 2016/3/26.
@@ -21,6 +17,7 @@ import remix.myplayer.util.DensityUtil;
 public class AboutActivity extends ToolbarActivity {
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
+    private boolean isplay = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

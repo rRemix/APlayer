@@ -13,6 +13,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
+import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.lrc.LrcRow;
 import remix.myplayer.lrc.LrcView;
 import remix.myplayer.lrc.SearchLRC;
@@ -32,7 +33,7 @@ public class LrcFragment extends BaseFragment {
     private static int NO_LRC = 2;
     private static int NO_NETWORK = 3;
     private static int SEARCHING = 4;
-    private OnLrcViewFindListener onFindListener;
+    private OnInflateFinishListener onFindListener;
     private MP3Item mInfo;
     @BindView(R.id.lrc_view)
     LrcView mLrcView;
@@ -63,7 +64,7 @@ public class LrcFragment extends BaseFragment {
         }
     };
 
-    public void setOnFindListener(OnLrcViewFindListener l){
+    public void setOnInflateFinishListener(OnInflateFinishListener l){
         onFindListener = l;
     }
 
@@ -79,7 +80,7 @@ public class LrcFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_lrc,container,false);
 
         mUnBinder = ButterKnife.bind(this,rootView);
-        onFindListener.onLrcViewFind(mLrcView);
+        onFindListener.onViewInflateFinish(mLrcView);
         mInfo = (MP3Item)getArguments().getSerializable("MP3Item");
         UpdateLrc(mInfo);
         return rootView;
@@ -109,7 +110,4 @@ public class LrcFragment extends BaseFragment {
         }
     }
 
-    public interface OnLrcViewFindListener{
-        void onLrcViewFind(LrcView lrcView);
-    }
 }

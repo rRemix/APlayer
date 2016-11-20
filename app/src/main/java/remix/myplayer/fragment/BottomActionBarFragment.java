@@ -74,10 +74,6 @@ public class BottomActionBarFragment extends BaseFragment{
         Theme.TintDrawable(rootView,
                 R.drawable.commom_playercontrols_bg,
                 ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.day_background_color_3 : R.color.night_background_color_3));
-        //设置向上按钮着色
-        Theme.TintDrawable(mCover,
-                R.drawable.home_btn_back,
-                ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
 
         mBottomActionBar = (RelativeLayout)rootView.findViewById(R.id.bottom_action_bar);
         //点击打开播放界面

@@ -22,8 +22,8 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
@@ -34,9 +34,6 @@ import android.widget.TextView;
 
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.rebound.SimpleSpringListener;
-import com.facebook.rebound.Spring;
-import com.facebook.rebound.SpringSystem;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
@@ -49,6 +46,7 @@ import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.fragment.CoverFragment;
 import remix.myplayer.fragment.LrcFragment;
 import remix.myplayer.fragment.RecordFragment;
+import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.lrc.LrcView;
 import remix.myplayer.model.MP3Item;
@@ -56,6 +54,8 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.AudioViewPager;
+
+import remix.myplayer.ui.customview.playpause.PlayPauseView;
 import remix.myplayer.ui.dialog.PlayQueueDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -88,10 +88,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     //是否正在拖动进度条
     public static boolean mIsDragSeekBar = false;
     private Palette.Swatch mNewSwatch = null;
-    private Palette.Swatch mOldSwatch = null;
-    //动画终点
-    @BindView(R.id.audio_cover_placeholder)
-    SimpleDraweeView mAnimPlaceHolder;
+    @BindView(R.id.playbar_play_pause)
+    PlayPauseView mPlayPauseView;
+    //入场动画封面
     SimpleDraweeView mAnimCover;
     //顶部信息
     @BindView(R.id.top_title)
@@ -183,26 +182,26 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     /**
      * 存储图片缩放比例和位移距离
      */
-    private Bundle mScaleBundle = new Bundle();
-    private Bundle mTransitionBundle = new Bundle();
-    /**
-     * 屏幕宽度和高度
-     */
-    private int mScreenWidth;
-    private int mScreenHeight;
+    private static Bundle mScaleBundle = new Bundle();
+    private static Bundle mTransitionBundle = new Bundle();
     /**
      * 上一个界面图片的宽度和高度
      */
-    private int mOriginWidth;
-    private int mOriginHeight;
+    private static int mOriginWidth;
+    private static int mOriginHeight;
     /**
      * 上一个界面图片的位置信息
      */
-    private Rect mOriginRect;
+    private static Rect mOriginRect;
     /**
      * 终点View的位置信息
      */
-    private Rect mDestRect = new Rect();
+    private static Rect mDestRect = new Rect();
+    /**
+     * 入场与退场动画时间
+     */
+    private final int DURATION = 250;
+
 
     //更新背景与专辑封面的Handler
     private Handler mBlurHandler = new Handler() {
@@ -215,7 +214,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 } else {
                     updateViewColor();
                 }
-
                 //更新专辑封面
                 ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
                 if(mFistStart)
@@ -288,112 +286,100 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
 //        ActivityTransition.with(getIntent()).to(mAnimCover).start(savedInstanceState);
 //        ViewCompat.setTransitionName(mAnimCover, "image");
-        //获得终点控件的位置信息
-        mAnimPlaceHolder.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                // 获取终点控件位置信息
-                mAnimPlaceHolder.getGlobalVisibleRect(mDestRect);
-                return true;
-            }
-        });
+
         //初始化控件
         //设置失败加载的图片和缩放类型
         mAnimCover = new SimpleDraweeView(this);
         mAnimCover.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
         mAnimCover.getHierarchy().setFailureImage(R.drawable.album_empty_bg_day, ScalingUtils.ScaleType.CENTER_CROP);
         mContainer.addView(mAnimCover);
-        // 设置封面
+        //设置封面
         MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
-        mAnimCover.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                mAnimCover.getViewTreeObserver().removeOnPreDrawListener(this);
 
-                // 获取上一个界面传入的信息
-                mOriginRect = getIntent().getSourceBounds();
-
-                // 获取上一个界面中，图片的宽度和高度
-                mOriginWidth = mOriginRect.width();
-                mOriginHeight = mOriginRect.height();
-
-                // 设置 view 的位置，使其和上一个界面中图片的位置重合
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mOriginWidth, mOriginHeight);
-                params.setMargins(mOriginRect.left, mOriginRect.top - StatusBarUtil.getStatusBarHeight(AudioHolderActivity.this), mOriginRect.right, mOriginRect.bottom);
-                mAnimCover.setLayoutParams(params);
-
-                // 计算图片缩放比例和位移距离
-                getMoveInfo(mDestRect);
-
-                mAnimCover.setPivotX(0);
-                mAnimCover.setPivotY(0);
-
-                mAnimCover.animate()
-                        .withStartAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                mAnimCover.setVisibility(View.VISIBLE);
-                                overridePendingTransition(0,0);
-                            }
-                        })
-                        .setDuration(250)
-                        .scaleX(mScaleBundle.getFloat(SCALE_WIDTH))
-                        .scaleY(mScaleBundle.getFloat(SCALE_HEIGHT))
-                        .translationX(mTransitionBundle.getFloat(TRANSITION_X))
-                        .translationY(mTransitionBundle.getFloat(TRANSITION_Y))
-                        .start();
-                return true;
-            }
-        });
-
-        //模拟入场动画
-        SpringSystem.create()
-                .createSpring()
-                .setEndValue(100)
-                .addListener(new SimpleSpringListener(){
-                    @Override
-                    public void onSpringAtRest(Spring spring) {
-                        super.onSpringAtRest(spring);
-                    }
-
-                    @Override
-                    public void onSpringUpdate(Spring spring) {
-                        super.onSpringUpdate(spring);
-                    }
-                });
     }
 
     /**
      * 计算图片缩放比例，以及位移距离
      *
      */
-    private void getMoveInfo(Rect rect) {
+    private void getMoveInfo(Rect destRect) {
         // 计算图片缩放比例，并存储在 bundle 中
-        mScaleBundle.putFloat(SCALE_WIDTH, (float) rect.width() / mOriginWidth);
-        mScaleBundle.putFloat(SCALE_HEIGHT, (float) rect.height() / mOriginHeight);
+        mScaleBundle.putFloat(SCALE_WIDTH, (float) destRect.width() / mOriginWidth);
+        mScaleBundle.putFloat(SCALE_HEIGHT, (float) destRect.height() / mOriginHeight);
 
         // 计算位移距离，并将数据存储到 bundle 中
-        mTransitionBundle.putFloat(TRANSITION_X, rect.left - mOriginRect.left);
-        mTransitionBundle.putFloat(TRANSITION_Y, rect.top - mOriginRect.top);
+        mTransitionBundle.putFloat(TRANSITION_X, destRect.left - mOriginRect.left);
+        mTransitionBundle.putFloat(TRANSITION_Y, destRect.top - mOriginRect.top);
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //只有从Mactivity启动，才使用动画
+        if(!mFromNotify && mFromMainActivity) {
+//            overridePendingTransition(R.anim.slide_bottom_in, 0);
+            overridePendingTransition(0,0);
+            mFromMainActivity = false;
+        }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        //只有后退到MainActivity,才使用动画
+        overridePendingTransition(0,0);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //更新界面
+//        if(MusicService.getCurrentMP3().getId() != mInfo.getId()) {
+//            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
+//        }
+        mIsRunning = true;
+        if(mNeedUpdateUI){
+            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
+            mNeedUpdateUI = false;
+        }
+
+        //更新进度条
+        new ProgeressThread().start();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mIsRunning = false;
     }
 
     @Override
     public void onBackPressed() {
         mFromBack = true;
         mAnimCover.animate()
-                .setDuration(250)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .withStartAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAnimCover.setVisibility(View.VISIBLE);
+                        //隐藏fragment中的image
+                        if(mAdapter.getItem(1) instanceof CoverFragment){
+                            ((CoverFragment) mAdapter.getItem(1)).hideImage();
+                        }
+                    }
+                })
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
+                    }
+                })
+                .setDuration(DURATION)
                 .scaleX(1)
                 .scaleY(1)
                 .translationX(0)
                 .translationY(0)
-                .withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        overridePendingTransition(0,0);
-                        finish();
-                    }
-                })
                 .start();
     }
 
@@ -413,12 +399,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 break;
             case R.id.playbar_play_container:
                 intent.putExtra("Control", Constants.PLAYORPAUSE);
-                if(mGradient){
-                    Theme.TintDrawable(mPlayBarPlay,!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop,mColorDraken);
-                } else {
-                    mPlayBarPlay.setImageResource(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
-                }
-
                 break;
         }
         MobclickAgent.onEvent(this,v.getId() == R.id.playbar_play_container ? "Prev" : v.getId() == R.id.playbar_next ? "Next" : "Play");
@@ -464,7 +444,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             //关闭
             case R.id.top_hide:
                 mFromBack = true;
-                finish();
+                onBackPressed();
                 break;
             //弹出窗口
             case R.id.top_more:
@@ -509,29 +489,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
     }
 
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        //更新界面
-//        if(MusicService.getCurrentMP3().getId() != mInfo.getId()) {
-//            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
-//        }
-        mIsRunning = true;
-        if(mNeedUpdateUI){
-            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
-            mNeedUpdateUI = false;
-        }
-
-        //更新进度条
-        new ProgeressThread().start();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mIsRunning = false;
-    }
 
     @Override
     protected void onDestroy() {
@@ -642,9 +599,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
      * @param isPlay
      */
     public void UpdatePlayButton(final boolean isPlay) {
-        if(mPlayBarPlay != null) {
-            mPlayBarPlay.setImageResource(!isPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
-        }
+
+        mPlayPauseView.updateState(isPlay,true);
+        mPlayBarPlay.setImageResource(isPlay ? R.drawable.play_btn_stop : R.drawable.play_btn_play);
     }
 
     private void initTop() {
@@ -656,23 +613,93 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         //初始化Viewpager
         mAdapter = new PagerAdapter(getSupportFragmentManager());
         mBundle = new Bundle();
-        mBundle.putInt("Width",mWidth);
+        mBundle.putInt("Width", mWidth);
         mBundle.putSerializable("MP3Item", mInfo);
         //初始化所有fragment
         RecordFragment recordFragment = new RecordFragment();
         mAdapter.AddFragment(recordFragment);
         CoverFragment coverFragment = new CoverFragment();
+        coverFragment.setInflateFinishListener(new OnInflateFinishListener() {
+            @Override
+            public void onViewInflateFinish(View view) {
+                if(mOriginRect == null) {
+                    // 获取上一个界面传入的信息
+                    mOriginRect = getIntent().getSourceBounds();
+                    // 获取上一个界面中，图片的宽度和高度
+                    mOriginWidth = mOriginRect.width();
+                    mOriginHeight = mOriginRect.height();
+                }
+
+                // 设置 view 的位置，使其和上一个界面中图片的位置重合
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mOriginWidth, mOriginHeight);
+                params.setMargins(mOriginRect.left, mOriginRect.top - StatusBarUtil.getStatusBarHeight(AudioHolderActivity.this), mOriginRect.right, mOriginRect.bottom);
+                mAnimCover.setLayoutParams(params);
+
+                //从通知栏启动只设置位置信息并隐藏
+                //不用启动动画
+                if (mFromNotify) {
+                    if (mAdapter.getItem(1) instanceof CoverFragment)
+                        ((CoverFragment) mAdapter.getItem(1)).showImage();
+                    //隐藏动画用的封面并设置位置信息
+                    mAnimCover.setVisibility(View.GONE);
+                    mAnimCover.setPivotX(0);
+                    mAnimCover.setPivotY(0);
+                    mAnimCover.setTranslationX(mTransitionBundle.getFloat(TRANSITION_X));
+                    mAnimCover.setTranslationY(mTransitionBundle.getFloat(TRANSITION_Y));
+                    mAnimCover.setScaleX(mScaleBundle.getFloat(SCALE_WIDTH));
+                    mAnimCover.setScaleY(mScaleBundle.getFloat(SCALE_HEIGHT));
+                    return;
+                }
+
+                //获得终点控件的位置信息
+                view.getGlobalVisibleRect(mDestRect);
+                // 计算图片缩放比例和位移距离
+                getMoveInfo(mDestRect);
+
+                mAnimCover.setPivotX(0);
+                mAnimCover.setPivotY(0);
+
+                mAnimCover.animate()
+                        .setInterpolator(new AccelerateDecelerateInterpolator())
+                        .withStartAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                overridePendingTransition(0, 0);
+                            }
+                        })
+                        .withEndAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                //入场动画结束时显示fragment中的封面
+                                if (mAdapter.getItem(1) instanceof CoverFragment) {
+                                    ((CoverFragment) mAdapter.getItem(1)).showImage();
+                                }
+                                //隐藏动画用的封面
+                                mAnimCover.setVisibility(View.GONE);
+                            }
+                        })
+                        .setDuration( DURATION)
+                        .scaleX(mScaleBundle.getFloat(SCALE_WIDTH))
+                        .scaleY(mScaleBundle.getFloat(SCALE_HEIGHT))
+                        .translationX(mTransitionBundle.getFloat(TRANSITION_X))
+                        .translationY(mTransitionBundle.getFloat(TRANSITION_Y))
+                        .start();
+            }
+        });
         coverFragment.setArguments(mBundle);
+
         mAdapter.AddFragment(coverFragment);
         LrcFragment lrcFragment = new LrcFragment();
-        lrcFragment.setOnFindListener(new LrcFragment.OnLrcViewFindListener() {
+        lrcFragment.setOnInflateFinishListener(new OnInflateFinishListener() {
             @Override
-            public void onLrcViewFind(LrcView lrcView) {
-                mLrcView = lrcView;
+            public void onViewInflateFinish(View view) {
+                if (!(view instanceof LrcView))
+                    return;
+                mLrcView = (LrcView) view;
                 mLrcView.setOnSeekToListener(new LrcView.OnSeekToListener() {
                     @Override
                     public void onSeekTo(int progress) {
-                        if(progress > 0 && progress < MusicService.getDuration()){
+                        if (progress > 0 && progress < MusicService.getDuration()) {
                             MusicService.setProgress(progress);
                             mCurrentTime = progress;
                             mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
@@ -690,48 +717,28 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
             }
+
             @Override
             public void onPageSelected(int position) {
                 mDotList.get(mPrevPosition).setImageDrawable(mNormalIndicator);
                 mDotList.get(position).setImageDrawable(mHighLightIndicator);
                 mPrevPosition = position;
-                if(position == 0)
+                if (position == 0)
                     mPager.setIntercept(true);
                 else
                     mPager.setIntercept(false);
-                if(mLrcView != null)
+                if (mLrcView != null)
                     mLrcView.setViewPagerScroll(false);
             }
+
             @Override
             public void onPageScrollStateChanged(int state) {
-                if(mLrcView != null)
+                if (mLrcView != null)
                     mLrcView.setViewPagerScroll(state != ViewPager.SCROLL_STATE_IDLE);
             }
         });
         mPager.setCurrentItem(1);
     }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        //只有从Mactivity启动，才使用动画
-        if(!mFromNotify && mFromMainActivity) {
-//            overridePendingTransition(R.anim.slide_bottom_in, 0);
-            overridePendingTransition(0,0);
-            mFromMainActivity = false;
-        }
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        //只有后退到MainActivity,才使用动画
-        if(mFromBack) {
-//            overridePendingTransition(0, R.anim.slide_bottom_out);
-            overridePendingTransition(0,0);
-            mFromBack = false;
-        }
-    }
-
 
     //更新界面
     @Override
@@ -763,22 +770,23 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 //背景开启渐变
                 if(mGradient){
                     new SwatchThread().start();
-                } else {
-                    //更新专辑封面
-                    mBlurHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
-                            mFistStart = false;
-                        }
-                    },16);
-
                 }
+                mBlurHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //更新专辑封面
+                        //不是第一次启动并且不是从通知栏启动，播放动画
+                        ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart && !mFromNotify);
+                        //更新动画控件封面 保证退场动画的封面与fragment中封面一致
+                        MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
+                        mFistStart = false;
+                    }
+                },10);
+
             }
-            if(!mGradient) {
-                //更新按钮状态
-                UpdatePlayButton(isplay);
-            }
+            //更新按钮状态
+            UpdatePlayButton(isplay);
+
         }
 
     }
@@ -842,10 +850,12 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 playmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                         R.drawable.play_btn_loop_one,garyColor);
         Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,garyColor);
-        //播放按钮
-        mPlayBarPlay.setImageResource(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
+        mPlayBarPlay.setImageResource(mIsPlay ? R.drawable.play_btn_stop : R.drawable.play_btn_play);
         //播放按钮背景
         Theme.TintDrawable(findView(R.id.playbar_play_bg),getResources().getDrawable(R.drawable.play_bg_play),stressColor);
+
+//        mPlayPauseView.updateState(mIsPlay,false);
+//        mPlayPauseView.setBackgroundColor(stressColor);
     }
 
     /**
@@ -891,9 +901,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             //修改控制按钮颜色
             Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,mColorDraken);
             Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,mColorDraken);
-            //播放按钮
-            mPlayBarPlay.setImageResource(!mIsPlay ? R.drawable.play_btn_play : R.drawable.play_btn_stop);
-            //播放按钮背景
+            //播放按钮背景颜色
+//            mPlayPauseView.setBackgroundColor(mColorDraken);
+            //播放按钮背景颜色
             Theme.TintDrawable(findView(R.id.playbar_play_bg),getResources().getDrawable(R.drawable.play_bg_play),mColorDraken);
 //            int currentmodel = MusicService.getPlayModel();
 //            Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
@@ -901,8 +911,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 //                            R.drawable.play_btn_loop_one,mColorDraken);
             //播放队列按钮
 //            Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,mColorDraken);
-
-
         }
     }
 
@@ -916,7 +924,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
                 /** start*/
                 Palette palette = new Palette.Builder(mRawBitMap).generate();
-                mOldSwatch = mNewSwatch;
                 mNewSwatch = palette.getMutedSwatch();
                 if(mNewSwatch == null)
                     mNewSwatch = new Palette.Swatch(Color.GRAY,100);

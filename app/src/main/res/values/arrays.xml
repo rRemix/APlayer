@@ -5,4 +5,5 @@
     <integer name="CoverCenterInDurationSlow">250</integer>
     <integer name="CoverOutFast">250</integer>
     <integer name="CoverOutSlow">400</integer>
+    <integer name="anim_duration">200</integer>
 </resources>

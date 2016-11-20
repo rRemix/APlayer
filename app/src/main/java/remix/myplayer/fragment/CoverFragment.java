@@ -1,23 +1,19 @@
 package remix.myplayer.fragment;
 
 import android.content.ContentUris;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.ScaleAnimation;
-import android.view.animation.TranslateAnimation;
+import android.view.ViewTreeObserver;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
-import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
 
 import java.io.File;
@@ -25,13 +21,13 @@ import java.io.File;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
+import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.thumb.SearchCover;
 
 /**
@@ -49,7 +45,7 @@ public class CoverFragment extends BaseFragment {
     private MP3Item mInfo;
     private int mWidth;
     private Uri mUri = Uri.EMPTY;
-
+    private OnInflateFinishListener mInflateFinishListener;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,9 +59,21 @@ public class CoverFragment extends BaseFragment {
         mWidth = getArguments().getInt("Width");
         View rootView = inflater.inflate(R.layout.fragment_cover,container,false);
         mUnBinder = ButterKnife.bind(this,rootView);
-
+        mImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                mImage.getViewTreeObserver().removeOnPreDrawListener(this);
+                if(mInflateFinishListener != null)
+                    mInflateFinishListener.onViewInflateFinish(mImage);
+                return true;
+            }
+        });
         return rootView;
 
+    }
+
+    public void setInflateFinishListener(OnInflateFinishListener l){
+        mInflateFinishListener = l;
     }
 
     /**
@@ -87,11 +95,14 @@ public class CoverFragment extends BaseFragment {
             mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
         }
 
-
         if(withAnim){
             int operation = Global.getOperation();
-            final double startValue = (mWidth - DensityUtil.dip2px(getActivity(),264)) / 2;
-            final double endValue = operation == Constants.PREV ? mWidth : -(DensityUtil.dip2px(getActivity(),264));
+//            final double startValue = (mWidth - DensityUtil.dip2px(getActivity(),264)) / 2;
+            //位置信息
+            Rect rect = new Rect();
+            mImage.getGlobalVisibleRect(rect);
+            final double startValue = rect.left;
+            final double endValue = operation == Constants.PREV ? mWidth : -rect.width();
 
             final Spring outAnim = SpringSystem.create().createSpring();
             outAnim.addListener(new SimpleSpringListener(){
@@ -102,12 +113,16 @@ public class CoverFragment extends BaseFragment {
 
                 @Override
                 public void onSpringAtRest(Spring spring) {
+                    if(mImage == null)
+                        return;
                     mImage.setX((float) startValue);
                     mImage.setImageURI(mUri);
                     final Spring inAnim = SpringSystem.create().createSpring();
                     inAnim.addListener(new SimpleSpringListener(){
                         @Override
                         public void onSpringUpdate(Spring spring) {
+                            if(mImage == null)
+                                return;
                             mImage.setScaleX((float) spring.getCurrentValue());
                             mImage.setScaleY((float) spring.getCurrentValue());
                         }
@@ -116,13 +131,29 @@ public class CoverFragment extends BaseFragment {
                     inAnim.setEndValue(1);
                 }
             });
-            outAnim.setRestDisplacementThreshold(40);
-            outAnim.setRestSpeedThreshold(40);
+            outAnim.setRestDisplacementThreshold(50);
+            outAnim.setRestSpeedThreshold(50);
             outAnim.setCurrentValue(startValue);
             outAnim.setEndValue(endValue);
         } else {
             mImage.setImageURI(mUri);
         }
+    }
+
+    /**
+     * activity退出时隐藏封面
+     */
+    public void hideImage(){
+        if(mImage != null)
+            mImage.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * activity入场动画播放完毕时显示封面
+     */
+    public void showImage(){
+        if(mImage != null)
+            mImage.setVisibility(View.VISIBLE);
     }
 
     /**

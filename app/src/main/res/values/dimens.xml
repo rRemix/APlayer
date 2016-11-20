@@ -86,4 +86,8 @@
     <dimen name="d323_size">323dp</dimen>
     <dimen name="d328_size">328dp</dimen>
     <dimen name="d410_size">410dp</dimen>
+
+    <dimen name="pause_bar_width">8dp</dimen>
+    <dimen name="pause_bar_distance">6dp</dimen>
+    <dimen name="pause_bar_height">24dp</dimen>
 </resources>

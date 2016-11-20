@@ -2,23 +2,12 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:fresco="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:background="@color/white"
     android:id="@+id/audio_holder_container">
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:id="@+id/audio_cover_img"
-        android:visibility="visible"
-        android:layout_width="@dimen/d48_size"
-        android:layout_height="@dimen/d48_size"
-        fresco:actualImageScaleType="centerCrop"
-        fresco:failureImage="@drawable/album_empty_bg_day"
-        fresco:failureImageScaleType="centerCrop"
-        android:layout_gravity="start|bottom"
-        android:layout_marginStart="@dimen/d12_size"
-        android:layout_marginBottom="@dimen/d12_size" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -82,28 +71,11 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
                 <!-- 中间三个页面 -->
-                <FrameLayout
-                    android:id="@+id/audio_holder_img_container"
+                <remix.myplayer.ui.customview.AudioViewPager
+                    android:id="@+id/holder_pager"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="10">
-                    <remix.myplayer.ui.customview.AudioViewPager
-                        android:id="@+id/holder_pager"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center" />
-                    <com.facebook.drawee.view.SimpleDraweeView
-                        android:visibility="visible"
-                        android:layout_margin="@dimen/d15_size"
-                        android:layout_marginTop="@dimen/d28_size"
-                        android:layout_gravity="center"
-                        android:id="@+id/audio_cover_placeholder"
-                        android:layout_width="@dimen/d264_size"
-                        android:layout_height="@dimen/d264_size"
-                        fresco:actualImageScaleType="centerCrop"
-                        fresco:failureImage="@drawable/album_empty_bg_day"
-                        fresco:failureImageScaleType="centerCrop" />
-                </FrameLayout>
+                    android:layout_weight="10"/>
 
                 <!--三个导航图标-->
                 <RelativeLayout
@@ -219,9 +191,22 @@
                     android:layout_height="match_parent"
                     android:gravity="center">
                     <FrameLayout
+                        android:id="@+id/playbar_play_container"
+                        android:visibility="visible"
                         android:layout_width="@dimen/d50_size"
                         android:layout_height="@dimen/d50_size"
-                        android:id="@+id/playbar_play_container"
+                        android:background="?android:attr/selectableItemBackgroundBorderless">
+                        <remix.myplayer.ui.customview.playpause.PlayPauseView
+                            android:id="@+id/playbar_play_pause"
+                            android:layout_width="@dimen/d50_size"
+                            android:layout_height="@dimen/d50_size"
+                            android:layout_gravity="center"
+                            android:visibility="visible"/>
+                    </FrameLayout>
+                    <FrameLayout
+                        android:visibility="gone"
+                        android:layout_width="@dimen/d50_size"
+                        android:layout_height="@dimen/d50_size"
                         android:background="?android:attr/selectableItemBackgroundBorderless">
                         <ImageView
                             android:id="@+id/playbar_play_bg"
@@ -231,11 +216,10 @@
                             android:layout_gravity="center"/>
                         <ImageView
                             android:id="@+id/playbar_play"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:scaleType="center"
+                            android:layout_width="@dimen/d32_size"
+                            android:layout_height="@dimen/d32_size"
                             android:layout_gravity="center"
-                            app:srcCompat="@drawable/play_btn_play"/>
+                            app:srcCompat="@drawable/ic_pause_to_play"/>
                     </FrameLayout>
                 </LinearLayout>
 

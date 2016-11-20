@@ -87,12 +87,8 @@ public class SplashActivity extends BaseActivity {
             }
         }.start();
 
-        if(!isFirst){
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
-        }
+        startActivity(new Intent(this,MainActivity.class));
 
-        getWindow().getDecorView().setSystemUiVisibility(View.INVISIBLE);
     }
 
 
