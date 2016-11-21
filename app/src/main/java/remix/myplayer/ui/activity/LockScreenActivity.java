@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.ColorInt;
-import android.support.v4.widget.ScrollerCompat;
 import android.support.v7.graphics.Palette;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -18,18 +17,11 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Scroller;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.enrique.stackblur.StackBlurManager;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.rebound.Spring;
-import com.facebook.rebound.SpringSystem;
-import com.tumblr.backboard.Actor;
-import com.tumblr.backboard.MotionProperty;
-import com.tumblr.backboard.imitator.Imitator;
-import com.tumblr.backboard.performer.Performer;
 import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;

@@ -56,6 +56,7 @@ public class PlayQueueAdapter extends BaseAdapter<PlayQueueAdapter.PlayQueueHold
                 //设置歌曲与艺术家
                 holder.mSong.setText(CommonUtil.processInfo(item.getTitle(),CommonUtil.SONGTYPE));
                 holder.mArtist.setText(CommonUtil.processInfo(item.getArtist(),CommonUtil.ARTISTTYPE));
+                holder.mArtist.setVisibility(View.VISIBLE);
             }
 
             //删除按钮

@@ -137,15 +137,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
 
         initToolbar(mToolBar,getString(R.string.recently));
 
-//        Theme.TintDrawable(findViewById(R.id.play_shuffle_button),R.drawable.btn_shuffle, ThemeStore.getMaterialPrimaryColor());
-//        new Thread(){
-//            @Override
-//            public void run() {
-//                mRefreshHandler.sendEmptyMessage(START);
-//                mInfoList = MediaStoreUtil.getMP3ListByIds(Global.mWeekList);
-//                mRefreshHandler.sendEmptyMessage(END);
-//            }
-//        }.start();
     }
 
     /**
@@ -181,7 +172,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control", Constants.NEXT);
         Global.setPlayQueue(mIdList,this,intent);
-//        sendBroadcast(intent);
     }
 
 

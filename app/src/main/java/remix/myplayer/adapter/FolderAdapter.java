@@ -54,7 +54,7 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
     public void onBindViewHolder(final FolderHolder holder, final int position) {
         if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
             return ;
-        //根据当前索引 获得对应的歌曲列表
+        //根据当前索引 获得对应的文件夹名字
         Iterator it = Global.mFolderMap.keySet().iterator();
         String temp = null;
         for(int i = 0 ; i <= position ; i++) {
@@ -65,7 +65,8 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
         if(temp != null){
             holder.mName.setText(temp.substring(temp.lastIndexOf("/")+ 1,temp.length()));
             holder.mPath.setText(temp);
-            holder.mCount.setText(Global.mFolderMap.get(temp).size()+ "首");
+            if(Global.mFolderMap.get(temp) != null)
+                holder.mCount.setText(Global.mFolderMap.get(temp).size()+ "首");
         }
         //根据主题模式 设置图片
         if(holder.mImg != null) {

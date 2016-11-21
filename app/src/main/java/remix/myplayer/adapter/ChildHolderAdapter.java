@@ -85,7 +85,7 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
             if(currentMP3 != null){
                 boolean highlight = temp.getId() == currentMP3.getId();
                 holder.mTitle.setTextColor(highlight ?
-                        ThemeStore.getStressColor() :
+                        ThemeStore.getAccentColor() :
                         ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
                 holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.GONE);
 

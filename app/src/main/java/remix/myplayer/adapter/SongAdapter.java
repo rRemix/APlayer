@@ -1,12 +1,10 @@
 package remix.myplayer.adapter;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +14,6 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -93,7 +90,7 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
         if(currentMP3 != null){
             boolean highlight = temp.getId() == MusicService.getCurrentMP3().getId();
             holder.mName.setTextColor(highlight ?
-                    ThemeStore.getStressColor():
+                    ThemeStore.getAccentColor():
                     ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
             holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.GONE);
             //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画

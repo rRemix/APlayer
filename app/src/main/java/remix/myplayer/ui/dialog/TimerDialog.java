@@ -119,7 +119,7 @@ public class TimerDialog extends BaseDialogActivity {
         //初始化开始计时按钮
         int[] state_prs = new int[]{android.R.attr.state_pressed};
         int[] state_non_focus = new int[]{-android.R.attr.state_focused};
-        int color = ThemeStore.getStressColor();
+        int color = ThemeStore.getAccentColor();
         StateListDrawable bg = new StateListDrawable();
         bg.addState(state_prs,Theme.getCorner(1.0f,4,0,color));
         bg.addState(state_non_focus,Theme.getCorner(0.01f,4,1,color));

@@ -55,7 +55,6 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 arg.putInt("Position", 0);
                 intent.putExtras(arg);
                 Global.setPlayQueue(idList,mContext,intent);
-//                mContext.sendBroadcast(intent);
                 break;
             //添加到播放队列
             case R.id.menu_add:
@@ -67,6 +66,10 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 break;
             //删除
             case R.id.menu_delete:
+                if(mId == Global.mMyLoveID){
+                    ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delelte));
+                    return true;
+                }
                 ToastUtil.show(mContext,(mType != Constants.PLAYLIST ? MediaStoreUtil.delete(mId , mType) : PlayListUtil.deletePlayList(mId)) ?
                         R.string.delete_success :
                         R.string.delete_error);

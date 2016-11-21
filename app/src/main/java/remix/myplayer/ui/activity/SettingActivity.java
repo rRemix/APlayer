@@ -3,8 +3,6 @@ package remix.myplayer.ui.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
@@ -98,7 +96,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcPath","")));
         }
         //初始化箭头颜色
-        final int arrowColor = ThemeStore.getStressColor();
+        final int arrowColor = ThemeStore.getAccentColor();
         ((GradientDrawable)mColorSrc.getDrawable()).setColor(arrowColor);
         ButterKnife.apply( new ImageView[]{findView(R.id.setting_eq_arrow),findView(R.id.setting_feedback_arrow),
                 findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow)},

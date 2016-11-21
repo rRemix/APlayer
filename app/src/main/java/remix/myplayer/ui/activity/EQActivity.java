@@ -204,7 +204,7 @@ public class EQActivity extends ToolbarActivity {
         });
 
         //初始化重置按钮背景
-        mReset.setBackground(Theme.getCorner(1.0f,5,0,ThemeStore.getStressColor()));
+        mReset.setBackground(Theme.getCorner(1.0f,5,0,ThemeStore.getAccentColor()));
 
         addEQSeekBar();
 

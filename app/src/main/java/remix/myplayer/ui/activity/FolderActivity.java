@@ -36,7 +36,7 @@ public class FolderActivity extends MultiChoiceActivity {
 
     public static FolderActivity mInstance;
     private FolderAdapter mAdapter;
-
+    private boolean mIsRunning = false;
     public static final String TAG = FolderActivity.class.getSimpleName();
     //更新
     private Handler mRefreshHandler = new Handler(){
@@ -92,7 +92,7 @@ public class FolderActivity extends MultiChoiceActivity {
     }
 
     public void UpdateList() {
-        if(mAdapter != null){
+        if(mAdapter != null && mIsRunning){
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -110,9 +110,13 @@ public class FolderActivity extends MultiChoiceActivity {
     protected void onResume() {
         MobclickAgent.onPageStart(FolderActivity.class.getSimpleName());
         super.onResume();
-        if(mMultiChoice.isShow()){
-            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-        }
+        mIsRunning = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mIsRunning = false;
     }
 
     protected void onPause() {

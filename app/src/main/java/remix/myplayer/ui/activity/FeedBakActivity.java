@@ -44,7 +44,7 @@ public class FeedBakActivity extends ToolbarActivity {
         ButterKnife.bind(this);
         initToolbar(mToolBar,getString(R.string.back));
 
-        mSubmit.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0,ThemeStore.getStressColor()));
+        mSubmit.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0,ThemeStore.getAccentColor()));
         mEditText.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0, ColorUtil.getColor(R.color.gray_e2e2e2)));
         Theme.setTint(mEditText,ThemeStore.getMaterialPrimaryColor(),false);
     }

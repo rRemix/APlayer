@@ -219,7 +219,7 @@
                             android:layout_width="@dimen/d32_size"
                             android:layout_height="@dimen/d32_size"
                             android:layout_gravity="center"
-                            app:srcCompat="@drawable/ic_pause_to_play"/>
+                            android:src="@drawable/play_btn_play"/>
                     </FrameLayout>
                 </LinearLayout>
 

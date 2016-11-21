@@ -236,8 +236,8 @@ public class FilterSizeSeekBar extends View {
         if(thumbPress == null)
             thumbPress = getResources().getDrawable(R.drawable.thumb);
 
-        Theme.TintDrawable(thumb,ThemeStore.getStressColor());
-        Theme.TintDrawable(thumbPress,ThemeStore.getStressColor());
+        Theme.TintDrawable(thumb,ThemeStore.getAccentColor());
+        Theme.TintDrawable(thumbPress,ThemeStore.getAccentColor());
 
         mThumbNormal = new int[]{-android.R.attr.state_focused, -android.R.attr.state_pressed,
                 -android.R.attr.state_selected, -android.R.attr.state_checked};
@@ -256,7 +256,7 @@ public class FilterSizeSeekBar extends View {
 
         //轨道 已完成轨道 文字颜色
         mTrackColor = ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_scan_track_color : R.color.night_scan_track_color);
-        mProgressColor = ThemeStore.getStressColor();
+        mProgressColor = ThemeStore.getAccentColor();
         mTextColor = ThemeStore.getTextColorPrimary();
 
         //小圆点数量与宽度
@@ -267,7 +267,7 @@ public class FilterSizeSeekBar extends View {
         mTrackHeigh = (int)typedArray.getDimension(R.styleable.FilterSizeSeekBar_trackheight,DensityUtil.dip2px(mContext,2));
 
         //小圆点画笔
-        mDotColor = ColorUtil.shiftColor(ThemeStore.getStressColor(),0.8f);
+        mDotColor = ColorUtil.shiftColor(ThemeStore.getAccentColor(),0.8f);
         mDotPaint = new Paint();
         mDotPaint.setAntiAlias(true);
         mDotPaint.setColor(mDotColor);

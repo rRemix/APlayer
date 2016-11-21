@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.ColorInt;
+import android.support.v13.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.view.ContextThemeWrapper;
@@ -166,10 +167,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     private Animation mAnimOut;
     //是否从通知栏启动
     private boolean mFromNotify = false;
-    //是否从MainActivity启动
-    private boolean mFromMainActivity = false;
-    //是否是后退按钮
-    private boolean mFromBack = false;
+    //是否从Activity启动
+    private boolean mFromActivity = false;
     //是否需要更新
     private boolean mNeedUpdateUI = true;
     //是否开启背景渐变
@@ -256,7 +255,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
-        mFromMainActivity =  getIntent().getBooleanExtra("FromMainActivity",false);
+        mFromActivity =  getIntent().getBooleanExtra("FromActivity",false);
         mGradient = SPUtil.getValue(this,"Setting","Gradient",false);
 
         super.onCreate(savedInstanceState);
@@ -272,17 +271,17 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
         MusicService.addCallback(this);
         //初始化动画相关
-        initAnim();
+        setUpAnim();
         //初始化顶部信息
-        initTop();
+        setUpTop();
         //初始化三个指示标志
-        initGuide();
+        setUpGuide();
         //初始化ViewPager
-        initPager();
+        setUpViewPager();
         //初始化seekbar以及播放时间
-        initSeekBar();
+        setUpSeekBar();
         //初始化主题颜色
-        initViewColor();
+        setUpViewColor();
 
 //        ActivityTransition.with(getIntent()).to(mAnimCover).start(savedInstanceState);
 //        ViewCompat.setTransitionName(mAnimCover, "image");
@@ -317,10 +316,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     protected void onStart() {
         super.onStart();
         //只有从Mactivity启动，才使用动画
-        if(!mFromNotify && mFromMainActivity) {
-//            overridePendingTransition(R.anim.slide_bottom_in, 0);
+        if(!mFromNotify && mFromActivity) {
             overridePendingTransition(0,0);
-            mFromMainActivity = false;
+            mFromActivity = false;
         }
     }
 
@@ -335,9 +333,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     public void onResume() {
         super.onResume();
         //更新界面
-//        if(MusicService.getCurrentMP3().getId() != mInfo.getId()) {
-//            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
-//        }
         mIsRunning = true;
         if(mNeedUpdateUI){
             UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
@@ -356,7 +351,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
     @Override
     public void onBackPressed() {
-        mFromBack = true;
         mAnimCover.animate()
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .withStartAction(new Runnable() {
@@ -443,7 +437,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 break;
             //关闭
             case R.id.top_hide:
-                mFromBack = true;
                 onBackPressed();
                 break;
             //弹出窗口
@@ -460,7 +453,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     /**
      * 初始化动画
      */
-    private void initAnim() {
+    private void setUpAnim() {
         WindowManager wm = getWindowManager();
         Display display = wm.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
@@ -489,7 +482,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -500,21 +492,24 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     /**
      * 初始化三个dot
      */
-    private void initGuide() {
+    private void setUpGuide() {
         mDotList = new ArrayList<>();
         mDotList.add((ImageView) findView(R.id.guide_01));
         mDotList.add((ImageView) findViewById(R.id.guide_02));
         mDotList.add((ImageView) findViewById(R.id.guide_03));
         int width = DensityUtil.dip2px(this,5);
         int height = DensityUtil.dip2px(this,2);
-        mHighLightIndicator = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getStressColor(),width,height);
-        mNormalIndicator = Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.adjustAlpha(ThemeStore.getStressColor(),0.3f),width,height);
+        mHighLightIndicator = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getAccentColor(),width,height);
+        mNormalIndicator = Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.adjustAlpha(ThemeStore.getAccentColor(),0.3f),width,height);
         for(int i = 0; i < mDotList.size(); i++){
             mDotList.get(i).setImageDrawable(mNormalIndicator);
         }
     }
 
-    private void initSeekBar() {
+    /**
+     * 初始化seekbar
+     */
+    private void setUpSeekBar() {
         if(mInfo == null)
             return;
 
@@ -563,9 +558,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         });
     }
 
-    /**
-     *
-     */
     public void setMP3Item(MP3Item mp3Item){
         if(mp3Item != null)
             mInfo = mp3Item;
@@ -599,17 +591,15 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
      * @param isPlay
      */
     public void UpdatePlayButton(final boolean isPlay) {
-
         mPlayPauseView.updateState(isPlay,true);
         mPlayBarPlay.setImageResource(isPlay ? R.drawable.play_btn_stop : R.drawable.play_btn_play);
     }
 
-    private void initTop() {
+    private void setUpTop() {
         //初始化顶部信息
         UpdateTopStatus(mInfo);
     }
 
-    private void initPager() {
         //初始化Viewpager
         mAdapter = new PagerAdapter(getSupportFragmentManager());
         mBundle = new Bundle();
@@ -776,17 +766,15 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                     public void run() {
                         //更新专辑封面
                         //不是第一次启动并且不是从通知栏启动，播放动画
-                        ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart && !mFromNotify);
+                        ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
                         //更新动画控件封面 保证退场动画的封面与fragment中封面一致
                         MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
                         mFistStart = false;
                     }
                 },10);
-
             }
             //更新按钮状态
             UpdatePlayButton(isplay);
-
         }
 
     }
@@ -818,10 +806,10 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     /**
      * 根据主题颜色修改按钮颜色
      */
-    private void initViewColor() {
+    private void setUpViewColor() {
         if(mGradient)
             return;
-        int stressColor = ThemeStore.getStressColor();
+        int accentColor = ThemeStore.getAccentColor();
         int garyColor = ColorUtil.getColor(R.color.gray_6c6a6c);
         //修改顶部按钮颜色
         Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,garyColor);
@@ -836,26 +824,27 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
         LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
         //修改progress颜色
-        (layerDrawable.getDrawable(1)).setColorFilter(stressColor, PorterDuff.Mode.SRC_IN);
+        (layerDrawable.getDrawable(1)).setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
         mSeekBar.setProgressDrawable(layerDrawable);
         //修改thumb颜色
-        mSeekBar.setThumb(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,stressColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),stressColor));
+        mSeekBar.setThumb(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),accentColor));
 
         //修改控制按钮颜色
-        Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,stressColor);
-        Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,stressColor);
+        Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,accentColor);
+        Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,accentColor);
 
         int playmodel = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
         Theme.TintDrawable(mPlayModel,playmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                 playmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                         R.drawable.play_btn_loop_one,garyColor);
         Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,garyColor);
+
         mPlayBarPlay.setImageResource(mIsPlay ? R.drawable.play_btn_stop : R.drawable.play_btn_play);
         //播放按钮背景
-        Theme.TintDrawable(findView(R.id.playbar_play_bg),getResources().getDrawable(R.drawable.play_bg_play),stressColor);
+        Theme.TintDrawable(findView(R.id.playbar_play_bg),getResources().getDrawable(R.drawable.play_bg_play),accentColor);
 
 //        mPlayPauseView.updateState(mIsPlay,false);
-//        mPlayPauseView.setBackgroundColor(stressColor);
+        mPlayPauseView.setBackgroundColor(accentColor);
     }
 
     /**
@@ -902,7 +891,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,mColorDraken);
             Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,mColorDraken);
             //播放按钮背景颜色
-//            mPlayPauseView.setBackgroundColor(mColorDraken);
+            mPlayPauseView.setBackgroundColor(mColorDraken);
             //播放按钮背景颜色
             Theme.TintDrawable(findView(R.id.playbar_play_bg),getResources().getDrawable(R.drawable.play_bg_play),mColorDraken);
 //            int currentmodel = MusicService.getPlayModel();

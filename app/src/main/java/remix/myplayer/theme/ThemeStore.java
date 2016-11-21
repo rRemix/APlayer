@@ -157,7 +157,7 @@ public class ThemeStore {
     }
 
     @ColorInt
-    public static int getStressColor(){
+    public static int getAccentColor(){
         return ColorUtil.getColor(isDay() ? getMaterialPrimaryColorRes() : R.color.purple_782899);
     }
 

@@ -71,8 +71,6 @@ public class MultiChoiceActivity extends ToolbarActivity {
                         mTipPopupWindow.show(new View(MultiChoiceActivity.this));
                     }
                 }
-
-
             }
         });
     }

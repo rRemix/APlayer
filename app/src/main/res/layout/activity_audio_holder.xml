@@ -214,7 +214,7 @@
                         android:layout_gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/play_btn_play"
+                        android:src="@drawable/play_btn_play"
                         android:background="@color/transparent"/>
                 </FrameLayout>
             </LinearLayout>

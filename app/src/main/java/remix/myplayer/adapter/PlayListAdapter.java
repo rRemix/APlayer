@@ -87,44 +87,36 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
             }
 
             if(holder.mButton != null) {
-                boolean isLove = info.Name.equals(mContext.getString(R.string.my_favorite));
                 Theme.TintDrawable(holder.mButton,
-                        isLove ? R.drawable.playlist_love : R.drawable.list_icn_more,
+                          R.drawable.list_icn_more,
                         ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.gray_6c6a6c : R.color.white));
-                if(!isLove){
-                    holder.mButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if(mMultiChoice.isShow())
-                                return;
-                            Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
-                            final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-                            popupMenu.getMenuInflater().inflate(R.menu.playlist_menu, popupMenu.getMenu());
-                            popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext, info._Id, Constants.PLAYLIST, info.Name));
-                            popupMenu.show();
-                        }
-                    });
-                    holder.mButton.setClickable(true);
 
-                    //点击效果
-                    int size = DensityUtil.dip2px(mContext,45);
-                    Drawable defaultDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-                    Drawable selectDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
-                    holder.mButton.setBackground(Theme.getPressDrawable(
-                            defaultDrawable,
-                            selectDrawable,
-                            ThemeStore.getRippleColor(),
-                            null,
-                            null));
-                } else {
-                    holder.mButton.setBackgroundResource(R.color.transparent);
-                    holder.mButton.setClickable(false);
-                }
+                holder.mButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(mMultiChoice.isShow())
+                            return;
+                        Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
+                        final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
+                        popupMenu.getMenuInflater().inflate(R.menu.playlist_menu, popupMenu.getMenu());
+                        popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext, info._Id, Constants.PLAYLIST, info.Name));
+                        popupMenu.show();
+                    }
+                });
+                //点击效果
+                int size = DensityUtil.dip2px(mContext,45);
+                Drawable defaultDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+                Drawable selectDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
+                holder.mButton.setBackground(Theme.getPressDrawable(
+                        defaultDrawable,
+                        selectDrawable,
+                        ThemeStore.getRippleColor(),
+                        null,
+                        null));
+
             }
 
             //背景点击效果
-            holder.mContainer.setBackground(
-                    Theme.getPressAndSelectedStateListRippleDrawable(PlayListFragment.getModel(),mContext));
 
             //是否处于选中状态
             if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&

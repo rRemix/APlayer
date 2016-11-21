@@ -89,7 +89,6 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         mItemDecoration.setDividerColor(ListModel == Constants.LIST_MODEL ? ThemeStore.getDividerColor() : Color.TRANSPARENT);
         mRecycleView.addItemDecoration(mItemDecoration);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
-
         if(getActivity() instanceof MultiChoiceActivity){
            mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }

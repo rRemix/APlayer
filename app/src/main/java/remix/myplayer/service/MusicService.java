@@ -103,7 +103,6 @@ public class MusicService extends BaseService {
     /** 播放控制的Receiver */
     private ControlReceiver mRecevier;
 
-
     /** 监测耳机拔出的Receiver*/
     private HeadsetPlugReceiver mHeadSetReceiver;
 
@@ -213,11 +212,9 @@ public class MusicService extends BaseService {
                 sendBroadcast(new Intent(Constants.NOTIFY));
             }
         };
-
         //播放模式
         mPlayModel = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
         init();
-
     }
 
     private void init() {
@@ -236,7 +233,6 @@ public class MusicService extends BaseService {
 //                    if (FolderActivity.mInstance != null) {
 //                        FolderActivity.mInstance.UpdateList();
 //                    }
-//
 //                }
 //                if(msg.what == Constants.UPDATE_CHILDHOLDER ){
 //                    if(ChildHolderActivity.mInstance != null){
@@ -283,7 +279,7 @@ public class MusicService extends BaseService {
             public void onCompletion(MediaPlayer mp) {
                 playNextOrPrev(true, true);
                 Global.setOperation(Constants.NEXT);
-                mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
+//                mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
                 //更新通知栏
                 sendBroadcast(new Intent(Constants.NOTIFY));
             }
@@ -336,16 +332,13 @@ public class MusicService extends BaseService {
         if(mNextId == -1)
             return;
         //查找上次退出时保存的下一首歌曲是否还存在
+        //如果不存在，重新设置下一首歌曲
         mNextIndex = Global.mPlayQueue.indexOf(mNextId);
-        if(mNextIndex != -1){
-            mNextInfo = MediaStoreUtil.getMP3InfoById(mNextId);
-            return;
-        }
-        mNextIndex = mCurrentIndex;
-        mNextId = mCurrentId;
-        //下一首歌曲已经不存在(外部删除) 重新设置下一首歌曲
-        updateNextSong(true);
         mNextInfo = MediaStoreUtil.getMP3InfoById(mNextId);
+        if(mNextInfo != null)
+            return;
+        mNextIndex = mCurrentIndex + 1;
+        updateNextSong(true);
     }
 
     private void unInit(){
@@ -398,20 +391,6 @@ public class MusicService extends BaseService {
 
                 //更新所有界面
                 Update(Global.getOperation());
-//                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
-//                if(mCurrentVolume == 0)
-//                    return;
-//                int temp = 0;
-//                int sleeptime = 100 / mCurrentVolume;
-//                while(temp++ < mCurrentVolume){
-//                    try {
-//                        sleep(sleeptime);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
-//                            AudioManager.FLAG_PLAY_SOUND);
-//                }
             }
         }.start();
     }
@@ -482,7 +461,6 @@ public class MusicService extends BaseService {
     }
 
     /**
-     * 将activity添加到队列
      * @param callback
      */
     public static void addCallback(Callback callback) {
@@ -718,7 +696,7 @@ public class MusicService extends BaseService {
     }
 
     /**
-     * 设置播放模式
+     * 设置播放模式并更新下一首歌曲
      * @param playModel
      */
     public static void setPlayModel(int playModel) {
@@ -876,7 +854,6 @@ public class MusicService extends BaseService {
                     AudioManager.FLAG_PLAY_SOUND);
         }
     }
-
 
     /**
      * 记录在一秒中线控按下的次数

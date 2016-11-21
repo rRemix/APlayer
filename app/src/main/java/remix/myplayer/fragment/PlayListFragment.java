@@ -91,10 +91,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
             @Override
             public void onItemClick(View view, int position) {
                 String name = getPlayListName(position);
-                //多选状态下我的收藏列表不能被选中
-                if(mMultiChoice.isShow() && name.equals(getString(R.string.my_favorite))){
-                    return;
-                }
+
                 if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,getPlayListId(position),TAG)){
                     if(getPlayListSongCount(position) == 0) {
                         ToastUtil.show(getActivity(),getString(R.string.list_isempty));
@@ -112,7 +109,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
             @Override
             public void onItemLongClick(View view, int position) {
                 String name = getPlayListName(position);
-                if(!TextUtils.isEmpty(name) && !name.equals(getString(R.string.my_favorite)))
+                if(!TextUtils.isEmpty(name))
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,getPlayListId(position),TAG,Constants.PLAYLIST);
             }
         });

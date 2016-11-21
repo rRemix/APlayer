@@ -213,6 +213,8 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.PLAYLIST:
                 for(Object arg : mSelectedArg){
                     if (arg instanceof Integer) {
+                        if((Integer)arg == Global.mMyLoveID)
+                            continue;
                         idList.add((Integer) arg);
                         //保存删除前，选中的播放列表下一共有多少歌曲
                         ArrayList<Integer> selectIDList = PlayListUtil.getIDList((Integer) arg);

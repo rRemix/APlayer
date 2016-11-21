@@ -41,7 +41,6 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
-import remix.myplayer.application.Application;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
@@ -49,11 +48,9 @@ import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnModeChangeListener;
-import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.customview.TipPopupwindow;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -181,16 +178,14 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         ButterKnife.bind(this);
 
         mInstance = this;
-
         //播放的service
         MusicService.addCallback(this);
-
         //初始化toolbar
-        initToolbar(mToolBar,"");
-        initPager();
-        initTab();
+        setUpToolbar(mToolBar,"");
+        setUpPager();
+        setUpTab();
         //初始化测滑菜单
-        initDrawerLayout();
+        setUpDrawerLayout();
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
 
@@ -238,8 +233,8 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         //上次退出时正在播放的歌曲的pos
         int pos = 0;
         //查找上次退出时的歌曲是否还存在
-        for(int i = 0 ; i < Global.mAllSongList.size();i++){
-            if(lastId == Global.mAllSongList.get(i)){
+        for(int i = 0 ; i < Global.mPlayQueue.size();i++){
+            if(lastId == Global.mPlayQueue.get(i)){
                 isLastSongExist = true;
                 pos = i;
                 break;
@@ -285,8 +280,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                 ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
     }
 
-    @Override
-    protected void initToolbar(Toolbar toolbar, String title) {
+    protected void setUpToolbar(Toolbar toolbar, String title) {
         super.initToolbar(toolbar,"");
         mToolBar.setTitle("");
 
@@ -359,7 +353,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     }
 
     //初始化ViewPager
-    private void initPager() {
+    private void setUpPager() {
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
         mPagerAdapter.setTitles(new String[]{getResources().getString(R.string.tab_song),
                 getResources().getString(R.string.tab_album),
@@ -400,7 +394,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     }
 
     //初始化custontab
-    private void initTab() {
+    private void setUpTab() {
         //添加tab选项卡
         mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_song)));
         mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_album)));
@@ -424,7 +418,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     }
 
 
-    private void initDrawerLayout() {
+    private void setUpDrawerLayout() {
         mDrawerAdapter = new DrawerAdapter(this);
         mDrawerAdapter.setOnModeChangeListener(new OnModeChangeListener() {
             @Override

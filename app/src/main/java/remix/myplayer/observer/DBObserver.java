@@ -4,6 +4,7 @@ import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Handler;
 
+import remix.myplayer.db.DBContentProvider;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
@@ -13,6 +14,8 @@ import remix.myplayer.util.PlayListUtil;
  */
 
 public class DBObserver extends ContentObserver {
+    private static OnChangeListener mPlayListListener;
+    private static OnChangeListener mPlayListSongListener;
     private Handler mHandler;
     /**
      * Creates a content observer.
@@ -30,32 +33,54 @@ public class DBObserver extends ContentObserver {
     }
 
     @Override
-    public void onChange(boolean selfChange, Uri uri) {
+    public void onChange(boolean selfChange, final Uri uri) {
+//        if(!selfChange){
+//            new Thread(){
+//                @Override
+//                public void run() {
+//                    Global.mPlayList = PlayListUtil.getAllPlayListInfo();
+//                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueID);
+//                    mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+//                }
+//            }.start();
+//        }
+
         if(!selfChange){
             new Thread(){
                 @Override
                 public void run() {
-                    Global.mPlayList = PlayListUtil.getAllPlayListInfo();
-                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueID);
+                    switch (DBContentProvider.mUriMatcher.match(uri)){
+                        //更新播放列表
+                        case DBContentProvider.PLAY_LIST_MULTIPLE:
+                        case DBContentProvider.PLAY_LIST_SINGLE:
+                            Global.mPlayList = PlayListUtil.getAllPlayListInfo();
+                            if(mPlayListListener != null)
+                                mPlayListListener.OnChange();
+                            break;
+                        //更新播放队列
+                        case DBContentProvider.PLAY_LIST_SONG_MULTIPLE:
+                        case DBContentProvider.PLAY_LIST_SONG_SINGLE:
+                            Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueID);
+                            if(mPlayListSongListener != null)
+                                mPlayListSongListener.OnChange();
+                            break;
+                    }
                     mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                 }
             }.start();
         }
+    }
 
-//        if(!selfChange){
-//            switch (DBContentProvider.mUriMatcher.match(uri)){
-//                //更新播放列表
-//                case DBContentProvider.PLAY_LIST_MULTIPLE:
-//                case DBContentProvider.PLAY_LIST_SINGLE:
-//                    Global.mPlayList = PlayListUtil.getAllPlayListInfo();
-//                    break;
-//                //更新播放队列
-//                case DBContentProvider.PLAY_LIST_SONG_MULTIPLE:
-//                case DBContentProvider.PLAY_LIST_SONG_SINGLE:
-//                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueID);
-//                    break;
-//            }
-//        }
+    public static void setPlayListListener(OnChangeListener playListListener) {
+        mPlayListListener = playListListener;
+    }
+
+    public static void setPlayListSongListener(OnChangeListener playListSongListener) {
+        mPlayListSongListener = playListSongListener;
+    }
+
+    public interface OnChangeListener{
+        void OnChange();
     }
 
 }

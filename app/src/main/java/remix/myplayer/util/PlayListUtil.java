@@ -27,11 +27,9 @@ import remix.myplayer.model.PlayListSongInfo;
 public class PlayListUtil {
     private static final String TAG = "PlayListUtil";
     private static Context mContext;
-//    private static DBContentProvider mProvider;
     private PlayListUtil(){}
     public static void setContext(Context context){
         mContext = context;
-//        mProvider = new DBContentProvider(mContext);
     }
 
     /**
@@ -92,10 +90,7 @@ public class PlayListUtil {
             return 0;
         ContentValues cv = new ContentValues();
         cv.put(PlayListSongs.PlayListSongColumns.AUDIO_ID,info.AudioId);
-//        cv.put(PlayListSongs.PlayListSongColumns.Album,info.Album);
-//        cv.put(PlayListSongs.PlayListSongColumns.Album_ID,info.AlbumID);
-//        cv.put(PlayListSongs.PlayListSongColumns.Artist,info.Artist);
-//        cv.put(PlayListSongs.PlayListSongColumns.Artist_ID,info.ArtistID);
+
         cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_ID,info.PlayListID);
         cv.put(PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME,info.PlayListName);
         Uri uri = mContext.getContentResolver().insert(PlayListSongs.CONTENT_URI, cv);
@@ -108,6 +103,8 @@ public class PlayListUtil {
      * @return
      */
     public static int addMultiSongs(ArrayList<PlayListSongInfo> infos){
+        if(infos == null || infos.size() == 0 )
+            return 0;
         //不重复添加
         ArrayList<Integer> rawIDList = getIDList(infos.get(0).PlayListID);
         for(int i = 0 ; i < rawIDList.size() ;i++){
@@ -116,9 +113,6 @@ public class PlayListUtil {
                     infos.remove(j);
             }
         }
-        if(infos == null || infos.size() == 0 )
-            return 0;
-
 
         ContentValues[] values = new ContentValues[infos.size()];
         for(int i = 0 ; i < infos.size() ;i++){
@@ -147,6 +141,8 @@ public class PlayListUtil {
      * @return
      */
     public static int addMultiSongs(ArrayList<Integer> IDList,String playListName,int playListId){
+        if(IDList == null || IDList.size() == 0 )
+            return 0;
         //不重复添加
         ArrayList<Integer> rawIDList = getIDList(playListName);
         for(int i = 0 ; i < rawIDList.size() ;i++){
@@ -155,10 +151,6 @@ public class PlayListUtil {
                     IDList.remove(j);
             }
         }
-        if(IDList == null || IDList.size() == 0 )
-            return 0;
-
-
         ContentValues[] values = new ContentValues[IDList.size()];
         for(int i = 0 ; i < IDList.size() ;i++){
             ContentValues cv = new ContentValues();

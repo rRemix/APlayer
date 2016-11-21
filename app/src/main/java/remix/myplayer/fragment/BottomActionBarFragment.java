@@ -2,6 +2,7 @@ package remix.myplayer.fragment;
 
 import android.content.Intent;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v13.app.ActivityCompat;
@@ -10,13 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.kogitune.activity_transition.ActivityTransitionLauncher;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -87,21 +86,16 @@ public class BottomActionBarFragment extends BaseFragment{
                 bundle.putSerializable("MP3Item",MusicService.getCurrentMP3());
                 intent.putExtras(bundle);
                 intent.putExtra("Isplay",MusicService.getIsplay());
-                intent.putExtra("FromMainActivity",true);
+                intent.putExtra("FromActivity",true);
                 Rect rect = new Rect();
                 // 获取元素位置信息
                 mCover.getGlobalVisibleRect(rect);
                 intent.setSourceBounds(rect);
-                getContext().startActivity(intent);
-//                ActivityTransitionLauncher
-//                        .with(getActivity())
-//                        .from(mCover)
-//                        .launch(intent);
+//                getContext().startActivity(intent);
                 // 这里指定了共享的视图元素
-//                ActivityOptionsCompat options = ActivityOptionsCompat
-//                        .makeSceneTransitionAnimation(getActivity(), mCover, "image");
-//
-//                ActivityCompat.startActivity(getActivity(), intent, options.toBundle());
+                ActivityOptionsCompat options = ActivityOptionsCompat
+                        .makeSceneTransitionAnimation(getActivity(), mCover, "image");
+                ActivityCompat.startActivity(getActivity(), intent, options.toBundle());
 
             }
         });
