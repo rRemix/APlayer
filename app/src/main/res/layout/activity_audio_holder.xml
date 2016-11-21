@@ -255,6 +255,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/d8_size"
                 android:layout_marginRight="@dimen/d8_size"
+                android:gravity="center"
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:textSize="@dimen/s14_size"

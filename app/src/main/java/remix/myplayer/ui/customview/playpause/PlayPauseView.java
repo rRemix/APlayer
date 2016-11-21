@@ -35,7 +35,7 @@ public class PlayPauseView extends FrameLayout {
                 }
             };
 
-    private static final long PLAY_PAUSE_ANIMATION_DURATION = 350L;
+    private static final long PLAY_PAUSE_ANIMATION_DURATION = 250L;
 
     private final PlayPauseDrawable mDrawable;
     private final Paint mPaint = new Paint();

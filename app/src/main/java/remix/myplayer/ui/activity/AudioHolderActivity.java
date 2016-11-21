@@ -351,6 +351,11 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
     @Override
     public void onBackPressed() {
+        mContainer.animate()
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .setDuration(DURATION)
+                .alpha(0)
+                .start();
         mAnimCover.animate()
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .withStartAction(new Runnable() {
@@ -595,12 +600,17 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         mPlayBarPlay.setImageResource(isPlay ? R.drawable.play_btn_stop : R.drawable.play_btn_play);
     }
 
+    /**
+     * 初始化顶部信息
+     */
     private void setUpTop() {
-        //初始化顶部信息
         UpdateTopStatus(mInfo);
     }
 
-        //初始化Viewpager
+    /**
+     * 初始化viewpager
+     */
+    private void setUpViewPager(){
         mAdapter = new PagerAdapter(getSupportFragmentManager());
         mBundle = new Bundle();
         mBundle.putInt("Width", mWidth);
@@ -730,6 +740,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         mPager.setCurrentItem(1);
     }
 
+
+
+
     //更新界面
     @Override
     public void UpdateUI(MP3Item mp3Item, boolean isplay){
@@ -842,9 +855,11 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         mPlayBarPlay.setImageResource(mIsPlay ? R.drawable.play_btn_stop : R.drawable.play_btn_play);
         //播放按钮背景
         Theme.TintDrawable(findView(R.id.playbar_play_bg),getResources().getDrawable(R.drawable.play_bg_play),accentColor);
-
 //        mPlayPauseView.updateState(mIsPlay,false);
         mPlayPauseView.setBackgroundColor(accentColor);
+        //下一首背景
+        mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.getColor(R.color.white_fafafa),
+                DensityUtil.dip2px(this,2),0,0,DensityUtil.dip2px(this,288),DensityUtil.dip2px(this,38),1));
     }
 
     /**
