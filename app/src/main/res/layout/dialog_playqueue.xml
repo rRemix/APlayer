@@ -6,7 +6,7 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="1.5"
         android:background="@color/night_interval_color">
         <TextView
             android:layout_width="match_parent"

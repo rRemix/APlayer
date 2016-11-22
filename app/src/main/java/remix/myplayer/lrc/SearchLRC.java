@@ -1,5 +1,7 @@
 package remix.myplayer.lrc;
 
+import android.text.TextUtils;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -87,7 +89,7 @@ public class SearchLRC {
         //查找本地目录
         //没有设置歌词路径
         String setLrcPath =  SPUtil.getValue(Application.getContext(),"Setting","LrcPath","");
-        if(setLrcPath.equals("")){
+        if(setLrcPath.equals("") && !TextUtils.isEmpty(mInfo.getUrl())){
             File file = new File(mInfo.getUrl());
             //父目录
             File parentfile = file.getParentFile();

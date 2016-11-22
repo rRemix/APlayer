@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.ColorInt;
+import android.support.v13.app.ActivityCompat;
 import android.support.v13.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
@@ -286,7 +287,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 //        ActivityTransition.with(getIntent()).to(mAnimCover).start(savedInstanceState);
 //        ViewCompat.setTransitionName(mAnimCover, "image");
 
-        //初始化控件
+        //初始化动画控件
         //设置失败加载的图片和缩放类型
         mAnimCover = new SimpleDraweeView(this);
         mAnimCover.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
@@ -309,7 +310,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         // 计算位移距离，并将数据存储到 bundle 中
         mTransitionBundle.putFloat(TRANSITION_X, destRect.left - mOriginRect.left);
         mTransitionBundle.putFloat(TRANSITION_Y, destRect.top - mOriginRect.top);
-
     }
 
     @Override
@@ -322,12 +322,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         }
     }
 
-    @Override
-    public void finish() {
-        super.finish();
-        //只有后退到MainActivity,才使用动画
-        overridePendingTransition(0,0);
-    }
 
     @Override
     public void onResume() {
@@ -372,6 +366,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                     @Override
                     public void run() {
                         finish();
+                        overridePendingTransition(0,0);
+//                        ActivityCompat.finishAfterTransition(AudioHolderActivity.this);
                     }
                 })
                 .setDuration(DURATION)
@@ -739,8 +735,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         });
         mPager.setCurrentItem(1);
     }
-
-
 
 
     //更新界面
