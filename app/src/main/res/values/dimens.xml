@@ -95,4 +95,5 @@
     <dimen name="pause_bar_width">4dp</dimen>
     <dimen name="pause_bar_distance">10dp</dimen>
     <dimen name="pause_bar_height">22dp</dimen>
+    <dimen name="d108_size">108dp</dimen>
 </resources>

@@ -3,11 +3,12 @@
 
     android:layout_width="@dimen/d264_size"
     android:layout_height="wrap_content"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:background="?attr/material_color_primary">
 
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/header_img"
         android:layout_marginTop="@dimen/d20_size"
         android:layout_width="108dp"
@@ -17,8 +18,10 @@
         android:paddingRight="@dimen/d4_size"
         android:paddingBottom="@dimen/d6_size"
         android:scaleType="centerCrop"
-        android:src="@drawable/album_empty_bg_day"
-        android:background="@color/transparent"/>
+        fresco:actualImageScaleType="centerCrop"
+        fresco:placeholderImageScaleType="centerCrop"
+        fresco:placeholderImage="?attr/default_album"
+        android:background="@drawable/drawer_bg_album_shadow"/>
 
     <TextView
         android:visibility="visible"

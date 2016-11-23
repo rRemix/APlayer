@@ -250,7 +250,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         //上次退出时保存的正在播放的歌曲未失效
         if(isLastSongExist && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
             mBottomBar.UpdateBottomStatus(item, isPlay);
-            updateHeader(item,false);
+            updateHeader(item);
             MusicService.initDataSource(item,pos);
         }else {
             if(Global.mPlayQueue.size() > 0){
@@ -263,7 +263,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                 }
                 item = MediaStoreUtil.getMP3InfoById(id);
                 mBottomBar.UpdateBottomStatus(item,isPlay);
-                updateHeader(item,false);
+                updateHeader(item);
                 SPUtil.putValue(this,"Setting","LastSongId",id);
                 MusicService.initDataSource(item,0);
             }
@@ -586,32 +586,25 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 //            }
 //        }
         mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ALLSONG_ADAPTER);
-        updateHeader(mp3Item,MusicService.getIsplay());
+        updateHeader(mp3Item);
     }
 
     /**
      * 更新侧滑菜单
      * @param mp3Item
      */
-    private void updateHeader(MP3Item mp3Item,boolean isPlay) {
+    private void updateHeader(MP3Item mp3Item) {
         TextView textView = findView(R.id.header_txt);
-        ImageView shadow = findView(R.id.header_img);
+        SimpleDraweeView shadowImgView = findView(R.id.header_img);
         if(mp3Item == null)
             return;
         if(textView != null){
             textView.setText(getString(R.string.play_now,mp3Item.getTitle()));
         }
-        if(shadow != null){
-            String imgPath = MediaStoreUtil.getImageUrl(mp3Item.getAlbumId() + "",Constants.URL_ALBUM);
-            shadow.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
-            if(new File(imgPath).exists()){
-                shadow.setImageDrawable(BitmapDrawable.createFromPath(imgPath));
-            } else {
-                shadow.setImageResource(R.drawable.drawer_bg_album_shadow);
-            }
-
+        if(shadowImgView != null) {
+            MediaStoreUtil.setImageUrl(shadowImgView, mp3Item.getAlbumId());
+//            shadowImgView.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
         }
-
     }
 
     @Override
