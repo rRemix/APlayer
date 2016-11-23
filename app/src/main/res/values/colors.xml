@@ -77,6 +77,13 @@
     <color name="gray_cecece">#cecece</color>
     <color name="gray_e6dccb">#e6dccb</color>
     <color name="white_fafafa">#fafafa</color>
+    <color name="white_c6c6c6">#c6c6c6</color>
+    <color name="white_dcdcdc">#dcdcdc</color>
+    <color name="black_313131">#313131</color>
+    <color name="gray_666666">#666666</color>
+    <color name="orange_e78334">#e78334</color>
+    <color name="orange_f5cdae">#f5cdae</color>
+    <color name="black_2a2a2a">#2a2a2a</color>
 
     <color name="lrc_normal">#e8e8e8</color>
     <color name="lrc_hight">#4a4a4a</color>

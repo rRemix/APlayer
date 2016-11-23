@@ -1,36 +1,41 @@
 package remix.myplayer.ui.activity;
 
 import android.app.ProgressDialog;
-import android.content.ContentUris;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.model.MP3Item;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.dialog.ShareDialog;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -46,16 +51,23 @@ import remix.myplayer.util.ToastUtil;
 public class RecordShareActivity extends BaseActivity {
     public static RecordShareActivity mInstance;
     @BindView(R.id.recordshare_image)
-    ImageView mImage;
+    SimpleDraweeView mImage;
     //歌曲名与分享内容
     @BindView(R.id.recordshare_name)
     TextView mSong;
     @BindView(R.id.recordshare_content)
     TextView mContent;
+    //背景
+    @BindView(R.id.recordshare_background_1)
+    View mBackground1;
+    @BindView(R.id.recordshare_background_2)
+    LinearLayout mBackground2;
+    @BindView(R.id.recordshare_image_container)
+    FrameLayout mImageBackground;
     //保存截屏
     private static Bitmap mBackgroudCache;
     @BindView(R.id.recordshare_container)
-    RelativeLayout mContainer;
+    LinearLayout mContainer;
 
     //当前正在播放的歌曲
     private MP3Item mInfo;
@@ -109,7 +121,6 @@ public class RecordShareActivity extends BaseActivity {
         ButterKnife.bind(this);
 
         mInstance = this;
-
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //初始化控件
@@ -118,17 +129,24 @@ public class RecordShareActivity extends BaseActivity {
         mInfo = (MP3Item)getIntent().getExtras().getSerializable("MP3Item");
         if(mInfo == null)
             return;
-        //设置专辑封面
-        File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(),Constants.URL_ALBUM);
-        if(imgFile != null && imgFile.exists()) {
-            mImage.setImageURI(Uri.parse("file://" + imgFile));
-        } else {
-            mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId()));
-        }
+
+        mContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                mContainer.getViewTreeObserver().removeOnPreDrawListener(this);
+                return true;
+            }
+        });
+
+        MediaStoreUtil.setImageUrl(mImage,mInfo.getAlbumId());
 
         //设置歌曲名与分享内容
         mContent.setText(getIntent().getExtras().getString("Content"));
         mSong.setText(" " + mInfo.getTitle() + " ");
+        //背景
+        mBackground1.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0, DensityUtil.dip2px(this,2), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));
+        mBackground2.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0,DensityUtil.dip2px(this,1), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));
+        mImageBackground.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0,DensityUtil.dip2px(this,1), ColorUtil.getColor(R.color.white_f6f6f5),0,0,1));
     }
 
     public static Bitmap getBg(){
@@ -161,7 +179,8 @@ public class RecordShareActivity extends BaseActivity {
             mFile = null;
             try {
                 //将截屏内容保存到文件
-                mFile = new File(DiskCache.getDiskCacheDir(RecordShareActivity.this,"thumbnail/album")  + "/mind.png");
+                mFile = new File(DiskCache.getDiskCacheDir(RecordShareActivity.this,"share") + "/" +
+                        new SimpleDateFormat ("yyyy年MM月dd日 HH:mm:ss ").format(new Date(System.currentTimeMillis())) + ".png");
                 if (!mFile.exists()) {
                     mFile.createNewFile();
                 }
@@ -195,6 +214,7 @@ public class RecordShareActivity extends BaseActivity {
             arg.putSerializable("MP3Item",mInfo);
             intent.putExtras(arg);
             startActivity(intent);
+            finish();
         }
     }
 

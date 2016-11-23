@@ -4,6 +4,7 @@ package remix.myplayer.ui.activity;
 import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.facebook.drawee.backends.pipeline.DrawableFactory;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.core.ImagePipeline;
@@ -195,6 +197,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         if(mIsFirstCreateActivity)
             initLastSong();
 
+        mBottomBar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
 //        BmobUpdateAgent.setUpdateOnlyWifi(false);
 //        BmobUpdateAgent.update(this);
 
@@ -242,32 +245,28 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         }
 
         boolean isPlay = !mIsFirst && MusicService.getIsplay();
-        if(mIsFirst){
-            mIsFirst = false;
-            MP3Item item = null;
-            //上次退出时保存的正在播放的歌曲未失效
-            if(isLastSongExist && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
-                mBottomBar.UpdateBottomStatus(item, isPlay);
-                updateHeader(item,false);
-                MusicService.initDataSource(item,pos);
-            }else {
-                if(Global.mPlayQueue.size() > 0){
-                    //重新找到一个歌曲id
-                    int id =  Global.mPlayQueue.get(0);
-                    for(int i = 0; i < Global.mPlayQueue.size() ; i++){
-                        id = Global.mPlayQueue.get(i);
-                        if (id != lastId)
-                            break;
-                    }
-                    item = MediaStoreUtil.getMP3InfoById(id);
-                    mBottomBar.UpdateBottomStatus(item,isPlay);
-                    updateHeader(item,false);
-                    SPUtil.putValue(this,"Setting","LastSongId",id);
-                    MusicService.initDataSource(item,0);
+        mIsFirst = false;
+        MP3Item item = null;
+        //上次退出时保存的正在播放的歌曲未失效
+        if(isLastSongExist && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
+            mBottomBar.UpdateBottomStatus(item, isPlay);
+            updateHeader(item,false);
+            MusicService.initDataSource(item,pos);
+        }else {
+            if(Global.mPlayQueue.size() > 0){
+                //重新找到一个歌曲id
+                int id =  Global.mPlayQueue.get(0);
+                for(int i = 0; i < Global.mPlayQueue.size() ; i++){
+                    id = Global.mPlayQueue.get(i);
+                    if (id != lastId)
+                        break;
                 }
+                item = MediaStoreUtil.getMP3InfoById(id);
+                mBottomBar.UpdateBottomStatus(item,isPlay);
+                updateHeader(item,false);
+                SPUtil.putValue(this,"Setting","LastSongId",id);
+                MusicService.initDataSource(item,0);
             }
-        } else {
-            mBottomBar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
         }
 
     }
@@ -596,20 +595,22 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
      */
     private void updateHeader(MP3Item mp3Item,boolean isPlay) {
         TextView textView = findView(R.id.header_txt);
-        SimpleDraweeView simpleDraweeView = findView(R.id.header_img);
-        View shadow = findView(R.id.header_shadow);
+        ImageView shadow = findView(R.id.header_img);
         if(mp3Item == null)
             return;
         if(textView != null){
             textView.setText(getString(R.string.play_now,mp3Item.getTitle()));
         }
-        if(simpleDraweeView != null){
-            //封面
-            MediaStoreUtil.setImageUrl(simpleDraweeView,mp3Item.getAlbumId());
+        if(shadow != null){
+            String imgPath = MediaStoreUtil.getImageUrl(mp3Item.getAlbumId() + "",Constants.URL_ALBUM);
+            shadow.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
+            if(new File(imgPath).exists()){
+                shadow.setImageDrawable(BitmapDrawable.createFromPath(imgPath));
+            } else {
+                shadow.setImageResource(R.drawable.drawer_bg_album_shadow);
+            }
+
         }
-//        if(shadow != null){
-//            shadow.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.drawable.drawer_bg_album);
-//        }
 
     }
 

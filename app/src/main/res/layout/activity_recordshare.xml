@@ -1,85 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white_f4f4f5">
-
-    <RelativeLayout
+    android:background="@color/white">
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/d6_size"
-        android:paddingTop="0dp"
+        android:orientation="vertical"
         android:id="@+id/recordshare_container">
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal">
-            <ImageView
+            android:layout_height="0dp"
+            android:layout_weight="12">
+            <View
+                android:id="@+id/recordshare_background_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/recordshare_image"
-                android:layout_gravity="center_horizontal"
-                android:scaleType="centerCrop"/>
+                android:layout_marginLeft="@dimen/d10_size"
+                android:layout_marginRight="@dimen/d10_size"
+                android:layout_marginTop="@dimen/d14_size" />
             <LinearLayout
+                android:id="@+id/recordshare_background_2"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/d200_size"
-                android:layout_gravity="bottom|center_horizontal"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="@color/black">
-                <TextView
-                    android:layout_width="@dimen/d260_size"
-                    android:layout_height="@dimen/d56_size"
-                    android:lines="1"
-                    android:ellipsize="end"
-                    android:layout_marginLeft="@dimen/d18_size"
-                    android:id="@+id/recordshare_name"
-                    android:textSize="@dimen/s20_size"
-                    android:textColor="@color/white"
-                    android:gravity="center_vertical"/>
-                <ImageView
-                    android:layout_marginLeft="@dimen/d18_size"
-                    android:layout_width="wrap_content"
-                    android:layout_height="1px"
-                    android:src="@drawable/divider2"/>
-                <TextView
-                    android:layout_marginLeft="@dimen/d18_size"
-                    android:paddingTop="@dimen/d20_size"
+                android:layout_marginLeft="@dimen/d15_size"
+                android:layout_marginRight="@dimen/d15_size"
+                android:layout_marginTop="@dimen/d19_size"
+                android:layout_marginBottom="@dimen/d6_size"
+                android:gravity="center_horizontal">
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="77"/>
+                <FrameLayout
+                    android:layout_width="@dimen/d268_size"
+                    android:layout_height="@dimen/d268_size"
+                    android:id="@+id/recordshare_image_container"
+                    android:padding="@dimen/d4_size">
+                    <com.facebook.drawee.view.SimpleDraweeView
+                        android:layout_gravity="center"
+                        android:id="@+id/recordshare_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        fresco:actualImageScaleType="centerCrop"
+                        fresco:failureImageScaleType="centerCrop"
+                        fresco:failureImage="@drawable/album_empty_bg_day"
+                        fresco:paddingStart="@dimen/d22_size"
+                        fresco:paddingEnd="@dimen/d22_size" />
+                </FrameLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="77">
+                    <View
+                        android:layout_width="@dimen/d28_size"
+                        android:layout_height="@dimen/d1_size"
+                        android:background="@color/white_dcdcdc"
+                        android:layout_centerInParent="true"/>
+                </RelativeLayout>
+
+                <TextView
                     android:id="@+id/recordshare_content"
-                    android:textSize="@dimen/s14_size"
-                    android:textColor="@color/white"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="116"
+                    android:paddingTop="@dimen/d5_szie"
+                    android:paddingBottom="@dimen/d5_szie"
+                    android:paddingRight="@dimen/d18_size"
+                    android:paddingLeft="@dimen/d18_size"
+                    android:layout_marginLeft="@dimen/d19_size"
+                    android:layout_marginRight="@dimen/d19_size"
+                    android:gravity="center_horizontal"
+                    android:ellipsize="end"
+                    android:textColor="@color/black_313131"
+                    android:textSize="@dimen/s16_size"
+                    android:background="@color/orange_e78334"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="52">
+                    <TextView
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:id="@+id/recordshare_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/d19_size"
+                        android:layout_marginRight="@dimen/d19_size"
+                        android:paddingTop="@dimen/d5_szie"
+                        android:paddingBottom="@dimen/d8_size"
+                        android:paddingRight="@dimen/d18_size"
+                        android:paddingLeft="@dimen/d18_size"
+                        android:background="@color/orange_f5cdae"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textSize="@dimen/s14_size"
+                        android:textColor="@color/gray_666666"/>
+                </RelativeLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="9"/>
             </LinearLayout>
         </FrameLayout>
-
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="@dimen/d34_size"
-            android:orientation="horizontal"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:background="@color/white_f4f4f5">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/share_player_icon"/>
-            <TextView
-                android:layout_marginLeft="@dimen/d12_size"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/from_aplayer"
-                android:layout_gravity="center_vertical"
-                android:textSize="@dimen/s14_size"/>
-        </LinearLayout>
-    </RelativeLayout>
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical|left"
+            android:text="@string/from_aplayer"
+            android:textSize="@dimen/s12_size"
+            android:textColor="@color/white_c6c6c6"
+            android:paddingLeft="@dimen/d10_size" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/d48_size"
         android:background="@color/black"
         android:orientation="horizontal"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        android:alpha="0.7"
+        android:gravity="center_vertical">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -92,19 +137,21 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/d12_size"
                 android:layout_gravity="center_vertical"
-                android:background="@drawable/bg_btn_activity_share"/>
+                android:background="@drawable/share_normal"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textSize="@dimen/s14_size"
-                android:text="分享"/>
+                android:text="@string/share"/>
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/divider1"/>
+        <View
+            android:layout_width="1px"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/d6_size"
+            android:layout_marginBottom="@dimen/d6_size"
+            android:background="@color/gray_6c6a6c"/>
 
         <LinearLayout
             android:id="@+id/recordshare_cancel"
@@ -118,14 +165,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/d12_size"
                 android:layout_gravity="center_vertical"
-                android:background="@drawable/bg_btn_activity_cancel"/>
+                android:background="@drawable/btn_cancel_normal"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textSize="@dimen/s16_size"
-                android:text="取消"/>
+                android:text="@string/cancel"/>
         </LinearLayout>
     </LinearLayout>
-
 </FrameLayout>

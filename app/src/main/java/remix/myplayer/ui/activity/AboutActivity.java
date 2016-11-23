@@ -17,8 +17,6 @@ import remix.myplayer.ui.customview.playpause.PlayPauseView;
 public class AboutActivity extends ToolbarActivity {
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
-    @BindView(R.id.playbar_play_pause)
-    PlayPauseView playPauseView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,12 +25,6 @@ public class AboutActivity extends ToolbarActivity {
         ButterKnife.bind(this);
         initToolbar(mToolBar, getString(R.string.about));
 
-        playPauseView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playPauseView.toggle(true);
-            }
-        });
     }
 
     public void onResume() {
