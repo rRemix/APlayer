@@ -15,7 +15,7 @@
         android:id="@+id/recently_shuffle"
         android:layout_width="match_parent"
         android:layout_height="@dimen/d48_size"
-        android:background="@color/night_interval_color"
+        android:background="@color/white"
         android:orientation="horizontal"
         android:onClick="onPlayShuffle">
         <ImageButton

@@ -11,7 +11,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/d48_size"
-            android:background="@color/night_interval_color"
+            android:background="@color/white"
             android:id="@+id/play_shuffle">
             <ImageButton
                 android:id="@+id/play_shuffle_button"

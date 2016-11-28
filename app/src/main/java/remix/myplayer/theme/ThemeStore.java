@@ -29,9 +29,10 @@ public class ThemeStore {
     public static final int THEME_PURPLE = 105;
     public static final int THEME_INDIGO = 106;
     public static final int THEME_PLUM = 107;
+    public static final int THEME_BLUE = 108;
 
     /** 当前主题颜色 */
-    public static int THEME_COLOR = THEME_RED;
+    public static int THEME_COLOR = THEME_BLUE;
 
     public static int STATUS_BAR_ALPHA = 150;
     public static int MATERIAL_COLOR_PRIMARY = R.color.transparent;
@@ -81,6 +82,9 @@ public class ThemeStore {
             case THEME_PLUM:
                 colorRes =  R.color.md_plum_primary;
                 break;
+            case THEME_BLUE:
+                colorRes = R.color.md_blue_primary;
+                break;
         }
         return colorRes;
     }
@@ -120,6 +124,9 @@ public class ThemeStore {
             case THEME_PLUM:
                 colorRes =  R.color.md_plum_primary_dark;
                 break;
+            case THEME_BLUE:
+                colorRes = R.color.md_blue_primary_dark;
+                break;
         }
         return colorRes;
     }
@@ -137,7 +144,7 @@ public class ThemeStore {
      * @return
      */
     public static int loadThemeColor(){
-        return SPUtil.getValue(Application.getContext(),"Setting","ThemeColor",ThemeStore.THEME_RED);
+        return SPUtil.getValue(Application.getContext(),"Setting","ThemeColor",ThemeStore.THEME_INDIGO);
     }
 
     /**

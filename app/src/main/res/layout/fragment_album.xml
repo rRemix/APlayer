@@ -29,9 +29,9 @@
     </RelativeLayout>
 
     <View
+        android:id="@+id/divider"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/d12_size"
-        android:background="?attr/background_color_2"/>
+        android:layout_height="1px"/>
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"

@@ -153,9 +153,9 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
             //设置padding
             if(AlbumFragment.ListModel == 2 && holder.mRoot != null){
                 if(position % 2 == 0){
-                    holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),0,DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,8));
+                    holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4));
                 } else {
-                    holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),0,DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,8));
+                    holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4));
                 }
             }
         }

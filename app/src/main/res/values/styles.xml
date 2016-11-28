@@ -76,7 +76,7 @@
     </style>
     <style name="CustomTabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">@dimen/s16_size</item>
-        <item name="android:textColor">@color/day_list_divider</item>
+        <item name="android:textColor">@color/normal_tab_text_color</item>
         <item name="textAllCaps">true</item>
     </style>
 
@@ -264,6 +264,18 @@
         <item name="colorControlActivated">@color/md_plum_primary</item>
         <item name="colorAccent">@color/md_plum_primary</item>
         <item name="android:textColor">@color/md_plum_primary</item>
+    </style>
+
+    <style name="DayTheme.Blue" parent="@style/DayTheme">
+        <item name="material_color_primary">@color/md_blue_primary</item>
+        <item name="material_color_secondry">@color/md_blue_primary</item>
+        <item name="material_color_primary_dark">@color/md_blue_primary_dark</item>
+        <item name="stress_color">@color/md_blue_primary</item>
+        <item name="colorPrimary">@color/md_blue_primary</item>
+        <item name="colorPrimaryDark">@color/md_blue_primary_dark</item>
+        <item name="colorControlActivated">@color/md_blue_primary</item>
+        <item name="colorAccent">@color/md_blue_primary</item>
+        <item name="android:textColor">@color/md_blue_primary</item>
     </style>
 
 </resources>

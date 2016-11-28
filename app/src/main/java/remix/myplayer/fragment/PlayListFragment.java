@@ -119,9 +119,11 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
 //        mListModelBtn.setSelected(ListModel == Constants.LIST_MODEL);
 //        mGridModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list1));
 //        mGridModelBtn.setSelected(ListModel == Constants.GRID_MODEL);
-
+        //模式切换按钮
         mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+        //分割线
+        rootView.findViewById(R.id.divider).setBackgroundColor(ThemeStore.getDividerColor());
         return rootView;
     }
 

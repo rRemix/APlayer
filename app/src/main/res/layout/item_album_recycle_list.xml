@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/d56_size"
-    android:minHeight="@dimen/d56_size"
+    android:layout_height="@dimen/d64_size"
+    android:minHeight="@dimen/d64_size"
     android:background="?attr/background_list">
     <com.facebook.drawee.view.SimpleDraweeView
         android:layout_width="@dimen/d42_size"
@@ -46,7 +46,7 @@
     <!--结尾处按钮-->
     <ImageButton
         android:layout_alignParentRight="true"
-        android:layout_marginRight="@dimen/d16_size"
+        android:layout_marginRight="@dimen/d12_size"
         android:id="@+id/item_button"
         android:layout_width="@dimen/d45_size"
         android:layout_height="@dimen/d45_size"

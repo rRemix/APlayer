@@ -131,6 +131,8 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
 
         mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+        //分割线
+        rootView.findViewById(R.id.divider).setBackgroundColor(ThemeStore.getDividerColor());
         return rootView;
     }
 

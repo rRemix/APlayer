@@ -37,7 +37,7 @@ import remix.myplayer.util.Global;
 public class SearchActivity extends ToolbarActivity {
     //查询索引
     public static int mIdIndex = -1;
-    public static int mDisplayNameIndex = -1;
+    public static int mTitleIndex = -1;
     public static int mArtistIndex = -1;
     public static int mAlbumIndex = -1;
     public static int mAlbumIdIndex = -1;
@@ -104,7 +104,6 @@ public class SearchActivity extends ToolbarActivity {
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-//                    sendBroadcast(intent);
                     Global.setPlayQueue(list,SearchActivity.this,intent);
                 }
             }
@@ -130,16 +129,13 @@ public class SearchActivity extends ToolbarActivity {
         mkey = key;
         if(mkey == null)
             mkey = "";
-        if(isclick && !mkey.equals("")){
-            //            XmlUtil.addKey(mkey);
-        }
 
         Cursor cursor = null;
         try {
-            String selection = MediaStore.Audio.Media.DISPLAY_NAME + " like ? " + "or " + MediaStore.Audio.Media.ARTIST + " like ? "
+            String selection = MediaStore.Audio.Media.TITLE + " like ? " + "or " + MediaStore.Audio.Media.ARTIST + " like ? "
                     + "or " + MediaStore.Audio.Media.ALBUM + " like ? ";
             cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.ARTIST,MediaStore.Audio.Media.ALBUM_ID},
+                    new String[]{MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.ARTIST,MediaStore.Audio.Media.ALBUM_ID},
                     selection,
                     new String[]{mkey + "%",mkey + "%",mkey + "%"}, null);
         } catch (Exception e) {
@@ -147,7 +143,7 @@ public class SearchActivity extends ToolbarActivity {
         }
         if (cursor != null && cursor.getCount() > 0) {
             mIdIndex = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
-            mDisplayNameIndex = cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
+            mTitleIndex = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             mArtistIndex = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             mAlbumIndex = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
             mAlbumIdIndex = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);

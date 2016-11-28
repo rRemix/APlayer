@@ -60,6 +60,8 @@ public class BaseActivity extends AppCompatActivity {
             case ThemeStore.THEME_PLUM:
                 setTheme(R.style.DayTheme_Plum);
                 break;
+            case ThemeStore.THEME_BLUE:
+                setTheme(R.style.DayTheme_Blue);
         }
     }
 

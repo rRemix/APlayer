@@ -17,6 +17,8 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.ui.activity.SearchActivity;
+import remix.myplayer.util.CommonUtil;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * Created by Remix on 2016/1/23.
@@ -38,26 +40,17 @@ public class SearchResAdapter extends BaseAdapter<SearchResAdapter.SearchResHold
     @Override
     public void onBindViewHolder(final SearchResHolder holder, final int position) {
         if(mCursor != null && mCursor.moveToPosition(position)) {
-            try{
-                String name = mCursor.getString(SearchActivity.mDisplayNameIndex);
-                holder.mName.setText(name.substring(0,name.lastIndexOf(".")));
-                holder.mOther.setText(mCursor.getString(SearchActivity.mArtistIndex) + "-" + mCursor.getString(SearchActivity.mAlbumIndex));
-                DraweeController controller = Fresco.newDraweeControllerBuilder()
-                        .setUri(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mCursor.getInt(SearchActivity.mAlbumIdIndex)))
-                        .setOldController(holder.mImage.getController())
-                        .setAutoPlayAnimations(false)
-                        .build();
-                holder.mImage.setController(controller);
-                if(mOnItemClickLitener != null && holder.mRooView != null){
-                    holder.mRooView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition());
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            holder.mName.setText(CommonUtil.processInfo(mCursor.getString(SearchActivity.mTitleIndex),CommonUtil.SONGTYPE));
+            holder.mOther.setText(mCursor.getString(SearchActivity.mArtistIndex) + "-" + mCursor.getString(SearchActivity.mAlbumIndex));
+            //封面
+            MediaStoreUtil.setImageUrl(holder.mImage,mCursor.getInt(SearchActivity.mAlbumIdIndex));
+            if(mOnItemClickLitener != null && holder.mRooView != null){
+                holder.mRooView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition());
+                    }
+                });
             }
         }
     }

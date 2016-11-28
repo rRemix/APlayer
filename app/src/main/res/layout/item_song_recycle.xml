@@ -3,7 +3,7 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/item_height"
+    android:layout_height="@dimen/d64_size"
     android:id="@+id/item_root"
     android:background="?attr/background_list">
 
@@ -53,7 +53,7 @@
     <!--结尾处按钮-->
     <ImageButton
         android:layout_alignParentRight="true"
-        android:layout_marginRight="@dimen/d16_size"
+        android:layout_marginRight="@dimen/d12_size"
         android:id="@+id/song_button"
         android:layout_width="@dimen/d60_size"
         android:layout_height="match_parent"
