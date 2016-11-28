@@ -76,7 +76,7 @@
                     android:ellipsize="end"
                     android:textColor="@color/black_313131"
                     android:textSize="@dimen/s16_size"
-                    android:background="@color/orange_e78334"/>
+                    android:background="@color/transparent"/>
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -93,7 +93,7 @@
                         android:paddingBottom="@dimen/d8_size"
                         android:paddingRight="@dimen/d18_size"
                         android:paddingLeft="@dimen/d18_size"
-                        android:background="@color/orange_f5cdae"
+                        android:background="@color/transparent"
                         android:gravity="center"
                         android:maxLines="1"
                         android:ellipsize="end"

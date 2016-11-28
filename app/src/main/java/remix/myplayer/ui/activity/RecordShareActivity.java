@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.umeng.analytics.MobclickAgent;
 
@@ -72,7 +73,7 @@ public class RecordShareActivity extends BaseActivity {
     //当前正在播放的歌曲
     private MP3Item mInfo;
     //处理图片的进度条
-    private ProgressDialog mProgressDialog;
+    private MaterialDialog mProgressDialog;
     //处理状态
     private final int START = 0;
     private final int STOP = 1;
@@ -87,7 +88,8 @@ public class RecordShareActivity extends BaseActivity {
             switch (msg.what){
                 //开始处理
                 case START:
-                    mProgressDialog = ProgressDialog.show(RecordShareActivity.this,"请稍候","图片处理中",true,false);
+                    if(mProgressDialog != null && !mProgressDialog.isShowing())
+                        mProgressDialog.show();
                     break;
                 //处理中止
                 case STOP:
@@ -102,6 +104,8 @@ public class RecordShareActivity extends BaseActivity {
                 //处理错误
                 case ERROR:
                     ToastUtil.show(RecordShareActivity.this,R.string.share_error);
+                    if(mProgressDialog != null)
+                        mProgressDialog.dismiss();
                     break;
             }
         }
@@ -130,13 +134,6 @@ public class RecordShareActivity extends BaseActivity {
         if(mInfo == null)
             return;
 
-        mContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                mContainer.getViewTreeObserver().removeOnPreDrawListener(this);
-                return true;
-            }
-        });
 
         MediaStoreUtil.setImageUrl(mImage,mInfo.getAlbumId());
 
@@ -147,6 +144,15 @@ public class RecordShareActivity extends BaseActivity {
         mBackground1.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0, DensityUtil.dip2px(this,2), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));
         mBackground2.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0,DensityUtil.dip2px(this,1), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));
         mImageBackground.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0,DensityUtil.dip2px(this,1), ColorUtil.getColor(R.color.white_f6f6f5),0,0,1));
+
+        mProgressDialog = new MaterialDialog.Builder(this)
+                .title("请稍候")
+                .titleColorRes(R.color.day_textcolor_primary)
+                .content("图片处理中")
+                .contentColorRes(R.color.day_textcolor_primary)
+                .progress(true, 0)
+                .backgroundColorRes(R.color.day_background_color_3)
+                .progressIndeterminateStyle(false).build();
     }
 
     public static Bitmap getBg(){
@@ -179,13 +185,17 @@ public class RecordShareActivity extends BaseActivity {
             mFile = null;
             try {
                 //将截屏内容保存到文件
+                File shareDir = DiskCache.getDiskCacheDir(RecordShareActivity.this,"share");
+                if(!shareDir.exists()){
+                    shareDir.mkdir();
+                }
                 mFile = new File(DiskCache.getDiskCacheDir(RecordShareActivity.this,"share") + "/" +
                         new SimpleDateFormat ("yyyy年MM月dd日 HH:mm:ss ").format(new Date(System.currentTimeMillis())) + ".png");
                 if (!mFile.exists()) {
                     mFile.createNewFile();
                 }
                 fos = new FileOutputStream(mFile);
-                if (null != fos) {
+                if (fos != null) {
                     mBackgroudCache.compress(Bitmap.CompressFormat.JPEG, 80, fos);
                     fos.flush();
                     fos.close();
@@ -214,7 +224,6 @@ public class RecordShareActivity extends BaseActivity {
             arg.putSerializable("MP3Item",mInfo);
             intent.putExtras(arg);
             startActivity(intent);
-            finish();
         }
     }
 
