@@ -2,8 +2,6 @@ package remix.myplayer.ui.dialog;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.icu.util.MeasureUnit;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,7 +13,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.sina.weibo.sdk.api.ImageObject;
 import com.sina.weibo.sdk.api.TextObject;
@@ -27,16 +24,15 @@ import com.sina.weibo.sdk.api.share.SendMultiMessageToWeiboRequest;
 import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.sina.weibo.sdk.constant.WBConstants;
 import com.tencent.connect.share.QQShare;
-import com.tencent.mm.sdk.modelmsg.SendMessageToWX;
-import com.tencent.mm.sdk.modelmsg.WXImageObject;
-import com.tencent.mm.sdk.modelmsg.WXMediaMessage;
-import com.tencent.mm.sdk.modelmsg.WXTextObject;
-import com.tencent.mm.sdk.openapi.IWXAPI;
-import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
+import com.umeng.socialize.ShareAction;
+import com.umeng.socialize.UMShareListener;
+import com.umeng.socialize.bean.SHARE_MEDIA;
+import com.umeng.socialize.media.UMImage;
 
+import java.io.File;
 import java.net.URLEncoder;
 
 import butterknife.BindView;
@@ -76,11 +72,11 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     private Tencent mTencentApi;
     private IWeiboShareAPI mWeiboApi;
     private BaseUiListener mQQListener;
-    private IWXAPI mWechatApi;
     private String mImageUrl;
     //分享心情还是歌曲
     private int mType;
-
+    //友盟分享回调
+    private UMShareListener mShareListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,8 +109,25 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         mWeiboApi = WeiboShareSDK.createWeiboAPI(this, Constants.WEIBO_APIID);
         mWeiboApi.registerApp();
         //初始化微信api
-        mWechatApi = WXAPIFactory.createWXAPI(this, Constants.WECHAT_APIID,false);
-        mWechatApi.registerApp(Constants.WECHAT_APIID);
+        mShareListener = new UMShareListener() {
+            @Override
+            public void onResult(SHARE_MEDIA share_media) {
+                ToastUtil.show(ShareDialog.this,R.string.share_success);
+                finish();
+            }
+
+            @Override
+            public void onError(SHARE_MEDIA share_media, Throwable throwable) {
+                ToastUtil.show(ShareDialog.this,R.string.share_error);
+                finish();
+            }
+
+            @Override
+            public void onCancel(SHARE_MEDIA share_media) {
+                ToastUtil.show(ShareDialog.this,R.string.share_cancel);
+                finish();
+            }
+        };
 
         if (savedInstanceState != null) {
             mWeiboApi.handleWeiboResponse(getIntent(), this);
@@ -163,12 +176,6 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
                 break;
             case R.id.share_wechat:
             case R.id.share_circlefriend:
-                if (!mWechatApi.isWXAppInstalled()) {
-                    Toast.makeText(ShareDialog.this, "您还未安装微信客户端",
-                            Toast.LENGTH_SHORT).show();
-                    finish();
-                    return;
-                }
                 if(mType == Constants.SHARESONG){
                     shareSongtoWechat(v);
                 }
@@ -233,41 +240,63 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
 
     //分享心情到微信或者朋友圈
     private void shareMindtoWeChat(View v) {
-        WXImageObject imgObj = new WXImageObject();
-        imgObj.setImagePath(mImageUrl);
+//        WXImageObject imgObj = new WXImageObject();
+//        imgObj.setImagePath(mImageUrl);
+//
+//        WXMediaMessage msg = new WXMediaMessage();
+//        msg.mediaObject = imgObj;
+//
+//        //设置缩略图
+//        if(RecordShareActivity.getBg() != null){
+//            Bitmap thumbBmp = Bitmap.createScaledBitmap(RecordShareActivity.getBg(), 150, 150, true);
+//            msg.setThumbImage(thumbBmp);
+//        }
+//
+//        //发送请求
+//        SendMessageToWX.Req req = new SendMessageToWX.Req();
+//        req.transaction = buildTransaction("img");
+//        req.message = msg;
+//        req.scene = v.getId() == R.id.share_wechat ? SendMessageToWX.Req.WXSceneSession : SendMessageToWX.Req.WXSceneTimeline;
+//        mWechatApi.sendReq(req);
 
-        WXMediaMessage msg = new WXMediaMessage();
-        msg.mediaObject = imgObj;
-
+        UMImage umImage = new UMImage(this,new File(mImageUrl));
         //设置缩略图
         if(RecordShareActivity.getBg() != null){
-            Bitmap thumbBmp = Bitmap.createScaledBitmap(RecordShareActivity.getBg(), 150, 150, true);
-            msg.setThumbImage(thumbBmp);
+            Bitmap thumbBmp = Bitmap.createScaledBitmap(
+                    RecordShareActivity.getBg(),
+                    150 * RecordShareActivity.getBg().getWidth() / RecordShareActivity.getBg().getHeight(),
+                    150, true);
+            umImage.setThumb(new UMImage(this,thumbBmp));
         }
-
-        //发送请求
-        SendMessageToWX.Req req = new SendMessageToWX.Req();
-        req.transaction = buildTransaction("img");
-        req.message = msg;
-        req.scene = v.getId() == R.id.share_wechat ? SendMessageToWX.Req.WXSceneSession : SendMessageToWX.Req.WXSceneTimeline;
-        mWechatApi.sendReq(req);
+        new ShareAction(this)
+                .setPlatform(v.getId() == R.id.share_wechat ? SHARE_MEDIA.WEIXIN : SHARE_MEDIA.WEIXIN_CIRCLE)
+                .withText("")
+                .withMedia(umImage)
+                .setCallback(mShareListener)
+                .share();
     }
 
     //分享歌曲到微信或者朋友圈
     private void shareSongtoWechat(View v) {
-        WXTextObject textObject = new WXTextObject();
-        textObject.text = "推荐一首好歌：" + mInfo.getArtist() +
-                "的《" + mInfo.getTitle() + "》";
+//        WXTextObject textObject = new WXTextObject();
+//        textObject.text = "推荐一首好歌：" + mInfo.getArtist() +
+//                "的《" + mInfo.getTitle() + "》";
+//
+//        WXMediaMessage msg = new WXMediaMessage();
+//        msg.mediaObject = textObject;
+//        msg.description = "推荐一首好歌：" + mInfo.getArtist() +
+//                "的《" + mInfo.getTitle() + "》";
+//        SendMessageToWX.Req req = new SendMessageToWX.Req();
+//        req.scene = v.getId() == R.id.share_wechat ? SendMessageToWX.Req.WXSceneSession : SendMessageToWX.Req.WXSceneTimeline;
+//        req.transaction = buildTransaction("text"); // transaction字段用于唯一标识一个请求
+//        req.message = msg;
+//        mWechatApi.sendReq(req);
 
-        WXMediaMessage msg = new WXMediaMessage();
-        msg.mediaObject = textObject;
-        msg.description = "推荐一首好歌：" + mInfo.getArtist() +
-                "的《" + mInfo.getTitle() + "》";
-        SendMessageToWX.Req req = new SendMessageToWX.Req();
-        req.scene = v.getId() == R.id.share_wechat ? SendMessageToWX.Req.WXSceneSession : SendMessageToWX.Req.WXSceneTimeline;
-        req.transaction = buildTransaction("text"); // transaction字段用于唯一标识一个请求
-        req.message = msg;
-        mWechatApi.sendReq(req);
+        new ShareAction(this)
+                .setPlatform(v.getId() == R.id.share_wechat ? SHARE_MEDIA.WEIXIN : SHARE_MEDIA.WEIXIN_CIRCLE)
+                .withText("推荐一首好歌：" + mInfo.getArtist() + "的《" + mInfo.getTitle() + "》")
+                .setCallback(mShareListener)
+                .share();
     }
 
     private String buildTransaction(final String type) {
@@ -295,9 +324,6 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
                 ToastUtil.show(this,"分享失败" + " Error Message: " + baseResponse.errMsg);
                 break;
         }
-//        if(RecordShareActivity.mInstance != null){
-//            RecordShareActivity.mInstance.finish();
-//        }
         finish();
     }
 
@@ -305,9 +331,6 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(data != null) {
-            String action = data.getAction();
-        }
         if(requestCode != 765)
             Tencent.onActivityResultData(requestCode, resultCode, data, mQQListener);
     }
@@ -317,26 +340,17 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         @Override
         public void onComplete(Object o) {
             ToastUtil.show(ShareDialog.this, R.string.share_success);
-//            if(RecordShareActivity.mInstance != null){
-//                RecordShareActivity.mInstance.finish();
-//            }
             finish();
         }
 
         @Override
         public void onError(UiError uiError) {
             ToastUtil.show(ShareDialog.this,R.string.share_error);
-//            if(RecordShareActivity.mInstance != null){
-//                RecordShareActivity.mInstance.finish();
-//            }
             finish();
         }
         @Override
         public void onCancel() {
             ToastUtil.show(ShareDialog.this,R.string.share_cancel);
-//            if(RecordShareActivity.mInstance != null){
-//                RecordShareActivity.mInstance.finish();
-//            }
             finish();
         }
     }

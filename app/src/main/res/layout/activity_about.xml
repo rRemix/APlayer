@@ -28,20 +28,22 @@
             android:orientation="vertical"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
-            android:layout_width="@dimen/d323_size"
-            android:layout_height="@dimen/d187_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:cardBackgroundColor="?attr/background_aboutus_color"
             app:cardCornerRadius="@dimen/d4_size"
             app:cardElevation="@dimen/d4_size"
-            android:layout_marginTop="@dimen/d28_size">
+            android:layout_marginTop="@dimen/d28_size"
+            android:layout_marginStart="@dimen/d16_size"
+            android:layout_marginEnd="@dimen/d16_size">
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
                 <TextView
-                    android:layout_marginTop="@dimen/d28_size"
+                    android:layout_marginTop="@dimen/d24_size"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/s18_size"
@@ -63,6 +65,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/d50_size"
+                    android:layout_marginBottom="@dimen/d2_size"
                     android:orientation="horizontal"
                     android:gravity="center">
                     <ImageView

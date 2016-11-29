@@ -190,7 +190,7 @@ public class RecordShareActivity extends BaseActivity {
                     shareDir.mkdir();
                 }
                 mFile = new File(DiskCache.getDiskCacheDir(RecordShareActivity.this,"share") + "/" +
-                        new SimpleDateFormat ("yyyy年MM月dd日 HH:mm:ss ").format(new Date(System.currentTimeMillis())) + ".png");
+                        new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())) + ".png");
                 if (!mFile.exists()) {
                     mFile.createNewFile();
                 }

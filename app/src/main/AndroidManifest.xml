@@ -138,6 +138,7 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
 
+
         <!--微信-->
         <activity
             android:name=".wxapi.WXEntryActivity"

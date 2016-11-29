@@ -69,6 +69,16 @@
 -keepclassmembers class * {
     public <init> (org.json.JSONObject);
 }
+
+#友盟分享
+-keep public interface com.facebook.**
+-keep public interface com.tencent.**
+-keep public interface com.umeng.socialize.**
+-keep public interface com.umeng.socialize.sensor.**
+-keep public interface com.umeng.scrshot.**
+-keep public class com.umeng.socialize.* {*;}
+-dontwarn com.umeng.**
+
 # fresco
 -keep class android.support.v4.** { *; }
 -keep interface android.support.v4.app.** { *; }

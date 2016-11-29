@@ -8,6 +8,9 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.umeng.analytics.MobclickAgent;
+import com.umeng.socialize.Config;
+import com.umeng.socialize.PlatformConfig;
+import com.umeng.socialize.UMShareAPI;
 
 import cn.bmob.v3.Bmob;
 import remix.myplayer.db.DBManager;
@@ -39,11 +42,13 @@ public class Application extends android.app.Application {
 
     @Override
     public void onCreate() {
-
         super.onCreate();
         mContext = getApplicationContext();
-        //日志
+        //是否开启日志
         LogUtil.isDebug = true;
+        //友盟分享
+        UMShareAPI.get(this);
+        Config.DEBUG = true;
         //bomb
         Bmob.initialize(this, "0c070110fffa9e88a1362643fb9d4d64");
         //禁止默认的页面统计方式
@@ -191,5 +196,9 @@ public class Application extends android.app.Application {
 
     public static Context getContext(){
         return mContext;
+    }
+
+    static {
+        PlatformConfig.setWeixin("wx10775467a6664fbb","8a64ff1614ffe8d8dd4f8cc794f3c4f1");
     }
 }
