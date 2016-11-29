@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -11,47 +12,44 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/material_color_primary"
-            android:orientation="horizontal"
-            android:id="@+id/search_view">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|left"
-                android:src="@drawable/act_btn_search"
-                android:background="@color/transparent"
-                android:id="@+id/search_img"
-                android:layout_marginRight="@dimen/d12_size"
-                android:layout_marginLeft="@dimen/d12_size"/>
-            <ImageButton
-                android:src="@drawable/actionbar_delete"
-                android:background="@color/transparent"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:id="@+id/search_clear"
-                android:layout_marginRight="@dimen/d14_size"
-                android:layout_marginLeft="@dimen/d14_size"
-                android:visibility="invisible"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center_vertical|right"/>
-            <EditText
+            android:id="@+id/search_view"
+            app:contentInsetStartWithNavigation="0dp">
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_toRightOf="@id/search_img"
-                android:layout_toLeftOf="@id/search_clear"
-                android:layout_marginLeft="@dimen/d20_size"
-                android:id="@+id/search_text"
-                android:background="@null"
-                android:textSize="@dimen/s16_size"
-                android:textColor="@color/gray_eaeaea"
-                android:textColorHint="@color/gray_eaeaea"
-                android:maxLines="1"
-                android:hint="@string/search_song_artist_album"
-                android:imeOptions="actionSearch"
-                android:textCursorDrawable="@drawable/bg_cursor_white"/>
-
+                android:layout_height="match_parent">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/search_input"
+                    android:textSize="@dimen/s16_size"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/search_hint_text_color"
+                    android:maxLines="1"
+                    android:layout_marginRight="@dimen/d8_size"
+                    android:hint="@string/search_song_artist_album"
+                    android:textCursorDrawable="@drawable/bg_cursor_white"/>
+                <ImageButton
+                    android:src="@drawable/actionbar_delete"
+                    android:background="@color/transparent"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:id="@+id/search_clear"
+                    android:layout_marginRight="@dimen/d16_size"
+                    android:visibility="invisible"
+                    android:layout_gravity="center_vertical|right"/>
+            </FrameLayout>
         </remix.myplayer.ui.customview.SearchToolBar>
     </android.support.design.widget.AppBarLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true" />
+    </RelativeLayout>
 
     <!--搜索历史与搜索结果-->
     <FrameLayout

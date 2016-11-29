@@ -24,7 +24,7 @@
     <!--歌曲名、歌手、专辑-->
     <LinearLayout
         android:layout_width="@dimen/d180_size"
-        android:layout_height="@dimen/item_height"
+        android:layout_height="@dimen/d64_size"
         android:layout_toRightOf="@id/song_head_image"
         android:layout_marginLeft="@dimen/d16_size"
         android:orientation="vertical"
@@ -72,4 +72,10 @@
         android:layout_toRightOf="@id/song_text_container"
         android:layout_marginLeft="@dimen/d16_size" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/d1_size"
+        android:background="?attr/divider_color"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="@dimen/d16_size"/>
 </RelativeLayout>

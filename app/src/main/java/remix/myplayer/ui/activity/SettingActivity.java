@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
@@ -136,7 +138,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             ta.recycle();
         }
 
-
         //计算缓存大小
         new Thread(){
             @Override
@@ -146,7 +147,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 mCacheSize += CommonUtil.getFolderSize(DiskCache.getDiskCacheDir(SettingActivity.this,"thumbnail"));
                 mCacheSize += CommonUtil.getFolderSize(getCacheDir());
                 mCacheSize += CommonUtil.getFolderSize(getFilesDir());
-                mCacheSize += CommonUtil.getFolderSize(new File("/data/data/" + getPackageName() + "/shared_prefs"));
                 mHandler.sendEmptyMessage(CACHESIZE);
             }
         }.start();
@@ -229,11 +229,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     e.printStackTrace();
                 }
                 break;
-//            //夜间模式
-//            case R.id.setting_mode_container:
-//                MobclickAgent.onEvent(this,"NightModel");
-//                mModeSwitch.setChecked(!mModeSwitch.isChecked());
-//                break;
             //音效设置
             case R.id.setting_eq_container:
                 MobclickAgent.onEvent(this,"EQ");
@@ -276,8 +271,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                         //清除配置文件、数据库等缓存
                                         CommonUtil.deleteFilesByDirectory(getCacheDir());
                                         CommonUtil.deleteFilesByDirectory(getFilesDir());
-                                        CommonUtil.deleteFilesByDirectory(new File("/data/data/" + getPackageName() + "/shared_prefs"));
+                                        SPUtil.deleteFile(SettingActivity.this,"Setting");
                                         deleteDatabase(DBOpenHelper.DBNAME);
+                                        //清除fresco缓存
+                                        Fresco.getImagePipeline().clearCaches();
                                         mHandler.sendEmptyMessage(CLEARFINISH);
                                     }
                                 }.start();

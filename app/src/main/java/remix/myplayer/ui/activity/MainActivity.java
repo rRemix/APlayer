@@ -4,7 +4,6 @@ package remix.myplayer.ui.activity;
 import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.facebook.drawee.backends.pipeline.DrawableFactory;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.core.ImagePipeline;
@@ -40,6 +38,7 @@ import java.io.File;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
@@ -69,8 +68,6 @@ import remix.myplayer.util.ToastUtil;
  *
  */
 public class MainActivity extends MultiChoiceActivity implements MusicService.Callback {
-    public static MainActivity mInstance = null;
-
     @BindView(R.id.tabs)
     TabLayout mTablayout;
     @BindView(R.id.ViewPager)
@@ -179,7 +176,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        mInstance = this;
         //播放的service
         MusicService.addCallback(this);
         //初始化toolbar
@@ -198,8 +194,9 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             initLastSong();
 
         mBottomBar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
-//        BmobUpdateAgent.setUpdateOnlyWifi(false);
-//        BmobUpdateAgent.update(this);
+
+        BmobUpdateAgent.setUpdateOnlyWifi(false);
+        BmobUpdateAgent.update(this);
 
     }
 
@@ -316,7 +313,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                         .negativeColorAttr(R.attr.text_color_primary)
                         .buttonRippleColorAttr(R.attr.ripple_color)
                         .backgroundColorAttr(R.attr.background_color_3)
-                        .content(R.string.input_playlist_name)
                         .contentColorAttr(R.attr.text_color_primary)
                         .inputRange(1,15)
                         .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
@@ -485,8 +481,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             }
         });
 
-//        mAddButton.setBackgroundTintList(ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? R.color.select_model_button_color : R.color.purple_782899)));
-//        mAddButton.setRippleColor(ColorUtil.getColor(R.color.day_ripple_color));
     }
 
     @Override
@@ -542,14 +536,10 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                                 }
                             } else {
                                 imagePipeline.clearCaches();
-//                                Uri fileUri = Uri.parse("file://" + MediaStoreUtil.getImageUrl(Global.mSetCoverID + "",Constants.URL_ALBUM));
-//                                imagePipeline.evictFromCache(fileUri);
                             }
-
                             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                         }
                     }.start();
-
                     break;
             }
         }

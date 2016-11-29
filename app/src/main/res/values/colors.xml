@@ -85,6 +85,7 @@
     <color name="orange_f5cdae">#f5cdae</color>
     <color name="black_2a2a2a">#2a2a2a</color>
     <color name="normal_tab_text_color">#99ffffff</color>
+    <color name="search_hint_text_color">#33ffffff</color>
 
     <color name="lrc_normal">#e8e8e8</color>
     <color name="lrc_hight">#4a4a4a</color>

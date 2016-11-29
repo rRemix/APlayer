@@ -206,7 +206,7 @@ public class TimerDialog extends BaseDialogActivity {
             return;
         }
         String msg = misTiming ? "取消定时关闭" : "将在" + mTime + "分钟后关闭";
-        ToastUtil.show(MainActivity.mInstance,msg);
+        ToastUtil.show(this,msg);
         misTiming = !misTiming;
         mSeekbar.setStart(misTiming);
         Intent intent = new Intent(Constants.CONTROL_TIMER);

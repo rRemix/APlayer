@@ -35,7 +35,7 @@ public class SplashActivity extends BaseActivity {
                 if(isFirst){
                     //保存默认主题设置
                     SPUtil.putValue(SplashActivity.this,"Setting","ThemeMode", ThemeStore.DAY);
-                    SPUtil.putValue(SplashActivity.this,"Setting","ThemeColor",ThemeStore.THEME_RED);
+                    SPUtil.putValue(SplashActivity.this,"Setting","ThemeColor",ThemeStore.THEME_BLUE);
                     //添加我的收藏列表
                     Global.mPlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
                     SPUtil.putValue(SplashActivity.this,"Setting","PlayQueueID",Global.mPlayQueueID);

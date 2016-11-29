@@ -1,6 +1,9 @@
 package remix.myplayer.ui.customview;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -10,6 +13,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import remix.myplayer.R;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.util.DensityUtil;
 
 /**
  * Created by taeja on 16-2-29.
@@ -38,39 +43,16 @@ public class SearchToolBar extends Toolbar {
     }
 
     private void init(){
-        mEditText = (EditText)findViewById(R.id.search_text);
+        mEditText = (EditText)findViewById(R.id.search_input);
+//        mEditText.getPaint().setStrokeWidth(DensityUtil.dip2px(mContext,2));
+//        mEditText.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         //设置EditText光标与下划线颜色
-//        mEditText.getBackground().setColorFilter(getResources().getColor(R.color.progress_complete), PorterDuff.Mode.SRC_ATOP);
-
+        mEditText.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
 //        final int size = MediaStoreUtil.mSearchKeyList.size();
 //        String[] strs = (String[]) MediaStoreUtil.mSearchKeyList.toArray(new String[size]);
 //        ArrayAdapter adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_list_item_1, strs);
 //        mEditText.setAdapter(adapter);
 
-//        mEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                if(actionId == EditorInfo.IME_ACTION_SEARCH){
-//                    String key = v.getText().toString();
-//                    if(key != null){
-//                        if(key.toString().equals("")){
-//                            if(mSearchListener != null) {
-//                                mSearchListener.onClear();
-//                                mButtonClear.setVisibility(INVISIBLE);
-//                            }
-//                        }else {
-//                            if (mSearchListener != null) {
-//                                mSearchListener.onSearch(key.toString(),false);
-//                                mButtonClear.setVisibility(VISIBLE);
-//                            }
-//                        }
-//                    }
-//                    return true;
-//                } else {
-//                    return false;
-//                }
-//            }
-//        });
         mEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

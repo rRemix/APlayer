@@ -24,6 +24,7 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.customview.SearchToolBar;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 
 /**
@@ -45,7 +46,6 @@ public class SearchActivity extends ToolbarActivity {
     private SearchResAdapter mSearchResAdapter = null;
     //搜索的关键字
     private String mkey = "";
-    public static SearchActivity mInstance = null;
 
     //搜索结果的listview
     @BindView(R.id.search_result_native)
@@ -66,12 +66,11 @@ public class SearchActivity extends ToolbarActivity {
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
         initToolbar(mSearchToolBar,"");
-        mInstance = this;
 
         mSearchToolBar.addSearchListener(new SearchToolBar.SearchListener() {
             @Override
             public void onSearch(String key, boolean isclick) {
-                search(key, isclick);
+                search(key);
             }
 
             @Override
@@ -113,7 +112,6 @@ public class SearchActivity extends ToolbarActivity {
         });
         mSearchResRecyclerView.setAdapter(mSearchResAdapter);
         mSearchResRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mSearchResRecyclerView.addItemDecoration(new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST));
         mSearchResRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         UpdateUI();
@@ -123,9 +121,8 @@ public class SearchActivity extends ToolbarActivity {
     /**
      * 搜索歌曲名，专辑，艺术家中包含该关键的记录
      * @param key 搜索关键字
-     * @param isclick 是否点击，决定是否保存搜索历史
      */
-    private void search(String key,boolean isclick) {
+    private void search(String key) {
         mkey = key;
         if(mkey == null)
             mkey = "";
@@ -179,6 +176,7 @@ public class SearchActivity extends ToolbarActivity {
         MobclickAgent.onPageStart(SearchActivity.class.getSimpleName());
         super.onResume();
     }
+
     public void onPause() {
         MobclickAgent.onPageEnd(SearchActivity.class.getSimpleName());
         super.onPause();

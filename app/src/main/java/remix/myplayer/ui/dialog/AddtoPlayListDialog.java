@@ -133,7 +133,6 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                     .negativeText(R.string.cancel)
                     .negativeColorAttr(R.attr.text_color_primary)
                     .backgroundColorAttr(R.attr.background_color_3)
-                    .content(R.string.input_playlist_name)
                     .contentColorAttr(R.attr.text_color_primary)
                     .inputRange(1,15)
                     .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {

@@ -21,12 +21,11 @@ public class ToolbarActivity extends BaseActivity {
     }
 
     protected void initToolbar(Toolbar toolbar,String title){
-
         toolbar.setTitle(title);
-        toolbar.setTitleTextColor(Color.parseColor("#ffffffff"));
-//        toolbar.setBackgroundColor(ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY));
+        toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.common_btn_back);
+
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

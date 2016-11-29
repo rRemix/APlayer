@@ -22,6 +22,7 @@ import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 
 /**
@@ -61,7 +62,6 @@ public class FolderActivity extends MultiChoiceActivity {
         ButterKnife.bind(this);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.addItemDecoration(new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mAdapter = new FolderAdapter(this,mMultiChoice);

@@ -21,6 +21,7 @@ import remix.myplayer.adapter.SongChooseAdaper;
 import remix.myplayer.interfaces.OnCheckListener;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -80,7 +81,6 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
         getLoaderManager().initLoader(LOADER_ID++, null, this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addItemDecoration(new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mConfirm.setAlpha(0.6f);
     }

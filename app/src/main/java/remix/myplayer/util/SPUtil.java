@@ -46,11 +46,11 @@ public class SPUtil {
 
     public static void deleteValue(Context context,String name,String key) {
         SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
-        editor.remove(key).commit();
+        editor.remove(key).apply();
     }
 
     public static void deleteFile(Context context,String name) {
         SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
-        editor.clear().commit();
+        editor.clear().apply();
     }
 }

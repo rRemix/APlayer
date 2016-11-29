@@ -32,6 +32,7 @@ import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
 
 /**
@@ -52,7 +53,6 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     //当前列表模式 1:列表 2:网格
     public static int ListModel = 2;
     private Cursor mCursor = null;
-    private ListItemDecoration mItemDecoration;
     //专辑名 专辑id 艺术家对应的索引
     public static int mAlbumIdIndex = -1;
     public static int mAlbumIndex = -1;
@@ -85,9 +85,6 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
 
         ListModel = SPUtil.getValue(getActivity(),"Setting","AlbumModel",2);
         mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-        mItemDecoration = new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST);
-        mItemDecoration.setDividerColor(ListModel == Constants.LIST_MODEL ? ThemeStore.getDividerColor() : Color.TRANSPARENT);
-        mRecycleView.addItemDecoration(mItemDecoration);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         if(getActivity() instanceof MultiChoiceActivity){
            mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
@@ -123,16 +120,8 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         });
         mRecycleView.setAdapter(mAdapter);
 
-//        mListModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list2));
-//        mListModelBtn.setSelected(ListModel == Constants.LIST_MODEL);
-//
-//        mGridModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list1));
-//        mGridModelBtn.setSelected(ListModel == Constants.GRID_MODEL);
-
         mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-        //分割线
-        rootView.findViewById(R.id.divider).setBackgroundColor(ThemeStore.getDividerColor());
         return rootView;
     }
 
@@ -156,10 +145,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         ListModel = newModel;
         mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-//        mListModelBtn.setSelected(v.getId() == R.id.list_model);
-//        mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
 
-        mItemDecoration.setDividerColor(ListModel == Constants.LIST_MODEL ? ThemeStore.getDividerColor() : Color.TRANSPARENT);
         mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
 
         SPUtil.putValue(getActivity(),"Setting","AlbumModel",ListModel);

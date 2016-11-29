@@ -55,9 +55,10 @@
         android:src="@drawable/list_icn_more"
         android:background="@color/transparent"/>
 
-    <!--<View-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="1px"-->
-        <!--android:background="?attr/background_grid_color"-->
-        <!--android:layout_alignParentBottom="true"/>-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/d1_size"
+        android:background="?attr/divider_color"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="@dimen/d8_size"/>
 </RelativeLayout>

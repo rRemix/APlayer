@@ -7,10 +7,9 @@
     android:background="@drawable/commom_playercontrols_bg"
     android:id="@+id/bottom_actionbar_container">
     <ImageView
-        android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="@color/day_list_divider"/>
+        android:background="?attr/divider_color"/>
     <!-- 底部自定义actionbar -->
     <RelativeLayout
         android:id="@+id/bottom_action_bar"

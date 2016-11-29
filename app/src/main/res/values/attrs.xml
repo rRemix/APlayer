@@ -65,4 +65,6 @@
     <attr name="material_color_primary" format="color|reference"/>
     <attr name="material_color_primary_dark" format="color|reference"/>
     <attr name="material_color_secondry" format="color|reference"/>
+    <!--分割线-->
+    <attr name="divider_color" format="color|reference"/>
 </resources>

@@ -32,6 +32,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.ToastUtil;
@@ -97,7 +98,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         MusicService.addCallback(RecetenlyActivity.this);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.addItemDecoration(new ListItemDecoration(this,ListItemDecoration.VERTICAL_LIST));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mAdapter = new SongAdapter(RecetenlyActivity.this, mMultiChoice,SongAdapter.RECENTLY);

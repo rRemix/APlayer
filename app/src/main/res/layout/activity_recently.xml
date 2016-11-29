@@ -35,6 +35,11 @@
             android:layout_marginLeft="@dimen/d72_size"/>
     </RelativeLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/d1_size"
+        android:background="?attr/divider_color"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview"
         android:background="?attr/background_color_3"

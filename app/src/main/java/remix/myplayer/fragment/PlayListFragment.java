@@ -32,6 +32,7 @@ import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -61,7 +62,6 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
 
     private PlayListAdapter mAdapter;
     private MultiChoice mMultiChoice;
-    private ListItemDecoration mItemDecoration;
 
     @Override
     public void onAttach(Context context) {
@@ -77,9 +77,6 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
         mUnBinder = ButterKnife.bind(this,rootView);
 
         ListModel = SPUtil.getValue(getActivity(),"Setting","PlayListModel",2);
-        mItemDecoration = new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST);
-        mItemDecoration.setDividerColor(ListModel == Constants.LIST_MODEL ? ThemeStore.getDividerColor() : Color.TRANSPARENT);
-        mRecyclerView.addItemDecoration(mItemDecoration);
         mRecyclerView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
 
         if(getActivity() instanceof MultiChoiceActivity){
@@ -115,15 +112,9 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
         });
         mRecyclerView.setAdapter(mAdapter);
 
-//        mListModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list2));
-//        mListModelBtn.setSelected(ListModel == Constants.LIST_MODEL);
-//        mGridModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list1));
-//        mGridModelBtn.setSelected(ListModel == Constants.GRID_MODEL);
         //模式切换按钮
         mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-        //分割线
-        rootView.findViewById(R.id.divider).setBackgroundColor(ThemeStore.getDividerColor());
         return rootView;
     }
 
@@ -167,11 +158,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
                 ListModel = newModel;
                 mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
                 mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-//                mListModelBtn.setSelected(v.getId() == R.id.list_model);
-//                mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
-
                 mRecyclerView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-                mItemDecoration.setDividerColor(ListModel == Constants.LIST_MODEL ? ThemeStore.getDividerColor() : Color.TRANSPARENT);
                 SPUtil.putValue(getActivity(),"Setting","PlayListModel",ListModel);
                 break;
 

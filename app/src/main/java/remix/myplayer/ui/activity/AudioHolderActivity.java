@@ -78,7 +78,6 @@ import remix.myplayer.util.ToastUtil;
  */
 public class AudioHolderActivity extends BaseActivity implements MusicService.Callback{
     private static final String TAG = "AudioHolderActivity";
-    public static AudioHolderActivity mInstance = null;
     //是否正在运行
     public static boolean mIsRunning;
     //上次选中的Fragment
@@ -260,11 +259,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         mGradient = SPUtil.getValue(this,"Setting","Gradient",false);
 
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_audio_holder);
-
         ButterKnife.bind(this);
-        mInstance = this;
 
         //获是否正在播放和正在播放的歌曲
         mInfo = MusicService.getCurrentMP3();

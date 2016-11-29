@@ -90,10 +90,20 @@ public class CommonUtil {
      * @param directory
      */
     public static void deleteFilesByDirectory(File directory) {
-        if (directory != null && directory.exists() && directory.isDirectory()) {
-            for (File item : directory.listFiles()) {
-                item.delete();
+        if(directory.isFile()){
+            directory.delete();
+            return;
+        }
+        if(directory.isDirectory()){
+            File[] childFile = directory.listFiles();
+            if(childFile == null || childFile.length == 0){
+                directory.delete();
+                return;
             }
+            for(File f : childFile){
+                deleteFilesByDirectory(f);
+            }
+            directory.delete();
         }
     }
 

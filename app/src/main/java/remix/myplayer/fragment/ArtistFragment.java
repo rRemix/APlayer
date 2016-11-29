@@ -32,6 +32,7 @@ import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
 
 /**
@@ -59,7 +60,6 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     ImageView mGridModelBtn;
     //当前列表模式 1:列表 2:网格
     public static int ListModel = 2;
-    private ListItemDecoration mItemDecoration;
 
     @Override
     public void onAttach(Context context) {
@@ -81,9 +81,6 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
 
         ListModel = SPUtil.getValue(getActivity(),"Setting","ArtistModel",2);
         mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-        mItemDecoration = new ListItemDecoration(getActivity(),ListItemDecoration.VERTICAL_LIST);
-        mItemDecoration.setDividerColor(ListModel == Constants.LIST_MODEL ? ThemeStore.getDividerColor() : Color.TRANSPARENT);
-        mRecycleView.addItemDecoration(mItemDecoration);
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
@@ -119,22 +116,12 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         });
         mRecycleView.setAdapter(mAdapter);
 
-//        mListModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list2));
-//        mListModelBtn.setSelected(ListModel == Constants.LIST_MODEL);
-//
-//        mGridModelBtn.setImageDrawable(Theme.getPressAndSelectedStateListDrawalbe(getActivity(),R.drawable.btn_list1));
-//        mGridModelBtn.setSelected(ListModel == Constants.GRID_MODEL);
-
         mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-        //分割线
-        rootView.findViewById(R.id.divider).setBackgroundColor(ThemeStore.getDividerColor());
         return rootView;
     }
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-//        CursorLoader loader = new CursorLoader(getActivity(),MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
-//                new String[]{BaseColumns._ID,MediaStore.Audio.ArtistColumns.ARTIST},null,null,null);
         return new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 new String[]{"distinct " + MediaStore.Audio.Media.ARTIST_ID,MediaStore.Audio.Media.ARTIST},
                 Constants.MEDIASTORE_WHERE_SIZE + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
@@ -155,11 +142,8 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         ListModel = newModel;
         mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-//        mListModelBtn.setSelected(v.getId() == R.id.list_model);
-//        mGridModelBtn.setSelected(v.getId() == R.id.grid_model);
 
         mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-        mItemDecoration.setDividerColor(ListModel == Constants.LIST_MODEL ? ThemeStore.getDividerColor() : Color.TRANSPARENT);
         SPUtil.putValue(getActivity(),"Setting","ArtistModel",ListModel);
     }
 

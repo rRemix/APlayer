@@ -144,7 +144,7 @@ public class ThemeStore {
      * @return
      */
     public static int loadThemeColor(){
-        return SPUtil.getValue(Application.getContext(),"Setting","ThemeColor",ThemeStore.THEME_INDIGO);
+        return SPUtil.getValue(Application.getContext(),"Setting","ThemeColor",ThemeStore.THEME_BLUE);
     }
 
     /**

@@ -30,6 +30,7 @@
             android:textSize="@dimen/s16_size"
             android:textColor="@color/drawer_list_color"
             android:textCursorDrawable="@drawable/bg_cursor_white"
+            android:padding="@dimen/d4_size"
             android:layout_width="match_parent"
             android:layout_height="@dimen/d180_size"
             android:layout_marginLeft="@dimen/d8_size"

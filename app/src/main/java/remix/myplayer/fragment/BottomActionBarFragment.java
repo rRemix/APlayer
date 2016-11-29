@@ -101,8 +101,6 @@ public class BottomActionBarFragment extends BaseFragment{
         });
         CtrlButtonListener listener = new CtrlButtonListener(getContext());
         mPlayButton.setOnClickListener(listener);
-        //分割线颜色
-        rootView.findViewById(R.id.divider).setBackgroundColor(ThemeStore.getDividerColor());
         return rootView;
     }
     //更新界面

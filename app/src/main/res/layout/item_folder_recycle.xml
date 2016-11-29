@@ -55,4 +55,10 @@
             android:textColor="?attr/text_color"/>
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/d1_size"
+        android:background="?attr/divider_color"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="@dimen/d15_size"/>
 </RelativeLayout>

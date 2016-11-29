@@ -37,6 +37,11 @@
             android:layout_marginLeft="@dimen/d16_size" />
     </RelativeLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/d1_size"
+        android:background="?attr/divider_color"/>
+
     <LinearLayout
         android:background="?attr/background_color_main"
         android:layout_width="match_parent"

@@ -3,14 +3,18 @@ package remix.myplayer.ui;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.InsetDrawable;
 import android.support.annotation.ColorInt;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import remix.myplayer.R;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.DensityUtil;
 
 /**
  * Created by taeja on 16-6-23.
@@ -22,22 +26,29 @@ public class ListItemDecoration extends RecyclerView.ItemDecoration {
 
     public static final int VERTICAL_LIST = LinearLayoutManager.VERTICAL;
 
-    private GradientDrawable mDivider;
-
+    private InsetDrawable mDivider;
+    private GradientDrawable mContentDrawable;
     private int mOrientation;
 
     public ListItemDecoration(Context context, int orientation) {
         mContext = context;
-        mDivider = (GradientDrawable) mContext.getResources().getDrawable(R.drawable.bg_divider_day);
-        mDivider.setColor(ThemeStore.getDividerColor());
+        mContentDrawable = (GradientDrawable) mContext.getResources().getDrawable(R.drawable.bg_divider_day);
+        mContentDrawable.setColor(ThemeStore.getDividerColor());
+        mDivider = new InsetDrawable(mContentDrawable, DensityUtil.dip2px(context,4),0,0,0);
         setOrientation(orientation);
     }
 
-
-    public void setDividerColor(@ColorInt int color){
-        mDivider.setColor(color);
+    public ListItemDecoration(Context context,int orientation,int insetLeft){
+        mContext = context;
+        mContentDrawable = (GradientDrawable) mContext.getResources().getDrawable(R.drawable.bg_divider_day).mutate();
+        mContentDrawable.setColor(ThemeStore.getDividerColor());
+        mDivider = new InsetDrawable(mContentDrawable,insetLeft,0,0,0);
+        setOrientation(orientation);
     }
 
+    public void setDividerColor(@ColorInt int color){
+        mContentDrawable.setColor(color);
+    }
 
     public void setOrientation(int orientation) {
         if (orientation != HORIZONTAL_LIST && orientation != VERTICAL_LIST) {
