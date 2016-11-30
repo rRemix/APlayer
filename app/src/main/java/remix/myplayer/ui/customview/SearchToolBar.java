@@ -2,7 +2,6 @@ package remix.myplayer.ui.customview;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -13,8 +12,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import remix.myplayer.R;
-import remix.myplayer.theme.Theme;
-import remix.myplayer.util.DensityUtil;
 
 /**
  * Created by taeja on 16-2-29.

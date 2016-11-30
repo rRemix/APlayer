@@ -65,11 +65,8 @@
     <color name="black_272628">#272628</color>
     <color name="gray_b2b1b2">#b2b1b2</color>
     <color name="gray_e6e6e6">#e6e6e6</color>
-    <color name="gray_3c3c3c">#3c3c3c</color>
-    <color name="black_30000000">#30000000</color>
     <color name="gray_d9d9d9">#d9d9d9</color>
     <color name="gray_efeeed">#efeeed</color>
-    <color name="gray_eaeaea">#eaeaea</color>
     <color name="gray_e2e2e2">#e2e2e2</color>
     <color name="black_333333">#333333</color>
     <color name="gray_7e7e7e">#7e7e7e</color>
@@ -81,8 +78,6 @@
     <color name="white_dcdcdc">#dcdcdc</color>
     <color name="black_313131">#313131</color>
     <color name="gray_666666">#666666</color>
-    <color name="orange_e78334">#e78334</color>
-    <color name="orange_f5cdae">#f5cdae</color>
     <color name="black_2a2a2a">#2a2a2a</color>
     <color name="normal_tab_text_color">#99ffffff</color>
     <color name="search_hint_text_color">#33ffffff</color>
@@ -145,6 +140,6 @@
     <color name="md_plum_primary_dark">#c74a5b</color>
 
     <color name="md_blue_primary">#698CF6</color>
-    <color name="md_blue_primary_dark">#587FF5</color>
+    <color name="md_blue_primary_dark">#5C7EE4</color>
 
 </resources>

@@ -3,7 +3,6 @@ package remix.myplayer.ui.customview;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
@@ -14,6 +13,7 @@ import android.widget.AbsSeekBar;
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 
 /**
  * Created by taeja on 16-2-15.
@@ -28,7 +28,10 @@ public class CircleSeekBar extends AbsSeekBar {
      * 圆圈画笔
      */
     private Paint mCirclePaint;
-
+    /**
+     * 阴影圆圈画笔
+     */
+    private Paint mShadowCirclePaint;
     /**
      * 圆弧画笔
      */
@@ -138,16 +141,28 @@ public class CircleSeekBar extends AbsSeekBar {
 
     @Override
     protected void onDraw(Canvas canvas) {
-//        mThumbDrawable = getThumb();
-//        Theme.TintDrawable(mThumbDrawable, ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899));
+        //阴影
+//        int gray = 0xeeeeee;
+//        int px = DensityUtil.dip2px(mContext,12);
+//        int step = (0xeeeeee - 0xfefefe) / px;
+//        for(int i = 0; i < px; i++){
+//            mShadowCirclePaint.setColor(Color.parseColor("#" + Integer.toHexString(gray + (i + 0) * step)));
+//            String hexString = Integer.toHexString(gray - (i + 0) * step);
+//            Log.d("CircleSeekbar","i:" + i + "  hexString:" + hexString);
+//            canvas.drawCircle(mCenterX, mCenterY, mRadius - i,mShadowCirclePaint );
+//        }
+
+        //背景圆圈
         canvas.drawCircle(mCenterX, mCenterY, mRadius, mCirclePaint);
+        //圆弧
         canvas.drawArc(mRectF, -90, (float) Math.toDegrees(mRad), false, mArcPaint);
+
         mThumbDrawable.setBounds((int)(mCenterX + mOffsetX - mThumbWidth / 2),
                 (int)(mCenterY + mOffsetY - mThumbHeight / 2),
                 (int)(mCenterX + mOffsetX + mThumbWidth / 2),
                 (int)(mCenterY + mOffsetY + mThumbHeight / 2));
+
         mThumbDrawable.draw(canvas);
-//        super.onDraw(canvas);
     }
 
 
@@ -192,8 +207,6 @@ public class CircleSeekBar extends AbsSeekBar {
      * @param radian 滑过的弧度
      */
     private void setThumbPostion(double radian) {
-//        mOffsetX = (float) Math.cos(radian) * mRadius;
-//        mOffsetY = (float) Math.sin(radian) * mRadius;
         mOffsetX = (float) Math.sin(radian) * mRadius;
         mOffsetY = -(float) Math.cos(radian) * mRadius;
     }
@@ -228,8 +241,8 @@ public class CircleSeekBar extends AbsSeekBar {
         //圆圈画笔
         mCirclePaint = new Paint();
         mCirclePaint.setAntiAlias(true);
-        mCirclePaint.setColor(Color.parseColor("#DCDCDC"));
         mCirclePaint.setStyle(Paint.Style.STROKE);
+        mCirclePaint.setColor(ColorUtil.getColor(R.color.white_dcdcdc));
         mCirclePaint.setStrokeWidth(mProgressWidth);
         //圆弧画笔
         mArcPaint = new Paint();
@@ -237,6 +250,12 @@ public class CircleSeekBar extends AbsSeekBar {
         mArcPaint.setColor(mProgressCorlor);
         mArcPaint.setStyle(Paint.Style.STROKE);
         mArcPaint.setStrokeWidth(mProgressWidth);
+        //阴影圆圈画笔
+        mShadowCirclePaint = new Paint();
+        mShadowCirclePaint.setAntiAlias(true);
+        mShadowCirclePaint.setStyle(Paint.Style.STROKE);
+        mShadowCirclePaint.setStrokeWidth(1);
+
 
         mThumbWidth = mThumbDrawable.getIntrinsicWidth();
         mThumbHeight = mThumbDrawable.getIntrinsicHeight();
@@ -260,11 +279,6 @@ public class CircleSeekBar extends AbsSeekBar {
             mOffsetY = -(float) Math.cos(mRad) * mRadius;
             invalidate();
         }
-//        if(mOffsetX == 0 && mOffsetY == 0 && mRadius > 0) {
-//            //初始0度
-//            mOffsetX = (float) Math.sin(0) * mRadius;
-//            mOffsetY = -(float) Math.cos(0) * mRadius;
-//        }
     }
 
     public void setMax(int max) {

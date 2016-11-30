@@ -27,7 +27,6 @@ import remix.myplayer.R;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.customview.CircleSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -132,19 +131,6 @@ public class TimerDialog extends BaseDialogActivity {
 //        mSwitch = findView(R.id.popup_timer_switch);
         mSwitch = new SwitchCompat(new ContextThemeWrapper(this, Theme.getTheme()));
         ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
-//        int[] states_check = new int[]{android.R.attr.state_checked};
-//        int[] states_default = new int[]{};
-//        StateListDrawable trackDrawable = new StateListDrawable();
-//        Drawable oriTrackDrawable = getResources().getDrawable(R.drawable.md_track);
-//        trackDrawable.setBounds(oriTrackDrawable.getBounds());
-//        trackDrawable.addState(states_check,Theme.TintDrawable(oriTrackDrawable,ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899),0.3f));
-//        trackDrawable.addState(states_default,getResources().getDrawable(R.drawable.md_track));
-//        mSwitch.setTrackDrawable(trackDrawable);
-
-//        ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
-
-//        Theme.TintDrawable(mSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
-//        Theme.TintDrawable(mSwitch.getTrackDrawable(), ColorUtil.adjustAlpha(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899),0.7f));
 
         //读取保存的配置
         boolean hasdefault = SPUtil.getValue(this, "Setting", "TimerDefault", false);

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
@@ -25,7 +26,6 @@ import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.thumb.SearchCover;
@@ -41,7 +41,8 @@ import remix.myplayer.util.thumb.SearchCover;
 public class CoverFragment extends BaseFragment {
     @BindView(R.id.cover_image)
     SimpleDraweeView mImage;
-
+    @BindView(R.id.cover_shadow)
+    ImageView mShadow;
     private MP3Item mInfo;
     private int mWidth;
     private Uri mUri = Uri.EMPTY;

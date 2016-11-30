@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -24,11 +23,9 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 
 /**

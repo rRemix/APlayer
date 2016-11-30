@@ -88,21 +88,6 @@ public class MultiChoiceActivity extends ToolbarActivity {
                     case R.id.toolbar_timer:
                         startActivity(new Intent(MultiChoiceActivity.this, TimerDialog.class));
                         break;
-                    case R.id.toolbar_delete:
-                        MobclickAgent.onEvent(MultiChoiceActivity.this,"Delete");
-                        if(mMultiChoice != null)
-                            mMultiChoice.OnDelete();
-                        break;
-                    case R.id.toolbar_add_playing:
-                        MobclickAgent.onEvent(MultiChoiceActivity.this,"AddtoPlayingList");
-                        if(mMultiChoice != null)
-                            mMultiChoice.OnAddToPlayQueue();
-                        break;
-                    case R.id.toolbar_add_playlist:
-                        MobclickAgent.onEvent(MultiChoiceActivity.this,"AddtoPlayList");
-                        if(mMultiChoice != null)
-                            mMultiChoice.OnAddToPlayList();
-                        break;
                 }
                 return true;
             }

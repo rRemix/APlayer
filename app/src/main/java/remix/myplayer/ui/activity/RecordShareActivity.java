@@ -1,6 +1,5 @@
 package remix.myplayer.ui.activity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -10,7 +9,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -139,7 +137,7 @@ public class RecordShareActivity extends BaseActivity {
 
         //设置歌曲名与分享内容
         mContent.setText(getIntent().getExtras().getString("Content"));
-        mSong.setText(" " + mInfo.getTitle() + " ");
+        mSong.setText("《" + mInfo.getTitle() + "》");
         //背景
         mBackground1.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0, DensityUtil.dip2px(this,2), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));
         mBackground2.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0,DensityUtil.dip2px(this,1), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));

@@ -199,6 +199,8 @@ public class Theme {
                 return R.style.DayTheme_Indigo;
             case ThemeStore.THEME_PLUM:
                 return R.style.DayTheme_Plum;
+            case ThemeStore.THEME_BLUE:
+                return R.style.DayTheme_Blue;
             default:return -1;
         }
     }

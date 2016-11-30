@@ -21,10 +21,8 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SearchResAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.customview.SearchToolBar;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 
 /**

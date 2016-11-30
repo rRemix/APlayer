@@ -3,7 +3,6 @@ package remix.myplayer.ui;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.support.annotation.ColorInt;
@@ -12,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import remix.myplayer.R;
-import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.DensityUtil;
 

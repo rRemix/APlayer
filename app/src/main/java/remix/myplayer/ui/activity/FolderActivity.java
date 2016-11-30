@@ -7,7 +7,6 @@ import android.os.Message;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -18,11 +17,8 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.FolderAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
-import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 
 /**

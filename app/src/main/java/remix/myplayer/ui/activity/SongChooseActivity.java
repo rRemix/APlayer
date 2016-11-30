@@ -19,9 +19,7 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongChooseAdaper;
 import remix.myplayer.interfaces.OnCheckListener;
-import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 

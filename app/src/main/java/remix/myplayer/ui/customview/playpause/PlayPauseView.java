@@ -1,7 +1,6 @@
 package remix.myplayer.ui.customview.playpause;
 
 import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
