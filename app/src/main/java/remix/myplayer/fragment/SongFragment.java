@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -67,6 +68,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         mInstance = this;
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -101,6 +103,7 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
         mAdapter = new SongAdapter(getActivity(),mMultiChoice, SongAdapter.ALLSONG);
+
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -112,7 +115,6 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
                     Global.setPlayQueue(Global.mAllSongList,getActivity(),intent);
-//                    getActivity().sendBroadcast(intent);
                 }
             }
 
@@ -124,8 +126,6 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
             }
         });
         mRecyclerView.setAdapter(mAdapter);
-
-//        Theme.TintDrawable(rootView.findViewById(R.id.play_shuffle_button),R.drawable.btn_shuffle, ThemeStore.getMaterialPrimaryColor());
 
         return rootView;
     }
@@ -157,7 +157,6 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         mSongId = data.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
         mAlbumIdIndex = data.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
         mAdapter.setCursor(mCursor);
-//        new IndexThread().start();
     }
 
     @Override
@@ -170,26 +169,5 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     public SongAdapter getAdapter(){
         return mAdapter;
     }
-
-
-//    class IndexThread extends Thread{
-//        @Override
-//        public void run() {
-//            long start = System.currentTimeMillis();
-//            ArrayList<String> list = new ArrayList<String>();
-//            if(Global.mIndexOpen){
-//                while (mCursor.moveToNext()) {
-//                    String firstLetter = Compator.getFirstLetter(mCursor.getString(mTitleIndex));
-//                    Log.d("SongFragment","\nTitle:" + mCursor.getString(mTitleIndex) + " \nFirstLetter:" + firstLetter);
-//                    list.add(firstLetter);
-//                }
-//            }
-//            Message msg = new Message();
-//            msg.obj = list;
-//            mHandler.sendMessage(msg);
-//
-//            Log.d("ALlSongFragment","CostTime:" + (System.currentTimeMillis() - start));
-//        }
-//    }
 
 }

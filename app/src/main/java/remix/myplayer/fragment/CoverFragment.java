@@ -97,7 +97,6 @@ public class CoverFragment extends BaseFragment {
 
         if(withAnim){
             int operation = Global.getOperation();
-//            final double startValue = (mWidth - DensityUtil.dip2px(getActivity(),264)) / 2;
             //位置信息
             Rect rect = new Rect();
             mImage.getGlobalVisibleRect(rect);
@@ -110,7 +109,6 @@ public class CoverFragment extends BaseFragment {
                 public void onSpringUpdate(Spring spring) {
                     mImage.setX((float) spring.getCurrentValue());
                 }
-
                 @Override
                 public void onSpringAtRest(Spring spring) {
                     if(mImage == null)

@@ -60,7 +60,6 @@
                 android:value=".ui.activity.MainActivity"/>
         </activity>
 
-
         <activity android:name=".ui.activity.SearchActivity"
             android:theme="@style/ActivityStyle"/>
 

@@ -66,7 +66,9 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 
-    <style name="AudioHolderStyle" parent="AppTheme.NoActionBar.Translucent"/>
+    <style name="AudioHolderStyle" parent="ActivityStyle">
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
 
     <style name="CustomTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorColor">@color/white</item>

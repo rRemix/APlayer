@@ -2,9 +2,6 @@ package remix.myplayer.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -13,9 +10,6 @@ import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.ColorInt;
-import android.support.v13.app.ActivityCompat;
-import android.support.v13.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.view.ContextThemeWrapper;
@@ -26,8 +20,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -88,9 +81,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     private boolean mFistStart = true;
     //是否正在拖动进度条
     public static boolean mIsDragSeekBar = false;
-    private Palette.Swatch mNewSwatch = null;
-    @BindView(R.id.playbar_play_pause)
-    PlayPauseView mPlayPauseView;
+
     //入场动画封面
     SimpleDraweeView mAnimCover;
     //顶部信息
@@ -105,10 +96,10 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     @BindView(R.id.top_more)
     ImageButton mTopMore;
     //播放控制
+    @BindView(R.id.playbar_play_pause)
+    PlayPauseView mPlayPauseView;
     @BindView(R.id.playbar_prev)
     ImageButton mPlayBarPrev;
-    @BindView(R.id.playbar_play)
-    ImageView mPlayBarPlay;
     @BindView(R.id.playbar_next)
     ImageButton mPlayBarNext;
     @BindView(R.id.playbar_model)
@@ -133,15 +124,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     TextView mNextSong;
     //歌词控件
     private LrcView mLrcView;
-    //背景渐变色
-    @ColorInt
-    private int mColorFrom;
-    @ColorInt
-    private int mColorTo;
-    @ColorInt
-    private int mColorDraken;
-    @ColorInt
-    private int mColorDark;
     //高亮与非高亮指示器
     private Drawable mHighLightIndicator;
     private Drawable mNormalIndicator;
@@ -160,19 +142,12 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     //需要高斯模糊的高度与宽度
     public static int mWidth;
     public static int mHeight;
-    //高斯模糊之前的bitmap
-    private Bitmap mRawBitMap;
-    //背景消失与现实的动画
-    private Animation mAnimIn;
-    private Animation mAnimOut;
     //是否从通知栏启动
     private boolean mFromNotify = false;
     //是否从Activity启动
     private boolean mFromActivity = false;
     //是否需要更新
     private boolean mNeedUpdateUI = true;
-    //是否开启背景渐变
-    private boolean mGradient = false;
 
     private static final String SCALE_WIDTH = "SCALE_WIDTH";
     private static final String SCALE_HEIGHT = "SCALE_HEIGHT";
@@ -201,26 +176,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
      */
     private final int DURATION = 250;
 
-
-    //更新背景与专辑封面的Handler
-    private Handler mBlurHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if(msg.what == Constants.UPDATE_BG) {
-                //第一次更新不启用动画
-                if(!mFistStart) {
-                    mContainer.startAnimation(mAnimOut);
-                } else {
-                    updateViewColor();
-                }
-                //更新专辑封面
-                ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
-                if(mFistStart)
-                    mFistStart = false;
-            }
-        }
-    };
-    //更新进度条的Handler
+    /** 更新进度条的Handler */
     public  Handler mProgressHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -237,26 +193,15 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         }
     };
 
-
     @Override
     protected void setStatusBar() {
-        if(mGradient){
-            StatusBarUtil.setTransparent(this);
-        } else {
-            StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.white_f2f2f2));
-        }
-    }
-
-    @Override
-    protected void setUpTheme() {
-        super.setUpTheme();
+        StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.white_f2f2f2));
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         mFromActivity =  getIntent().getBooleanExtra("FromActivity",false);
-        mGradient = SPUtil.getValue(this,"Setting","Gradient",false);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_audio_holder);
@@ -267,23 +212,13 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         mIsPlay = MusicService.getIsplay();
 
         MusicService.addCallback(this);
-        //初始化动画相关
-        setUpAnim();
-        //初始化顶部信息
+        setUpSize();
         setUpTop();
-        //初始化三个指示标志
         setUpGuide();
-        //初始化ViewPager
         setUpViewPager();
-        //初始化seekbar以及播放时间
         setUpSeekBar();
-        //初始化主题颜色
         setUpViewColor();
 
-//        ActivityTransition.with(getIntent()).to(mAnimCover).start(savedInstanceState);
-//        ViewCompat.setTransitionName(mAnimCover, "image");
-
-        //初始化动画控件
         //设置失败加载的图片和缩放类型
         mAnimCover = new SimpleDraweeView(this);
         mAnimCover.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
@@ -318,7 +253,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         }
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
@@ -328,7 +262,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
             mNeedUpdateUI = false;
         }
-
         //更新进度条
         new ProgeressThread().start();
     }
@@ -341,8 +274,17 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
     @Override
     public void onBackPressed() {
+        //更新动画控件封面 保证退场动画的封面与fragment中封面一致
+        MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
         mContainer.animate()
                 .setInterpolator(new AccelerateDecelerateInterpolator())
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
+                        overridePendingTransition(0,0);
+                    }
+                })
                 .setDuration(DURATION)
                 .alpha(0)
                 .start();
@@ -363,7 +305,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                     public void run() {
                         finish();
                         overridePendingTransition(0,0);
-//                        ActivityCompat.finishAfterTransition(AudioHolderActivity.this);
                     }
                 })
                 .setDuration(DURATION)
@@ -409,15 +350,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 int currentmodel = MusicService.getPlayModel();
                 currentmodel = (currentmodel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentmodel);
                 MusicService.setPlayModel(currentmodel);
-                if(mGradient){
-                    Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                mPlayModel.setImageResource(currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                         currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-                                R.drawable.play_btn_loop_one,mColorDraken);
-                } else {
-                    mPlayModel.setImageResource(currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-                            currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-                                    R.drawable.play_btn_loop_one);
-                }
+                                R.drawable.play_btn_loop_one);
 
                 String msg = currentmodel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
                         currentmodel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
@@ -448,42 +383,15 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     }
 
     /**
-     * 初始化动画
+     * 获得屏幕大小
      */
-    private void setUpAnim() {
+    private void setUpSize() {
         WindowManager wm = getWindowManager();
         Display display = wm.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
-
         mWidth = metrics.widthPixels;
         mHeight = metrics.heightPixels;
-
-        mAnimIn = AnimationUtils.loadAnimation(this,R.anim.audio_bg_in);
-        mAnimIn.setFillAfter(true);
-        mAnimOut = AnimationUtils.loadAnimation(this,R.anim.audio_bg_out);
-        mAnimOut.setFillAfter(true);
-        mAnimOut.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                updateViewColor();
-                mContainer.startAnimation(mAnimIn);
-            }
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-            }
-        });
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(mRawBitMap != null && !mRawBitMap.isRecycled())
-            mRawBitMap.recycle();
     }
 
     /**
@@ -589,7 +497,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
      */
     public void UpdatePlayButton(final boolean isPlay) {
         mPlayPauseView.updateState(isPlay,true);
-        mPlayBarPlay.setImageResource(isPlay ? R.drawable.play_btn_stop : R.drawable.play_btn_play);
     }
 
     /**
@@ -760,18 +667,12 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 if(MusicService.getNextMP3() != null){
                     mNextSong.setText("下一首：" + MusicService.getNextMP3().getTitle());
                 }
-                //背景开启渐变
-                if(mGradient){
-                    new SwatchThread().start();
-                }
-                mBlurHandler.postDelayed(new Runnable() {
+                new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         //更新专辑封面
                         //不是第一次启动并且不是从通知栏启动，播放动画
                         ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
-                        //更新动画控件封面 保证退场动画的封面与fragment中封面一致
-                        MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
                         mFistStart = false;
                     }
                 },10);
@@ -779,7 +680,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             //更新按钮状态
             UpdatePlayButton(isplay);
         }
-
     }
 
     @Override
@@ -810,8 +710,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
      * 根据主题颜色修改按钮颜色
      */
     private void setUpViewColor() {
-        if(mGradient)
-            return;
         int accentColor = ThemeStore.getAccentColor();
         int garyColor = ColorUtil.getColor(R.color.gray_6c6a6c);
         //修改顶部按钮颜色
@@ -842,96 +740,11 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                         R.drawable.play_btn_loop_one,garyColor);
         Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,garyColor);
 
-        mPlayBarPlay.setImageResource(mIsPlay ? R.drawable.play_btn_stop : R.drawable.play_btn_play);
-        //播放按钮背景
-        Theme.TintDrawable(findView(R.id.playbar_play_bg),getResources().getDrawable(R.drawable.play_bg_play),accentColor);
-//        mPlayPauseView.updateState(mIsPlay,false);
         mPlayPauseView.setBackgroundColor(accentColor);
         //下一首背景
         mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.getColor(R.color.white_fafafa),
                 DensityUtil.dip2px(this,2),0,0,DensityUtil.dip2px(this,288),DensityUtil.dip2px(this,38),1));
     }
 
-    /**
-     * 修改所有控件颜色
-     */
-    private void updateViewColor(){
-        if(mTopDetail != null && mTopTitle != null && mRawBitMap != null){
-            //修改背景颜色
-            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{mColorFrom, mColorTo}));
-            //歌词字体颜色
-            if(mLrcView != null){
-                mLrcView.setHighLightColor(ColorUtil.adjustAlpha(mNewSwatch.getRgb(),1.0f));
-                mLrcView.setOtherColor(ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.6f));
-                mLrcView.setTimeLineColor(ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.6f));
-                mLrcView.invalidate();
-            }
-            //修改顶部字体颜色
-//            mTopTitle.setTextColor(mColorDraken);
-//            mTopDetail.setTextColor(mColorDark);
-
-            //修改顶部按钮颜色
-//            Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,mColorDraken);
-//            Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,mColorDraken);
-            int garyColor = ColorUtil.getColor(R.color.gray_6c6a6c);
-            Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,garyColor);
-            Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,garyColor);
-
-            LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
-            //修改progress颜色
-            (layerDrawable.getDrawable(1)).setColorFilter(mColorDraken, PorterDuff.Mode.SRC_IN);
-            mSeekBar.setProgressDrawable(layerDrawable);
-            //修改thumb颜色
-            mSeekBar.setThumb(
-                    Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,mColorDraken, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),mColorDraken));
-            //三个指示器
-            int width = DensityUtil.dip2px(this,5);
-            int height = DensityUtil.dip2px(this,2);
-            mHighLightIndicator = Theme.getShape(GradientDrawable.RECTANGLE,mColorDraken,width,height);
-            mNormalIndicator = Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.adjustAlpha(mColorDraken,0.3f),width,height);
-            for(int i = 0 ; i < mDotList.size() ;i++){
-                mDotList.get(i).setImageDrawable(i == mPrevPosition ? mHighLightIndicator : mNormalIndicator);
-            }
-            //修改控制按钮颜色
-            Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,mColorDraken);
-            Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,mColorDraken);
-            //播放按钮背景颜色
-            mPlayPauseView.setBackgroundColor(mColorDraken);
-            //播放按钮背景颜色
-            Theme.TintDrawable(findView(R.id.playbar_play_bg),getResources().getDrawable(R.drawable.play_bg_play),mColorDraken);
-//            int currentmodel = MusicService.getPlayModel();
-//            Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-//                    currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-//                            R.drawable.play_btn_loop_one,mColorDraken);
-            //播放队列按钮
-//            Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,mColorDraken);
-        }
-    }
-
-    class SwatchThread extends Thread{
-        @Override
-        public void run() {
-            if(mInfo != null){
-                mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
-                if(mRawBitMap == null)
-                    mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.no_art_normal);
-
-                /** start*/
-                Palette palette = new Palette.Builder(mRawBitMap).generate();
-                mNewSwatch = palette.getMutedSwatch();
-                if(mNewSwatch == null)
-                    mNewSwatch = new Palette.Swatch(Color.GRAY,100);
-                mColorFrom = ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.4f);
-                mColorTo = ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.1f);
-//                mColorDraken = ColorUtil.shiftColor(mNewSwatch.getRgb(),0.8f);
-//                mColorDark = mNewSwatch.getRgb();
-                mColorDraken = mNewSwatch.getRgb();
-                mColorDark = ColorUtil.adjustAlpha(mNewSwatch.getRgb(),0.8f);
-
-                mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
-                /** end */
-            }
-        }
-    }
 
 }

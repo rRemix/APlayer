@@ -158,6 +158,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     @Override
     protected void onPause() {
         super.onPause();
+        mIsRunning = false;
         if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
         }
@@ -166,9 +167,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     @Override
     protected void onStop() {
         super.onStop();
-        mIsRunning = false;
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,8 +177,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
         //播放的service
         MusicService.addCallback(this);
-        //初始化toolbar
-        setUpToolbar(mToolBar,"");
+        setUpToolbar(mToolBar);
         setUpPager();
         setUpTab();
         //初始化测滑菜单
@@ -276,7 +274,11 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                 ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
     }
 
-    protected void setUpToolbar(Toolbar toolbar, String title) {
+    /**
+     * 初始化toolbar
+     * @param toolbar
+     */
+    protected void setUpToolbar(Toolbar toolbar) {
         super.initToolbar(toolbar,"");
         mToolBar.setTitle("");
 

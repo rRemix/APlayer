@@ -34,11 +34,6 @@ public class AsynLoadImage extends AsyncTask<Object,Integer,String> {
     protected void onPostExecute(String url) {
         if(mImage != null && url != null) {
             mImage.setImageURI(Uri.parse("file://" + url));
-//            if(TextUtils.isDigitsOnly(url)) {
-//                mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), Long.parseLong(url)));
-//            } else {
-//                mImage.setImageURI(Uri.parse("file:///" + url));
-//            }
         }
     }
 }

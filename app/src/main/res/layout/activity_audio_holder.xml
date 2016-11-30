@@ -189,7 +189,6 @@
                 android:gravity="center">
                 <FrameLayout
                     android:id="@+id/playbar_play_container"
-                    android:visibility="visible"
                     android:layout_width="@dimen/d50_size"
                     android:layout_height="@dimen/d50_size">
                     <remix.myplayer.ui.customview.playpause.PlayPauseView
@@ -198,24 +197,6 @@
                         android:layout_height="@dimen/d50_size"
                         android:layout_gravity="center"
                         android:visibility="visible"/>
-                </FrameLayout>
-                <FrameLayout
-                    android:layout_width="@dimen/d60_size"
-                    android:layout_height="@dimen/d60_size"
-                    android:visibility="gone">
-                    <ImageView
-                        android:id="@+id/playbar_play_bg"
-                        android:layout_width="@dimen/d60_size"
-                        android:layout_height="@dimen/d60_size"
-                        android:src="@drawable/play_bg_play"
-                        android:layout_gravity="center"/>
-                    <ImageView
-                        android:id="@+id/playbar_play"
-                        android:layout_gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:src="@drawable/play_btn_play"
-                        android:background="@color/transparent"/>
                 </FrameLayout>
             </LinearLayout>
 
@@ -251,10 +232,14 @@
             android:layout_weight="1.5">
             <TextView
                 android:layout_centerInParent="true"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/d8_size"
-                android:layout_marginRight="@dimen/d8_size"
+                android:layout_marginLeft="@dimen/d36_size"
+                android:layout_marginRight="@dimen/d36_size"
+                android:paddingTop="@dimen/d12_size"
+                android:paddingBottom="@dimen/d12_size"
+                android:paddingStart="@dimen/d8_size"
+                android:paddingEnd="@dimen/d8_size"
                 android:gravity="center"
                 android:maxLines="1"
                 android:ellipsize="end"
