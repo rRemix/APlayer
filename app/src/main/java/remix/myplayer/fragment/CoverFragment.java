@@ -19,6 +19,7 @@ import com.facebook.rebound.SpringSystem;
 
 import java.io.File;
 
+import butterknife.BindInt;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
@@ -43,6 +44,8 @@ public class CoverFragment extends BaseFragment {
     SimpleDraweeView mImage;
     @BindView(R.id.cover_shadow)
     ImageView mShadow;
+    @BindView(R.id.cover_container)
+    View mCoverContainer;
     private MP3Item mInfo;
     private int mWidth;
     private Uri mUri = Uri.EMPTY;
@@ -100,21 +103,22 @@ public class CoverFragment extends BaseFragment {
             int operation = Global.getOperation();
             //位置信息
             Rect rect = new Rect();
-            mImage.getGlobalVisibleRect(rect);
+            mCoverContainer.getGlobalVisibleRect(rect);
             final double startValue = rect.left;
             final double endValue = operation == Constants.PREV ? mWidth : -rect.width();
-
+            //封面移动动画
             final Spring outAnim = SpringSystem.create().createSpring();
             outAnim.addListener(new SimpleSpringListener(){
                 @Override
                 public void onSpringUpdate(Spring spring) {
-                    mImage.setX((float) spring.getCurrentValue());
+                    mCoverContainer.setX((float) spring.getCurrentValue());
                 }
                 @Override
                 public void onSpringAtRest(Spring spring) {
+                    //显示封面的动画
                     if(mImage == null)
                         return;
-                    mImage.setX((float) startValue);
+                    mCoverContainer.setX((float) startValue);
                     mImage.setImageURI(mUri);
                     final Spring inAnim = SpringSystem.create().createSpring();
                     inAnim.addListener(new SimpleSpringListener(){
@@ -122,8 +126,8 @@ public class CoverFragment extends BaseFragment {
                         public void onSpringUpdate(Spring spring) {
                             if(mImage == null)
                                 return;
-                            mImage.setScaleX((float) spring.getCurrentValue());
-                            mImage.setScaleY((float) spring.getCurrentValue());
+                            mCoverContainer.setScaleX((float) spring.getCurrentValue());
+                            mCoverContainer.setScaleY((float) spring.getCurrentValue());
                         }
                     });
                     inAnim.setCurrentValue(0.85);
@@ -136,6 +140,7 @@ public class CoverFragment extends BaseFragment {
             outAnim.setEndValue(endValue);
         } else {
             mImage.setImageURI(mUri);
+            mShadow.setVisibility(View.VISIBLE);
         }
     }
 
@@ -143,8 +148,8 @@ public class CoverFragment extends BaseFragment {
      * activity退出时隐藏封面
      */
     public void hideImage(){
-        if(mImage != null)
-            mImage.setVisibility(View.INVISIBLE);
+        if(mCoverContainer != null)
+            mCoverContainer.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -153,6 +158,8 @@ public class CoverFragment extends BaseFragment {
     public void showImage(){
         if(mImage != null)
             mImage.setVisibility(View.VISIBLE);
+        if(mCoverContainer != null)
+            mCoverContainer.setVisibility(View.VISIBLE);
     }
 
     /**

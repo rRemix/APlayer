@@ -20,7 +20,7 @@
             android:layout_width="@dimen/d120_size"
             android:layout_height="@dimen/d120_size"
             android:layout_centerVertical="true"
-            android:src="@drawable/song_artist_empty_bg_night"
+            android:src="@drawable/album_empty_bg_day"
             android:scaleType="centerCrop"/>
 
         <LinearLayout

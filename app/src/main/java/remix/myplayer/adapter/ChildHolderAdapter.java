@@ -97,6 +97,10 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
                     holder.mColumnView.stopAnim();
                 }
             }
+            //是否无损
+            String prefix = temp.getDisplayname().substring(temp.getDisplayname().lastIndexOf(".") + 1);
+            holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
+
             //设置标题
             holder.mTitle.setText(CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE));
 
@@ -161,15 +165,17 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
         return mInfoList == null ? 0 : mInfoList.size();
     }
 
-    public static class ViewHoler extends BaseViewHolder {
+    static class ViewHoler extends BaseViewHolder {
+        @BindView(R.id.sq)
+        View mSQ;
         @BindView(R.id.album_holder_item_title)
-        public TextView mTitle;
+        TextView mTitle;
         @BindView(R.id.song_item_button)
         public ImageButton mButton;
         @BindView(R.id.song_columnview)
-        public ColumnView mColumnView;
+        ColumnView mColumnView;
         public View mContainer;
-        public ViewHoler(View itemView) {
+        ViewHoler(View itemView) {
             super(itemView);
             mContainer = itemView;
         }

@@ -20,36 +20,53 @@
         fresco:roundAsCircle="true"
         fresco:fadeDuration="0"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="@dimen/d16_size"/>
+        android:layout_marginLeft="@dimen/d16_size"
+        android:layout_marginRight="@dimen/d16_size"/>
     <!--歌曲名、歌手、专辑-->
     <LinearLayout
         android:layout_width="@dimen/d180_size"
         android:layout_height="@dimen/d64_size"
+        android:id="@+id/song_text_container"
         android:layout_toRightOf="@id/song_head_image"
-        android:layout_marginLeft="@dimen/d16_size"
         android:orientation="vertical"
-        android:id="@+id/song_text_container">
-        <TextView
+        android:gravity="center_vertical">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:lines="1"
-            android:ellipsize="end"
-            android:textSize="@dimen/s14_size"
-            android:textColor="?attr/text_color_primary"
-            android:id="@+id/song_title"
-            android:layout_marginTop="@dimen/d16_size"
-            android:text="歌曲名" />
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="@dimen/d180_size"
+                android:lines="1"
+                android:ellipsize="end"
+                android:textSize="@dimen/s14_size"
+                android:textColor="?attr/text_color_primary"
+                android:id="@+id/song_title"
+                android:layout_centerVertical="true"/>
+            <ImageView
+                android:id="@+id/sq"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_sq"
+                android:background="@color/transparent"
+                android:layout_marginLeft="@dimen/d2_size"
+                android:layout_toRightOf="@id/song_title"
+                android:layout_alignBottom="@id/song_title"/>
+        </RelativeLayout>
+
         <TextView
             android:id="@+id/song_other"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxWidth="@dimen/d180_size"
             android:lines="1"
             android:ellipsize="end"
             android:textSize="@dimen/s12_size"
             android:textColor="?attr/text_color"
-            android:text="歌手与专辑"
             android:layout_marginTop="@dimen/d4_size"/>
     </LinearLayout>
+
     <!--结尾处按钮-->
     <ImageButton
         android:layout_alignParentRight="true"

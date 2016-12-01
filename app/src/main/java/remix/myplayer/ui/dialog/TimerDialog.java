@@ -7,6 +7,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
 import android.util.DisplayMetrics;
@@ -23,6 +24,7 @@ import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.theme.Theme;
@@ -42,7 +44,11 @@ import remix.myplayer.util.ToastUtil;
  * 定时关闭界面
  */
 public class TimerDialog extends BaseDialogActivity {
-
+    //提示信息
+    @BindView(R.id.timer_info_container)
+    View mInfoContainer;
+    @BindView(R.id.timer_content_container)
+    View mContentContainer;
     //分钟
     @BindView(R.id.minute)
     TextView mMinute;
@@ -61,16 +67,19 @@ public class TimerDialog extends BaseDialogActivity {
     TextView mCancel;
 
     //是否正在计时
-    public static boolean misTiming = false;
+    public static boolean mIsTiming = false;
     //是否正在运行
-    public static boolean misRun = false;
+    public static boolean mIsRunning = false;
     //定时时间
     private static long mTime;
     //更新seekbar与剩余时间
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            mMinute.setText(msg.obj.toString());
+            if(msg.getData() != null){
+                mMinute.setText(msg.getData().getString("Minute"));
+                mSecond.setText(msg.getData().getString("Second"));
+            }
             mSeekbar.setProgress(msg.arg1);
         }
     };
@@ -84,7 +93,7 @@ public class TimerDialog extends BaseDialogActivity {
 
         //居中显示
         Window w = getWindow();
-        WindowManager wm = getWindowManager();
+        final WindowManager wm = getWindowManager();
         Display display = wm.getDefaultDisplay();
         final DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
@@ -93,7 +102,7 @@ public class TimerDialog extends BaseDialogActivity {
         w.setGravity(Gravity.CENTER);
 
         //如果正在计时，设置seekbar的进度
-        if(misTiming) {
+        if(mIsTiming) {
             int remain = (int)mTime * 60 - (int)(System.currentTimeMillis() - TimerService.mStartTime) / 1000;
             mSeekbar.setProgress(remain / 60);
             mSeekbar.setStart(true);
@@ -103,9 +112,9 @@ public class TimerDialog extends BaseDialogActivity {
             @Override
             public void onProgressChanged(CircleSeekBar seekBar, long progress, boolean fromUser) {
                 if (progress > 0) {
-                    String text = (progress < 10 ? "0" + progress : "" + progress) + ":00";
                     //记录倒计时时间和更新界面
-                    mMinute.setText(text);
+                    mMinute.setText(progress < 10 ? "0" + progress : "" + progress);
+                    mSecond.setText("00");
                     mTime = progress;
                 }
             }
@@ -118,7 +127,6 @@ public class TimerDialog extends BaseDialogActivity {
         });
 
         //初始化switch
-//        mSwitch = findView(R.id.popup_timer_switch);
         mSwitch = new SwitchCompat(new ContextThemeWrapper(this, Theme.getTheme()));
         ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
         //读取保存的配置
@@ -129,7 +137,7 @@ public class TimerDialog extends BaseDialogActivity {
         if(hasdefault && time > 0){
             //如果有默认设置并且没有开始计时，直接开始计时
             //如果有默认设置但已经开始计时，打开该popupwindow,并更改switch外观
-            if(!misTiming) {
+            if(!mIsTiming) {
                 mTime = time;
                 Toggle();
             }
@@ -156,82 +164,97 @@ public class TimerDialog extends BaseDialogActivity {
         });
 
 
-        mToggle.setText(misTiming ? "取消计时" : "开始计时");
-        mToggle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toggle();
-            }
-        });
-        mCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                misRun = false;
-                finish();
-            }
-        });
-
-        findView(R.id.timer_info).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
+        mToggle.setText(mIsTiming ? "取消计时" : "开始计时");
 
         //分钟 秒 背景框
-        Drawable containerDrawable = Theme.getShape(
+        final Drawable containerDrawable = Theme.getShape(
                 GradientDrawable.RECTANGLE,
                 Color.TRANSPARENT,
                 DensityUtil.dip2px(this,1),
                 DensityUtil.dip2px(this,1),
                 ColorUtil.getColor(R.color.gray_404040),
                 0,0,1);
-        findView(R.id.timer_minute_container).setBackground(containerDrawable);
-        findView(R.id.timer_second_container).setBackground(containerDrawable);
+        ButterKnife.apply(new View[]{findView(R.id.timer_minute_container),findView(R.id.timer_second_container)},
+                new ButterKnife.Action<View>() {
+                    @Override
+                    public void apply(@NonNull View view, int index) {
+                        view.setBackground(containerDrawable);
+                    }
+                });
 
-        Drawable selectDrawable = Theme.getShape(
-                GradientDrawable.RECTANGLE,
-                ColorUtil.getColor(R.color.day_selected_color),
-                DensityUtil.dip2px(this,2),
-                0,0,0,0,1);
-        Drawable defaultDrawable = Theme.getShape(
-                GradientDrawable.RECTANGLE,
-                ColorUtil.getColor(R.color.white_f6f6f5),
-                DensityUtil.dip2px(this,2),
-                0,0,0,0,1);
         //点击效果
-//        mToggle.setBackground(Theme.getPressDrawable(defaultDrawable,selectDrawable,ColorUtil.getColor(R.color.day_ripple_color),defaultDrawable,defaultDrawable));
-//        mCancel.setBackground(Theme.getPressDrawable(defaultDrawable,selectDrawable,ColorUtil.getColor(R.color.day_ripple_color),null,defaultDrawable));
+        ButterKnife.apply(new View[]{mCancel,mToggle},
+                new ButterKnife.Action<View>() {
+                    @Override
+                    public void apply(@NonNull View view, int index) {
+                        Drawable selectDrawable = getResources().getDrawable(R.drawable.bg_corner_select_day);
+                        Drawable defaultDrawable = getResources().getDrawable(R.drawable.bg_corner_default_day);
+                        view.setBackground(Theme.getPressDrawable(defaultDrawable,selectDrawable,ColorUtil.getColor(R.color.day_ripple_color),defaultDrawable,defaultDrawable));
+                    }
+                });
+
+        //点击效果
+//        Drawable selectDrawable = Theme.getShape(
+//                GradientDrawable.RECTANGLE,
+//                ColorUtil.getColor(R.color.day_selected_color),
+//                DensityUtil.dip2px(this,2),
+//                0,0,0,0,1);
+//        Drawable defaultDrawable = Theme.getShape(
+//                GradientDrawable.RECTANGLE,
+//                ColorUtil.getColor(R.color.white_f6f6f5),
+//                DensityUtil.dip2px(this,2),
+//                0,0,0,0,1);
+//        mToggle.setBackground(
+//                Theme.getPressDrawable(defaultDrawable,selectDrawable,ColorUtil.getColor(R.color.day_ripple_color),defaultDrawable,defaultDrawable));
+//        mCancel.setBackground(Theme.getPressDrawable(defaultDrawable.mutate(),selectDrawable.mutate(),ColorUtil.getColor(R.color.day_ripple_color),defaultDrawable.mutate(),null));
+
+
     }
 
     /**
      * 根据是否已经开始计时来取消或开始计时
      */
     private void Toggle(){
-        if(mTime <= 0 && !misTiming) {
+        if(mTime <= 0 && !mIsTiming) {
             ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
             return;
         }
-        String msg = misTiming ? "取消定时关闭" : "将在" + mTime + "分钟后关闭";
+        String msg = mIsTiming ? "取消定时关闭" : "将在" + mTime + "分钟后关闭";
         ToastUtil.show(this,msg);
-        misTiming = !misTiming;
-        mSeekbar.setStart(misTiming);
+        mIsTiming = !mIsTiming;
+        mSeekbar.setStart(mIsTiming);
         Intent intent = new Intent(Constants.CONTROL_TIMER);
         intent.putExtra("Time", mTime);
-        intent.putExtra("Run", misTiming);
+        intent.putExtra("Run", mIsTiming);
         sendBroadcast(intent);
         finish();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
+    @OnClick({R.id.timer_info,R.id.timer_info_close,R.id.close_stop,R.id.close_toggle})
+    public void OnClick(View view){
+        switch (view.getId()){
+            case R.id.timer_info:
+                mContentContainer.setVisibility(View.INVISIBLE);
+                mInfoContainer.setVisibility(View.VISIBLE);
+                break;
+            case R.id.timer_info_close:
+                mInfoContainer.setVisibility(View.INVISIBLE);
+                mContentContainer.setVisibility(View.VISIBLE);
+                break;
+            case R.id.close_stop:
+                finish();
+                break;
+            case R.id.close_toggle:
+                Toggle();
+                break;
+        }
     }
+
     @Override
     protected void onResume() {
         super.onResume();
-        misRun = true;
-        if(misTiming) {
+        mIsRunning = true;
+        if(mIsTiming) {
             TimeThread thread = new TimeThread();
             thread.start();
         }
@@ -240,7 +263,7 @@ public class TimerDialog extends BaseDialogActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        misRun = false;
+        mIsRunning = false;
     }
 
     @Override
@@ -262,16 +285,16 @@ public class TimerDialog extends BaseDialogActivity {
         int min,sec,remain;
         @Override
         public void run(){
-            while (misRun){
+            while (mIsRunning){
                 remain = (int)mTime * 60 - (int)(System.currentTimeMillis() - TimerService.mStartTime) / 1000;
                 min = remain / 60;
                 sec = remain % 60;
-                String str_min = min < 10 ? "0" + min : "" + min;
-                String str_sec = sec < 10 ? "0" + sec : "" + sec;
-                String text = str_min + ":" + str_sec + "min";
                 Message msg = new Message();
-                msg.obj = text;
                 msg.arg1 = min;
+                Bundle data = new Bundle();
+                data.putString("Minute",min < 10 ? "0" + min : "" + min);
+                data.putString("Second",sec < 10 ? "0" + sec : "" + sec);
+                msg.setData(data);
                 mHandler.sendMessage(msg);
                 LogUtil.d("Timer","SendMsg");
                 try {

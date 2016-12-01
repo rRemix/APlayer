@@ -2,10 +2,14 @@ package remix.myplayer.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,7 +19,10 @@ import com.umeng.analytics.MobclickAgent;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
 import remix.myplayer.R;
+import remix.myplayer.model.Feedback;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
@@ -37,6 +44,7 @@ public class FeedBakActivity extends ToolbarActivity {
     EditText mEditText;
     @BindView(R.id.feedback_submit)
     Button mSubmit;
+    Feedback mFeedBack = new Feedback();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,10 +59,42 @@ public class FeedBakActivity extends ToolbarActivity {
 
     @OnClick(R.id.feedback_submit)
     public void onClick(View v){
+        try {
+            if(TextUtils.isEmpty(mEditText.getText())){
+                ToastUtil.show(this,getString(R.string.input_feedback_content));
+                return;
+            }
+            PackageManager pm = getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES);
+            mFeedBack = new Feedback(mEditText.getText().toString(),
+                    pi.versionName,
+                    pi.versionCode + "",
+                    Build.VERSION.RELEASE,
+                    Build.VERSION.SDK_INT + "",
+                    Build.MANUFACTURER,
+                    Build.MODEL,
+                    Build.CPU_ABI + "," + Build.CPU_ABI2);
+            mFeedBack.save(new SaveListener<String>() {
+                @Override
+                public void done(String s, BmobException e) {
+                    if(e == null){
+                        ToastUtil.show(FeedBakActivity.this,R.string.send_success);
+                        finish();
+                    } else {
+                        commit();
+                    }
+                }
+            });
+        } catch (PackageManager.NameNotFoundException e) {
+            ToastUtil.show(FeedBakActivity.this,R.string.send_error);
+        }
+    }
+
+    private void commit(){
         Intent data = new Intent(Intent.ACTION_SENDTO);
         data.setData(Uri.parse("mailto:568920427@qq.com"));
         data.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback));
-        data.putExtra(Intent.EXTRA_TEXT, mEditText.getText().toString());
+        data.putExtra(Intent.EXTRA_TEXT, mEditText.getText().toString() + "\n\n\n" + mFeedBack);
         startActivityForResult(data,0);
     }
 

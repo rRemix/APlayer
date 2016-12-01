@@ -359,7 +359,7 @@ public class MediaStoreUtil {
         long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
         return new MP3Item(
                 cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)),
-                CommonUtil.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),CommonUtil.SONGTYPE),
+                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
                 cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)),
                 CommonUtil.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)),CommonUtil.ALBUMTYPE),
                 cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),

@@ -103,6 +103,10 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
         }
 
         try {
+            //是否为无损
+            String prefix = temp.getDisplayname().substring(temp.getDisplayname().lastIndexOf(".") + 1);
+            holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
+
             //设置歌曲名
             String name = CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE);
             holder.mName.setText(name);
@@ -188,6 +192,8 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
     }
 
     public static class SongViewHolder extends BaseViewHolder{
+        @BindView(R.id.sq)
+        View mSQ;
         @BindView(R.id.song_title)
         TextView mName;
         @BindView(R.id.song_other)

@@ -133,28 +133,22 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         //应用的版本名称和版本号
         PackageManager pm = mContext.getPackageManager();
         PackageInfo pi = pm.getPackageInfo(mContext.getPackageName(), PackageManager.GET_ACTIVITIES);
-        pw.print("App Version: ");
-        pw.print(pi.versionName);
-        pw.print('_');
-        pw.println(pi.versionCode);
+        pw.println("App Version: " + pi.versionName);
 
+        pw.println("App Version code: " + pi.versionCode);
+        pw.println(pi.versionCode);
         //android版本号
-        pw.print("OS Version: ");
-        pw.print(Build.VERSION.RELEASE);
-        pw.print("_");
-        pw.println(Build.VERSION.SDK_INT);
+        pw.println("Android release version: " + Build.VERSION.RELEASE);
+        pw.println("Android Sdk version: " + Build.VERSION.SDK_INT);
 
         //手机制造商
-        pw.print("Vendor: ");
-        pw.println(Build.MANUFACTURER);
+        pw.println("Device manufacturer: " + Build.MANUFACTURER);
 
         //手机型号
-        pw.print("Model: ");
+        pw.print("Device model: " + Build.MODEL);
         pw.println(Build.MODEL);
-
         //cpu架构
-        pw.print("CPU ABI: ");
-        pw.println(Build.CPU_ABI);
+        pw.print("CPU ABI: " + Build.CPU_ABI);
     }
 
 
