@@ -79,6 +79,12 @@
     <color name="black_313131">#313131</color>
     <color name="gray_666666">#666666</color>
     <color name="black_2a2a2a">#2a2a2a</color>
+    <color name="gray_6967ab">#6967ab</color>
+    <color name="gray_8b8b8b">#8b8b8b</color>
+    <color name="gray_404040">#404040</color>
+    <color name="white_f0f0f0">#f0f0f0</color>
+    <color name="gray_3c3c3c">#3c3c3c</color>
+    <color name="gray_b7b7b7">#b7b7b7</color>
     <color name="normal_tab_text_color">#99ffffff</color>
     <color name="search_hint_text_color">#33ffffff</color>
 

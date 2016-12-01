@@ -1,8 +1,9 @@
 package remix.myplayer.ui.dialog;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.drawable.StateListDrawable;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,7 +15,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,10 +26,10 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.theme.Theme;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.CircleSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -43,20 +43,22 @@ import remix.myplayer.util.ToastUtil;
  */
 public class TimerDialog extends BaseDialogActivity {
 
-    //剩余时间
-    @BindView(R.id.close_time)
-    TextView mText;
-    //设置或取下默认
-    @BindView(R.id.popup_timer_switch)
+    //分钟
+    @BindView(R.id.minute)
+    TextView mMinute;
+    @BindView(R.id.second)
+    //秒
+    TextView mSecond;
+    //设置或取消默认
     SwitchCompat mSwitch;
     //圆形seekbar
     @BindView(R.id.close_seekbar)
     CircleSeekBar mSeekbar;
     //开始或取消计时
     @BindView(R.id.close_toggle)
-    Button mToggle;
+    TextView mToggle;
     @BindView(R.id.close_stop)
-    Button mCancel;
+    TextView mCancel;
 
     //是否正在计时
     public static boolean misTiming = false;
@@ -68,7 +70,7 @@ public class TimerDialog extends BaseDialogActivity {
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
-            mText.setText(msg.obj.toString());
+            mMinute.setText(msg.obj.toString());
             mSeekbar.setProgress(msg.arg1);
         }
     };
@@ -101,9 +103,9 @@ public class TimerDialog extends BaseDialogActivity {
             @Override
             public void onProgressChanged(CircleSeekBar seekBar, long progress, boolean fromUser) {
                 if (progress > 0) {
-                    String text = (progress < 10 ? "0" + progress : "" + progress) + ":00min";
+                    String text = (progress < 10 ? "0" + progress : "" + progress) + ":00";
                     //记录倒计时时间和更新界面
-                    mText.setText(text);
+                    mMinute.setText(text);
                     mTime = progress;
                 }
             }
@@ -115,23 +117,10 @@ public class TimerDialog extends BaseDialogActivity {
             }
         });
 
-        //初始化开始计时按钮
-        int[] state_prs = new int[]{android.R.attr.state_pressed};
-        int[] state_non_focus = new int[]{-android.R.attr.state_focused};
-        int color = ThemeStore.getAccentColor();
-        StateListDrawable bg = new StateListDrawable();
-        bg.addState(state_prs,Theme.getCorner(1.0f,4,0,color));
-        bg.addState(state_non_focus,Theme.getCorner(0.01f,4,1,color));
-
-        mToggle.setBackground(bg);
-        mToggle.setTextColor(new ColorStateList(new int[][]{state_prs,state_non_focus},
-                new int[]{ColorUtil.getColor(R.color.white),color}));
-
         //初始化switch
 //        mSwitch = findView(R.id.popup_timer_switch);
         mSwitch = new SwitchCompat(new ContextThemeWrapper(this, Theme.getTheme()));
         ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
-
         //读取保存的配置
         boolean hasdefault = SPUtil.getValue(this, "Setting", "TimerDefault", false);
         final int time = SPUtil.getValue(this,"Setting","TimerNum",-1);
@@ -181,6 +170,38 @@ public class TimerDialog extends BaseDialogActivity {
                 finish();
             }
         });
+
+        findView(R.id.timer_info).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        //分钟 秒 背景框
+        Drawable containerDrawable = Theme.getShape(
+                GradientDrawable.RECTANGLE,
+                Color.TRANSPARENT,
+                DensityUtil.dip2px(this,1),
+                DensityUtil.dip2px(this,1),
+                ColorUtil.getColor(R.color.gray_404040),
+                0,0,1);
+        findView(R.id.timer_minute_container).setBackground(containerDrawable);
+        findView(R.id.timer_second_container).setBackground(containerDrawable);
+
+        Drawable selectDrawable = Theme.getShape(
+                GradientDrawable.RECTANGLE,
+                ColorUtil.getColor(R.color.day_selected_color),
+                DensityUtil.dip2px(this,2),
+                0,0,0,0,1);
+        Drawable defaultDrawable = Theme.getShape(
+                GradientDrawable.RECTANGLE,
+                ColorUtil.getColor(R.color.white_f6f6f5),
+                DensityUtil.dip2px(this,2),
+                0,0,0,0,1);
+        //点击效果
+//        mToggle.setBackground(Theme.getPressDrawable(defaultDrawable,selectDrawable,ColorUtil.getColor(R.color.day_ripple_color),defaultDrawable,defaultDrawable));
+//        mCancel.setBackground(Theme.getPressDrawable(defaultDrawable,selectDrawable,ColorUtil.getColor(R.color.day_ripple_color),null,defaultDrawable));
     }
 
     /**

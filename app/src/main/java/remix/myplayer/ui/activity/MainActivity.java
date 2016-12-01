@@ -193,8 +193,8 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
         mBottomBar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
 
-        BmobUpdateAgent.setUpdateOnlyWifi(false);
-        BmobUpdateAgent.update(this);
+//        BmobUpdateAgent.setUpdateOnlyWifi(false);
+//        BmobUpdateAgent.update(this);
 
     }
 
@@ -309,7 +309,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                 new MaterialDialog.Builder(MainActivity.this)
                         .title(R.string.new_playlist)
                         .titleColorAttr(R.attr.text_color_primary)
-                        .positiveText(R.string.create)
+                        .positiveText(R.string.start_timer)
                         .positiveColorAttr(R.attr.text_color_primary)
                         .negativeText(R.string.cancel)
                         .negativeColorAttr(R.attr.text_color_primary)

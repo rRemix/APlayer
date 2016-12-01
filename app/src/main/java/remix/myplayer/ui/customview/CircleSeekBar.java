@@ -242,7 +242,7 @@ public class CircleSeekBar extends AbsSeekBar {
         mCirclePaint = new Paint();
         mCirclePaint.setAntiAlias(true);
         mCirclePaint.setStyle(Paint.Style.STROKE);
-        mCirclePaint.setColor(ColorUtil.getColor(R.color.white_dcdcdc));
+        mCirclePaint.setColor(ColorUtil.getColor(R.color.gray_b7b7b7));
         mCirclePaint.setStrokeWidth(mProgressWidth);
         //圆弧画笔
         mArcPaint = new Paint();

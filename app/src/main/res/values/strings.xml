@@ -101,5 +101,9 @@
     <string name="circlefriend">朋友圈</string>
     <string name="record_share">以海报分享</string>
     <string name="share">分享</string>
+    <string name="timer">伴着音乐入睡</string>
+    <string name="as_default">设为默认</string>
+    <string name="start_timer">开始计时</string>
+    <string name="close">关闭</string>
 
 </resources>

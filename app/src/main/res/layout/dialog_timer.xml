@@ -1,125 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:CircleSeekBar="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="@dimen/d274_size"
-    android:layout_height="@dimen/d410_size"
-    android:background="@drawable/timer_bg" >
+    android:orientation="vertical" android:layout_width="270dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/timer_bg">
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="@dimen/d48_size"
-        android:text="伴着音乐入睡"
-        android:textColor="@color/black_1c1b19"
+        android:layout_height="wrap_content"
+        android:text="@string/timer"
+        android:textColor="@color/black_333333"
         android:textSize="@dimen/s20_size"
-        android:paddingLeft="@dimen/d32_size"
-        android:gravity="left|center_vertical" />
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/d12_size"
+        android:layout_marginBottom="@dimen/d12_size"/>
 
     <LinearLayout
-        android:layout_marginLeft="@dimen/d23_size"
-        android:layout_marginRight="@dimen/d23_size"
+        android:layout_marginLeft="@dimen/d14_size"
+        android:layout_marginRight="@dimen/d14_size"
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="@color/gray_d3d2d3"/>
+        android:background="@color/day_list_divider"/>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/d238_size"
-        android:gravity="center">
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/d24_size"
+        android:layout_marginBottom="@dimen/d20_size">
         <remix.myplayer.ui.customview.CircleSeekBar
             android:layout_gravity="center"
             android:id="@+id/close_seekbar"
-            android:layout_width="@dimen/d200_size"
-            android:layout_height="@dimen/d200_size"
+            android:layout_width="@dimen/d180_size"
+            android:layout_height="@dimen/d180_size"
             CircleSeekBar:progress_max="60"
             CircleSeekBar:progress_width="@dimen/d4_size" />
-        <TextView
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/close_time"
-            android:textSize="@dimen/s24_size"
-            android:textColor="@color/black_1b1c19"
-            android:text="00:00min"/>
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_centerInParent="true"
+                android:id="@+id/timer_time_container">
+                <FrameLayout
+                    android:id="@+id/timer_minute_container"
+                    android:layout_width="@dimen/d28_size"
+                    android:layout_height="wrap_content"
+                    android:background="@color/gray_6c6a6c"
+                    android:layout_gravity="center"
+                    android:padding="0dp">
+                    <TextView
+                        android:padding="0dp"
+                        android:background="@null"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/minute"
+                        android:textSize="@dimen/s24_size"
+                        android:textColor="@color/gray_404040"
+                        android:text="00"/>
+                    <View
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/d1_size"
+                        android:background="@color/white"
+                        android:layout_margin="@dimen/d1_size"/>
+                </FrameLayout>
+
+                <FrameLayout
+                    android:padding="0dp"
+                    android:id="@+id/timer_second_container"
+                    android:layout_width="@dimen/d28_size"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/d12_size">
+                    <TextView
+                        android:padding="0dp"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/second"
+                        android:textSize="@dimen/s24_size"
+                        android:textColor="@color/gray_404040"
+                        android:text="00" />
+                    <View
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/d1_size"
+                        android:background="@color/white"
+                        android:layout_margin="@dimen/d1_size"/>
+                </FrameLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_marginLeft="@dimen/d6_size"
+                android:layout_toRightOf="@id/timer_time_container"
+                android:layout_alignBottom="@id/timer_time_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/s12_size"
+                android:textColor="@color/gray_3c3c3c"
+                android:text="min" />
+        </RelativeLayout>
+
     </FrameLayout>
 
     <!-- 默认设置-->
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="@dimen/d10_size"
-        android:id="@+id/popup_timer_container">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black_272628"
-            android:textSize="@dimen/s13_size"
-            android:text="设为默认"
-            android:layout_marginRight="@dimen/d8_size"/>
-        <android.support.v7.widget.SwitchCompat
-            android:visibility="invisible"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textOn=""
-            android:textOff=""
-            android:id="@+id/popup_timer_switch" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/d40_size">
         <LinearLayout
-            android:layout_marginLeft="@dimen/d55_size"
-            android:layout_marginRight="@dimen/d55_size"
-            android:layout_gravity="center_horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="@color/gray_d3d2d3"
-            android:layout_marginBottom="@dimen/d5_szie"/>
-        <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/popup_timer_container"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/d5_szie"
-            android:gravity="center"
-            android:text="设为默认后下次点击'定时停止'按钮将直接开始计时"
-            android:textSize="@dimen/s8_size"
-            android:textColor="@color/gray_b2b1b2"/>
-        <TextView
-            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_centerInParent="true"
+            android:gravity="center_vertical"
+            android:layout_marginRight="@dimen/d4_size">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/gray_404040"
+                android:textSize="@dimen/s14_size"
+                android:text="@string/as_default"
+                android:layout_marginRight="@dimen/d20_size"/>
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/timer_info"
+            android:layout_toRightOf="@id/popup_timer_container"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/d5_szie"
-            android:gravity="center"
-            android:text="在开始计时时点击'定时停止'按钮可重新设置"
-            android:textSize="8sp"
-            android:textColor="@color/gray_b2b1b2"/>
-    </LinearLayout>
+            android:src="@drawable/icon_timer_info"
+            android:background="@color/transparent" />
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/d10_size"
-        android:layout_marginBottom="@dimen/d16_size">
-        <Button
+        android:layout_marginBottom="@dimen/d12_size">
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/close_toggle"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="@dimen/d20_size"
-            android:layout_marginLeft="@dimen/d16_size"
-            android:gravity="center"
-            android:padding="@dimen/d1_size"
-            android:textSize="@dimen/s14_size"
-            android:text="开始计时" />
-        <Button
-            android:visibility="gone"
+            android:layout_marginRight="@dimen/d10_size"
+            android:layout_marginLeft="@dimen/d2_size"
+            android:textSize="@dimen/s16_size"
+            android:text="@string/start_timer"
+            android:textColor="@color/gray_6967ab"
+            android:paddingTop="@dimen/d6_size"
+            android:paddingBottom="@dimen/d6_size"
+            android:paddingRight="@dimen/d12_size"
+            android:paddingLeft="@dimen/d12_size"
+            android:background="?android:attr/selectableItemBackground"/>
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/close_stop"
             android:layout_toLeftOf="@id/close_toggle"
             android:gravity="center"
-            android:padding="@dimen/d1_size"
-            android:textSize="@dimen/s14_size"
-            android:text="关闭"/>
+            android:textSize="@dimen/s16_size"
+            android:text="@string/cancel"
+            android:textColor="@color/gray_8b8b8b"
+            android:paddingTop="@dimen/d6_size"
+            android:paddingBottom="@dimen/d6_size"
+            android:paddingRight="@dimen/d12_size"
+            android:paddingLeft="@dimen/d12_size"
+            android:background="?android:attr/selectableItemBackground"/>
     </RelativeLayout>
 </LinearLayout>
