@@ -37,6 +37,16 @@ import remix.myplayer.util.DensityUtil;
  * @Date 2016/8/9 14:55
  */
 public class Theme {
+    /**
+     * thumb加深色边框并着色
+     */
+    public static GradientDrawable getTinThumb(Context context){
+        GradientDrawable thumbDrawable = (GradientDrawable) context.getResources().getDrawable(R.drawable.bg_circleseekbar_thumb);
+        thumbDrawable.setStroke(DensityUtil.dip2px(context,1),ColorUtil.shiftColor(ThemeStore.getAccentColor(),0.8f));
+        thumbDrawable.setColor(ThemeStore.getAccentColor());
+        return thumbDrawable;
+    }
+
 
     /**
      * 为drawable着色

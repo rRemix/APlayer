@@ -20,7 +20,7 @@ public class ToolbarActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
     }
 
-    protected void initToolbar(Toolbar toolbar,String title){
+    protected void setUpToolbar(Toolbar toolbar, String title){
         toolbar.setTitle(title);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);

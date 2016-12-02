@@ -21,7 +21,7 @@ public class AboutActivity extends ToolbarActivity {
         setContentView(R.layout.activity_about);
 
         ButterKnife.bind(this);
-        initToolbar(mToolBar, getString(R.string.about));
+        setUpToolbar(mToolBar, getString(R.string.about));
 
     }
 

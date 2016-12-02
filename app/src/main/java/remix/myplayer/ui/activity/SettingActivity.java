@@ -85,7 +85,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
-        initToolbar(mToolbar,"设置");
+        setUpToolbar(mToolbar,"设置");
 
         //读取重启aitivity之前的数据
         if(savedInstanceState != null){

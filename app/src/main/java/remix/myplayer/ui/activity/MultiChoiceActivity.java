@@ -76,8 +76,8 @@ public class MultiChoiceActivity extends ToolbarActivity {
     }
 
     @Override
-    protected void initToolbar(Toolbar toolbar, String title) {
-        super.initToolbar(toolbar,title);
+    protected void setUpToolbar(Toolbar toolbar, String title) {
+        super.setUpToolbar(toolbar,title);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {

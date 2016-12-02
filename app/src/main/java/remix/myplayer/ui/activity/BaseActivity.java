@@ -91,8 +91,6 @@ public class BaseActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //将该activity添加到ActivityManager,用于退出程序时关闭
         ActivityManager.AddActivity(this);
-        //友盟推送
-//        PushAgent.getInstance(this).onAppStart();
     }
 
     @Override

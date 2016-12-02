@@ -46,9 +46,7 @@
             android:id="@+id/custom_seekbar"
             app:trackheight="@dimen/d2_size"
             app:dotnum="6"
-            app:dotwidth="@dimen/d2_size"
-            app:thumb="@drawable/thumb"
-            app:thumbpress="@drawable/thumb"
+            app:dotwidth="@dimen/d1_size"
             app:tiptextcolor="?attr/text_color_primary"/>
     </LinearLayout>
 

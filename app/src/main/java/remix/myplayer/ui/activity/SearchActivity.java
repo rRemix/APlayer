@@ -63,7 +63,7 @@ public class SearchActivity extends ToolbarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
-        initToolbar(mSearchToolBar,"");
+        setUpToolbar(mSearchToolBar,"");
 
         mSearchToolBar.addSearchListener(new SearchToolBar.SearchListener() {
             @Override

@@ -164,10 +164,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -266,7 +262,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
     }
 
-
     @Override
     protected void setStatusBar() {
         StatusBarUtil.setColorNoTranslucentForDrawerLayout(this,
@@ -279,7 +274,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
      * @param toolbar
      */
     protected void setUpToolbar(Toolbar toolbar) {
-        super.initToolbar(toolbar,"");
+        super.setUpToolbar(toolbar,"");
         mToolBar.setTitle("");
 
         mToolBar.setNavigationIcon(R.drawable.actionbar_menu);

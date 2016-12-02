@@ -34,6 +34,7 @@
             android:textSize="@dimen/s12_size"
             android:textColor="@color/gray_b7b7b7"
             android:text="@string/timer_info_2"
+            android:lineSpacingExtra="@dimen/d4_size"
             android:layout_gravity="center_horizontal"
             android:layout_marginLeft="@dimen/d22_size"
             android:layout_marginRight="@dimen/d22_size"/>

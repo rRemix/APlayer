@@ -131,7 +131,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
                 .backgroundColorAttr(R.attr.background_color_3)
                 .progressIndeterminateStyle(false).build();
 
-        initToolbar(mToolBar,getString(R.string.recently));
+        setUpToolbar(mToolBar,getString(R.string.recently));
 
     }
 

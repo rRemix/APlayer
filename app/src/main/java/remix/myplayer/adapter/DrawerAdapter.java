@@ -54,7 +54,6 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
 
     @Override
     public void onBindViewHolder(final DrawerHolder holder, final int position) {
-        holder.mImg.setImageResource(mImgs[position]);
         Theme.TintDrawable(holder.mImg,mImgs[position],ThemeStore.getMaterialPrimaryColor());
         holder.mText.setText(mTitles[position]);
         if(position == 3){

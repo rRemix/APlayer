@@ -171,7 +171,7 @@ public class EQActivity extends ToolbarActivity {
 
         mInstance = this;
 
-        initToolbar(mToolBar,getString(R.string.use_eq));
+        setUpToolbar(mToolBar,getString(R.string.use_eq));
 
         //初始化switch
         ContextThemeWrapper ctw = new ContextThemeWrapper(this,R.style.DayTheme);

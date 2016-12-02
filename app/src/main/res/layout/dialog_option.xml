@@ -22,10 +22,7 @@
             fresco:placeholderImage="@drawable/song_artist_empty_bg_night"
             fresco:failureImage="@drawable/song_artist_empty_bg_night"
             fresco:failureImageScaleType="centerCrop"
-            fresco:roundAsCircle="true"
-            fresco:roundingBorderWidth="1px"
-            fresco:roundingBorderColor="@color/white"
-            android:layout_centerVertical="true" />
+            fresco:roundAsCircle="true"/>
         <TextView
             android:layout_width="@dimen/d240_size"
             android:layout_height="wrap_content"

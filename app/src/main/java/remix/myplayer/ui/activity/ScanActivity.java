@@ -49,7 +49,7 @@ public class ScanActivity extends ToolbarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
         ButterKnife.bind(this);
-        initToolbar(mToolBar,getString(R.string.back));
+        setUpToolbar(mToolBar,getString(R.string.back));
         initSeekbar();
     }
 

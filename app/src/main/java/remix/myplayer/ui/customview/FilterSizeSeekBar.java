@@ -229,15 +229,13 @@ public class FilterSizeSeekBar extends View {
         mInit = false;
         TypedArray typedArray = mContext.obtainStyledAttributes(attrs, R.styleable.FilterSizeSeekBar);
         //初始化thumbdrawable及其状态
-        Drawable thumb = typedArray.getDrawable(R.styleable.FilterSizeSeekBar_thumb);
-        Drawable thumbPress = typedArray.getDrawable(R.styleable.FilterSizeSeekBar_thumbpress);
+        Drawable thumb = Theme.getTinThumb(mContext);
+        Drawable thumbPress = Theme.getTinThumb(mContext);
         if(thumb == null)
-            thumb = getResources().getDrawable(R.drawable.thumb);
+            thumb = getResources().getDrawable(R.drawable.bg_circleseekbar_thumb);
         if(thumbPress == null)
-            thumbPress = getResources().getDrawable(R.drawable.thumb);
+            thumbPress = getResources().getDrawable(R.drawable.bg_circleseekbar_thumb);
 
-        Theme.TintDrawable(thumb,ThemeStore.getAccentColor());
-        Theme.TintDrawable(thumbPress,ThemeStore.getAccentColor());
 
         mThumbNormal = new int[]{-android.R.attr.state_focused, -android.R.attr.state_pressed,
                 -android.R.attr.state_selected, -android.R.attr.state_checked};

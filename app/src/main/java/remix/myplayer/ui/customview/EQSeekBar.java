@@ -211,27 +211,9 @@ public class EQSeekBar extends View {
         mContext = context;
         TypedArray typedArray = mContext.obtainStyledAttributes(attributeSet,R.styleable.EQSeekBar);
         //初始化thumbdrawable及其状态
-        mThumbDrawable = typedArray.getDrawable(R.styleable.FilterSizeSeekBar_thumb);
+        mThumbDrawable = Theme.getTinThumb(mContext);
         if(mThumbDrawable == null)
-            mThumbDrawable = getResources().getDrawable(R.drawable.thumb);
-        Theme.TintDrawable(mThumbDrawable,ThemeStore.getAccentColor());
-//        Drawable thumb = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumb);
-//        Drawable thumbPress = typedArray.getDrawable(R.styleable.ScanSizeSeekBar_thumbpress);
-//        if(thumb == null)
-//            thumb = getResources().getDrawable(R.drawable.thumb);
-//        if(thumbPress == null)
-//            thumbPress = getResources().getDrawable(R.drawable.thumb_press);
-//
-//        Theme.TintDrawable(thumb, ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899)));
-//        Theme.TintDrawable(thumbPress,ColorStateList.valueOf(ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.MATERIAL_COLOR_PRIMARY : R.color.purple_782899)));
-//
-//        mThumbNormal = new int[]{-android.R.attr.state_focused, -android.R.attr.state_pressed,
-//                -android.R.attr.state_selected, -android.R.attr.state_checked};
-//        mThumbPressed = new int[]{android.R.attr.state_focused, android.R.attr.state_pressed,
-//                android.R.attr.state_selected, android.R.attr.state_checked};
-//        mThumbDrawable = new StateListDrawable();
-//        mThumbDrawable.addState(mThumbNormal,thumb);
-//        mThumbDrawable.addState(mThumbPressed,thumbPress);
+            mThumbDrawable = getResources().getDrawable(R.drawable.bg_circleseekbar_thumb);
 
         //计算thumb的大小
         mThumbHeight = mThumbDrawable.getIntrinsicHeight();

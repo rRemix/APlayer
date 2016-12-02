@@ -154,7 +154,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         } else
             Title = mArg.substring(mArg.lastIndexOf("/") + 1,mArg.length());
         //初始化toolbar
-        initToolbar(mToolBar,Title);
+        setUpToolbar(mToolBar,Title);
 
         //加载歌曲列表
         mMDDialog = new MaterialDialog.Builder(this)
