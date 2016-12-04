@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/header_root"
     android:layout_width="@dimen/d264_size"
     android:layout_height="wrap_content"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:background="?attr/material_color_primary">
@@ -21,10 +21,9 @@
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImageScaleType="centerCrop"
         fresco:placeholderImage="?attr/default_album"
-        android:background="@drawable/drawer_bg_album_shadow"/>
+        android:background="@color/transparent"/>
 
     <TextView
-        android:visibility="visible"
         android:id="@+id/header_txt"
         android:layout_margin="@dimen/d20_size"
         android:paddingLeft="@dimen/d8_size"

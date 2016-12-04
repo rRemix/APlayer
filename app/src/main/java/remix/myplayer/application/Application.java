@@ -132,14 +132,14 @@ public class Application extends android.app.Application {
         MobclickAgent.setDebugMode(true);
         initTheme();
         initUtil();
-        loadSong();
+        loadData();
 
     }
 
     /**
      * 读取歌曲id列表与播放队列
      */
-    public void loadSong() {
+    public void loadData() {
         new Thread() {
             @Override
             public void run() {

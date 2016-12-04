@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -150,6 +151,12 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
                 holder.mContainer.setSelected(false);
             }
 
+            //半圆着色
+            if(AlbumFragment.ListModel == Constants.GRID_MODEL){
+                Theme.TintDrawable(holder.mHalfCircle,R.drawable.icon_half_circular_left,
+                        ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.night_background_color_2));
+            }
+
             //设置padding
             if(AlbumFragment.ListModel == 2 && holder.mRoot != null){
                 if(position % 2 == 0){
@@ -161,33 +168,36 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
         }
     }
 
-    public static class AlbumHolder extends BaseViewHolder {
+    static class AlbumHolder extends BaseViewHolder {
+        @BindView(R.id.item_half_circle)
+        @Nullable
+        ImageView mHalfCircle;
         @BindView(R.id.item_text1)
-        public TextView mText1;
+        TextView mText1;
         @BindView(R.id.item_text2)
-        public TextView mText2;
+        TextView mText2;
         @BindView(R.id.item_button)
-        public ImageButton mButton;
+        ImageButton mButton;
         @BindView(R.id.item_simpleiview)
-        public SimpleDraweeView mImage;
+        SimpleDraweeView mImage;
         @BindView(R.id.item_container)
-        public RelativeLayout mContainer;
+        RelativeLayout mContainer;
         @BindView(R.id.item_root)
         @Nullable
-        public View mRoot;
-        public AlbumHolder(View v) {
+        View mRoot;
+        AlbumHolder(View v) {
             super(v);
         }
     }
 
-    public static class AlbumGridHolder extends AlbumHolder {
-        public AlbumGridHolder(View v) {
+    static class AlbumGridHolder extends AlbumHolder {
+        AlbumGridHolder(View v) {
             super(v);
         }
     }
 
-    public static class AlbumListHolder extends AlbumHolder {
-        public AlbumListHolder(View v) {
+    static class AlbumListHolder extends AlbumHolder {
+        AlbumListHolder(View v) {
             super(v);
         }
     }

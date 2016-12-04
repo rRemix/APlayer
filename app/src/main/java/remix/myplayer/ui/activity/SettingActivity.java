@@ -54,7 +54,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     TextView mLrcPath;
     @BindView(R.id.setting_clear_text)
     TextView mCache;
-    //是否需要刷新
+    //是否需要重建activity
+    private boolean mNeedRecreate = false;
+    //是否需要刷新adapter
     private boolean mNeedRefresh = false;
     //是否从主题颜色选择对话框返回
     private boolean mFromColorChoose = false;
@@ -89,6 +91,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         //读取重启aitivity之前的数据
         if(savedInstanceState != null){
+            mNeedRecreate = savedInstanceState.getBoolean("needRecreate");
             mNeedRefresh = savedInstanceState.getBoolean("needRefresh");
             mFromColorChoose = savedInstanceState.getBoolean("fromColorChoose");
         }
@@ -100,13 +103,13 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         final int arrowColor = ThemeStore.getAccentColor();
         ((GradientDrawable)mColorSrc.getDrawable()).setColor(arrowColor);
         ButterKnife.apply( new ImageView[]{findView(R.id.setting_eq_arrow),findView(R.id.setting_feedback_arrow),
-                findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow)},
+                        findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow)},
                 new ButterKnife.Action<ImageView>(){
                     @Override
                     public void apply(@NonNull ImageView view, int index) {
                         Theme.TintDrawable(view,view.getBackground(),arrowColor);
                     }
-        });
+                });
 
         //分根线颜色
         ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),findView(R.id.setting_divider_3)},
@@ -128,9 +131,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         public void apply(@NonNull View view, int index) {
                             if(ta != null)
                                 view.setBackground(ta.getDrawable(0));
-//                            Drawable defaultDrawable = Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT);
-//                            Drawable selectDrawable = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getSelectColor());
-//                            view.setBackground(Theme.getPressDrawable(defaultDrawable,selectDrawable,ThemeStore.getRippleColor(),null,selectDrawable));
                         }
                     });
         } finally {
@@ -142,10 +142,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             @Override
             public void run() {
                 mCacheSize = 0;
-                mCacheSize += CommonUtil.getFolderSize(DiskCache.getDiskCacheDir(SettingActivity.this,"lrc"));
-                mCacheSize += CommonUtil.getFolderSize(DiskCache.getDiskCacheDir(SettingActivity.this,"thumbnail"));
+                mCacheSize += CommonUtil.getFolderSize(getExternalCacheDir());
                 mCacheSize += CommonUtil.getFolderSize(getCacheDir());
-                mCacheSize += CommonUtil.getFolderSize(getFilesDir());
                 mHandler.sendEmptyMessage(CACHESIZE);
             }
         }.start();
@@ -164,6 +162,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
+        intent.putExtra("needRecreate", mNeedRecreate);
         intent.putExtra("needRefresh",mNeedRefresh);
         setResult(Activity.RESULT_OK,intent);
         finish();
@@ -214,13 +213,13 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
                             .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"Setting","IsSystemColor",true) ? 0 : 1,
                                     new MaterialDialog.ListCallbackSingleChoice() {
-                                @Override
-                                public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                    SPUtil.putValue(SettingActivity.this,"Setting","IsSystemColor",which == 0);
-                                    sendBroadcast(new Intent(Constants.NOTIFY));
-                                    return true;
-                                }
-                            })
+                                        @Override
+                                        public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                            SPUtil.putValue(SettingActivity.this,"Setting","IsSystemColor",which == 0);
+                                            sendBroadcast(new Intent(Constants.NOTIFY));
+                                            return true;
+                                        }
+                                    })
                             .backgroundColorAttr(R.attr.background_color_3)
                             .itemsColorAttr(R.attr.text_color_primary)
                             .show();
@@ -265,16 +264,17 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     @Override
                                     public void run() {
                                         //清除歌词，封面等缓存
-                                        CommonUtil.deleteFilesByDirectory(DiskCache.getDiskCacheDir(SettingActivity.this,"lrc"));
-                                        CommonUtil.deleteFilesByDirectory(DiskCache.getDiskCacheDir(SettingActivity.this,"thumbnail"));
                                         //清除配置文件、数据库等缓存
                                         CommonUtil.deleteFilesByDirectory(getCacheDir());
-                                        CommonUtil.deleteFilesByDirectory(getFilesDir());
+                                        CommonUtil.deleteFilesByDirectory(getExternalCacheDir());
                                         SPUtil.deleteFile(SettingActivity.this,"Setting");
                                         deleteDatabase(DBOpenHelper.DBNAME);
                                         //清除fresco缓存
                                         Fresco.getImagePipeline().clearCaches();
                                         mHandler.sendEmptyMessage(CLEARFINISH);
+                                        //新建封面 歌词缓存目录
+                                        DiskCache.init(SettingActivity.this);
+                                        mNeedRefresh = true;
                                     }
                                 }.start();
                             }
@@ -291,8 +291,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("needRefresh",mNeedRefresh);
+        outState.putBoolean("needRecreate", mNeedRecreate);
         outState.putBoolean("fromColorChoose",mFromColorChoose);
+        outState.putBoolean("needRefresh",mNeedRefresh);
     }
 
 
@@ -300,12 +301,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 0 && data != null){
-            mNeedRefresh = data.getBooleanExtra("needRefresh",false);
+            mNeedRecreate = data.getBooleanExtra("needRecreate",false);
             mFromColorChoose = data.getBooleanExtra("fromColorChoose",false);
-            if(mNeedRefresh){
+            if(mNeedRecreate){
                 mHandler.sendEmptyMessage(RECREATE);
-//                if(mFromColorChoose)
-//                    mModeSwitch.setChecked(false);
             }
 
         }

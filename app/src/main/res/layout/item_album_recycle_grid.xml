@@ -33,6 +33,7 @@
                 fresco:placeholderImage="?attr/default_album"
                 fresco:roundedCornerRadius="@dimen/d2_size" />
             <ImageView
+                android:id="@+id/item_half_circle"
                 android:layout_gravity="right|center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

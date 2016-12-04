@@ -21,6 +21,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -98,8 +99,8 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE};
 
-    //更新主题
-    private final int RESULT_UPDATE_THEME = 1;
+    //设置界面
+    private final int SETTING = 1;
     private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -241,7 +242,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         //上次退出时保存的正在播放的歌曲未失效
         if(isLastSongExist && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
             mBottomBar.UpdateBottomStatus(item, isPlay);
-            updateHeader(item);
+            updateHeader(item,isPlay);
             MusicService.initDataSource(item,pos);
         }else {
             if(Global.mPlayQueue.size() > 0){
@@ -254,7 +255,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                 }
                 item = MediaStoreUtil.getMP3InfoById(id);
                 mBottomBar.UpdateBottomStatus(item,isPlay);
-                updateHeader(item);
+                updateHeader(item,isPlay);
                 SPUtil.putValue(this,"Setting","LastSongId",id);
                 MusicService.initDataSource(item,0);
             }
@@ -440,7 +441,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                         break;
                     //设置
                     case 4:
-                        startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), RESULT_UPDATE_THEME);
+                        startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), SETTING);
                         break;
                 }
                 mDrawerAdapter.setSelectIndex(position);
@@ -453,10 +454,11 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         //正在播放文字的背景
-        TextView textView = (TextView)findViewById(R.id.header_txt);
+        TextView textView = findView(R.id.header_txt);
         if(textView != null){
             GradientDrawable bg = new GradientDrawable();
-            bg.setColor(ThemeStore.getMaterialPrimaryDarkColor());
+            bg.setColor(ThemeStore.getAccentColor());
+            bg.setColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryDarkColor() : ThemeStore.getAccentColor());
             bg.setCornerRadius(DensityUtil.dip2px(this,4));
             textView.setBackground(bg);
         }
@@ -488,10 +490,13 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
                     Global.mSetCoverType == Constants.ALBUM ? R.string.set_album_cover_error : Global.mSetCoverType == Constants.ARTIST ? R.string.set_artist_cover_error : R.string.set_playlist_cover_error);
             final int id = Global.mSetCoverID; //专辑、艺术家、播放列表封面
             switch (requestCode){
-                //重启activity
-                case RESULT_UPDATE_THEME:
-                    if(data.getBooleanExtra("needRefresh",false))
+                //设置主题后重启activity或者清除缓存后刷新adapter
+                case SETTING:
+                    if(data.getBooleanExtra("needRecreate",false)) {
                         mRefreshHandler.sendEmptyMessage(Constants.RECREATE_ACTIVITY);
+                    }else if(data.getBooleanExtra("needRefresh",false)){
+                        mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+                    }
                     break;
                 //图片选择
                 case Crop.REQUEST_PICK:
@@ -573,14 +578,14 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 //            }
 //        }
         mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ALLSONG_ADAPTER);
-        updateHeader(mp3Item);
+        updateHeader(mp3Item,isplay);
     }
 
     /**
      * 更新侧滑菜单
      * @param mp3Item
      */
-    private void updateHeader(MP3Item mp3Item) {
+    private void updateHeader(MP3Item mp3Item,boolean isPlay) {
         TextView textView = findView(R.id.header_txt);
         SimpleDraweeView shadowImgView = findView(R.id.header_img);
         if(mp3Item == null)
@@ -590,7 +595,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         }
         if(shadowImgView != null) {
             MediaStoreUtil.setImageUrl(shadowImgView, mp3Item.getAlbumId());
-//            shadowImgView.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
+            shadowImgView.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
         }
     }
 
