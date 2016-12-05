@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -58,6 +59,8 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
+
+import static remix.myplayer.util.StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -192,7 +195,19 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
     @Override
     protected void setStatusBar() {
-        StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.white_f2f2f2));
+        if(Build.MANUFACTURER.equals("Meizu")){
+            StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this,true);
+            StatusBarUtil.setTransparent(this);
+        } else if (Build.MANUFACTURER.equals("Xiaomi")){
+            StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true,this);
+            StatusBarUtil.setTransparent(this);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            StatusBarUtil.setTransparent(this);
+            getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        } else {
+            StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.white_f2f2f2));
+        }
+
     }
 
     @Override
@@ -672,7 +687,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                         ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
                         mFistStart = false;
                     }
-                },10);
+                }, mFistStart ? 16 : 0);
             }
             //更新按钮状态
             UpdatePlayButton(isplay);

@@ -23,7 +23,8 @@
             android:layout_height="@dimen/d264_size"
             fresco:failureImage="@drawable/album_empty_bg_day"
             fresco:failureImageScaleType="centerCrop"
-            fresco:actualImageScaleType="centerCrop" />
+            fresco:actualImageScaleType="centerCrop"
+            fresco:fadeDuration="200"/>
         <ImageView
             android:id="@+id/cover_shadow"
             android:layout_width="wrap_content"

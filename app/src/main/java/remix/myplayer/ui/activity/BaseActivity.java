@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity;
 
 import android.content.pm.ActivityInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -100,8 +101,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void setStatusBar() {
-        StatusBarUtil.setColorNoTranslucent(this, ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
-//        StatusBarUtil.setNormalColor(this, ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
+        StatusBarUtil.setColorNoTranslucent(this, ThemeStore.getMaterialPrimaryDarkColor());
     }
 
     @Override

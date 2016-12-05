@@ -145,7 +145,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         pw.println("Device manufacturer: " + Build.MANUFACTURER);
 
         //手机型号
-        pw.print("Device model: " + Build.MODEL);
         pw.println(Build.MODEL);
         //cpu架构
         pw.print("CPU ABI: " + Build.CPU_ABI);
