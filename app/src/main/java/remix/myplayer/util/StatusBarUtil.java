@@ -168,6 +168,7 @@ public class StatusBarUtil {
         if (!(contentLayout instanceof LinearLayout) && contentLayout.getChildAt(1) != null) {
             contentLayout.getChildAt(1).setPadding(0, getStatusBarHeight(activity), 0, 0);
         }
+        
         // 设置属性
         ViewGroup drawer = (ViewGroup) drawerLayout.getChildAt(1);
         drawerLayout.setFitsSystemWindows(false);
