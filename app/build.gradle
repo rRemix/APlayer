@@ -33,8 +33,7 @@ android {
         release {
             //混淆代码
             minifyEnabled true
-            buildConfigField "boolean", "LOG_DEBUG", "false"
-            buildConfigField "boolean", "DEBUG", "false"
+            debuggable false
             zipAlignEnabled true
             shrinkResources true
             signingConfig signingConfigs.release
@@ -43,14 +42,14 @@ android {
     }
     productFlavors {
         qihu360{}
-        assistant91{}
-        baidu{}
-        anzhuomarket{}
-        chuizi{}
-        wandoujia{}
-        meizu{}
-        xiaomi{}
-        kuan{}
+//        assistant91{}
+//        baidu{}
+//        anzhuomarket{}
+//        chuizi{}
+//        wandoujia{}
+//        meizu{}
+//        xiaomi{}
+//        kuan{}
         productFlavors.all { flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
         }

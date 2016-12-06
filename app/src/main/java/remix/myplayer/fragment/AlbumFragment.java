@@ -155,7 +155,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
                     new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,
                             MediaStore.Audio.Media.ALBUM,
                             MediaStore.Audio.Media.ARTIST,},
-                    Constants.MEDIASTORE_WHERE_SIZE + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
+                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
                     null,
                     null);
         } catch (Exception e){

@@ -3,6 +3,7 @@ package remix.myplayer.theme;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 
+import me.zhanghai.android.materialprogressbar.internal.ThemeUtils;
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.util.ColorUtil;
@@ -222,5 +223,9 @@ public class ThemeStore {
     @ColorInt
     public static int getDividerColor(){
         return ColorUtil.getColor(isDay() ? R.color.day_list_divider : R.color.night_list_divier);
+    }
+
+    public static com.afollestad.materialdialogs.Theme getMDDialogTheme(){
+        return isDay() ? com.afollestad.materialdialogs.Theme.LIGHT : com.afollestad.materialdialogs.Theme.DARK;
     }
 }

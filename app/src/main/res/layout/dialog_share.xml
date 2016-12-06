@@ -14,10 +14,10 @@
         android:text="@string/share_to"
         android:textSize="@dimen/s17_size"/>
 
-    <ImageView
+    <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="@color/gray_e6e6e6"/>
+        android:background="?attr/divider_color"/>
 
     <LinearLayout
         android:layout_width="match_parent"

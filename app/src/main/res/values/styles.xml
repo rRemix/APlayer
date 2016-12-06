@@ -25,6 +25,7 @@
         <item name="text_color_primary">@color/day_textcolor_primary</item>
         <item name="text_color">@color/day_textcolor</item>
         <item name="colorControlHighlight">@color/day_ripple_color</item>
+        <item name="divider_color">@color/day_list_divider</item>
     </style>
 
 
@@ -41,6 +42,7 @@
         <item name="text_color_primary">@color/night_textcolor_primary</item>
         <item name="text_color">@color/night_textcolor</item>
         <item name="colorControlHighlight">@color/night_ripple_color</item>
+        <item name="divider_color">@color/night_list_divier</item>
     </style>
 
 

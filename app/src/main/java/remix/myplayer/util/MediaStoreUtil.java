@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 
+import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.io.File;
@@ -51,15 +52,15 @@ public class MediaStoreUtil {
         //默认过滤文件大小500K
         Constants.SCAN_SIZE = SPUtil.getValue(mContext,"Setting","ScanSize",-1);
         if( Constants.SCAN_SIZE < 0) {
-            Constants.SCAN_SIZE = 512000;
-            SPUtil.putValue(mContext,"Setting","ScanSize",512000);
+            Constants.SCAN_SIZE = 500 * ByteConstants.KB;
+            SPUtil.putValue(mContext,"Setting","ScanSize",500 * ByteConstants.KB);
         }
 
         try{
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DATA},
-                    Constants.MEDIASTORE_WHERE_SIZE, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
             if(cursor != null) {
                 Global.mFolderMap.clear();
 
@@ -129,11 +130,11 @@ public class MediaStoreUtil {
         try {
             if (type == Constants.ALBUM) {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                        MediaStore.Audio.Media.ALBUM_ID + "=" + id + " and " + Constants.MEDIASTORE_WHERE_SIZE, null, null);
+                        MediaStore.Audio.Media.ALBUM_ID + "=" + id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
             }
             if (type == Constants.ARTIST) {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                        MediaStore.Audio.Media.ARTIST_ID + "=" + id + " and " + Constants.MEDIASTORE_WHERE_SIZE, null, null);
+                        MediaStore.Audio.Media.ARTIST_ID + "=" + id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
             }
 
             if(cursor != null && cursor.getCount() > 0) {
@@ -298,7 +299,6 @@ public class MediaStoreUtil {
 //        return null;
 //    }
 
-    //
 
     /**
      * 根据歌曲id查询图片
@@ -390,7 +390,7 @@ public class MediaStoreUtil {
                 where += " or ";
             }
             if(i == idList.size() - 1)
-                where += (" and " + Constants.MEDIASTORE_WHERE_SIZE);
+                where += (" and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE);
         }
 
         Cursor cursor = null;
@@ -432,7 +432,7 @@ public class MediaStoreUtil {
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
                     MediaStore.Audio.Media._ID + "=" + id +
-                            " and " + Constants.MEDIASTORE_WHERE_SIZE, null, null);
+                            " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE, null, null);
             if(cursor == null || cursor.getCount() == 0)
                 return null;
             if(cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()){
@@ -694,7 +694,7 @@ public class MediaStoreUtil {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                         new String[]{MediaStore.Audio.Media._ID},
                         (type == Constants.ALBUM ? MediaStore.Audio.Media.ALBUM_ID : MediaStore.Audio.Media.ARTIST_ID) + "=" + arg +
-                                " and " + Constants.MEDIASTORE_WHERE_SIZE,
+                                " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,
                         null, null);
                 if(cursor != null){
                     while (cursor.moveToNext()){

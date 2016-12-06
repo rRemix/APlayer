@@ -20,6 +20,7 @@ import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.PlayListInfo;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.util.CommonUtil;
@@ -146,6 +147,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                 .title(R.string.add_to_playlist)
                 .titleColorAttr(R.attr.text_color_primary)
                 .buttonRippleColorAttr(R.attr.ripple_color)
+                .theme(ThemeStore.getMDDialogTheme())
                 .items(playlistNameList)
                 .itemsColorAttr(R.attr.text_color_primary)
                 .itemsCallback(new MaterialDialog.ListCallback() {

@@ -101,7 +101,6 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 MaterialDialog editDialog = new MaterialDialog.Builder(mContext)
                         .title("音乐标签编辑")
                         .customView(R.layout.dialog_song_edit,true)
-//                        .inputType()
                         .negativeText(R.string.cancel)
                         .negativeColorRes(R.color.black)
                         .positiveText(R.string.confirm)
@@ -109,7 +108,6 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-
                                 String title = "",artist = "",album = "",genre = "",year = "";
                                 title = mSongLayout.getEditText() != null ? mSongLayout.getEditText().getText().toString() : mInfo.getTitle();
                                 if(TextUtils.isEmpty(title)){
@@ -204,7 +202,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         mDetailName.setText(mInfo.getDisplayname());
                     //歌曲大小
                     if(mDetailSize != null)
-                        mDetailSize.setText(mInfo.getSize() / 1024 / 1024 + "MB");
+                        mDetailSize.setText(mContext.getString(R.string.cache_szie,mInfo.getSize() / 1024f / 1024));
                     //歌曲格式
                     if(mDetailMime != null){
                         String path = mInfo.getUrl();

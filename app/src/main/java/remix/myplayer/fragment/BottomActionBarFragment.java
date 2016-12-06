@@ -123,8 +123,8 @@ public class BottomActionBarFragment extends BaseFragment{
                     ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
         }
         //封面
-//        MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
-        new AsynLoadImage(mCover).execute(mp3Item.getAlbumId(), Constants.URL_ALBUM);
+        MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
+//        new AsynLoadImage(mCover).execute(mp3Item.getAlbumId(), Constants.URL_ALBUM);
     }
 
 }

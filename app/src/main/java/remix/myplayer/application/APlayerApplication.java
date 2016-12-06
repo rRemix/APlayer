@@ -13,6 +13,7 @@ import com.umeng.socialize.PlatformConfig;
 import com.umeng.socialize.UMShareAPI;
 
 import cn.bmob.v3.Bmob;
+import remix.myplayer.BuildConfig;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.LockScreenListener;
@@ -29,6 +30,7 @@ import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-3-16.
@@ -44,8 +46,6 @@ public class APlayerApplication extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
-        //是否开启日志
-        LogUtil.isDebug = true;
         //字体
         CommonUtil.setFontSize(this);
         //友盟分享

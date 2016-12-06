@@ -6,6 +6,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 
+import com.facebook.common.util.ByteConstants;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
@@ -30,11 +31,11 @@ public class ScanActivity extends ToolbarActivity {
     //几种扫描大小
     static {
         mSizeList.add(0);
-        mSizeList.add(300 * 1024);
-        mSizeList.add(500 * 1024);
-        mSizeList.add(800 * 1024);
-        mSizeList.add(1024 * 1024);
-        mSizeList.add(2 * 1024 * 1024);
+        mSizeList.add(300 * ByteConstants.KB);
+        mSizeList.add(500 * ByteConstants.KB);
+        mSizeList.add(800 * ByteConstants.KB);
+        mSizeList.add(ByteConstants.MB);
+        mSizeList.add(2 * ByteConstants.KB);
     }
     private Handler mHandler = new Handler(){
         @Override

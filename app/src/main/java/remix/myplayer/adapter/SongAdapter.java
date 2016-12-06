@@ -118,8 +118,8 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
             holder.mOther.setText(artist + "-" + album);
 
             //封面
-//            MediaStoreUtil.setImageUrl(holder.mImage,temp.getAlbumId());
-            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(),Constants.URL_ALBUM);
+            MediaStoreUtil.setImageUrl(holder.mImage,temp.getAlbumId());
+//            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(),Constants.URL_ALBUM);
             //背景点击效果
             holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 

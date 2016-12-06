@@ -24,6 +24,7 @@ import remix.myplayer.R;
 import remix.myplayer.model.ColorChooseInfo;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
+import remix.myplayer.util.LogUtil;
 
 /**
  * @ClassName ColorChooseDialog
@@ -115,7 +116,8 @@ public class ColorChooseDialog extends BaseDialogActivity {
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
                             }
-                        }).show();
+                        }).
+                        show();
             } else {
                 changeThemeColor(false);
             }
@@ -123,7 +125,7 @@ public class ColorChooseDialog extends BaseDialogActivity {
 
         private void changeThemeColor(boolean isfromNight) {
             Intent intent = new Intent();
-            intent.putExtra("needRefresh",true);
+            intent.putExtra("needRecreate",true);
             intent.putExtra("fromColorChoose",isfromNight);
             setResult(Activity.RESULT_OK,intent);
             ThemeStore.THEME_MODE = ThemeStore.DAY;

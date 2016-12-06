@@ -3,19 +3,11 @@ package remix.myplayer.ui.customview;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.RadialGradient;
 import android.graphics.RectF;
-import android.graphics.Shader;
-import android.graphics.SweepGradient;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.AbsSeekBar;
 
@@ -146,15 +138,15 @@ public class CircleSeekBar extends AbsSeekBar {
         mContext = context;
         mAttrs = attrs;
         init();
+        
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-
-        //背景圆圈
-        canvas.drawCircle(mCenterX, mCenterY, mRadius, mCirclePaint);
         //阴影
         canvas.drawCircle(mCenterX,mCenterY,mRadius,mShadowCirclePaint);
+        //背景圆圈
+        canvas.drawCircle(mCenterX, mCenterY, mRadius, mCirclePaint);
         //圆弧
         canvas.drawArc(mRectF, -90, (float) Math.toDegrees(mRad), false, mArcPaint);
 
@@ -248,7 +240,7 @@ public class CircleSeekBar extends AbsSeekBar {
         mArcPaint.setAntiAlias(true);
         mArcPaint.setColor(mProgressCorlor);
         mArcPaint.setStyle(Paint.Style.STROKE);
-        mArcPaint.setStrokeWidth(mProgressCorlor);
+        mArcPaint.setStrokeWidth(mProgressWidth);
 
         //阴影圆圈画笔
         mShadowCirclePaint = new Paint();

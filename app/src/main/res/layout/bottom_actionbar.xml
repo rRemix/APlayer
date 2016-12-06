@@ -24,6 +24,7 @@
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImageScaleType="centerCrop"
             fresco:placeholderImage="?attr/default_album"
+            fresco:fadeDuration="0"
             android:layout_centerVertical="true"/>
 
         <!-- 播放按钮 -->

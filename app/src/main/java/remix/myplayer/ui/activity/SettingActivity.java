@@ -3,12 +3,14 @@ package remix.myplayer.ui.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.umeng.analytics.MobclickAgent;
 
@@ -25,6 +28,7 @@ import java.io.File;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.bmob.v3.b.The;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.R;
 import remix.myplayer.db.DBOpenHelper;
@@ -71,7 +75,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             if(msg.what == RECREATE)
                 recreate();
             if(msg.what == CACHESIZE){
-                mCache.setText(getString(R.string.cache_szie,1.0 * mCacheSize / 1024 / 1024));
+                mCache.setText(getString(R.string.cache_szie,mCacheSize / 1024f / 1024));
             }
             if(msg.what == CLEARFINISH){
                 ToastUtil.show(SettingActivity.this,"清除成功");
@@ -80,6 +84,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             }
         }
     };
+    private final int[] mScanSize = new int[]{0,500 * ByteConstants.KB,ByteConstants.MB, 2 * ByteConstants.MB};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +93,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
         setUpToolbar(mToolbar,"设置");
+
 
         //读取重启aitivity之前的数据
         if(savedInstanceState != null){
@@ -99,9 +105,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         if(!SPUtil.getValue(this,"Setting","LrcPath","").equals("")) {
             mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcPath","")));
         }
+
+        //主题颜色
+        ((GradientDrawable)mColorSrc.getDrawable()).setColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : Color.TRANSPARENT);
         //初始化箭头颜色
         final int arrowColor = ThemeStore.getAccentColor();
-        ((GradientDrawable)mColorSrc.getDrawable()).setColor(arrowColor);
         ButterKnife.apply( new ImageView[]{findView(R.id.setting_eq_arrow),findView(R.id.setting_feedback_arrow),
                         findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow)},
                 new ButterKnife.Action<ImageView>(){
@@ -110,6 +118,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         Theme.TintDrawable(view,view.getBackground(),arrowColor);
                     }
                 });
+
 
         //分根线颜色
         ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),findView(R.id.setting_divider_3)},
@@ -187,21 +196,28 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         switch (v.getId()){
             //文件过滤
             case R.id.setting_filter_container:
+                //读取以前设置
+                int position = 0;
+                for (int i = 0 ; i < mScanSize.length ;i++){
+                    position = i;
+                    if(mScanSize[i] == Constants.SCAN_SIZE)
+                        break;
+                }
                 new MaterialDialog.Builder(this)
                         .title(R.string.set_filter_size)
                         .titleColorAttr(R.attr.text_color_primary)
-                        .buttonRippleColorAttr(R.attr.ripple_color)
                         .items(new String[]{"0K","500K","1MB","2MB"})
-                        .backgroundColorAttr(R.attr.background_color_3)
                         .itemsColorAttr(R.attr.text_color_primary)
-                        .itemsCallbackSingleChoice(2, new MaterialDialog.ListCallbackSingleChoice() {
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .itemsCallbackSingleChoice(position, new MaterialDialog.ListCallbackSingleChoice() {
                             @Override
                             public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                                SPUtil.putValue(SettingActivity.this, "Setting", "ScanSize",
-                                        which == 0 ? 0 : which == 1 ? 500 * 1024 : which == 2 ? 1024 * 1024 : 2 * 1024 * 1024);
+                                SPUtil.putValue(SettingActivity.this, "Setting", "ScanSize", mScanSize[which]);
+                                Constants.SCAN_SIZE = mScanSize[which];
                                 return true;
                             }
                         })
+                        .theme(ThemeStore.getMDDialogTheme())
                         .positiveText(R.string.confirm)
                         .positiveColorAttr(R.attr.text_color_primary)
                         .show();
@@ -239,6 +255,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     })
                             .backgroundColorAttr(R.attr.background_color_3)
                             .itemsColorAttr(R.attr.text_color_primary)
+                            .theme(ThemeStore.getMDDialogTheme())
                             .show();
                 } catch (Exception e){
                     e.printStackTrace();

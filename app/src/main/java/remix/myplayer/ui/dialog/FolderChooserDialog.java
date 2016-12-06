@@ -32,6 +32,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import remix.myplayer.R;
+import remix.myplayer.theme.ThemeStore;
 
 /**
  * @author Aidan Follestad (afollestad)
@@ -103,6 +104,7 @@ public class FolderChooserDialog extends DialogFragment implements MaterialDialo
                 .title(parentFolder.getAbsolutePath())
                 .titleColorAttr(R.attr.text_color_primary)
                 .items(getContentsArray())
+                .theme(ThemeStore.getMDDialogTheme())
                 .itemsColorAttr(R.attr.text_color_primary)
                 .itemsCallback(this)
                 .buttonRippleColorAttr(R.attr.ripple_color)
