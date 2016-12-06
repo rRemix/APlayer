@@ -67,7 +67,7 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
             holder.mName.setText(info.Name);
             holder.mOther.setText(info.Count + "首歌曲");
             //设置专辑封面
-            new AsynLoadImage(holder.mImage).execute(info._Id,Constants.URL_PLAYLIST,true);
+            new AsynLoadImage(holder.mImage).execute(info._Id,Constants.URL_PLAYLIST);
 
             if(mOnItemClickLitener != null) {
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {

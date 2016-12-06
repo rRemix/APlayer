@@ -15,7 +15,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 
-import remix.myplayer.application.Application;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.DiskCache;
@@ -88,16 +88,16 @@ public class SearchLRC {
 
         //查找本地目录
         //没有设置歌词路径
-        String setLrcPath =  SPUtil.getValue(Application.getContext(),"Setting","LrcPath","");
+        String setLrcPath =  SPUtil.getValue(APlayerApplication.getContext(),"Setting","LrcPath","");
         if(setLrcPath.equals("") && !TextUtils.isEmpty(mInfo.getUrl())){
             File file = new File(mInfo.getUrl());
             //父目录
             File parentfile = file.getParentFile();
             if(parentfile.exists() && parentfile.isDirectory())
-                CommonUtil.searchFile(Application.getContext(),mSongName,mArtistName, parentfile);
+                CommonUtil.searchFile(APlayerApplication.getContext(),mSongName,mArtistName, parentfile);
         } else {
             //已设置歌词路径
-            CommonUtil.searchFile(Application.getContext(),mSongName,mArtistName, new File(setLrcPath));
+            CommonUtil.searchFile(APlayerApplication.getContext(),mSongName,mArtistName, new File(setLrcPath));
         }
 
         if(!Global.mCurrentLrcPath.equals("")){

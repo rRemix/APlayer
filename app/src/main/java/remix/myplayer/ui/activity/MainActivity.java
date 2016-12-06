@@ -43,6 +43,7 @@ import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
+import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
@@ -267,7 +268,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     protected void setStatusBar() {
         StatusBarUtil.setColorNoTranslucentForDrawerLayout(this,
                 (DrawerLayout) findViewById(R.id.drawer_layout),
-                ColorUtil.getColor(ThemeStore.MATERIAL_COLOR_PRIMARY_DARK));
+                ThemeStore.getMaterialPrimaryDarkColor());
     }
 
     /**
@@ -594,7 +595,8 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             textView.setText(getString(R.string.play_now,mp3Item.getTitle()));
         }
         if(shadowImgView != null) {
-            MediaStoreUtil.setImageUrl(shadowImgView, mp3Item.getAlbumId());
+//            MediaStoreUtil.setImageUrl(shadowImgView, mp3Item.getAlbumId());
+            new AsynLoadImage(shadowImgView).execute(mp3Item.getAlbumId(), Constants.URL_ALBUM);
             shadowImgView.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
         }
     }

@@ -37,7 +37,7 @@ import remix.myplayer.util.PlayListUtil;
 /**
  * 错误收集与上报
  */
-public class Application extends android.app.Application {
+public class APlayerApplication extends android.app.Application {
     private static Context mContext;
 
     @Override
@@ -46,6 +46,8 @@ public class Application extends android.app.Application {
         mContext = getApplicationContext();
         //是否开启日志
         LogUtil.isDebug = true;
+        //字体
+        CommonUtil.setFontSize(this);
         //友盟分享
         UMShareAPI.get(this);
         Config.DEBUG = true;
@@ -53,73 +55,7 @@ public class Application extends android.app.Application {
         Bmob.initialize(this, "0c070110fffa9e88a1362643fb9d4d64");
         //禁止默认的页面统计方式
         MobclickAgent.openActivityDurationTrack(false);
-//        //初始化友盟推送
-//        PushAgent mPushAgent = PushAgent.getInstance(this);
-////        注册推送服务，每次调用register方法都会回调该接口
-//        mPushAgent.register(new IUmengRegisterCallback() {
-//            @Override
-//            public void onSuccess(String deviceToken) {
-//                //注册成功会返回device token
-//                LogUtil.d("DeviceToken","DeviceToker:" + deviceToken);
-//            }
-//            @Override
-//            public void onFailure(String s, String s1) {
-//            }
-//        });
-
-//        UmengNotificationClickHandler notificationClickHandler = new UmengNotificationClickHandler() {
-//            @Override
-//            public void dealWithCustomAction(Context context, UMessage msg) {
-//                try {
-//                    final UpdateInfo info = new UpdateInfo();
-//                    JSONObject json = new JSONObject(msg.custom);
-//                    JSONArray jsonlogs = json.getJSONArray("update_log");
-//                    for(int i = 0; i < jsonlogs.length();i++){
-//                        info.Logs.add(jsonlogs.getString(i));
-//                    }
-//                    info.ApkUrl = json.getString("apk_url");
-//                    info.MD5 = json.getString("md5");
-//                    info.VersionName = json.getString("version");
-//                    info.Size = json.getString("target_size");
-//
-//                    if(MainActivity.mInstance == null){
-//                        CommonUtil.openUrl(info.ApkUrl);
-//                    } else {
-//                        MaterialDialog materialDialog = new MaterialDialog.Builder(MainActivity.mInstance)
-//                                .title("发现新版本")
-//                                .titleColor(ThemeStore.getTextColorPrimary())
-//                                .backgroundColor(ThemeStore.getBackgroundColor3())
-//                                .customView(R.layout.dialog_update,true)
-//                                .positiveText("立即更新")
-//                                .positiveColor(ThemeStore.getMaterialPrimaryColor())
-//                                .onPositive(new MaterialDialog.SingleButtonCallback() {
-//                                    @Override
-//                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-//                                        CommonUtil.openUrl(info.ApkUrl);
-//                                    }
-//                                })
-//                                .negativeText("以后再说")
-//                                .negativeColor(ThemeStore.getTextColorPrimary())
-//                                .build();
-//                        ((TextView)(materialDialog.getCustomView().findViewById(R.id.update_version))).setText(info.VersionName);
-//                        ((TextView)(materialDialog.getCustomView().findViewById(R.id.update_size))).setText(info.Size);
-//                        String logs = "";
-//                        for(int i = 0 ; i < info.Logs.size();i++){
-//                            logs += (i + 1 + "." + info.Logs.get(i) + "\n");
-//                        }
-//                        ((TextView)(materialDialog.getCustomView().findViewById(R.id.update_log))).setText(logs);
-//                        materialDialog.show();
-//                    }
-//
-//                } catch (JSONException e) {
-//                    LogUtil.d("Application","创建更新对话框错误:" + e.toString());
-//                    Toast.makeText(context,"创建更新对话框错误:" + e.toString(),Toast.LENGTH_SHORT).show();
-//                    e.printStackTrace();
-//                }
-//            }
-//        };
-//        mPushAgent.setNotificationClickHandler(notificationClickHandler);
-
+        //异常捕获
         CrashHandler crashHandler = CrashHandler.getInstance();
         crashHandler.init(this);
         startService(new Intent(this, MusicService.class));
@@ -127,7 +63,7 @@ public class Application extends android.app.Application {
         startService(new Intent(this, TimerService.class));
         //监听锁屏
         new LockScreenListener(getApplicationContext()).beginListen();
-        //异常捕获
+        //友盟异常捕获
         MobclickAgent.setCatchUncaughtExceptions(true);
         MobclickAgent.setDebugMode(true);
         initTheme();

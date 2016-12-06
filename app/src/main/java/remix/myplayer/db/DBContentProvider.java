@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-import remix.myplayer.application.Application;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.util.LogUtil;
 
 /**
@@ -36,7 +36,7 @@ public class DBContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-//        mOpenHelper = new DBOpenHelper(Application.getContext());
+//        mOpenHelper = new DBOpenHelper(APlayerApplication.getContext());
         return true;
     }
 
@@ -50,7 +50,7 @@ public class DBContentProvider extends ContentProvider {
             int match = mUriMatcher.match(uri);
             cursor = db.query(match == PLAY_LIST_MULTIPLE  ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
                         projection,selection,selectionArgs,null,null,null);
-            cursor.setNotificationUri(Application.getContext().getContentResolver(), Uri.parse(CONTENT_AUTHORITY_SLASH));
+            cursor.setNotificationUri(APlayerApplication.getContext().getContentResolver(), Uri.parse(CONTENT_AUTHORITY_SLASH));
         } catch (Exception e){
             e.printStackTrace();
         } finally {
@@ -81,7 +81,7 @@ public class DBContentProvider extends ContentProvider {
                 lines++;
             }
             db.setTransactionSuccessful(); // Commit
-            Application.getContext().getContentResolver().notifyChange(uri,null);
+            APlayerApplication.getContext().getContentResolver().notifyChange(uri,null);
         } finally {
             db.endTransaction(); //结束事务
         }
@@ -101,7 +101,7 @@ public class DBContentProvider extends ContentProvider {
                 LogUtil.d("DBTest","rowId:" + rowId);
                 if(rowId > 0){
                     newUri = ContentUris.withAppendedId(match == PLAY_LIST_MULTIPLE ? PlayLists.CONTENT_URI : PlayListSongs.CONTENT_URI,rowId);
-                    Application.getContext().getContentResolver().notifyChange(newUri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
+                    APlayerApplication.getContext().getContentResolver().notifyChange(newUri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
                 }
             }
         } catch (Exception e){
@@ -121,7 +121,7 @@ public class DBContentProvider extends ContentProvider {
         int deleteRow = 0;
         try {
             deleteRow = db.delete(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME, selection, selectionArgs);
-            Application.getContext().getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
+            APlayerApplication.getContext().getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
         }catch (Exception e){
             e.printStackTrace();
         } finally {
@@ -140,7 +140,7 @@ public class DBContentProvider extends ContentProvider {
         try {
             updateRow = db.delete(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
                     selection,selectionArgs);
-            Application.getContext().getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
+            APlayerApplication.getContext().getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
         } catch (Exception e){
             e.printStackTrace();
         } finally {

@@ -27,14 +27,14 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".application.Application">
+        android:name=".application.APlayerApplication">
         <!--友盟统计与推送-->
         <meta-data android:name="UMENG_APPKEY" android:value="56d6563367e58e6aa70005af"/>
         <meta-data android:name="UMENG_MESSAGE_SECRET" android:value="5cc69b6b8425a8e30cf6f0b40b67bda3"/>
         <meta-data android:name="UMENG_CHANNEL" android:value="${CHANNEL_VALUE}"/>
 
         <!--bombupdate-->
-        <meta-data  android:name="BMOB_CHANNEL" android:value="bmob"/>
+        <meta-data  android:name="BMOB_CHANNEL" android:value="${CHANNEL_VALUE}"/>
 
         <!--闪屏页-->
         <activity android:name=".ui.activity.SplashActivity" android:theme="@style/ActivityStyle">

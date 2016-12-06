@@ -78,7 +78,7 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
                 //设置封面
                 int albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
                 holder.mImage.setImageURI(Uri.EMPTY);
-                new AsynLoadImage(holder.mImage).execute(albumid,Constants.URL_ALBUM,true);
+                new AsynLoadImage(holder.mImage).execute(albumid,Constants.URL_ALBUM);
                 if(holder instanceof AlbumListHolder){
                     new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);
                 }

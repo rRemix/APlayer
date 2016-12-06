@@ -17,7 +17,7 @@ import android.widget.Scroller;
 
 import java.util.List;
 
-import remix.myplayer.application.Application;
+import remix.myplayer.application.APlayerApplication;
 
 /***
  * 
@@ -125,18 +125,18 @@ public class LrcView extends View implements ILrcView{
 		mScroller = new Scroller(getContext());
 		mPaintForHighLightLrc = new Paint();
 		mPaintForHighLightLrc.setColor(mCurColorForHightLightLrc);
-        mCurSizeForHightLightLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,18, Application.getContext().getResources().getDisplayMetrics());
+        mCurSizeForHightLightLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,18, APlayerApplication.getContext().getResources().getDisplayMetrics());
 		mPaintForHighLightLrc.setTextSize(mCurSizeForHightLightLrc);
 		mPaintForHighLightLrc.setFakeBoldText(true);
 
 		mPaintForOtherLrc = new Paint();
 		mPaintForOtherLrc.setColor(mCurColorForOtherLrc);
 
-        mCurSizeForOtherLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,12, Application.getContext().getResources().getDisplayMetrics());
+        mCurSizeForOtherLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,12, APlayerApplication.getContext().getResources().getDisplayMetrics());
 		mPaintForOtherLrc.setTextSize(mCurSizeForOtherLrc);
 
 		mPaintForTimeLine = new Paint();
-        mCurSizeForTimeLine = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,12, Application.getContext().getResources().getDisplayMetrics());
+        mCurSizeForTimeLine = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,12, APlayerApplication.getContext().getResources().getDisplayMetrics());
         mPaintForTimeLine.setTextSize(mCurSizeForTimeLine);
 		mPaintForTimeLine.setColor(mTimeLineColor);
 

@@ -14,7 +14,7 @@ import com.umeng.analytics.MobclickAgent;
 import butterknife.BindView;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.application.Application;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.customview.TipPopupwindow;
@@ -56,8 +56,8 @@ public class MultiChoiceActivity extends ToolbarActivity {
                 //只有主界面显示分割线
                 mMultiToolBar.findViewById(R.id.multi_divider).setVisibility(MultiChoiceActivity.this instanceof MainActivity ? View.VISIBLE : View.GONE);
                 //第一次长按操作显示提示框
-                if(SPUtil.getValue(Application.getContext(),"Setting","IsFirstMulti",true)){
-                    SPUtil.putValue(Application.getContext(),"Setting","IsFirstMulti",false);
+                if(SPUtil.getValue(APlayerApplication.getContext(),"Setting","IsFirstMulti",true)){
+                    SPUtil.putValue(APlayerApplication.getContext(),"Setting","IsFirstMulti",false);
                     if(mTipPopupWindow == null){
                         mTipPopupWindow = new TipPopupwindow(MultiChoiceActivity.this);
                         mTipPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {

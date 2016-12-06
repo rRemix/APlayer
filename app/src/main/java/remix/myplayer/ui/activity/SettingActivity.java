@@ -187,7 +187,24 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         switch (v.getId()){
             //文件过滤
             case R.id.setting_filter_container:
-                startActivity(new Intent(SettingActivity.this,ScanActivity.class));
+                new MaterialDialog.Builder(this)
+                        .title(R.string.set_filter_size)
+                        .titleColorAttr(R.attr.text_color_primary)
+                        .buttonRippleColorAttr(R.attr.ripple_color)
+                        .items(new String[]{"0K","500K","1MB","2MB"})
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .itemsColorAttr(R.attr.text_color_primary)
+                        .itemsCallbackSingleChoice(2, new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                                SPUtil.putValue(SettingActivity.this, "Setting", "ScanSize",
+                                        which == 0 ? 0 : which == 1 ? 500 * 1024 : which == 2 ? 1024 * 1024 : 2 * 1024 * 1024);
+                                return true;
+                            }
+                        })
+                        .positiveText(R.string.confirm)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .show();
                 break;
             //歌词扫描路径
             case R.id.setting_lrc_container:

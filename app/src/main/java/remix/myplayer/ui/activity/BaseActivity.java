@@ -1,7 +1,6 @@
 package remix.myplayer.ui.activity;
 
 import android.content.pm.ActivityInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +13,6 @@ import remix.myplayer.R;
 import remix.myplayer.manager.ActivityManager;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.StatusBarUtil;
 
 /**
@@ -74,7 +72,7 @@ public class BaseActivity extends AppCompatActivity {
                     .detectDiskReads()
                     .detectDiskWrites()
                     .detectNetwork()
-//                    .detectCustomSlowCalls()
+                    .detectCustomSlowCalls()
                     .penaltyLog()
 //                    .penaltyFlashScreen()
                     .build());

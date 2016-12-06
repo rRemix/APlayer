@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.MultiPosition;
@@ -117,8 +118,8 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
             holder.mOther.setText(artist + "-" + album);
 
             //封面
-            MediaStoreUtil.setImageUrl(holder.mImage,temp.getAlbumId());
-
+//            MediaStoreUtil.setImageUrl(holder.mImage,temp.getAlbumId());
+            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(),Constants.URL_ALBUM);
             //背景点击效果
             holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 

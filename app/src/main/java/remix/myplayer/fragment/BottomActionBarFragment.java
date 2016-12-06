@@ -19,6 +19,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
+import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
@@ -26,6 +27,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.AudioHolderActivity;
 import remix.myplayer.util.ColorUtil;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -121,7 +123,8 @@ public class BottomActionBarFragment extends BaseFragment{
                     ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
         }
         //封面
-        MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
+//        MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
+        new AsynLoadImage(mCover).execute(mp3Item.getAlbumId(), Constants.URL_ALBUM);
     }
 
 }

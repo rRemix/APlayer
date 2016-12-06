@@ -5,6 +5,9 @@ import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.FloatRange;
+import android.support.v4.content.ContextCompat;
+
+import remix.myplayer.R;
 
 /**
  * @ClassName
@@ -21,7 +24,7 @@ public class ColorUtil {
 
     @ColorInt
     public static int getColor(@ColorRes int colorRes){
-        return mContext.getResources().getColor(colorRes);
+        return ContextCompat.getColor(mContext, colorRes);
     }
 
     /**

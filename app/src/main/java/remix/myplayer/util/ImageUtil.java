@@ -3,7 +3,7 @@ package remix.myplayer.util;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import remix.myplayer.application.Application;
+import remix.myplayer.application.APlayerApplication;
 
 /**
  * Created by taeja on 16-3-23.
@@ -25,7 +25,7 @@ public class ImageUtil {
         //不为其分配内存
         options.inJustDecodeBounds = true;
 
-        BitmapFactory.decodeResource(Application.getContext().getResources(), resid,options);
+        BitmapFactory.decodeResource(APlayerApplication.getContext().getResources(), resid,options);
         int imageHeight = options.outHeight;
         int imageWidth = options.outWidth;
         String imageType = options.outMimeType;
@@ -59,11 +59,11 @@ public class ImageUtil {
     public static Bitmap decodeSampledBitmapFromResource(int reqHeight,int reqWidth,int resid){
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(Application.getContext().getResources(),resid,options);
+        BitmapFactory.decodeResource(APlayerApplication.getContext().getResources(),resid,options);
 
         options.inSampleSize = calculateInSampleSize(options.outWidth,options.outHeight,reqWidth,reqHeight);
         options.inJustDecodeBounds = false;
 
-        return BitmapFactory.decodeResource(Application.getContext().getResources(),resid,options);
+        return BitmapFactory.decodeResource(APlayerApplication.getContext().getResources(),resid,options);
     }
 }

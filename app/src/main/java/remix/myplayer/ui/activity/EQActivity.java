@@ -24,7 +24,7 @@ import java.util.HashMap;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.application.Application;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -85,12 +85,12 @@ public class EQActivity extends ToolbarActivity {
                 int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
                 LogUtil.d(TAG,"AudioSessionId:" + AudioSessionId);
                 if(AudioSessionId  == 0) {
-                    ToastUtil.show(Application.getContext(),R.string.eq_initial_failed);
+                    ToastUtil.show(APlayerApplication.getContext(),R.string.eq_initial_failed);
                     return;
                 }
                 //是否启用音效设置
-                mEnable = SPUtil.getValue(Application.getContext(),"Setting","EnableEQ",false) & Global.getHeadsetOn();
-                mInitialEnable = SPUtil.getValue(Application.getContext(),"Setting","InitialEnableEQ",false);
+                mEnable = SPUtil.getValue(APlayerApplication.getContext(),"Setting","EnableEQ",false) & Global.getHeadsetOn();
+                mInitialEnable = SPUtil.getValue(APlayerApplication.getContext(),"Setting","InitialEnableEQ",false);
 
                 //EQ
                 mEqualizer = new Equalizer(0, AudioSessionId);
@@ -98,13 +98,13 @@ public class EQActivity extends ToolbarActivity {
 //                //重低音
 //                mBassBoost = new BassBoost(0,AudioSessionId);
 //                mBassBoost.setEnabled(mEnable);
-//                mBassBoostLevel = (short)SPUtil.getValue(Application.getContext(),"setting","BassBoostLevel",0);
+//                mBassBoostLevel = (short)SPUtil.getValue(APlayerApplication.getContext(),"setting","BassBoostLevel",0);
 //                if(mEnable && mBassBoost.getStrengthSupported()){
 //                    mBassBoost.setStrength(mBassBoostLevel);
 //                }
 //                //环绕音效
 //                mVirtualizer = new Virtualizer(0,AudioSessionId);
-//                mVirtualizeLevel = (short)SPUtil.getValue(Application.getContext(),"setting","VirtualizeLevel",0);
+//                mVirtualizeLevel = (short)SPUtil.getValue(APlayerApplication.getContext(),"setting","VirtualizeLevel",0);
 //                mVirtualizer.setEnabled(mEnable);
 //                if(mEnable && mVirtualizer.getStrengthSupported()){
 //                    mVirtualizer.setStrength(mVirtualizeLevel);
@@ -115,7 +115,7 @@ public class EQActivity extends ToolbarActivity {
 
                 //得到之前存储的每个频率的db值
                 for(short i = 0 ; i < mBandNumber; i++){
-                    short temp = (short)(SPUtil.getValue(Application.getContext(),"Setting","Band" + i,0));
+                    short temp = (short)(SPUtil.getValue(APlayerApplication.getContext(),"Setting","Band" + i,0));
                     mBandFrequencys.add(temp);
                     if (mEnable){
                         mEqualizer.setBandLevel(i,temp);

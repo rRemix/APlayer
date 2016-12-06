@@ -24,7 +24,7 @@ import android.widget.TextView;
 import java.lang.reflect.Field;
 
 import remix.myplayer.R;
-import remix.myplayer.application.Application;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -97,9 +97,9 @@ public class Theme {
      */
     public static void TintDrawable(View view, @DrawableRes int res,@ColorInt int color){
         if(view instanceof ImageView){
-            ((ImageView)view).setImageDrawable(TintDrawable(Application.getContext().getResources().getDrawable(res),color));
+            ((ImageView)view).setImageDrawable(TintDrawable(APlayerApplication.getContext().getResources().getDrawable(res),color));
         } else {
-            view.setBackground(TintDrawable(Application.getContext().getResources().getDrawable(res),color));
+            view.setBackground(TintDrawable(APlayerApplication.getContext().getResources().getDrawable(res),color));
         }
     }
 

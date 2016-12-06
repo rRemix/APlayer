@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.widget.TextView;
 
-import remix.myplayer.application.Application;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.util.Constants;
 
 /**
@@ -25,7 +25,7 @@ public class AsynLoadSongNum extends AsyncTask<Integer, Integer, Integer> {
 
     @Override
     protected Integer doInBackground(Integer... params) {
-        ContentResolver resolver = Application.getContext().getContentResolver();
+        ContentResolver resolver = APlayerApplication.getContext().getContentResolver();
         boolean isAlbuum = mType == Constants.ALBUM;
         Cursor cursor = null;
         try {

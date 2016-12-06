@@ -60,7 +60,7 @@ public class SongChooseAdaper extends BaseAdapter<SongChooseAdaper.SongChooseHol
             //封面
             holder.mImage.setImageURI(Uri.EMPTY);
 //            ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId());
-            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(), Constants.URL_ALBUM,true);
+            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(), Constants.URL_ALBUM);
             //选中歌曲
             holder.mRoot.setOnClickListener(new View.OnClickListener() {
                 @Override

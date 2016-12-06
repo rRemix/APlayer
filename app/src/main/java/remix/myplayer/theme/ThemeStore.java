@@ -4,7 +4,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 
 import remix.myplayer.R;
-import remix.myplayer.application.Application;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SPUtil;
 
@@ -136,7 +136,7 @@ public class ThemeStore {
      * @param themeColor
      */
     public static void saveThemeColor(int themeColor){
-        SPUtil.putValue(Application.getContext(),"Setting","ThemeColor",themeColor);
+        SPUtil.putValue(APlayerApplication.getContext(),"Setting","ThemeColor",themeColor);
     }
 
     /**
@@ -144,7 +144,7 @@ public class ThemeStore {
      * @return
      */
     public static int loadThemeColor(){
-        return SPUtil.getValue(Application.getContext(),"Setting","ThemeColor",ThemeStore.THEME_BLUE);
+        return SPUtil.getValue(APlayerApplication.getContext(),"Setting","ThemeColor",ThemeStore.THEME_BLUE);
     }
 
     /**
@@ -152,7 +152,7 @@ public class ThemeStore {
      * @param mode
      */
     public static void saveThemeMode(int mode){
-        SPUtil.putValue(Application.getContext(),"Setting","ThemeMode",mode);
+        SPUtil.putValue(APlayerApplication.getContext(),"Setting","ThemeMode",mode);
     }
 
     /**
@@ -160,7 +160,7 @@ public class ThemeStore {
      * @return
      */
     public static int loadThemeMode(){
-        return SPUtil.getValue(Application.getContext(),"Setting","ThemeMode",DAY);
+        return SPUtil.getValue(APlayerApplication.getContext(),"Setting","ThemeMode",DAY);
     }
 
     @ColorInt

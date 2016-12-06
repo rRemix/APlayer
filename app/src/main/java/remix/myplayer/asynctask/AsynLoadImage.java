@@ -15,7 +15,6 @@ import remix.myplayer.util.MediaStoreUtil;
  */
 public class AsynLoadImage extends AsyncTask<Object,Integer,String> {
     private final SimpleDraweeView mImage;
-    private boolean mAutoPlayAnimation = true;
     public AsynLoadImage(SimpleDraweeView imageView) {
         mImage = imageView;
     }
@@ -26,7 +25,6 @@ public class AsynLoadImage extends AsyncTask<Object,Integer,String> {
      */
     @Override
     protected String doInBackground(Object... params) {
-        mAutoPlayAnimation = (boolean)params[2];
         return MediaStoreUtil.getImageUrl(params[0].toString(), (int)params[1]);
     }
 

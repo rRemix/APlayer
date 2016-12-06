@@ -32,7 +32,7 @@
         android:layout_height="@dimen/d32_size"
         android:textColor="@color/white"
         android:textSize="@dimen/s14_size"
-        android:text="正在播放"
+        android:text="@string/playing"
         android:gravity="center"
         android:lines="1"
         android:ellipsize="end" />

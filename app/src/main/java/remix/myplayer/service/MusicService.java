@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Random;
 
 import remix.myplayer.R;
-import remix.myplayer.application.Application;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.model.MP3Item;
@@ -320,7 +320,7 @@ public class MusicService extends BaseService {
             e.printStackTrace();
         }
         //初始化下一首歌曲
-        mNextId = SPUtil.getValue(Application.getContext(),"Setting","NextSongId",-1);
+        mNextId = SPUtil.getValue(APlayerApplication.getContext(),"Setting","NextSongId",-1);
         if(mNextId == -1)
             return;
         //查找上次退出时保存的下一首歌曲是否还存在

@@ -10,7 +10,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 6
-        versionName "1.1.2"
+        versionName "1.2.0"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -34,6 +34,7 @@ android {
             //混淆代码
             minifyEnabled true
             buildConfigField "boolean", "LOG_DEBUG", "false"
+            buildConfigField "boolean", "DEBUG", "false"
             zipAlignEnabled true
             shrinkResources true
             signingConfig signingConfigs.release
@@ -41,8 +42,15 @@ android {
         }
     }
     productFlavors {
-
+        qihu360{}
+        assistant91{}
+        baidu{}
+        anzhuomarket{}
+        chuizi{}
+        wandoujia{}
         meizu{}
+        xiaomi{}
+        kuan{}
         productFlavors.all { flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
         }

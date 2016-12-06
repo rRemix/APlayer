@@ -75,7 +75,7 @@ public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
                 }
                 //设置封面
                 holder.mImage.setImageURI(Uri.EMPTY);
-                new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId,Constants.URL_ARTIST,true);
+                new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId,Constants.URL_ARTIST);
 
                 //item点击效果
                 holder.mContainer.setBackground(
