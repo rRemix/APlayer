@@ -6,7 +6,6 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:visibility="visible"
         android:id="@+id/cover_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,8 +28,6 @@
             android:id="@+id/cover_shadow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/cover_image"
             android:background="@drawable/player_cover_shadow"/>
     </LinearLayout>
 

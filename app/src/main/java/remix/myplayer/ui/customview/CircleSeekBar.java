@@ -127,14 +127,14 @@ public class CircleSeekBar extends AbsSeekBar {
     }
 
     public CircleSeekBar(Context context, AttributeSet attrs) {
-        this(context, attrs,android.R.attr.seekBarStyle);
+        this(context, attrs,0);
         mContext = context;
         mAttrs = attrs;
         init();
     }
 
     public CircleSeekBar(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, android.R.attr.seekBarStyle);
+        super(context, attrs, defStyleAttr);
         mContext = context;
         mAttrs = attrs;
         init();

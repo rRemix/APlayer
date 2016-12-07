@@ -30,8 +30,7 @@
             android:lines="1"
             android:ellipsize="end"
             android:textSize="@dimen/s16_size"
-            android:textColor="?attr/text_color_primary"
-            android:text="歌曲名-歌手"/>
+            android:textColor="?attr/text_color_primary"/>
     </LinearLayout>
 
     <View
@@ -42,9 +41,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:paddingTop="@dimen/d1_size"
-        android:paddingBottom="@dimen/d2_size">
+        android:gravity="center_vertical">
         <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -52,7 +49,8 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/popup_add"
-            android:background="?attr/background_common">
+            android:background="?attr/background_common"
+            android:paddingBottom="@dimen/d12_size">
             <ImageView
                 android:id="@+id/popup_add_img"
                 android:layout_width="wrap_content"
@@ -67,7 +65,7 @@
                 android:gravity="center"
                 android:textColor="?attr/text_color"
                 android:textSize="@dimen/s15_size"
-                android:text="加入"/>
+                android:text="@string/join"/>
         </LinearLayout>
 
         <LinearLayout
@@ -77,7 +75,8 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/popup_ring"
-            android:background="?attr/background_common">
+            android:background="?attr/background_common"
+            android:paddingBottom="@dimen/d12_size">
             <ImageView
                 android:id="@+id/popup_ring_img"
                 android:layout_width="wrap_content"
@@ -91,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="@dimen/s15_size"
-                android:text="铃声"/>
+                android:text="@string/ring"/>
         </LinearLayout>
 
         <LinearLayout
@@ -101,7 +100,8 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/popup_share"
-            android:background="?attr/background_common">
+            android:background="?attr/background_common"
+            android:paddingBottom="@dimen/d12_size">
             <ImageView
                 android:id="@+id/popup_share_img"
                 android:layout_width="wrap_content"
@@ -115,7 +115,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="@dimen/s15_size"
-                android:text="分享"/>
+                android:text="@string/share"/>
         </LinearLayout>
 
         <LinearLayout
@@ -125,7 +125,8 @@
             android:orientation="vertical"
             android:gravity="center"
             android:id="@+id/popup_delete"
-            android:background="?attr/background_common">
+            android:background="?attr/background_common"
+            android:paddingBottom="@dimen/d12_size">
             <ImageView
                 android:id="@+id/popup_delete_img"
                 android:layout_width="wrap_content"
@@ -139,7 +140,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="@dimen/s15_size"
-                android:text="删除"/>
+                android:text="@string/delete"/>
         </LinearLayout>
 
     </LinearLayout>

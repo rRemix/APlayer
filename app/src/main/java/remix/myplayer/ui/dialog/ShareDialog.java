@@ -176,12 +176,10 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
                 break;
             case R.id.share_wechat:
             case R.id.share_circlefriend:
-                if(mType == Constants.SHARESONG){
+                if(mType == Constants.SHARESONG)
                     shareSongtoWechat(v);
-                }
-                else {
+                else
                     shareMindtoWeChat(v);
-                }
                 break;
         }
     }

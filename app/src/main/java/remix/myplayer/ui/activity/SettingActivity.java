@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -23,13 +24,22 @@ import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.umeng.analytics.MobclickAgent;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.bmob.v3.b.The;
+import cn.bmob.v3.listener.BmobUpdateListener;
 import cn.bmob.v3.update.BmobUpdateAgent;
+import cn.bmob.v3.update.UpdateResponse;
+import cn.bmob.v3.update.UpdateStatus;
 import remix.myplayer.R;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.service.MusicService;
@@ -106,7 +116,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcPath","")));
         }
 
-        //主题颜色
+        //主题颜色指示器
         ((GradientDrawable)mColorSrc.getDrawable()).setColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : Color.TRANSPARENT);
         //初始化箭头颜色
         final int arrowColor = ThemeStore.getAccentColor();
@@ -119,7 +129,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     }
                 });
 
-
         //分根线颜色
         ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),findView(R.id.setting_divider_3)},
                 new ButterKnife.Action<View>() {
@@ -128,23 +137,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         view.setBackgroundColor(ThemeStore.getDividerColor());
                     }
                 });
-
-        //初始化点击效果
-        final TypedArray ta = getTheme().obtainStyledAttributes(new int[]{R.attr.background_common});
-        try {
-            ButterKnife.apply(new View[]{findView(R.id.setting_filter_container),findView(R.id.setting_lrc_container),findView(R.id.setting_color_container),
-                            findView(R.id.setting_notify_container),findView(R.id.setting_eq_container),findView(R.id.setting_feedback_container),
-                            findView(R.id.setting_about_container),findView(R.id.setting_update_container),findView(R.id.setting_clear_container)},
-                    new ButterKnife.Action<View>() {
-                        @Override
-                        public void apply(@NonNull View view, int index) {
-                            if(ta != null)
-                                view.setBackground(ta.getDrawable(0));
-                        }
-                    });
-        } finally {
-            ta.recycle();
-        }
 
         //计算缓存大小
         new Thread(){
@@ -283,6 +275,19 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             //检查更新
             case R.id.setting_update_container:
                 MobclickAgent.onEvent(this,"CheckUpdate");
+                BmobUpdateAgent.setUpdateListener(new BmobUpdateListener() {
+                    @Override
+                    public void onUpdateReturned(int updateStatus, UpdateResponse updateInfo) {
+                        // TODO Auto-generated method stub
+                        if(updateStatus == UpdateStatus.No){
+                            ToastUtil.show(SettingActivity.this,getString(R.string.no_update));
+                        }else if(updateStatus == UpdateStatus.IGNORED){
+                            ToastUtil.show(SettingActivity.this,getString(R.string.update_ignore));
+                        }else if(updateStatus == UpdateStatus.TimeOut){
+                            ToastUtil.show(SettingActivity.this,R.string.updat_error);
+                        }
+                    }
+                });
                 BmobUpdateAgent.forceUpdate(this);
                 break;
             //清除缓存
@@ -306,8 +311,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                         //清除fresco缓存
                                         Fresco.getImagePipeline().clearCaches();
                                         mHandler.sendEmptyMessage(CLEARFINISH);
-                                        //新建封面 歌词缓存目录
-                                        DiskCache.init(SettingActivity.this);
                                         mNeedRefresh = true;
                                     }
                                 }.start();
@@ -340,7 +343,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             if(mNeedRecreate){
                 mHandler.sendEmptyMessage(RECREATE);
             }
-
         }
     }
 

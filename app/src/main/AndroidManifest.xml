@@ -34,7 +34,7 @@
         <meta-data android:name="UMENG_CHANNEL" android:value="${CHANNEL_VALUE}"/>
 
         <!--bombupdate-->
-        <meta-data  android:name="BMOB_CHANNEL" android:value="${CHANNEL_VALUE}"/>
+        <!--<meta-data  android:name="BMOB_CHANNEL" android:value="${CHANNEL_VALUE}"/>-->
 
         <!--闪屏页-->
         <activity android:name=".ui.activity.SplashActivity" android:theme="@style/ActivityStyle">

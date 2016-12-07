@@ -58,10 +58,12 @@ public class DiskCache {
     public static DiskLruCache getArtistCache(){return mArtistCache;}
 
     public static File getDiskCacheDir(Context context, String uniqueName) {
-        String cachePath;
+        String cachePath = "";
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
                 || !Environment.isExternalStorageRemovable()) {
-            cachePath = context.getExternalCacheDir().getPath();
+            File file = context.getExternalCacheDir();
+            if(file != null)
+                cachePath = file.getPath();
         } else {
             cachePath = context.getCacheDir().getPath();
         }

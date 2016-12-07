@@ -93,20 +93,35 @@ public class CommonUtil {
      */
     public static void deleteFilesByDirectory(File directory) {
         if(directory.isFile()){
-            directory.delete();
+            deleteFileSafely(directory);
             return;
         }
         if(directory.isDirectory()){
             File[] childFile = directory.listFiles();
             if(childFile == null || childFile.length == 0){
-                directory.delete();
+                deleteFileSafely(directory);
                 return;
             }
             for(File f : childFile){
                 deleteFilesByDirectory(f);
             }
-            directory.delete();
+            deleteFileSafely(directory);
         }
+    }
+
+    /**
+     * 安全删除文件 小米、华为等手机极有可能在删除一个文件后再创建同名文件出现bug
+     * @param file
+     * @return
+     */
+    public static boolean deleteFileSafely(File file) {
+        if (file != null) {
+            String tmpPath = file.getParent() + File.separator + System.currentTimeMillis();
+            File tmp = new File(tmpPath);
+            file.renameTo(tmp);
+            return tmp.delete();
+        }
+        return false;
     }
 
     /**
@@ -449,7 +464,7 @@ public class CommonUtil {
 
             File dir = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/cache/cover");
             if(!dir.exists())
-                dir.mkdir();
+                dir.mkdirs();
             img = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/cache/cover/" + albumid  + ".jpg");
             fos = new FileOutputStream(img);
 

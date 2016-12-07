@@ -10,7 +10,6 @@
     android:background="@color/white">
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -69,22 +68,18 @@
                         android:textColor="@color/gray_7e7e7e"/>
                 </LinearLayout>
             </RelativeLayout>
-            <LinearLayout
+
+            <RelativeLayout
                 android:layout_below="@id/top_actionbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                <!-- 中间三个页面 -->
-                <remix.myplayer.ui.customview.AudioViewPager
-                    android:id="@+id/holder_pager"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="10"/>
+                android:layout_height="match_parent">
                 <!--三个导航图标-->
                 <RelativeLayout
+                    android:id="@+id/holder_indicator"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1">
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -105,7 +100,14 @@
                         android:layout_alignTop="@id/guide_02"
                         android:id="@+id/guide_03"/>
                 </RelativeLayout>
-            </LinearLayout>
+                <!-- 中间三个页面 -->
+                <remix.myplayer.ui.customview.AudioViewPager
+                    android:id="@+id/holder_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_above="@id/holder_indicator"/>
+            </RelativeLayout>
+
         </RelativeLayout>
 
         <RelativeLayout

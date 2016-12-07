@@ -185,7 +185,7 @@ public class RecordShareActivity extends BaseActivity {
                 //将截屏内容保存到文件
                 File shareDir = DiskCache.getDiskCacheDir(RecordShareActivity.this,"share");
                 if(!shareDir.exists()){
-                    shareDir.mkdir();
+                    shareDir.mkdirs();
                 }
                 mFile = new File(DiskCache.getDiskCacheDir(RecordShareActivity.this,"share") + "/" +
                         new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())) + ".png");
