@@ -5,16 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    
+    <FrameLayout
+        android:visibility="invisible"
         android:id="@+id/cover_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginStart="@dimen/d15_size"
         android:layout_marginEnd="@dimen/d15_size"
         android:layout_marginTop="@dimen/d28_size"
-        android:layout_centerInParent="true"
-        android:gravity="center_horizontal">
+        android:layout_centerHorizontal="true">
+        <ImageView
+            android:id="@+id/cover_shadow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/player_cover_shadow"
+            android:layout_gravity="top|center_horizontal"/>
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/cover_image"
             android:visibility="invisible"
@@ -23,12 +29,8 @@
             fresco:failureImage="@drawable/album_empty_bg_day"
             fresco:failureImageScaleType="centerCrop"
             fresco:actualImageScaleType="centerCrop"
-            fresco:fadeDuration="200"/>
-        <ImageView
-            android:id="@+id/cover_shadow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/player_cover_shadow"/>
-    </LinearLayout>
+            fresco:fadeDuration="200"
+            android:layout_gravity="top|center_horizontal"/>
+    </FrameLayout>
 
 </RelativeLayout>
