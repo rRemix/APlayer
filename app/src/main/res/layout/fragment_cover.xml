@@ -29,7 +29,7 @@
             fresco:failureImage="@drawable/album_empty_bg_day"
             fresco:failureImageScaleType="centerCrop"
             fresco:actualImageScaleType="centerCrop"
-            fresco:fadeDuration="200"
+            fresco:fadeDuration="150"
             android:layout_gravity="top|center_horizontal"/>
     </FrameLayout>
 

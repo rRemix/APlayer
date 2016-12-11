@@ -1,9 +1,13 @@
 package remix.myplayer.ui.activity;
 
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RippleDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.util.DialogUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.umeng.analytics.MobclickAgent;
 
@@ -142,6 +147,7 @@ public class RecordShareActivity extends BaseActivity {
         mBackground1.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0, DensityUtil.dip2px(this,2), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));
         mBackground2.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0,DensityUtil.dip2px(this,1), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));
         mImageBackground.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0,DensityUtil.dip2px(this,1), ColorUtil.getColor(R.color.white_f6f6f5),0,0,1));
+
 
         mProgressDialog = new MaterialDialog.Builder(this)
                 .title("请稍候")

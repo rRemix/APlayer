@@ -70,7 +70,8 @@
         <activity android:name=".ui.activity.ChildHolderActivity"
             android:theme="@style/ActivityStyle"/>
 
-        <activity android:name=".ui.activity.RecordShareActivity"/>
+        <activity android:name=".ui.activity.RecordShareActivity"
+            android:theme="@style/ActivityStyle"/>
 
         <activity android:name=".ui.activity.AboutActivity"
             android:theme="@style/ActivityStyle"/>
