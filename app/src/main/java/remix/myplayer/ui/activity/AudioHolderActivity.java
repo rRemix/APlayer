@@ -20,6 +20,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.BaseInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -28,6 +30,9 @@ import android.widget.TextView;
 
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.rebound.SimpleSpringListener;
+import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringSystem;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
@@ -175,6 +180,8 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
      * 入场与退场动画时间
      */
     private final int DURATION = 250;
+//    private DecelerateInterpolator mInterpolator = new DecelerateInterpolator(1.5f);
+    private AccelerateDecelerateInterpolator mInterpolator = new AccelerateDecelerateInterpolator();
 
     /** 更新进度条的Handler */
     public  Handler mProgressHandler = new Handler() {
@@ -207,7 +214,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         } else {
             StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.white_f2f2f2));
         }
-
     }
 
     @Override
@@ -289,7 +295,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         //更新动画控件封面 保证退场动画的封面与fragment中封面一致
         MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
         mContainer.animate()
-                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .setInterpolator(mInterpolator)
                 .withEndAction(new Runnable() {
                     @Override
                     public void run() {
@@ -298,10 +304,10 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                     }
                 })
                 .setDuration(DURATION)
-                .alpha(0)
+                .alpha(0.2f)
                 .start();
         mAnimCover.animate()
-                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .setInterpolator(mInterpolator)
                 .withStartAction(new Runnable() {
                     @Override
                     public void run() {
@@ -312,19 +318,74 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                         }
                     }
                 })
-                .withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        finish();
-                        overridePendingTransition(0,0);
-                    }
-                })
+//                .withEndAction(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        finish();
+//                        overridePendingTransition(0,0);
+//                    }
+//                })
                 .setDuration(DURATION)
                 .scaleX(1)
                 .scaleY(1)
                 .translationX(0)
                 .translationY(0)
                 .start();
+
+//        Spring alphaSpring = SpringSystem.create().createSpring();
+//        alphaSpring.addListener(new SimpleSpringListener(){
+//            @Override
+//            public void onSpringActivate(Spring spring) {
+//                mContainer.setAlpha((float) spring.getCurrentValue());
+//            }
+//            @Override
+//            public void onSpringUpdate(Spring spring) {
+//                mContainer.setAlpha((float) spring.getCurrentValue());
+//            }
+//
+//            @Override
+//            public void onSpringAtRest(Spring spring) {
+//                finish();
+//                overridePendingTransition(0,0);
+//            }
+//        });
+//        alphaSpring.setCurrentValue(1);
+//        alphaSpring.setEndValue(0);
+//        alphaSpring.setRestDisplacementThreshold(0.15f);
+//        alphaSpring.setRestSpeedThreshold(0.15f);
+//
+//        final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
+//        final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
+//        final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
+//        final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
+//        Spring coverSpring = SpringSystem.create().createSpring();
+//        coverSpring.addListener(new SimpleSpringListener(){
+//            @Override
+//            public void onSpringAtRest(Spring spring) {
+//                finish();
+//                overridePendingTransition(0,0);
+//            }
+//            @Override
+//            public void onSpringUpdate(Spring spring) {
+//                final double currentVal = spring.getCurrentValue();
+//                mAnimCover.setTranslationX((float) (transitionX * currentVal));
+//                mAnimCover.setTranslationY((float) (transitionY * currentVal));
+//                mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
+//                mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
+//            }
+//            @Override
+//            public void onSpringActivate(Spring spring) {
+//                mAnimCover.setVisibility(View.VISIBLE);
+//                //隐藏fragment中的image
+//                if(mAdapter.getItem(1) instanceof CoverFragment){
+//                    ((CoverFragment) mAdapter.getItem(1)).hideImage();
+//                }
+//            }
+//        });
+//        coverSpring.setCurrentValue(1);
+//        coverSpring.setEndValue(0);
+//        coverSpring.setRestSpeedThreshold(0.15f);
+//        coverSpring.setRestDisplacementThreshold(0.15f);
     }
 
     /**
@@ -570,8 +631,42 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 mAnimCover.setPivotX(0);
                 mAnimCover.setPivotY(0);
 
+//                final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
+//                final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
+//                final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
+//                final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
+//
+//                final Spring scaleXSpring = SpringSystem.create().createSpring();
+//                scaleXSpring.addListener(new SimpleSpringListener(){
+//                    @Override
+//                    public void onSpringUpdate(Spring spring) {
+//                        final double currentVal = spring.getCurrentValue();
+//                        mAnimCover.setTranslationX((float) (transitionX * currentVal));
+//                        mAnimCover.setTranslationY((float) (transitionY * currentVal));
+//                        mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
+//                        mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
+//                    }
+//                    @Override
+//                    public void onSpringAtRest(Spring spring) {
+//                        //入场动画结束时显示fragment中的封面
+//                        if (mAdapter.getItem(1) instanceof CoverFragment) {
+//                            ((CoverFragment) mAdapter.getItem(1)).showImage();
+//                        }
+//                        //隐藏动画用的封面
+//                        mAnimCover.setVisibility(View.GONE);
+//                    }
+//                    @Override
+//                    public void onSpringActivate(Spring spring) {
+//                        overridePendingTransition(0, 0);
+//                    }
+//                });
+//                scaleXSpring.setCurrentValue(0);
+//                scaleXSpring.setEndValue(1);
+//                scaleXSpring.setRestSpeedThreshold(0.99f);
+//                scaleXSpring.setRestDisplacementThreshold(0.99f);
+
                 mAnimCover.animate()
-                        .setInterpolator(new AccelerateDecelerateInterpolator())
+                        .setInterpolator(mInterpolator)
                         .withStartAction(new Runnable() {
                             @Override
                             public void run() {
@@ -585,11 +680,17 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                                 if (mAdapter.getItem(1) instanceof CoverFragment) {
                                     ((CoverFragment) mAdapter.getItem(1)).showImage();
                                 }
-                                //隐藏动画用的封面
-                                mAnimCover.setVisibility(View.GONE);
+                                //延迟消失 避免闪烁
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //隐藏动画用的封面
+                                        mAnimCover.setVisibility(View.GONE);
+                                    }
+                                },1000);
                             }
                         })
-                        .setDuration( DURATION)
+                        .setDuration(DURATION)
                         .scaleX(mScaleBundle.getFloat(SCALE_WIDTH))
                         .scaleY(mScaleBundle.getFloat(SCALE_HEIGHT))
                         .translationX(mTransitionBundle.getFloat(TRANSITION_X))

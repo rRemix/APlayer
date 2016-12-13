@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:lines="1"
                 android:ellipsize="end"
-                android:textColor="@color/white"
+                android:textColor="@color/night_textcolor_primary"
                 android:textSize="@dimen/s16_size"
                 android:layout_marginBottom="@dimen/d5_szie"/>
             <TextView

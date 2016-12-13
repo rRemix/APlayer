@@ -73,7 +73,7 @@ public class MusicService extends BaseService {
     /** 当前正在播放的歌曲id */
     private static int mCurrentId = -1;
     /** 当前正在播放的mp3 */
-    private static MP3Item mInfo = null;
+    private static MP3Item mCurrentInfo = null;
 
     /** 下一首歌曲的索引 */
     private static int mNextIndex = 0;
@@ -123,7 +123,7 @@ public class MusicService extends BaseService {
                 for (int i = 0; i < mCallBacklist.size(); i++) {
                     if(mCallBacklist.get(i) != null){
                         try {
-                            mCallBacklist.get(i).UpdateUI(mInfo,mIsplay);
+                            mCallBacklist.get(i).UpdateUI(mCurrentInfo,mIsplay);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -267,7 +267,7 @@ public class MusicService extends BaseService {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 if(mPlayModel == Constants.PLAY_REPEATONE){
-                    prepareAndPlay(mInfo.getUrl());
+                    prepareAndPlay(mCurrentInfo.getUrl());
                 } else {
                     playNextOrPrev(true, true);
                 }
@@ -309,13 +309,13 @@ public class MusicService extends BaseService {
         if(item == null)
             return;
         //初始化当前播放歌曲
-        mInfo = item;
-        mCurrentId = mInfo.getId();
+        mCurrentInfo = item;
+        mCurrentId = mCurrentInfo.getId();
         mCurrentIndex = pos;
         try {
             if(mMediaPlayer == null)
                 mMediaPlayer = new MediaPlayer();
-            mMediaPlayer.setDataSource(mInfo.getUrl());
+            mMediaPlayer.setDataSource(mCurrentInfo.getUrl());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -330,7 +330,7 @@ public class MusicService extends BaseService {
         if(mNextInfo != null)
             return;
         mNextIndex = mCurrentIndex + 1;
-        updateNextSong(true);
+        updateNextSong();
     }
 
     private void unInit(){
@@ -396,11 +396,10 @@ public class MusicService extends BaseService {
             pause();
         }
         else {
-            if(mInfo == null)
+            if(mCurrentInfo == null)
                 return;
             if(mFirstFlag) {
-//                playStart();
-                prepareAndPlay(mInfo.getUrl());
+                prepareAndPlay(mCurrentInfo.getUrl());
                 mFirstFlag = false;
                 return;
             }
@@ -428,19 +427,19 @@ public class MusicService extends BaseService {
             return;
 
         mCurrentId = Global.mPlayQueue.get(mCurrentIndex);
-        mInfo = MediaStoreUtil.getMP3InfoById(mCurrentId);
+        mCurrentInfo = MediaStoreUtil.getMP3InfoById(mCurrentId);
 
         mNextIndex = mCurrentIndex;
         mNextId = mCurrentId;
-        updateNextSong(true);
+        updateNextSong();
 
-        if(mInfo == null) {
+        if(mCurrentInfo == null) {
             ToastUtil.show(mContext,R.string.song_lose_effect);
             return;
         }
 
         mIsplay = true;
-        prepareAndPlay(mInfo.getUrl());
+        prepareAndPlay(mCurrentInfo.getUrl());
     }
 
 
@@ -611,39 +610,43 @@ public class MusicService extends BaseService {
         if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
             return;
 
-        mCurrentId = mNextId;
-        mCurrentIndex = mNextIndex;
-        mInfo = new MP3Item(mNextInfo);
+        if(isNext){
+            //如果是点击下一首 播放预先设置好的下一首歌曲
+            mCurrentId = mNextId;
+            mCurrentIndex = mNextIndex;
+            mCurrentInfo = new MP3Item(mNextInfo);
+        } else {
+            //如果点击上一首 根据播放模式查找上一首歌曲 再重新设置当前歌曲为上一首
+            if ((--mCurrentIndex) < 0)
+                mCurrentIndex = Global.mPlayQueue.size() - 1;
+            mCurrentId = Global.mPlayQueue.get(mCurrentIndex);
+            mCurrentInfo = MediaStoreUtil.getMP3InfoById(mCurrentId);
+            mNextIndex = mCurrentIndex;
+            mNextId = mCurrentId;
+        }
 
-        updateNextSong(isNext);
+        updateNextSong();
 
-        MP3Item temp = mInfo;
-        if(mInfo == null) {
-            mInfo = temp;
+        MP3Item temp = mCurrentInfo;
+        if(mCurrentInfo == null) {
+            mCurrentInfo = temp;
             ToastUtil.show(mContext,R.string.song_lose_effect);
             return;
         }
         mIsplay = true;
         if(needPlay)
-            prepareAndPlay(mInfo.getUrl());
+            prepareAndPlay(mCurrentInfo.getUrl());
     }
 
 
     /**
      * 更新下一首歌曲
      */
-    private static void updateNextSong(boolean isNext){
+    private static void updateNextSong(){
         if(mPlayModel == Constants.PLAY_LOOP || mPlayModel == Constants.PLAY_REPEATONE){
-            if(isNext) {
-                if ((++mNextIndex) > Global.mPlayQueue.size() - 1)
-                    mNextIndex = 0;
-                mNextId = Global.mPlayQueue.get(mNextIndex);
-            }
-            else {
-                if ((--mNextIndex) < 0)
-                    mNextIndex = Global.mPlayQueue.size() - 1;
-                mNextId = Global.mPlayQueue.get(mNextIndex);
-            }
+            if ((++mNextIndex) > Global.mPlayQueue.size() - 1)
+                mNextIndex = 0;
+            mNextId = Global.mPlayQueue.get(mNextIndex);
         } else{
             mNextIndex = getShuffle();
             mNextId = Global.mPlayQueue.get(mNextIndex);
@@ -701,7 +704,7 @@ public class MusicService extends BaseService {
      * @return
      */
     public static MP3Item getCurrentMP3() {
-        return mInfo;
+        return mCurrentInfo;
     }
 
     /**
@@ -713,11 +716,11 @@ public class MusicService extends BaseService {
     }
 
     public static MediaFormat getMediaFormat(){
-        if(mInfo == null)
+        if(mCurrentInfo == null)
             return null;
         try {
             mMediaExtractor = new MediaExtractor();
-            mMediaExtractor.setDataSource(mInfo.getUrl());// the adresss location of the sound on sdcard.
+            mMediaExtractor.setDataSource(mCurrentInfo.getUrl());// the adresss location of the sound on sdcard.
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -739,8 +742,8 @@ public class MusicService extends BaseService {
                 if(mf.containsKey(MediaFormat.KEY_BIT_RATE)){
                     return mf.getInteger(MediaFormat.KEY_BIT_RATE) / 1024 + "";
                 } else {
-                    long durationUs = mf.containsKey(MediaFormat.KEY_DURATION) ? mf.getLong(MediaFormat.KEY_DURATION) : mInfo.getDuration();
-                    return mInfo.getSize() * 8 / (durationUs / 1024) + "";
+                    long durationUs = mf.containsKey(MediaFormat.KEY_DURATION) ? mf.getLong(MediaFormat.KEY_DURATION) : mCurrentInfo.getDuration();
+                    return mCurrentInfo.getSize() * 8 / (durationUs / 1024) + "";
                 }
             case Constants.SAMPLE_RATE:
                 return mf.containsKey(MediaFormat.KEY_SAMPLE_RATE) ?
