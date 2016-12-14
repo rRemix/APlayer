@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
@@ -7,6 +8,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,6 +37,7 @@ import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
 import com.umeng.analytics.MobclickAgent;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -180,11 +183,10 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
      * 入场与退场动画时间
      */
     private final int DURATION = 250;
-//    private DecelerateInterpolator mInterpolator = new DecelerateInterpolator(1.5f);
     private AccelerateDecelerateInterpolator mInterpolator = new AccelerateDecelerateInterpolator();
 
     /** 更新进度条的Handler */
-    public  Handler mProgressHandler = new Handler() {
+    private Handler mProgressHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             //如果当前正在播放，参数合法且用户没有在拖动进度条，更新进度条与时间
@@ -197,6 +199,18 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             }
             if(msg.what == Constants.UPDATE_TIME_ALL && mSeekBar != null && !mIsDragSeekBar)
                 mSeekBar.setProgress(mCurrentTime);
+        }
+    };
+    /** 更新封面的Handler */
+    private Uri mUri;
+    private final int UPDATE_COVER = 0;
+    private Handler mCoverHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            if(msg.what == UPDATE_COVER){
+                ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,mUri,!mFistStart);
+                mFistStart = false;
+            }
         }
     };
 
@@ -293,31 +307,10 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     @Override
     public void onBackPressed() {
         //更新动画控件封面 保证退场动画的封面与fragment中封面一致
-        MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
-        mContainer.animate()
-                .setInterpolator(mInterpolator)
-                .withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        finish();
-                        overridePendingTransition(0,0);
-                    }
-                })
-                .setDuration(DURATION)
-                .alpha(0.2f)
-                .start();
-        mAnimCover.animate()
-                .setInterpolator(mInterpolator)
-                .withStartAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAnimCover.setVisibility(View.VISIBLE);
-                        //隐藏fragment中的image
-                        if(mAdapter.getItem(1) instanceof CoverFragment){
-                            ((CoverFragment) mAdapter.getItem(1)).hideImage();
-                        }
-                    }
-                })
+//        MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
+        mAnimCover.setImageURI(mUri);
+//        mContainer.animate()
+//                .setInterpolator(mInterpolator)
 //                .withEndAction(new Runnable() {
 //                    @Override
 //                    public void run() {
@@ -325,67 +318,84 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 //                        overridePendingTransition(0,0);
 //                    }
 //                })
-                .setDuration(DURATION)
-                .scaleX(1)
-                .scaleY(1)
-                .translationX(0)
-                .translationY(0)
-                .start();
+//                .setDuration(DURATION)
+//                .alpha(0.2f)
+//                .start();
+//        mAnimCover.animate()
+//                .setInterpolator(mInterpolator)
+//                .withStartAction(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mAnimCover.setVisibility(View.VISIBLE);
+//                        //隐藏fragment中的image
+//                        if(mAdapter.getItem(1) instanceof CoverFragment){
+//                            ((CoverFragment) mAdapter.getItem(1)).hideImage();
+//                        }
+//                    }
+//                })
+//                .withEndAction(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        finish();
+//                        overridePendingTransition(0,0);
+//                    }
+//                })
+//                .setDuration(DURATION)
+//                .scaleX(1)
+//                .scaleY(1)
+//                .translationX(0)
+//                .translationY(0)
+//                .start();
 
-//        Spring alphaSpring = SpringSystem.create().createSpring();
-//        alphaSpring.addListener(new SimpleSpringListener(){
-//            @Override
-//            public void onSpringActivate(Spring spring) {
-//                mContainer.setAlpha((float) spring.getCurrentValue());
-//            }
-//            @Override
-//            public void onSpringUpdate(Spring spring) {
-//                mContainer.setAlpha((float) spring.getCurrentValue());
-//            }
-//
-//            @Override
-//            public void onSpringAtRest(Spring spring) {
-//                finish();
-//                overridePendingTransition(0,0);
-//            }
-//        });
-//        alphaSpring.setCurrentValue(1);
-//        alphaSpring.setEndValue(0);
-//        alphaSpring.setRestDisplacementThreshold(0.15f);
-//        alphaSpring.setRestSpeedThreshold(0.15f);
-//
-//        final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
-//        final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
-//        final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
-//        final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
-//        Spring coverSpring = SpringSystem.create().createSpring();
-//        coverSpring.addListener(new SimpleSpringListener(){
-//            @Override
-//            public void onSpringAtRest(Spring spring) {
-//                finish();
-//                overridePendingTransition(0,0);
-//            }
-//            @Override
-//            public void onSpringUpdate(Spring spring) {
-//                final double currentVal = spring.getCurrentValue();
-//                mAnimCover.setTranslationX((float) (transitionX * currentVal));
-//                mAnimCover.setTranslationY((float) (transitionY * currentVal));
-//                mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
-//                mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
-//            }
-//            @Override
-//            public void onSpringActivate(Spring spring) {
-//                mAnimCover.setVisibility(View.VISIBLE);
-//                //隐藏fragment中的image
-//                if(mAdapter.getItem(1) instanceof CoverFragment){
-//                    ((CoverFragment) mAdapter.getItem(1)).hideImage();
-//                }
-//            }
-//        });
-//        coverSpring.setCurrentValue(1);
-//        coverSpring.setEndValue(0);
-//        coverSpring.setRestSpeedThreshold(0.15f);
-//        coverSpring.setRestDisplacementThreshold(0.15f);
+        Spring alphaSpring = SpringSystem.create().createSpring();
+        alphaSpring.addListener(new SimpleSpringListener(){
+            @Override
+            public void onSpringActivate(Spring spring) {
+                mContainer.setAlpha((float) spring.getCurrentValue());
+            }
+            @Override
+            public void onSpringUpdate(Spring spring) {
+                mContainer.setAlpha((float) spring.getCurrentValue());
+            }
+
+            @Override
+            public void onSpringAtRest(Spring spring) {
+                finish();
+                overridePendingTransition(0,0);
+            }
+        });
+        alphaSpring.setCurrentValue(1);
+        alphaSpring.setEndValue(0.2f);
+        alphaSpring.setRestDisplacementThreshold(0.15f);
+        alphaSpring.setRestSpeedThreshold(0.15f);
+
+        final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
+        final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
+        final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
+        final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
+        Spring coverSpring = SpringSystem.create().createSpring();
+        coverSpring.addListener(new SimpleSpringListener(){
+            @Override
+            public void onSpringUpdate(Spring spring) {
+                final double currentVal = spring.getCurrentValue();
+                mAnimCover.setTranslationX((float) (transitionX * currentVal));
+                mAnimCover.setTranslationY((float) (transitionY * currentVal));
+                mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
+                mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
+            }
+            @Override
+            public void onSpringActivate(Spring spring) {
+                mAnimCover.setVisibility(View.VISIBLE);
+                //隐藏fragment中的image
+                if(mAdapter.getItem(1) instanceof CoverFragment){
+                    ((CoverFragment) mAdapter.getItem(1)).hideImage();
+                }
+            }
+        });
+        coverSpring.setCurrentValue(1);
+        coverSpring.setEndValue(0);
+        coverSpring.setRestSpeedThreshold(0.15f);
+        coverSpring.setRestDisplacementThreshold(0.15f);
     }
 
     /**
@@ -631,71 +641,71 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 mAnimCover.setPivotX(0);
                 mAnimCover.setPivotY(0);
 
-//                final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
-//                final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
-//                final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
-//                final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
-//
-//                final Spring scaleXSpring = SpringSystem.create().createSpring();
-//                scaleXSpring.addListener(new SimpleSpringListener(){
-//                    @Override
-//                    public void onSpringUpdate(Spring spring) {
-//                        final double currentVal = spring.getCurrentValue();
-//                        mAnimCover.setTranslationX((float) (transitionX * currentVal));
-//                        mAnimCover.setTranslationY((float) (transitionY * currentVal));
-//                        mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
-//                        mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
-//                    }
-//                    @Override
-//                    public void onSpringAtRest(Spring spring) {
-//                        //入场动画结束时显示fragment中的封面
-//                        if (mAdapter.getItem(1) instanceof CoverFragment) {
-//                            ((CoverFragment) mAdapter.getItem(1)).showImage();
-//                        }
-//                        //隐藏动画用的封面
-//                        mAnimCover.setVisibility(View.GONE);
-//                    }
-//                    @Override
-//                    public void onSpringActivate(Spring spring) {
-//                        overridePendingTransition(0, 0);
-//                    }
-//                });
-//                scaleXSpring.setCurrentValue(0);
-//                scaleXSpring.setEndValue(1);
-//                scaleXSpring.setRestSpeedThreshold(0.99f);
-//                scaleXSpring.setRestDisplacementThreshold(0.99f);
+                final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
+                final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
+                final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
+                final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
 
-                mAnimCover.animate()
-                        .setInterpolator(mInterpolator)
-                        .withStartAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                overridePendingTransition(0, 0);
-                            }
-                        })
-                        .withEndAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                //入场动画结束时显示fragment中的封面
-                                if (mAdapter.getItem(1) instanceof CoverFragment) {
-                                    ((CoverFragment) mAdapter.getItem(1)).showImage();
-                                }
-                                //延迟消失 避免闪烁
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        //隐藏动画用的封面
-                                        mAnimCover.setVisibility(View.GONE);
-                                    }
-                                },1000);
-                            }
-                        })
-                        .setDuration(DURATION)
-                        .scaleX(mScaleBundle.getFloat(SCALE_WIDTH))
-                        .scaleY(mScaleBundle.getFloat(SCALE_HEIGHT))
-                        .translationX(mTransitionBundle.getFloat(TRANSITION_X))
-                        .translationY(mTransitionBundle.getFloat(TRANSITION_Y))
-                        .start();
+                final Spring scaleXSpring = SpringSystem.create().createSpring();
+                scaleXSpring.addListener(new SimpleSpringListener(){
+                    @Override
+                    public void onSpringUpdate(Spring spring) {
+                        final double currentVal = spring.getCurrentValue();
+                        mAnimCover.setTranslationX((float) (transitionX * currentVal));
+                        mAnimCover.setTranslationY((float) (transitionY * currentVal));
+                        mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
+                        mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
+                    }
+                    @Override
+                    public void onSpringAtRest(Spring spring) {
+                        //入场动画结束时显示fragment中的封面
+                        if (mAdapter.getItem(1) instanceof CoverFragment) {
+                            ((CoverFragment) mAdapter.getItem(1)).showImage();
+                        }
+                        //隐藏动画用的封面
+                        mAnimCover.setVisibility(View.GONE);
+                    }
+                    @Override
+                    public void onSpringActivate(Spring spring) {
+                        overridePendingTransition(0, 0);
+                    }
+                });
+                scaleXSpring.setCurrentValue(0);
+                scaleXSpring.setEndValue(1);
+                scaleXSpring.setRestSpeedThreshold(0.99f);
+                scaleXSpring.setRestDisplacementThreshold(0.99f);
+
+//                mAnimCover.animate()
+//                        .setInterpolator(mInterpolator)
+//                        .withStartAction(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                overridePendingTransition(0, 0);
+//                            }
+//                        })
+//                        .withEndAction(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                //入场动画结束时显示fragment中的封面
+//                                if (mAdapter.getItem(1) instanceof CoverFragment) {
+//                                    ((CoverFragment) mAdapter.getItem(1)).showImage();
+//                                }
+//                                //延迟消失 避免闪烁
+//                                new Handler().postDelayed(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        //隐藏动画用的封面
+//                                        mAnimCover.setVisibility(View.GONE);
+//                                    }
+//                                },1000);
+//                            }
+//                        })
+//                        .setDuration(DURATION)
+//                        .scaleX(mScaleBundle.getFloat(SCALE_WIDTH))
+//                        .scaleY(mScaleBundle.getFloat(SCALE_HEIGHT))
+//                        .translationX(mTransitionBundle.getFloat(TRANSITION_X))
+//                        .translationY(mTransitionBundle.getFloat(TRANSITION_Y))
+//                        .start();
             }
         });
         coverFragment.setArguments(mBundle);
@@ -780,15 +790,27 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 if(MusicService.getNextMP3() != null){
                     mNextSong.setText("下一首：" + MusicService.getNextMP3().getTitle());
                 }
-                new Handler().postDelayed(new Runnable() {
+                new Thread(){
                     @Override
                     public void run() {
-                        //更新专辑封面
-                        //不是第一次启动并且不是从通知栏启动，播放动画
-                        ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
-                        mFistStart = false;
+                        File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(),Constants.URL_ALBUM);
+                        if(imgFile.exists()) {
+                            mUri = Uri.parse("file:///" +  imgFile);
+                        } else {
+                            mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
+                        }
+                        mCoverHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
                     }
-                }, mFistStart ? 16 : 0);
+                }.start();
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        //更新专辑封面
+//                        //不是第一次启动并且不是从通知栏启动，播放动画
+//                        ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
+//                        mFistStart = false;
+//                    }
+//                }, mFistStart ? 16 : 0);
             }
             //更新按钮状态
             UpdatePlayButton(isplay);

@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.view.KeyEvent;
@@ -88,11 +89,6 @@ public class MusicService extends BaseService {
     /** MediaPlayer 负责歌曲的播放等 */
     private static MediaPlayer mMediaPlayer;
 
-    /** 最大音量 */
-    private int mMaxVolume = -1;
-
-    /** 当前音量 */
-    private int mCurrentVolume = -1;
 
     /** AudiaoManager */
     private AudioManager mAudioManager;
@@ -370,19 +366,20 @@ public class MusicService extends BaseService {
     private void playStart() {
         new Thread(){
             @Override
-            //音量逐渐增大
             public void run(){
-                mAudioFouus = mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
-                                              AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+                mAudioFouus = mAudioManager.requestAudioFocus(
+                        mAudioFocusListener,
+                        AudioManager.STREAM_MUSIC,
+                        AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
                 if(!mAudioFouus)
                     return;
                 mIsplay = true;
-                mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-
                 mMediaPlayer.start();
-
                 //更新所有界面
                 Update(Global.getOperation());
+                //保存当前播放的下一首播放的歌曲的id
+                SPUtil.putValue(mContext,"Setting","LastSongId", mCurrentId);
+                SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
             }
         }.start();
     }
@@ -431,15 +428,14 @@ public class MusicService extends BaseService {
 
         mNextIndex = mCurrentIndex;
         mNextId = mCurrentId;
-        updateNextSong();
 
         if(mCurrentInfo == null) {
             ToastUtil.show(mContext,R.string.song_lose_effect);
             return;
         }
-
         mIsplay = true;
         prepareAndPlay(mCurrentInfo.getUrl());
+        updateNextSong();
     }
 
 
@@ -569,26 +565,31 @@ public class MusicService extends BaseService {
      * 准备播放
      * @param path 播放歌曲的路径
      */
-    private void prepareAndPlay(String path) {
-        try {
-            mAudioFouus =  mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
-                    AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-            if(!mAudioFouus)
-                return;
-            mIsIniting = true;
-            mMediaPlayer.reset();
-            mMediaPlayer.setDataSource(path);
+    private void prepareAndPlay(final String path) {
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    mAudioFouus =  mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
+                            AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+                    if(!mAudioFouus)
+                        return;
+                    mIsIniting = true;
+                    mMediaPlayer.reset();
+                    mMediaPlayer.setDataSource(path);
 
-            mMediaPlayer.prepareAsync();
-            mFirstFlag = false;
-            mIsplay = true;
-            mIsIniting = false;
-            SPUtil.putValue(mContext,"Setting","LastSongId", mCurrentId);
-            SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+                    mMediaPlayer.prepareAsync();
+                    mFirstFlag = false;
+                    mIsplay = true;
+                    mIsIniting = false;
+
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+
     }
 
     /**
@@ -625,8 +626,6 @@ public class MusicService extends BaseService {
             mNextId = mCurrentId;
         }
 
-        updateNextSong();
-
         MP3Item temp = mCurrentInfo;
         if(mCurrentInfo == null) {
             mCurrentInfo = temp;
@@ -636,6 +635,7 @@ public class MusicService extends BaseService {
         mIsplay = true;
         if(needPlay)
             prepareAndPlay(mCurrentInfo.getUrl());
+        updateNextSong();
     }
 
 
@@ -791,34 +791,6 @@ public class MusicService extends BaseService {
         mCurrentIndex = pos;
     }
 
-
-    /**
-     * 逐步减小音量
-     */
-    public class VolDownThread extends Thread{
-        @Override
-        public void run(){
-            mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-            mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            if((double)mCurrentVolume / mMaxVolume < 0.15)
-                return;
-            int sleeptime = (int)(1000 / (mCurrentVolume - (double)mCurrentVolume / mMaxVolume));
-            int temp = mCurrentVolume;
-            if(sleeptime > 0){
-                while (temp-- < mMaxVolume * 0.15){
-                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, temp,
-                            AudioManager.FLAG_PLAY_SOUND);
-                    try {
-                        sleep(sleeptime);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume,
-                    AudioManager.FLAG_PLAY_SOUND);
-        }
-    }
 
     /**
      * 记录在一秒中线控按下的次数

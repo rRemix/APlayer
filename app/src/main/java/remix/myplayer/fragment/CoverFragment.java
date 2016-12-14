@@ -86,18 +86,13 @@ public class CoverFragment extends BaseFragment {
      * @param info 需要更新的歌曲
      * @param withAnim 是否需要动画
      */
-    public void UpdateCover(MP3Item info, boolean withAnim){
+    public void UpdateCover(MP3Item info,Uri uri, boolean withAnim){
         if(!isAdded())
             return;
         if (mImage == null || (mInfo = info) == null)
             return;
 
-        File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(),Constants.URL_ALBUM);
-        if(imgFile.exists()) {
-            mUri = Uri.parse("file:///" +  imgFile);
-        } else {
-            mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
-        }
+        mUri = uri;
 
         if(withAnim){
             int operation = Global.getOperation();
