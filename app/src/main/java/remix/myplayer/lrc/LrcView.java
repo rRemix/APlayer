@@ -124,18 +124,22 @@ public class LrcView extends View implements ILrcView{
 	public void init() {
 		mScroller = new Scroller(getContext());
 		mPaintForHighLightLrc = new Paint();
+		mPaintForHighLightLrc.setAntiAlias(true);
 		mPaintForHighLightLrc.setColor(mCurColorForHightLightLrc);
+
         mCurSizeForHightLightLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,18, APlayerApplication.getContext().getResources().getDisplayMetrics());
 		mPaintForHighLightLrc.setTextSize(mCurSizeForHightLightLrc);
 		mPaintForHighLightLrc.setFakeBoldText(true);
 
 		mPaintForOtherLrc = new Paint();
+        mPaintForOtherLrc.setAntiAlias(true);
 		mPaintForOtherLrc.setColor(mCurColorForOtherLrc);
 
         mCurSizeForOtherLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,12, APlayerApplication.getContext().getResources().getDisplayMetrics());
 		mPaintForOtherLrc.setTextSize(mCurSizeForOtherLrc);
 
 		mPaintForTimeLine = new Paint();
+        mPaintForTimeLine.setAntiAlias(true);
         mCurSizeForTimeLine = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,12, APlayerApplication.getContext().getResources().getDisplayMetrics());
         mPaintForTimeLine.setTextSize(mCurSizeForTimeLine);
 		mPaintForTimeLine.setColor(mTimeLineColor);
@@ -208,9 +212,6 @@ public class LrcView extends View implements ILrcView{
 				float textX = (getWidth() - textWidth) / 2;
 				//如果计算出的textX为负数，将textX置为0(实现：如果歌词宽大于view宽，则居左显示，否则居中显示)
 				textX = Math.max(textX, 0);
-				//实现颜色渐变  从0xFFFFFFFF 逐渐变为 0x11FFFFFF(颜色还是白色，只是透明度变化)
-				int curAlpha = 255 - (Math.abs(i - mCurRow) - 1 ) * alpha; //求出当前歌词颜色的透明度
-//				mPaintForOtherLrc.setColor(0x1000000 * curAlpha + 0xffffff);
 				canvas.drawText(text, textX, rowY, mPaintForOtherLrc);
 			}
 			//计算出下一行歌词绘制的y坐标

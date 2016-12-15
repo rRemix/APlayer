@@ -3,7 +3,6 @@ package remix.myplayer.theme;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 
-import me.zhanghai.android.materialprogressbar.internal.ThemeUtils;
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.util.ColorUtil;

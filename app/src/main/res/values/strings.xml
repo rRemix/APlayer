@@ -8,7 +8,6 @@
     <string name="tab_playlist">播放列表</string>
 
     <string name="from_aplayer">来自APlayer播放器</string>
-    <string name="version">APlaer V1.1.2</string>
     <string name="about">关于APlayer</string>
     <string name="model_random">随机播放</string>
     <string name="model_repeat">单曲播放</string>
@@ -116,5 +115,6 @@
     <string name="updat_error">查询出错或查询超时</string>
     <string name="update_ignore">该版本已被忽略更新</string>
     <string name="no_update">当前已经是最新版本</string>
+    <string name="v1_1_2">v1.2.0</string>
 
 </resources>

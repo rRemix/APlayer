@@ -21,9 +21,6 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.BaseInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -68,8 +65,6 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
-
-import static remix.myplayer.util.StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -745,15 +740,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                         mCoverHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
                     }
                 }.start();
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        //更新专辑封面
-//                        //不是第一次启动并且不是从通知栏启动，播放动画
-//                        ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,!mFistStart);
-//                        mFistStart = false;
-//                    }
-//                }, mFistStart ? 16 : 0);
             }
             //更新按钮状态
             UpdatePlayButton(isplay);

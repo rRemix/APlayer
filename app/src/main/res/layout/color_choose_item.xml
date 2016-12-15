@@ -4,8 +4,8 @@
     android:layout_height="wrap_content"
     android:background="?attr/background_common"
     android:paddingBottom="@dimen/d8_size"
-    android:paddingLeft="@dimen/d12_size"
-    android:paddingRight="@dimen/d12_size"
+    android:paddingLeft="@dimen/d10_size"
+    android:paddingRight="@dimen/d10_size"
     android:paddingTop="@dimen/d12_size">
     <FrameLayout
         android:id="@+id/color_choose_item_container"

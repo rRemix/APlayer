@@ -21,7 +21,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,10 +38,7 @@ import java.io.File;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import cn.bmob.v3.listener.BmobUpdateListener;
 import cn.bmob.v3.update.BmobUpdateAgent;
-import cn.bmob.v3.update.UpdateResponse;
-import cn.bmob.v3.update.UpdateStatus;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
@@ -57,7 +53,6 @@ import remix.myplayer.interfaces.OnModeChangeListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -192,7 +187,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         if(mIsFirstCreateActivity)
             initLastSong();
 
-        mBottomBar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
+        mBottomBar.UpdateBottomStatus(MusicService.getCurrentMP3(),  MusicService.getIsplay());
 
         BmobUpdateAgent.setUpdateOnlyWifi(false);
         BmobUpdateAgent.update(this);
@@ -205,25 +200,10 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
      */
     private void initLastSong() {
         //第一次打开软件，播放队列以及正在播放歌曲都为空
-//        if(mIsFirstAfterInstall){
-//            mBottomBar.UpdateBottomStatus(new MP3Item(),false);
-//        }
         mIsFirstCreateActivity = false;
 
         if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
             return;
-        //如果是第一次打开，设置第一首歌曲为正在播放
-//        if(mIsFirstAfterInstall){
-//            int id =  Global.mPlayQueue.get(0);
-//            MP3Item item = MediaStoreUtil.getMP3InfoById(id);
-//            if(item != null){
-//                mBottomBar.UpdateBottomStatus(item,false);
-//                updateHeader(item,false);
-//                SPUtil.putValue(this,"Setting","LastSongId",id);
-//                MusicService.initDataSource(item,0);
-//            }
-//            return;
-//        }
 
         //读取上次退出时正在播放的歌曲的id
         int lastId = SPUtil.getValue(this,"Setting","LastSongId",0);

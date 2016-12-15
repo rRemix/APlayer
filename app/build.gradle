@@ -10,7 +10,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 6
-        versionName "1.1.2"
+        versionName "1.2.0"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -32,10 +32,7 @@ android {
         }
         release {
             //混淆代码
-            minifyEnabled true
-            debuggable false
-            zipAlignEnabled true
-            shrinkResources true
+
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -49,6 +46,7 @@ android {
 //        wandoujia{}
 //        meizu{}
 //        xiaomi{}
+//        tencent{}
 //        kuan{}
         productFlavors.all { flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]

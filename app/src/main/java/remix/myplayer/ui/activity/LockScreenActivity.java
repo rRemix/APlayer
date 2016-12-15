@@ -13,10 +13,8 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -219,6 +217,9 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
     @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
         mInfo = MP3Item;
+        mIsPlay = isplay;
+        if(!mIsRunning)
+            return;
         if(mInfo == null){
             ToastUtil.show(this,"mp3Info:null", Toast.LENGTH_LONG);
         }
@@ -266,29 +267,29 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         public void run() {
             if (mInfo == null)
                 return;
-            mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
-            if(mRawBitMap == null)
-                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
+            try {
+                mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
+                if(mRawBitMap == null)
+                    mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
 
-            StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
-            mStackBlurManager.process(40);
-            mNewBitMap = mStackBlurManager.returnBlurredImage();
+                StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
+                mStackBlurManager.process(40);
+                mNewBitMap = mStackBlurManager.returnBlurredImage();
 
-            Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
-                @Override
-                public void onGenerated(Palette palette) {
-                    mSwatch = palette.getDarkMutedSwatch();//柔和 暗色
-                    if(mSwatch == null)
-                        mSwatch = new Palette.Swatch(Color.GRAY,100);
-//                    mSongColor = ColorUtil.shiftColor(mSwatch.getRgb(),1.2f);
-//                    mArtistColor = ColorUtil.shiftColor(mSwatch.getRgb(),1.1f);
-                    mSongColor = mSwatch.getBodyTextColor();
-                    mArtistColor = mSwatch.getTitleTextColor();
-                    mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
-                }
-            });
-
+                Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        mSwatch = palette.getMutedSwatch();//柔和 暗色
+                        if(mSwatch == null)
+                            mSwatch = new Palette.Swatch(Color.GRAY,100);
+                        mSongColor = mSwatch.getBodyTextColor();
+                        mArtistColor = mSwatch.getTitleTextColor();
+                        mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
+                    }
+                });
+            } catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
-
 }

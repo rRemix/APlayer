@@ -17,9 +17,6 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
 
-import java.io.File;
-
-import butterknife.BindInt;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
@@ -28,7 +25,6 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.thumb.SearchCover;
 
 /**

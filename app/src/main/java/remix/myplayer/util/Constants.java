@@ -4,10 +4,6 @@ package remix.myplayer.util;
  * Created by taeja on 16-2-17.
  */
 
-import android.provider.MediaStore;
-
-import com.facebook.common.util.ByteConstants;
-
 /**
  * 常量值
  */

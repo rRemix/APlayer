@@ -22,7 +22,6 @@ public class AboutActivity extends ToolbarActivity {
 
         ButterKnife.bind(this);
         setUpToolbar(mToolBar, getString(R.string.about));
-
     }
 
     public void onResume() {

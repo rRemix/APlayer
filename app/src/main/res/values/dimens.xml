@@ -3,10 +3,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <dimen name="s8_size">8sp</dimen>
     <dimen name="s10_size">10sp</dimen>
     <dimen name="s12_size">12sp</dimen>
-    <dimen name="s13_size">13sp</dimen>
     <dimen name="s14_size">14sp</dimen>
     <dimen name="s15_size">15sp</dimen>
     <dimen name="s16_size">16sp</dimen>
@@ -33,16 +31,13 @@
     <dimen name="d18_size">18dp</dimen>
     <dimen name="d19_size">19dp</dimen>
     <dimen name="d20_size">20dp</dimen>
-    <dimen name="d21_size">21dp</dimen>
     <dimen name="d22_size">22dp</dimen>
     <dimen name="d23_size">23dp</dimen>
     <dimen name="d24_size">24dp</dimen>
-    <dimen name="d26_size">26dp</dimen>
     <dimen name="d28_size">28dp</dimen>
     <dimen name="d30_size">30dp</dimen>
     <dimen name="d32_size">32dp</dimen>
     <dimen name="d36_size">36dp</dimen>
-    <dimen name="d38_size">38dp</dimen>
     <dimen name="d40_size">40dp</dimen>
     <dimen name="d42_size">42dp</dimen>
     <dimen name="d44_size">44dp</dimen>
@@ -50,7 +45,6 @@
     <dimen name="d48_size">48dp</dimen>
     <dimen name="d50_size">50dp</dimen>
     <dimen name="d54_size">54dp</dimen>
-    <dimen name="d55_size">55dp</dimen>
     <dimen name="d56_size">56dp</dimen>
     <dimen name="d60_size">60dp</dimen>
     <dimen name="d64_size">64dp</dimen>
@@ -60,7 +54,6 @@
     <dimen name="d123_size">123dp</dimen>
     <dimen name="d124_size">124dp</dimen>
     <dimen name="d160_size">160dp</dimen>
-    <dimen name="d162_size">162dp</dimen>
     <dimen name="d170_size">170dp</dimen>
     <dimen name="d180_size">180dp</dimen>
     <dimen name="d188_size">188dp</dimen>
@@ -68,14 +61,10 @@
     <dimen name="d200_size">200dp</dimen>
     <dimen name="d210_size">210dp</dimen>
     <dimen name="d218_size">218dp</dimen>
-    <dimen name="d238_size">238dp</dimen>
     <dimen name="d240_size">240dp</dimen>
     <dimen name="d264_size">264dp</dimen>
     <dimen name="d268_size">268dp</dimen>
-    <dimen name="d270_size">270dp</dimen>
     <dimen name="d300_size">300dp</dimen>
-    <dimen name="d351_size">351dp</dimen>
-    <dimen name="d410_size">410dp</dimen>
 
     <dimen name="pause_bar_width">4dp</dimen>
     <dimen name="pause_bar_distance">10dp</dimen>

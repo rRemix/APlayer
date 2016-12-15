@@ -13,7 +13,6 @@ import com.umeng.socialize.PlatformConfig;
 import com.umeng.socialize.UMShareAPI;
 
 import cn.bmob.v3.Bmob;
-import remix.myplayer.BuildConfig;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.LockScreenListener;
@@ -26,11 +25,9 @@ import remix.myplayer.util.CrashHandler;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-3-16.

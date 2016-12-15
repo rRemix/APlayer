@@ -16,94 +16,30 @@
             app:layout_scrollFlags="scroll|enterAlways" />
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:background="?attr/background_color_3">
 
-        <android.support.v7.widget.CardView
-            android:orientation="vertical"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_horizontal"
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="?attr/background_aboutus_color"
-            app:cardCornerRadius="@dimen/d4_size"
-            app:cardElevation="@dimen/d4_size"
-            android:layout_marginTop="@dimen/d28_size"
-            android:layout_marginStart="@dimen/d16_size"
-            android:layout_marginEnd="@dimen/d16_size">
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_marginTop="@dimen/d24_size"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/s18_size"
-                    android:textColor="?attr/text_color_primary"
-                    android:text="勇敢踏出第一步"/>
-                <ImageView
-                    android:layout_width="@dimen/d30_size"
-                    android:layout_height="@dimen/d1_size"
-                    android:background="?attr/text_color_primary"
-                    android:layout_marginTop="@dimen/d21_size"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/s14_size"
-                    android:textColor="?attr/text_color_primary"
-                    android:text="我们的第一个应用"
-                    android:layout_marginTop="@dimen/d20_size"/>
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/d50_size"
-                    android:layout_marginBottom="@dimen/d2_size"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-                    <ImageView
-                        android:layout_width="@dimen/d18_size"
-                        android:layout_height="@dimen/d1_size"
-                        android:background="?attr/text_color"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="@dimen/s12_size"
-                        android:textColor="?attr/text_color"
-                        android:text="@string/version"
-                        android:layout_marginLeft="@dimen/d5_szie"
-                        android:layout_marginRight="@dimen/d5_szie"/>
-                    <ImageView
-                        android:layout_width="@dimen/d18_size"
-                        android:layout_height="@dimen/d1_size"
-                        android:background="?attr/text_color"/>
-                </LinearLayout>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
-    </LinearLayout>
+            android:layout_alignParentTop="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/image_aboutus"
+            android:background="@color/transparent"/>
 
-
-    <!--<TextView-->
-    <!--android:id="@+id/about_text"-->
-    <!--android:layout_centerInParent="true"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:textColor="@color/text_color_white"-->
-    <!--android:textSize="@dimen/textsize_huge"-->
-    <!--android:text="APlayer V1.0.0"/>-->
-
-    <!--<ImageView-->
-    <!--android:id="@+id/about_icon"-->
-    <!--android:layout_centerHorizontal="true"-->
-    <!--android:layout_marginBottom="20dp"-->
-    <!--android:layout_above="@id/about_text"-->
-    <!--android:layout_width="180dp"-->
-    <!--android:layout_height="180dp"-->
-    <!--android:src="@mipmap/sideaplayer_icon"/>-->
+        <TextView
+            android:id="@+id/about_text"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/d12_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/text_color"
+            android:textSize="@dimen/s15_size"
+            android:text="@string/v1_1_2"/>
+    </RelativeLayout>
 </LinearLayout>

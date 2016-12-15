@@ -27,8 +27,6 @@
             android:id="@+id/lockscreen_image"
             fresco:placeholderImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/album_empty_bg_night"
-            fresco:failureImage="@drawable/album_empty_bg_night"
-            fresco:failureImageScaleType="centerCrop"
             fresco:actualImageScaleType="centerCrop"
             android:scaleType="centerCrop"
             android:layout_centerInParent="true"/>
@@ -83,11 +81,12 @@
             android:src="@drawable/lock_btn_play"
             android:layout_centerInParent="true"
             android:background="@color/transparent"
-            android:layout_marginLeft="@dimen/d38_size"
-            android:layout_marginRight="@dimen/d38_size"/>
+            android:layout_marginLeft="@dimen/d30_size"
+            android:layout_marginRight="@dimen/d30_size"/>
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="@dimen/d8_size"
             android:id="@+id/lockscreen_prev"
             android:src="@drawable/lock_btn_prev"
             android:background="@color/transparent"
@@ -96,6 +95,7 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="@dimen/d8_size"
             android:id="@+id/lockscreen_next"
             android:src="@drawable/lock_btn_next"
             android:background="@color/transparent"

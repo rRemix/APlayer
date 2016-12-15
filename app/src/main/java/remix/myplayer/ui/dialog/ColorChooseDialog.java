@@ -24,7 +24,6 @@ import remix.myplayer.R;
 import remix.myplayer.model.ColorChooseInfo;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.LogUtil;
 
 /**
  * @ClassName ColorChooseDialog

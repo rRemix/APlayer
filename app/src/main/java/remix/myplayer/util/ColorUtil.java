@@ -7,8 +7,6 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.FloatRange;
 import android.support.v4.content.ContextCompat;
 
-import remix.myplayer.R;
-
 /**
  * @ClassName
  * @Description
