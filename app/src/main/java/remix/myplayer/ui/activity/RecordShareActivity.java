@@ -53,7 +53,6 @@ import remix.myplayer.util.ToastUtil;
  * 将分享内容与专辑封面进行处理用于分享
  */
 public class RecordShareActivity extends BaseActivity {
-    public static RecordShareActivity mInstance;
     @BindView(R.id.recordshare_image)
     SimpleDraweeView mImage;
     //歌曲名与分享内容
@@ -127,7 +126,6 @@ public class RecordShareActivity extends BaseActivity {
         setContentView(R.layout.activity_recordshare);
         ButterKnife.bind(this);
 
-        mInstance = this;
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //初始化控件

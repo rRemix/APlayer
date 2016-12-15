@@ -113,58 +113,11 @@
         android:id="@+id/lockscreen_next_song"
         android:gravity="center"
         android:layout_marginTop="@dimen/d40_size"
-        android:paddingLeft="@dimen/d22_size"
-        android:paddingRight="@dimen/d22_size"
+        android:paddingStart="@dimen/d12_size"
+        android:paddingEnd="@dimen/d12_size"
         android:paddingTop="@dimen/d12_size"
         android:paddingBottom="@dimen/d12_size"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/lockscreen_button_container"/>
-
-    <LinearLayout
-        android:id="@+id/lockscreen_arrow_container"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_below="@id/lockscreen_next_song"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/d12_size"
-        android:visibility="gone">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/lockscreen_arrow"
-            android:background="@color/transparent"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/lockscreen_arrow"
-            android:background="@color/transparent"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/lockscreen_arrow"
-            android:background="@color/transparent"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/lockscreen_arrow"
-            android:background="@color/transparent"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/lockscreen_arrow"
-            android:background="@color/transparent"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/lockscreen_arrow"
-            android:background="@color/transparent"/>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/lockscreen_arrow"
-            android:background="@color/transparent"/>
-    </LinearLayout>
 
 </RelativeLayout>

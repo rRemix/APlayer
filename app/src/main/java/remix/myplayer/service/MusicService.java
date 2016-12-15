@@ -620,6 +620,8 @@ public class MusicService extends BaseService {
             //如果点击上一首 根据播放模式查找上一首歌曲 再重新设置当前歌曲为上一首
             if ((--mCurrentIndex) < 0)
                 mCurrentIndex = Global.mPlayQueue.size() - 1;
+            if(mCurrentIndex  == -1 || (mCurrentIndex > Global.mPlayQueue.size() - 1))
+                return;
             mCurrentId = Global.mPlayQueue.get(mCurrentIndex);
             mCurrentInfo = MediaStoreUtil.getMP3InfoById(mCurrentId);
             mNextIndex = mCurrentIndex;

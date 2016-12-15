@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.facebook.common.util.ByteConstants;
 import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
@@ -202,7 +203,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         mDetailName.setText(mInfo.getDisplayname());
                     //歌曲大小
                     if(mDetailSize != null)
-                        mDetailSize.setText(mContext.getString(R.string.cache_szie,mInfo.getSize() / 1024f / 1024));
+                        mDetailSize.setText(mContext.getString(R.string.cache_szie,1.0f * mInfo.getSize() / ByteConstants.MB));
                     //歌曲格式
                     if(mDetailMime != null){
                         String path = mInfo.getUrl();

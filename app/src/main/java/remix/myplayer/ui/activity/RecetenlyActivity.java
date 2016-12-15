@@ -45,7 +45,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
     public static final String TAG = RecetenlyActivity.class.getSimpleName();
     private static int LOADER_ID = 1;
 
-    private ArrayList<MP3Item> mInfoList;
+
     private SongAdapter mAdapter;
     @BindView(R.id.recently_shuffle)
     RelativeLayout mShuffle;
@@ -54,26 +54,10 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
     private Cursor mCursor;
     private ArrayList<Integer> mIdList = new ArrayList<>();
 
-    private MaterialDialog mMDDialog;
-
-    private static final int START = 0;
-    private static final int END = 1;
     private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
-                case START:
-                    if(mMDDialog != null && !mMDDialog.isShowing()){
-                        mMDDialog.show();
-                    }
-                    break;
-                case END:
-                    if(mMDDialog != null && mMDDialog.isShowing()){
-                        mAdapter.setInfoList(mInfoList);
-                        mShuffle.setVisibility(mInfoList == null || mInfoList.size() == 0 ? View.GONE : View.VISIBLE);
-                        mMDDialog.dismiss();
-                    }
-                    break;
                 case Constants.CLEAR_MULTI:
                     mMultiChoice.clearSelectedViews();
                     break;
@@ -122,14 +106,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         mRecyclerView.setAdapter(mAdapter);
         getLoaderManager().initLoader(LOADER_ID++, null, this);
 
-        mMDDialog = new MaterialDialog.Builder(this)
-                .title("加载中")
-                .titleColorAttr(R.attr.text_color_primary)
-                .content("请稍等")
-                .contentColorAttr(R.attr.text_color_primary)
-                .progress(true, 0)
-                .backgroundColorAttr(R.attr.background_color_3)
-                .progressIndeterminateStyle(false).build();
 
         setUpToolbar(mToolBar,getString(R.string.recently));
 

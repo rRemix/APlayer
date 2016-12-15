@@ -21,7 +21,8 @@
             android:layout_height="@dimen/d120_size"
             android:layout_centerVertical="true"
             android:src="@drawable/album_empty_bg_day"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop"
+            android:layout_gravity="center_vertical"/>
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -53,11 +54,12 @@ public class BottomActionBarFragment extends BaseFragment{
     @BindView(R.id.bottom_action_bar_cover)
     SimpleDraweeView mCover;
 
-    public static BottomActionBarFragment mInstance;
+    //保存封面位置信息
+    private static Rect mCoverRect;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mInstance = this;
         mPageName = BottomActionBarFragment.class.getSimpleName();
     }
     @Override
@@ -88,11 +90,7 @@ public class BottomActionBarFragment extends BaseFragment{
                 intent.putExtras(bundle);
                 intent.putExtra("Isplay",MusicService.getIsplay());
                 intent.putExtra("FromActivity",true);
-                Rect rect = new Rect();
-                // 获取元素位置信息
-                mCover.getGlobalVisibleRect(rect);
-                intent.setSourceBounds(rect);
-//                getContext().startActivity(intent);
+                intent.putExtra("Rect",mCoverRect);
 
                 // 这里指定了共享的视图元素
                 ActivityOptionsCompat options = ActivityOptionsCompat
@@ -101,8 +99,24 @@ public class BottomActionBarFragment extends BaseFragment{
 
             }
         });
+        //播放按钮
         CtrlButtonListener listener = new CtrlButtonListener(getContext());
         mPlayButton.setOnClickListener(listener);
+
+        //获取封面位置信息
+        mCover.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                mCover.getViewTreeObserver().removeOnPreDrawListener(this);
+                mCoverRect = new Rect();
+                mCover.getGlobalVisibleRect(mCoverRect);
+                //数据失效重新获取位置信息
+                if(mCoverRect == null || mCoverRect.width() <= 0 || mCoverRect.height() <= 0){
+                    mCover.getGlobalVisibleRect(mCoverRect);
+                }
+                return true;
+            }
+        });
         return rootView;
     }
     //更新界面
@@ -124,7 +138,11 @@ public class BottomActionBarFragment extends BaseFragment{
         }
         //封面
         MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
-//        new AsynLoadImage(mCover).execute(mp3Item.getAlbumId(), Constants.URL_ALBUM);
+
+    }
+
+    public static Rect getCoverRect(){
+        return mCoverRect;
     }
 
 }

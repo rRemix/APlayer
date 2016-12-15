@@ -13,6 +13,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
 import remix.myplayer.R;
+import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.AudioHolderActivity;
@@ -114,6 +115,7 @@ public class NotifyReceiver extends BroadcastReceiver {
             stackBuilder.addParentStack(AudioHolderActivity.class);
             stackBuilder.addNextIntent(result);
             stackBuilder.editIntentAt(1).putExtra("Notify", true);
+            stackBuilder.editIntentAt(1).putExtra("Rect",BottomActionBarFragment.getCoverRect());
             stackBuilder.editIntentAt(0).putExtra("Notify", true);
 
             PendingIntent resultPendingIntent =

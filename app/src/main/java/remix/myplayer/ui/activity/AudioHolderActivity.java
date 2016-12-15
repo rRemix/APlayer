@@ -63,6 +63,7 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -179,11 +180,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
      * 终点View的位置信息
      */
     private static Rect mDestRect = new Rect();
-    /**
-     * 入场与退场动画时间
-     */
-    private final int DURATION = 250;
-    private AccelerateDecelerateInterpolator mInterpolator = new AccelerateDecelerateInterpolator();
+
 
     /** 更新进度条的Handler */
     private Handler mProgressHandler = new Handler() {
@@ -259,6 +256,10 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         //设置封面
         MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
 
+        //恢复位置信息
+        if(savedInstanceState != null){
+            mOriginRect = savedInstanceState.getParcelable("Rect");
+        }
     }
 
     /**
@@ -305,47 +306,16 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("Rect",mOriginRect);
+    }
+
+    @Override
     public void onBackPressed() {
         //更新动画控件封面 保证退场动画的封面与fragment中封面一致
 //        MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
         mAnimCover.setImageURI(mUri);
-//        mContainer.animate()
-//                .setInterpolator(mInterpolator)
-//                .withEndAction(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        finish();
-//                        overridePendingTransition(0,0);
-//                    }
-//                })
-//                .setDuration(DURATION)
-//                .alpha(0.2f)
-//                .start();
-//        mAnimCover.animate()
-//                .setInterpolator(mInterpolator)
-//                .withStartAction(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        mAnimCover.setVisibility(View.VISIBLE);
-//                        //隐藏fragment中的image
-//                        if(mAdapter.getItem(1) instanceof CoverFragment){
-//                            ((CoverFragment) mAdapter.getItem(1)).hideImage();
-//                        }
-//                    }
-//                })
-//                .withEndAction(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        finish();
-//                        overridePendingTransition(0,0);
-//                    }
-//                })
-//                .setDuration(DURATION)
-//                .scaleX(1)
-//                .scaleY(1)
-//                .translationX(0)
-//                .translationY(0)
-//                .start();
 
         Spring alphaSpring = SpringSystem.create().createSpring();
         alphaSpring.addListener(new SimpleSpringListener(){
@@ -365,9 +335,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
             }
         });
         alphaSpring.setCurrentValue(1);
-        alphaSpring.setEndValue(0.2f);
-        alphaSpring.setRestDisplacementThreshold(0.15f);
-        alphaSpring.setRestSpeedThreshold(0.15f);
+        alphaSpring.setEndValue(0.15f);
+        alphaSpring.setRestSpeedThreshold(0.10f);
+        alphaSpring.setRestDisplacementThreshold(0.10f);
 
         final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
         final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
@@ -604,18 +574,27 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         coverFragment.setInflateFinishListener(new OnInflateFinishListener() {
             @Override
             public void onViewInflateFinish(View view) {
-                if(mOriginRect == null) {
-                    // 获取上一个界面传入的信息
-                    mOriginRect = getIntent().getSourceBounds();
-                    // 获取上一个界面中，图片的宽度和高度
-                    mOriginWidth = mOriginRect.width();
-                    mOriginHeight = mOriginRect.height();
+                LogUtil.d(TAG,mOriginRect != null ? "获取数据之前Rect:" + mOriginRect.toString() : "获取数据之前Rect: null" );
+                if(mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
+                    //获取传入的界面信息
+                    mOriginRect = getIntent().getParcelableExtra("Rect");
                 }
+                LogUtil.d(TAG,mOriginRect != null ? "获取数据之后Rect:" + mOriginRect.toString() : "获取数据之后Rect: null" );
+                if(mOriginRect == null)
+                    return;
+                // 获取上一个界面中，图片的宽度和高度
+                mOriginWidth = mOriginRect.width();
+                mOriginHeight = mOriginRect.height();
 
                 // 设置 view 的位置，使其和上一个界面中图片的位置重合
                 FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mOriginWidth, mOriginHeight);
                 params.setMargins(mOriginRect.left, mOriginRect.top - StatusBarUtil.getStatusBarHeight(AudioHolderActivity.this), mOriginRect.right, mOriginRect.bottom);
                 mAnimCover.setLayoutParams(params);
+
+                //获得终点控件的位置信息
+                view.getGlobalVisibleRect(mDestRect);
+                // 计算图片缩放比例和位移距离
+                getMoveInfo(mDestRect);
 
                 //从通知栏启动只设置位置信息并隐藏
                 //不用启动动画
@@ -632,11 +611,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                     mAnimCover.setScaleY(mScaleBundle.getFloat(SCALE_HEIGHT));
                     return;
                 }
-
-                //获得终点控件的位置信息
-                view.getGlobalVisibleRect(mDestRect);
-                // 计算图片缩放比例和位移距离
-                getMoveInfo(mDestRect);
 
                 mAnimCover.setPivotX(0);
                 mAnimCover.setPivotY(0);
@@ -675,37 +649,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 scaleXSpring.setRestSpeedThreshold(0.99f);
                 scaleXSpring.setRestDisplacementThreshold(0.99f);
 
-//                mAnimCover.animate()
-//                        .setInterpolator(mInterpolator)
-//                        .withStartAction(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                overridePendingTransition(0, 0);
-//                            }
-//                        })
-//                        .withEndAction(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                //入场动画结束时显示fragment中的封面
-//                                if (mAdapter.getItem(1) instanceof CoverFragment) {
-//                                    ((CoverFragment) mAdapter.getItem(1)).showImage();
-//                                }
-//                                //延迟消失 避免闪烁
-//                                new Handler().postDelayed(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        //隐藏动画用的封面
-//                                        mAnimCover.setVisibility(View.GONE);
-//                                    }
-//                                },1000);
-//                            }
-//                        })
-//                        .setDuration(DURATION)
-//                        .scaleX(mScaleBundle.getFloat(SCALE_WIDTH))
-//                        .scaleY(mScaleBundle.getFloat(SCALE_HEIGHT))
-//                        .translationX(mTransitionBundle.getFloat(TRANSITION_X))
-//                        .translationY(mTransitionBundle.getFloat(TRANSITION_Y))
-//                        .start();
             }
         });
         coverFragment.setArguments(mBundle);

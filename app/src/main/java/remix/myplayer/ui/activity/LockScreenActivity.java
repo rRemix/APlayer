@@ -47,12 +47,8 @@ import remix.myplayer.util.ToastUtil;
 
 public class LockScreenActivity extends BaseActivity implements MusicService.Callback{
     private final static String TAG = "LockScreenActivity";
-    public static LockScreenActivity mInstance;
     //当前播放的歌曲信息
     private MP3Item mInfo;
-    //底部滑动提示图片容器
-    @BindView(R.id.lockscreen_arrow_container)
-    LinearLayout mArrowContainer;
     //歌曲与艺术家
     @BindView(R.id.lockscreen_song)
     TextView mSong;
@@ -123,7 +119,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         setContentView(R.layout.activity_lockscreen);
         ButterKnife.bind(this);
 
-        mInstance = this;
         if((mInfo = MusicService.getCurrentMP3()) == null)
             return;
         DisplayMetrics metric = new DisplayMetrics();
@@ -146,7 +141,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
 
         //初始化控件
         mImageBackground.setAlpha(0.75f);
-        mArrowContainer.startAnimation(AnimationUtils.loadAnimation(this,R.anim.arrow_left_to_right));
         mView = getWindow().getDecorView();
         mView.setBackgroundColor(getResources().getColor(R.color.transparent));
 

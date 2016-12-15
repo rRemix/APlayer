@@ -137,13 +137,16 @@ public class Global {
         new Thread(){
             @Override
             public void run() {
-                long start = System.currentTimeMillis();
                 int deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue, mPlayQueueID);
-                LogUtil.d("TimeTest","DeleteTime:" + (System.currentTimeMillis() - start) );
+                LogUtil.d("DBTest","deleteRow:" + deleteRow);
                 int addRow = PlayListUtil.addMultiSongs(mPlayQueue,Constants.PLAY_QUEUE, mPlayQueueID);
-                LogUtil.d("TimeTest","AddTime:" + (System.currentTimeMillis() - start) );
+                LogUtil.d("DBTest","addRow:" + addRow );
             }
         }.start();
+    }
+
+    public static synchronized ArrayList<Integer> getPlayQueue(){
+        return mPlayQueue;
     }
 
     /**
