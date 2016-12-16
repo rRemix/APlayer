@@ -45,21 +45,20 @@ public class LrcFragment extends BaseFragment {
             if(mLrcView == null)
                 return;
             //是否正在搜索
-            mLrcView.setSearching(msg.what == SEARCHING);
             if(msg.what == SEARCHING){
-                return;
-            }
-            if(msg.what == UPDATE_LRC) {
+                mLrcView.setText("正在搜索");
+
+            } else if(msg.what == UPDATE_LRC) {
                 //更新歌词
                 if(mLrcList != null) {
                     mLrcView.setLrcRows(mLrcList);
                 }
             } else if (msg.what == NO_LRC) {
                 //没有找到歌词
-                mLrcView.setLrcRows(null);
+                mLrcView.setText("暂无歌词");
             } else if (msg.what == NO_NETWORK) {
                 //没用网络
-                mLrcView.setLrcRows(null);
+                mLrcView.setText("请检查网络连接");
             }
         }
     };
@@ -102,7 +101,7 @@ public class LrcFragment extends BaseFragment {
             }
             mHandler.sendEmptyMessage(SEARCHING);
             mLrcList = new SearchLRC(mInfo).getLrc();
-            if(mLrcList == null) {
+            if(mLrcList == null || mLrcList.size() == 0) {
                 mHandler.sendEmptyMessage(NO_LRC);
                 return;
             }

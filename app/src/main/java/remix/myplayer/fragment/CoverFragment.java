@@ -11,10 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
 
 import butterknife.BindView;
@@ -92,24 +94,23 @@ public class CoverFragment extends BaseFragment {
 
         if(withAnim){
             int operation = Global.getOperation();
-            //位置信息
-            Rect rect = new Rect();
-            mCoverContainer.getGlobalVisibleRect(rect);
-            final double startValue = rect.left;
-            final double endValue = operation == Constants.PREV ? mWidth : -rect.width();
+
+            int offsetX = (mWidth +  mImage.getWidth()) >> 1;
+            final double startValue = 0;
+            final double endValue = operation == Constants.PREV ? offsetX : -offsetX;
             //封面移动动画
             final Spring outAnim = SpringSystem.create().createSpring();
             outAnim.addListener(new SimpleSpringListener(){
                 @Override
                 public void onSpringUpdate(Spring spring) {
-                    mCoverContainer.setX((float) spring.getCurrentValue());
+                    mCoverContainer.setTranslationX((float) spring.getCurrentValue());
                 }
                 @Override
                 public void onSpringAtRest(Spring spring) {
                     //显示封面的动画
                     if(mImage == null)
                         return;
-                    mCoverContainer.setX((float) startValue);
+                    mCoverContainer.setTranslationX((float) startValue);
                     mImage.setImageURI(mUri);
                     final Spring inAnim = SpringSystem.create().createSpring();
                     inAnim.addListener(new SimpleSpringListener(){

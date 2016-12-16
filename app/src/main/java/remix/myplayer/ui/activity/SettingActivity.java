@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -165,6 +166,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     @Override
     public void onFolderSelection(@NonNull FolderChooserDialog dialog, @NonNull File folder) {
+        if(folder.equals(Environment.getExternalStorageDirectory())){
+            ToastUtil.show(this,"请不要设置存储根目录为搜索路径");
+            return;
+        }
         boolean success = SPUtil.putValue(this,"Setting","LrcPath",folder.getAbsolutePath());
         ToastUtil.show(this, success ? R.string.setting_success : R.string.setting_error, Toast.LENGTH_SHORT);
         mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcPath","")));
@@ -207,7 +212,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             case R.id.setting_lrc_container:
                 new FolderChooserDialog.Builder(this)
                         .chooseButton(R.string.choose_folder)
-                        .allowNewFolder(true,R.string.new_folder)
+                        .allowNewFolder(false,R.string.new_folder)
                         .show();
                 break;
             //选择主色调

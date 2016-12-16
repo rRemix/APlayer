@@ -32,7 +32,10 @@ android {
         }
         release {
             //混淆代码
-
+            minifyEnabled true
+            debuggable false
+            zipAlignEnabled true
+            shrinkResources true
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

@@ -46,10 +46,7 @@
 
         <activity
             android:name=".ui.activity.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/ActivityStyle">
-
-        </activity>
+            android:theme="@style/ActivityStyle"/>
 
         <activity android:name=".ui.activity.AudioHolderActivity"
             android:windowSoftInputMode="adjustPan"

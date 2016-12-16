@@ -63,7 +63,7 @@ public class LrcRow implements Comparable<LrcRow>{
 	 * @param lrcLine
 	 * @return
 	 */
-	public static final List<LrcRow> createRows(String lrcLine){
+	public static List<LrcRow> createRows(String lrcLine){
 		if(!lrcLine.startsWith("[") || lrcLine.indexOf("]") != 9){
 			return null;
 		}

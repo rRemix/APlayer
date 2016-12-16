@@ -381,6 +381,7 @@ public class CommonUtil {
         StringBuilder strBuffer = new StringBuilder();
         try {
             HttpURLConnection httpConn = (HttpURLConnection) lrcIdUrl.openConnection();
+            httpConn.setConnectTimeout(10000);
             httpConn.connect();
             InputStreamReader inReader = new InputStreamReader(httpConn.getInputStream());
             br = new BufferedReader(inReader);
@@ -522,21 +523,22 @@ public class CommonUtil {
         if (Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
             File[] files = searchPath.listFiles();
-            if (files.length > 0) {
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        //如果目录可读就执行（一定要加，不然会挂掉）
-                        if(file.canRead()){
-                            searchFile(context,songName,artistName,file);  //如果是目录，递归查找
-                        }
-                    } else {
-                        //判断是文件，则进行文件名判断
-                        try {
-                            if((file.getName().contains(songName) || file.getName().contains(songName.toUpperCase()))
-                               && (file.getName().contains(artistName) || file.getName().contains(artistName.toUpperCase()))){
-                                Global.mCurrentLrcPath = file.getAbsolutePath();
-                                LogUtil.d("Lrc","LrcPath:" + Global.mCurrentLrcPath);
-                                return;
+            if(files == null || files.length == 0)
+                return;
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    //如果目录可读就执行（一定要加，不然会挂掉）
+                    if(file.canRead()){
+                        searchFile(context,songName,artistName,file);  //如果是目录，递归查找
+                    }
+                } else {
+                    //判断是文件，则进行文件名判断
+                    try {
+                        if((file.getName().contains(songName) || file.getName().contains(songName.toUpperCase()))
+                                && (file.getName().contains(artistName) || file.getName().contains(artistName.toUpperCase()))){
+                            Global.mCurrentLrcPath = file.getAbsolutePath();
+                            LogUtil.d("Lrc","LrcPath:" + Global.mCurrentLrcPath);
+                            return;
 //                                HashMap<String,Object> rowItem = new HashMap<>();
 //                                rowItem.put("number", index);    // 加入序列号
 //                                rowItem.put("name", file.getName());// 加入名称
@@ -544,10 +546,9 @@ public class CommonUtil {
 //                                rowItem.put("size", file.length());   // 加入文件大小
 //                                mLrcList.add(rowItem);
 //                                index++;
-                            }
-                        } catch(Exception e) {
-                            ToastUtil.show(context,R.string.search_error);
                         }
+                    } catch(Exception e) {
+                        ToastUtil.show(context,R.string.search_error);
                     }
                 }
             }

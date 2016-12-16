@@ -37,10 +37,6 @@ import remix.myplayer.application.APlayerApplication;
 public class LrcView extends View implements ILrcView{
 	/**所有的歌词***/
 	private List<LrcRow> mLrcRows;
-	/**无歌词数据的时候 显示的默认文字**/
-	private static final String DEFAULT_TEXT = "暂无歌词";
-    /**正在搜索的提示文字*/
-    private static final String SEARCHING = "正在搜索";
 	/**默认文字的字体大小**/
 	private static final float SIZE_FOR_DEFAULT_TEXT = 35;
 
@@ -104,8 +100,9 @@ public class LrcView extends View implements ILrcView{
 	/**外部viewpager是否正在滑动*/
 	private boolean mIsViewPagerScroll = false;
 
-    /**是否正在搜索*/
-    private boolean mSearching = false;
+
+    /** 错误提示文字 */
+    private String mText;
 
 	public LrcView(Context context) {
 		super(context);
@@ -152,17 +149,11 @@ public class LrcView extends View implements ILrcView{
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-        if(mSearching){
-            float textWidth = mPaintForOtherLrc.measureText(SEARCHING);
-            float textX = (getWidth() - textWidth) / 2;
-            canvas.drawText(SEARCHING, textX, getHeight() / 2, mPaintForOtherLrc);
-            return;
-        }
 		if(mLrcRows == null || mLrcRows.size() == 0){
 			//画默认的显示文字
-			float textWidth = mPaintForOtherLrc.measureText(DEFAULT_TEXT);
+			float textWidth = mPaintForOtherLrc.measureText(mText);
 			float textX = (getWidth() - textWidth ) / 2;
-			canvas.drawText(DEFAULT_TEXT, textX, getHeight() / 2, mPaintForOtherLrc);
+			canvas.drawText(mText, textX, getHeight() / 2, mPaintForOtherLrc);
 			return;
 		}
 		if(mTotleDrawRow == 0){
@@ -471,6 +462,11 @@ public class LrcView extends View implements ILrcView{
 		this.onSeekToListener = onSeekToListener;
 	}
 
+    public void setText(String text) {
+        mText = text;
+        reset();
+    }
+
     public interface OnSeekToListener{
 		void onSeekTo(int progress);
 	}
@@ -494,14 +490,6 @@ public class LrcView extends View implements ILrcView{
      */
     public void setViewPagerScroll(boolean scrolling){
         mIsViewPagerScroll = scrolling;
-    }
-
-    /**
-     * 是否正在搜索
-     * @param searching
-     */
-    public void setSearching(boolean searching){
-        mSearching = searching;
     }
 
     /**
