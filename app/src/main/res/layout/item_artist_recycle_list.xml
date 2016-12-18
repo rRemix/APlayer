@@ -47,7 +47,7 @@
     <!--结尾处按钮-->
     <ImageButton
         android:layout_alignParentRight="true"
-        android:layout_marginRight="@dimen/d12_size"
+        android:layout_marginRight="@dimen/d8_size"
         android:id="@+id/item_button"
         android:layout_width="@dimen/d45_size"
         android:layout_height="@dimen/d45_size"

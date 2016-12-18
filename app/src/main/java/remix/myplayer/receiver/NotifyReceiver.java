@@ -8,11 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
 
 import remix.myplayer.R;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
@@ -48,7 +50,7 @@ public class NotifyReceiver extends BroadcastReceiver {
 
         if(!Global.isNotifyShowing() && !mIsplay)
             return;
-        
+
         if((MusicService.getCurrentMP3() != null)) {
             boolean isSystemColor = SPUtil.getValue(context,"Setting","IsSystemColor",true);
 
@@ -75,31 +77,30 @@ public class NotifyReceiver extends BroadcastReceiver {
             }
 
             //添加Action
-            Intent mButtonIntent = new Intent(Constants.CTL_ACTION);
-            mButtonIntent.putExtra("FromNotify", true);
+            Intent actionIntent = new Intent(Constants.CTL_ACTION);
+            actionIntent.putExtra("FromNotify", true);
             //播放或者暂停
-            mButtonIntent.putExtra("Control", Constants.PLAYORPAUSE);
-            PendingIntent mIntent_Play = PendingIntent.getBroadcast(context, 1, mButtonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            mRemoteView.setOnClickPendingIntent(R.id.notify_play, mIntent_Play);
+            actionIntent.putExtra("Control", Constants.PLAYORPAUSE);
+            PendingIntent playIntent = PendingIntent.getBroadcast(context, 1, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            mRemoteView.setOnClickPendingIntent(R.id.notify_play, playIntent);
             //下一首
-            mButtonIntent.putExtra("Control", Constants.NEXT);
-            PendingIntent mIntent_Next = PendingIntent.getBroadcast(context,2,mButtonIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-            mRemoteView.setOnClickPendingIntent(R.id.notify_next, mIntent_Next);
+            actionIntent.putExtra("Control", Constants.NEXT);
+            PendingIntent nextIntent = PendingIntent.getBroadcast(context,2,actionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+            mRemoteView.setOnClickPendingIntent(R.id.notify_next, nextIntent);
             //上一首
             if(isBig){
-                mButtonIntent.putExtra("Control", Constants.PREV);
-                PendingIntent mIntent_Prev = PendingIntent.getBroadcast(context, 2, mButtonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                mRemoteView.setOnClickPendingIntent(R.id.notify_prev,mIntent_Prev);
+                actionIntent.putExtra("Control", Constants.PREV);
+                PendingIntent prevIntent = PendingIntent.getBroadcast(context, 2, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                mRemoteView.setOnClickPendingIntent(R.id.notify_prev,prevIntent);
             }
 
             //关闭通知栏
-            mButtonIntent.putExtra("Close", true);
-            PendingIntent mIntent_Close = PendingIntent.getBroadcast(context, 4, mButtonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            mRemoteView.setOnClickPendingIntent(R.id.notify_close, mIntent_Close);
+            actionIntent.putExtra("Close", true);
+            PendingIntent closeIntent = PendingIntent.getBroadcast(context, 4, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            mRemoteView.setOnClickPendingIntent(R.id.notify_close, closeIntent);
 
 
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-//                    .setLargeIcon(MediaStoreUtil.CheckBitmapByAlbumId((int)temp.getAlbumId(),false))
                     .setContent(mRemoteView)
                     .setContentText("")
                     .setContentTitle("")
@@ -107,6 +108,9 @@ public class NotifyReceiver extends BroadcastReceiver {
                     .setPriority(Notification.PRIORITY_HIGH)
                     .setOngoing(true)
                     .setSmallIcon(R.drawable.notifbar_icon);
+//            if(isBig){
+//                mBuilder.setCustomBigContentView(mRemoteView);
+//            }
 
             //点击通知栏打开播放界面
             //后退回到主界面
@@ -125,11 +129,11 @@ public class NotifyReceiver extends BroadcastReceiver {
                     );
             mBuilder.setContentIntent(resultPendingIntent);
             Notification mNotify = mBuilder.build();
-            //根据分辨率设置布局
-            if(isBig)
-                mNotify.bigContentView = mRemoteView;
-            else
-                mNotify.contentView = mRemoteView;
+//            //根据分辨率设置布局
+//            if(isBig)
+//                mNotify.bigContentView = mRemoteView;
+//            else
+//                mNotify.contentView = mRemoteView;
 
             mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(0, mNotify);

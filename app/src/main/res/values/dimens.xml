@@ -59,7 +59,9 @@
     <dimen name="d188_size">188dp</dimen>
     <dimen name="d198_size">198dp</dimen>
     <dimen name="d200_size">200dp</dimen>
+    <dimen name="d204_size">204dp</dimen>
     <dimen name="d210_size">210dp</dimen>
+    <dimen name="d214_size">214dp</dimen>
     <dimen name="d218_size">218dp</dimen>
     <dimen name="d240_size">240dp</dimen>
     <dimen name="d264_size">264dp</dimen>

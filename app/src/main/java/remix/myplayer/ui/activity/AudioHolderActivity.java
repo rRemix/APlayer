@@ -175,7 +175,10 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
      * 终点View的位置信息
      */
     private static Rect mDestRect = new Rect();
-
+    /**
+     *
+     */
+    private boolean mIsBacking = false;
 
     /** 更新进度条的Handler */
     private Handler mProgressHandler = new Handler() {
@@ -309,58 +312,84 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     @Override
     public void onBackPressed() {
         //更新动画控件封面 保证退场动画的封面与fragment中封面一致
-//        MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
-        mAnimCover.setImageURI(mUri);
+        if(mPager.getCurrentItem() == 1){
+            if(mIsBacking)
+                return;
 
-        Spring alphaSpring = SpringSystem.create().createSpring();
-        alphaSpring.addListener(new SimpleSpringListener(){
-            @Override
-            public void onSpringActivate(Spring spring) {
-                mContainer.setAlpha((float) spring.getCurrentValue());
-            }
-            @Override
-            public void onSpringUpdate(Spring spring) {
-                mContainer.setAlpha((float) spring.getCurrentValue());
-            }
+            mIsBacking = true;
+            mAnimCover.setImageURI(mUri);
 
-            @Override
-            public void onSpringAtRest(Spring spring) {
-                finish();
-                overridePendingTransition(0,0);
-            }
-        });
-        alphaSpring.setCurrentValue(1);
-        alphaSpring.setEndValue(0.15f);
-        alphaSpring.setRestSpeedThreshold(0.10f);
-        alphaSpring.setRestDisplacementThreshold(0.10f);
-
-        final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
-        final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
-        final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
-        final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
-        Spring coverSpring = SpringSystem.create().createSpring();
-        coverSpring.addListener(new SimpleSpringListener(){
-            @Override
-            public void onSpringUpdate(Spring spring) {
-                final double currentVal = spring.getCurrentValue();
-                mAnimCover.setTranslationX((float) (transitionX * currentVal));
-                mAnimCover.setTranslationY((float) (transitionY * currentVal));
-                mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
-                mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
-            }
-            @Override
-            public void onSpringActivate(Spring spring) {
-                mAnimCover.setVisibility(View.VISIBLE);
-                //隐藏fragment中的image
-                if(mAdapter.getItem(1) instanceof CoverFragment){
-                    ((CoverFragment) mAdapter.getItem(1)).hideImage();
+            Spring alphaSpring = SpringSystem.create().createSpring();
+            alphaSpring.addListener(new SimpleSpringListener(){
+                @Override
+                public void onSpringActivate(Spring spring) {
+                    mContainer.setAlpha((float) spring.getCurrentValue());
                 }
-            }
-        });
-        coverSpring.setCurrentValue(1);
-        coverSpring.setEndValue(0);
-        coverSpring.setRestSpeedThreshold(0.15f);
-        coverSpring.setRestDisplacementThreshold(0.15f);
+                @Override
+                public void onSpringUpdate(Spring spring) {
+                    mContainer.setAlpha((float) spring.getCurrentValue());
+                }
+
+                @Override
+                public void onSpringAtRest(Spring spring) {
+                    finish();
+                    overridePendingTransition(0,0);
+                }
+            });
+            alphaSpring.setCurrentValue(1);
+            alphaSpring.setEndValue(0.15f);
+            alphaSpring.setRestSpeedThreshold(0.10f);
+            alphaSpring.setRestDisplacementThreshold(0.10f);
+
+            final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
+            final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
+            final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
+            final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
+            Spring coverSpring = SpringSystem.create().createSpring();
+            coverSpring.addListener(new SimpleSpringListener(){
+                @Override
+                public void onSpringUpdate(Spring spring) {
+                    final double currentVal = spring.getCurrentValue();
+                    mAnimCover.setTranslationX((float) (transitionX * currentVal));
+                    mAnimCover.setTranslationY((float) (transitionY * currentVal));
+                    mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
+                    mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
+                }
+                @Override
+                public void onSpringActivate(Spring spring) {
+                    mAnimCover.setVisibility(View.VISIBLE);
+                    //隐藏fragment中的image
+                    if(mAdapter.getItem(1) instanceof CoverFragment){
+                        ((CoverFragment) mAdapter.getItem(1)).hideImage();
+                    }
+                }
+            });
+            coverSpring.setCurrentValue(1);
+            coverSpring.setEndValue(0);
+            coverSpring.setRestSpeedThreshold(0.15f);
+            coverSpring.setRestDisplacementThreshold(0.15f);
+        } else {
+            finish();
+            overridePendingTransition(0,R.anim.audio_out);
+//            final View decorView = getWindow().getDecorView();
+//            Spring outAnim = SpringSystem.create().createSpring();
+//            outAnim.addListener(new SimpleSpringListener(){
+//                @Override
+//                public void onSpringAtRest(Spring spring) {
+//                    finish();
+//                }
+//
+//                @Override
+//                public void onSpringUpdate(Spring spring) {
+//                    decorView.setTranslationY((float) spring.getCurrentValue());
+//                }
+//            });
+//            outAnim.setCurrentValue(0);
+//            outAnim.setEndValue(mHeight);
+//            outAnim.setRestDisplacementThreshold(50);
+//            outAnim.setRestSpeedThreshold(50);
+        }
+
     }
 
     /**

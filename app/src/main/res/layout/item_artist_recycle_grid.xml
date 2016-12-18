@@ -3,14 +3,14 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:id="@+id/item_root"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/d198_size"
+    android:layout_height="214dp"
     android:paddingBottom="@dimen/d8_size"
     android:paddingLeft="@dimen/d6_size"
     android:paddingRight="@dimen/d6_size">
     <RelativeLayout
         android:id="@+id/item_container"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/d188_size"
+        android:layout_height="@dimen/d204_size"
         android:background="?attr/background_grid">
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="@dimen/d123_size"
@@ -36,37 +36,28 @@
             android:layout_marginRight="@dimen/d4_size"/>
 
         <ImageButton
-            android:layout_width="@dimen/d32_size"
+            android:layout_width="@dimen/d48_size"
             android:layout_height="match_parent"
             android:id="@+id/item_button"
             android:src="@drawable/list_icn_more"
             android:background="@color/transparent"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
             android:layout_below="@id/divider"/>
 
-        <LinearLayout
+        <TextView
+            android:layout_toLeftOf="@id/item_button"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:layout_height="@dimen/d48_size"
+            android:id="@+id/item_text1"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="?attr/text_color_primary"
+            android:textSize="@dimen/s14_size"
             android:layout_marginLeft="@dimen/d8_size"
             android:layout_marginRight="@dimen/d8_size"
-            android:gravity="center_vertical"
-            android:layout_toLeftOf="@id/item_button"
-            android:layout_alignParentBottom="true"
+            android:gravity="center_vertical|left"
             android:layout_alignParentLeft="true"
-            android:layout_below="@id/divider">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="歌手名"
-                android:id="@+id/item_text1"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:textColor="?attr/text_color_primary"
-                android:textSize="@dimen/s14_size" />
-        </LinearLayout>
+            android:layout_below="@id/divider"/>
     </RelativeLayout>
 
 </FrameLayout>

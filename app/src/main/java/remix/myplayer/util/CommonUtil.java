@@ -534,18 +534,13 @@ public class CommonUtil {
                 } else {
                     //判断是文件，则进行文件名判断
                     try {
-                        if((file.getName().contains(songName) || file.getName().contains(songName.toUpperCase()))
-                                && (file.getName().contains(artistName) || file.getName().contains(artistName.toUpperCase()))){
+                        String prefix = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1);
+                        String fileName = file.getName();
+                        if(prefix.equals("lrc") && fileName.contains(songName) || fileName.contains(songName.toUpperCase())
+                                && (fileName.contains(artistName) || fileName.contains(artistName.toUpperCase()))){
                             Global.mCurrentLrcPath = file.getAbsolutePath();
                             LogUtil.d("Lrc","LrcPath:" + Global.mCurrentLrcPath);
                             return;
-//                                HashMap<String,Object> rowItem = new HashMap<>();
-//                                rowItem.put("number", index);    // 加入序列号
-//                                rowItem.put("name", file.getName());// 加入名称
-//                                rowItem.put("path", file.getPath());  // 加入路径
-//                                rowItem.put("size", file.length());   // 加入文件大小
-//                                mLrcList.add(rowItem);
-//                                index++;
                         }
                     } catch(Exception e) {
                         ToastUtil.show(context,R.string.search_error);

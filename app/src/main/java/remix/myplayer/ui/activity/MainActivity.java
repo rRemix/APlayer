@@ -19,6 +19,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -531,7 +532,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         }
     }
 
-
     @Override
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
@@ -539,13 +539,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         } else if(mMultiChoice.isShow()) {
             onBackPress();
         } else {
-            Intent home = new Intent(Intent.ACTION_MAIN);
-            home.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            home.addCategory(Intent.CATEGORY_HOME);
-            startActivity(home);
-            Intent intent = new Intent(Constants.NOTIFY);
-            intent.putExtra("FromMainActivity", true);
-            sendBroadcast(intent);
+            moveTaskToBack(true);
         }
     }
 

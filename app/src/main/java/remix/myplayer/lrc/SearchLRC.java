@@ -23,6 +23,7 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.DiskLruCache;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 
 /**
@@ -92,11 +93,10 @@ public class SearchLRC {
         //没有设置歌词路径
         String setLrcPath =  SPUtil.getValue(APlayerApplication.getContext(),"Setting","LrcPath","");
         if(setLrcPath.equals("") && !TextUtils.isEmpty(mInfo.getUrl())){
-            File file = new File(mInfo.getUrl());
             //父目录
-            File parentfile = file.getParentFile();
-            if(parentfile.exists() && parentfile.isDirectory() && !parentfile.equals(Environment.getExternalStorageDirectory()))
-                CommonUtil.searchFile(APlayerApplication.getContext(),mSongName,mArtistName, parentfile);
+            File rootFile = Environment.getExternalStorageDirectory();
+            if(rootFile.exists() && rootFile.isDirectory() && !rootFile.equals(Environment.getExternalStorageDirectory()))
+                CommonUtil.searchFile(APlayerApplication.getContext(),mSongName,mArtistName, rootFile);
             else
                 return null;
         } else {
@@ -122,28 +122,28 @@ public class SearchLRC {
         }
 
         //没有缓存，下载并解析歌词
-//        String lrcUrl = getLrcUrl();
-//        if(lrcUrl == null || lrcUrl.equals(""))
-//            return null;
-//
-//        URL url = null;
-//        try {
-//            url = new URL(lrcUrl);
-//            HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-//            httpConn.setConnectTimeout(10000);
-//            httpConn.connect();
-//            br = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
-//            return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            if(br != null)
-//                try {
-//                    br.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//        }
+        String lrcUrl = getLrcUrl();
+        if(lrcUrl == null || lrcUrl.equals(""))
+            return null;
+
+        URL url = null;
+        try {
+            url = new URL(lrcUrl);
+            HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+            httpConn.setConnectTimeout(10000);
+            httpConn.connect();
+            br = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
+            return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(br != null)
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
         return null;
     }
 
