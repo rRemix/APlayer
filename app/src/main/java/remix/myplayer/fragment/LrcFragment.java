@@ -9,16 +9,22 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.interfaces.OnInflateFinishListener;
-import remix.myplayer.lrc.LrcRow;
-import remix.myplayer.lrc.LrcView;
-import remix.myplayer.lrc.SearchLRC;
+import remix.myplayer.lyric.LrcCallable;
+import remix.myplayer.lyric.LrcRow;
+import remix.myplayer.lyric.LrcView;
+import remix.myplayer.lyric.SearchLRC;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.util.CommonUtil;
+import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -35,6 +41,7 @@ public class LrcFragment extends BaseFragment {
     private static int SEARCHING = 4;
     private OnInflateFinishListener onFindListener;
     private MP3Item mInfo;
+    private ExecutorService mLrcExecutorService;
     @BindView(R.id.lrc_view)
     LrcView mLrcView;
     //歌词列表
@@ -71,6 +78,8 @@ public class LrcFragment extends BaseFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPageName = LrcFragment.class.getSimpleName();
+        mLrcExecutorService = Executors.newCachedThreadPool();
+
     }
 
     @Nullable
@@ -81,7 +90,7 @@ public class LrcFragment extends BaseFragment {
         mUnBinder = ButterKnife.bind(this,rootView);
         onFindListener.onViewInflateFinish(mLrcView);
         mInfo = (MP3Item)getArguments().getSerializable("MP3Item");
-        UpdateLrc(mInfo);
+
         return rootView;
     }
 
@@ -89,16 +98,30 @@ public class LrcFragment extends BaseFragment {
         if(mp3Item == null)
             return;
         mInfo = mp3Item;
+
+//        try {
+//            long start = System.currentTimeMillis();
+//            if(mLrcExecutorService == null){
+//                mLrcExecutorService = Executors.newCachedThreadPool();
+//            }
+//            mHandler.sendEmptyMessage(SEARCHING);
+//            Future<List<LrcRow>> result = mLrcExecutorService.submit(new LrcCallable(mInfo));
+//            mLrcList = result.get();
+//            long end = System.currentTimeMillis() - start;
+//            mHandler.sendEmptyMessage(mLrcList != null && mLrcList.size() > 0 ? UPDATE_LRC : NO_LRC);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        }
+
         new DownloadThread().start();
     }
+
 
     class DownloadThread extends Thread {
         @Override
         public void run() {
-            if(!CommonUtil.isNetWorkConnected()) {
-                mHandler.sendEmptyMessage(NO_NETWORK);
-                return;
-            }
             mHandler.sendEmptyMessage(SEARCHING);
             mLrcList = new SearchLRC(mInfo).getLrc();
             if(mLrcList == null || mLrcList.size() == 0) {

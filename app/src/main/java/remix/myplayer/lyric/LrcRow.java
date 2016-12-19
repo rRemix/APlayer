@@ -1,4 +1,4 @@
-package remix.myplayer.lrc;
+package remix.myplayer.lyric;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -70,11 +70,11 @@ public class LrcRow implements Comparable<LrcRow>{
 		//最后一个"]" 
 		int lastIndexOfRightBracket = lrcLine.lastIndexOf("]");
 		//歌词内容
-		String content = lrcLine.substring(lastIndexOfRightBracket+1, lrcLine.length());
+		String content = lrcLine.substring(lastIndexOfRightBracket + 1, lrcLine.length());
 		//截取出歌词时间，并将"[" 和"]" 替换为"-"   [offset:0]
-		System.out.println("lrcLine="+lrcLine);
+
 		// -03:33.02--00:36.37-
-		String times = lrcLine.substring(0, lastIndexOfRightBracket+1).replace("[", "-").replace("]", "-");
+		String times = lrcLine.substring(0, lastIndexOfRightBracket + 1).replace("[", "-").replace("]", "-");
 		String[] timesArray = times.split("-");
 		List<LrcRow> lrcRows = new ArrayList<LrcRow>();
 		for (String tem : timesArray) {
@@ -86,7 +86,7 @@ public class LrcRow implements Comparable<LrcRow>{
 				LrcRow lrcRow = new LrcRow(tem, formatTime(tem), content);
 				lrcRows.add(lrcRow);
 			}catch(Exception e){
-				Log.w("LrcRow", e.getMessage());
+				Log.d("LrcRow", e.getMessage());
 			}
 		}
 		return lrcRows;

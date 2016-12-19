@@ -166,10 +166,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     @Override
     public void onFolderSelection(@NonNull FolderChooserDialog dialog, @NonNull File folder) {
-        if(folder.equals(Environment.getExternalStorageDirectory())){
-            ToastUtil.show(this,"请不要设置存储根目录为搜索路径");
-            return;
-        }
         boolean success = SPUtil.putValue(this,"Setting","LrcPath",folder.getAbsolutePath());
         ToastUtil.show(this, success ? R.string.setting_success : R.string.setting_error, Toast.LENGTH_SHORT);
         mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcPath","")));

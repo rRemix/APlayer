@@ -1,4 +1,4 @@
-package remix.myplayer.lrc;
+package remix.myplayer.lyric;
 
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
@@ -102,7 +102,7 @@ public class LrcView extends View implements ILrcView{
 
 
     /** 错误提示文字 */
-    private String mText;
+    private String mText = "";
 
 	public LrcView(Context context) {
 		super(context);

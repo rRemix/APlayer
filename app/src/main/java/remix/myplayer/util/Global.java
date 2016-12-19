@@ -7,6 +7,7 @@ package remix.myplayer.util;
 import android.content.Context;
 import android.content.Intent;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Map;
@@ -167,4 +168,8 @@ public class Global {
      */
     public static String mCurrentLrcPath = "";
 
+    /**
+     * 所有可能的歌词目录
+     */
+    public static ArrayList<File> mLyricDir = new ArrayList<>();
 }

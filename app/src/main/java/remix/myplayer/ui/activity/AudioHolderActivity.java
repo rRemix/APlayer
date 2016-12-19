@@ -47,7 +47,7 @@ import remix.myplayer.fragment.LrcFragment;
 import remix.myplayer.fragment.RecordFragment;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.listener.AudioPopupListener;
-import remix.myplayer.lrc.LrcView;
+import remix.myplayer.lyric.LrcView;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;

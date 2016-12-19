@@ -1,4 +1,4 @@
-package remix.myplayer.lrc;
+package remix.myplayer.lyric;
 
 import android.os.Environment;
 import android.text.TextUtils;
@@ -12,10 +12,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.MP3Item;
@@ -23,54 +26,31 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.DiskLruCache;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 
 /**
- * Created by Remix on 2015/12/7.
+ * @ClassName
+ * @Description
+ * @Author Xiaoborui
+ * @Date 2016/12/19 14:33
  */
 
-/**
- * 根据歌曲名和歌手名 搜索歌词并解析成固定格式
- */
-public class SearchLRC {
-    private static final String TAG = "SearchLRC";
-    private static final String DEFAULT_LOCAL = "GB2312";
+public class LrcCallable implements Callable<List<LrcRow>> {
+    private static final String LRC_REQUEST_ROOT = "http://s.geci.me/lrc/";
     private ILrcParser mLrcBuilder;
     private MP3Item mInfo;
     private String mSongName;
     private String mArtistName;
 
-    public SearchLRC(MP3Item item) {
+    public LrcCallable(MP3Item item){
         mInfo = item;
-        mSongName = mInfo.getTitle();
+        mSongName = item.getTitle();
         mArtistName = mInfo.getArtist();
         mLrcBuilder = new DefaultLrcParser();
     }
 
-    /**
-     * 根据歌手与歌手名,获得歌词id
-     * @return 歌词id
-     */
-    public String getLrcUrl(){
-        try {
-            JSONObject lrcid = CommonUtil.getSongJsonObject(
-                    URLEncoder.encode(mInfo.getTitle(), "utf-8"),
-                    URLEncoder.encode(mInfo.getArtist(), "utf-8"));
-            if(lrcid != null && lrcid.getInt("count") > 0 && lrcid.getInt("code") == 0){
-                return lrcid.getJSONArray("result").getJSONObject(0).getString("lrc");
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return "";
-    }
-
-    /**
-     * 根据歌词id,发送请求并解析歌词
-     * @return 歌词信息list
-     */
-    public List<LrcRow> getLrc(){
+    @Override
+    public List<LrcRow> call() throws Exception {
         BufferedReader br = null;
         //先判断该歌曲是否有缓存
         try {
@@ -90,15 +70,15 @@ public class SearchLRC {
         }
 
         //查找本地目录
-        //没有设置歌词路径
+
         String setLrcPath =  SPUtil.getValue(APlayerApplication.getContext(),"Setting","LrcPath","");
         if(setLrcPath.equals("") && !TextUtils.isEmpty(mInfo.getUrl())){
-            //父目录
-            File rootFile = Environment.getExternalStorageDirectory();
-            if(rootFile.exists() && rootFile.isDirectory() && !rootFile.equals(Environment.getExternalStorageDirectory()))
-                CommonUtil.searchFile(APlayerApplication.getContext(),mSongName,mArtistName, rootFile);
-            else
-                return null;
+            //没有设置歌词路径
+            for(int i = 0; i < Global.mLyricDir.size() ; i++){
+                File searchPath = Global.mLyricDir.get(i);
+                if(searchPath.exists() && searchPath.isDirectory() && !searchPath.equals(Environment.getExternalStorageDirectory()))
+                    CommonUtil.searchFile(APlayerApplication.getContext(),mSongName,mArtistName, searchPath);
+            }
         } else {
             //已设置歌词路径
             CommonUtil.searchFile(APlayerApplication.getContext(),mSongName,mArtistName, new File(setLrcPath));
@@ -122,9 +102,10 @@ public class SearchLRC {
         }
 
         //没有缓存，下载并解析歌词
-        String lrcUrl = getLrcUrl();
-        if(lrcUrl == null || lrcUrl.equals(""))
+        String arg = getLrcUrl();
+        if(arg == null || arg.equals(""))
             return null;
+        String lrcUrl = LRC_REQUEST_ROOT + arg;
 
         URL url = null;
         try {
@@ -132,6 +113,7 @@ public class SearchLRC {
             HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
             httpConn.setConnectTimeout(10000);
             httpConn.connect();
+
             br = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
             return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
         } catch (IOException e) {
@@ -147,4 +129,25 @@ public class SearchLRC {
         return null;
     }
 
+    /**
+     * 根据歌手与歌手名,获得歌词id
+     * @return 歌词id
+     */
+    public String getLrcUrl(){
+        try {
+            JSONObject lrcid = CommonUtil.getSongJsonObject(
+                    URLEncoder.encode(mInfo.getTitle(), "utf-8"),
+                    URLEncoder.encode(mInfo.getArtist(), "utf-8"));
+            if(lrcid != null && lrcid.getInt("count") > 0 && lrcid.getInt("code") == 0){
+                String url = lrcid.getJSONArray("result").getJSONObject(0).getString("lrc");
+                Matcher matcher = Pattern.compile("[0-9]").matcher(url);
+                if(matcher.find()){
+                    return url.substring(matcher.start());
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return "";
+    }
 }

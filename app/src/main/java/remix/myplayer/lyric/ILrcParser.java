@@ -1,4 +1,4 @@
-package remix.myplayer.lrc;
+package remix.myplayer.lyric;
 
 import java.io.BufferedReader;
 import java.util.List;

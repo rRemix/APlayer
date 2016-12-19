@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -513,6 +514,29 @@ public class CommonUtil {
     }
 
     /**
+     * 保存所有名字包含lyric的目录
+     */
+    public static void getLyricDir(File searchFile){
+        //判断SD卡是否存在
+        if (Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) {
+            File[] files = searchFile.listFiles();
+            if(files == null || files.length == 0)
+                return;
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    //如果目录可读就执行（一定要加，不然会挂掉）
+                    if(file.canRead() && file.getName().contains("lyric")){
+                        //保存
+                        Global.mLyricDir.add(file);
+                    }
+                    getLyricDir(file);
+                }
+            }
+        }
+    }
+
+    /**
      * 查找歌曲的lrc文件
      * @param context
      * @param songName
@@ -520,8 +544,7 @@ public class CommonUtil {
      */
     public static void searchFile(Context context,String songName,String artistName,File searchPath) {
         //判断SD卡是否存在
-        if (Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED)) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File[] files = searchPath.listFiles();
             if(files == null || files.length == 0)
                 return;
@@ -532,16 +555,39 @@ public class CommonUtil {
                         searchFile(context,songName,artistName,file);  //如果是目录，递归查找
                     }
                 } else {
-                    //判断是文件，则进行文件名判断
+                    //判断是文件
                     try {
                         String prefix = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1);
                         String fileName = file.getName();
-                        if(prefix.equals("lrc") && fileName.contains(songName) || fileName.contains(songName.toUpperCase())
-                                && (fileName.contains(artistName) || fileName.contains(artistName.toUpperCase()))){
-                            Global.mCurrentLrcPath = file.getAbsolutePath();
-                            LogUtil.d("Lrc","LrcPath:" + Global.mCurrentLrcPath);
-                            return;
+                        if(prefix.equals("lrc") ){
+                            //先判断是否包含歌手名和歌曲名
+                            if(fileName.contains(songName) || fileName.contains(songName.toUpperCase())
+                                    && (fileName.contains(artistName) || fileName.contains(artistName.toUpperCase()))){
+                                Global.mCurrentLrcPath = file.getAbsolutePath();
+                                LogUtil.d("Lrc","LrcPath:" + Global.mCurrentLrcPath);
+                                return;
+                            }
+                            //读取前五行歌词内容进行判断
+                            String lrcLine = "";
+                            boolean hasArtist = false;
+                            boolean hasTitle = false;
+                            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+                            for(int i = 0 ; i < 5;i++){
+                                if((lrcLine = br.readLine()) == null)
+                                    break;
+                                LogUtil.d("LrcLine","LrcLine:" + lrcLine);
+                                if(lrcLine.contains(artistName))
+                                    hasArtist = true;
+                                if(lrcLine.contains(songName))
+                                    hasTitle = true;
+                            }
+                            if(hasArtist && hasTitle){
+                                Global.mCurrentLrcPath = file.getAbsolutePath();
+                                LogUtil.d("Lrc","LrcPath:" + Global.mCurrentLrcPath);
+                                return;
+                            }
                         }
+
                     } catch(Exception e) {
                         ToastUtil.show(context,R.string.search_error);
                     }

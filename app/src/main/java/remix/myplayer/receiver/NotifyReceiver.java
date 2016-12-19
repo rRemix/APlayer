@@ -129,11 +129,11 @@ public class NotifyReceiver extends BroadcastReceiver {
                     );
             mBuilder.setContentIntent(resultPendingIntent);
             Notification mNotify = mBuilder.build();
-//            //根据分辨率设置布局
-//            if(isBig)
-//                mNotify.bigContentView = mRemoteView;
-//            else
-//                mNotify.contentView = mRemoteView;
+            //根据分辨率设置布局
+            if(isBig)
+                mNotify.bigContentView = mRemoteView;
+            else
+                mNotify.contentView = mRemoteView;
 
             mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(0, mNotify);
