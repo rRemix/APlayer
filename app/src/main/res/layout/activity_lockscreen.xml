@@ -120,4 +120,49 @@
         android:layout_centerHorizontal="true"
         android:layout_below="@id/lockscreen_button_container"/>
 
+    <LinearLayout
+        android:id="@+id/lockscreen_arrow_container"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_below="@id/lockscreen_next_song"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/d12_size">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_lockscreen_arrow"
+            android:background="@color/transparent"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_lockscreen_arrow"
+            android:background="@color/transparent"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_lockscreen_arrow"
+            android:background="@color/transparent"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_lockscreen_arrow"
+            android:background="@color/transparent"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_lockscreen_arrow"
+            android:background="@color/transparent"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_lockscreen_arrow"
+            android:background="@color/transparent"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_lockscreen_arrow"
+            android:background="@color/transparent"/>
+    </LinearLayout>
 </RelativeLayout>

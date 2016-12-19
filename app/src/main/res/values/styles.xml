@@ -129,7 +129,7 @@
         <item name="background_color_1">@color/day_background_color_1</item>
         <item name="background_color_2">@color/day_background_color_2</item>
         <item name="background_color_3">@color/day_background_color_3</item>
-        <item name="background_grid_color">@color/night_selected_color</item>
+        <item name="background_grid_color">@color/day_background_grid_color</item>
         <item name="background_aboutus_color">@color/white_f6f6f5</item>
         <item name="background_grid">@drawable/bg_grid_day</item>
         <item name="background_list">@drawable/bg_list_day</item>

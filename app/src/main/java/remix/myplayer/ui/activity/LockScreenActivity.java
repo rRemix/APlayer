@@ -13,6 +13,7 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -140,8 +141,9 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         //初始化控件
         mImageBackground.setAlpha(0.75f);
         mView = getWindow().getDecorView();
-        mView.setBackgroundColor(getResources().getColor(R.color.transparent));
+        mView.setBackgroundColor(Color.TRANSPARENT);
 
+        findView(R.id.lockscreen_arrow_container).startAnimation(AnimationUtils.loadAnimation(this,R.anim.arrow_left_to_right));
     }
 
     //前后两次触摸的X

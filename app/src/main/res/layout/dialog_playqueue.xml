@@ -3,22 +3,16 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
-    <android.support.design.widget.AppBarLayout
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1.5"
-        android:background="@color/night_interval_color">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/play_queue"
-            android:textSize="@dimen/s16_size"
-            android:textColor="@color/black"
-            android:background="@color/gray_efeeed" />
-    </android.support.design.widget.AppBarLayout>
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/play_queue"
+        android:textSize="@dimen/s16_size"
+        android:textColor="@color/black"
+        android:background="@color/night_interval_color" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/bottom_actionbar_play_list"

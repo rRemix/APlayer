@@ -101,11 +101,13 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
             case R.id.menu_edit:
                 MaterialDialog editDialog = new MaterialDialog.Builder(mContext)
                         .title("音乐标签编辑")
+                        .titleColorRes(R.color.day_textcolor_primary)
                         .customView(R.layout.dialog_song_edit,true)
                         .negativeText(R.string.cancel)
-                        .negativeColorRes(R.color.black)
+                        .negativeColorRes(R.color.day_textcolor_primary)
                         .positiveText(R.string.confirm)
-                        .positiveColorRes(R.color.black)
+                        .positiveColorRes(R.color.day_textcolor_primary)
+                        .backgroundColorRes(R.color.day_background_color_3)
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -188,7 +190,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         .title("歌曲详情")
                         .customView(R.layout.dialog_song_detail,true)
                         .positiveText(R.string.confirm)
-                        .positiveColorRes(R.color.black)
+                        .positiveColorRes(R.color.day_textcolor_primary)
                         .build();
                 detailDialog.show();
                 mDetailRootView = detailDialog.getCustomView();
@@ -260,16 +262,15 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                     }
                                 }
                             })
-                            .backgroundColor(ThemeStore.getBackgroundColor3())
-                            .positiveColor(ThemeStore.getTextColorPrimary())
-                            .negativeColor(ThemeStore.getTextColorPrimary())
-                            .contentColor(ThemeStore.getTextColorPrimary())
+                            .backgroundColorRes(R.color.day_background_color_3)
+                            .positiveColorRes(R.color.day_textcolor_primary)
+                            .negativeColorRes(R.color.day_textcolor_primary)
+                            .contentColorRes(R.color.day_textcolor_primary)
                             .show();
                 } catch (Exception e){
                     e.printStackTrace();
                 }
                 break;
-
         }
         return true;
     }

@@ -27,10 +27,11 @@
     <!--默认的colorControlHighLight-->
     <color name="day_ripple_color">#1f000000</color>
     <color name="day_selected_color">#1f000000</color>
-    <color name="night_selected_color">#f1f1f1</color>
-    <color name="night_ripple_color">#f1f1f1</color>
+    <color name="night_selected_color">#353538</color>
+    <color name="night_ripple_color">#353538</color>
     <color name="default_model_button_color">#e2e4e8</color>
     <color name="select_model_button_color">#ffce64</color>
+    <color name="day_background_grid_color">#f1f1f1</color>
     <!--<color name="night_selected_color">@color/default_control_highlight</color>-->
 
     <!--默认textview颜色-->

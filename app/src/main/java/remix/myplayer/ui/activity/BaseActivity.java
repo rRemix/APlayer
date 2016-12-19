@@ -29,7 +29,6 @@ public class BaseActivity extends AppCompatActivity {
      * 设置主题
      */
     protected void setUpTheme(){
-//        setTheme(ThemeStore.isDay() ? R.style.DayTheme : R.style.NightTheme);
         if(ThemeStore.THEME_MODE == ThemeStore.NIGHT) {
             setTheme(R.style.NightTheme);
             return;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
+    android:layout_height="128dp"
     android:orientation="horizontal">
 
     <ImageView
@@ -45,7 +45,7 @@
                     android:background="?android:attr/selectableItemBackground"
                     android:layout_marginRight="@dimen/d12_size"
                     android:layout_marginLeft="@dimen/d12_size"
-                    android:src="@drawable/notify_btn_close_white"/>
+                    android:src="@drawable/notify_btn_close_white" />
                 <TextView
                     android:id="@+id/notify_song"
                     android:text="歌曲名"
@@ -72,7 +72,7 @@
                 android:lines="1"
                 android:ellipsize="end"
                 android:textSize="@dimen/s14_size"
-                android:textColor="@color/gray_8d8c8e"/>
+                android:textColor="@color/gray_8d8c8e" />
 
             <!--三个控制按钮-->
             <LinearLayout

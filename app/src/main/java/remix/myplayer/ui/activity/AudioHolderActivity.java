@@ -210,6 +210,11 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
     };
 
     @Override
+    protected void setUpTheme() {
+        setTheme(R.style.DayTheme );
+    }
+
+    @Override
     protected void setStatusBar() {
         if(Build.MANUFACTURER.equals("Meizu")){
             StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this,true);
