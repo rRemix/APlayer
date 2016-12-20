@@ -28,6 +28,7 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.CircleSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -52,8 +53,8 @@ public class TimerDialog extends BaseDialogActivity {
     //分钟
     @BindView(R.id.minute)
     TextView mMinute;
-    @BindView(R.id.second)
     //秒
+    @BindView(R.id.second)
     TextView mSecond;
     //设置或取消默认
     SwitchCompat mSwitch;
@@ -83,6 +84,7 @@ public class TimerDialog extends BaseDialogActivity {
             mSeekbar.setProgress(msg.arg1);
         }
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,8 +129,9 @@ public class TimerDialog extends BaseDialogActivity {
         });
 
         //初始化switch
-        mSwitch = new SwitchCompat(new ContextThemeWrapper(this, Theme.getTheme()));
+        mSwitch = new SwitchCompat(new ContextThemeWrapper(this, ThemeStore.isDay() ? Theme.getTheme() : R.style.TimerDialogNightTheme));
         ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
+
         //读取保存的配置
         boolean hasdefault = SPUtil.getValue(this, "Setting", "TimerDefault", false);
         final int time = SPUtil.getValue(this,"Setting","TimerNum",-1);
@@ -183,31 +186,15 @@ public class TimerDialog extends BaseDialogActivity {
                 });
 
         //点击效果
-        ButterKnife.apply(new View[]{mCancel,mToggle},
-                new ButterKnife.Action<View>() {
-                    @Override
-                    public void apply(@NonNull View view, int index) {
-                        Drawable selectDrawable = getResources().getDrawable(R.drawable.bg_corner_select_day);
-                        Drawable defaultDrawable = getResources().getDrawable(R.drawable.bg_corner_default_day);
-                        view.setBackground(Theme.getPressDrawable(defaultDrawable,selectDrawable,ColorUtil.getColor(R.color.day_ripple_color),defaultDrawable,defaultDrawable));
-                    }
-                });
-
-        //点击效果
-//        Drawable selectDrawable = Theme.getShape(
-//                GradientDrawable.RECTANGLE,
-//                ColorUtil.getColor(R.color.day_selected_color),
-//                DensityUtil.dip2px(this,2),
-//                0,0,0,0,1);
-//        Drawable defaultDrawable = Theme.getShape(
-//                GradientDrawable.RECTANGLE,
-//                ColorUtil.getColor(R.color.white_f6f6f5),
-//                DensityUtil.dip2px(this,2),
-//                0,0,0,0,1);
-//        mToggle.setBackground(
-//                Theme.getPressDrawable(defaultDrawable,selectDrawable,ColorUtil.getColor(R.color.day_ripple_color),defaultDrawable,defaultDrawable));
-//        mCancel.setBackground(Theme.getPressDrawable(defaultDrawable.mutate(),selectDrawable.mutate(),ColorUtil.getColor(R.color.day_ripple_color),defaultDrawable.mutate(),null));
-
+//        ButterKnife.apply(new View[]{mCancel,mToggle},
+//                new ButterKnife.Action<View>() {
+//                    @Override
+//                    public void apply(@NonNull View view, int index) {
+//                        Drawable selectDrawable = getResources().getDrawable(R.drawable.bg_corner_select_day);
+//                        Drawable defaultDrawable = getResources().getDrawable(R.drawable.bg_corner_default_day);
+//                        view.setBackground(Theme.getPressDrawable(defaultDrawable,selectDrawable,ColorUtil.getColor(R.color.day_ripple_color),defaultDrawable,defaultDrawable));
+//                    }
+//                });
 
     }
 

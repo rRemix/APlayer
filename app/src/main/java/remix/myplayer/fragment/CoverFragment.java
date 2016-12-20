@@ -1,7 +1,6 @@
 package remix.myplayer.fragment;
 
 import android.content.ContentUris;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
@@ -11,12 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
-import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
 
 import butterknife.BindView;

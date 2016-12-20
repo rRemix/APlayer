@@ -172,7 +172,7 @@
                     android:textColor="@color/gray_404040"
                     android:textSize="@dimen/s14_size"
                     android:text="@string/as_default"
-                    android:layout_marginRight="@dimen/d20_size"/>
+                    android:layout_marginRight="@dimen/d18_size" />
             </LinearLayout>
             <ImageView
                 android:id="@+id/timer_info"
@@ -202,7 +202,8 @@
                 android:paddingTop="@dimen/d6_size"
                 android:paddingBottom="@dimen/d6_size"
                 android:paddingRight="@dimen/d12_size"
-                android:paddingLeft="@dimen/d12_size" />
+                android:paddingLeft="@dimen/d12_size"
+                android:background="@drawable/bg_grid_day"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -215,7 +216,8 @@
                 android:paddingTop="@dimen/d6_size"
                 android:paddingBottom="@dimen/d6_size"
                 android:paddingRight="@dimen/d12_size"
-                android:paddingLeft="@dimen/d12_size" />
+                android:paddingLeft="@dimen/d12_size"
+                android:background="@drawable/bg_grid_day"/>
         </RelativeLayout>
     </LinearLayout>
 </FrameLayout>

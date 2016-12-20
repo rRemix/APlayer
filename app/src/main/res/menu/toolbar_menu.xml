@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:enabled="true" >
         <item android:id="@+id/toolbar_search" android:icon="@drawable/act_btn_search"
-            android:title="搜索" android:orderInCategory="90" app:showAsAction="always" />
+            android:title="@string/search" android:orderInCategory="90" app:showAsAction="ifRoom" />
         <item android:id="@+id/toolbar_timer" android:icon="@drawable/act_btn_timer"
-            android:title="定时关闭" android:orderInCategory="80" app:showAsAction="always" />
+            android:title="@string/timer_close" android:orderInCategory="80" app:showAsAction="ifRoom" />
     </group>
 </menu>

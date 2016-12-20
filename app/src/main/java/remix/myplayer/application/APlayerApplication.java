@@ -21,7 +21,6 @@ import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.SplashActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;

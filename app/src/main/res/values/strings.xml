@@ -115,6 +115,8 @@
     <string name="updat_error">查询出错或查询超时</string>
     <string name="update_ignore">该版本已被忽略更新</string>
     <string name="no_update">当前已经是最新版本</string>
-    <string name="v1_1_2">v1.2.0</string>
+    <string name="v1_1_2">v1.1.2</string>
+    <string name="search">搜索</string>
+    <string name="timer_close">定时关闭</string>
 
 </resources>

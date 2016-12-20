@@ -14,7 +14,6 @@
     <dimen name="s24_size">24sp</dimen>
 
     <dimen name="item_height">72dp</dimen>
-    <dimen name="item_text_width">230dp</dimen>
 
     <dimen name="tab_height">48dp</dimen>
     <dimen name="d1_size">1dp</dimen>
@@ -56,12 +55,9 @@
     <dimen name="d160_size">160dp</dimen>
     <dimen name="d170_size">170dp</dimen>
     <dimen name="d180_size">180dp</dimen>
-    <dimen name="d188_size">188dp</dimen>
-    <dimen name="d198_size">198dp</dimen>
     <dimen name="d200_size">200dp</dimen>
     <dimen name="d204_size">204dp</dimen>
     <dimen name="d210_size">210dp</dimen>
-    <dimen name="d214_size">214dp</dimen>
     <dimen name="d218_size">218dp</dimen>
     <dimen name="d240_size">240dp</dimen>
     <dimen name="d264_size">264dp</dimen>

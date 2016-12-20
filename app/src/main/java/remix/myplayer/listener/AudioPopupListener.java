@@ -27,7 +27,6 @@ import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.AudioHolderActivity;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.dialog.TimerDialog;
