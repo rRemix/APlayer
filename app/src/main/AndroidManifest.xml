@@ -33,17 +33,6 @@
         <meta-data android:name="UMENG_MESSAGE_SECRET" android:value="5cc69b6b8425a8e30cf6f0b40b67bda3"/>
         <meta-data android:name="UMENG_CHANNEL" android:value="${CHANNEL_VALUE}"/>
 
-        <!--bombupdate-->
-        <!--<meta-data  android:name="BMOB_CHANNEL" android:value="${CHANNEL_VALUE}"/>-->
-
-        <!--闪屏页-->
-        <!--<activity android:name=".ui.activity.SplashActivity" android:theme="@style/ActivityStyle">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN"/>-->
-                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
-
         <activity
             android:name=".ui.activity.MainActivity"
             android:theme="@style/ActivityStyle">
@@ -204,6 +193,16 @@
             android:authorities="remix.myplayer"
             android:name=".db.DBContentProvider"
             android:exported="false"/>
+
+        <!--桌面部件-->
+        <receiver android:name=".appwidgets.Appwidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <!-- 声明数据 -->
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/example_appwidget_info" />
+        </receiver>
     </application>
 
 </manifest>

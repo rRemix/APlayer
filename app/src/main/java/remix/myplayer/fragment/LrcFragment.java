@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,7 +32,7 @@ public class LrcFragment extends BaseFragment {
     private static int NO_LRC = 2;
     private static int NO_NETWORK = 3;
     private static int SEARCHING = 4;
-    private OnInflateFinishListener onFindListener;
+    private OnInflateFinishListener mOnFindListener;
     private MP3Item mInfo;
     @BindView(R.id.lrc_view)
     LrcView mLrcView;
@@ -64,7 +63,7 @@ public class LrcFragment extends BaseFragment {
     };
 
     public void setOnInflateFinishListener(OnInflateFinishListener l){
-        onFindListener = l;
+        mOnFindListener = l;
     }
 
     @Override
@@ -80,7 +79,8 @@ public class LrcFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_lrc,container,false);
 
         mUnBinder = ButterKnife.bind(this,rootView);
-        onFindListener.onViewInflateFinish(mLrcView);
+        if(mOnFindListener != null)
+            mOnFindListener.onViewInflateFinish(mLrcView);
         mInfo = (MP3Item)getArguments().getSerializable("MP3Item");
 
         return rootView;

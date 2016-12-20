@@ -16,6 +16,7 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.telephony.gsm.GsmCellLocation;
 import android.view.KeyEvent;
 
 import java.io.IOException;
@@ -596,6 +597,8 @@ public class MusicService extends BaseService {
      * @return 随机索引
      */
     private static int getShuffle(){
+        if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
+            return 0;
         if(Global.mPlayQueue.size() == 1)
             return 0;
         return new Random().nextInt(Global.mPlayQueue.size() - 1);

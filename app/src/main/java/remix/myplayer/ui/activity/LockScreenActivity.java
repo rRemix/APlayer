@@ -33,6 +33,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -110,6 +111,7 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
 
     @Override
     protected void setStatusBar() {
+        StatusBarUtil.setTransparent(this);
     }
 
     @Override
@@ -125,12 +127,11 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         mWidth = metric.widthPixels;
         mHeight = metric.heightPixels;
         MusicService.addCallback(this);
-        //解锁屏幕并全屏
+
+        //解锁屏幕
         WindowManager.LayoutParams attr = getWindow().getAttributes();
-        attr.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
         attr.flags |= WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
         attr.flags |= WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
         //初始化按钮
         CtrlButtonListener listener = new CtrlButtonListener(this);

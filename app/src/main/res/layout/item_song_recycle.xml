@@ -56,8 +56,7 @@
         android:layout_toLeftOf="@id/song_columnview"
         android:orientation="vertical"
         android:gravity="center_vertical"
-        android:layout_marginRight="@dimen/d4_size"
-        android:layout_marginLeft="@dimen/d4_size">
+        android:layout_marginRight="@dimen/d4_size">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
