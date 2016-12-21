@@ -40,8 +40,10 @@ import remix.myplayer.util.ToastUtil;
 public class FeedBakActivity extends ToolbarActivity {
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
-    @BindView(R.id.feedback_edittext)
-    EditText mEditText;
+    @BindView(R.id.feedback_content)
+    EditText mContent;
+    @BindView(R.id.feedback_contact)
+    EditText mContact;
     @BindView(R.id.feedback_submit)
     Button mSubmit;
     Feedback mFeedBack = new Feedback();
@@ -53,27 +55,32 @@ public class FeedBakActivity extends ToolbarActivity {
         setUpToolbar(mToolBar,getString(R.string.back));
 
         mSubmit.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0,ThemeStore.getAccentColor()));
-        mEditText.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0, ColorUtil.getColor(R.color.gray_e2e2e2)));
-        Theme.setTint(mEditText,ThemeStore.getMaterialPrimaryColor(),false);
+        mContent.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0, ColorUtil.getColor(R.color.gray_e2e2e2)));
+        mContact.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0, ColorUtil.getColor(R.color.gray_e2e2e2)));
+        Theme.setTint(mContent,ThemeStore.getMaterialPrimaryColor(),false);
+        Theme.setTint(mContact,ThemeStore.getMaterialPrimaryColor(),false);
     }
 
     @OnClick(R.id.feedback_submit)
     public void onClick(View v){
         try {
-            if(TextUtils.isEmpty(mEditText.getText())){
+            if(TextUtils.isEmpty(mContent.getText())){
                 ToastUtil.show(this,getString(R.string.input_feedback_content));
                 return;
             }
             PackageManager pm = getPackageManager();
             PackageInfo pi = pm.getPackageInfo(getPackageName(), PackageManager.GET_ACTIVITIES);
-            mFeedBack = new Feedback(mEditText.getText().toString(),
+            mFeedBack = new Feedback(mContent.getText().toString(),
+                    mContact.getText().toString(),
                     pi.versionName,
                     pi.versionCode + "",
-                    Build.VERSION.RELEASE,
-                    Build.VERSION.SDK_INT + "",
+                    Build.DISPLAY,
+                    Build.CPU_ABI + "," + Build.CPU_ABI2,
                     Build.MANUFACTURER,
                     Build.MODEL,
-                    Build.CPU_ABI + "," + Build.CPU_ABI2);
+                    Build.VERSION.RELEASE,
+                    Build.VERSION.SDK_INT + ""
+            );
             mFeedBack.save(new SaveListener<String>() {
                 @Override
                 public void done(String s, BmobException e) {
@@ -81,7 +88,7 @@ public class FeedBakActivity extends ToolbarActivity {
                         ToastUtil.show(FeedBakActivity.this,R.string.send_success);
                         finish();
                     } else {
-                        commit();
+                        commitByEmail();
                     }
                 }
             });
@@ -90,11 +97,11 @@ public class FeedBakActivity extends ToolbarActivity {
         }
     }
 
-    private void commit(){
+    private void commitByEmail(){
         Intent data = new Intent(Intent.ACTION_SENDTO);
         data.setData(Uri.parse("mailto:568920427@qq.com"));
         data.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback));
-        data.putExtra(Intent.EXTRA_TEXT, mEditText.getText().toString() + "\n\n\n" + mFeedBack);
+        data.putExtra(Intent.EXTRA_TEXT, mContent.getText().toString() + "\n\n\n" + mFeedBack);
         startActivityForResult(data,0);
     }
 

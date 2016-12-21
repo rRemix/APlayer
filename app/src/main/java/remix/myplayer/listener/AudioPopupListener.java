@@ -3,6 +3,9 @@ package remix.myplayer.listener;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,6 +30,7 @@ import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.AudioHolderActivity;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.dialog.TimerDialog;
@@ -99,14 +103,14 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
         switch (item.getItemId()){
             case R.id.menu_edit:
                 MaterialDialog editDialog = new MaterialDialog.Builder(mContext)
-                        .title("音乐标签编辑")
-                        .titleColorRes(R.color.day_textcolor_primary)
+                        .title(R.string.song_edit)
+                        .titleColorAttr(R.attr.text_color_primary)
                         .customView(R.layout.dialog_song_edit,true)
                         .negativeText(R.string.cancel)
-                        .negativeColorRes(R.color.day_textcolor_primary)
+                        .negativeColorAttr(R.attr.text_color_primary)
                         .positiveText(R.string.confirm)
-                        .positiveColorRes(R.color.day_textcolor_primary)
-                        .backgroundColorRes(R.color.day_background_color_3)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .backgroundColorAttr(R.attr.background_color_3)
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -160,25 +164,36 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                     ButterKnife.bind(AudioPopupListener.this, mEditRootView);
 
                     if(mSongLayout.getEditText() != null){
-                        mSongLayout.setHintTextAppearance(Theme.getTheme(true));
+                        if(!ThemeStore.isDay()){
+                            mSongLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
+                            mSongLayout.getEditText().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                        }
                         mSongLayout.getEditText().addTextChangedListener(new TextInputEditWatcher(mSongLayout,"歌曲名不能为空"));
                         mSongLayout.getEditText().setText(mInfo.getTitle());
                     }
                     if(mAlbumLayout.getEditText() != null) {
-                        mAlbumLayout.setHintTextAppearance(Theme.getTheme(true));
+                        if(!ThemeStore.isDay()){
+                            mAlbumLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
+                        }
                         mAlbumLayout.getEditText().setText(mInfo.getAlbum());
                     }
                     if(mArtistLayout.getEditText() != null) {
-                        mArtistLayout.setHintTextAppearance(Theme.getTheme(true));
+                        if(!ThemeStore.isDay()){
+                            mArtistLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
+                        }
                         mArtistLayout.getEditText().setText(mInfo.getArtist());
                     }
                     if(mYearLayout.getEditText() != null){
-                        mYearLayout.setHintTextAppearance(Theme.getTheme(true));
+                        if(!ThemeStore.isDay()){
+                            mYearLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
+                        }
                         mYearLayout.getEditText().setText(mInfo.getYear() + "");
                     }
                     mGenreInfo = MediaStoreUtil.getGenre(mInfo.getId());
                     if(mGenreLayout.getEditText() != null){
-                        mGenreLayout.setHintTextAppearance(Theme.getTheme(true));
+                        if(!ThemeStore.isDay()){
+                            mGenreLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
+                        }
                         mGenreLayout.getEditText().setText(mGenreInfo.GenreName);
                     }
                 }
@@ -186,10 +201,12 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
 
             case R.id.menu_detail:
                 MaterialDialog detailDialog = new MaterialDialog.Builder(mContext)
-                        .title("歌曲详情")
+                        .title(R.string.song_detail)
+                        .titleColorAttr(R.attr.text_color_primary)
                         .customView(R.layout.dialog_song_detail,true)
                         .positiveText(R.string.confirm)
-                        .positiveColorRes(R.color.day_textcolor_primary)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .backgroundColorAttr(R.attr.background_color_3)
                         .build();
                 detailDialog.show();
                 mDetailRootView = detailDialog.getCustomView();
@@ -242,42 +259,45 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 }
                 break;
             case R.id.menu_delete:
-                try {
-                    new MaterialDialog.Builder(mContext)
-                            .content(mContext.getString(R.string.confirm_delete_playlist,"曲库"))
-                            .positiveText(R.string.confirm)
-                            .negativeText(R.string.cancel)
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-
-                                    if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG)){
-                                        if(PlayListUtil.deleteSong(mInfo.getId(), Global.mPlayQueueID)){
-                                            ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
-
-                                        }
-                                    } else {
-                                        ToastUtil.show(mContext, mContext.getString(R.string.delete_error));
-                                    }
-                                }
-                            })
-                            .backgroundColorRes(R.color.day_background_color_3)
-                            .positiveColorRes(R.color.day_textcolor_primary)
-                            .negativeColorRes(R.color.day_textcolor_primary)
-                            .contentColorRes(R.color.day_textcolor_primary)
-                            .show();
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
+//                try {
+//                    new MaterialDialog.Builder(mContext)
+//                            .content(mContext.getString(R.string.confirm_delete_playlist,"曲库"))
+//                            .positiveText(R.string.confirm)
+//                            .negativeText(R.string.cancel)
+//                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+//                                @Override
+//                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+//                                    if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG)){
+//                                        if(PlayListUtil.deleteSong(mInfo.getId(), Global.mPlayQueueID)){
+//                                            ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
+//                                        }
+//                                    } else {
+//                                        ToastUtil.show(mContext, mContext.getString(R.string.delete_error));
+//                                    }
+//                                }
+//                            })
+//                            .backgroundColorAttr(R.attr.background_color_3)
+//                            .positiveColorAttr(R.attr.text_color_primary)
+//                            .negativeColorAttr(R.attr.text_color_primary)
+//                            .contentColorAttr(R.attr.text_color_primary)
+//                            .show();
+//                } catch (Exception e){
+//                    e.printStackTrace();
+//                }
                 break;
+            case R.id.menu_vol:
+                AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+                if(audioManager != null){
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
+                }
         }
         return true;
     }
 
-    class TextInputEditWatcher implements TextWatcher{
+    private class TextInputEditWatcher implements TextWatcher{
         private TextInputLayout mInputLayout;
         private String mError;
-        public TextInputEditWatcher(TextInputLayout layout,String error){
+        TextInputEditWatcher(TextInputLayout layout,String error){
             mError = error;
             mInputLayout = layout;
         }

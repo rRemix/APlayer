@@ -102,7 +102,7 @@ public class LrcView extends View implements ILrcView{
 
 
     /** 错误提示文字 */
-    private String mText = "";
+    private String mText = "正在搜索";
 
 	public LrcView(Context context) {
 		super(context);

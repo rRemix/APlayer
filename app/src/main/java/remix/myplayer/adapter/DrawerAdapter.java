@@ -54,8 +54,9 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
 
     @Override
     public void onBindViewHolder(final DrawerHolder holder, final int position) {
-        Theme.TintDrawable(holder.mImg,mImgs[position],ThemeStore.getMaterialPrimaryColor());
+        Theme.TintDrawable(holder.mImg,mImgs[position],ThemeStore.getAccentColor());
         holder.mText.setText(mTitles[position]);
+        holder.mText.setTextColor(ThemeStore.isDay() ? ColorUtil.getColor(R.color.gray_34353a) : ThemeStore.getTextColorPrimary());
         if(position == 3){
             holder.mSwitch.setVisibility(View.VISIBLE);
             holder.mSwitch.setChecked(!ThemeStore.isDay());
@@ -75,15 +76,15 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
         });
         holder.mRoot.setSelected(mSelectIndex == position);
         holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(mContext,
-                        Theme.getShape(GradientDrawable.RECTANGLE, ColorUtil.getColor(R.color.drawer_selected)),
-                        Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE),
-                        ColorUtil.getColor(R.color.drawer_selected)));
+                        Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerEffectColor()),
+                        Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getBackgroundColor3()),
+                        ThemeStore.getDrawerEffectColor()));
 
     }
 
     @Override
     public int getItemCount() {
-        return 5;
+        return mTitles != null ? mTitles.length : 0;
     }
 
     class DrawerHolder extends BaseViewHolder{

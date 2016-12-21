@@ -1,6 +1,7 @@
 package remix.myplayer.model;
 
 import cn.bmob.v3.BmobObject;
+import remix.myplayer.util.DiskCache;
 
 /**
  * Created by Remix on 2016/12/1.
@@ -15,12 +16,16 @@ public class Feedback extends BmobObject {
     private String DeviceModel;
     private String ReleaseVersion;
     private String SdkVersion;
+    private String Display;
+    private String Contact;
 
-    public Feedback(String content, String appVersion, String appVersionCode, String cpuABI, String deviceManufacturer, String deviceModel, String releaseVersion, String sdkVersion) {
+    public Feedback(String content,String contact, String appVersion, String appVersionCode,String display, String cpuABI, String deviceManufacturer, String deviceModel, String releaseVersion, String sdkVersion) {
         super();
         Content = content;
+        Contact = contact;
         AppVersion = appVersion;
         AppVersionCode = appVersionCode;
+        Display = display;
         CpuABI = cpuABI;
         DeviceManufacturer = deviceManufacturer;
         DeviceModel = deviceModel;
@@ -50,6 +55,14 @@ public class Feedback extends BmobObject {
         Content = content;
     }
 
+    public String getContact() {
+        return Contact;
+    }
+
+    public void setContact(String contact) {
+        Contact = contact;
+    }
+
     public String getAppVersion() {
         return AppVersion;
     }
@@ -60,6 +73,14 @@ public class Feedback extends BmobObject {
 
     public String getAppVersionCode() {
         return AppVersionCode;
+    }
+
+    public String getDisplay() {
+        return Display;
+    }
+
+    public void setDisplay(String display) {
+        Display = display;
     }
 
     public void setAppVersionCode(String appVersionCode) {

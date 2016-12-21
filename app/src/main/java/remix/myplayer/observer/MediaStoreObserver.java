@@ -13,6 +13,7 @@ import remix.myplayer.util.MediaStoreUtil;
  * Created by taeja on 16-3-30.
  */
 public class MediaStoreObserver extends ContentObserver {
+    private static MediaStoreObserver mInstance;
     private Handler mHandler;
     /**
      * Creates a content observer.
@@ -22,6 +23,10 @@ public class MediaStoreObserver extends ContentObserver {
     public MediaStoreObserver(Handler handler) {
         super(handler);
         mHandler = handler;
+    }
+
+    public synchronized static MediaStoreObserver getInstance(){
+        return mInstance;
     }
 
     @Override

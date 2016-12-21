@@ -30,8 +30,7 @@ public class DefaultLrcParser implements ILrcParser {
         String s = "";
         DiskLruCache.Editor editor = null;
         OutputStream lrcCacheStream = null;
-        if (bufferedReader == null)
-            return null;
+
 
         List<LrcRow> lrcRows = new ArrayList<>();
         try {

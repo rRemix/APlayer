@@ -1,6 +1,8 @@
 package remix.myplayer.ui;
 
 import android.content.Context;
+import android.os.Message;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
@@ -20,6 +22,7 @@ import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.PlayListInfo;
+import remix.myplayer.observer.MediaStoreObserver;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.FolderActivity;
@@ -102,10 +105,6 @@ public class MultiChoice implements OnMultiItemClickListener {
                 }
                 break;
         }
-//        ArrayList<PlayListSongInfo> songs = new ArrayList<>();
-//        for(int i = 0 ; i < idList.size() ;i++){
-//            songs.add(new PlayListSongInfo(idList.get(i),Global.mPlayQueueID,Constants.PLAY_QUEUE));
-//        }
 
         num = Global.AddSongToPlayQueue(idList);
         ToastUtil.show(mContext,mContext.getString(R.string.add_song_playinglist_success,num));
@@ -198,7 +197,6 @@ public class MultiChoice implements OnMultiItemClickListener {
                     }
                 })
                 .backgroundColorAttr(R.attr.background_color_3).build().show();
-
     }
 
     @Override
@@ -250,6 +248,7 @@ public class MultiChoice implements OnMultiItemClickListener {
             }
         }
         ToastUtil.show(mContext,mContext.getString(R.string.delete_multi_song,num));
+        mContext.getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, MediaStoreObserver.getInstance());
         UpdateOptionMenu(false);
     }
 

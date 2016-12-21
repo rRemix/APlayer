@@ -124,6 +124,15 @@
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
     </style>
 
+    <style name="AudioHolderStyle.Day" parent="DayTheme"/>
+    <style name="AudioHolderStyle.Night" parent="NightTheme">
+        <item name="colorControlActivated">@color/white</item>
+        <item name="colorControlNormal">@color/white_f2f2f2</item>
+        <item name="android:textColorHint">@color/night_textcolor</item>
+        <item name="android:windowBackground">@color/night_background_color_3</item>
+    </style>
+
+
     <style name="DayTheme" parent="@style/ActivityStyle">
         <item name="background_color_main">@color/day_background_color_main</item>
         <item name="background_color_1">@color/day_background_color_1</item>
@@ -145,6 +154,7 @@
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Light</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
     </style>
+
 
     <!--夜间模式-->
     <style name="NightTheme" parent="@style/ActivityStyle">
@@ -170,7 +180,7 @@
         <item name="stress_color">@color/purple_782899</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Dark</item>
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
-        <item name="android:textColor">@color/md_brown_primary</item>
+        <item name="android:textColor">@color/purple_782899</item>
         <item name="colorControlActivated">@color/purple_782899</item>
         <item name="colorAccent">@color/purple_782899</item>
         <item name="colorControlHighlight">@color/night_ripple_color</item>

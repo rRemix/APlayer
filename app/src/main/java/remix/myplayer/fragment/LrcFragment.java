@@ -49,9 +49,7 @@ public class LrcFragment extends BaseFragment {
 
             } else if(msg.what == UPDATE_LRC) {
                 //更新歌词
-                if(mLrcList != null) {
-                    mLrcView.setLrcRows(mLrcList);
-                }
+                mLrcView.setLrcRows(mLrcList);
             } else if (msg.what == NO_LRC) {
                 //没有找到歌词
                 mLrcView.setText("暂无歌词");

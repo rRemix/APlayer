@@ -20,6 +20,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.SongChooseAdaper;
 import remix.myplayer.interfaces.OnCheckListener;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -109,7 +110,7 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
                 new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.ARTIST,
                         MediaStore.Audio.Media.ARTIST_ID, MediaStore.Audio.Media.TITLE,
                         MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.DISPLAY_NAME,MediaStore.Audio.Media.ALBUM_ID},
-                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE,null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID(),null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
     }
 
     @Override

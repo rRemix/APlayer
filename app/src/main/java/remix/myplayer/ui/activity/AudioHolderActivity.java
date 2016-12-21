@@ -3,6 +3,7 @@ package remix.myplayer.ui.activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -13,12 +14,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -211,24 +215,49 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
 
     @Override
     protected void setUpTheme() {
-        setTheme(R.style.DayTheme );
+        if(ThemeStore.isDay())
+            super.setUpTheme();
+        else {
+            setTheme(R.style.AudioHolderStyle_Night);
+        }
     }
 
     @Override
     protected void setStatusBar() {
-        if(Build.MANUFACTURER.equals("Meizu")){
-            StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this,true);
-            StatusBarUtil.setTransparent(this);
-        } else if (Build.MANUFACTURER.equals("Xiaomi")){
-            StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true,this);
-            StatusBarUtil.setTransparent(this);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            StatusBarUtil.setTransparent(this);
-            getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        if(ThemeStore.isDay()){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                StatusBarUtil.setTransparent(this);
+                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else if(Build.MANUFACTURER.equals("Meizu")){
+                StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this,true);
+                StatusBarUtil.setTransparent(this);
+            } else if (Build.MANUFACTURER.equals("Xiaomi")){
+                StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true,this);
+                StatusBarUtil.setTransparent(this);
+            } else {
+                StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.white_f2f2f2));
+            }
         } else {
-            StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.white_f2f2f2));
+            StatusBarUtil.setTransparent(this);
         }
     }
+
+    private float mEventY1;
+    private float mEventY2;
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        if(event.getAction() == MotionEvent.ACTION_DOWN){
+//            mEventY1 = event.getY();
+//        }
+//        if(event.getAction() == MotionEvent.ACTION_UP){
+//            mEventY2 = event.getY();
+//            if(mEventY2 - mEventY1 > 100){
+//                onBackPressed();
+//            }
+//        }
+//
+//        return super.onTouchEvent(event);
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -263,6 +292,22 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         if(savedInstanceState != null){
             mOriginRect = savedInstanceState.getParcelable("Rect");
         }
+
+        getWindow().getDecorView().setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    mEventY1 = event.getY();
+                }
+                if(event.getAction() == MotionEvent.ACTION_UP){
+                    mEventY2 = event.getY();
+                    if(mEventY2 - mEventY1 > 100){
+                        onBackPressed();
+                    }
+                }
+                return false;
+            }
+        });
     }
 
     /**
@@ -376,23 +421,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         } else {
             finish();
             overridePendingTransition(0,R.anim.audio_out);
-//            final View decorView = getWindow().getDecorView();
-//            Spring outAnim = SpringSystem.create().createSpring();
-//            outAnim.addListener(new SimpleSpringListener(){
-//                @Override
-//                public void onSpringAtRest(Spring spring) {
-//                    finish();
-//                }
-//
-//                @Override
-//                public void onSpringUpdate(Spring spring) {
-//                    decorView.setTranslationY((float) spring.getCurrentValue());
-//                }
-//            });
-//            outAnim.setCurrentValue(0);
-//            outAnim.setEndValue(mHeight);
-//            outAnim.setRestDisplacementThreshold(50);
-//            outAnim.setRestSpeedThreshold(50);
         }
 
     }
@@ -455,7 +483,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
                 break;
             //弹出窗口
             case R.id.top_more:
-                Context wrapper = new ContextThemeWrapper(this,R.style.PopupMenuDayStyle);
+                Context wrapper = new ContextThemeWrapper(this,Theme.getPopupMenuStyle());
                 final PopupMenu popupMenu = new PopupMenu(wrapper,v, Gravity.TOP);
                 popupMenu.getMenuInflater().inflate(R.menu.audio_menu, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new AudioPopupListener(this,mInfo));
@@ -706,6 +734,21 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         mAdapter.AddFragment(lrcFragment);
 
         mPager.setAdapter(mAdapter);
+        //下滑关闭
+        mPager.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    mEventY1 = event.getY();
+                }
+                if(event.getAction() == MotionEvent.ACTION_UP){
+                    mEventY2 = event.getY();
+                    if(mEventY2 - mEventY1 > 200)
+                        onBackPressed();
+                }
+                return false;
+            }
+        });
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -811,11 +854,12 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         int accentColor = ThemeStore.getAccentColor();
         int garyColor = ColorUtil.getColor(R.color.gray_6c6a6c);
         //修改顶部按钮颜色
-        Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,garyColor);
-        Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,garyColor);
+        int tintColor = ThemeStore.isDay() ? garyColor : Color.WHITE;
+        Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,tintColor);
+        Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,tintColor);
         //歌词颜色
         if(mLrcView != null){
-            mLrcView.setHighLightColor(ColorUtil.getColor(R.color.lrc_hight));
+            mLrcView.setHighLightColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_hight : R.color.night_textcolor_primary));
             mLrcView.setOtherColor(ColorUtil.getColor(R.color.lrc_normal));
             mLrcView.setTimeLineColor(ColorUtil.getColor(R.color.lrc_normal));
             mLrcView.invalidate();
@@ -832,6 +876,9 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,accentColor);
         Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,accentColor);
 
+        //歌曲名颜色
+        mTopTitle.setTextColor(ThemeStore.isDay() ? ColorUtil.getColor(R.color.black_333333) : ThemeStore.getTextColorPrimary());
+
         int playmodel = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
         Theme.TintDrawable(mPlayModel,playmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                 playmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
@@ -842,6 +889,7 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         //下一首背景
         mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.getColor(R.color.white_fafafa),
                 DensityUtil.dip2px(this,2),0,0,DensityUtil.dip2px(this,288),DensityUtil.dip2px(this,38),1));
+        mNextSong.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_a8a8a8 : R.color.night_textcolor));
     }
 
 

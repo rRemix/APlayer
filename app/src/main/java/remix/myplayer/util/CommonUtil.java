@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
@@ -556,7 +557,9 @@ public class CommonUtil {
                     }
                 } else {
                     //判断是文件
+                    BufferedReader br = null;
                     try {
+                        br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
                         String prefix = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1);
                         String fileName = file.getName();
                         if(prefix.equals("lrc") ){
@@ -571,7 +574,6 @@ public class CommonUtil {
                             String lrcLine = "";
                             boolean hasArtist = false;
                             boolean hasTitle = false;
-                            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
                             for(int i = 0 ; i < 5;i++){
                                 if((lrcLine = br.readLine()) == null)
                                     break;
@@ -590,6 +592,14 @@ public class CommonUtil {
 
                     } catch(Exception e) {
                         ToastUtil.show(context,R.string.search_error);
+                    } finally {
+                        try {
+                            if(br != null){
+                                br.close();
+                            }
+                        } catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                 }
             }

@@ -5,6 +5,7 @@
 
     <dimen name="s10_size">10sp</dimen>
     <dimen name="s12_size">12sp</dimen>
+    <dimen name="s13_size">13sp</dimen>
     <dimen name="s14_size">14sp</dimen>
     <dimen name="s15_size">15sp</dimen>
     <dimen name="s16_size">16sp</dimen>

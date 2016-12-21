@@ -1,7 +1,13 @@
 package remix.myplayer.util;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Created by taeja on 16-1-15.
@@ -17,6 +23,18 @@ public class SPUtil {
             mInstance = this;
     }
 
+    public static boolean putStringSet(Context context, String name, String key, Set<String> set){
+        if(set == null)
+            return false;
+        SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
+        editor.remove(key);
+        return editor.putStringSet(key,set).commit();
+    }
+
+    public static Set<String> getStringSet(Context context, String name, String key){
+        return context.getSharedPreferences(name,Context.MODE_PRIVATE).getStringSet(key,new HashSet<String>());
+    }
+
     public static boolean putValue(Context context,String name,String key,int value) {
         SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
         return editor.putInt(key,value).commit();
@@ -29,6 +47,7 @@ public class SPUtil {
 
     public static boolean putValue(Context context,String name,String key,boolean value) {
         SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
+
         return editor.putBoolean(key,value).commit();
     }
 
@@ -53,4 +72,5 @@ public class SPUtil {
         SharedPreferences.Editor editor = context.getSharedPreferences(name,Context.MODE_PRIVATE).edit();
         editor.clear().apply();
     }
+
 }

@@ -24,7 +24,7 @@
         android:background="?attr/background_color_3"
         android:gravity="center_horizontal">
         <EditText
-            android:id="@+id/feedback_edittext"
+            android:id="@+id/feedback_content"
             android:background="@drawable/set_submit_input_bg"
             android:gravity="left|top"
             android:textSize="@dimen/s16_size"
@@ -35,7 +35,24 @@
             android:layout_height="@dimen/d180_size"
             android:layout_marginLeft="@dimen/d8_size"
             android:layout_marginRight="@dimen/d8_size"
-            android:layout_marginTop="@dimen/d23_size"/>
+            android:layout_marginTop="@dimen/d23_size" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/d40_size"
+            android:layout_marginLeft="@dimen/d8_size"
+            android:layout_marginRight="@dimen/d8_size"
+            android:layout_marginTop="@dimen/d23_size"
+            android:id="@+id/feedback_contact"
+            android:maxLines="1"
+            android:background="@drawable/set_submit_input_bg"
+            android:gravity="left|center_vertical"
+            android:textSize="@dimen/s13_size"
+            android:textColor="@color/drawer_list_color"
+            android:hint="@string/feedback_contact_hint"
+            android:textColorHint="@color/drawer_list_color"
+            android:textCursorDrawable="@drawable/bg_cursor_white"
+            android:padding="@dimen/d4_size"/>
 
         <Button
             android:layout_width="match_parent"

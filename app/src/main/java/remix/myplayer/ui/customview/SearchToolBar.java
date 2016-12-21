@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import remix.myplayer.R;
+import remix.myplayer.theme.Theme;
 
 /**
  * Created by taeja on 16-2-29.
@@ -41,14 +42,8 @@ public class SearchToolBar extends Toolbar {
 
     private void init(){
         mEditText = (EditText)findViewById(R.id.search_input);
-//        mEditText.getPaint().setStrokeWidth(DensityUtil.dip2px(mContext,2));
-//        mEditText.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
         //设置EditText光标与下划线颜色
         mEditText.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-//        final int size = MediaStoreUtil.mSearchKeyList.size();
-//        String[] strs = (String[]) MediaStoreUtil.mSearchKeyList.toArray(new String[size]);
-//        ArrayAdapter adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_list_item_1, strs);
-//        mEditText.setAdapter(adapter);
 
         mEditText.addTextChangedListener(new TextWatcher() {
             @Override

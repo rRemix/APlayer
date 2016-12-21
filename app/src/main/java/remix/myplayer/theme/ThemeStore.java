@@ -195,7 +195,7 @@ public class ThemeStore {
     }
 
     @ColorInt
-    public static int getBackgrounfColor1(){
+    public static int getBackgroundColor1(){
         return ColorUtil.getColor(isDay() ? R.color.day_background_color_1 : R.color.night_background_color_1);
     }
 
@@ -222,6 +222,11 @@ public class ThemeStore {
     @ColorInt
     public static int getDividerColor(){
         return ColorUtil.getColor(isDay() ? R.color.day_list_divider : R.color.night_list_divier);
+    }
+
+    @ColorInt
+    public static int getDrawerEffectColor(){
+        return ThemeStore.isDay() ?  ColorUtil.getColor(R.color.drawer_selected) : ThemeStore.getRippleColor();
     }
 
     public static com.afollestad.materialdialogs.Theme getMDDialogTheme(){

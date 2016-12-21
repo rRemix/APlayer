@@ -3,6 +3,7 @@ package remix.myplayer.ui.activity;
 
 import android.Manifest;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -34,6 +35,8 @@ import com.facebook.rebound.SpringSystem;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

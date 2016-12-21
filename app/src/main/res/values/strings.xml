@@ -41,7 +41,7 @@
     <string name="add_error">添加失败</string>
     <string name="add_to_playlist">添加到播放列表</string>
     <string name="add_song_playlist_success">添加%1$d首歌曲到%2$s</string>
-    <string name="delete_multi_song">删除%d首歌曲</string>
+    <string name="delete_multi_song">移除%d首歌曲</string>
     <string name="add_song_playinglist_success">添加%d首歌曲到播放队列</string>
     <string name="add_song_playlist_error">添加歌曲到播放列表失败</string>
 
@@ -118,5 +118,8 @@
     <string name="v1_1_2">v1.1.2</string>
     <string name="search">搜索</string>
     <string name="timer_close">定时关闭</string>
+    <string name="feedback_contact_hint">请输入您的微信号/QQ号</string>
+    <string name="song_detail">歌曲详情</string>
+    <string name="song_edit">音乐标签编辑</string>
 
 </resources>
