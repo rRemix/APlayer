@@ -4,9 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.SoundPool;
 
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.LockScreenActivity;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by taeja on 16-3-11.
@@ -33,6 +35,9 @@ public class LockScreenListener {
     class ScreenReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if(!SPUtil.getValue(mContext,"Setting","LockScreenOn",true)){
+                return;
+            }
             String action = intent.getAction();
             if (action.equals(Intent.ACTION_SCREEN_ON) && MusicService.getIsplay()) {
                 try {

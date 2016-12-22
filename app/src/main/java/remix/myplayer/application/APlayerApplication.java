@@ -2,6 +2,9 @@ package remix.myplayer.application;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
 
 import com.facebook.common.internal.Supplier;
@@ -14,10 +17,13 @@ import com.umeng.socialize.PlatformConfig;
 import com.umeng.socialize.UMShareAPI;
 
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.SaveListener;
 import remix.myplayer.R;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.LockScreenListener;
+import remix.myplayer.model.Feedback;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.theme.ThemeStore;
@@ -84,14 +90,41 @@ public class APlayerApplication extends android.app.Application {
                 final boolean isFirst = SPUtil.getValue(getApplicationContext(), "Setting", "First", true);
                 //第一次启动软件
                 if(isFirst){
-                    //保存默认主题设置
-                    SPUtil.putValue(mContext,"Setting","ThemeMode", ThemeStore.DAY);
-                    SPUtil.putValue(mContext,"Setting","ThemeColor",ThemeStore.THEME_BLUE);
-                    //添加我的收藏列表
-                    Global.mPlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
-                    SPUtil.putValue(mContext,"Setting","PlayQueueID",Global.mPlayQueueID);
-                    Global.mMyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
-                    SPUtil.putValue(mContext,"Setting","MyLoveID",Global.mMyLoveID);
+                    try {
+                        //保存默认主题设置
+                        SPUtil.putValue(mContext,"Setting","ThemeMode", ThemeStore.DAY);
+                        SPUtil.putValue(mContext,"Setting","ThemeColor",ThemeStore.THEME_BLUE);
+                        //添加我的收藏列表
+                        Global.mPlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
+                        SPUtil.putValue(mContext,"Setting","PlayQueueID",Global.mPlayQueueID);
+                        Global.mMyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
+                        SPUtil.putValue(mContext,"Setting","MyLoveID",Global.mMyLoveID);
+                    } catch (Exception e){
+                        try {
+                            PackageManager pm = APlayerApplication.getContext().getPackageManager();
+                            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
+                            Feedback feedback =  new Feedback(e.toString(),
+                                    "新建播放列表错误",
+                                    pi.versionName,
+                                    pi.versionCode + "",
+                                    Build.DISPLAY,
+                                    Build.CPU_ABI + "," + Build.CPU_ABI2,
+                                    Build.MANUFACTURER,
+                                    Build.MODEL,
+                                    Build.VERSION.RELEASE,
+                                    Build.VERSION.SDK_INT + ""
+                            );
+
+                            feedback.save(new SaveListener<String>() {
+                                @Override
+                                public void done(String s, BmobException e) {
+                                }
+                            });
+                        } catch (PackageManager.NameNotFoundException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+
                 }else {
                     Global.mPlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
                     Global.mMyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);

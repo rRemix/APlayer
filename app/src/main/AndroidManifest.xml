@@ -194,15 +194,15 @@
             android:name=".db.DBContentProvider"
             android:exported="false"/>
 
-        <!--桌面部件-->
-        <receiver android:name=".appwidgets.Appwidget">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
-            </intent-filter>
-            <!-- 声明数据 -->
-            <meta-data android:name="android.appwidget.provider"
-                android:resource="@xml/example_appwidget_info" />
-        </receiver>
+        <!--&lt;!&ndash;桌面部件&ndash;&gt;-->
+        <!--<receiver android:name=".appwidgets.Appwidget">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>-->
+            <!--</intent-filter>-->
+            <!--&lt;!&ndash; 声明数据 &ndash;&gt;-->
+            <!--<meta-data android:name="android.appwidget.provider"-->
+                <!--android:resource="@xml/example_appwidget_info" />-->
+        <!--</receiver>-->
     </application>
 
 </manifest>

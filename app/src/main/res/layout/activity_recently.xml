@@ -15,7 +15,7 @@
         android:id="@+id/recently_shuffle"
         android:layout_width="match_parent"
         android:layout_height="@dimen/d48_size"
-        android:background="@color/white"
+        android:background="?attr/background_color_main"
         android:orientation="horizontal"
         android:onClick="onPlayShuffle">
         <ImageButton
@@ -33,6 +33,12 @@
             android:textColor="@color/default_textview_color"
             android:text="@string/play_random"
             android:layout_marginLeft="@dimen/d72_size"/>
+        <ImageView
+            android:id="@+id/divider"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="?attr/divider_color"/>
     </RelativeLayout>
 
     <View

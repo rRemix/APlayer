@@ -1,8 +1,11 @@
 package remix.myplayer.ui.activity;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
@@ -21,6 +24,8 @@ import remix.myplayer.util.StatusBarUtil;
 
 
 public class BaseActivity extends AppCompatActivity {
+    protected Context mContext;
+
     protected <T extends View> T findView(int id){
         return (T)findViewById(id);
     }
@@ -65,6 +70,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mContext = this;
         //严格模式
         if(BuildConfig.DEBUG){
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -121,4 +127,17 @@ public class BaseActivity extends AppCompatActivity {
         MobclickAgent.onPause(this);
     }
 
+    /**
+     * 获得歌曲id
+     * @param cursor
+     * @param position
+     * @return
+     */
+    protected int getSongId(Cursor cursor,int position){
+        int id = -1;
+        if(cursor != null && !cursor.isClosed() && cursor.moveToPosition(position)){
+            id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+        }
+        return id;
+    }
 }

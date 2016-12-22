@@ -29,17 +29,15 @@
             android:gravity="center_vertical">
             <TextView
                 android:id="@+id/notify_song"
-                android:text="歌曲名"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lines="1"
                 android:ellipsize="end"
-                android:textColor="@color/night_textcolor_primary"
+                android:textColor="@color/white_f4f4f5"
                 android:textSize="@dimen/s16_size"
                 android:layout_marginBottom="@dimen/d5_szie"/>
             <TextView
                 android:id="@+id/notify_artist_album"
-                android:text="歌手名-专辑"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lines="1"

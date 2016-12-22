@@ -3,7 +3,6 @@ package remix.myplayer.ui.activity;
 
 import android.Manifest;
 import android.content.ContentUris;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -35,8 +34,6 @@ import com.facebook.rebound.SpringSystem;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -56,6 +53,7 @@ import remix.myplayer.interfaces.OnModeChangeListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -81,6 +79,12 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
     DrawerLayout mDrawerLayout;
     @BindView(R.id.add)
     ImageView mAddButton;
+    @BindView(R.id.header_txt)
+    TextView mHeadText;
+    @BindView(R.id.header_img)
+    SimpleDraweeView mHeadImg;
+    @BindView(R.id.header)
+    View mHeadRoot;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
 
@@ -181,6 +185,7 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         setUpTab();
         //初始化测滑菜单
         setUpDrawerLayout();
+        setUpViewColor();
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
 
@@ -440,16 +445,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         mRecyclerView.setAdapter(mDrawerAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        //正在播放文字的背景
-        TextView textView = findView(R.id.header_txt);
-        if(textView != null){
-            GradientDrawable bg = new GradientDrawable();
-            bg.setColor(ThemeStore.getAccentColor());
-            bg.setColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryDarkColor() : ThemeStore.getAccentColor());
-            bg.setCornerRadius(DensityUtil.dip2px(this,4));
-            textView.setBackground(bg);
-        }
-
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
@@ -467,6 +462,23 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
             }
         });
 
+    }
+
+    /**
+     * 初始化控件相关颜色
+     */
+    private void setUpViewColor() {
+
+        //正在播放文字的背景
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(ThemeStore.getAccentColor());
+        bg.setColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryDarkColor() : ColorUtil.getColor(R.color.gray_343438));
+        bg.setCornerRadius(DensityUtil.dip2px(this,4));
+        mHeadText.setBackground(bg);
+        mHeadText.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.white_e5e5e5));
+        //抽屉
+        mHeadRoot.setBackgroundColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : ColorUtil.getColor(R.color.night_background_color_main));
+        mNavigationView.setBackgroundColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.gray_343438));
     }
 
     @Override
@@ -566,18 +578,12 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
      * @param mp3Item
      */
     private void updateHeader(MP3Item mp3Item,boolean isPlay) {
-        TextView textView = findView(R.id.header_txt);
-        SimpleDraweeView shadowImgView = findView(R.id.header_img);
         if(mp3Item == null)
             return;
-        if(textView != null){
-            textView.setText(getString(R.string.play_now,mp3Item.getTitle()));
-        }
-        if(shadowImgView != null) {
-//            MediaStoreUtil.setImageUrl(shadowImgView, mp3Item.getAlbumId());
-            new AsynLoadImage(shadowImgView).execute(mp3Item.getAlbumId(), Constants.URL_ALBUM);
-            shadowImgView.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
-        }
+        mHeadText.setText(getString(R.string.play_now,mp3Item.getTitle()));
+        new AsynLoadImage(mHeadImg).execute(mp3Item.getAlbumId(), Constants.URL_ALBUM);
+        mHeadImg.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
+
     }
 
     @Override

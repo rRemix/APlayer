@@ -50,13 +50,9 @@ public class DBContentProvider extends ContentProvider {
             int match = mUriMatcher.match(uri);
             cursor = db.query(match == PLAY_LIST_MULTIPLE  ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
                         projection,selection,selectionArgs,null,null,null);
-            cursor.setNotificationUri(APlayerApplication.getContext().getContentResolver(), Uri.parse(CONTENT_AUTHORITY_SLASH));
+//            cursor.setNotificationUri(APlayerApplication.getContext().getContentResolver(), Uri.parse(CONTENT_AUTHORITY_SLASH));
         } catch (Exception e){
             e.printStackTrace();
-        } finally {
-//            if(db != null)
-//                db.close();
-//            DBManager.getInstance().closeDataBase();
         }
         return cursor;
     }
@@ -76,7 +72,6 @@ public class DBContentProvider extends ContentProvider {
             db.beginTransaction(); //开始事务
             //数据库操作
             for (ContentValues cv : values) {
-//                insert(uri, cv);
                 db.insert(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,null,cv);
                 lines++;
             }
@@ -106,10 +101,6 @@ public class DBContentProvider extends ContentProvider {
             }
         } catch (Exception e){
             e.printStackTrace();
-        } finally {
-//            if(db != null )
-//                db.close();
-//            DBManager.getInstance().closeDataBase();
         }
         return newUri;
     }
@@ -124,9 +115,6 @@ public class DBContentProvider extends ContentProvider {
             APlayerApplication.getContext().getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
         }catch (Exception e){
             e.printStackTrace();
-        } finally {
-//            if(db != null)
-//                db.close();
         }
 
         return deleteRow;
@@ -143,9 +131,6 @@ public class DBContentProvider extends ContentProvider {
             APlayerApplication.getContext().getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
         } catch (Exception e){
             e.printStackTrace();
-        } finally {
-//            if(db != null )
-//                db.close();
         }
 
         return updateRow;

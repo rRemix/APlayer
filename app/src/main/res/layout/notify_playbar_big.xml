@@ -48,13 +48,12 @@
                     android:src="@drawable/notify_btn_close_white" />
                 <TextView
                     android:id="@+id/notify_song"
-                    android:text="歌曲名"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:lines="1"
                     android:ellipsize="end"
-                    android:textColor="@color/night_textcolor_primary"
+                    android:textColor="@color/white_f4f4f5"
                     android:textSize="@dimen/s16_size"
                     android:layout_toLeftOf="@id/notify_close"/>
 

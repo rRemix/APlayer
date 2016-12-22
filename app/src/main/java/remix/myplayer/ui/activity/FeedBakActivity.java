@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -22,6 +23,7 @@ import butterknife.OnClick;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
 import remix.myplayer.R;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.Feedback;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -59,6 +61,35 @@ public class FeedBakActivity extends ToolbarActivity {
         mContact.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0, ColorUtil.getColor(R.color.gray_e2e2e2)));
         Theme.setTint(mContent,ThemeStore.getMaterialPrimaryColor(),false);
         Theme.setTint(mContact,ThemeStore.getMaterialPrimaryColor(),false);
+    }
+
+    public static void commitToBomb(Context context,String content, String contact){
+        try {
+            if(TextUtils.isEmpty(content)){
+                return;
+            }
+            PackageManager pm = APlayerApplication.getContext().getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
+            Feedback feedback =  new Feedback(content,
+                    contact,
+                    pi.versionName,
+                    pi.versionCode + "",
+                    Build.DISPLAY,
+                    Build.CPU_ABI + "," + Build.CPU_ABI2,
+                    Build.MANUFACTURER,
+                    Build.MODEL,
+                    Build.VERSION.RELEASE,
+                    Build.VERSION.SDK_INT + ""
+            );
+
+            feedback.save(new SaveListener<String>() {
+                @Override
+                public void done(String s, BmobException e) {
+                }
+            });
+        } catch (PackageManager.NameNotFoundException e) {
+
+        }
     }
 
     @OnClick(R.id.feedback_submit)

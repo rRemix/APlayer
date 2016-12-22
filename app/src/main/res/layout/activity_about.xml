@@ -24,6 +24,7 @@
         android:background="?attr/background_color_3">
 
         <ImageView
+            android:layout_marginTop="@dimen/d8_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"

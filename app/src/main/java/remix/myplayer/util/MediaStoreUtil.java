@@ -562,7 +562,7 @@ public class MediaStoreUtil {
     /**
      * 删除歌曲
      * @param data 删除参数 包括歌曲路径、专辑id、艺术家id、播放列表id、文件夹索引
-     * @param type 删除类型 包括单个歌曲、专辑、艺术家、、文件夹、播放列表
+     * @param type 删除类型 包括单个歌曲、专辑、艺术家、文件夹、播放列表
      * @return 是否删除成功
      */
     public static boolean delete(int data, int type) {
@@ -616,8 +616,12 @@ public class MediaStoreUtil {
                 }
                 break;
         }
-
-        return SPUtil.putStringSet(mContext,"Setting","DeleteID",oriID);
+//        resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, MediaStore.Audio.Media._ID + "=?", new String[]{data + ""});
+        if(SPUtil.putStringSet(mContext,"Setting","DeleteID",oriID)){
+            resolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
+            return true;
+        }
+        return false;
     }
 
     /**

@@ -24,6 +24,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
@@ -40,7 +41,6 @@ import remix.myplayer.util.ToastUtil;
  */
 public class PlayListFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>{
     public static final String TAG = PlayListFragment.class.getSimpleName();
-    public static PlayListFragment mInstance = null;
     public static int mPlayListIDIndex;
     public static int mPlayListNameIndex;
     public static int mPlayListSongCountIndex;
@@ -72,6 +72,8 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
         View rootView = inflater.inflate(R.layout.fragment_playlist,null);
         mUnBinder = ButterKnife.bind(this,rootView);
 
+        rootView.findViewById(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
+
         ListModel = SPUtil.getValue(getActivity(),"Setting","PlayListModel",2);
         mRecyclerView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
 
@@ -84,7 +86,6 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
             @Override
             public void onItemClick(View view, int position) {
                 String name = getPlayListName(position);
-
                 if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,getPlayListId(position),TAG)){
                     if(getPlayListSongCount(position) == 0) {
                         ToastUtil.show(getActivity(),getString(R.string.list_isempty));

@@ -97,12 +97,17 @@ public class LrcFragment extends BaseFragment {
         @Override
         public void run() {
             mHandler.sendEmptyMessage(SEARCHING);
-            mLrcList = new SearchLRC(mInfo).getLrc();
-            if(mLrcList == null || mLrcList.size() == 0) {
-                mHandler.sendEmptyMessage(NO_LRC);
-                return;
+            SearchLRC searchLRC = new SearchLRC(mInfo);
+            List<LrcRow> temp = searchLRC.getLrc();
+            if(searchLRC.getSongID() == mInfo.getId()){
+                mLrcList = temp;
+                if(mLrcList == null || mLrcList.size() == 0) {
+                    mHandler.sendEmptyMessage(NO_LRC);
+                    return;
+                }
+                mHandler.sendEmptyMessage(UPDATE_LRC);
             }
-            mHandler.sendEmptyMessage(UPDATE_LRC);
+
         }
     }
 

@@ -23,8 +23,10 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -45,7 +47,6 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     public static int mAlbumIndex = -1;
     public static int mAlbumIdIndex = -1;
     public static int mSongId = -1;
-    public static SongFragment mInstance = null;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
     private SongAdapter mAdapter;
@@ -63,7 +64,6 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPageName = TAG;
-        mInstance = this;
     }
 
 
@@ -84,6 +84,8 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         super.onCreateView(inflater, container, savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_song,null);
         mUnBinder = ButterKnife.bind(this,rootView);
+
+        rootView.findViewById(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
         rootView.findViewById(R.id.play_shuffle).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

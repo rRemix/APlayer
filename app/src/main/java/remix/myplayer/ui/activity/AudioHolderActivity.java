@@ -3,7 +3,6 @@ package remix.myplayer.ui.activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -14,13 +13,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -852,21 +849,19 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
      */
     private void setUpViewColor() {
         int accentColor = ThemeStore.getAccentColor();
-        int garyColor = ColorUtil.getColor(R.color.gray_6c6a6c);
-        //修改顶部按钮颜色
-        int tintColor = ThemeStore.isDay() ? garyColor : Color.WHITE;
-        Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,tintColor);
-        Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,tintColor);
+        int tintColor = ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b);
+
         //歌词颜色
         if(mLrcView != null){
-            mLrcView.setHighLightColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_hight : R.color.night_textcolor_primary));
-            mLrcView.setOtherColor(ColorUtil.getColor(R.color.lrc_normal));
-            mLrcView.setTimeLineColor(ColorUtil.getColor(R.color.lrc_normal));
+            mLrcView.setHighLightColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_highlight_day : R.color.lrc_highlight_night));
+            mLrcView.setOtherColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
+            mLrcView.setTimeLineColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
             mLrcView.invalidate();
         }
 
         LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
         //修改progress颜色
+        ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_efeeed : R.color.gray_343438));
         (layerDrawable.getDrawable(1)).setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
         mSeekBar.setProgressDrawable(layerDrawable);
         //修改thumb颜色
@@ -877,19 +872,23 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,accentColor);
 
         //歌曲名颜色
-        mTopTitle.setTextColor(ThemeStore.isDay() ? ColorUtil.getColor(R.color.black_333333) : ThemeStore.getTextColorPrimary());
+        mTopTitle.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.black_333333 : R.color.white_e5e5e5));
 
+        //修改顶部按钮颜色
+        Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,tintColor);
+        Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,tintColor);
+        //播放模式与播放队列
         int playmodel = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
         Theme.TintDrawable(mPlayModel,playmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                 playmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
-                        R.drawable.play_btn_loop_one,garyColor);
-        Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,garyColor);
+                        R.drawable.play_btn_loop_one,tintColor);
+        Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,tintColor);
 
         mPlayPauseView.setBackgroundColor(accentColor);
         //下一首背景
-        mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.getColor(R.color.white_fafafa),
+        mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.getColor(ThemeStore.isDay() ? R.color.white_fafafa : R.color.gray_343438),
                 DensityUtil.dip2px(this,2),0,0,DensityUtil.dip2px(this,288),DensityUtil.dip2px(this,38),1));
-        mNextSong.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_a8a8a8 : R.color.night_textcolor));
+        mNextSong.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_a8a8a8 : R.color.white_e5e5e5));
     }
 
 

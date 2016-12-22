@@ -385,9 +385,7 @@ public class Theme {
      * @return
      */
     public static StateListDrawable getPressAndSelectedStateListRippleDrawable(int model,Context context){
-        int defaultColor = ThemeStore.isDay() ?
-                ThemeStore.getBackgroundColorMain() :
-                ColorUtil.getColor(model == Constants.LIST_MODEL ? R.color.night_background_color_main : R.color.night_background_color_2);
+        int defaultColor = ThemeStore.getBackgroundColorMain();
 
         return getPressAndSelectedStateListRippleDrawable(context,
                 model == Constants.GRID_MODEL ? getCorner(1, DensityUtil.dip2px(context,2),0,ThemeStore.getSelectColor()) : getShape(GradientDrawable.RECTANGLE,ThemeStore.getSelectColor()),

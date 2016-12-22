@@ -9,8 +9,8 @@
             android:id="@+id/menu_timer"/>
         <item android:title="均衡器"
             android:id="@+id/menu_eq"/>
-        <item android:title="音量调节"
-            android:id="@+id/menu_vol"/>
+        <!--<item android:title="音量调节"-->
+            <!--android:id="@+id/menu_vol"/>-->
         <item android:title="删除"
             android:id="@+id/menu_delete"/>
     </group>

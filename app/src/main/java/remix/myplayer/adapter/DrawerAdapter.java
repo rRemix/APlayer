@@ -1,6 +1,7 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.SwitchCompat;
@@ -57,6 +58,7 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
         Theme.TintDrawable(holder.mImg,mImgs[position],ThemeStore.getAccentColor());
         holder.mText.setText(mTitles[position]);
         holder.mText.setTextColor(ThemeStore.isDay() ? ColorUtil.getColor(R.color.gray_34353a) : ThemeStore.getTextColorPrimary());
+        holder.mText.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_34353a : R.color.white_e5e5e5));
         if(position == 3){
             holder.mSwitch.setVisibility(View.VISIBLE);
             holder.mSwitch.setChecked(!ThemeStore.isDay());
@@ -77,7 +79,7 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
         holder.mRoot.setSelected(mSelectIndex == position);
         holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(mContext,
                         Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerEffectColor()),
-                        Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getBackgroundColor3()),
+                        Theme.getShape(GradientDrawable.RECTANGLE, ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.gray_343438)),
                         ThemeStore.getDrawerEffectColor()));
 
     }

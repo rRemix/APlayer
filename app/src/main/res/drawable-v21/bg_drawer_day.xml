@@ -3,7 +3,7 @@
     <item android:state_selected="true"
         android:drawable="@drawable/bg_drawer_select"/>
     <item >
-        <ripple android:color="@color/drawer_selected">
+        <ripple android:color="@color/drawer_selected_day">
             <item android:drawable="@drawable/bg_drawer_default"/>
         </ripple>
     </item>

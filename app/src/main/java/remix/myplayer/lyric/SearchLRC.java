@@ -49,6 +49,10 @@ public class SearchLRC {
         mLrcBuilder = new DefaultLrcParser();
     }
 
+    public int getSongID(){
+        return mInfo.getId();
+    }
+
     /**
      * 根据歌手与歌手名,获得歌词id
      * @return 歌词id

@@ -20,6 +20,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadImage;
+import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
@@ -117,6 +118,8 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
             }
 
             //背景点击效果
+            holder.mContainer.setBackground(
+                    Theme.getPressAndSelectedStateListRippleDrawable(AlbumFragment.getModel(), mContext));
 
             //是否处于选中状态
             if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&

@@ -1,9 +1,16 @@
 package remix.myplayer.ui.activity;
 
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.ContentObserver;
+import android.database.Cursor;
+import android.database.DataSetObserver;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,10 +32,14 @@ import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -37,10 +48,11 @@ import remix.myplayer.util.PlayListUtil;
 /**
  * 专辑、艺术家、文件夹、播放列表详情
  */
-public class ChildHolderActivity extends MultiChoiceActivity implements MusicService.Callback{
+public class ChildHolderActivity extends MultiChoiceActivity implements MusicService.Callback,LoaderManager.LoaderCallbacks<Cursor>{
     public final static String TAG = ChildHolderActivity.class.getSimpleName();
     public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";
     private boolean mIsRunning = false;
+    private static int LOADER_ID = 1;
     //获得歌曲信息列表的参数
     public static int mId;
     private int mType;
@@ -57,6 +69,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
     private String Title;
     private BottomActionBarFragment mBottombar;
+    private Cursor mCursor;
 
     private ChildHolderAdapter mAdapter;
     public static ChildHolderActivity mInstance = null;
@@ -75,7 +88,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
                 case Constants.UPDATE_ADAPTER:
                     if(mInfoList == null)
                         return;
-                    mAdapter.setList(mInfoList);
+//                    mAdapter.setList(mInfoList);
                     mNum.setText(mInfoList.size() + "首歌曲");
                     break;
                 case START:
@@ -92,6 +105,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
             }
         }
     };
+    private ArrayList<Integer> mIdList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,31 +116,27 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         mInstance = this;
         MusicService.addCallback(ChildHolderActivity.this);
 
-        //参数id，类型，标题
+        //参数，类型，标题
         mId = getIntent().getIntExtra("Id", -1);
         mType = getIntent().getIntExtra("Type", -1);
         mArg = getIntent().getStringExtra("Title");
+
+        findView(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
 
         mAdapter = new ChildHolderAdapter(this,mType,mArg,mMultiChoice);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                int songid = mInfoList.get(position).getId();
+                int songid = getSongId(mCursor,position);
                 if( !mMultiChoice.itemAddorRemoveWithClick(view,position,songid,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
-                    if (mInfoList != null && mInfoList.size() == 0)
-                        return;
-                    ArrayList<Integer> idList = new ArrayList<>();
-                    for (MP3Item info : mInfoList) {
-                        if(info != null && info.getId() > 0)
-                            idList.add(info.getId());
-                    }
+
                     //设置正在播放列表
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    Global.setPlayQueue(idList,ChildHolderActivity.this,intent);
+                    Global.setPlayQueue(mIdList,ChildHolderActivity.this,intent);
                 }
             }
 
@@ -165,8 +175,8 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
                 .progress(true, 0)
                 .backgroundColorAttr(R.attr.background_color_3)
                 .progressIndeterminateStyle(false).build();
-        new GetSongListThread().start();
 
+        getLoaderManager().initLoader(LOADER_ID++, null, this);
         //初始化底部状态栏
         mBottombar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
@@ -177,12 +187,74 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
     }
 
+    public void updateCursor() {
+        if(mIsRunning)
+            getLoaderManager().initLoader(LOADER_ID++, null, this);
+    }
+
     @Override
     public void onBackPressed() {
         if(mMultiChoice.isShow()) {
             onBackPress();
         } else {
             finish();
+        }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        StringBuilder where = new StringBuilder();
+        switch (mType) {
+            //专辑id
+            case Constants.ALBUM:
+                where.append(MediaStore.Audio.Media.ALBUM_ID).append("=").append(mId).append(" and ");
+                break;
+            //歌手id
+            case Constants.ARTIST:
+                where.append(MediaStore.Audio.Media.ARTIST_ID).append("=").append(mId).append(" and ");
+                break;
+            //文件夹名
+            case Constants.FOLDER:
+            //播放列表名
+            case Constants.PLAYLIST:
+                if(mType == Constants.FOLDER){
+                    mIdList = Global.mFolderMap.get(mArg);
+                } else {
+                    mIdList = PlayListUtil.getIDList(mId);
+                }
+                if(mIdList == null || mIdList.size() == 0)
+                    return null;
+                for(int i = 0 ; i < mIdList.size() ;i++){
+                    where.append(MediaStore.Audio.Media._ID).append("=").append(mIdList.get(i)).append(i != mIdList.size() - 1 ? " or " : " and ");
+                }
+        }
+        return new android.content.CursorLoader(this,
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DISPLAY_NAME,MediaStore.Audio.Media.TITLE,
+                        MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ALBUM_ID,MediaStore.Audio.Media.ARTIST},
+                where.toString() + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID(),
+                null,
+                MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if(data == null)
+            return;
+        //查询完毕后保存结果，并设置查询索引
+        mCursor = data;
+        if(mType == Constants.ALBUM || mType == Constants.ARTIST){
+            mIdList = MediaStoreUtil.getSongIdListByCursor(mCursor);
+        }
+        mAdapter.setIDList(mIdList);
+        mAdapter.setCursor(mCursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        if (mAdapter != null) {
+            mAdapter.setCursor(null);
+            mAdapter.setIDList(null);
         }
     }
 
@@ -230,14 +302,22 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
     @OnClick(R.id.shuffle_container)
     public void onClick(View v){
+//        MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
+//        Intent intent = new Intent(Constants.CTL_ACTION);
+//        intent.putExtra("Control", Constants.NEXT);
+//        //设置正在播放列表
+//        ArrayList<Integer> ids = new ArrayList<>();
+//        for (MP3Item info : mInfoList)
+//            ids.add(info.getId());
+//        Global.setPlayQueue(ids,this,intent);
+        if(mIdList == null || mIdList.size() == 0){
+            ToastUtil.show(this,R.string.no_song);
+            return;
+        }
         MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control", Constants.NEXT);
-        //设置正在播放列表
-        ArrayList<Integer> ids = new ArrayList<>();
-        for (MP3Item info : mInfoList)
-            ids.add(info.getId());
-        Global.setPlayQueue(ids,this,intent);
+        Global.setPlayQueue(mIdList,this,intent);
     }
 
     //更新界面
@@ -277,9 +357,5 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         mIsRunning = false;
     }
 
-    public void UpdateList() {
-        if(mIsRunning)
-            new GetSongListThread().start();
-    }
 
 }

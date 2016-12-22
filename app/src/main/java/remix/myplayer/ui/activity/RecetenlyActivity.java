@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity;
 
 import android.app.LoaderManager;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -27,6 +28,8 @@ import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -43,7 +46,6 @@ import remix.myplayer.util.ToastUtil;
 public class RecetenlyActivity extends MultiChoiceActivity implements MusicService.Callback,LoaderManager.LoaderCallbacks<Cursor>{
     public static final String TAG = RecetenlyActivity.class.getSimpleName();
     private static int LOADER_ID = 1;
-
 
     private SongAdapter mAdapter;
     @BindView(R.id.recently_shuffle)
@@ -76,6 +78,8 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         ButterKnife.bind(this);
         MusicService.addCallback(RecetenlyActivity.this);
 
+        findView(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -91,7 +95,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
                     Global.setPlayQueue(mIdList,RecetenlyActivity.this,intent);
-//                    sendBroadcast(intent);
                 }
             }
 
@@ -104,7 +107,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         });
         mRecyclerView.setAdapter(mAdapter);
         getLoaderManager().initLoader(LOADER_ID++, null, this);
-
 
         setUpToolbar(mToolBar,getString(R.string.recently));
 
@@ -136,7 +138,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
     //随机播放
     public void onPlayShuffle(View v){
         if(mIdList == null || mIdList.size() == 0){
-            ToastUtil.show(RecetenlyActivity.this,R.string.no_song);
+            ToastUtil.show(this,R.string.no_song);
             return;
         }
         MusicService.setPlayModel(Constants.PLAY_SHUFFLE);

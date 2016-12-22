@@ -102,7 +102,7 @@ public class NotifyReceiver extends BroadcastReceiver {
             actionIntent.putExtra("Close", true);
             PendingIntent closeIntent = PendingIntent.getBroadcast(context, 4, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             mRemoteBigView.setOnClickPendingIntent(R.id.notify_close, closeIntent);
-//            mRemoteView.setOnClickPendingIntent(R.id.notify_close,closeIntent);
+            mRemoteView.setOnClickPendingIntent(R.id.notify_close,closeIntent);
 
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
             if(mNotification == null){

@@ -285,11 +285,11 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
 //                    e.printStackTrace();
 //                }
                 break;
-            case R.id.menu_vol:
-                AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
-                if(audioManager != null){
-                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
-                }
+//            case R.id.menu_vol:
+//                AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+//                if(audioManager != null){
+//                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,audioManager.getStreamVolume(AudioManager.STREAM_MUSIC),AudioManager.FLAG_PLAY_SOUND | AudioManager.FLAG_SHOW_UI);
+//                }
         }
         return true;
     }

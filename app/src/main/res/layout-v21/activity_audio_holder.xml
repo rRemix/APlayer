@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:id="@+id/audio_holder_container"
-    android:background="?attr/background_color_3">
+    android:background="?attr/background_color_main">
 
     <LinearLayout
         android:layout_width="match_parent"

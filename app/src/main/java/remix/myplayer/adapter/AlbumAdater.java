@@ -154,7 +154,7 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
             //半圆着色
             if(AlbumFragment.ListModel == Constants.GRID_MODEL){
                 Theme.TintDrawable(holder.mHalfCircle,R.drawable.icon_half_circular_left,
-                        ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.night_background_color_2));
+                        ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.night_background_color_main));
             }
 
             //设置padding

@@ -9,8 +9,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +59,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     TextView mLrcPath;
     @BindView(R.id.setting_clear_text)
     TextView mCache;
+    @BindView(R.id.setting_lockscreen_switch)
+    SwitchCompat mSwitch;
     //是否需要重建activity
     private boolean mNeedRecreate = false;
     //是否需要刷新adapter
@@ -100,6 +104,15 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             mNeedRefresh = savedInstanceState.getBoolean("needRefresh");
             mFromColorChoose = savedInstanceState.getBoolean("fromColorChoose");
         }
+
+        //锁屏是否显示
+        mSwitch.setChecked(SPUtil.getValue(this,"Setting","LockScreenOn",true));
+        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SPUtil.putValue(SettingActivity.this,"Setting","LockScreenOn",isChecked);
+            }
+        });
 
         if(!SPUtil.getValue(this,"Setting","LrcPath","").equals("")) {
             mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcPath","")));

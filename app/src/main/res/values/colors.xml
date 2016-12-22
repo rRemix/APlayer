@@ -23,7 +23,8 @@
     <color name="day_list_divider">#ededed</color>
     <color name="night_list_divier">#322f33</color>
     <!--侧滑菜单选中颜色-->
-    <color name="drawer_selected">#f5f5f5</color>、
+    <color name="drawer_selected_day">#f5f5f5</color>
+    <color name="drawer_selected_night">#3d3d42</color>
     <!--默认的colorControlHighLight-->
     <color name="day_ripple_color">#1f000000</color>
     <color name="day_selected_color">#1f000000</color>
@@ -32,6 +33,7 @@
     <color name="default_model_button_color">#e2e4e8</color>
     <color name="select_model_button_color">#ffce64</color>
     <color name="day_background_grid_color">#f1f1f1</color>
+    <color name="night_background_grid_color">#171719</color>
     <!--<color name="night_selected_color">@color/default_control_highlight</color>-->
 
     <!--默认textview颜色-->
@@ -60,7 +62,7 @@
     <color name="gray_323232">#323232</color>
     <color name="white_f6f6f5">#f6f6f5</color>
     <color name="white_f4f4f5">#f4f4f5</color>
-    <color name="purple_782899">#782899</color>
+    <color name="purple_555393">#555393</color>
     <color name="gray_e6e6e6">#e6e6e6</color>
     <color name="gray_efeeed">#efeeed</color>
     <color name="gray_e2e2e2">#e2e2e2</color>
@@ -80,11 +82,16 @@
     <color name="gray_404040">#404040</color>
     <color name="gray_3c3c3c">#3c3c3c</color>
     <color name="gray_b7b7b7">#b7b7b7</color>
+    <color name="white_e5e5e5">#e5e5e5</color>
+    <color name="gray_6b6b6b">#6b6b6b</color>
+    <color name="gray_343438">#343438</color>
     <color name="normal_tab_text_color">#99ffffff</color>
     <color name="search_hint_text_color">#33ffffff</color>
 
-    <color name="lrc_normal">#e8e8e8</color>
-    <color name="lrc_hight">#4a4a4a</color>
+    <color name="lrc_normal_day">#e8e8e8</color>
+    <color name="lrc_highlight_day">#4a4a4a</color>
+    <color name="lrc_normal_night">#7e7e7e</color>
+    <color name="lrc_highlight_night">#e5e5e5</color>
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>
     <color name="day_textcolor">@color/gray_6d6c69</color>
@@ -108,7 +115,7 @@
     <color name="night_interval_color">#e2e1e2</color>
     <color name="night_scan_track_color">@color/gray_6d6c69</color>
     <color name="night_nonenable_track_color">@color/white</color>
-    <color name="night_nonenable_progress_color">@color/purple_782899</color>
+    <color name="night_nonenable_progress_color">@color/purple_555393</color>
     <color name="night_nonenable_text_color">@color/white</color>
     <color name="night_enable_track_color">@color/white</color>
     <color name="night_enable_text_color">@color/white</color>

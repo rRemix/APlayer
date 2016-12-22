@@ -225,19 +225,18 @@ public class MusicService extends BaseService {
             @Override
             public void handleMessage(Message msg) {
                 //更新adapter
-                if(msg.what == Constants.UPDATE_ADAPTER ){
-                    if (FolderActivity.mInstance != null ) {
-                        FolderActivity.mInstance.UpdateList();
-                    }
-                    if(ChildHolderActivity.mInstance != null ){
-                        ChildHolderActivity.mInstance.UpdateList();
-                    }
-                }
+//                if(msg.what == Constants.UPDATE_ADAPTER ){
+//                    if (FolderActivity.mInstance != null ) {
+//                        FolderActivity.mInstance.UpdateList();
+//                    }
+//                    if(ChildHolderActivity.mInstance != null ){
+//                        ChildHolderActivity.mInstance.updateCursor();
+//                    }
+//                }
             }
         };
         mMediaStoreObserver = new MediaStoreObserver(updateHandler);
         //监听数据库变化
-
         mPlayListObserver = new DBObserver(updateHandler);
         mPlayListSongObserver = new DBObserver(updateHandler);
         getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,true, mMediaStoreObserver);

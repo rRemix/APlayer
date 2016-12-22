@@ -374,6 +374,7 @@ public class CommonUtil {
         URL lrcIdUrl = null;
         try {
             lrcIdUrl = new URL("http://geci.me/api/lyric/" + songname + "/" + artistname);
+
         } catch (Exception e1) {
             e1.printStackTrace();
         }
@@ -382,12 +383,16 @@ public class CommonUtil {
         String s;
         StringBuilder strBuffer = new StringBuilder();
         try {
+            if(lrcIdUrl == null)
+                return new JSONObject("");
             HttpURLConnection httpConn = (HttpURLConnection) lrcIdUrl.openConnection();
             httpConn.setConnectTimeout(10000);
             httpConn.connect();
             InputStreamReader inReader = new InputStreamReader(httpConn.getInputStream());
             br = new BufferedReader(inReader);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         try {

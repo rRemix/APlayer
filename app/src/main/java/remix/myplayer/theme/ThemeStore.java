@@ -165,7 +165,7 @@ public class ThemeStore {
 
     @ColorInt
     public static int getAccentColor(){
-        return ColorUtil.getColor(isDay() ? getMaterialPrimaryColorRes() : R.color.purple_782899);
+        return ColorUtil.getColor(isDay() ? getMaterialPrimaryColorRes() : R.color.purple_555393);
     }
 
     @ColorInt
@@ -226,7 +226,7 @@ public class ThemeStore {
 
     @ColorInt
     public static int getDrawerEffectColor(){
-        return ThemeStore.isDay() ?  ColorUtil.getColor(R.color.drawer_selected) : ThemeStore.getRippleColor();
+        return ColorUtil.getColor(ThemeStore.isDay() ? R.color.drawer_selected_day : R.color.drawer_selected_night);
     }
 
     public static com.afollestad.materialdialogs.Theme getMDDialogTheme(){

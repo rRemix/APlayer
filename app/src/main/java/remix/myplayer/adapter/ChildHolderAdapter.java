@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,12 +36,12 @@ import remix.myplayer.util.DensityUtil;
  * Created by taeja on 16-6-24.
  */
 public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler> {
-    private ArrayList<MP3Item> mInfoList;
     private int mType;
     private String mArg;
     private MultiChoice mMultiChoice;
     private Drawable mDefaultDrawable;
     private Drawable mSelectDrawable;
+    private ArrayList<Integer> mIDList = new ArrayList<>();
     public ChildHolderAdapter(Context context, int type, String arg,MultiChoice multiChoice){
         super(context);
         this.mContext = context;
@@ -52,16 +53,14 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
         mSelectDrawable = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getSelectColor(),size,size);
     }
 
-    public void setList(ArrayList<MP3Item> list){
-        mInfoList = list;
-        notifyDataSetChanged();
+    public void setIDList(ArrayList<Integer> idList){
+        mIDList = idList;
     }
 
-    public void setOnItemClickLitener(OnItemClickListener l)
-    {
-        this.mOnItemClickLitener = l;
+    @Override
+    public int getItemCount() {
+        return mIDList != null ? mIDList.size() : 0;
     }
-
 
     @Override
     public ViewHoler onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -70,8 +69,28 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
 
     @Override
     public void onBindViewHolder(final ViewHoler holder, int position) {
-        final MP3Item temp = mInfoList.get(position);
-        if(temp == null || temp.getId() < 0 || temp.Title.equals(mContext.getString(R.string.song_lose_effect))) {
+        if(mCursor == null || position >= mIDList.size()){
+            return;
+        }
+
+        final MP3Item temp;
+        //如果外部删除了某些歌曲 手动添加歌曲信息，保证点击播放列表前后歌曲数目一致
+        if(position > mCursor.getCount()){
+            temp = new MP3Item();
+            temp.Title = mContext.getString(R.string.song_lose_effect);
+            temp.Id = mIDList.get(position);
+        } else if(!mCursor.isClosed() && mCursor.moveToPosition(position)) {
+            temp = new MP3Item(mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media._ID)),
+                    mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
+                    mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)),
+                    mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)),
+                    mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
+                    mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),0,"","",0,"");
+        } else {
+            return;
+        }
+
+        if(temp.getId() < 0 || temp.Title.equals(mContext.getString(R.string.song_lose_effect))) {
             holder.mTitle.setText(R.string.song_lose_effect);
             holder.mColumnView.setVisibility(View.INVISIBLE);
             holder.mButton.setVisibility(View.INVISIBLE);
@@ -160,10 +179,6 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
         }
     }
 
-    @Override
-    public int getItemCount() {
-        return mInfoList == null ? 0 : mInfoList.size();
-    }
 
     static class ViewHoler extends BaseViewHolder {
         @BindView(R.id.sq)
