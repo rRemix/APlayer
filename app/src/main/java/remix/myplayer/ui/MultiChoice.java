@@ -1,8 +1,6 @@
 package remix.myplayer.ui;
 
 import android.content.Context;
-import android.os.Message;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
@@ -22,7 +20,7 @@ import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.PlayListInfo;
-import remix.myplayer.observer.MediaStoreObserver;
+import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.FolderActivity;
@@ -204,12 +202,6 @@ public class MultiChoice implements OnMultiItemClickListener {
         int num = 0;
         ArrayList<Integer> idList = new ArrayList<>();
         switch (TYPE){
-            case Constants.SONG:
-                for(Object arg : mSelectedArg){
-                    if (arg instanceof Integer)
-                        idList.add((Integer) arg);
-                }
-                break;
             case Constants.PLAYLIST:
                 for(Object arg : mSelectedArg){
                     if (arg instanceof Integer) {
@@ -231,24 +223,25 @@ public class MultiChoice implements OnMultiItemClickListener {
                 }
                 num = PlayListUtil.deleteMultiSongs(idList,ChildHolderActivity.mId);
                 break;
+            case Constants.SONG:
             case Constants.ALBUM:
             case Constants.ARTIST:
             case Constants.FOLDER:
                 for(Object arg : mSelectedArg){
-                    ArrayList<Integer> tempList = MediaStoreUtil.getSongIdList(arg,TYPE);
-                    if(tempList != null && tempList.size() > 0)
-                        idList.addAll(tempList);
+                    num += MediaStoreUtil.delete((Integer) arg,TYPE);
                 }
                 break;
         }
-        if(TYPE != Constants.PLAYLIST && TYPE != Constants.PLAYLISTSONG) {
-            for (Integer id : idList) {
-                if (MediaStoreUtil.delete(id, Constants.SONG))
-                    num++;
-            }
-        }
+//        if(TYPE != Constants.PLAYLIST && TYPE != Constants.PLAYLISTSONG) {
+//            for (Integer id : idList) {
+//                if (MediaStoreUtil.delete(id, Constants.SONG))
+//                    num++;
+//            }
+//        }
         ToastUtil.show(mContext,mContext.getString(R.string.delete_multi_song,num));
-        mContext.getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, MediaStoreObserver.getInstance());
+        if(num > 0){
+            DeleteHelper.onChange();
+        }
         UpdateOptionMenu(false);
     }
 

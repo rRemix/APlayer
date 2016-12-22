@@ -16,7 +16,6 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.telephony.gsm.GsmCellLocation;
 import android.view.KeyEvent;
 
 import java.io.IOException;
@@ -225,20 +224,21 @@ public class MusicService extends BaseService {
             @Override
             public void handleMessage(Message msg) {
                 //更新adapter
-//                if(msg.what == Constants.UPDATE_ADAPTER ){
-//                    if (FolderActivity.mInstance != null ) {
-//                        FolderActivity.mInstance.UpdateList();
-//                    }
-//                    if(ChildHolderActivity.mInstance != null ){
-//                        ChildHolderActivity.mInstance.updateCursor();
-//                    }
-//                }
+                if(msg.what == Constants.UPDATE_ADAPTER ){
+                    if (FolderActivity.getInstance() != null ) {
+                        FolderActivity.getInstance().UpdateList();
+                    }
+                    if(ChildHolderActivity.getInstance() != null ){
+                        ChildHolderActivity.getInstance().updateCursor();
+                    }
+                }
             }
         };
-        mMediaStoreObserver = new MediaStoreObserver(updateHandler);
         //监听数据库变化
-        mPlayListObserver = new DBObserver(updateHandler);
-        mPlayListSongObserver = new DBObserver(updateHandler);
+        mMediaStoreObserver = new MediaStoreObserver(updateHandler);
+        mPlayListObserver = new DBObserver(null);
+        mPlayListSongObserver = new DBObserver(null);
+        //监听删除
         getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,true, mMediaStoreObserver);
         getContentResolver().registerContentObserver(PlayLists.CONTENT_URI,true, mPlayListObserver);
         getContentResolver().registerContentObserver(PlayListSongs.CONTENT_URI,true,mPlayListSongObserver);
@@ -596,8 +596,6 @@ public class MusicService extends BaseService {
      * @return 随机索引
      */
     private static int getShuffle(){
-        if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
-            return 0;
         if(Global.mPlayQueue.size() == 1)
             return 0;
         return new Random().nextInt(Global.mPlayQueue.size() - 1);
@@ -649,9 +647,10 @@ public class MusicService extends BaseService {
         if(mPlayModel == Constants.PLAY_LOOP || mPlayModel == Constants.PLAY_REPEATONE){
             if ((++mNextIndex) > Global.mPlayQueue.size() - 1)
                 mNextIndex = 0;
-            mNextId = Global.mPlayQueue.get(mNextIndex);
         } else{
             mNextIndex = getShuffle();
+        }
+        if(mNextIndex <= Global.mPlayQueue.size()){
             mNextId = Global.mPlayQueue.get(mNextIndex);
         }
         mNextInfo = MediaStoreUtil.getMP3InfoById(mNextId);

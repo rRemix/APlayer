@@ -5,9 +5,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import remix.myplayer.R;
 import remix.myplayer.db.PlayListSongs;
@@ -375,6 +377,19 @@ public class PlayListUtil {
             }
         }
         return mp3list;
+    }
 
+    public static String getDeleteID(){
+        Set<String> deleteId = SPUtil.getStringSet(mContext,"Setting","DeleteID");
+        if(deleteId == null || deleteId.size() == 0)
+            return "";
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(" and ");
+        int i = 0;
+        for (String id : deleteId) {
+            stringBuilder.append(PlayListSongs.PlayListSongColumns.AUDIO_ID + " != ").append(id).append(i != deleteId.size() - 1 ?  " and " : " ");
+            i++;
+        }
+        return stringBuilder.toString();
     }
 }

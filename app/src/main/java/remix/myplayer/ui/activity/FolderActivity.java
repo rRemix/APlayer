@@ -31,7 +31,7 @@ public class FolderActivity extends MultiChoiceActivity {
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
 
-    public static FolderActivity mInstance;
+    private static FolderActivity mInstance;
     private FolderAdapter mAdapter;
     private boolean mIsRunning = false;
     public static final String TAG = FolderActivity.class.getSimpleName();
@@ -88,7 +88,7 @@ public class FolderActivity extends MultiChoiceActivity {
     }
 
     public void UpdateList() {
-        if(mAdapter != null && mIsRunning){
+        if(mAdapter != null){
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -123,4 +123,7 @@ public class FolderActivity extends MultiChoiceActivity {
         }
     }
 
+    public static FolderActivity getInstance() {
+        return mInstance;
+    }
 }

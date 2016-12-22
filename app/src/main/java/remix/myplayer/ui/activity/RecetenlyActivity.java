@@ -106,7 +106,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
             }
         });
         mRecyclerView.setAdapter(mAdapter);
-        getLoaderManager().initLoader(LOADER_ID++, null, this);
+        getLoaderManager().initLoader(++LOADER_ID, null, this);
 
         setUpToolbar(mToolBar,getString(R.string.recently));
 

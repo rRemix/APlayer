@@ -24,6 +24,7 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.customview.SearchToolBar;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * Created by taeja on 16-1-22.
@@ -128,7 +129,7 @@ public class SearchActivity extends ToolbarActivity {
         Cursor cursor = null;
         try {
             String selection = MediaStore.Audio.Media.TITLE + " like ? " + "or " + MediaStore.Audio.Media.ARTIST + " like ? "
-                    + "or " + MediaStore.Audio.Media.ALBUM + " like ? ";
+                    + "or " + MediaStore.Audio.Media.ALBUM + " like ? " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID();
             cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.ARTIST,MediaStore.Audio.Media.ALBUM_ID},
                     selection,

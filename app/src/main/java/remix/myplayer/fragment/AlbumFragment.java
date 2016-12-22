@@ -24,6 +24,7 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.AlbumAdater;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
@@ -40,7 +41,7 @@ import remix.myplayer.util.SPUtil;
 /**
  * 专辑Fragment
  */
-public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback {
     @BindView(R.id.album_recycleview)
     RecyclerView mRecycleView;
     //列表显示与网格显示切换
@@ -59,8 +60,15 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     private static int LOADER_ID = 1;
     private MultiChoice mMultiChoice;
 
-
     public static final String TAG = AlbumFragment.class.getSimpleName();
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        //初始化LoaderManager
+        getLoaderManager().initLoader(LOADER_ID++, null, this);
+
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,17 +76,11 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         mPageName = TAG;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        //初始化LoaderManager
-        getLoaderManager().initLoader(LOADER_ID++, null, this);
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_album,null);
+        DeleteHelper.addCallback(this);
         mUnBinder = ButterKnife.bind(this,rootView);
 
         rootView.findViewById(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
@@ -108,7 +110,6 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
                         }
                     }
                 }
-
             }
             @Override
             public void onItemLongClick(View view, int position) {
@@ -198,12 +199,22 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         return mAdapter;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        DeleteHelper.removeCallback(this);
+    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         if(mCursor != null)
             mCursor.close();
+
     }
 
+    @Override
+    public void OnDelete() {
+        getLoaderManager().restartLoader(LOADER_ID,null,this);
+    }
 }

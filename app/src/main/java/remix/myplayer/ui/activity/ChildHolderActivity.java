@@ -72,35 +72,15 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
     private Cursor mCursor;
 
     private ChildHolderAdapter mAdapter;
-    public static ChildHolderActivity mInstance = null;
 
-    private MaterialDialog mMDDialog;
-    //更新
-    private static final int START = 0;
-    private static final int END = 1;
+    private static ChildHolderActivity mInstance = null;
+
     private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case Constants.CLEAR_MULTI:
                     mMultiChoice.clearSelectedViews();
-                    break;
-                case Constants.UPDATE_ADAPTER:
-                    if(mInfoList == null)
-                        return;
-//                    mAdapter.setList(mInfoList);
-                    mNum.setText(mInfoList.size() + "首歌曲");
-                    break;
-                case START:
-                    if(mMDDialog != null && !mMDDialog.isShowing()){
-                        mMDDialog.show();
-                    }
-                    break;
-                case END:
-                    if(mMDDialog != null && mMDDialog.isShowing()){
-                        findViewById(R.id.shuffle_container).setVisibility(mInfoList == null || mInfoList.size() == 0 ? View.GONE : View.VISIBLE);
-                        mMDDialog.dismiss();
-                    }
                     break;
             }
         }
@@ -129,7 +109,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
             public void onItemClick(View view, int position) {
                 int songid = getSongId(mCursor,position);
                 if( !mMultiChoice.itemAddorRemoveWithClick(view,position,songid,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
-
                     //设置正在播放列表
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
@@ -142,7 +121,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
             @Override
             public void onItemLongClick(View view, int position) {
-                int songid = mInfoList.get(position).getId();
+                int songid = mIdList.get(position);
                 mMultiChoice.itemAddorRemoveWithLongClick(view,position,songid, TAG,mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
             }
         });
@@ -166,17 +145,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         //初始化toolbar
         setUpToolbar(mToolBar,Title);
 
-        //加载歌曲列表
-        mMDDialog = new MaterialDialog.Builder(this)
-                .title("加载中")
-                .titleColorAttr(R.attr.text_color_primary)
-                .content("请稍等")
-                .contentColorAttr(R.attr.text_color_primary)
-                .progress(true, 0)
-                .backgroundColorAttr(R.attr.background_color_3)
-                .progressIndeterminateStyle(false).build();
-
-        getLoaderManager().initLoader(LOADER_ID++, null, this);
+        getLoaderManager().initLoader(++LOADER_ID, null, this);
         //初始化底部状态栏
         mBottombar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
@@ -184,12 +153,11 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
 
         mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
 
-
     }
 
     public void updateCursor() {
         if(mIsRunning)
-            getLoaderManager().initLoader(LOADER_ID++, null, this);
+            getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
     @Override
@@ -232,7 +200,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DISPLAY_NAME,MediaStore.Audio.Media.TITLE,
                         MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ALBUM_ID,MediaStore.Audio.Media.ARTIST},
-                where.toString() + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID(),
+                where.toString() +  MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID(),
                 null,
                 MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
     }
@@ -243,7 +211,8 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
             return;
         //查询完毕后保存结果，并设置查询索引
         mCursor = data;
-        if(mType == Constants.ALBUM || mType == Constants.ARTIST){
+        //如果是非播放列表，需要重新设置idlist,因为外部删除歌曲会导致次级目录歌曲的数量变化
+        if(mType != Constants.PLAYLIST){
             mIdList = MediaStoreUtil.getSongIdListByCursor(mCursor);
         }
         mAdapter.setIDList(mIdList);
@@ -258,15 +227,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         }
     }
 
-    class GetSongListThread extends Thread{
-        @Override
-        public void run() {
-            mRefreshHandler.sendEmptyMessage(START);
-            mInfoList = getMP3List();
-            mRefreshHandler.sendEmptyMessage(END);
-            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-        }
-    }
 
     /**
      * 根据参数(专辑id 歌手id 文件夹名 播放列表名)获得对应的歌曲信息列表
@@ -357,5 +317,8 @@ public class ChildHolderActivity extends MultiChoiceActivity implements MusicSer
         mIsRunning = false;
     }
 
+    public static ChildHolderActivity getInstance() {
+        return mInstance;
+    }
 
 }

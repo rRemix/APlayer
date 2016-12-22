@@ -4,10 +4,12 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 
@@ -24,6 +26,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 import remix.myplayer.R;
+import remix.myplayer.adapter.SongAdapter;
+import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.observer.MediaStoreObserver;
@@ -565,12 +569,12 @@ public class MediaStoreUtil {
      * @param type 删除类型 包括单个歌曲、专辑、艺术家、文件夹、播放列表
      * @return 是否删除成功
      */
-    public static boolean delete(int data, int type) {
-        LogUtil.d("删除测试","删除:" + data);
+    public static int delete(int data, int type) {
         ContentResolver resolver = mContext.getContentResolver();
         String where ;
         String[] arg;
         String folderName;
+        int deleteNum = 0;
 
         //之前保存的所有移除歌曲id
         Set<String> oriID = new HashSet<>(SPUtil.getStringSet(mContext,"Setting","DeleteID"));
@@ -583,6 +587,7 @@ public class MediaStoreUtil {
         switch (type) {
             case Constants.SONG:
                 oriID.add(data + "");
+                deleteNum = 1;
                 break;
             case Constants.ALBUM:
             case Constants.ARTIST:
@@ -599,6 +604,7 @@ public class MediaStoreUtil {
                         while (cursor.moveToNext()){
                             oriID.add(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
                         }
+                        deleteNum = cursor.getCount();
                     }
                 } finally {
                     if(cursor != null && !cursor.isClosed())
@@ -608,20 +614,24 @@ public class MediaStoreUtil {
             case Constants.FOLDER:
                 try {
                     folderName = CommonUtil.getMapkeyByPosition(Global.mFolderMap,data);
-                    for(Integer id : Global.mFolderMap.get(folderName)){
-                        oriID.add(id + "");
+                    if(Global.mFolderMap.get(folderName) != null){
+                        for(Integer id : Global.mFolderMap.get(folderName)){
+                            oriID.add(id + "");
+                        }
+                        deleteNum = Global.mFolderMap.get(folderName).size();
                     }
                 } catch (Exception e){
                     e.printStackTrace();
                 }
                 break;
         }
-//        resolver.delete(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, MediaStore.Audio.Media._ID + "=?", new String[]{data + ""});
-        if(SPUtil.putStringSet(mContext,"Setting","DeleteID",oriID)){
+        SPUtil.putStringSet(mContext, "Setting", "DeleteID", oriID);
+        if(type == Constants.FOLDER){
             resolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
-            return true;
         }
-        return false;
+        DeleteHelper.onChange(type);
+        return deleteNum;
+
     }
 
     /**

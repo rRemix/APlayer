@@ -26,6 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
+import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -158,9 +159,10 @@ public class OptionDialog extends BaseDialogActivity {
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                     String result = "";
                                     if(!mIsDeletePlayList){
-                                        result = MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) ?
+                                        result = MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0 ?
                                                 getString(R.string.delete_success) :
                                                 getString(R.string.delete_error);
+//                                        DeleteHelper.onChange();
                                     } else {
                                         result = PlayListUtil.deleteSong(mInfo.getId(),mPlayListName) ?
                                                 getString(R.string.delete_success):

@@ -12,6 +12,7 @@ import com.soundcloud.android.crop.Crop;
 import java.util.ArrayList;
 
 import remix.myplayer.R;
+import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -66,13 +67,16 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 break;
             //删除
             case R.id.menu_delete:
-                if(mId == Global.mMyLoveID){
+                if(mId == Global.mMyLoveID && mType == Constants.PLAYLIST){
                     ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delelte));
                     return true;
                 }
-                ToastUtil.show(mContext,(mType != Constants.PLAYLIST ? MediaStoreUtil.delete(mId , mType) : PlayListUtil.deletePlayList(mId)) ?
-                        R.string.delete_success :
-                        R.string.delete_error);
+                if(mType != Constants.PLAYLIST){
+                    ToastUtil.show(mContext,MediaStoreUtil.delete(mId , mType) > 0 ? R.string.delete_success : R.string.delete_error);
+//                    DeleteHelper.onChange();
+                } else {
+                    ToastUtil.show(mContext,PlayListUtil.deletePlayList(mId) ? R.string.delete_success : R.string.delete_error);
+                }
                 break;
             //设置封面
             case R.id.menu_album_thumb:

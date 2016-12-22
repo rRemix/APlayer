@@ -16,7 +16,6 @@ import remix.myplayer.util.PlayListUtil;
 public class DBObserver extends ContentObserver {
     private static OnChangeListener mPlayListListener;
     private static OnChangeListener mPlayListSongListener;
-    private Handler mHandler;
     /**
      * Creates a content observer.
      *
@@ -24,26 +23,11 @@ public class DBObserver extends ContentObserver {
      */
     public DBObserver(Handler handler) {
         super(handler);
-        mHandler = handler;
     }
 
-    @Override
-    public void onChange(boolean selfChange) {
-
-    }
 
     @Override
     public void onChange(boolean selfChange, final Uri uri) {
-//        if(!selfChange){
-//            new Thread(){
-//                @Override
-//                public void run() {
-//                    Global.mPlayList = PlayListUtil.getAllPlayListInfo();
-//                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueID);
-//                    mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-//                }
-//            }.start();
-//        }
 
         if(!selfChange){
             new Thread(){
@@ -65,7 +49,6 @@ public class DBObserver extends ContentObserver {
                                 mPlayListSongListener.OnChange();
                             break;
                     }
-                    mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                 }
             }.start();
         }

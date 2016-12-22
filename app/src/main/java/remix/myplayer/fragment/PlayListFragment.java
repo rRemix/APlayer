@@ -23,6 +23,7 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.db.PlayLists;
+import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -63,7 +64,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     public void onAttach(Context context) {
         super.onAttach(context);
         mPageName = TAG;
-        getLoaderManager().initLoader(LOADER_ID++, null, this);
+        getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 
     @Nullable
@@ -206,4 +207,5 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
             mAdapter.setCursor(null);
         }
     }
+
 }

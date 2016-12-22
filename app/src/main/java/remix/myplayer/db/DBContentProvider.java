@@ -1,13 +1,19 @@
 package remix.myplayer.db;
 
+import android.app.LoaderManager;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Loader;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
+
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.util.LogUtil;
@@ -50,12 +56,13 @@ public class DBContentProvider extends ContentProvider {
             int match = mUriMatcher.match(uri);
             cursor = db.query(match == PLAY_LIST_MULTIPLE  ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,
                         projection,selection,selectionArgs,null,null,null);
-//            cursor.setNotificationUri(APlayerApplication.getContext().getContentResolver(), Uri.parse(CONTENT_AUTHORITY_SLASH));
+            cursor.setNotificationUri(APlayerApplication.getContext().getContentResolver(), Uri.parse(CONTENT_AUTHORITY_SLASH));
         } catch (Exception e){
             e.printStackTrace();
         }
         return cursor;
     }
+
 
     /**
      *  插入多条歌曲信息

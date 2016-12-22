@@ -31,6 +31,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * Created by taeja on 16-6-24.
@@ -75,20 +76,21 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
 
         final MP3Item temp;
         //如果外部删除了某些歌曲 手动添加歌曲信息，保证点击播放列表前后歌曲数目一致
-        if(position > mCursor.getCount()){
-            temp = new MP3Item();
-            temp.Title = mContext.getString(R.string.song_lose_effect);
-            temp.Id = mIDList.get(position);
-        } else if(!mCursor.isClosed() && mCursor.moveToPosition(position)) {
+        if(mCursor.moveToPosition(position) && mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media._ID)) == mIDList.get(position)){
             temp = new MP3Item(mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media._ID)),
                     mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
                     mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)),
                     mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)),
                     mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
                     mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),0,"","",0,"");
-        } else {
+        } else if (position >= mCursor.getCount()){
+            temp = new MP3Item();
+            temp.Title = mContext.getString(R.string.song_lose_effect);
+            temp.Id = mIDList.get(position);
+        } else{
             return;
         }
+
 
         if(temp.getId() < 0 || temp.Title.equals(mContext.getString(R.string.song_lose_effect))) {
             holder.mTitle.setText(R.string.song_lose_effect);

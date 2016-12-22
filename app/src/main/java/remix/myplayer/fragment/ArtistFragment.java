@@ -23,6 +23,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ArtistAdapter;
+import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -40,7 +41,7 @@ import remix.myplayer.util.SPUtil;
 /**
  * 艺术家Fragment
  */
-public class ArtistFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class ArtistFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback{
     @BindView(R.id.artist_recycleview)
     RecyclerView mRecycleView;
     Cursor mCursor = null;
@@ -62,7 +63,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        getLoaderManager().initLoader(LOADER_ID++, null, this);
+        DeleteHelper.addCallback(this);
     }
 
     @Override
@@ -76,6 +77,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_artist,null);
         mUnBinder = ButterKnife.bind(this,rootView);
+        getLoaderManager().initLoader(++LOADER_ID, null, this);
 
         rootView.findViewById(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
 
@@ -183,4 +185,14 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
             mCursor.close();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        DeleteHelper.removeCallback(this);
+    }
+
+    @Override
+    public void OnDelete() {
+        getLoaderManager().restartLoader(LOADER_ID,null,this);
+    }
 }

@@ -77,7 +77,7 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
                 mConfirm.setClickable(mCheckSongIdList.size() > 0);
             }
         });
-        getLoaderManager().initLoader(LOADER_ID++, null, this);
+        getLoaderManager().initLoader(++LOADER_ID, null, this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());

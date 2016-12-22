@@ -22,11 +22,11 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -38,7 +38,7 @@ import remix.myplayer.util.MediaStoreUtil;
 /**
  * 全部歌曲的Fragment
  */
-public class SongFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class SongFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback {
     private Cursor mCursor = null;
     //歌曲名 艺术家 专辑名 专辑id 歌曲id对应的索引
     public static int mDisPlayNameIndex = -1;
@@ -57,7 +57,8 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        getLoaderManager().initLoader(LOADER_ID++, null, this);
+        getLoaderManager().initLoader(++LOADER_ID, null, this);
+
     }
 
     @Override
@@ -66,6 +67,11 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         mPageName = TAG;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        DeleteHelper.removeCallback(this);
+    }
 
     @Override
     public void onDestroy() {
@@ -73,14 +79,12 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         if(mCursor != null) {
             mCursor.close();
         }
-        if(mAdapter != null){
-            mAdapter.setCursor(null);
-        }
     }
 
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        DeleteHelper.addCallback(this);
         super.onCreateView(inflater, container, savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_song,null);
         mUnBinder = ButterKnife.bind(this,rootView);
@@ -141,11 +145,12 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         //查询所有歌曲
-        String arg = MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID();
         return  new CursorLoader(getActivity(),
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null,MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID(),null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
     }
+
+
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
@@ -171,4 +176,9 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
         return mAdapter;
     }
 
+
+    @Override
+    public void OnDelete() {
+        getLoaderManager().restartLoader(LOADER_ID,null,this);
+    }
 }
