@@ -48,6 +48,7 @@ import remix.myplayer.fragment.ArtistFragment;
 import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.fragment.SongFragment;
+import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnModeChangeListener;
 import remix.myplayer.model.MP3Item;
@@ -68,7 +69,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  *
  */
-public class MainActivity extends MultiChoiceActivity implements MusicService.Callback {
+public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Callback {
     @BindView(R.id.tabs)
     TabLayout mTablayout;
     @BindView(R.id.ViewPager)
@@ -179,7 +180,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
         ButterKnife.bind(this);
 
         //播放的service
-        MusicService.addCallback(this);
         setUpToolbar(mToolBar);
         setUpPager();
         setUpTab();
@@ -586,10 +586,6 @@ public class MainActivity extends MultiChoiceActivity implements MusicService.Ca
 
     }
 
-    @Override
-    public int getType() {
-        return Constants.MAINACTIVITY;
-    }
 
 }
 

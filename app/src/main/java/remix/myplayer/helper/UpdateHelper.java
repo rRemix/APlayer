@@ -2,17 +2,22 @@ package remix.myplayer.helper;
 
 import java.util.ArrayList;
 
+import remix.myplayer.model.MP3Item;
 
 /**
- * Created by Remix on 2016/12/22.
+ * @ClassName
+ * @Description
+ * @Author Xiaoborui
+ * @Date 2016/12/23 10:06
  */
 
-public class DeleteHelper {
+public class UpdateHelper {
     private static ArrayList<Callback> mCallbacks = new ArrayList<>();
 
-    public static void delete() {
+    public static void update(MP3Item mp3Item, boolean isPlay) {
         for(int i = 0 ; i < mCallbacks.size();i++){
-            mCallbacks.get(i).OnDelete();
+            if(mCallbacks.get(i) != null)
+                mCallbacks.get(i).UpdateUI(mp3Item,isPlay);
         }
     }
 
@@ -29,6 +34,6 @@ public class DeleteHelper {
     }
 
     public interface Callback{
-        void OnDelete();
+        void UpdateUI(MP3Item MP3Item, boolean isplay);
     }
 }

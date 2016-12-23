@@ -59,11 +59,11 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     ImageView mGridModelBtn;
     //当前列表模式 1:列表 2:网格
     public static int ListModel = 2;
-
+    private static int LOADER_ID = 1;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        DeleteHelper.addCallback(this);
+        getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 
     @Override
@@ -75,9 +75,9 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater,container,savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_artist,null);
         mUnBinder = ButterKnife.bind(this,rootView);
-        getLoaderManager().initLoader(++LOADER_ID, null, this);
 
         rootView.findViewById(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
 
@@ -122,14 +122,6 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         return rootView;
     }
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                new String[]{"distinct " + MediaStore.Audio.Media.ARTIST_ID,MediaStore.Audio.Media.ARTIST},
-                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE +  MediaStoreUtil.getDeleteID() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
-                null,
-                null);
-    }
 
     public static synchronized int getModel(){
         return ListModel;
@@ -158,6 +150,15 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     }
 
     @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                new String[]{"distinct " + MediaStore.Audio.Media.ARTIST_ID,MediaStore.Audio.Media.ARTIST},
+                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE +  MediaStoreUtil.getDeleteID() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
+                null,
+                MediaStore.Audio.Artists.DEFAULT_SORT_ORDER);
+    }
+
+    @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         if(mAdapter != null)
             mAdapter.setCursor(null);
@@ -169,7 +170,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         //设置查询索引
         mArtistIdIndex = data.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
         mArtistIndex = data.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-        mAdapter.setCursor(data);
+        mAdapter.setCursor(mCursor);
     }
 
 
@@ -183,12 +184,6 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         super.onDestroy();
         if(mCursor != null)
             mCursor.close();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        DeleteHelper.removeCallback(this);
     }
 
     @Override

@@ -4,6 +4,10 @@ import android.app.Activity;
 
 import java.util.ArrayList;
 
+import remix.myplayer.helper.DeleteHelper;
+import remix.myplayer.helper.UpdateHelper;
+import remix.myplayer.service.MusicService;
+
 /**
  * Created by taeja on 16-3-21.
  */
@@ -16,9 +20,15 @@ public class ActivityManager {
     private static ArrayList<Activity> mActivityList = new ArrayList<>();
 
     public static void AddActivity(Activity activity){
+        if(activity instanceof UpdateHelper.Callback){
+            UpdateHelper.addCallback((UpdateHelper.Callback)activity);
+        }
         mActivityList.add(activity);
     }
     public static void RemoveActivity(Activity activity){
+        if(activity instanceof UpdateHelper.Callback){
+            UpdateHelper.removeCallback((UpdateHelper.Callback)activity);
+        }
         mActivityList.remove(activity);
     }
 

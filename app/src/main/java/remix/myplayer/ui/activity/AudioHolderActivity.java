@@ -46,6 +46,7 @@ import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.fragment.CoverFragment;
 import remix.myplayer.fragment.LrcFragment;
 import remix.myplayer.fragment.RecordFragment;
+import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.lyric.LrcView;
@@ -74,7 +75,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 播放界面
  */
-public class AudioHolderActivity extends BaseActivity implements MusicService.Callback{
+public class AudioHolderActivity extends BaseActivity implements UpdateHelper.Callback{
     private static final String TAG = "AudioHolderActivity";
     //是否正在运行
     public static boolean mIsRunning;
@@ -269,7 +270,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         mInfo = MusicService.getCurrentMP3();
         mIsPlay = MusicService.getIsplay();
 
-        MusicService.addCallback(this);
         setUpSize();
         setUpTop();
         setUpGuide();
@@ -820,10 +820,6 @@ public class AudioHolderActivity extends BaseActivity implements MusicService.Ca
         }
     }
 
-    @Override
-    public int getType() {
-        return Constants.AUDIOHOLDERACTIVITY;
-    }
 
     //更新进度条线程
     class ProgeressThread extends Thread {

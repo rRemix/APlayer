@@ -19,14 +19,13 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.view.KeyEvent;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
+import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.observer.DBObserver;
 import remix.myplayer.observer.MediaStoreObserver;
@@ -92,9 +91,6 @@ public class MusicService extends BaseService {
     /** AudiaoManager */
     private AudioManager mAudioManager;
 
-    /** 回调接口的集合 */
-    private static List<Callback> mCallBacklist  = new ArrayList<Callback>(){};
-
     /** 播放控制的Receiver */
     private ControlReceiver mRecevier;
 
@@ -115,15 +111,7 @@ public class MusicService extends BaseService {
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == Constants.UPDATE_UI) {
-                for (int i = 0; i < mCallBacklist.size(); i++) {
-                    if(mCallBacklist.get(i) != null){
-                        try {
-                            mCallBacklist.get(i).UpdateUI(mCurrentInfo,mIsplay);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
+                UpdateHelper.update(mCurrentInfo,mIsplay);
             }
         }
     };
@@ -150,8 +138,10 @@ public class MusicService extends BaseService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent,flags,startId);
+//        flags = Service.START_FLAG_REDELIVERY;
+        return super.onStartCommand(intent, flags, startId);
     }
+
 
     @Override
     public void onDestroy() {
@@ -226,10 +216,10 @@ public class MusicService extends BaseService {
                 //更新adapter
                 if(msg.what == Constants.UPDATE_ADAPTER ){
                     if (FolderActivity.getInstance() != null ) {
-                        FolderActivity.getInstance().UpdateList();
+                        FolderActivity.getInstance().updateList();
                     }
                     if(ChildHolderActivity.getInstance() != null ){
-                        ChildHolderActivity.getInstance().updateCursor();
+                        ChildHolderActivity.getInstance().updateList();
                     }
                 }
             }
@@ -342,6 +332,8 @@ public class MusicService extends BaseService {
         getContentResolver().unregisterContentObserver(mMediaStoreObserver);
         getContentResolver().unregisterContentObserver(mPlayListObserver);
         getContentResolver().unregisterContentObserver(mPlayListSongObserver);
+        //关闭通知
+        ((NotificationManager) APlayerApplication.getContext().getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
     }
 
 
@@ -437,36 +429,6 @@ public class MusicService extends BaseService {
         updateNextSong();
     }
 
-
-    /**
-     * 回调接口，当发生更新时，通知相关activity更新
-     */
-    public interface Callback {
-        void UpdateUI(MP3Item MP3Item, boolean isplay);
-        int getType();
-    }
-
-    /**
-     * @param callback
-     */
-    public static void addCallback(Callback callback) {
-        for(int i = mCallBacklist.size() - 1 ; i >= 0 ; i--){
-            if(callback.getType() == mCallBacklist.get(i).getType()){
-                mCallBacklist.remove(i);
-            }
-        }
-        mCallBacklist.add(callback);
-    }
-
-    /**
-     * 将callback移出队列
-     * @param callback
-     */
-    public static void removeCallback(Callback callback){
-        if(mCallBacklist != null && mCallBacklist.size() > 0){
-            mCallBacklist.remove(callback);
-        }
-    }
 
     /**
      * 接受控制命令

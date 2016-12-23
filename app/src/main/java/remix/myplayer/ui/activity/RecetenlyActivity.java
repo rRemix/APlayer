@@ -25,6 +25,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
+import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
@@ -43,7 +44,7 @@ import remix.myplayer.util.ToastUtil;
  * 最近添加歌曲的界面
  * 目前为最近7天添加
  */
-public class RecetenlyActivity extends MultiChoiceActivity implements MusicService.Callback,LoaderManager.LoaderCallbacks<Cursor>{
+public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelper.Callback,LoaderManager.LoaderCallbacks<Cursor>{
     public static final String TAG = RecetenlyActivity.class.getSimpleName();
     private static int LOADER_ID = 1;
 
@@ -76,7 +77,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recently);
         ButterKnife.bind(this);
-        MusicService.addCallback(RecetenlyActivity.this);
 
         findView(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
 
@@ -151,11 +151,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements MusicServi
     @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
         mAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public int getType() {
-        return Constants.RECENTLYACTIVITY;
     }
 
 

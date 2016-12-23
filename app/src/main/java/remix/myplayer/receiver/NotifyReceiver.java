@@ -112,7 +112,7 @@ public class NotifyReceiver extends BroadcastReceiver {
                         .setContentTitle("")
                         .setWhen(System.currentTimeMillis())
                         .setPriority(NotificationCompat.PRIORITY_MAX)
-                        .setOngoing(true)
+                        .setOngoing(mIsplay)
                         .setSmallIcon(R.drawable.notifbar_icon);
                 //点击通知栏打开播放界面
                 //后退回到主界面

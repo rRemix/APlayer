@@ -37,12 +37,12 @@ import remix.myplayer.util.MediaStoreUtil;
  * Created by taeja on 16-6-24.
  */
 public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler> {
+    private ArrayList<MP3Item> mInfoList;
     private int mType;
     private String mArg;
     private MultiChoice mMultiChoice;
     private Drawable mDefaultDrawable;
     private Drawable mSelectDrawable;
-    private ArrayList<Integer> mIDList = new ArrayList<>();
     public ChildHolderAdapter(Context context, int type, String arg,MultiChoice multiChoice){
         super(context);
         this.mContext = context;
@@ -54,13 +54,9 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
         mSelectDrawable = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getSelectColor(),size,size);
     }
 
-    public void setIDList(ArrayList<Integer> idList){
-        mIDList = idList;
-    }
-
-    @Override
-    public int getItemCount() {
-        return mIDList != null ? mIDList.size() : 0;
+    public void setList(ArrayList<MP3Item> list){
+        mInfoList = list;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -70,29 +66,8 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
 
     @Override
     public void onBindViewHolder(final ViewHoler holder, int position) {
-        if(mCursor == null || position >= mIDList.size()){
-            return;
-        }
-
-        final MP3Item temp;
-        //如果外部删除了某些歌曲 手动添加歌曲信息，保证点击播放列表前后歌曲数目一致
-        if(mCursor.moveToPosition(position) && mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media._ID)) == mIDList.get(position)){
-            temp = new MP3Item(mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media._ID)),
-                    mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
-                    mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)),
-                    mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)),
-                    mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
-                    mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),0,"","",0,"");
-        } else if (position >= mCursor.getCount()){
-            temp = new MP3Item();
-            temp.Title = mContext.getString(R.string.song_lose_effect);
-            temp.Id = mIDList.get(position);
-        } else{
-            return;
-        }
-
-
-        if(temp.getId() < 0 || temp.Title.equals(mContext.getString(R.string.song_lose_effect))) {
+        final MP3Item temp = mInfoList.get(position);
+        if(temp == null || temp.getId() < 0 || temp.Title.equals(mContext.getString(R.string.song_lose_effect))) {
             holder.mTitle.setText(R.string.song_lose_effect);
             holder.mColumnView.setVisibility(View.INVISIBLE);
             holder.mButton.setVisibility(View.INVISIBLE);
@@ -181,6 +156,10 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
         }
     }
 
+    @Override
+    public int getItemCount() {
+        return mInfoList == null ? 0 : mInfoList.size();
+    }
 
     static class ViewHoler extends BaseViewHolder {
         @BindView(R.id.sq)

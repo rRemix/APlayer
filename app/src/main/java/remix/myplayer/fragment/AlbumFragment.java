@@ -57,18 +57,17 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     public static int mAlbumIndex = -1;
     public static int mArtistIndex = -1;
     private AlbumAdater mAdapter;
-    private static int LOADER_ID = 1;
     private MultiChoice mMultiChoice;
 
     public static final String TAG = AlbumFragment.class.getSimpleName();
-
+    private static int LOADER_ID = 1;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         //初始化LoaderManager
         getLoaderManager().initLoader(LOADER_ID++, null, this);
-
     }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,8 +78,8 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_album,null);
-        DeleteHelper.addCallback(this);
         mUnBinder = ButterKnife.bind(this,rootView);
 
         rootView.findViewById(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
@@ -156,13 +155,14 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         //根据专辑id 创建Loader
         try {
+            String arg = MediaStoreUtil.getDeleteID();
             return  new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,
                             MediaStore.Audio.Media.ALBUM,
                             MediaStore.Audio.Media.ARTIST},
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
                     null,
-                    null);
+                    MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -180,8 +180,7 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
             mAlbumIdIndex = data.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
             mAlbumIndex = data.getColumnIndex(MediaStore.Audio.Media.ALBUM);
             mArtistIndex = data.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-//            mSongNumIndex = data.getColumnIndex(MediaStore.Audio.Albums.NUMBER_OF_SONGS);
-            mAdapter.setCursor(data);
+            mAdapter.setCursor(mCursor);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -200,17 +199,10 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        DeleteHelper.removeCallback(this);
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         if(mCursor != null)
             mCursor.close();
-
     }
 
     @Override

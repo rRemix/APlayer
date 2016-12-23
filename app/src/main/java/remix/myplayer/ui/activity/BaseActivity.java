@@ -111,9 +111,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         ActivityManager.RemoveActivity(this);
-        if(this instanceof MusicService.Callback){
-            MusicService.removeCallback((MusicService.Callback) this);
-        }
+
     }
 
     @Override

@@ -162,7 +162,7 @@ public class OptionDialog extends BaseDialogActivity {
                                         result = MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0 ?
                                                 getString(R.string.delete_success) :
                                                 getString(R.string.delete_error);
-//                                        DeleteHelper.onChange();
+//                                        DeleteHelper.delete();
                                     } else {
                                         result = PlayListUtil.deleteSong(mInfo.getId(),mPlayListName) ?
                                                 getString(R.string.delete_success):

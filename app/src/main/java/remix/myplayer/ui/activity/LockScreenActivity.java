@@ -26,6 +26,7 @@ import com.umeng.analytics.MobclickAgent;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
+import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
@@ -45,7 +46,7 @@ import remix.myplayer.util.ToastUtil;
  * 实际为将手机解锁并对Activity进行处理，使其看起来像锁屏界面
  */
 
-public class LockScreenActivity extends BaseActivity implements MusicService.Callback{
+public class LockScreenActivity extends BaseActivity implements UpdateHelper.Callback{
     private final static String TAG = "LockScreenActivity";
     //当前播放的歌曲信息
     private MP3Item mInfo;
@@ -126,7 +127,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         mWidth = metric.widthPixels;
         mHeight = metric.heightPixels;
-        MusicService.addCallback(this);
 
         //解锁屏幕
         WindowManager.LayoutParams attr = getWindow().getAttributes();
@@ -251,12 +251,6 @@ public class LockScreenActivity extends BaseActivity implements MusicService.Cal
             mNextSong.setText("下一首：" + MusicService.getNextMP3().getTitle());
 
         new BlurThread().start();
-    }
-
-
-    @Override
-    public int getType() {
-        return Constants.LOCKSCREENACTIIVITY;
     }
 
 

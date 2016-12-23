@@ -53,24 +53,17 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
 
     public static final String TAG = SongFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
-
+    private static int LOADER_ID = 1;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         getLoaderManager().initLoader(++LOADER_ID, null, this);
-
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPageName = TAG;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        DeleteHelper.removeCallback(this);
     }
 
     @Override
@@ -84,7 +77,6 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        DeleteHelper.addCallback(this);
         super.onCreateView(inflater, container, savedInstanceState);
         final View rootView = inflater.inflate(R.layout.fragment_song,null);
         mUnBinder = ButterKnife.bind(this,rootView);
@@ -145,12 +137,11 @@ public class SongFragment extends BaseFragment implements LoaderManager.LoaderCa
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         //查询所有歌曲
+        String arg = MediaStoreUtil.getDeleteID();
         return  new CursorLoader(getActivity(),
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null,MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID(),null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
     }
-
-
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {

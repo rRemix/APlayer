@@ -626,10 +626,7 @@ public class MediaStoreUtil {
                 break;
         }
         SPUtil.putStringSet(mContext, "Setting", "DeleteID", oriID);
-        if(type == Constants.FOLDER){
-            resolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
-        }
-        DeleteHelper.onChange(type);
+        resolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
         return deleteNum;
 
     }

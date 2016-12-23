@@ -60,7 +60,7 @@ public class ColorChooseDialog extends BaseDialogActivity {
      * 添加颜色
      */
     private void addColor(@ColorRes int mdColor, String colorText,int themeColor) {
-        View colorItem = LayoutInflater.from(this).inflate(R.layout.color_choose_item,null);
+        View colorItem = LayoutInflater.from(this).inflate(R.layout.item_color_choose,null);
         ImageView src = (ImageView) colorItem.findViewById(R.id.color_choose_item_src);
         GradientDrawable drawable = (GradientDrawable) src.getDrawable();
         drawable.setColor(ColorUtil.getColor(mdColor));

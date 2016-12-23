@@ -240,7 +240,7 @@ public class MultiChoice implements OnMultiItemClickListener {
 //        }
         ToastUtil.show(mContext,mContext.getString(R.string.delete_multi_song,num));
         if(num > 0){
-            DeleteHelper.onChange();
+            DeleteHelper.delete();
         }
         UpdateOptionMenu(false);
     }
