@@ -12,7 +12,6 @@ import com.soundcloud.android.crop.Crop;
 import java.util.ArrayList;
 
 import remix.myplayer.R;
-import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;

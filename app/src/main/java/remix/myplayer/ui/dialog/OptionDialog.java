@@ -26,7 +26,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;

@@ -4,12 +4,10 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 
@@ -20,17 +18,13 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import remix.myplayer.R;
-import remix.myplayer.adapter.SongAdapter;
-import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.observer.MediaStoreObserver;
 
 /**
  * Created by taeja on 16-2-17.
@@ -627,6 +621,7 @@ public class MediaStoreUtil {
         }
         SPUtil.putStringSet(mContext, "Setting", "DeleteID", oriID);
         resolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
+
         return deleteNum;
 
     }

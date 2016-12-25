@@ -1,8 +1,6 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;

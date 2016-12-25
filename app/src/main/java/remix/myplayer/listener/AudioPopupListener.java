@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,16 +28,13 @@ import remix.myplayer.R;
 import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.AudioHolderActivity;
 import remix.myplayer.ui.activity.EQActivity;
+import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -150,8 +146,8 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                     mInfo.setArtist(artist);
                                     mInfo.setTitle(title);
                                     mInfo.setYear(year);
-                                    ((AudioHolderActivity)mContext).UpdateTopStatus(mInfo);
-                                    ((AudioHolderActivity)mContext).setMP3Item(mInfo);
+                                    ((PlayerActivity)mContext).UpdateTopStatus(mInfo);
+                                    ((PlayerActivity)mContext).setMP3Item(mInfo);
                                 } else {
                                     ToastUtil.show(mContext,R.string.save_error);
                                 }

@@ -62,7 +62,6 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -75,8 +74,8 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 播放界面
  */
-public class AudioHolderActivity extends BaseActivity implements UpdateHelper.Callback{
-    private static final String TAG = "AudioHolderActivity";
+public class PlayerActivity extends BaseActivity implements UpdateHelper.Callback{
+    private static final String TAG = "PlayerActivity";
     //是否正在运行
     public static boolean mIsRunning;
     //上次选中的Fragment
@@ -181,6 +180,8 @@ public class AudioHolderActivity extends BaseActivity implements UpdateHelper.Ca
      *
      */
     private boolean mIsBacking = false;
+    private float mEventY1;
+    private float mEventY2;
 
     /** 更新进度条的Handler */
     private Handler mProgressHandler = new Handler() {
@@ -240,22 +241,6 @@ public class AudioHolderActivity extends BaseActivity implements UpdateHelper.Ca
         }
     }
 
-    private float mEventY1;
-    private float mEventY2;
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        if(event.getAction() == MotionEvent.ACTION_DOWN){
-//            mEventY1 = event.getY();
-//        }
-//        if(event.getAction() == MotionEvent.ACTION_UP){
-//            mEventY2 = event.getY();
-//            if(mEventY2 - mEventY1 > 100){
-//                onBackPressed();
-//            }
-//        }
-//
-//        return super.onTouchEvent(event);
-//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -280,7 +265,7 @@ public class AudioHolderActivity extends BaseActivity implements UpdateHelper.Ca
         //设置失败加载的图片和缩放类型
         mAnimCover = new SimpleDraweeView(this);
         mAnimCover.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
-        mAnimCover.getHierarchy().setFailureImage(R.drawable.album_empty_bg_day, ScalingUtils.ScaleType.CENTER_CROP);
+        mAnimCover.getHierarchy().setFailureImage(ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night, ScalingUtils.ScaleType.CENTER_CROP);
         mContainer.addView(mAnimCover);
         //设置封面
         MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
@@ -336,10 +321,11 @@ public class AudioHolderActivity extends BaseActivity implements UpdateHelper.Ca
         super.onResume();
         //更新界面
         mIsRunning = true;
-        if(mNeedUpdateUI){
-            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
-            mNeedUpdateUI = false;
-        }
+        UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
+//        if(mNeedUpdateUI){
+//            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
+//            mNeedUpdateUI = false;
+//        }
         //更新进度条
         new ProgeressThread().start();
     }
@@ -358,11 +344,10 @@ public class AudioHolderActivity extends BaseActivity implements UpdateHelper.Ca
 
     @Override
     public void onBackPressed() {
-        //更新动画控件封面 保证退场动画的封面与fragment中封面一致
         if(mPager.getCurrentItem() == 1){
-            if(mIsBacking)
+            if(mIsBacking || mAnimCover == null)
                 return;
-
+            //更新动画控件封面 保证退场动画的封面与fragment中封面一致
             mIsBacking = true;
             mAnimCover.setImageURI(mUri);
 
@@ -628,12 +613,11 @@ public class AudioHolderActivity extends BaseActivity implements UpdateHelper.Ca
         coverFragment.setInflateFinishListener(new OnInflateFinishListener() {
             @Override
             public void onViewInflateFinish(View view) {
-                LogUtil.d(TAG,mOriginRect != null ? "获取数据之前Rect:" + mOriginRect.toString() : "获取数据之前Rect: null" );
                 if(mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
                     //获取传入的界面信息
                     mOriginRect = getIntent().getParcelableExtra("Rect");
                 }
-                LogUtil.d(TAG,mOriginRect != null ? "获取数据之后Rect:" + mOriginRect.toString() : "获取数据之后Rect: null" );
+
                 if(mOriginRect == null)
                     return;
                 // 获取上一个界面中，图片的宽度和高度
@@ -642,7 +626,7 @@ public class AudioHolderActivity extends BaseActivity implements UpdateHelper.Ca
 
                 // 设置 view 的位置，使其和上一个界面中图片的位置重合
                 FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mOriginWidth, mOriginHeight);
-                params.setMargins(mOriginRect.left, mOriginRect.top - StatusBarUtil.getStatusBarHeight(AudioHolderActivity.this), mOriginRect.right, mOriginRect.bottom);
+                params.setMargins(mOriginRect.left, mOriginRect.top - StatusBarUtil.getStatusBarHeight(mContext), mOriginRect.right, mOriginRect.bottom);
                 mAnimCover.setLayoutParams(params);
 
                 //获得终点控件的位置信息
@@ -782,11 +766,11 @@ public class AudioHolderActivity extends BaseActivity implements UpdateHelper.Ca
         mIsPlay = isplay;
         //两种情况下更新ui
         //一是activity在前台  二是activity暂停后有更新的动作，当activity重新回到前台后更新ui
-        if(!mIsRunning){
-            mNeedUpdateUI = true;
+        if(!mIsRunning || mInfo == null){
+//            mNeedUpdateUI = true;
             return;
         }
-        if(mNeedUpdateUI || mIsRunning){
+        if(/**mNeedUpdateUI ||*/ mIsRunning){
             //当操作不为播放或者暂停且正在运行时，更新所有控件
             if((Global.getOperation() != Constants.PLAYORPAUSE  || mFistStart) && mInfo != null ) {
                 //更新顶部信息

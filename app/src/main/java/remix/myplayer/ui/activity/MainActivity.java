@@ -172,6 +172,10 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,7 +213,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private void initLastSong() {
         //第一次打开软件，播放队列以及正在播放歌曲都为空
         mIsFirstCreateActivity = false;
-
         if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
             return;
 
@@ -230,7 +233,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
         boolean isPlay = !mIsFirst && MusicService.getIsplay();
         mIsFirst = false;
-        MP3Item item = null;
+        MP3Item item;
         //上次退出时保存的正在播放的歌曲未失效
         if(isLastSongExist && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
             mBottomBar.UpdateBottomStatus(item, isPlay);
@@ -468,7 +471,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      * 初始化控件相关颜色
      */
     private void setUpViewColor() {
-
         //正在播放文字的背景
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(ThemeStore.getAccentColor());
@@ -582,7 +584,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             return;
         mHeadText.setText(getString(R.string.play_now,mp3Item.getTitle()));
         new AsynLoadImage(mHeadImg).execute(mp3Item.getAlbumId(), Constants.URL_ALBUM);
-        mHeadImg.setBackgroundResource(isPlay ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
+        mHeadImg.setBackgroundResource(isPlay && ThemeStore.isDay() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
 
     }
 

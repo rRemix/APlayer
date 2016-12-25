@@ -1,7 +1,6 @@
 package remix.myplayer.ui.activity;
 
 import android.app.LoaderManager;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -30,7 +29,6 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;

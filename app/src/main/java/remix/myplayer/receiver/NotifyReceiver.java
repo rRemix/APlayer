@@ -15,7 +15,7 @@ import remix.myplayer.R;
 import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.activity.AudioHolderActivity;
+import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -116,9 +116,9 @@ public class NotifyReceiver extends BroadcastReceiver {
                         .setSmallIcon(R.drawable.notifbar_icon);
                 //点击通知栏打开播放界面
                 //后退回到主界面
-                Intent result = new Intent(context,AudioHolderActivity.class);
+                Intent result = new Intent(context,PlayerActivity.class);
                 TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-                stackBuilder.addParentStack(AudioHolderActivity.class);
+                stackBuilder.addParentStack(PlayerActivity.class);
                 stackBuilder.addNextIntent(result);
                 stackBuilder.editIntentAt(1).putExtra("Notify", true);
                 stackBuilder.editIntentAt(1).putExtra("Rect",BottomActionBarFragment.getCoverRect());

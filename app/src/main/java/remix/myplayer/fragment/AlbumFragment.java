@@ -23,9 +23,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.AlbumAdater;
-import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.helper.DeleteHelper;
-import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
@@ -41,7 +40,7 @@ import remix.myplayer.util.SPUtil;
 /**
  * 专辑Fragment
  */
-public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback {
+public class AlbumFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback {
     @BindView(R.id.album_recycleview)
     RecyclerView mRecycleView;
     //列表显示与网格显示切换
@@ -49,25 +48,30 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     ImageButton mListModelBtn;
     @BindView(R.id.grid_model)
     ImageButton mGridModelBtn;
+    @BindView(R.id.divider)
+    View mDivider;
     //当前列表模式 1:列表 2:网格
     public static int ListModel = 2;
-    private Cursor mCursor = null;
+
     //专辑名 专辑id 艺术家对应的索引
     public static int mAlbumIdIndex = -1;
     public static int mAlbumIndex = -1;
     public static int mArtistIndex = -1;
-    private AlbumAdater mAdapter;
+
+//    private Cursor mCursor;
+//    private AlbumAdater mAdapter;
     private MultiChoice mMultiChoice;
+    private static int LOADER_ID = 0;
 
     public static final String TAG = AlbumFragment.class.getSimpleName();
-    private static int LOADER_ID = 1;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        //初始化LoaderManager
-        getLoaderManager().initLoader(LOADER_ID++, null, this);
-    }
+        CURRENT_ID = ++LOADER_ID;
+        getLoaderManager().initLoader(CURRENT_ID, null, (LoaderManager.LoaderCallbacks) this);
 
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,9 +86,8 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         View rootView = inflater.inflate(R.layout.fragment_album,null);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-        rootView.findViewById(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
-
-        ListModel = SPUtil.getValue(getActivity(),"Setting","AlbumModel",2);
+        ListModel = SPUtil.getValue(getActivity(),"Setting","AlbumModel",Constants.GRID_MODEL);
+        mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
         mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         if(getActivity() instanceof MultiChoiceActivity){
@@ -145,9 +148,8 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
         ListModel = newModel;
         mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-
         mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-
+        mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
         SPUtil.putValue(getActivity(),"Setting","AlbumModel",ListModel);
     }
 
@@ -155,7 +157,6 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         //根据专辑id 创建Loader
         try {
-            String arg = MediaStoreUtil.getDeleteID();
             return  new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,
                             MediaStore.Audio.Media.ALBUM,
@@ -172,14 +173,14 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(data == null)
+        if(data == null || loader.getId() != CURRENT_ID)
             return;
         //查询完毕后保存结果，并设置查询索引
         try {
             mCursor = data;
-            mAlbumIdIndex = data.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-            mAlbumIndex = data.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-            mArtistIndex = data.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            mAlbumIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+            mAlbumIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
+            mArtistIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
             mAdapter.setCursor(mCursor);
         } catch (Exception e){
             e.printStackTrace();
@@ -189,24 +190,26 @@ public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        if (mAdapter != null)
+        if(mAdapter != null){
             mAdapter.setCursor(null);
+        }
     }
 
     @Override
     public AlbumAdater getAdapter(){
-        return mAdapter;
+        return (AlbumAdater) mAdapter;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if(mCursor != null)
-            mCursor.close();
-    }
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        if(mAdapter != null)
+//            mAdapter.setCursor(null);
+//    }
 
     @Override
     public void OnDelete() {
-        getLoaderManager().restartLoader(LOADER_ID,null,this);
+        CURRENT_ID = ++LOADER_ID;
+        getLoaderManager().initLoader(CURRENT_ID, null, this);
     }
 }

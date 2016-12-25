@@ -6,7 +6,6 @@ import android.os.Handler;
 
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**

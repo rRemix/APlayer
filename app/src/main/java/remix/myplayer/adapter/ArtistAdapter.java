@@ -175,14 +175,14 @@ public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
         }
     }
 
-    public static class ArtistListHolder extends ArtistHolder{
-        public ArtistListHolder(View v) {
+    static class ArtistListHolder extends ArtistHolder{
+        ArtistListHolder(View v) {
             super(v);
         }
     }
 
-    public static class ArtistGridHolder extends ArtistHolder{
-        public ArtistGridHolder(View v) {
+    static class ArtistGridHolder extends ArtistHolder{
+        ArtistGridHolder(View v) {
             super(v);
         }
     }

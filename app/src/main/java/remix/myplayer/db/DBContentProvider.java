@@ -1,19 +1,13 @@
 package remix.myplayer.db;
 
-import android.app.LoaderManager;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Loader;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.annotation.Nullable;
-
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
 
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.util.LogUtil;

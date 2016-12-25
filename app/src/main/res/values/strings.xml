@@ -137,5 +137,10 @@
     <string name="about_info">关于</string>
     <string name="check_update">检查更新</string>
     <string name="clear_cache">清除缓存</string>
+    <string name="donate">捐赠</string>
+    <string name="choose">选择</string>
+    <string name="donate_tip">您的支持，是我们进步的动力。</string>
+    <string name="copy_account">复制支付宝账户(*博睿)</string>
+    <string name="alread_copy">已复制到剪切板</string>
 
 </resources>

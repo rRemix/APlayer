@@ -22,7 +22,6 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ChildHolderAdapter;
 import remix.myplayer.fragment.BottomActionBarFragment;
-import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
@@ -166,7 +165,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                 .progress(true, 0)
                 .backgroundColorAttr(R.attr.background_color_3)
                 .progressIndeterminateStyle(false).build();
-        new GetSongListThread().start();
 
         //初始化底部状态栏
         mBottombar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
@@ -265,6 +263,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         MobclickAgent.onPageStart(ChildHolderActivity.class.getSimpleName());
         super.onResume();
         mIsRunning = true;
+        new GetSongListThread().start();
     }
 
     @Override

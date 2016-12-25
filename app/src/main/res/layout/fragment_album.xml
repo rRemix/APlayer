@@ -33,11 +33,7 @@
             android:layout_height="1px"
             android:background="?attr/divider_color"/>
     </RelativeLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/d1_size"
-        android:background="?attr/divider_color"/>
+    
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"

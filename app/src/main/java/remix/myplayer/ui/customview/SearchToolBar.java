@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import remix.myplayer.R;
-import remix.myplayer.theme.Theme;
 
 /**
  * Created by taeja on 16-2-29.

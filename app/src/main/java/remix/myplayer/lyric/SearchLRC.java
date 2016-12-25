@@ -15,8 +15,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.MP3Item;
@@ -63,11 +61,12 @@ public class SearchLRC {
                     URLEncoder.encode(mInfo.getTitle(), "utf-8"),
                     URLEncoder.encode(mInfo.getArtist(), "utf-8"));
             if(lrcid != null && lrcid.getInt("count") > 0 && lrcid.getInt("code") == 0){
-                String url = lrcid.getJSONArray("result").getJSONObject(0).getString("lrc");
-                Matcher matcher = Pattern.compile("[0-9]").matcher(url);
-                if(matcher.find()){
-                    return url.substring(matcher.start());
-                }
+//                String url = lrcid.getJSONArray("result").getJSONObject(0).getString("lrc");
+//                Matcher matcher = Pattern.compile("[0-9]").matcher(url);
+//                if(matcher.find()){
+//                    return url.substring(matcher.start());
+//                }
+                return lrcid.getJSONArray("result").getJSONObject(0).getString("lrc");
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -84,7 +83,7 @@ public class SearchLRC {
         //先判断该歌曲是否有缓存
         try {
             DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(CommonUtil.hashKeyForDisk(mSongName + "/" + mArtistName));
-            if(snapShot != null && (br = new BufferedReader(new InputStreamReader(snapShot.getInputStream(0)))) != null ){
+             if(snapShot != null && (br = new BufferedReader(new InputStreamReader(snapShot.getInputStream(0)))) != null ){
                 return mLrcBuilder.getLrcRows(br,false,mSongName,mArtistName);
             }
         } catch (IOException e) {
@@ -130,10 +129,11 @@ public class SearchLRC {
         }
 
        //没有缓存，下载并解析歌词
-        String arg = getLrcUrl();
-        if(arg == null || arg.equals(""))
-            return null;
-        String lrcUrl = LRC_REQUEST_ROOT + arg;
+//        String arg = getLrcUrl();
+//        if(arg == null || arg.equals(""))
+//            return null;
+//        String lrcUrl = LRC_REQUEST_ROOT + arg;
+        String lrcUrl = getLrcUrl();
 
         URL url;
         try {

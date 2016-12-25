@@ -1,6 +1,9 @@
 package remix.myplayer.ui.activity;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -97,7 +100,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         ButterKnife.bind(this);
         setUpToolbar(mToolbar,"设置");
 
-
         //读取重启aitivity之前的数据
         if(savedInstanceState != null){
             mNeedRecreate = savedInstanceState.getBoolean("needRecreate");
@@ -123,7 +125,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         //初始化箭头颜色
         final int arrowColor = ThemeStore.getAccentColor();
         ButterKnife.apply( new ImageView[]{findView(R.id.setting_eq_arrow),findView(R.id.setting_feedback_arrow),
-                        findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow)},
+                        findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow),findView(R.id.setting_donate_arrow)},
                 new ButterKnife.Action<ImageView>(){
                     @Override
                     public void apply(@NonNull ImageView view, int index) {
@@ -185,7 +187,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_container,
             R.id.setting_feedback_container,R.id.setting_about_container, R.id.setting_update_container,
-            R.id.setting_eq_container,R.id.setting_lrc_container,R.id.setting_clear_container})
+            R.id.setting_eq_container,R.id.setting_lrc_container,R.id.setting_clear_container,R.id.setting_donate_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -225,16 +227,16 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //选择主色调
             case R.id.setting_color_container:
-                startActivityForResult(new Intent(SettingActivity.this, ColorChooseDialog.class),0);
+                startActivityForResult(new Intent(this, ColorChooseDialog.class),0);
                 break;
             //通知栏底色
             case R.id.setting_notify_container:
                 try {
                     MobclickAgent.onEvent(this,"NotifyColor");
                     new MaterialDialog.Builder(this)
-                            .title("通知栏底色")
+                            .title(R.string.notify_bg_color)
                             .titleColorAttr(R.attr.text_color_primary)
-                            .positiveText("选择")
+                            .positiveText(R.string.choose)
                             .positiveColorAttr(R.attr.text_color_primary)
                             .buttonRippleColorAttr(R.attr.ripple_color)
                             .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
@@ -268,11 +270,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //意见与反馈
             case R.id.setting_feedback_container:
-                startActivity(new Intent(SettingActivity.this,FeedBakActivity.class));
+                startActivity(new Intent(this,FeedBakActivity.class));
                 break;
             //关于我们
             case R.id.setting_about_container:
-                startActivity(new Intent(SettingActivity.this,AboutActivity.class));
+                startActivity(new Intent(this,AboutActivity.class));
                 break;
             //检查更新
             case R.id.setting_update_container:
@@ -282,19 +284,42 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     public void onUpdateReturned(int updateStatus, UpdateResponse updateInfo) {
                         // TODO Auto-generated method stub
                         if(updateStatus == UpdateStatus.No){
-                            ToastUtil.show(SettingActivity.this,getString(R.string.no_update));
+                            ToastUtil.show(mContext,getString(R.string.no_update));
                         }else if(updateStatus == UpdateStatus.IGNORED){
-                            ToastUtil.show(SettingActivity.this,getString(R.string.update_ignore));
+                            ToastUtil.show(mContext,getString(R.string.update_ignore));
                         }else if(updateStatus == UpdateStatus.TimeOut){
-                            ToastUtil.show(SettingActivity.this,R.string.updat_error);
+                            ToastUtil.show(mContext,R.string.updat_error);
                         }
                     }
                 });
                 BmobUpdateAgent.forceUpdate(this);
                 break;
+            //捐赠
+            case R.id.setting_donate_container:
+                new MaterialDialog.Builder(this)
+                        .title(R.string.donate)
+                        .titleColorAttr(R.attr.text_color_primary)
+                        .positiveText(R.string.copy_account)
+                        .negativeText(R.string.cancel)
+                        .content(R.string.donate_tip)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                ClipboardManager clipboardManager = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+                                ClipData clipData = ClipData.newPlainText("text", "568920427@qq.com(*博睿)");
+                                clipboardManager.setPrimaryClip(clipData);
+                                ToastUtil.show(mContext,getString(R.string.alread_copy));
+                            }
+                        })
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .negativeColorAttr(R.attr.text_color_primary)
+                        .contentColorAttr(R.attr.text_color_primary)
+                        .show();
+                break;
             //清除缓存
             case R.id.setting_clear_container:
-                new MaterialDialog.Builder(SettingActivity.this)
+                new MaterialDialog.Builder(this)
                         .content(R.string.confirm_clear_cache)
                         .positiveText(R.string.confirm)
                         .negativeText(R.string.cancel)

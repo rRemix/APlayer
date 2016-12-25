@@ -25,7 +25,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.ArtistAdapter;
 import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
@@ -41,29 +40,37 @@ import remix.myplayer.util.SPUtil;
 /**
  * 艺术家Fragment
  */
-public class ArtistFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback{
+public class ArtistFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback{
     @BindView(R.id.artist_recycleview)
     RecyclerView mRecycleView;
-    Cursor mCursor = null;
+
     //艺术家与艺术家id的索引
     public static int mArtistIdIndex = -1;
     public static int mArtistIndex = -1;
-    private ArtistAdapter mAdapter;
+
     public static final String TAG = ArtistFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
+
+    private static int LOADER_ID = 0;
+//    private ArtistAdapter mAdapter;
+//    private Cursor mCursor;
 
     //列表显示与网格显示切换
     @BindView(R.id.list_model)
     ImageView mListModelBtn;
     @BindView(R.id.grid_model)
     ImageView mGridModelBtn;
+    @BindView(R.id.divider)
+    View mDivider;
     //当前列表模式 1:列表 2:网格
     public static int ListModel = 2;
-    private static int LOADER_ID = 1;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        getLoaderManager().initLoader(++LOADER_ID, null, this);
+        CURRENT_ID = ++LOADER_ID;
+        getLoaderManager().initLoader(CURRENT_ID, null, (LoaderManager.LoaderCallbacks) this);
+
     }
 
     @Override
@@ -79,9 +86,8 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         View rootView = inflater.inflate(R.layout.fragment_artist,null);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-        rootView.findViewById(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
-
-        ListModel = SPUtil.getValue(getActivity(),"Setting","ArtistModel",2);
+        ListModel = SPUtil.getValue(getActivity(),"Setting","ArtistModel",Constants.GRID_MODEL);
+        mDivider.findViewById(R.id.divider).setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
         mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
         mRecycleView.setItemAnimator(new DefaultItemAnimator());
         if(getActivity() instanceof MultiChoiceActivity){
@@ -136,7 +142,7 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
         ListModel = newModel;
         mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
         mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-
+        mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
         mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
         SPUtil.putValue(getActivity(),"Setting","ArtistModel",ListModel);
     }
@@ -165,29 +171,37 @@ public class ArtistFragment extends BaseFragment implements LoaderManager.Loader
     }
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(data != null)
-            mCursor = data;
-        //设置查询索引
-        mArtistIdIndex = data.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
-        mArtistIndex = data.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-        mAdapter.setCursor(mCursor);
+        if(data == null || loader.getId() != CURRENT_ID)
+            return;
+        mCursor = data;
+        try {
+            //设置查询索引
+            mArtistIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
+            mArtistIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            mAdapter.setCursor(mCursor);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
 
     @Override
     public ArtistAdapter getAdapter(){
-        return mAdapter;
+        return (ArtistAdapter) mAdapter;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if(mCursor != null)
-            mCursor.close();
-    }
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        if(mAdapter != null){
+//            mAdapter.setCursor(null);
+//        }
+//    }
 
     @Override
     public void OnDelete() {
-        getLoaderManager().restartLoader(LOADER_ID,null,this);
+        CURRENT_ID = ++LOADER_ID;
+        getLoaderManager().initLoader(CURRENT_ID, null, this);
     }
 }

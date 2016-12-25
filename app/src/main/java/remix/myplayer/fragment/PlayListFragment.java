@@ -23,9 +23,7 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.db.PlayLists;
-import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
@@ -40,12 +38,12 @@ import remix.myplayer.util.ToastUtil;
  * @Author Xiaoborui
  * @Date 2016/10/8 09:46
  */
-public class PlayListFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class PlayListFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>{
     public static final String TAG = PlayListFragment.class.getSimpleName();
     public static int mPlayListIDIndex;
     public static int mPlayListNameIndex;
     public static int mPlayListSongCountIndex;
-    private Cursor mCursor;
+
     @BindView(R.id.playlist_recycleview)
     RecyclerView mRecyclerView;
 
@@ -54,17 +52,21 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
     ImageView mListModelBtn;
     @BindView(R.id.grid_model)
     ImageView mGridModelBtn;
+    @BindView(R.id.divider)
+    View mDivider;
     //当前列表模式 1:列表 2:网格
     public static int ListModel = 2;
 
-    private PlayListAdapter mAdapter;
+//    private Cursor mCursor;
+//    private PlayListAdapter mAdapter;
+    private static int LOADER_ID = 0;
     private MultiChoice mMultiChoice;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mPageName = TAG;
-        getLoaderManager().initLoader(++LOADER_ID, null, this);
+        CURRENT_ID = ++LOADER_ID;
+        getLoaderManager().initLoader(CURRENT_ID, null, (LoaderManager.LoaderCallbacks) this);
     }
 
     @Nullable
@@ -73,16 +75,14 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
         View rootView = inflater.inflate(R.layout.fragment_playlist,null);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-        rootView.findViewById(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
-
-        ListModel = SPUtil.getValue(getActivity(),"Setting","PlayListModel",2);
+        ListModel = SPUtil.getValue(getActivity(),"Setting","PlayListModel",Constants.GRID_MODEL);
+        mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
         mRecyclerView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
 
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
         mAdapter = new PlayListAdapter(getActivity(),mMultiChoice);
-
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -157,6 +157,7 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
                 mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
                 mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
                 mRecyclerView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+                mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
                 SPUtil.putValue(getActivity(),"Setting","PlayListModel",ListModel);
                 break;
 
@@ -182,9 +183,9 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
         //查询完毕后保存结果，并设置查询索引
         try {
             mCursor = data;
-            mPlayListIDIndex = data.getColumnIndex(PlayLists.PlayListColumns._ID);
-            mPlayListNameIndex = data.getColumnIndex(PlayLists.PlayListColumns.NAME);
-            mPlayListSongCountIndex = data.getColumnIndex(PlayLists.PlayListColumns.COUNT);
+            mPlayListIDIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns._ID);
+            mPlayListNameIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns.NAME);
+            mPlayListSongCountIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns.COUNT);
             mAdapter.setCursor(data);
         } catch (Exception e){
             e.printStackTrace();
@@ -197,15 +198,12 @@ public class PlayListFragment extends BaseFragment implements LoaderManager.Load
             mAdapter.setCursor(null);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if(mCursor != null) {
-            mCursor.close();
-        }
-        if(mAdapter != null){
-            mAdapter.setCursor(null);
-        }
-    }
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        if(mAdapter != null){
+//            mAdapter.setCursor(null);
+//        }
+//    }
 
 }

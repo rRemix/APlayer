@@ -16,6 +16,7 @@ import remix.myplayer.util.PlayListUtil;
 public class DBObserver extends ContentObserver {
     private static OnChangeListener mPlayListListener;
     private static OnChangeListener mPlayListSongListener;
+    private Handler mHandler;
     /**
      * Creates a content observer.
      *
@@ -23,6 +24,7 @@ public class DBObserver extends ContentObserver {
      */
     public DBObserver(Handler handler) {
         super(handler);
+        mHandler = handler;
     }
 
 
@@ -49,6 +51,7 @@ public class DBObserver extends ContentObserver {
                                 mPlayListSongListener.OnChange();
                             break;
                     }
+                    mHandler.sendEmptyMessage(Constants.UPDATE_CHILDHOLDER_ADAPTER);
                 }
             }.start();
         }

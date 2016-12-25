@@ -4,9 +4,7 @@ import android.app.Activity;
 
 import java.util.ArrayList;
 
-import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.service.MusicService;
 
 /**
  * Created by taeja on 16-3-21.

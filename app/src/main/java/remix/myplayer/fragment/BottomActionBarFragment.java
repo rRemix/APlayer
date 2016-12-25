@@ -25,7 +25,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.AudioHolderActivity;
+import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.MediaStoreUtil;
 
@@ -82,7 +82,7 @@ public class BottomActionBarFragment extends BaseFragment{
             public void onClick(View v) {
                 if(MusicService.getCurrentMP3() == null)
                     return;
-                Intent intent = new Intent(v.getContext(), AudioHolderActivity.class);
+                Intent intent = new Intent(v.getContext(), PlayerActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("MP3Item",MusicService.getCurrentMP3());
                 intent.putExtras(bundle);
@@ -94,7 +94,6 @@ public class BottomActionBarFragment extends BaseFragment{
                 ActivityOptionsCompat options = ActivityOptionsCompat
                         .makeSceneTransitionAnimation(getActivity(), mCover, "image");
                 ActivityCompat.startActivity(getActivity(), intent, options.toBundle());
-
             }
         });
         //播放按钮
@@ -136,7 +135,6 @@ public class BottomActionBarFragment extends BaseFragment{
         }
         //封面
         MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
-
     }
 
     public static Rect getCoverRect(){

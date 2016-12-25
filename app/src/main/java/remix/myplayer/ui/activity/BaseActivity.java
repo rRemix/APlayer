@@ -14,7 +14,6 @@ import com.umeng.analytics.MobclickAgent;
 import remix.myplayer.BuildConfig;
 import remix.myplayer.R;
 import remix.myplayer.manager.ActivityManager;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.StatusBarUtil;
 

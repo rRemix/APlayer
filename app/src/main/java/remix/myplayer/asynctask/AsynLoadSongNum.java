@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * @ClassName
@@ -26,18 +27,15 @@ public class AsynLoadSongNum extends AsyncTask<Integer, Integer, Integer> {
     @Override
     protected Integer doInBackground(Integer... params) {
         ContentResolver resolver = APlayerApplication.getContext().getContentResolver();
-        boolean isAlbuum = mType == Constants.ALBUM;
+        boolean isAlbum = mType == Constants.ALBUM;
         Cursor cursor = null;
         try {
-            cursor = resolver.query(isAlbuum ? MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI : MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
-                    isAlbuum ? new String[]{MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS} :new String[]{MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS},
-                    isAlbuum ? MediaStore.Audio.Albums._ID + "=" + params[0] : MediaStore.Audio.Artists._ID + "=" + params[0],
+            cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    new String[]{MediaStore.Audio.Media._ID},
+                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID()
+                    + " and " + (isAlbum ? MediaStore.Audio.Media.ALBUM_ID  : MediaStore.Audio.Media.ARTIST_ID)+ "=" + params[0],
                     null,null);
-            if(cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()){
-                return cursor.getInt(cursor.getColumnIndex(isAlbuum ? MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS : MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS));
-            } else {
-                return 0;
-            }
+            return cursor != null ? cursor.getCount() : 0;
         } catch (Exception e){
             e.printStackTrace();
         } finally {

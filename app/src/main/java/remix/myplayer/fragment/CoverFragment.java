@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.model.MP3Item;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -67,8 +68,9 @@ public class CoverFragment extends BaseFragment {
                 return true;
             }
         });
-        return rootView;
+        mImage.getHierarchy().setFailureImage(ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night);
 
+        return rootView;
     }
 
     public void setInflateFinishListener(OnInflateFinishListener l){
@@ -129,7 +131,7 @@ public class CoverFragment extends BaseFragment {
             outAnim.setEndValue(endValue);
         } else {
             mImage.setImageURI(mUri);
-            mShadow.setVisibility(View.VISIBLE);
+            mShadow.setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.INVISIBLE);
         }
     }
 

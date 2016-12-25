@@ -1,7 +1,6 @@
 package remix.myplayer.model;
 
 import cn.bmob.v3.BmobObject;
-import remix.myplayer.util.DiskCache;
 
 /**
  * Created by Remix on 2016/12/1.

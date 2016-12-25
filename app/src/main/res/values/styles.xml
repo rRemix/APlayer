@@ -84,7 +84,6 @@
         <item name="textAllCaps">true</item>
     </style>
 
-
     <style name="AnimBottom" parent="@android:style/Animation">
         <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
         <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
@@ -124,7 +123,6 @@
         <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
     </style>
 
-    <style name="AudioHolderStyle.Day" parent="DayTheme"/>
     <style name="AudioHolderStyle.Night" parent="NightTheme">
         <item name="colorControlActivated">@color/white</item>
         <item name="colorControlNormal">@color/white_f2f2f2</item>
