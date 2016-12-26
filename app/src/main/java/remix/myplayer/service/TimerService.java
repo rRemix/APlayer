@@ -45,7 +45,6 @@ public class TimerService extends BaseService {
      */
     public static long mStartTime;
 
-    public static TimerService mInstance;
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -56,7 +55,6 @@ public class TimerService extends BaseService {
     public void onCreate() {
         super.onCreate();
         //添加到servicemanager
-        mInstance = this;
         mReceiver = new TimerReceiver();
         IntentFilter filter = new IntentFilter(Constants.CONTROL_TIMER);
         registerReceiver(mReceiver,filter);

@@ -85,6 +85,7 @@ public class OptionDialog extends BaseDialogActivity {
         mDraweeView.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId()));
         //置于底部
         Window w = getWindow();
+        w.setWindowAnimations(R.style.AnimBottom);
         WindowManager wm = getWindowManager();
         Display display = wm.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();

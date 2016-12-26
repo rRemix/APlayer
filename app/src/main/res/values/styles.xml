@@ -28,7 +28,6 @@
         <item name="divider_color">@color/day_list_divider</item>
     </style>
 
-
     <!--dialog夜间模式-->
     <style name="Dialog.NightTheme" parent="BaseDialogTheme">
         <item name="background_color_main">@color/night_background_color_main</item>
@@ -67,7 +66,6 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-
     <style name="AudioHolderStyle" parent="ActivityStyle">
         <item name="android:windowIsTranslucent">true</item>
     </style>
@@ -87,6 +85,11 @@
     <style name="AnimBottom" parent="@android:style/Animation">
         <item name="android:windowEnterAnimation">@anim/slide_bottom_in</item>
         <item name="android:windowExitAnimation">@anim/slide_bottom_out</item>
+    </style>
+
+    <style name="AnimPopup">
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
     </style>
 
     <!--锁屏-->
@@ -112,7 +115,7 @@
 
     <!--popup_style-->
 
-    <style name="ActivityAnim">
+    <style name="AnimActivity">
         <item name="android:activityOpenExitAnimation">@anim/slide_left_out</item>
         <item name="android:activityOpenEnterAnimation">@anim/slide_left_in</item>
         <item name="android:activityCloseExitAnimation">@anim/slide_right_out</item>
@@ -120,7 +123,7 @@
     </style>
 
     <style name="ActivityStyle" parent="@style/AppTheme">
-        <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
+        <item name="android:windowAnimationStyle">@style/AnimActivity</item>
     </style>
 
     <style name="AudioHolderStyle.Night" parent="NightTheme">
@@ -150,7 +153,7 @@
         <item name="ripple_color">@color/day_ripple_color</item>
         <item name="divider_color">@color/day_list_divider</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Light</item>
-        <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
+        <item name="android:windowAnimationStyle">@style/AnimActivity</item>
     </style>
 
 
@@ -177,7 +180,7 @@
         <item name="divider_color">@color/night_list_divier</item>
         <item name="stress_color">@color/purple_555393</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Dark</item>
-        <item name="android:windowAnimationStyle">@style/ActivityAnim</item>
+        <item name="android:windowAnimationStyle">@style/AnimActivity</item>
         <item name="android:textColor">@color/purple_555393</item>
         <item name="colorControlActivated">@color/purple_555393</item>
         <item name="colorAccent">@color/purple_555393</item>

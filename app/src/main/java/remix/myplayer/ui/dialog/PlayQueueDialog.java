@@ -36,7 +36,6 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
     @BindView(R.id.bottom_actionbar_play_list)
     RecyclerView mRecyclerView;
     private PlayQueueAdapter mAdapter;
-    public static PlayQueueDialog mInstance;
     Cursor mCursor = null;
     public static int mAudioIdIndex;
     private static int LOADER_ID = 0;
@@ -47,7 +46,6 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         setContentView(R.layout.dialog_playqueue);
         ButterKnife.bind(this);
 
-        mInstance = this;
         mAdapter = new PlayQueueAdapter(this);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
@@ -73,6 +71,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
 
         //改变播放列表高度，并置于底部
         Window w = getWindow();
+        w.setWindowAnimations(R.style.AnimBottom);
         WindowManager wm = getWindowManager();
         Display display = wm.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();

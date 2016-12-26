@@ -321,11 +321,11 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         super.onResume();
         //更新界面
         mIsRunning = true;
-        UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
-//        if(mNeedUpdateUI){
-//            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
-//            mNeedUpdateUI = false;
-//        }
+//        UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
+        if(mNeedUpdateUI){
+            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
+            mNeedUpdateUI = false;
+        }
         //更新进度条
         new ProgeressThread().start();
     }
@@ -758,7 +758,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mPager.setCurrentItem(1);
     }
 
-
     //更新界面
     @Override
     public void UpdateUI(MP3Item mp3Item, boolean isplay){
@@ -767,41 +766,39 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         //两种情况下更新ui
         //一是activity在前台  二是activity暂停后有更新的动作，当activity重新回到前台后更新ui
         if(!mIsRunning || mInfo == null){
-//            mNeedUpdateUI = true;
+            mNeedUpdateUI = true;
             return;
         }
-        if(/**mNeedUpdateUI ||*/ mIsRunning){
-            //当操作不为播放或者暂停且正在运行时，更新所有控件
-            if((Global.getOperation() != Constants.PLAYORPAUSE  || mFistStart) && mInfo != null ) {
-                //更新顶部信息
-                UpdateTopStatus(mInfo);
-                //更新歌词
-                ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
-                //更新进度条
-                int temp = MusicService.getProgress();
-                mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
-                mDuration = (int) mInfo.getDuration();
-                mSeekBar.setMax(mDuration);
-                //更新下一首歌曲
-                if(MusicService.getNextMP3() != null){
-                    mNextSong.setText("下一首：" + MusicService.getNextMP3().getTitle());
-                }
-                new Thread(){
-                    @Override
-                    public void run() {
-                        File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(),Constants.URL_ALBUM);
-                        if(imgFile.exists()) {
-                            mUri = Uri.parse("file:///" +  imgFile);
-                        } else {
-                            mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
-                        }
-                        mCoverHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
-                    }
-                }.start();
+        //当操作不为播放或者暂停且正在运行时，更新所有控件
+        if((Global.getOperation() != Constants.PLAYORPAUSE  || mFistStart) && mInfo != null ) {
+            //更新顶部信息
+            UpdateTopStatus(mInfo);
+            //更新歌词
+            ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
+            //更新进度条
+            int temp = MusicService.getProgress();
+            mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
+            mDuration = (int) mInfo.getDuration();
+            mSeekBar.setMax(mDuration);
+            //更新下一首歌曲
+            if(MusicService.getNextMP3() != null){
+                mNextSong.setText("下一首：" + MusicService.getNextMP3().getTitle());
             }
-            //更新按钮状态
-            UpdatePlayButton(isplay);
+            new Thread(){
+                @Override
+                public void run() {
+                    File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(),Constants.URL_ALBUM);
+                    if(imgFile.exists()) {
+                        mUri = Uri.parse("file:///" +  imgFile);
+                    } else {
+                        mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
+                    }
+                    mCoverHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+                }
+            }.start();
         }
+        //更新按钮状态
+        UpdatePlayButton(isplay);
     }
 
 

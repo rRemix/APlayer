@@ -56,7 +56,6 @@ import remix.myplayer.util.ToastUtil;
  * 分享的Dialog
  */
 public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Response{
-    public static ShareDialog mInstance;
     //四个分享按钮
     @BindView(R.id.share_qq)
     View mQQ;
@@ -83,7 +82,6 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_share);
         ButterKnife.bind(this);
-        mInstance = this;
 
         mInfo = (MP3Item)getIntent().getExtras().getSerializable("MP3Item");
         mType = getIntent().getExtras().getInt("Type");
@@ -93,6 +91,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
 
         //改变高度，并置于底部
         Window w = getWindow();
+        w.setWindowAnimations(R.style.AnimBottom);
         WindowManager wm = getWindowManager();
         Display display = wm.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
