@@ -232,12 +232,6 @@ public class MultiChoice implements OnMultiItemClickListener {
                 }
                 break;
         }
-//        if(TYPE != Constants.PLAYLIST && TYPE != Constants.PLAYLISTSONG) {
-//            for (Integer id : idList) {
-//                if (MediaStoreUtil.delete(id, Constants.SONG))
-//                    num++;
-//            }
-//        }
         ToastUtil.show(mContext,mContext.getString(R.string.delete_multi_song,num));
         if(num > 0){
             DeleteHelper.delete();

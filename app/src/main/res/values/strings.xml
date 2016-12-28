@@ -47,9 +47,9 @@
 
     <string name="load_playlist_error">加载播放列表失败</string>
 
-    <string name="confirm_delete_playlist">确认从%s移除?</string>
-    <string name="delete_success">删除成功</string>
-    <string name="delete_error">删除失败</string>
+    <string name="confirm_delete_from_playlist_or_library">确认从%s移除?</string>
+    <string name="delete_success">移除成功</string>
+    <string name="delete_error">移除失败</string>
     <string name="set_ringtone_success">设置铃声成功</string>
     <string name="set_ringtone_error">设置铃声失败</string>
     <string name="set_success">设置成功</string>
@@ -142,5 +142,8 @@
     <string name="donate_tip">您的支持，是我们进步的动力。</string>
     <string name="copy_account">复制支付宝账户(*博睿)</string>
     <string name="alread_copy">已复制到剪切板</string>
+    <string name="confirm_delete_playlist">是否移除所选播放列表?</string>
+    <string name="confirm_delete_from_playlist">是否从播放列表移除?</string>
+    <string name="confirm_delete_from_library">是否从曲库移除?</string>
 
 </resources>

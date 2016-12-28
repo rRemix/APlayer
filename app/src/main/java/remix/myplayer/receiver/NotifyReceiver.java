@@ -17,6 +17,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
@@ -63,7 +64,8 @@ public class NotifyReceiver extends BroadcastReceiver {
             mRemoteBigView.setImageViewResource(R.id.notify_bg,isSystemColor ? R.drawable.bg_system : R.drawable.bg_black);
             mRemoteView.setImageViewResource(R.id.notify_bg,isSystemColor ? R.drawable.bg_system : R.drawable.bg_black);
             //设置封面
-            Bitmap bitmap = MediaStoreUtil.getAlbumBitmap(temp.getAlbumId(), true);
+            Bitmap bitmap = MediaStoreUtil.getAlbumBitmap(temp.getAlbumId(), false);
+
             if(bitmap != null) {
                 mRemoteBigView.setImageViewBitmap(R.id.notify_image, bitmap);
                 mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);

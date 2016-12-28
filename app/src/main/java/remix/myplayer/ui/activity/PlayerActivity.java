@@ -355,10 +355,14 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             alphaSpring.addListener(new SimpleSpringListener(){
                 @Override
                 public void onSpringActivate(Spring spring) {
+                    if(mContainer == null)
+                        return;
                     mContainer.setAlpha((float) spring.getCurrentValue());
                 }
                 @Override
                 public void onSpringUpdate(Spring spring) {
+                    if(mContainer == null)
+                        return;
                     mContainer.setAlpha((float) spring.getCurrentValue());
                 }
 
@@ -381,6 +385,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             coverSpring.addListener(new SimpleSpringListener(){
                 @Override
                 public void onSpringUpdate(Spring spring) {
+                    if(mAnimCover == null)
+                        return;
                     final double currentVal = spring.getCurrentValue();
                     mAnimCover.setTranslationX((float) (transitionX * currentVal));
                     mAnimCover.setTranslationY((float) (transitionY * currentVal));
@@ -662,6 +668,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 scaleXSpring.addListener(new SimpleSpringListener(){
                     @Override
                     public void onSpringUpdate(Spring spring) {
+                        if(mAnimCover == null)
+                            return;
                         final double currentVal = spring.getCurrentValue();
                         mAnimCover.setTranslationX((float) (transitionX * currentVal));
                         mAnimCover.setTranslationY((float) (transitionY * currentVal));

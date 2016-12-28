@@ -4,14 +4,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.soundcloud.android.crop.Crop;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 
 import remix.myplayer.R;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -40,8 +45,6 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
         ArrayList<Integer> idList = new ArrayList<>();
         //根据不同参数获得歌曲id列表
         idList = MediaStoreUtil.getSongIdList(mId,mType);
-
-
         switch (item.getItemId()) {
             //播放
             case R.id.menu_play:
@@ -66,16 +69,35 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 break;
             //删除
             case R.id.menu_delete:
-                if(mId == Global.mMyLoveID && mType == Constants.PLAYLIST){
-                    ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delelte));
-                    return true;
-                }
-                if(mType != Constants.PLAYLIST){
-                    ToastUtil.show(mContext,MediaStoreUtil.delete(mId , mType) > 0 ? R.string.delete_success : R.string.delete_error);
-//                    DeleteHelper.onChange();
-                } else {
-                    ToastUtil.show(mContext,PlayListUtil.deletePlayList(mId) ? R.string.delete_success : R.string.delete_error);
-                }
+                new MaterialDialog.Builder(mContext)
+                        .content(mType == Constants.PLAYLIST ? R.string.confirm_delete_playlist : R.string.confirm_delete_from_library)
+                        .buttonRippleColor(ThemeStore.getRippleColor())
+                        .positiveText(R.string.confirm)
+                        .negativeText(R.string.cancel)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                MobclickAgent.onEvent(mContext,"Delete");
+                                if(mId == Global.mMyLoveID && mType == Constants.PLAYLIST){
+                                    ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delelte));
+                                }
+                                if(mType != Constants.PLAYLIST){
+                                    ToastUtil.show(mContext,MediaStoreUtil.delete(mId , mType) > 0 ? R.string.delete_success : R.string.delete_error);
+                                } else {
+                                    ToastUtil.show(mContext,PlayListUtil.deletePlayList(mId) ? R.string.delete_success : R.string.delete_error);
+                                }
+                            }
+                        })
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            }
+                        })
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .negativeColorAttr(R.attr.text_color_primary)
+                        .contentColorAttr(R.attr.text_color_primary)
+                        .show();
                 break;
             //设置封面
             case R.id.menu_album_thumb:

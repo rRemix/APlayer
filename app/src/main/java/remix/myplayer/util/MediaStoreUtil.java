@@ -7,6 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
@@ -276,32 +277,6 @@ public class MediaStoreUtil {
         return url;
     }
 
-    //根据专辑id查询图片
-//    public static Bitmap CheckBitmapByAlbumId(int albumId, boolean isthumb) {
-//        try {
-//            Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId);
-//            ParcelFileDescriptor pfd = mContext.getContentResolver().openFileDescriptor(uri, "r");
-//            if (pfd != null) {
-//                FileDescriptor fd = pfd.getFileDescriptor();
-//                Bitmap bm = BitmapFactory.decodeFileDescriptor(fd);
-//                if(bm == null)
-//                    return null;
-//                Bitmap thumb;
-//                if(isthumb)
-//                    thumb = Bitmap.createScaledBitmap(bm, 150, 150, true);
-//                else
-//                    thumb = Bitmap.createScaledBitmap(bm, 350, 350, true);
-//                return thumb;
-//            }
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
-
     /**
      * 根据歌曲id查询图片
      * @param albumId 专辑id
@@ -323,7 +298,6 @@ public class MediaStoreUtil {
                 FileDescriptor fd = pfd.getFileDescriptor();
                 bm = BitmapFactory.decodeFileDescriptor(fd);
             }
-//            Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), id);
             if(bm == null)
                 return null;
             Bitmap thumb = null;
@@ -331,9 +305,6 @@ public class MediaStoreUtil {
                 thumb = Bitmap.createScaledBitmap(bm, 150, 150, true);
             else
                 thumb = Bitmap.createScaledBitmap(bm, 350, 350, true);
-            if(bm != null && !bm.isRecycled()) {
-                bm = null;
-            }
             return thumb;
         } catch (IOException e) {
             e.printStackTrace();
@@ -348,6 +319,45 @@ public class MediaStoreUtil {
         return null;
     }
 
+    /**
+     * 根据歌曲id查询图片
+     * @param albumId
+     * @param width
+     * @param height
+     * @return
+     */
+    public static Bitmap getAlbumBitmap(int albumId, int width,int height) {
+        ParcelFileDescriptor pfd = null;
+        FileDescriptor fd = null;
+        try {
+            File imgFile = getImageUrlInCache(albumId,Constants.URL_ALBUM);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            if(imgFile.exists()){
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(imgFile.getAbsolutePath(),options);
+            } else {
+                Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), albumId);
+                pfd = mContext.getContentResolver().openFileDescriptor(uri, "r");
+                if(pfd == null || (fd = pfd.getFileDescriptor()) == null)
+                    return null;
+                BitmapFactory.decodeFileDescriptor(fd,new Rect(),options);
+            }
+            options.outWidth = Math.min(options.outWidth,width);
+            options.outHeight = Math.min(options.outHeight,height);
+            options.inJustDecodeBounds = false;
+            return imgFile.exists() ? BitmapFactory.decodeFile(imgFile.getAbsolutePath(),options) : BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor(),new Rect(),options);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if(pfd != null)
+                try {
+                    pfd.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+        return null;
+    }
 
     /**
      * 根据记录集获得歌曲详细

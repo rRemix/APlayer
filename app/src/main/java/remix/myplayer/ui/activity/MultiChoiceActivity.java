@@ -2,6 +2,7 @@ package remix.myplayer.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
@@ -16,10 +19,16 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.customview.TipPopupwindow;
+import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.ui.dialog.TimerDialog;
+import remix.myplayer.util.Constants;
+import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * @ClassName
@@ -97,7 +106,6 @@ public class MultiChoiceActivity extends ToolbarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(mMultiChoice.isShow() ? R.menu.multi_menu : R.menu.toolbar_menu, menu);
         getMenuInflater().inflate(R.menu.toolbar_menu,menu);
         return true;
     }
@@ -115,9 +123,31 @@ public class MultiChoiceActivity extends ToolbarActivity {
     public void onMutltiClick(View v){
         switch (v.getId()){
             case R.id.multi_delete:
-                MobclickAgent.onEvent(MultiChoiceActivity.this,"Delete");
-                if(mMultiChoice != null)
-                    mMultiChoice.OnDelete();
+                String title = MultiChoice.TYPE == Constants.PLAYLIST ? getString(R.string.confirm_delete_playlist) : MultiChoice.TYPE == Constants.PLAYLISTSONG ?
+                        getString(R.string.confirm_delete_from_playlist) : getString(R.string.confirm_delete_from_library);
+                new MaterialDialog.Builder(this)
+                        .content(title)
+                        .buttonRippleColor(ThemeStore.getRippleColor())
+                        .positiveText(R.string.confirm)
+                        .negativeText(R.string.cancel)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                MobclickAgent.onEvent(MultiChoiceActivity.this,"Delete");
+                                if(mMultiChoice != null)
+                                    mMultiChoice.OnDelete();
+                            }
+                        })
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            }
+                        })
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .negativeColorAttr(R.attr.text_color_primary)
+                        .contentColorAttr(R.attr.text_color_primary)
+                        .show();
                 break;
             case R.id.multi_playqueue:
                 MobclickAgent.onEvent(MultiChoiceActivity.this,"AddtoPlayingList");

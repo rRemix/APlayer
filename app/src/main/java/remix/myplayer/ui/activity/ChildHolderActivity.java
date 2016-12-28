@@ -111,6 +111,8 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                if(position < 0 || mInfoList == null || position >= mInfoList.size())
+                    return;
                 int songid = mInfoList.get(position).getId();
                 if( !mMultiChoice.itemAddorRemoveWithClick(view,position,songid,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
                     if (mInfoList != null && mInfoList.size() == 0)

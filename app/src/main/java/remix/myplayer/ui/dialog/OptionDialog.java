@@ -26,6 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
+import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -148,7 +149,7 @@ public class OptionDialog extends BaseDialogActivity {
             case R.id.popup_delete:
                 MobclickAgent.onEvent(this,"Delete");
                 try {
-                    String title = getString(R.string.confirm_delete_playlist,mIsDeletePlayList ? mPlayListName : "曲库");
+                    String title = getString(R.string.confirm_delete_from_playlist_or_library,mIsDeletePlayList ? mPlayListName : "曲库");
                     new MaterialDialog.Builder(OptionDialog.this)
                             .content(title)
                             .buttonRippleColor(ThemeStore.getRippleColor())
@@ -157,18 +158,13 @@ public class OptionDialog extends BaseDialogActivity {
                             .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
                                 public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    String result = "";
-                                    if(!mIsDeletePlayList){
-                                        result = MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0 ?
-                                                getString(R.string.delete_success) :
-                                                getString(R.string.delete_error);
-//                                        DeleteHelper.delete();
-                                    } else {
-                                        result = PlayListUtil.deleteSong(mInfo.getId(),mPlayListName) ?
-                                                getString(R.string.delete_success):
-                                                getString(R.string.delete_error);
+                                    boolean deleteSuccess = !mIsDeletePlayList ?
+                                            MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0 :
+                                            PlayListUtil.deleteSong(mInfo.getId(),mPlayListName);
+                                    if(deleteSuccess){
+                                        DeleteHelper.delete();
                                     }
-                                    ToastUtil.show(OptionDialog.this,result);
+                                    ToastUtil.show(OptionDialog.this,deleteSuccess ? R.string.delete_success : R.string.delete_error);
                                     finish();
                                 }
                             })
