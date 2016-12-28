@@ -4,6 +4,8 @@ package remix.myplayer.util;
  * Created by taeja on 16-2-17.
  */
 
+import android.content.Context;
+
 /**
  * 常量值
  */
@@ -34,7 +36,7 @@ public class Constants {
     public final static String NOTIFY = "remix.music.NOTIFY";
     public final static String EXIT = "remix.music.EXIT";
     public final static String SOUNDEFFECT_ACTION = "remix.music.SOUNDEFFECT_ACTION";
-
+    public final static String WIDGET_UPDATE = "remix.music.WIDGET_UPDATE";
 
     //控制命令
     public final static int PLAYSELECTEDSONG = 0;
@@ -91,6 +93,7 @@ public class Constants {
     public final static int RECENTLYACTIVITY = 3;
     public final static int PLAYLISTACTIVITY = 4;
     public final static int LOCKSCREENACTIIVITY = 5;
+
 
     //扫描文件默认大小设置
     public static int SCAN_SIZE = 0;

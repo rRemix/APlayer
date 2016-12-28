@@ -7,11 +7,14 @@ import android.content.Intent;
 import android.os.Bundle;
 
 /**
- * Created by Remix on 2016/12/20.
+ * @ClassName
+ * @Description
+ * @Author Xiaoborui
+ * @Date 2016/12/28 11:22
  */
 
-public class Appwidget extends AppWidgetProvider {
-    public Appwidget() {
+public class AppWidgetSmall extends BaseAppwidget {
+    public AppWidgetSmall() {
         super();
     }
 

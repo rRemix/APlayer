@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#aa000000"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView android:id="@+id/appwidget_image"
+        android:layout_width="match_parent" 
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+        <ImageButton
+            android:id="@+id/appwidget_prev"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/appwidget_big_button_height"
+            android:layout_weight="1"
+            android:src="@drawable/notify_prev"
+            android:background="?android:attr/selectableItemBackground"/>
+        <ImageButton
+            android:id="@+id/appwidget_toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/appwidget_big_button_height"
+            android:layout_weight="1"
+            android:src="@drawable/notify_play"
+            android:background="?android:attr/selectableItemBackground"/>
+        <ImageButton
+            android:id="@+id/appwidget_next"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/appwidget_big_button_height"
+            android:layout_weight="1"
+            android:src="@drawable/notify_next"
+            android:background="?android:attr/selectableItemBackground"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:id="@+id/appwidget_text_container">
+        <TextView
+            android:id="@+id/appwidget_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s24_size"
+            android:textColor="@color/night_textcolor_primary"
+            android:text="歌曲名"
+            android:maxLines="1"/>
+        <TextView
+            android:layout_marginTop="@dimen/d4_size"
+            android:id="@+id/appwidget_artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/s18_size"
+            android:textColor="@color/night_textcolor"
+            android:text="艺术家"
+            android:maxLines="1"/>
+    </LinearLayout>
+</RelativeLayout>

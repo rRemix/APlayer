@@ -11,10 +11,8 @@ import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.view.KeyEvent;
 
@@ -23,6 +21,8 @@ import java.util.Random;
 
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.appwidgets.AppWidgetBig;
+import remix.myplayer.appwidgets.AppWidgetSmall;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.UpdateHelper;
@@ -87,15 +87,21 @@ public class MusicService extends BaseService {
     /** MediaPlayer 负责歌曲的播放等 */
     private static MediaPlayer mMediaPlayer;
 
+    /** 更新桌面部件 */
+    private AppWidgetBig mAppWidgetBig;
+    private AppWidgetSmall mAppWidgetSmall;
 
     /** AudiaoManager */
     private AudioManager mAudioManager;
 
     /** 播放控制的Receiver */
-    private ControlReceiver mRecevier;
+    private ControlReceiver mControlRecevier;
 
     /** 监测耳机拔出的Receiver*/
     private HeadsetPlugReceiver mHeadSetReceiver;
+
+    /** 接收桌面部件 */
+    private WidgetReceiver mWidgerReceiver;
 
     /** 监听AudioFocus的改变 */
     private AudioManager.OnAudioFocusChangeListener mAudioFocusListener;
@@ -130,18 +136,18 @@ public class MusicService extends BaseService {
         return mInstance;
     }
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        flags = Service.START_FLAG_REDELIVERY;
+//        return Service.START_REDELIVER_INTENT;
         return super.onStartCommand(intent, flags, startId);
     }
 
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
+    }
 
     @Override
     public void onDestroy() {
@@ -167,7 +173,7 @@ public class MusicService extends BaseService {
                     if(mMediaPlayer == null)
                         init();
                     else if(mNeedContinue){
-                        playStart();
+                        play();
                         mNeedContinue = false;
                         Global.setOperation(Constants.PLAYORPAUSE);
                     }
@@ -203,11 +209,17 @@ public class MusicService extends BaseService {
     }
 
     private void init() {
-        //初始化两个Receiver
-        mRecevier = new ControlReceiver();
-        registerReceiver(mRecevier,new IntentFilter("remix.music.CTL_ACTION"));
+        //桌面部件
+        mAppWidgetBig = new AppWidgetBig();
+        mAppWidgetSmall = new AppWidgetSmall();
+
+        //初始化Receiver
+        mControlRecevier = new ControlReceiver();
+        registerReceiver(mControlRecevier,new IntentFilter(Constants.CTL_ACTION));
         mHeadSetReceiver = new HeadsetPlugReceiver();
         registerReceiver(mHeadSetReceiver,new IntentFilter(Intent.ACTION_HEADSET_PLUG));
+        mWidgerReceiver = new WidgetReceiver();
+        registerReceiver(mWidgerReceiver,new IntentFilter(Constants.WIDGET_UPDATE));
 
         //监听媒体库变化
         Handler updateHandler = new Handler() {
@@ -268,7 +280,7 @@ public class MusicService extends BaseService {
         mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
-                playStart();
+                play();
             }
         });
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
@@ -331,8 +343,9 @@ public class MusicService extends BaseService {
 
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
         mMediaSession.release();
-        unregisterReceiver(mRecevier);
+        unregisterReceiver(mControlRecevier);
         unregisterReceiver(mHeadSetReceiver);
+        unregisterReceiver(mWidgerReceiver);
         getContentResolver().unregisterContentObserver(mMediaStoreObserver);
         getContentResolver().unregisterContentObserver(mPlayListObserver);
         getContentResolver().unregisterContentObserver(mPlayListSongObserver);
@@ -358,7 +371,7 @@ public class MusicService extends BaseService {
     /**
      * 开始播放
      */
-    private void playStart() {
+    private void play() {
         new Thread(){
             @Override
             public void run(){
@@ -383,7 +396,7 @@ public class MusicService extends BaseService {
     /**
      * 根据当前播放状态暂停或者继续播放
      */
-    private void PlayOrPause() {
+    private void toggle() {
         if(mMediaPlayer.isPlaying()) {
             pause();
         }
@@ -395,7 +408,7 @@ public class MusicService extends BaseService {
                 mFirstFlag = false;
                 return;
             }
-            playStart();
+            play();
         }
     }
 
@@ -433,12 +446,25 @@ public class MusicService extends BaseService {
         updateNextSong();
     }
 
+    public class WidgetReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String str = intent.getStringExtra("WidgetName");
+            switch (str){
+                case "BigWidget":
+                    mAppWidgetBig.updateWidget(context);
+                    break;
+                case "SmallWidget":
+                    break;
+            }
+        }
+    }
 
     /**
      * 接受控制命令
      * 包括暂停、播放、上下首、播放模式
      */
-    public class ControlReceiver extends BroadcastReceiver {
+    public class ControlReceiver extends WidgetReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getExtras() == null)
@@ -484,7 +510,7 @@ public class MusicService extends BaseService {
                     if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
                         return;
                     mIsplay = !mIsplay;
-                    PlayOrPause();
+                    toggle();
                     break;
                 //暂停
                 case Constants.PAUSE:
@@ -492,7 +518,7 @@ public class MusicService extends BaseService {
                     break;
                 //继续播放
                 case Constants.START:
-                    playStart();
+                    play();
                     break;
                 //顺序播放
                 case Constants.PLAY_LOOP:

@@ -51,7 +51,7 @@ public class NotifyReceiver extends BroadcastReceiver {
             return;
 
         if((MusicService.getCurrentMP3() != null)) {
-            boolean isSystemColor = SPUtil.getValue(context,"Setting","IsSystemColor",true);
+            boolean isSystemColor = SPUtil.getValue(context,"Setting","IsSystemColor",false);
 
             MP3Item temp = MusicService.getCurrentMP3();
             //设置歌手，歌曲名
@@ -80,65 +80,73 @@ public class NotifyReceiver extends BroadcastReceiver {
                 mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notify_pause);
             }
 
-            //添加Action
-            Intent actionIntent = new Intent(Constants.CTL_ACTION);
-            actionIntent.putExtra("FromNotify", true);
-            //播放或者暂停
-            actionIntent.putExtra("Control", Constants.PLAYORPAUSE);
-            PendingIntent playIntent = PendingIntent.getBroadcast(context, 1, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            mRemoteBigView.setOnClickPendingIntent(R.id.notify_play, playIntent);
-            mRemoteView.setOnClickPendingIntent(R.id.notify_play,playIntent);
-            //下一首
-            actionIntent.putExtra("Control", Constants.NEXT);
-            PendingIntent nextIntent = PendingIntent.getBroadcast(context,2,actionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-            mRemoteBigView.setOnClickPendingIntent(R.id.notify_next, nextIntent);
-            mRemoteView.setOnClickPendingIntent(R.id.notify_next, nextIntent);
-            //上一首
-            actionIntent.putExtra("Control", Constants.PREV);
-            PendingIntent prevIntent = PendingIntent.getBroadcast(context, 2, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            mRemoteBigView.setOnClickPendingIntent(R.id.notify_prev,prevIntent);
+            buildAction(context);
 
-            //关闭通知栏
-            actionIntent.putExtra("Close", true);
-            PendingIntent closeIntent = PendingIntent.getBroadcast(context, 4, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            mRemoteBigView.setOnClickPendingIntent(R.id.notify_close, closeIntent);
-            mRemoteView.setOnClickPendingIntent(R.id.notify_close,closeIntent);
-
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
-            if(mNotification == null){
-                mBuilder.setContent(mRemoteView)
-                        .setCustomBigContentView(mRemoteBigView)
-                        .setContentText("")
-                        .setContentTitle("")
-                        .setWhen(System.currentTimeMillis())
-                        .setPriority(NotificationCompat.PRIORITY_MAX)
-                        .setOngoing(mIsplay)
-                        .setSmallIcon(R.drawable.notifbar_icon);
-                //点击通知栏打开播放界面
-                //后退回到主界面
-                Intent result = new Intent(context,PlayerActivity.class);
-                TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-                stackBuilder.addParentStack(PlayerActivity.class);
-                stackBuilder.addNextIntent(result);
-                stackBuilder.editIntentAt(1).putExtra("Notify", true);
-                stackBuilder.editIntentAt(1).putExtra("Rect",BottomActionBarFragment.getCoverRect());
-                stackBuilder.editIntentAt(0).putExtra("Notify", true);
-                PendingIntent resultPendingIntent =
-                        stackBuilder.getPendingIntent(
-                                0,
-                                PendingIntent.FLAG_UPDATE_CURRENT
-                        );
-                mBuilder.setContentIntent(resultPendingIntent);
-                mNotification = mBuilder.build();
-            } else {
-                mNotification.bigContentView = mRemoteBigView;
-                mNotification.contentView = mRemoteView;
-            }
+            buildNotitication(context);
 
             mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(0, mNotification);
             Global.setNotifyShowing(true);
         }
 
+    }
+
+    private void buildNotitication(Context context) {
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+        if(mNotification == null){
+            mBuilder.setContent(mRemoteView)
+                    .setCustomBigContentView(mRemoteBigView)
+                    .setContentText("")
+                    .setContentTitle("")
+                    .setWhen(System.currentTimeMillis())
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setOngoing(mIsplay)
+                    .setSmallIcon(R.drawable.notifbar_icon);
+            //点击通知栏打开播放界面
+            //后退回到主界面
+            Intent result = new Intent(context,PlayerActivity.class);
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+            stackBuilder.addParentStack(PlayerActivity.class);
+            stackBuilder.addNextIntent(result);
+            stackBuilder.editIntentAt(1).putExtra("Notify", true);
+            stackBuilder.editIntentAt(1).putExtra("Rect", BottomActionBarFragment.getCoverRect());
+            stackBuilder.editIntentAt(0).putExtra("Notify", true);
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            0,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent);
+            mNotification = mBuilder.build();
+        } else {
+            mNotification.bigContentView = mRemoteBigView;
+            mNotification.contentView = mRemoteView;
+        }
+    }
+
+    private void buildAction(Context context) {
+        //添加Action
+        Intent actionIntent = new Intent(Constants.CTL_ACTION);
+        actionIntent.putExtra("FromNotify", true);
+        //播放或者暂停
+        actionIntent.putExtra("Control", Constants.PLAYORPAUSE);
+        PendingIntent playIntent = PendingIntent.getBroadcast(context, 1, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mRemoteBigView.setOnClickPendingIntent(R.id.notify_play, playIntent);
+        mRemoteView.setOnClickPendingIntent(R.id.notify_play,playIntent);
+        //下一首
+        actionIntent.putExtra("Control", Constants.NEXT);
+        PendingIntent nextIntent = PendingIntent.getBroadcast(context,2,actionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        mRemoteBigView.setOnClickPendingIntent(R.id.notify_next, nextIntent);
+        mRemoteView.setOnClickPendingIntent(R.id.notify_next, nextIntent);
+        //上一首
+        actionIntent.putExtra("Control", Constants.PREV);
+        PendingIntent prevIntent = PendingIntent.getBroadcast(context, 2, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mRemoteBigView.setOnClickPendingIntent(R.id.notify_prev,prevIntent);
+
+        //关闭通知栏
+        actionIntent.putExtra("Close", true);
+        PendingIntent closeIntent = PendingIntent.getBroadcast(context, 4, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mRemoteBigView.setOnClickPendingIntent(R.id.notify_close, closeIntent);
+        mRemoteView.setOnClickPendingIntent(R.id.notify_close,closeIntent);
     }
 }

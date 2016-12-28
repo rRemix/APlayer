@@ -68,4 +68,14 @@
     <dimen name="pause_bar_width">4dp</dimen>
     <dimen name="pause_bar_distance">10dp</dimen>
     <dimen name="pause_bar_height">22dp</dimen>
+
+    <dimen name="app_widget_big_min_height">110dp</dimen>
+    <dimen name="app_widget_big_min_width">250dp</dimen>
+    <dimen name="app_widget_small_min_height">40dp</dimen>
+    <dimen name="app_widget_small_min_width">250dp</dimen>
+    <dimen name="app_widget_small_image_size">48dp</dimen>
+    <dimen name="app_widget_small_button_height">48dp</dimen>
+    <dimen name="appwidget_small_image_size">48dp</dimen>
+    <dimen name="appwidget_small_button_height">48dp</dimen>
+    <dimen name="appwidget_big_button_height">60dp</dimen>
 </resources>
