@@ -1,19 +1,12 @@
 package remix.myplayer.appwidgets;
 
 import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.widget.RemoteViews;
 
-import remix.myplayer.R;
-import remix.myplayer.model.MP3Item;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * @ClassName

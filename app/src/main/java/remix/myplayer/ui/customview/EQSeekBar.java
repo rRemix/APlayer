@@ -371,8 +371,6 @@ public class EQSeekBar extends View {
             int paddingbottom = getPaddingBottom();
             mTrackHeigh = mViewHeight - paddingtop - paddingbottom - mThumbWidth * 4;
             //计算轨道宽度 两个小圆点之间的距离
-            double test = mTrackHeigh * 1.0 / (mDotNum - 1);
-            float test1 = mTrackHeigh * 1.0f / (mDotNum - 1);
             mDotBetween = Math.round(mTrackHeigh * 1.0f / (mDotNum - 1));
             mDotPosition.clear();
             //设置所有小圆点的坐标
@@ -381,6 +379,7 @@ public class EQSeekBar extends View {
             }
             mThumbCenterY = Math.round(mDotPosition.get(mPositon));
             mInit = true;
+            setProgress(mProgress);
         }
     }
 
@@ -396,6 +395,8 @@ public class EQSeekBar extends View {
     }
 
     public void setProgress(int progress){
+        if(!mInit)
+            return;
         if(progress > mMax)
             progress = mMax;
         if(progress < 0)
@@ -439,7 +440,6 @@ public class EQSeekBar extends View {
             invalidate();
         }
     }
-
 
     @Override
     public void setEnabled(boolean enabled) {

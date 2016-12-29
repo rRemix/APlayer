@@ -4,8 +4,6 @@ package remix.myplayer.util;
  * Created by taeja on 16-2-17.
  */
 
-import android.content.Context;
-
 /**
  * 常量值
  */

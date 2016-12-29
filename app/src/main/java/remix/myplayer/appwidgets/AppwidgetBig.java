@@ -2,12 +2,10 @@ package remix.myplayer.appwidgets;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Bundle;
 import android.widget.RemoteViews;
 
 import remix.myplayer.R;

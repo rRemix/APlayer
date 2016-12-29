@@ -22,13 +22,9 @@ import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.customview.TipPopupwindow;
-import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
-import remix.myplayer.util.ToastUtil;
 
 /**
  * @ClassName

@@ -565,12 +565,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if (!mIsRunning)
             return;
         mBottomBar.UpdateBottomStatus(mp3Item, isplay);
-//        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
-//        for (Fragment fragment : fragmentList) {
-//            if (fragment instanceof SongFragment && ((SongFragment) fragment).getAdapter() != null) {
-//                ((SongFragment) fragment).getAdapter().notifyDataSetChanged();
-//            }
-//        }
         mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ALLSONG_ADAPTER);
         updateHeader(mp3Item,isplay);
     }
@@ -585,9 +579,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         mHeadText.setText(getString(R.string.play_now,mp3Item.getTitle()));
         new AsynLoadImage(mHeadImg).execute(mp3Item.getAlbumId(), Constants.URL_ALBUM);
         mHeadImg.setBackgroundResource(isPlay && ThemeStore.isDay() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
-
     }
-
 
 }
 

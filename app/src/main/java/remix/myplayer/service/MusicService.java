@@ -52,7 +52,7 @@ import remix.myplayer.util.ToastUtil;
  * 回调相关activity的界面更新
  * 通知栏的控制
  */
-public class MusicService extends BaseService {
+public class MusicService extends BaseService implements Playback {
     private final static String TAG = "MusicService";
     private static MusicService mInstance;
     /** 是否第一次启动*/
@@ -121,6 +121,7 @@ public class MusicService extends BaseService {
             }
         }
     };
+
 
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
@@ -357,21 +358,25 @@ public class MusicService extends BaseService {
     /**
      * 播放下一首
      */
-    private void playNext() {
+    @Override
+    public void playNext() {
         playNextOrPrev(true,true);
     }
 
     /**
      * 播放上一首
      */
-    private void playPrevious() {
+    @Override
+    public void playPrevious() {
         playNextOrPrev(false, true);
     }
+
 
     /**
      * 开始播放
      */
-    private void play() {
+    @Override
+    public void play() {
         new Thread(){
             @Override
             public void run(){
@@ -396,7 +401,8 @@ public class MusicService extends BaseService {
     /**
      * 根据当前播放状态暂停或者继续播放
      */
-    private void toggle() {
+    @Override
+    public void toggle() {
         if(mMediaPlayer.isPlaying()) {
             pause();
         }
@@ -415,7 +421,8 @@ public class MusicService extends BaseService {
     /**
      * 暂停
      */
-    private void pause() {
+    @Override
+    public void pause() {
         mIsplay = false;
         mMediaPlayer.pause();
         //更新所有界面
@@ -427,7 +434,8 @@ public class MusicService extends BaseService {
      * 比如在全部歌曲或者专辑详情里面选中某一首歌曲
      * @param position 播放索引
      */
-    private void playSelectSong(int position){
+    @Override
+    public void playSelectSong(int position){
         if((mCurrentIndex = position) == -1 || (mCurrentIndex > Global.mPlayQueue.size() - 1))
             return;
 
@@ -452,7 +460,7 @@ public class MusicService extends BaseService {
             String str = intent.getStringExtra("WidgetName");
             switch (str){
                 case "BigWidget":
-                    mAppWidgetBig.updateWidget(context);
+//                    mAppWidgetBig.updateWidget(context);
                     break;
                 case "SmallWidget":
                     break;
@@ -493,7 +501,7 @@ public class MusicService extends BaseService {
             }
 
             switch (Control) {
-                //播放listview选中的歌曲
+                //播放选中的歌曲
                 case Constants.PLAYSELECTEDSONG:
                     playSelectSong(intent.getIntExtra("Position", -1));
                     break;
@@ -585,7 +593,7 @@ public class MusicService extends BaseService {
 
     /**
      * 根据当前播放列表的长度，得到一个随机数
-     * @return 随机索引
+     * @return
      */
     private static int getShuffle(){
         if(Global.mPlayQueue.size() == 1)
@@ -751,7 +759,6 @@ public class MusicService extends BaseService {
         }
     }
 
-
     /**
      * 获得当前播放进度
      * @return
@@ -818,10 +825,6 @@ public class MusicService extends BaseService {
                 return true;
             }
 
-            LogUtil.d(TAG,"count=" + mCount);
-            LogUtil.d(TAG,"AudioFocus:" + mAudioFouus);
-//            if(!mAudioFouus)
-//                return true;
             //如果是第一次按下，开启一条线程去判断用户操作
             if(mCount == 0){
                 new Thread(){

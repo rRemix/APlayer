@@ -372,7 +372,7 @@ public class CommonUtil {
     public static JSONObject getSongJsonObject(String songname, String artistname){
         URL lrcIdUrl = null;
         try {
-            lrcIdUrl = new URL("http://geci.me/api/lyric/" + songname + "/" + artistname);
+            lrcIdUrl = new URL("http://gecimi.com/api/lyric/" + songname + "/" + artistname);
 
         } catch (Exception e1) {
             e1.printStackTrace();

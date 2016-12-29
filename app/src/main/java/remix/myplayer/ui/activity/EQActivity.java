@@ -4,8 +4,6 @@ import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.Virtualizer;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -67,16 +65,6 @@ public class EQActivity extends ToolbarActivity {
     private static short mBassBoostLevel;
     private static short mVirtualizeLevel;
     private static boolean mHasInitial = false;
-    private Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            for(int i = 0 ; i < mEQSeekBars.size() ;i++){
-                int temp = mBandFrequencys.get(i);
-                setSeekBarProgress(mEQSeekBars.get(i),temp);
-                mEQSeekBars.get(i).setEnabled(mEnable);
-            }
-        }
-    };
 
     public static void Init(){
         new Thread(){
@@ -174,7 +162,7 @@ public class EQActivity extends ToolbarActivity {
         setUpToolbar(mToolBar,getString(R.string.use_eq));
 
         //初始化switch
-        ContextThemeWrapper ctw = new ContextThemeWrapper(this,R.style.DayTheme);
+        ContextThemeWrapper ctw = new ContextThemeWrapper(this,Theme.getTheme());
         mSwitch = new SwitchCompat(ctw);
         Toolbar.LayoutParams toolbarLp = new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         toolbarLp.rightMargin = DensityUtil.dip2px(this,16);
@@ -208,17 +196,22 @@ public class EQActivity extends ToolbarActivity {
 
         addEQSeekBar();
 
-        new Thread(){
-            @Override
-            public void run() {
-                if(!(mEQSeekBars.size() > 0))
-                    return;
-                while (!mEQSeekBars.get(mEQSeekBars.size() - 1).isInit()){
-                }
-                Message msg = new Message();
-                mHandler.sendMessage(msg);
-            }
-        }.start();
+        for(int i = 0 ; i < mEQSeekBars.size() ;i++){
+            int temp = mBandFrequencys.get(i);
+            setSeekBarProgress(mEQSeekBars.get(i),temp);
+            mEQSeekBars.get(i).setEnabled(mEnable);
+        }
+//        new Thread(){
+//            @Override
+//            public void run() {
+//                if(!(mEQSeekBars.size() > 0))
+//                    return;
+//                while (!mEQSeekBars.get(mEQSeekBars.size() - 1).isInit()){
+//                }
+//                Message msg = new Message();
+//                mHandler.sendMessage(msg);
+//            }
+//        }.start();
 
     }
 
@@ -239,8 +232,12 @@ public class EQActivity extends ToolbarActivity {
             int fre_temp = mCenterFres.get(i);
             String hz = fre_temp > 1000 ?  fre_temp / 1000 + "K" : fre_temp + "";
             eqSeekBar.setFreText(hz);
+            int temp = mBandFrequencys.get(i);
+            setSeekBarProgress(eqSeekBar,temp);
+            eqSeekBar.setEnabled(mEnable);
             mEQSeekBars.add(eqSeekBar);
             EQContainer.addView(eqSeekBar);
+
         }
     }
 
