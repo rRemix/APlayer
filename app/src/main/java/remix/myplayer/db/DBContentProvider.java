@@ -36,7 +36,6 @@ public class DBContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-//        mOpenHelper = new DBOpenHelper(APlayerApplication.getContext());
         return true;
     }
 

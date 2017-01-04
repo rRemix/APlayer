@@ -33,7 +33,7 @@ public class CtrlButtonListener implements View.OnClickListener {
                 break;
             case R.id.lockscreen_play:
             case R.id.playbar_play:
-                intent.putExtra("Control", Constants.PLAYORPAUSE);
+                intent.putExtra("Control", Constants.TOGGLE);
                 break;
         }
         context.sendBroadcast(intent);

@@ -145,5 +145,8 @@
     <string name="confirm_delete_playlist">是否移除所选播放列表?</string>
     <string name="confirm_delete_from_playlist">是否从播放列表移除?</string>
     <string name="confirm_delete_from_library">是否从曲库移除?</string>
+    <string name="sleep_timer">睡眠定时</string>
+    <string name="eq">均衡器</string>
+    <string name="collect">收藏</string>
 
 </resources>

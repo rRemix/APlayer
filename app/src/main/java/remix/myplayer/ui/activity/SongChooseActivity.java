@@ -115,6 +115,8 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
 
     @Override
     public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
+        if(data == null)
+            return;
         //保存查询结果，并设置查询索引
         mCursor = data;
         mTitleIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);

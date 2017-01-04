@@ -82,7 +82,7 @@ public class AlbumAdater extends BaseAdapter<AlbumAdater.AlbumHolder>  {
                 if(holder instanceof AlbumListHolder){
                     new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);
                 }
-//                holder.mImage.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mCursor.getInt(AlbumFragment.mAlbumIdIndex)));
+
 
             } catch (Exception e){
                 e.printStackTrace();
