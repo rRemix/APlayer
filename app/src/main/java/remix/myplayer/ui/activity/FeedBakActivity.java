@@ -39,7 +39,7 @@ import remix.myplayer.util.ToastUtil;
  * 反馈界面
  * 将用户的反馈通过邮箱发送
  */
-public class FeedBackActivity extends ToolbarActivity {
+public class FeedBakActivity extends ToolbarActivity {
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
     @BindView(R.id.feedback_content)
@@ -116,7 +116,7 @@ public class FeedBackActivity extends ToolbarActivity {
                 @Override
                 public void done(String s, BmobException e) {
                     if(e == null){
-                        ToastUtil.show(FeedBackActivity.this,R.string.send_success);
+                        ToastUtil.show(FeedBakActivity.this,R.string.send_success);
                         finish();
                     } else {
                         commitByEmail();
@@ -124,7 +124,7 @@ public class FeedBackActivity extends ToolbarActivity {
                 }
             });
         } catch (PackageManager.NameNotFoundException e) {
-            ToastUtil.show(FeedBackActivity.this,R.string.send_error);
+            ToastUtil.show(FeedBakActivity.this,R.string.send_error);
         }
     }
 
@@ -144,11 +144,11 @@ public class FeedBackActivity extends ToolbarActivity {
     }
 
     public void onResume() {
-        MobclickAgent.onPageStart(FeedBackActivity.class.getSimpleName());
+        MobclickAgent.onPageStart(FeedBakActivity.class.getSimpleName());
         super.onResume();
     }
     public void onPause() {
-        MobclickAgent.onPageEnd(FeedBackActivity.class.getSimpleName());
+        MobclickAgent.onPageEnd(FeedBakActivity.class.getSimpleName());
         super.onPause();
     }
 }

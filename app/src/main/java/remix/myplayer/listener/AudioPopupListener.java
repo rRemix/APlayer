@@ -27,18 +27,14 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.PlayerActivity;
-import remix.myplayer.ui.dialog.AddtoPlayListDialog;
 import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -257,11 +253,6 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 } else {
                     mContext.startActivity(new Intent(mContext,EQActivity.class));
                 }
-                break;
-            case R.id.menu_collect:
-                PlayListSongInfo info = new PlayListSongInfo(mInfo.getId(), Global.mMyLoveID,Constants.MYLOVE);
-                ToastUtil.show(mContext,
-                        PlayListUtil.addSong(info) > 0 ? mContext.getString(R.string.add_song_playlist_success, 1,Constants.MYLOVE) : mContext.getString(R.string.add_song_playlist_error));
                 break;
             case R.id.menu_delete:
 //                try {

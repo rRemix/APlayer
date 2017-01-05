@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Environment;
 
 import com.facebook.common.internal.Supplier;
-import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
@@ -101,8 +100,31 @@ public class APlayerApplication extends android.app.Application {
                         Global.mMyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
                         SPUtil.putValue(mContext,"Setting","MyLoveID",Global.mMyLoveID);
                     } catch (Exception e){
-                        CommonUtil.uploadException("新建我的收藏列表错误:" + Global.mPlayQueueID,e);
+                        try {
+                            PackageManager pm = APlayerApplication.getContext().getPackageManager();
+                            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
+                            Feedback feedback =  new Feedback(e.toString(),
+                                    "新建播放列表错误",
+                                    pi.versionName,
+                                    pi.versionCode + "",
+                                    Build.DISPLAY,
+                                    Build.CPU_ABI + "," + Build.CPU_ABI2,
+                                    Build.MANUFACTURER,
+                                    Build.MODEL,
+                                    Build.VERSION.RELEASE,
+                                    Build.VERSION.SDK_INT + ""
+                            );
+
+                            feedback.save(new SaveListener<String>() {
+                                @Override
+                                public void done(String s, BmobException e) {
+                                }
+                            });
+                        } catch (PackageManager.NameNotFoundException e1) {
+                            e1.printStackTrace();
+                        }
                     }
+
                 }else {
                     Global.mPlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
                     Global.mMyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);
@@ -117,6 +139,17 @@ public class APlayerApplication extends android.app.Application {
                     CommonUtil.getLyricDir(Environment.getExternalStorageDirectory());
                     LogUtil.d("LrcDir","Paths:" + Global.mLyricDir);
                 }
+
+                //读取播放队列
+//                if(!SPUtil.getValue(mContext, "Setting", "First", true)){
+//                    Global.mPlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",Global.mPlayQueueID);
+//                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueID);
+//                }
+//                Global.mPlayQueue = XmlUtil.getPlayQueue();
+//                Global.setPlayQueue(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0 ?
+//                                        Global.mAllSongList : Global.mPlayQueue);
+                //读取播放列表
+//                Global.mPlayList = XmlUtil.getPlayList("playlist.xml");
             }
         }.start();
     }
@@ -136,8 +169,7 @@ public class APlayerApplication extends android.app.Application {
                 .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {
                     @Override
                     public MemoryCacheParams get() {
-                        return new MemoryCacheParams(cacheSize, 20,cacheSize, 20, 5 * ByteConstants.MB);
-//                        return new MemoryCacheParams(cacheSize, Integer.MAX_VALUE,cacheSize, Integer.MAX_VALUE, Integer.MAX_VALUE);
+                        return new MemoryCacheParams(cacheSize, Integer.MAX_VALUE,cacheSize, Integer.MAX_VALUE, Integer.MAX_VALUE);
                     }
                 })
                 .build();

@@ -123,7 +123,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             pw.println();
             //导出异常的调用栈信息
             ex.printStackTrace(pw);
-            ToastUtil.show(mContext,"错误:" + ex.toString());
             pw.close();
         } catch (Exception e) {
             Log.e(TAG, "dump crash info failed");
@@ -158,6 +157,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
     private void uploadExceptionToServer(Throwable ex) {
         //TODO Upload Exception Message To Your Web Server
         MobclickAgent.reportError(mContext,ex);
+
     }
 
 }

@@ -48,7 +48,7 @@ public class LineCtlReceiver extends BroadcastReceiver {
                 keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
             LogUtil.d(TAG,"receive remote ctrl");
             intent_ctl = new Intent(Constants.CTL_ACTION);
-            int arg = keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.TOGGLE :
+            int arg = keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.PLAYORPAUSE :
                     keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Constants.NEXT : Constants.PREV;
             intent_ctl.putExtra("Control", arg);
             context.sendBroadcast(intent_ctl);
@@ -66,7 +66,7 @@ public class LineCtlReceiver extends BroadcastReceiver {
                     try {
                         sleep(800);
                         int arg = -1;
-                        arg = mCount == 1 ? Constants.TOGGLE : mCount == 2 ? Constants.NEXT : Constants.PREV;
+                        arg = mCount == 1 ? Constants.PLAYORPAUSE : mCount == 2 ? Constants.NEXT : Constants.PREV;
                         mCount = 0;
                         Intent intent = new Intent(Constants.CTL_ACTION);
                         intent.putExtra("Control", arg);

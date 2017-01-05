@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +19,6 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.MultiPosition;
@@ -119,8 +117,8 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
             holder.mOther.setText(artist + "-" + album);
 
             //封面
-//            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(),Constants.URL_ALBUM);
             MediaStoreUtil.setImageUrl(holder.mImage,temp.getAlbumId());
+//            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(),Constants.URL_ALBUM);
             //背景点击效果
             holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 

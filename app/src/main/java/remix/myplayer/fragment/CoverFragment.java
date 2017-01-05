@@ -52,7 +52,6 @@ public class CoverFragment extends BaseFragment {
         mPageName = CoverFragment.class.getSimpleName();
     }
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -103,14 +102,12 @@ public class CoverFragment extends BaseFragment {
             outAnim.addListener(new SimpleSpringListener(){
                 @Override
                 public void onSpringUpdate(Spring spring) {
-                    if(mCoverContainer == null || spring == null)
-                        return;
                     mCoverContainer.setTranslationX((float) spring.getCurrentValue());
                 }
                 @Override
                 public void onSpringAtRest(Spring spring) {
                     //显示封面的动画
-                    if(mImage == null || spring == null)
+                    if(mImage == null)
                         return;
                     mCoverContainer.setTranslationX((float) startValue);
                     mImage.setImageURI(mUri);
@@ -118,7 +115,7 @@ public class CoverFragment extends BaseFragment {
                     inAnim.addListener(new SimpleSpringListener(){
                         @Override
                         public void onSpringUpdate(Spring spring) {
-                            if(mImage == null || spring == null)
+                            if(mImage == null)
                                 return;
                             mCoverContainer.setScaleX((float) spring.getCurrentValue());
                             mCoverContainer.setScaleY((float) spring.getCurrentValue());

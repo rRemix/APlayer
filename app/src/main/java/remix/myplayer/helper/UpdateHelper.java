@@ -21,6 +21,7 @@ public class UpdateHelper {
         }
     }
 
+
     public static void addCallback(Callback callback){
         if(!mCallbacks.contains(callback)){
             mCallbacks.add(callback);

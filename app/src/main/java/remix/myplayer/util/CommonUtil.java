@@ -3,7 +3,6 @@ package remix.myplayer.util;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
@@ -12,7 +11,6 @@ import android.media.MediaFormat;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.os.Vibrator;
 import android.text.TextUtils;
@@ -36,11 +34,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.SaveListener;
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
-import remix.myplayer.model.Feedback;
 import remix.myplayer.util.thumb.SearchCover;
 
 /**
@@ -598,8 +593,9 @@ public class CommonUtil {
                                 return;
                             }
                         }
+
                     } catch(Exception e) {
-                        uploadException("查找歌词文件错误",e);
+                        ToastUtil.show(context,R.string.search_error);
                     } finally {
                         try {
                             if(br != null){
@@ -611,34 +607,6 @@ public class CommonUtil {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * 手动上传异常
-     */
-    public static void uploadException(String title,Exception e){
-        try {
-            PackageManager pm = APlayerApplication.getContext().getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
-            Feedback feedback =  new Feedback(e.toString(),
-                    title,
-                    pi.versionName,
-                    pi.versionCode + "",
-                    Build.DISPLAY,
-                    Build.CPU_ABI + "," + Build.CPU_ABI2,
-                    Build.MANUFACTURER,
-                    Build.MODEL,
-                    Build.VERSION.RELEASE,
-                    Build.VERSION.SDK_INT + ""
-            );
-            feedback.save(new SaveListener<String>() {
-                @Override
-                public void done(String s, BmobException e) {
-                }
-            });
-        } catch (PackageManager.NameNotFoundException e1) {
-            e1.printStackTrace();
         }
     }
 

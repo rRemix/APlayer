@@ -14,8 +14,6 @@ public class Constants {
     public final static String PLAY_QUEUE = "播放队列";
     //最近添加
     public final static String RECENTLY = "最近添加";
-    //我的收藏
-    public final static String MYLOVE = "我的收藏";
 
     //显示模式 1:列表 2:网格
     public final static int LIST_MODEL = 1;
@@ -41,7 +39,7 @@ public class Constants {
     //控制命令
     public final static int PLAYSELECTEDSONG = 0;
     public final static int PREV = 1;
-    public final static int TOGGLE = 2;
+    public final static int PLAYORPAUSE = 2;
     public final static int NEXT = 3;
     public final static int PAUSE = 4;
     public final static int START = 5;

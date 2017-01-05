@@ -31,7 +31,6 @@ import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
@@ -141,23 +140,19 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                         @Override
                         public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                             if(!TextUtils.isEmpty(input)){
-                                int newPlayListId = -1;
-                                try {
-                                    newPlayListId = PlayListUtil.addPlayList(input.toString());
-                                    ToastUtil.show(AddtoPlayListDialog.this, newPlayListId > 0 ?
-                                                    R.string.add_playlist_success :
-                                                    newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
+//                                XmlUtil.addPlaylist(AddtoPlayListDialog.this,input.toString());
+                                int newPlayListId = PlayListUtil.addPlayList(input.toString());
+                                ToastUtil.show(AddtoPlayListDialog.this, newPlayListId > 0 ?
+                                                R.string.add_playlist_success :
+                                                newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
+                                        Toast.LENGTH_SHORT);
+                                if(newPlayListId < 0){
+                                    return;
+                                }
+                                if(mAddAfterCreate){
+                                    ToastUtil.show(AddtoPlayListDialog.this,
+                                            PlayListUtil.addSong(new PlayListSongInfo(mAudioID,newPlayListId,input.toString())) > 0 ? getString(R.string.add_song_playlist_success, 1,input.toString()) : getString(R.string.add_song_playlist_error),
                                             Toast.LENGTH_SHORT);
-                                    if(newPlayListId < 0){
-                                        return;
-                                    }
-                                    if(mAddAfterCreate){
-                                        ToastUtil.show(AddtoPlayListDialog.this,
-                                                PlayListUtil.addSong(new PlayListSongInfo(mAudioID,newPlayListId,input.toString())) > 0 ? getString(R.string.add_song_playlist_success, 1,input.toString()) : getString(R.string.add_song_playlist_error),
-                                                Toast.LENGTH_SHORT);
-                                    }
-                                }catch (Exception e){
-                                    CommonUtil.uploadException("新建" + input + "错误:" + newPlayListId,e);
                                 }
                             }
                         }

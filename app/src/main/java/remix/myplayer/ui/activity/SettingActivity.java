@@ -240,7 +240,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             .positiveColorAttr(R.attr.text_color_primary)
                             .buttonRippleColorAttr(R.attr.ripple_color)
                             .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
-                            .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"Setting","IsSystemColor",true) ? 0 : 1,
+                            .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"Setting","IsSystemColor",false) ? 0 : 1,
                                     new MaterialDialog.ListCallbackSingleChoice() {
                                         @Override
                                         public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
@@ -270,7 +270,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //意见与反馈
             case R.id.setting_feedback_container:
-                startActivity(new Intent(this,FeedBackActivity.class));
+                startActivity(new Intent(this,FeedBakActivity.class));
                 break;
             //关于我们
             case R.id.setting_about_container:

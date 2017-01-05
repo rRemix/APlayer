@@ -113,16 +113,11 @@ public class MusicService extends BaseService implements Playback {
     private boolean mAudioFouus = false;
 
     /** 更新相关Activity的Handler */
-    private Handler mUpdateUIHandler = new Handler() {
+    private static Handler mUpdateUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == Constants.UPDATE_UI) {
                 UpdateHelper.update(mCurrentInfo,mIsplay);
-            }
-            if(mAppWidgetBig != null)
-                mAppWidgetBig.updateWidget(mContext);
-            if(mAppWidgetSmall != null){
-                mAppWidgetSmall.updateWidget(mContext);
             }
         }
     };
@@ -142,6 +137,13 @@ public class MusicService extends BaseService implements Playback {
         return mInstance;
     }
 
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+//        return Service.START_REDELIVER_INTENT;
+        return super.onStartCommand(intent, flags, startId);
+    }
+
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
@@ -153,24 +155,10 @@ public class MusicService extends BaseService implements Playback {
         super.onDestroy();
         unInit();
     }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        int ret = super.onStartCommand(intent,flags,startId);
-        LogUtil.d(TAG,"onStartCommand: " + ret);
-        if(mControlRecevier != null &&
-                intent != null &&
-                intent.getExtras() != null &&
-                intent.getExtras().getBoolean("FromWidget",false)){
-            mControlRecevier.onReceive(null,intent);
-        }
-        return ret;
-    }
-
     @Override
     public void onCreate() {
-        LogUtil.d(TAG,"onCreate" );
         super.onCreate();
+
         mContext = getApplicationContext();
         mInstance = this;
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
@@ -188,7 +176,7 @@ public class MusicService extends BaseService implements Playback {
                     else if(mNeedContinue){
                         play();
                         mNeedContinue = false;
-                        Global.setOperation(Constants.TOGGLE);
+                        Global.setOperation(Constants.PLAYORPAUSE);
                     }
                     mMediaPlayer.setVolume(1.0f,1.0f);
                 }
@@ -198,7 +186,7 @@ public class MusicService extends BaseService implements Playback {
                         focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK){
                     mNeedContinue = mIsplay;
                     if(mIsplay && mMediaPlayer != null){
-                        Global.setOperation(Constants.TOGGLE);
+                        Global.setOperation(Constants.PLAYORPAUSE);
                         pause();
                     }
                 }
@@ -207,7 +195,7 @@ public class MusicService extends BaseService implements Playback {
                 if(focusChange == AudioManager.AUDIOFOCUS_LOSS){
                     mAudioFouus = false;
                     if(mIsplay && mMediaPlayer != null) {
-                        Global.setOperation(Constants.TOGGLE);
+                        Global.setOperation(Constants.PLAYORPAUSE);
                         pause();
                     }
                 }
@@ -299,8 +287,7 @@ public class MusicService extends BaseService implements Playback {
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                CommonUtil.uploadException("MediaPlayerError",new Exception("what:" + what + " extra:" + extra));
-                LogUtil.e(TAG, "what = " + what + " extar = " + extra);
+                LogUtil.d(TAG, "what = " + what + " extar = " + extra);
                 return true;
             }
         });
@@ -328,10 +315,9 @@ public class MusicService extends BaseService implements Playback {
         mCurrentId = mCurrentInfo.getId();
         mCurrentIndex = pos;
         try {
-            if(mMediaPlayer == null) {
+            if(mMediaPlayer == null)
                 mMediaPlayer = new MediaPlayer();
-                mMediaPlayer.setDataSource(mCurrentInfo.getUrl());
-            }
+            mMediaPlayer.setDataSource(mCurrentInfo.getUrl());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -350,12 +336,11 @@ public class MusicService extends BaseService implements Playback {
     }
 
     private void unInit(){
-        if(mMediaPlayer != null) {
+        if(mMediaPlayer != null)
             mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
         if(mMediaExtractor != null)
             mMediaExtractor.release();
+        mMediaPlayer = null;
 
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
         mMediaSession.release();
@@ -368,6 +353,7 @@ public class MusicService extends BaseService implements Playback {
         //关闭通知
         ((NotificationManager) APlayerApplication.getContext().getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
     }
+
 
     /**
      * 播放下一首
@@ -384,6 +370,7 @@ public class MusicService extends BaseService implements Playback {
     public void playPrevious() {
         playNextOrPrev(false, true);
     }
+
 
     /**
      * 开始播放
@@ -445,7 +432,7 @@ public class MusicService extends BaseService implements Playback {
     /**
      * 播放选中的歌曲
      * 比如在全部歌曲或者专辑详情里面选中某一首歌曲
-     * @param position 播放位置
+     * @param position 播放索引
      */
     @Override
     public void playSelectSong(int position){
@@ -473,12 +460,9 @@ public class MusicService extends BaseService implements Playback {
             String str = intent.getStringExtra("WidgetName");
             switch (str){
                 case "BigWidget":
-                    if(mAppWidgetBig != null)
-                        mAppWidgetBig.updateWidget(context);
+//                    mAppWidgetBig.updateWidget(context);
                     break;
                 case "SmallWidget":
-                    if(mAppWidgetSmall != null)
-                        mAppWidgetSmall.updateWidget(context);
                     break;
             }
         }
@@ -488,7 +472,7 @@ public class MusicService extends BaseService implements Playback {
      * 接受控制命令
      * 包括暂停、播放、上下首、播放模式
      */
-    public class ControlReceiver extends BroadcastReceiver {
+    public class ControlReceiver extends WidgetReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getExtras() == null)
@@ -507,7 +491,7 @@ public class MusicService extends BaseService implements Playback {
             }
 
             if(Control == Constants.PLAYSELECTEDSONG || Control == Constants.PREV || Control == Constants.NEXT
-                    || Control == Constants.TOGGLE || Control == Constants.PAUSE || Control == Constants.START){
+                    || Control == Constants.PLAYORPAUSE || Control == Constants.PAUSE || Control == Constants.START){
                 if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
                     return;
                 if(CommonUtil.isFastDoubleClick()) {
@@ -530,7 +514,7 @@ public class MusicService extends BaseService implements Playback {
                     playNext();
                     break;
                 //暂停或者继续播放
-                case Constants.TOGGLE:
+                case Constants.PLAYORPAUSE:
                     if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
                         return;
                     mIsplay = !mIsplay;
@@ -834,7 +818,7 @@ public class MusicService extends BaseService implements Playback {
                     keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ||
                     keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
                 intent_ctl = new Intent(Constants.CTL_ACTION);
-                int arg = keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.TOGGLE :
+                int arg = keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.PLAYORPAUSE :
                         keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Constants.NEXT : Constants.PREV;
                 intent_ctl.putExtra("Control", arg);
                 getApplicationContext().sendBroadcast(intent_ctl);
@@ -849,7 +833,7 @@ public class MusicService extends BaseService implements Playback {
                         try {
                             sleep(800);
                             int arg = -1;
-                            arg = mCount == 1 ? Constants.TOGGLE : mCount == 2 ? Constants.NEXT : Constants.PREV;
+                            arg = mCount == 1 ? Constants.PLAYORPAUSE : mCount == 2 ? Constants.NEXT : Constants.PREV;
                             mCount = 0;
                             Intent intent = new Intent(Constants.CTL_ACTION);
                             intent.putExtra("Control", arg);
