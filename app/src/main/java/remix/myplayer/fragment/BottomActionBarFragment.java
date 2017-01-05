@@ -27,7 +27,6 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -122,7 +121,7 @@ public class BottomActionBarFragment extends BaseFragment{
         if(mp3Item == null)
             return;
         //歌曲名 艺术家
-        mTitle.setText(CommonUtil.processInfo(mp3Item.getTitle(),CommonUtil.SONGTYPE));
+        mTitle.setText(mp3Item.getTitle());
         mArtist.setText(mp3Item.getArtist());
         //设置按钮着色
         if(isPlaying) {

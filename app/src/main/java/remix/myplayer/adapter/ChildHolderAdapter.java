@@ -63,6 +63,8 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
 
     @Override
     public void onBindViewHolder(final ViewHoler holder, int position) {
+        if(mInfoList == null || position >= mInfoList.size())
+            return;
         final MP3Item temp = mInfoList.get(position);
         if(temp == null || temp.getId() < 0 || temp.Title.equals(mContext.getString(R.string.song_lose_effect))) {
             holder.mTitle.setText(R.string.song_lose_effect);

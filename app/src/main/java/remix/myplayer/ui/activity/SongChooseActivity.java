@@ -11,14 +11,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongChooseAdaper;
-import remix.myplayer.interfaces.OnCheckListener;
+import remix.myplayer.interfaces.OnSongChooseListener;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -33,8 +31,7 @@ import remix.myplayer.util.ToastUtil;
 
 public class SongChooseActivity extends BaseActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = SongChooseActivity.class.getSimpleName();
-    //所有选中的歌曲的id
-    private ArrayList<Integer> mCheckSongIdList = new ArrayList<>();
+
     private int mPlayListID;
     private String mPlayListName;
     Cursor mCursor = null;
@@ -65,16 +62,11 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
         }
         mPlayListName = getIntent().getStringExtra("PlayListName");
 
-        mAdapter = new SongChooseAdaper(this, new OnCheckListener() {
+        mAdapter = new SongChooseAdaper(this, new OnSongChooseListener() {
             @Override
-            public void OnCheck(boolean isCheck, int audioId) {
-                if(isCheck && !mCheckSongIdList.contains(audioId)){
-                    mCheckSongIdList.add(audioId);
-                } else if (!isCheck){
-                    mCheckSongIdList.remove(Integer.valueOf(audioId));
-                }
-                mConfirm.setAlpha(mCheckSongIdList.size() > 0 ? 1.0f : 0.6f);
-                mConfirm.setClickable(mCheckSongIdList.size() > 0);
+            public void OnSongChoose(boolean isValid) {
+                mConfirm.setAlpha(isValid ? 1.0f : 0.6f);
+                mConfirm.setClickable(isValid);
             }
         });
         getLoaderManager().initLoader(++LOADER_ID, null, this);
@@ -91,12 +83,11 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
                 finish();
                 break;
             case R.id.confirm:
-                if(mCheckSongIdList.size() == 0){
+                if(mAdapter.getCheckedSong() == null || mAdapter.getCheckedSong().size() == 0){
                     ToastUtil.show(this,R.string.choose_no_song);
                     return;
                 }
-                final int num;
-                num = PlayListUtil.addMultiSongs(mCheckSongIdList,mPlayListName,mPlayListID);
+                final int num = PlayListUtil.addMultiSongs(mAdapter.getCheckedSong(),mPlayListName,mPlayListID);
                 ToastUtil.show(this,getString(R.string.add_song_playlist_success, num,mPlayListName));
                 finish();
         }
@@ -115,6 +106,8 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
 
     @Override
     public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
+        if(data == null)
+            return;
         //保存查询结果，并设置查询索引
         mCursor = data;
         mTitleIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);

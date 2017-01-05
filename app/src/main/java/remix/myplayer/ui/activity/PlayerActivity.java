@@ -3,7 +3,6 @@ package remix.myplayer.ui.activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -225,16 +224,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     @Override
     protected void setStatusBar() {
         if(ThemeStore.isDay()){
-            if(Build.MANUFACTURER.equals("Meizu")){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                StatusBarUtil.setTransparent(this);
+                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else if(Build.MANUFACTURER.equals("Meizu")){
                 StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this,true);
                 StatusBarUtil.setTransparent(this);
             } else if (Build.MANUFACTURER.equals("Xiaomi")){
                 StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true,this);
                 StatusBarUtil.setTransparent(this);
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                StatusBarUtil.setTransparent(this);
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            }else {
+            } else {
                 StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.white_f2f2f2));
             }
         } else {
@@ -429,7 +428,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 intent.putExtra("Control", Constants.NEXT);
                 break;
             case R.id.playbar_play_container:
-                intent.putExtra("Control", Constants.PLAYORPAUSE);
+                intent.putExtra("Control", Constants.TOGGLE);
                 break;
         }
         MobclickAgent.onEvent(this,v.getId() == R.id.playbar_play_container ? "Prev" : v.getId() == R.id.playbar_next ? "Next" : "Play");
@@ -779,7 +778,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             return;
         }
         //当操作不为播放或者暂停且正在运行时，更新所有控件
-        if((Global.getOperation() != Constants.PLAYORPAUSE  || mFistStart) && mInfo != null ) {
+        if((Global.getOperation() != Constants.TOGGLE || mFistStart) && mInfo != null ) {
             //更新顶部信息
             UpdateTopStatus(mInfo);
             //更新歌词
