@@ -428,7 +428,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 intent.putExtra("Control", Constants.NEXT);
                 break;
             case R.id.playbar_play_container:
-                intent.putExtra("Control", Constants.PLAYORPAUSE);
+                intent.putExtra("Control", Constants.TOGGLE);
                 break;
         }
         MobclickAgent.onEvent(this,v.getId() == R.id.playbar_play_container ? "Prev" : v.getId() == R.id.playbar_next ? "Next" : "Play");
@@ -778,7 +778,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             return;
         }
         //当操作不为播放或者暂停且正在运行时，更新所有控件
-        if((Global.getOperation() != Constants.PLAYORPAUSE  || mFistStart) && mInfo != null ) {
+        if((Global.getOperation() != Constants.TOGGLE || mFistStart) && mInfo != null ) {
             //更新顶部信息
             UpdateTopStatus(mInfo);
             //更新歌词

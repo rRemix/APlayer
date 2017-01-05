@@ -50,7 +50,6 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/s24_size"
             android:textColor="@color/night_textcolor_primary"
-            android:text="歌曲名"
             android:maxLines="1"/>
         <TextView
             android:layout_marginTop="@dimen/d4_size"
@@ -59,7 +58,6 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/s18_size"
             android:textColor="@color/night_textcolor"
-            android:text="艺术家"
             android:maxLines="1"/>
     </LinearLayout>
 </RelativeLayout>

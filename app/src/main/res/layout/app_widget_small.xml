@@ -6,11 +6,10 @@
     android:layout_height="match_parent"
     android:rowCount="3"
     android:columnCount="2">
-    <ImageView android:id="@+id/image"
+    <ImageView android:id="@+id/appwidget_image"
         android:layout_width="@dimen/appwidget_small_image_size"
         android:layout_height="@dimen/appwidget_small_image_size"
-        android:background="@color/white"
-        android:scaleType="centerInside" />
+        android:scaleType="centerCrop" />
     <LinearLayout android:gravity="center_horizontal"
         android:layout_gravity="fill_horizontal"
         android:orientation="horizontal"

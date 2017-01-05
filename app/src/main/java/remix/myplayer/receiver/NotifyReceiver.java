@@ -7,17 +7,33 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.widget.RemoteViews;
+
+import com.facebook.common.executors.CallerThreadExecutor;
+import com.facebook.common.references.CloseableReference;
+import com.facebook.datasource.BaseDataSubscriber;
+import com.facebook.datasource.DataSource;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
+import com.facebook.imagepipeline.image.CloseableBitmap;
+import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import remix.myplayer.R;
 import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.PlayerActivity;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 
@@ -41,9 +57,8 @@ public class NotifyReceiver extends BroadcastReceiver {
         UpdateNotify(context);
     }
 
-    private void UpdateNotify(Context context) {
-
-        mRemoteBigView = new RemoteViews(context.getPackageName(),  R.layout.notify_playbar_big );
+    private void UpdateNotify(final Context context) {
+        mRemoteBigView = new RemoteViews(context.getPackageName(),  R.layout.notify_playbar_big);
         mRemoteView = new RemoteViews(context.getPackageName(),R.layout.notify_playbar);
         mIsplay = MusicService.getIsplay();
 
@@ -51,27 +66,20 @@ public class NotifyReceiver extends BroadcastReceiver {
             return;
 
         if((MusicService.getCurrentMP3() != null)) {
-            boolean isSystemColor = SPUtil.getValue(context,"Setting","IsSystemColor",false);
+            boolean isSystemColor = SPUtil.getValue(context,"Setting","IsSystemColor",true);
 
             MP3Item temp = MusicService.getCurrentMP3();
             //设置歌手，歌曲名
             mRemoteBigView.setTextViewText(R.id.notify_song, temp.getTitle());
             mRemoteBigView.setTextViewText(R.id.notify_artist_album, temp.getArtist() + " - " + temp.getAlbum());
+            mRemoteBigView.setTextColor(R.id.notify_song, ColorUtil.getColor(isSystemColor ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+
             mRemoteView.setTextViewText(R.id.notify_song,temp.getTitle());
+            mRemoteView.setTextColor(R.id.notify_song, ColorUtil.getColor(isSystemColor ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
             mRemoteView.setTextViewText(R.id.notify_artist_album,temp.getArtist() + " - " + temp.getAlbum());
             //背景
             mRemoteBigView.setImageViewResource(R.id.notify_bg,isSystemColor ? R.drawable.bg_system : R.drawable.bg_black);
             mRemoteView.setImageViewResource(R.id.notify_bg,isSystemColor ? R.drawable.bg_system : R.drawable.bg_black);
-            //设置封面
-            Bitmap bitmap = MediaStoreUtil.getAlbumBitmap(temp.getAlbumId(), false);
-
-            if(bitmap != null) {
-                mRemoteBigView.setImageViewBitmap(R.id.notify_image, bitmap);
-                mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
-            } else {
-                mRemoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
-                mRemoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
-            }
             //设置播放按钮
             if(!mIsplay){
                 mRemoteBigView.setImageViewResource(R.id.notify_play, R.drawable.notify_play);
@@ -80,16 +88,75 @@ public class NotifyReceiver extends BroadcastReceiver {
                 mRemoteBigView.setImageViewResource(R.id.notify_play, R.drawable.notify_pause);
                 mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notify_pause);
             }
+            //设置封面
+            int size = DensityUtil.dip2px(context,120);
+            ImageRequest imageRequest =
+                    ImageRequestBuilder.newBuilderWithSource(Uri.parse("file://" + MediaStoreUtil.getImageUrl(temp.getAlbumId() + "",Constants.URL_ALBUM)))
+                    .setResizeOptions(new ResizeOptions(size,size))
+                    .setProgressiveRenderingEnabled(true)
+                    .build();
+            DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);
 
-            buildAction(context);
+//            dataSource.subscribe(new BaseDataSubscriber<CloseableReference<CloseableImage>>() {
+//                @Override
+//                protected void onNewResultImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+//                    if(!dataSource.isFinished())
+//                        return;
+//                    CloseableReference<CloseableImage> result = dataSource.getResult();
+//                    if(result != null){
+//                        try {
+//                            CloseableImage closeableImage = result.get();
+//                            if(closeableImage instanceof CloseableBitmap){
+//                                Bitmap bitmap = Bitmap.createBitmap(((CloseableBitmap) closeableImage).getUnderlyingBitmap());
+//                                if(bitmap != null) {
+//                                    mRemoteBigView.setImageViewBitmap(R.id.notify_image, bitmap);
+//                                    mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
+//                                } else {
+//                                    mRemoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
+//                                    mRemoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
+//                                }
+//                                pushNotify(context);
+//                            }
+//                        }catch (Exception e){
+//                            LogUtil.e(e.toString());
+//                        }
+//                    }
+//                }
+//                @Override
+//                protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+//                    pushNotify(context);
+//                }
+//            }, CallerThreadExecutor.getInstance());
 
-            buildNotitication(context);
-
-            mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(0, mNotification);
-            Global.setNotifyShowing(true);
+            dataSource.subscribe(new BaseBitmapDataSubscriber() {
+                @Override
+                protected void onNewResultImpl(Bitmap bitmap) {
+                    Bitmap result = Bitmap.createBitmap(bitmap);
+                    if(result != null) {
+                        mRemoteBigView.setImageViewBitmap(R.id.notify_image, result);
+                        mRemoteView.setImageViewBitmap(R.id.notify_image,result);
+                    } else {
+                        mRemoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
+                        mRemoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
+                    }
+                    pushNotify(context);
+                }
+                @Override
+                protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+                    pushNotify(context);
+                }
+            }, CallerThreadExecutor.getInstance());
         }
 
+    }
+
+    private void pushNotify(Context context) {
+        buildAction(context);
+        buildNotitication(context);
+        if(mNotificationManager == null)
+            mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(0, mNotification);
+        Global.setNotifyShowing(true);
     }
 
     private void buildNotitication(Context context) {
@@ -130,7 +197,7 @@ public class NotifyReceiver extends BroadcastReceiver {
         Intent actionIntent = new Intent(Constants.CTL_ACTION);
         actionIntent.putExtra("FromNotify", true);
         //播放或者暂停
-        actionIntent.putExtra("Control", Constants.PLAYORPAUSE);
+        actionIntent.putExtra("Control", Constants.TOGGLE);
         PendingIntent playIntent = PendingIntent.getBroadcast(context, 1, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_play, playIntent);
         mRemoteView.setOnClickPendingIntent(R.id.notify_play,playIntent);
@@ -141,7 +208,7 @@ public class NotifyReceiver extends BroadcastReceiver {
         mRemoteView.setOnClickPendingIntent(R.id.notify_next, nextIntent);
         //上一首
         actionIntent.putExtra("Control", Constants.PREV);
-        PendingIntent prevIntent = PendingIntent.getBroadcast(context, 2, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent prevIntent = PendingIntent.getBroadcast(context, 3, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_prev,prevIntent);
 
         //关闭通知栏

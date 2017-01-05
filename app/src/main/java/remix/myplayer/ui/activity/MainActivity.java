@@ -311,19 +311,24 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                         .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
                             @Override
                             public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                                if(!TextUtils.isEmpty(input)){
-                                    int newPlayListId = PlayListUtil.addPlayList(input.toString());
-                                    ToastUtil.show(MainActivity.this, newPlayListId > 0 ?
-                                                    R.string.add_playlist_success :
-                                                    newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
-                                            Toast.LENGTH_SHORT);
-                                    if(newPlayListId > 0){
-                                        //跳转到添加歌曲界面
-                                        Intent intent = new Intent(MainActivity.this,SongChooseActivity.class);
-                                        intent.putExtra("PlayListID",newPlayListId);
-                                        intent.putExtra("PlayListName",input.toString());
-                                        startActivity(intent);
+                                int newPlayListId = -1;
+                                try {
+                                    if(!TextUtils.isEmpty(input)){
+                                        newPlayListId = PlayListUtil.addPlayList(input.toString());
+                                        ToastUtil.show(MainActivity.this, newPlayListId > 0 ?
+                                                        R.string.add_playlist_success :
+                                                        newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
+                                                Toast.LENGTH_SHORT);
+                                        if(newPlayListId > 0){
+                                            //跳转到添加歌曲界面
+                                            Intent intent = new Intent(MainActivity.this,SongChooseActivity.class);
+                                            intent.putExtra("PlayListID",newPlayListId);
+                                            intent.putExtra("PlayListName",input.toString());
+                                            startActivity(intent);
+                                        }
                                     }
+                                } catch (Exception e){
+                                    CommonUtil.uploadException("新建" + input + "错误:" + newPlayListId,e);
                                 }
                             }
                         })
@@ -519,6 +524,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 //图片裁剪
                 case Crop.REQUEST_CROP:
                     //裁剪后的图片路径
+                    if(Crop.getOutput(data) == null)
+                        return;
+
                     final String path = Crop.getOutput(data).getEncodedPath();
                     if(TextUtils.isEmpty(path) || id == -1){
                         ToastUtil.show(MainActivity.this,errorTxt);

@@ -12,11 +12,13 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadImage;
-import remix.myplayer.interfaces.OnCheckListener;
+import remix.myplayer.interfaces.OnSongChooseListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.ui.activity.SongChooseActivity;
 import remix.myplayer.util.CommonUtil;
@@ -30,10 +32,16 @@ import remix.myplayer.util.Constants;
  */
 
 public class SongChooseAdaper extends BaseAdapter<SongChooseAdaper.SongChooseHolder> {
-    private OnCheckListener mCheckListener;
-    public SongChooseAdaper(Context context,OnCheckListener l) {
+    private OnSongChooseListener mCheckListener;
+    private ArrayList<Integer> mCheckSongIdList = new ArrayList<>();
+
+    public SongChooseAdaper(Context context,OnSongChooseListener l) {
         super(context);
         mCheckListener = l;
+    }
+
+    public ArrayList<Integer> getCheckedSong(){
+        return mCheckSongIdList;
     }
 
     @Override
@@ -59,20 +67,29 @@ public class SongChooseAdaper extends BaseAdapter<SongChooseAdaper.SongChooseHol
             holder.mArtist.setText(artist);
             //封面
             holder.mImage.setImageURI(Uri.EMPTY);
-//            ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"),temp.getAlbumId());
+
             new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(), Constants.URL_ALBUM);
             //选中歌曲
             holder.mRoot.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     holder.mCheck.setChecked(!holder.mCheck.isChecked());
-                    mCheckListener.OnCheck(holder.mCheck.isChecked(),temp.getId());
+                    mCheckListener.OnSongChoose(mCheckSongIdList != null && mCheckSongIdList.size() > 0);
                 }
             });
+
+            final int audioId = temp.getId();
+            holder.mCheck.setOnCheckedChangeListener(null);
+            holder.mCheck.setChecked(mCheckSongIdList != null && mCheckSongIdList.contains(audioId));
             holder.mCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    mCheckListener.OnCheck(isChecked,temp.getId());
+                    if(isChecked && !mCheckSongIdList.contains(audioId)){
+                        mCheckSongIdList.add(audioId);
+                    } else if (!isChecked){
+                        mCheckSongIdList.remove(Integer.valueOf(audioId));
+                    }
+                    mCheckListener.OnSongChoose(mCheckSongIdList != null && mCheckSongIdList.size() > 0);
                 }
             });
         }
