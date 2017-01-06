@@ -2,9 +2,6 @@ package remix.myplayer.application;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Environment;
 
 import com.facebook.common.internal.Supplier;
@@ -18,13 +15,11 @@ import com.umeng.socialize.PlatformConfig;
 import com.umeng.socialize.UMShareAPI;
 
 import cn.bmob.v3.Bmob;
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.SaveListener;
+import remix.myplayer.BuildConfig;
 import remix.myplayer.R;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.LockScreenListener;
-import remix.myplayer.model.Feedback;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.service.TimerService;
 import remix.myplayer.theme.ThemeStore;
@@ -59,7 +54,7 @@ public class APlayerApplication extends android.app.Application {
         CommonUtil.setFontSize(this);
         //友盟分享
         UMShareAPI.get(this);
-        Config.DEBUG = true;
+        Config.DEBUG = BuildConfig.DEBUG;
         //bomb
         Bmob.initialize(this, "0c070110fffa9e88a1362643fb9d4d64");
         //禁止默认的页面统计方式
@@ -74,7 +69,7 @@ public class APlayerApplication extends android.app.Application {
         new LockScreenListener(getApplicationContext()).beginListen();
         //友盟异常捕获
         MobclickAgent.setCatchUncaughtExceptions(true);
-        MobclickAgent.setDebugMode(true);
+        MobclickAgent.setDebugMode(BuildConfig.DEBUG);
         initTheme();
         initUtil();
         loadData();
@@ -115,7 +110,6 @@ public class APlayerApplication extends android.app.Application {
                 //保存所有目录名字包含lyric的目录
                 if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
                     CommonUtil.getLyricDir(Environment.getExternalStorageDirectory());
-                    LogUtil.d("LrcDir","Paths:" + Global.mLyricDir);
                 }
             }
         }.start();
@@ -136,8 +130,7 @@ public class APlayerApplication extends android.app.Application {
                 .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {
                     @Override
                     public MemoryCacheParams get() {
-                        return new MemoryCacheParams(cacheSize, 20,cacheSize, 20, 5 * ByteConstants.MB);
-//                        return new MemoryCacheParams(cacheSize, Integer.MAX_VALUE,cacheSize, Integer.MAX_VALUE, Integer.MAX_VALUE);
+                        return new MemoryCacheParams(cacheSize, 20,cacheSize,10, 5 * ByteConstants.MB);
                     }
                 })
                 .build();

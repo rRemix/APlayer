@@ -156,15 +156,13 @@ public class MusicService extends BaseService implements Playback {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        int ret = super.onStartCommand(intent,flags,startId);
-        LogUtil.d(TAG,"onStartCommand: " + ret);
         if(mControlRecevier != null &&
                 intent != null &&
                 intent.getExtras() != null &&
                 intent.getExtras().getBoolean("FromWidget",false)){
             mControlRecevier.onReceive(null,intent);
         }
-        return ret;
+        return super.onStartCommand(intent,flags,startId);
     }
 
     @Override

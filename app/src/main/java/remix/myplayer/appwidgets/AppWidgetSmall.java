@@ -11,12 +11,10 @@ import android.widget.RemoteViews;
 
 import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.BaseDataSubscriber;
 import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableBitmap;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
@@ -42,6 +40,7 @@ public class AppWidgetSmall extends BaseAppwidget {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+//        context.startService(new Intent(context,MusicService.class));
         mAppIds = appWidgetIds;
         mRemoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_small);
         buildAction(context, mRemoteViews);
