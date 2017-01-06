@@ -37,6 +37,7 @@ public class AppWidgetBig extends BaseAppwidget {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+//        context.startService(new Intent(context,MusicService.class));
         mAppIds = appWidgetIds;
         mRemoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_big);
         buildAction(context, mRemoteViews);
