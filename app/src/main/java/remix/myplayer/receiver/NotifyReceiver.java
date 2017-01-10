@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import com.facebook.common.executors.CallerThreadExecutor;
@@ -55,8 +56,8 @@ public class NotifyReceiver extends BroadcastReceiver {
     }
 
     private void UpdateNotify(final Context context) {
-        mRemoteBigView = new RemoteViews(context.getPackageName(),  R.layout.notify_playbar_big);
-        mRemoteView = new RemoteViews(context.getPackageName(),R.layout.notify_playbar);
+        mRemoteBigView = new RemoteViews(context.getPackageName(),  R.layout.notification_big);
+        mRemoteView = new RemoteViews(context.getPackageName(),R.layout.notification);
         mIsplay = MusicService.getIsplay();
 
         if(!Global.isNotifyShowing() && !mIsplay)
@@ -69,14 +70,20 @@ public class NotifyReceiver extends BroadcastReceiver {
             //设置歌手，歌曲名
             mRemoteBigView.setTextViewText(R.id.notify_song, temp.getTitle());
             mRemoteBigView.setTextViewText(R.id.notify_artist_album, temp.getArtist() + " - " + temp.getAlbum());
-            mRemoteBigView.setTextColor(R.id.notify_song, ColorUtil.getColor(isSystemColor ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
 
             mRemoteView.setTextViewText(R.id.notify_song,temp.getTitle());
-            mRemoteView.setTextColor(R.id.notify_song, ColorUtil.getColor(isSystemColor ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
             mRemoteView.setTextViewText(R.id.notify_artist_album,temp.getArtist() + " - " + temp.getAlbum());
-            //背景
-            mRemoteBigView.setImageViewResource(R.id.notify_bg,isSystemColor ? R.drawable.bg_system : R.drawable.bg_black);
-            mRemoteView.setImageViewResource(R.id.notify_bg,isSystemColor ? R.drawable.bg_system : R.drawable.bg_black);
+
+            //设置了黑色背景
+            if(!isSystemColor){
+                mRemoteBigView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.night_textcolor_primary));
+                mRemoteView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.night_textcolor_primary));
+                //背景
+                mRemoteBigView.setImageViewResource(R.id.notify_bg, R.drawable.bg_black);
+                mRemoteBigView.setViewVisibility(R.id.notify_bg,View.VISIBLE);
+                mRemoteView.setImageViewResource(R.id.notify_bg, R.drawable.bg_black);
+                mRemoteView.setViewVisibility(R.id.notify_bg,View.VISIBLE);
+            }
             //设置播放按钮
             if(!mIsplay){
                 mRemoteBigView.setImageViewResource(R.id.notify_play, R.drawable.notify_play);

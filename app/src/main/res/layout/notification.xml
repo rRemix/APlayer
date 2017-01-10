@@ -8,7 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/notify_bg"
-        android:scaleType="fitXY"/>
+        android:scaleType="fitXY"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,22 +29,22 @@
             android:orientation="vertical"
             android:gravity="center_vertical">
             <TextView
+                style="@style/TextAppearance.AppCompat.Notification.Title"
                 android:id="@+id/notify_song"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lines="1"
                 android:ellipsize="end"
-                android:textColor="@color/white_f4f4f5"
                 android:textSize="@dimen/s16_size"
                 android:layout_marginBottom="@dimen/d5_szie"/>
             <TextView
+                style="@style/TextAppearance.StatusBar.EventContent"
                 android:id="@+id/notify_artist_album"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lines="1"
                 android:ellipsize="end"
-                android:textSize="@dimen/s14_size"
-                android:textColor="@color/gray_8d8c8e"/>
+                android:textSize="@dimen/s14_size" />
         </LinearLayout>
 
 

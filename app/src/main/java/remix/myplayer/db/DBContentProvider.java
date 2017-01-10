@@ -70,9 +70,10 @@ public class DBContentProvider extends ContentProvider {
         int lines = 0;
         try {
             db.beginTransaction(); //开始事务
+            String name = match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME;
             //数据库操作
             for (ContentValues cv : values) {
-                db.insert(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,null,cv);
+                db.insert(name,null,cv);
                 lines++;
             }
             db.setTransactionSuccessful(); // Commit
@@ -93,7 +94,6 @@ public class DBContentProvider extends ContentProvider {
         try {
             if(match == PLAY_LIST_MULTIPLE || match == PLAY_LIST_SONG_MULTIPLE){
                 long rowId = db.insert(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME,null,values);
-                LogUtil.d("DBTest","rowId:" + rowId);
                 if(rowId > 0){
                     newUri = ContentUris.withAppendedId(match == PLAY_LIST_MULTIPLE ? PlayLists.CONTENT_URI : PlayListSongs.CONTENT_URI,rowId);
                     APlayerApplication.getContext().getContentResolver().notifyChange(newUri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
