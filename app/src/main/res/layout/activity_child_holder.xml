@@ -12,36 +12,7 @@
         <include layout="@layout/toolbar_multi"/>
     </android.support.design.widget.AppBarLayout>
 
-
-    <RelativeLayout
-        android:id="@+id/shuffle_container"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/d48_size"
-        android:background="?attr/background_color_main">
-        <ImageButton
-            android:id="@+id/play_shuffle_button"
-            android:layout_centerVertical="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/btn_shuffle"
-            android:background="@color/transparent"
-            android:layout_marginLeft="@dimen/d16_size"
-            android:layout_alignParentLeft="true"/>
-        <TextView
-            android:layout_centerVertical="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/default_textview_color"
-            android:text="@string/play_random"
-            android:layout_toRightOf="@id/play_shuffle_button"
-            android:layout_marginLeft="@dimen/d16_size" />
-        <ImageView
-            android:id="@+id/divider"
-            android:layout_alignParentBottom="true"
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="?attr/divider_color"/>
-    </RelativeLayout>
+    <include layout="@layout/layout_play_shuffle"/>
 
     <View
         android:layout_width="match_parent"

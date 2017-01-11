@@ -306,7 +306,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 ClipboardManager clipboardManager = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
-                                ClipData clipData = ClipData.newPlainText("text", "568920427@qq.com(*博睿)");
+                                ClipData clipData = ClipData.newPlainText("text", "568920427@qq.com");
                                 clipboardManager.setPrimaryClip(clipData);
                                 ToastUtil.show(mContext,getString(R.string.alread_copy));
                             }

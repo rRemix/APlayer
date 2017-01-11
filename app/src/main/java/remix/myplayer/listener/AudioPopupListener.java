@@ -258,7 +258,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 }
                 break;
             case R.id.menu_collect:
-                PlayListSongInfo info = new PlayListSongInfo(mInfo.getId(), Global.mMyLoveID,Constants.MYLOVE);
+                PlayListSongInfo info = new PlayListSongInfo(mInfo.getId(), Global.MyLoveID,Constants.MYLOVE);
                 ToastUtil.show(mContext,
                         PlayListUtil.addSong(info) > 0 ? mContext.getString(R.string.add_song_playlist_success, 1,Constants.MYLOVE) : mContext.getString(R.string.add_song_playlist_error));
                 break;
@@ -272,7 +272,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
 //                                @Override
 //                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 //                                    if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG)){
-//                                        if(PlayListUtil.deleteSong(mInfo.getId(), Global.mPlayQueueID)){
+//                                        if(PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)){
 //                                            ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
 //                                        }
 //                                    } else {

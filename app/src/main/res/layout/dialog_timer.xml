@@ -75,7 +75,7 @@
                 android:id="@+id/close_seekbar"
                 android:layout_width="@dimen/d180_size"
                 android:layout_height="@dimen/d180_size"
-                CircleSeekBar:progress_max="60"
+                CircleSeekBar:progress_max="5400"
                 CircleSeekBar:progress_width="@dimen/d4_size" />
             <RelativeLayout
                 android:layout_width="match_parent"

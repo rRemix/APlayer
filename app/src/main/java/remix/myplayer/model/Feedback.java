@@ -36,14 +36,15 @@ public class Feedback extends BmobObject {
 
     @Override
     public String toString() {
-        return "Content: " + Content + '\n' +
-                "AppVersion: " + AppVersion + '\n' +
+        return "AppVersion: " + AppVersion + '\n' +
                 "AppVersionCode: " + AppVersionCode + '\n' +
                 "CpuABI: " + CpuABI + '\n' +
                 "DeviceManufacturer: " + DeviceManufacturer + '\n' +
-                "DeviceModel=" + DeviceModel + '\n' +
+                "DeviceModel: " + DeviceModel + '\n' +
                 "ReleaseVersion: " + ReleaseVersion + '\n' +
-                "SdkVersion: " + SdkVersion ;
+                "SdkVersion= : " + SdkVersion + '\n' +
+                "Display: " + Display + '\n' +
+                "Contact: " + Contact + '\n';
     }
 
     public String getContent() {

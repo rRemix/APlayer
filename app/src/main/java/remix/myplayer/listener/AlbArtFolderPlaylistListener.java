@@ -78,7 +78,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 MobclickAgent.onEvent(mContext,"Delete");
-                                if(mId == Global.mMyLoveID && mType == Constants.PLAYLIST){
+                                if(mId == Global.MyLoveID && mType == Constants.PLAYLIST){
                                     ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delelte));
                                 }
                                 if(mType != Constants.PLAYLIST){
@@ -101,9 +101,9 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 break;
             //设置封面
             case R.id.menu_album_thumb:
-                Global.mSetCoverID = mId;
-                Global.mSetCoverType = mType;
-                Global.mSetCoverName = mKey;
+                Global.SetCoverID = mId;
+                Global.SetCoverType = mType;
+                Global.SetCoverName = mKey;
                 Intent ori = ((Activity)mContext).getIntent();
                 ori.putExtra("ID",mId);
                 ((Activity)mContext).setIntent(ori);

@@ -69,9 +69,9 @@ public class CircleSeekBar extends AbsSeekBar {
     private float mOffsetY = 0;
 
     /**
-     * 最大进度值
+     * 最大计时值
      */
-    private int mProgressMax = 100;
+    private int mProgressMax ;
 
     /**
      * 当前进度
@@ -225,7 +225,7 @@ public class CircleSeekBar extends AbsSeekBar {
         mProgressCorlor = typedArray.getColor(R.styleable.CircleSeekBar_progress_color,
                 ThemeStore.getAccentColor());
         mProgressWidth = (int)typedArray.getDimension(R.styleable.CircleSeekBar_progress_width,14);
-        mProgressMax = typedArray.getInteger(R.styleable.CircleSeekBar_progress_max,60);
+        mProgressMax = typedArray.getInteger(R.styleable.CircleSeekBar_progress_max,600);
         typedArray.recycle();
 
         //圆圈画笔

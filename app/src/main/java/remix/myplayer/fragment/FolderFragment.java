@@ -57,7 +57,7 @@ public class FolderFragment extends BaseFragment {
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                String path = CommonUtil.getMapkeyByPosition(Global.mFolderMap,position);
+                String path = CommonUtil.getMapkeyByPosition(Global.FolderMap,position);
                 if(getUserVisibleHint() && !TextUtils.isEmpty(path) &&
                         !mMultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
                     Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
@@ -71,7 +71,7 @@ public class FolderFragment extends BaseFragment {
 
             @Override
             public void onItemLongClick(View view, int position) {
-                String path = CommonUtil.getMapkeyByPosition(Global.mFolderMap,position);
+                String path = CommonUtil.getMapkeyByPosition(Global.FolderMap,position);
                 if(getUserVisibleHint() && !TextUtils.isEmpty(path))
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG,Constants.FOLDER);
             }

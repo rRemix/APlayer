@@ -1,5 +1,6 @@
 package remix.myplayer.fragment;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 
@@ -15,9 +16,14 @@ import butterknife.Unbinder;
  */
 public class BaseFragment extends Fragment {
     protected Unbinder mUnBinder;
-
+    protected Context mContext;
     protected String mPageName = BaseFragment.class.getSimpleName();
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
 
     @Override
     public void onDestroyView() {

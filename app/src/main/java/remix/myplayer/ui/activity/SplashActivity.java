@@ -36,29 +36,29 @@ public class SplashActivity extends BaseActivity {
                     SPUtil.putValue(SplashActivity.this,"Setting","ThemeMode", ThemeStore.DAY);
                     SPUtil.putValue(SplashActivity.this,"Setting","ThemeColor",ThemeStore.THEME_BLUE);
                     //添加我的收藏列表
-                    Global.mPlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
-                    SPUtil.putValue(SplashActivity.this,"Setting","PlayQueueID",Global.mPlayQueueID);
-                    Global.mMyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
-                    SPUtil.putValue(SplashActivity.this,"Setting","MyLoveID",Global.mMyLoveID);
+                    Global.PlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
+                    SPUtil.putValue(SplashActivity.this,"Setting","PlayQueueID",Global.PlayQueueID);
+                    Global.MyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
+                    SPUtil.putValue(SplashActivity.this,"Setting","MyLoveID",Global.MyLoveID);
                 }else {
-                    Global.mPlayQueueID = SPUtil.getValue(SplashActivity.this,"Setting","PlayQueueID",-1);
-                    Global.mMyLoveID = SPUtil.getValue(SplashActivity.this,"Setting","MyLoveID",-1);
-                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueID);
-                    Global.mPlayList = PlayListUtil.getAllPlayListInfo();
-                    Global.mRecentlyID = SPUtil.getValue(SplashActivity.this,"Setting","RecentlyID",-1);
+                    Global.PlayQueueID = SPUtil.getValue(SplashActivity.this,"Setting","PlayQueueID",-1);
+                    Global.MyLoveID = SPUtil.getValue(SplashActivity.this,"Setting","MyLoveID",-1);
+                    Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
+                    Global.PlayList = PlayListUtil.getAllPlayListInfo();
+                    Global.RecentlyID = SPUtil.getValue(SplashActivity.this,"Setting","RecentlyID",-1);
                 }
 //                /** 更新最近添加列表 */
 //                //不是第一次打开软件，先删除原来的数据
 //                if(!isFirst){
 //                    long start = System.currentTimeMillis();
-//                    PlayListUtil.deleteMultiSongs(PlayListUtil.getIDList(Global.mRecentlyID),Global.mRecentlyID);
+//                    PlayListUtil.deleteMultiSongs(PlayListUtil.getIDList(Global.RecentlyID),Global.RecentlyID);
 //                    PlayListUtil.deletePlayList(SPUtil.getValue(SplashActivity.this,"Setting","RecentlyID",-1));
 //                    long time = System.currentTimeMillis() - start;
 //                    LogUtil.d("DELETE","time:" + time);
 //                }
 //                //新建最近添加列表
-//                Global.mRecentlyID = PlayListUtil.addPlayList(Constants.RECENTLY);
-//                SPUtil.putValue(SplashActivity.this,"Setting","RecentlyID", Global.mRecentlyID);
+//                Global.RecentlyID = PlayListUtil.addPlayList(Constants.RECENTLY);
+//                SPUtil.putValue(SplashActivity.this,"Setting","RecentlyID", Global.RecentlyID);
 //                //获得今天日期
 //                Calendar today = Calendar.getInstance();
 //                today.setTime(new Date());
@@ -75,7 +75,7 @@ public class SplashActivity extends BaseActivity {
 //                        while (cursor.moveToNext()){
 //                            IDList.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
 //                        }
-//                        PlayListUtil.addMultiSongs(IDList,Constants.RECENTLY,Global.mRecentlyID);
+//                        PlayListUtil.addMultiSongs(IDList,Constants.RECENTLY,Global.RecentlyID);
 //                    }
 //                }catch (Exception e){
 //                    e.printStackTrace();

@@ -374,11 +374,14 @@ public class CommonUtil {
      * @param artistname
      * @return
      */
-    public static JSONObject getSongJsonObject(String songname, String artistname){
+    public static JSONObject getSongJsonObject(String songname, String artistname,long duration){
         URL lrcIdUrl = null;
         try {
-            lrcIdUrl = new URL("http://gecimi.com/api/lyric/" + songname + "/" + artistname);
-
+            //歌词迷
+//            lrcIdUrl = new URL("http://gecimi.com/api/lyric/" + songname + "/" + artistname);
+            //酷狗
+            lrcIdUrl = new URL("http://lyrics.kugou.com/search?ver=1&man=yes&client=pc&keyword="
+                            + artistname + "-" + songname + "&duration=" + duration + "&hash=");
         } catch (Exception e1) {
             e1.printStackTrace();
         }
@@ -394,20 +397,13 @@ public class CommonUtil {
             httpConn.connect();
             InputStreamReader inReader = new InputStreamReader(httpConn.getInputStream());
             br = new BufferedReader(inReader);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        try {
             if(br == null)
                 return null;
             while((s = br.readLine()) != null){
                 strBuffer.append(s);
             }
             return new JSONObject(strBuffer.toString());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -421,6 +417,7 @@ public class CommonUtil {
                 e.printStackTrace();
             }
         }
+
         return null;
     }
 
@@ -535,10 +532,9 @@ public class CommonUtil {
                 return;
             for (File file : files) {
                 if (file.isDirectory()) {
-                    //如果目录可读就执行（一定要加，不然会挂掉）
                     if(file.canRead() && file.getName().contains("lyric")){
                         //保存
-                        Global.mLyricDir.add(file);
+                        Global.LyricDir.add(file);
                     }
                     getLyricDir(file);
                 }
@@ -575,8 +571,8 @@ public class CommonUtil {
                             //先判断是否包含歌手名和歌曲名
                             if(fileName.contains(songName) || fileName.contains(songName.toUpperCase())
                                     && (fileName.contains(artistName) || fileName.contains(artistName.toUpperCase()))){
-                                Global.mCurrentLrcPath = file.getAbsolutePath();
-                                LogUtil.d("Lrc","LrcPath:" + Global.mCurrentLrcPath);
+                                Global.CurrentLrcPath = file.getAbsolutePath();
+                                LogUtil.d("Lrc","LrcPath:" + Global.CurrentLrcPath);
                                 return;
                             }
                             //读取前五行歌词内容进行判断
@@ -593,8 +589,8 @@ public class CommonUtil {
                                     hasTitle = true;
                             }
                             if(hasArtist && hasTitle){
-                                Global.mCurrentLrcPath = file.getAbsolutePath();
-                                LogUtil.d("Lrc","LrcPath:" + Global.mCurrentLrcPath);
+                                Global.CurrentLrcPath = file.getAbsolutePath();
+                                LogUtil.d("Lrc","LrcPath:" + Global.CurrentLrcPath);
                                 return;
                             }
                         }
@@ -619,6 +615,9 @@ public class CommonUtil {
      */
     public static void uploadException(String title,Exception e){
         try {
+            if(!CommonUtil.isNetWorkConnected()){
+
+            }
             PackageManager pm = APlayerApplication.getContext().getPackageManager();
             PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
             Feedback feedback =  new Feedback(e.toString(),

@@ -15,11 +15,8 @@ import remix.myplayer.helper.DeleteHelper;
  */
 
 public class CursorFragment extends BaseFragment{
-
-    protected int CURRENT_ID = 1;
     protected Cursor mCursor;
     protected BaseAdapter mAdapter;
-
 
     @Nullable
     @Override

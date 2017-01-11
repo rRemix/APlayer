@@ -57,16 +57,13 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
     //当前列表模式 1:列表 2:网格
     public static int ListModel = 2;
 
-//    private Cursor mCursor;
-//    private PlayListAdapter mAdapter;
     private static int LOADER_ID = 0;
     private MultiChoice mMultiChoice;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        CURRENT_ID = ++LOADER_ID;
-        getLoaderManager().initLoader(CURRENT_ID, null, (LoaderManager.LoaderCallbacks) this);
+        getLoaderManager().initLoader(LOADER_ID, null, (LoaderManager.LoaderCallbacks) this);
     }
 
     @Nullable
@@ -197,13 +194,5 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
         if (mAdapter != null)
             mAdapter.setCursor(null);
     }
-
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        if(mAdapter != null){
-//            mAdapter.setCursor(null);
-//        }
-//    }
 
 }

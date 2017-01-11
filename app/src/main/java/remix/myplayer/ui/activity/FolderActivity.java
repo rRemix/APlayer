@@ -64,7 +64,7 @@ public class FolderActivity extends MultiChoiceActivity {
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                String path = CommonUtil.getMapkeyByPosition(Global.mFolderMap,position);
+                String path = CommonUtil.getMapkeyByPosition(Global.FolderMap,position);
                 if(!TextUtils.isEmpty(path) &&
                         !mMultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
                     Intent intent = new Intent(FolderActivity.this, ChildHolderActivity.class);
@@ -77,7 +77,7 @@ public class FolderActivity extends MultiChoiceActivity {
 
             @Override
             public void onItemLongClick(View view, int position) {
-                String path = CommonUtil.getMapkeyByPosition(Global.mFolderMap,position);
+                String path = CommonUtil.getMapkeyByPosition(Global.FolderMap,position);
                 if(!TextUtils.isEmpty(path))
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG,Constants.FOLDER);
             }

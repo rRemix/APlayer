@@ -15,6 +15,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -86,7 +87,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                     break;
                 case END:
                     if(mMDDialog != null && mMDDialog.isShowing()){
-                        findViewById(R.id.shuffle_container).setVisibility(mInfoList == null || mInfoList.size() == 0 ? View.GONE : View.VISIBLE);
+                        findViewById(R.id.shuffle_container).setVisibility(mInfoList != null && mInfoList.size() > 0 ? View.VISIBLE : View.GONE);
                         mMDDialog.dismiss();
                     }
                     break;
@@ -170,7 +171,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
 
         //初始化底部状态栏
         mBottombar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
+        if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
             return;
 
         mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
@@ -191,6 +192,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         public void run() {
             mRefreshHandler.sendEmptyMessage(START);
             mInfoList = getMP3List();
+
             mRefreshHandler.sendEmptyMessage(END);
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
@@ -215,7 +217,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                 break;
             //文件夹名
             case Constants.FOLDER:
-                mInfoList = MediaStoreUtil.getMP3ListByIds(Global.mFolderMap.get(mArg));
+                mInfoList = MediaStoreUtil.getMP3ListByIds(Global.FolderMap.get(mArg));
                 break;
             //播放列表名
             case Constants.PLAYLIST:
@@ -229,11 +231,12 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         return mInfoList;
     }
 
-    @OnClick(R.id.shuffle_container)
+    @OnClick(R.id.play_shuffle)
     public void onClick(View v){
         MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control", Constants.NEXT);
+        intent.putExtra("shuffle",true);
         //设置正在播放列表
         ArrayList<Integer> ids = new ArrayList<>();
         for (MP3Item info : mInfoList)

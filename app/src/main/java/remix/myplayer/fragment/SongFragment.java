@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -13,12 +14,17 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.telephony.gsm.GsmCellLocation;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.helper.DeleteHelper;
@@ -29,6 +35,7 @@ import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -48,23 +55,27 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
     public static int mSongId = -1;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
-
+    @BindView(R.id.sort)
+    TextView mSort;
+    @BindView(R.id.asc_desc)
+    TextView mAscDesc;
+    @BindView(R.id.shuffle_container)
+    View mShuffle;
     private static int LOADER_ID = 0;
-//    private Cursor mCursor;
-//    private SongAdapter mAdapter;
-
     public static final String TAG = SongFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
+    public static String ASCDESC = " asc";
+    public static String SORT = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        CURRENT_ID = ++LOADER_ID;
-        getLoaderManager().initLoader(CURRENT_ID, null, (LoaderManager.LoaderCallbacks) this);
+        //读取排序方式
+        ASCDESC = SPUtil.getValue(context,"Setting","AscDesc"," asc");
+        SORT = SPUtil.getValue(context,"Setting","Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+        getLoaderManager().initLoader(++LOADER_ID, null, (LoaderManager.LoaderCallbacks) this);
 
     }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,16 +89,6 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
         final View rootView = inflater.inflate(R.layout.fragment_song,null);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-        rootView.findViewById(R.id.play_shuffle).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
-                Intent intent = new Intent(Constants.CTL_ACTION);
-                intent.putExtra("Control", Constants.NEXT);
-                Global.setPlayQueue(Global.mAllSongList,getContext(),intent);
-            }
-        });
-
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -95,7 +96,6 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
         mAdapter = new SongAdapter(getActivity(),mMultiChoice, SongAdapter.ALLSONG);
-
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -106,10 +106,9 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    Global.setPlayQueue(Global.mAllSongList,getActivity(),intent);
+                    Global.setPlayQueue(Global.AllSongList,getActivity(),intent);
                 }
             }
-
             @Override
             public void onItemLongClick(View view, int position) {
                 int id = getSongID(position);
@@ -118,8 +117,61 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
             }
         });
         mRecyclerView.setAdapter(mAdapter);
-
+        //显示当前排序方式
+        mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "名字" : "添加时间");
+        mAscDesc.setText(!ASCDESC.equals(" desc") ? "升序" : "降序");
         return rootView;
+    }
+
+
+    @OnClick({R.id.asc_desc,R.id.sort,R.id.play_shuffle})
+    public void OnClick(View v){
+        switch (v.getId()){
+            case R.id.play_shuffle:
+                MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
+                Intent intent = new Intent(Constants.CTL_ACTION);
+                intent.putExtra("Control", Constants.NEXT);
+                intent.putExtra("shuffle",true);
+                Global.setPlayQueue(Global.AllSongList,getContext(),intent);
+                break;
+            case R.id.asc_desc:
+                if(ASCDESC.equals(" asc")){
+                    ASCDESC = " desc";
+                } else {
+                    ASCDESC = " asc";
+                }
+                mAscDesc.setText(ASCDESC.equals(" desc") ? "升序" : "降序");
+                getLoaderManager().restartLoader(LOADER_ID,null,this);
+                SPUtil.putValue(mContext,"Setting","AscDesc", ASCDESC);
+                break;
+            case R.id.sort:
+                if(SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER)){
+                    SORT = MediaStore.Audio.Media.DATE_ADDED;
+                } else {
+                    SORT = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
+                }
+                mSort.setText(SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "名字" : "添加时间");
+                getLoaderManager().restartLoader(LOADER_ID,null,this);
+                SPUtil.putValue(mContext,"Setting","Sort",SORT);
+                break;
+        }
+    }
+
+    /**
+     * 重新排序后需要重置全部歌曲列表
+     */
+    private synchronized void setAllSongList(){
+        if(mCursor == null)
+            return;
+        if(Global.AllSongList == null)
+            Global.AllSongList = new ArrayList<>();
+        else
+            Global.AllSongList.clear();
+        for(int i = 0 ; i < mCursor.getCount();i++){
+            if(mCursor.moveToPosition(i)){
+                Global.AllSongList.add(mCursor.getInt(mSongId));
+            }
+        }
     }
 
     private int getSongID(int position){
@@ -135,17 +187,20 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
         //查询所有歌曲
         return  new CursorLoader(getActivity(),
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                null,MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID(),null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                null,
+                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID(),
+                null,
+                SORT + ASCDESC);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
-
-        if(data == null || loader.getId() != CURRENT_ID)
+        if(data == null || loader.getId() != LOADER_ID)
             return;
         //保存查询结果，并设置查询索引
         mCursor = data;
         try {
+            mShuffle.setVisibility(mCursor.getCount() > 0 ? View.VISIBLE : View.GONE);
             mTitleIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
             mDisPlayNameIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
             mArtistIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
@@ -153,6 +208,7 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
             mSongId = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
             mAlbumIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
             mAdapter.setCursor(mCursor);
+            setAllSongList();
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -181,7 +237,6 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
 
     @Override
     public void OnDelete() {
-        CURRENT_ID = ++LOADER_ID;
-        getLoaderManager().initLoader(CURRENT_ID, null, this);
+        getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 }

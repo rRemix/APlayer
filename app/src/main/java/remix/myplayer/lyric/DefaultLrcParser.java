@@ -31,7 +31,6 @@ public class DefaultLrcParser implements ILrcParser {
         DiskLruCache.Editor editor = null;
         OutputStream lrcCacheStream = null;
 
-
         List<LrcRow> lrcRows = new ArrayList<>();
         try {
             if (needCache) {
@@ -51,6 +50,8 @@ public class DefaultLrcParser implements ILrcParser {
                 if(rows != null && rows.size() > 0)
                     lrcRows.addAll(rows);
             }
+            if(lrcRows.size() == 0)
+                return null;
             //为歌词排序
             Collections.sort(lrcRows);
 

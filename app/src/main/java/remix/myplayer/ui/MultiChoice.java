@@ -172,7 +172,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                                 .content(R.string.input_playlist_name)
                                 .contentColorAttr(R.attr.text_color_primary)
                                 .inputRange(1,15)
-                                .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
+                                .input("", "本地歌单" + Global.PlayList.size(), new MaterialDialog.InputCallback() {
                                     @Override
                                     public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                                         if(!TextUtils.isEmpty(input)){
@@ -205,7 +205,7 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.PLAYLIST:
                 for(Object arg : mSelectedArg){
                     if (arg instanceof Integer) {
-                        if((Integer)arg == Global.mMyLoveID)
+                        if((Integer)arg == Global.MyLoveID)
                             continue;
                         idList.add((Integer) arg);
                         //保存删除前，选中的播放列表下一共有多少歌曲

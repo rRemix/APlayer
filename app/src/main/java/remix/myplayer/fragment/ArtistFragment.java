@@ -52,8 +52,6 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
     private MultiChoice mMultiChoice;
 
     private static int LOADER_ID = 0;
-//    private ArtistAdapter mAdapter;
-//    private Cursor mCursor;
 
     //列表显示与网格显示切换
     @BindView(R.id.list_model)
@@ -68,9 +66,7 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        CURRENT_ID = ++LOADER_ID;
-        getLoaderManager().initLoader(CURRENT_ID, null, (LoaderManager.LoaderCallbacks) this);
-
+        getLoaderManager().initLoader(++LOADER_ID, null, (LoaderManager.LoaderCallbacks) this);
     }
 
     @Override
@@ -171,7 +167,7 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
     }
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(data == null || loader.getId() != CURRENT_ID)
+        if(data == null || loader.getId() != LOADER_ID)
             return;
         mCursor = data;
         try {
@@ -185,23 +181,13 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
 
     }
 
-
     @Override
     public ArtistAdapter getAdapter(){
         return (ArtistAdapter) mAdapter;
     }
 
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        if(mAdapter != null){
-//            mAdapter.setCursor(null);
-//        }
-//    }
-
     @Override
     public void OnDelete() {
-        CURRENT_ID = ++LOADER_ID;
-        getLoaderManager().initLoader(CURRENT_ID, null, this);
+        getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 }

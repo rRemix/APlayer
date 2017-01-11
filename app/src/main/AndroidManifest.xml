@@ -190,7 +190,6 @@
         </receiver>
 
         <service android:name=".service.MusicService" />
-        <service android:name=".service.TimerService" />
 
         <provider
             android:name=".db.DBContentProvider"

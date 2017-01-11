@@ -10,6 +10,7 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -112,6 +113,9 @@ public class MusicService extends BaseService implements Playback {
     /** 当前是否获得AudioFocus */
     private boolean mAudioFouus = false;
 
+    /** 计时器*/
+    private TimerUpdater mTimerUpdater;
+
     /** 更新相关Activity的Handler */
     private Handler mUpdateUIHandler = new Handler() {
         @Override
@@ -138,7 +142,9 @@ public class MusicService extends BaseService implements Playback {
         mContext = context;
     }
 
-    public static MusicService getInstance(){
+    public synchronized static MusicService getInstance(){
+        if(mInstance == null)
+            mInstance = new MusicService();
         return mInstance;
     }
 
@@ -339,7 +345,7 @@ public class MusicService extends BaseService implements Playback {
             return;
         //查找上次退出时保存的下一首歌曲是否还存在
         //如果不存在，重新设置下一首歌曲
-        mNextIndex = Global.mPlayQueue.indexOf(mNextId);
+        mNextIndex = Global.PlayQueue.indexOf(mNextId);
         mNextInfo = MediaStoreUtil.getMP3InfoById(mNextId);
         if(mNextInfo != null)
             return;
@@ -447,10 +453,10 @@ public class MusicService extends BaseService implements Playback {
      */
     @Override
     public void playSelectSong(int position){
-        if((mCurrentIndex = position) == -1 || (mCurrentIndex > Global.mPlayQueue.size() - 1))
+        if((mCurrentIndex = position) == -1 || (mCurrentIndex > Global.PlayQueue.size() - 1))
             return;
 
-        mCurrentId = Global.mPlayQueue.get(mCurrentIndex);
+        mCurrentId = Global.PlayQueue.get(mCurrentIndex);
         mCurrentInfo = MediaStoreUtil.getMP3InfoById(mCurrentId);
 
         mNextIndex = mCurrentIndex;
@@ -506,7 +512,7 @@ public class MusicService extends BaseService implements Playback {
 
             if(Control == Constants.PLAYSELECTEDSONG || Control == Constants.PREV || Control == Constants.NEXT
                     || Control == Constants.TOGGLE || Control == Constants.PAUSE || Control == Constants.START){
-                if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
+                if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
                     return;
                 if(CommonUtil.isFastDoubleClick()) {
                     ToastUtil.show(mContext,R.string.not_operate_fast);
@@ -529,7 +535,7 @@ public class MusicService extends BaseService implements Playback {
                     break;
                 //暂停或者继续播放
                 case Constants.TOGGLE:
-                    if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
+                    if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
                         return;
                     mIsplay = !mIsplay;
                     toggle();
@@ -610,9 +616,9 @@ public class MusicService extends BaseService implements Playback {
      * @return
      */
     private static int getShuffle(){
-        if(Global.mPlayQueue.size() == 1)
+        if(Global.PlayQueue.size() == 1)
             return 0;
-        return new Random().nextInt(Global.mPlayQueue.size() - 1);
+        return new Random().nextInt(Global.PlayQueue.size() - 1);
     }
 
     /**
@@ -621,7 +627,7 @@ public class MusicService extends BaseService implements Playback {
      * @param needPlay 是否需要播放
      */
     public void playNextOrPrev(boolean isNext, boolean needPlay){
-        if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
+        if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
             return;
 
         if(isNext){
@@ -632,18 +638,16 @@ public class MusicService extends BaseService implements Playback {
         } else {
             //如果点击上一首 根据播放模式查找上一首歌曲 再重新设置当前歌曲为上一首
             if ((--mCurrentIndex) < 0)
-                mCurrentIndex = Global.mPlayQueue.size() - 1;
-            if(mCurrentIndex  == -1 || (mCurrentIndex > Global.mPlayQueue.size() - 1))
+                mCurrentIndex = Global.PlayQueue.size() - 1;
+            if(mCurrentIndex  == -1 || (mCurrentIndex > Global.PlayQueue.size() - 1))
                 return;
-            mCurrentId = Global.mPlayQueue.get(mCurrentIndex);
+            mCurrentId = Global.PlayQueue.get(mCurrentIndex);
             mCurrentInfo = MediaStoreUtil.getMP3InfoById(mCurrentId);
             mNextIndex = mCurrentIndex;
             mNextId = mCurrentId;
         }
 
-        MP3Item temp = mCurrentInfo;
         if(mCurrentInfo == null) {
-            mCurrentInfo = temp;
             ToastUtil.show(mContext,R.string.song_lose_effect);
             return;
         }
@@ -653,21 +657,21 @@ public class MusicService extends BaseService implements Playback {
         updateNextSong();
     }
 
-
     /**
      * 更新下一首歌曲
      */
-    private static void updateNextSong(){
+    public static void updateNextSong(){
         if(mPlayModel == Constants.PLAY_LOOP || mPlayModel == Constants.PLAY_REPEATONE){
-            if ((++mNextIndex) > Global.mPlayQueue.size() - 1)
+            if ((++mNextIndex) > Global.PlayQueue.size() - 1)
                 mNextIndex = 0;
         } else{
             mNextIndex = getShuffle();
         }
-        if(mNextIndex <= Global.mPlayQueue.size()){
-            mNextId = Global.mPlayQueue.get(mNextIndex);
+        if(mNextIndex <= Global.PlayQueue.size()){
+            mNextId = Global.PlayQueue.get(mNextIndex);
         }
         mNextInfo = MediaStoreUtil.getMP3InfoById(mNextId);
+
     }
 
     /**
@@ -806,6 +810,56 @@ public class MusicService extends BaseService implements Playback {
         mCurrentIndex = pos;
     }
 
+
+    private long mMillisUntilFinish;
+    /**
+     * 开始或者停止计时
+     * @param start
+     * @param duration
+     */
+    public void toggleTimer(boolean start,long duration){
+        if(start){
+            if(duration <= 0)
+                return;
+            mTimerUpdater = new TimerUpdater(duration,1000);
+            mTimerUpdater.start();
+        } else {
+            if(mTimerUpdater != null){
+                mTimerUpdater.cancel();
+                mTimerUpdater = null;
+            }
+        }
+    }
+    /**
+     * 剩余的计时时间
+     * @return
+     */
+    public long getMillUntilFinish(){
+        synchronized (TimerUpdater.class){
+            return mMillisUntilFinish;
+        }
+    }
+    /**
+     * 定时关闭计时器
+     */
+    public class TimerUpdater extends CountDownTimer{
+        public TimerUpdater(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            synchronized (TimerUpdater.class){
+                mMillisUntilFinish = millisUntilFinished;
+            }
+        }
+
+        @Override
+        public void onFinish() {
+            //时间到后发送关闭程序的广播
+            sendBroadcast(new Intent(Constants.EXIT));
+        }
+    }
 
     /**
      * 记录在一秒中线控按下的次数

@@ -44,7 +44,7 @@ public class SearchCover {
     public String getImgUrl(){
         int albumId = 0;
         try {
-            JSONObject songJsonObject = CommonUtil.getSongJsonObject(mSongName,mArtistName);
+            JSONObject songJsonObject = CommonUtil.getSongJsonObject(mSongName,mArtistName,0);
             if(songJsonObject != null && songJsonObject.getInt("count") > 0 && songJsonObject.getInt("code") == 0){
                 albumId =  songJsonObject.getJSONArray("result").getJSONObject(0).getInt("aid");
             }

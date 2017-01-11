@@ -213,7 +213,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private void initLastSong() {
         //第一次打开软件，播放队列以及正在播放歌曲都为空
         mIsFirstCreateActivity = false;
-        if(Global.mPlayQueue == null || Global.mPlayQueue.size() == 0)
+        if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
             return;
 
         //读取上次退出时正在播放的歌曲的id
@@ -223,8 +223,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         //上次退出时正在播放的歌曲的pos
         int pos = 0;
         //查找上次退出时的歌曲是否还存在
-        for(int i = 0 ; i < Global.mPlayQueue.size();i++){
-            if(lastId == Global.mPlayQueue.get(i)){
+        for(int i = 0; i < Global.PlayQueue.size(); i++){
+            if(lastId == Global.PlayQueue.get(i)){
                 isLastSongExist = true;
                 pos = i;
                 break;
@@ -240,11 +240,11 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             updateHeader(item,isPlay);
             MusicService.initDataSource(item,pos);
         }else {
-            if(Global.mPlayQueue.size() > 0){
+            if(Global.PlayQueue.size() > 0){
                 //重新找到一个歌曲id
-                int id =  Global.mPlayQueue.get(0);
-                for(int i = 0; i < Global.mPlayQueue.size() ; i++){
-                    id = Global.mPlayQueue.get(i);
+                int id =  Global.PlayQueue.get(0);
+                for(int i = 0; i < Global.PlayQueue.size() ; i++){
+                    id = Global.PlayQueue.get(i);
                     if (id != lastId)
                         break;
                 }
@@ -308,7 +308,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                         .backgroundColorAttr(R.attr.background_color_3)
                         .contentColorAttr(R.attr.text_color_primary)
                         .inputRange(1,15)
-                        .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
+                        .input("", "本地歌单" + Global.PlayList.size(), new MaterialDialog.InputCallback() {
                             @Override
                             public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                                 int newPlayListId = -1;
@@ -493,8 +493,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null){
             String errorTxt = getString(
-                    Global.mSetCoverType == Constants.ALBUM ? R.string.set_album_cover_error : Global.mSetCoverType == Constants.ARTIST ? R.string.set_artist_cover_error : R.string.set_playlist_cover_error);
-            final int id = Global.mSetCoverID; //专辑、艺术家、播放列表封面
+                    Global.SetCoverType == Constants.ALBUM ? R.string.set_album_cover_error : Global.SetCoverType == Constants.ARTIST ? R.string.set_artist_cover_error : R.string.set_playlist_cover_error);
+            final int id = Global.SetCoverID; //专辑、艺术家、播放列表封面
             switch (requestCode){
                 //设置主题后重启activity或者清除缓存后刷新adapter
                 case SETTING:
@@ -508,7 +508,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 case Crop.REQUEST_PICK:
                     if(resultCode == RESULT_OK){
                         File cacheDir = DiskCache.getDiskCacheDir(this,
-                                "thumbnail/" + (Global.mSetCoverType == Constants.ALBUM ? "album" : Global.mSetCoverType == Constants.ARTIST ? "artist" : "playlist"));
+                                "thumbnail/" + (Global.SetCoverType == Constants.ALBUM ? "album" : Global.SetCoverType == Constants.ARTIST ? "artist" : "playlist"));
                         if(!cacheDir.exists()){
                             if(!cacheDir.mkdir()){
                                 ToastUtil.show(this,errorTxt);
@@ -537,7 +537,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                         @Override
                         public void run() {
                             ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                            if(Global.mSetCoverType != Constants.PLAYLIST){
+                            if(Global.SetCoverType != Constants.PLAYLIST){
                                 if(new File(path).exists()){
                                     Uri fileUri = Uri.parse("file://" + path);
                                     imagePipeline.evictFromCache(fileUri);

@@ -1,6 +1,5 @@
 package remix.myplayer.ui.dialog;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -22,18 +21,19 @@ import android.widget.TextView;
 
 import com.umeng.analytics.MobclickAgent;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.service.TimerService;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.CircleSeekBar;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -71,8 +71,12 @@ public class TimerDialog extends BaseDialogActivity {
     public static boolean mIsTiming = false;
     //是否正在运行
     public static boolean mIsRunning = false;
-    //定时时间
-    private static long mTime;
+    //定时时间 单位秒
+    private int mTime;
+    //设置的定时时间 用于保存默认设置
+    private static int mSaveTime = -1;
+    //每一秒中更新数据
+    private Timer mUpdateTimer;
     //更新seekbar与剩余时间
     private Handler mHandler = new Handler(){
         @Override
@@ -105,9 +109,11 @@ public class TimerDialog extends BaseDialogActivity {
 
         //如果正在计时，设置seekbar的进度
         if(mIsTiming) {
-            int remain = (int)mTime * 60 - (int)(System.currentTimeMillis() - TimerService.mStartTime) / 1000;
-            mSeekbar.setProgress(remain / 60);
-            mSeekbar.setStart(true);
+            mTime = (int) (MusicService.getInstance().getMillUntilFinish() / 1000);
+            if(mTime > 0){
+                mSeekbar.setProgress(mTime);
+                mSeekbar.setStart(true);
+            }
         }
 
         mSeekbar.setOnSeekBarChangeListener(new CircleSeekBar.OnSeekBarChangeListener() {
@@ -115,9 +121,11 @@ public class TimerDialog extends BaseDialogActivity {
             public void onProgressChanged(CircleSeekBar seekBar, long progress, boolean fromUser) {
                 if (progress > 0) {
                     //记录倒计时时间和更新界面
-                    mMinute.setText(progress < 10 ? "0" + progress : "" + progress);
+                    int minute = (int) (progress / 60);
+                    mMinute.setText(minute < 10 ? "0" + minute : "" + minute);
                     mSecond.setText("00");
-                    mTime = progress;
+                    mTime = (int) progress;
+                    mSaveTime = (int) progress;
                 }
             }
             @Override
@@ -142,7 +150,7 @@ public class TimerDialog extends BaseDialogActivity {
             //如果有默认设置但已经开始计时，打开该popupwindow,并更改switch外观
             if(!mIsTiming) {
                 mTime = time;
-                Toggle();
+                toggle();
             }
         }
         mSwitch.setChecked(hasdefault);
@@ -150,10 +158,10 @@ public class TimerDialog extends BaseDialogActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    if (mTime > 0) {
+                    if (mSaveTime > 0) {
                         ToastUtil.show(TimerDialog.this,R.string.set_success);
                         SPUtil.putValue(TimerDialog.this, "Setting", "TimerDefault", true);
-                        SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", (int) mTime);
+                        SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", mSaveTime);
                     } else {
                         ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
                         mSwitch.setChecked(false);
@@ -162,6 +170,7 @@ public class TimerDialog extends BaseDialogActivity {
                     ToastUtil.show(TimerDialog.this,R.string.cancel_success);
                     SPUtil.putValue(TimerDialog.this, "Setting", "TimerDefault", false);
                     SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", -1);
+                    mSaveTime = -1;
                 }
             }
         });
@@ -185,35 +194,24 @@ public class TimerDialog extends BaseDialogActivity {
                     }
                 });
 
-        //点击效果
-//        ButterKnife.apply(new View[]{mCancel,mToggle},
-//                new ButterKnife.Action<View>() {
-//                    @Override
-//                    public void apply(@NonNull View view, int index) {
-//                        Drawable selectDrawable = getResources().getDrawable(R.drawable.bg_corner_select_day);
-//                        Drawable defaultDrawable = getResources().getDrawable(R.drawable.bg_corner_default_day);
-//                        view.setBackground(Theme.getPressDrawable(defaultDrawable,selectDrawable,ColorUtil.getColor(R.color.day_ripple_color),defaultDrawable,defaultDrawable));
-//                    }
-//                });
-
     }
 
     /**
      * 根据是否已经开始计时来取消或开始计时
      */
-    private void Toggle(){
+    private void toggle(){
         if(mTime <= 0 && !mIsTiming) {
             ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
             return;
         }
-        String msg = mIsTiming ? "取消定时关闭" : "将在" + mTime + "分钟后关闭";
+        String msg = mIsTiming ? "取消定时关闭" : "将在" + mTime / 60 + "分钟后关闭";
         ToastUtil.show(this,msg);
         mIsTiming = !mIsTiming;
-        mSeekbar.setStart(mIsTiming);
-        Intent intent = new Intent(Constants.CONTROL_TIMER);
-        intent.putExtra("Time", mTime);
-        intent.putExtra("Run", mIsTiming);
-        sendBroadcast(intent);
+        //如果开始计时，保存设置的时间
+        if(mIsTiming){
+            mSaveTime = mTime / 60;
+        }
+        MusicService.getInstance().toggleTimer(mIsTiming,mTime / 60 * 60 * 1000);
         finish();
     }
 
@@ -232,7 +230,7 @@ public class TimerDialog extends BaseDialogActivity {
                 finish();
                 break;
             case R.id.close_toggle:
-                Toggle();
+                toggle();
                 break;
         }
     }
@@ -242,8 +240,23 @@ public class TimerDialog extends BaseDialogActivity {
         super.onResume();
         mIsRunning = true;
         if(mIsTiming) {
-            TimeThread thread = new TimeThread();
-            thread.start();
+            mUpdateTimer = new Timer();
+            mUpdateTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    int min,sec,remain;
+                    remain = (int) MusicService.getInstance().getMillUntilFinish() / 1000;
+                    min = remain / 60;
+                    sec = remain % 60;
+                    Message msg = new Message();
+                    msg.arg1 = remain;
+                    Bundle data = new Bundle();
+                    data.putString("Minute",min < 10 ? "0" + min : "" + min);
+                    data.putString("Second",sec < 10 ? "0" + sec : "" + sec);
+                    msg.setData(data);
+                    mHandler.sendMessage(msg);
+                }
+            },0,1000);
         }
     }
 
@@ -251,6 +264,10 @@ public class TimerDialog extends BaseDialogActivity {
     protected void onDestroy() {
         super.onDestroy();
         mIsRunning = false;
+        if(mUpdateTimer != null){
+            mUpdateTimer.cancel();
+            mUpdateTimer = null;
+        }
     }
 
     @Override
@@ -265,31 +282,4 @@ public class TimerDialog extends BaseDialogActivity {
         overridePendingTransition(0, android.R.anim.fade_out);
     }
 
-    /**
-     * 根据开始计时的时间，每隔一秒重新计算并通过handler更新界面
-     */
-    class TimeThread extends Thread{
-        int min,sec,remain;
-        @Override
-        public void run(){
-            while (mIsRunning){
-                remain = (int)mTime * 60 - (int)(System.currentTimeMillis() - TimerService.mStartTime) / 1000;
-                min = remain / 60;
-                sec = remain % 60;
-                Message msg = new Message();
-                msg.arg1 = min;
-                Bundle data = new Bundle();
-                data.putString("Minute",min < 10 ? "0" + min : "" + min);
-                data.putString("Second",sec < 10 ? "0" + sec : "" + sec);
-                msg.setData(data);
-                mHandler.sendMessage(msg);
-                LogUtil.d("Timer","SendMsg");
-                try {
-                    sleep(1000);
-                }catch (InterruptedException e){
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
 }

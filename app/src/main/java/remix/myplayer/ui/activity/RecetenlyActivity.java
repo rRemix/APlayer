@@ -22,8 +22,10 @@ import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
+import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
@@ -42,13 +44,15 @@ import remix.myplayer.util.ToastUtil;
  * 最近添加歌曲的界面
  * 目前为最近7天添加
  */
-public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelper.Callback,LoaderManager.LoaderCallbacks<Cursor>{
+public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelper.Callback,
+        DeleteHelper.Callback,
+        LoaderManager.LoaderCallbacks<Cursor>{
     public static final String TAG = RecetenlyActivity.class.getSimpleName();
     private static int LOADER_ID = 1;
 
     private SongAdapter mAdapter;
-    @BindView(R.id.recently_shuffle)
-    RelativeLayout mShuffle;
+    @BindView(R.id.shuffle_container)
+    View mShuffle;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
     private Cursor mCursor;
@@ -104,10 +108,12 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
             }
         });
         mRecyclerView.setAdapter(mAdapter);
+        DeleteHelper.addCallback(this);
         getLoaderManager().initLoader(++LOADER_ID, null, this);
-
         setUpToolbar(mToolBar,getString(R.string.recently));
-
+        //隐藏排序方式
+        findView(R.id.sort).setVisibility(View.GONE);
+        findView(R.id.asc_desc).setVisibility(View.GONE);
     }
 
     /**
@@ -123,7 +129,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
         return id;
     }
 
-
     @Override
     public void onBackPressed() {
         if(mMultiChoice.isShow()) {
@@ -133,24 +138,26 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
         }
     }
 
-    //随机播放
-    public void onPlayShuffle(View v){
-        if(mIdList == null || mIdList.size() == 0){
-            ToastUtil.show(this,R.string.no_song);
-            return;
+    @OnClick({R.id.play_shuffle})
+    public void OnClick(View v){
+        switch (v.getId()){
+            case R.id.play_shuffle:
+                if(mIdList == null || mIdList.size() == 0){
+                    ToastUtil.show(this,R.string.no_song);
+                    return;
+                }
+                MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
+                Intent intent = new Intent(Constants.CTL_ACTION);
+                intent.putExtra("Control", Constants.NEXT);
+                Global.setPlayQueue(mIdList,this,intent);
+                break;
         }
-        MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
-        Intent intent = new Intent(Constants.CTL_ACTION);
-        intent.putExtra("Control", Constants.NEXT);
-        Global.setPlayQueue(mIdList,this,intent);
     }
-
 
     @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
         mAdapter.notifyDataSetChanged();
     }
-
 
     @Override
     public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -171,10 +178,11 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
 
     @Override
     public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
-        if(data == null)
+        if(loader.getId() != LOADER_ID || data == null)
             return;
         //查询完毕后保存结果，并设置查询索引
         mCursor = data;
+        mShuffle.setVisibility(mCursor != null && mCursor.getCount() > 0 ? View.VISIBLE : View.GONE);
         mIdList = MediaStoreUtil.getSongIdListByCursor(mCursor);
         mAdapter.setCursor(mCursor);
     }
@@ -210,6 +218,11 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
             mCursor.close();
             mCursor = null;
         }
+        DeleteHelper.removeCallback(this);
     }
 
+    @Override
+    public void OnDelete() {
+        getLoaderManager().initLoader(++LOADER_ID, null, this);
+    }
 }

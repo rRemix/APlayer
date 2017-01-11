@@ -41,7 +41,7 @@ public class PlayListUtil {
     public static int addPlayList(String playListName) {
         if(TextUtils.isEmpty(playListName))
             return -1;
-        for(PlayListInfo info : Global.mPlayList){
+        for(PlayListInfo info : Global.PlayList){
             if(info.Name.equals(playListName))
                 return -2;
         }

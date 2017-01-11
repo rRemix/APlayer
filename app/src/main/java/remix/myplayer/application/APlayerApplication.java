@@ -21,7 +21,6 @@ import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.service.TimerService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -30,7 +29,6 @@ import remix.myplayer.util.CrashHandler;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -63,8 +61,6 @@ public class APlayerApplication extends android.app.Application {
         CrashHandler crashHandler = CrashHandler.getInstance();
         crashHandler.init(this);
         startService(new Intent(this, MusicService.class));
-        //定时
-        startService(new Intent(this, TimerService.class));
         //监听锁屏
         new LockScreenListener(getApplicationContext()).beginListen();
         //友盟异常捕获
@@ -91,22 +87,22 @@ public class APlayerApplication extends android.app.Application {
                         SPUtil.putValue(mContext,"Setting","ThemeMode", ThemeStore.DAY);
                         SPUtil.putValue(mContext,"Setting","ThemeColor",ThemeStore.THEME_BLUE);
                         //添加我的收藏列表
-                        Global.mPlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
-                        SPUtil.putValue(mContext,"Setting","PlayQueueID",Global.mPlayQueueID);
-                        Global.mMyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
-                        SPUtil.putValue(mContext,"Setting","MyLoveID",Global.mMyLoveID);
+                        Global.PlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
+                        SPUtil.putValue(mContext,"Setting","PlayQueueID",Global.PlayQueueID);
+                        Global.MyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
+                        SPUtil.putValue(mContext,"Setting","MyLoveID",Global.MyLoveID);
                     } catch (Exception e){
-                        CommonUtil.uploadException("新建我的收藏列表错误:" + Global.mPlayQueueID,e);
+                        CommonUtil.uploadException("新建我的收藏列表错误:" + Global.PlayQueueID,e);
                     }
                 }else {
-                    Global.mPlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
-                    Global.mMyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);
-                    Global.mPlayQueue = PlayListUtil.getIDList(Global.mPlayQueueID);
-                    Global.mPlayList = PlayListUtil.getAllPlayListInfo();
-                    Global.mRecentlyID = SPUtil.getValue(mContext,"Setting","RecentlyID",-1);
+                    Global.PlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
+                    Global.MyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);
+                    Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
+                    Global.PlayList = PlayListUtil.getAllPlayListInfo();
+                    Global.RecentlyID = SPUtil.getValue(mContext,"Setting","RecentlyID",-1);
                 }
                 //读取sd卡歌曲id
-                Global.mAllSongList = MediaStoreUtil.getAllSongsId();
+                Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
                 //保存所有目录名字包含lyric的目录
                 if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
                     CommonUtil.getLyricDir(Environment.getExternalStorageDirectory());

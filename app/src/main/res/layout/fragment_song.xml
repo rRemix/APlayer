@@ -9,35 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/d48_size"
-            android:background="?attr/background_color_main"
-            android:id="@+id/play_shuffle">
-            <ImageButton
-                android:id="@+id/play_shuffle_button"
-                android:layout_centerVertical="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/btn_shuffle"
-                android:background="@color/transparent"
-                android:layout_marginLeft="@dimen/d16_size"
-                android:layout_alignParentLeft="true" />
-            <TextView
-                android:layout_centerVertical="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/play_random"
-                android:textColor="@color/default_textview_color"
-                android:layout_toRightOf="@id/play_shuffle_button"
-                android:layout_marginLeft="@dimen/d16_size" />
-            <ImageView
-                android:id="@+id/divider"
-                android:layout_alignParentBottom="true"
-                android:layout_width="match_parent"
-                android:layout_height="1px"
-                android:background="?attr/divider_color"/>
-        </RelativeLayout>
+        <include layout="@layout/layout_play_shuffle"/>
 
         <View
             android:layout_width="match_parent"

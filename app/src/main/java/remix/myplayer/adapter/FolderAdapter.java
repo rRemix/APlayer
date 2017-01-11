@@ -52,10 +52,10 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
 
     @Override
     public void onBindViewHolder(final FolderHolder holder, final int position) {
-        if(Global.mFolderMap == null || Global.mFolderMap.size() < 0)
+        if(Global.FolderMap == null || Global.FolderMap.size() < 0)
             return ;
         //根据当前索引 获得对应的文件夹名字
-        Iterator it = Global.mFolderMap.keySet().iterator();
+        Iterator it = Global.FolderMap.keySet().iterator();
         String temp = null;
         for(int i = 0 ; i <= position ; i++) {
             if(it.hasNext())
@@ -65,8 +65,8 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
         if(temp != null){
             holder.mName.setText(temp.substring(temp.lastIndexOf("/")+ 1,temp.length()));
             holder.mPath.setText(temp);
-            if(Global.mFolderMap.get(temp) != null)
-                holder.mCount.setText(Global.mFolderMap.get(temp).size()+ "首");
+            if(Global.FolderMap.get(temp) != null)
+                holder.mCount.setText(Global.FolderMap.get(temp).size()+ "首");
         }
         //根据主题模式 设置图片
         if(holder.mImg != null) {
@@ -133,7 +133,7 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
 
     @Override
     public int getItemCount() {
-        return Global.mFolderMap == null ? 0 : Global.mFolderMap.size();
+        return Global.FolderMap == null ? 0 : Global.FolderMap.size();
     }
 
     public static class FolderHolder extends BaseViewHolder {

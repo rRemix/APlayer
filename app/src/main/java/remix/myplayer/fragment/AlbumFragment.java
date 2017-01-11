@@ -58,8 +58,6 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
     public static int mAlbumIndex = -1;
     public static int mArtistIndex = -1;
 
-//    private Cursor mCursor;
-//    private AlbumAdater mAdapter;
     private MultiChoice mMultiChoice;
     private static int LOADER_ID = 0;
 
@@ -68,8 +66,7 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        CURRENT_ID = ++LOADER_ID;
-        getLoaderManager().initLoader(CURRENT_ID, null, (LoaderManager.LoaderCallbacks) this);
+        getLoaderManager().initLoader(++LOADER_ID, null, (LoaderManager.LoaderCallbacks) this);
 
     }
 
@@ -173,7 +170,7 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(data == null || loader.getId() != CURRENT_ID)
+        if(data == null || loader.getId() != LOADER_ID)
             return;
         //查询完毕后保存结果，并设置查询索引
         try {
@@ -200,16 +197,9 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
         return (AlbumAdater) mAdapter;
     }
 
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        if(mAdapter != null)
-//            mAdapter.setCursor(null);
-//    }
 
     @Override
     public void OnDelete() {
-        CURRENT_ID = ++LOADER_ID;
-        getLoaderManager().initLoader(CURRENT_ID, null, this);
+        getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 }

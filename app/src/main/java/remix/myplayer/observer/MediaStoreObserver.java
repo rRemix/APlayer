@@ -30,7 +30,7 @@ public class MediaStoreObserver extends ContentObserver {
             new Thread(){
                 @Override
                 public void run() {
-                    Global.mAllSongList = MediaStoreUtil.getAllSongsId();
+                    Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
                     mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                 }
             }.start();

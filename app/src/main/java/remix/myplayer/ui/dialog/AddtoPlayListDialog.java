@@ -137,7 +137,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                     .backgroundColorAttr(R.attr.background_color_3)
                     .contentColorAttr(R.attr.text_color_primary)
                     .inputRange(1,15)
-                    .input("", "本地歌单" + Global.mPlayList.size(), new MaterialDialog.InputCallback() {
+                    .input("", "本地歌单" + Global.PlayList.size(), new MaterialDialog.InputCallback() {
                         @Override
                         public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                             if(!TextUtils.isEmpty(input)){

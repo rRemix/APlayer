@@ -63,7 +63,7 @@ public class FeedBackActivity extends ToolbarActivity {
         Theme.setTint(mContact,ThemeStore.getMaterialPrimaryColor(),false);
     }
 
-    public static void commitToBomb(Context context,String content, String contact){
+    public static void commitByBomb(Context context, String content, String contact){
         try {
             if(TextUtils.isEmpty(content)){
                 return;
@@ -112,17 +112,18 @@ public class FeedBackActivity extends ToolbarActivity {
                     Build.VERSION.RELEASE,
                     Build.VERSION.SDK_INT + ""
             );
-            mFeedBack.save(new SaveListener<String>() {
-                @Override
-                public void done(String s, BmobException e) {
-                    if(e == null){
-                        ToastUtil.show(FeedBackActivity.this,R.string.send_success);
-                        finish();
-                    } else {
-                        commitByEmail();
-                    }
-                }
-            });
+            commitByEmail();
+//            mFeedBack.save(new SaveListener<String>() {
+//                @Override
+//                public void done(String s, BmobException e) {
+//                    if(e == null){
+//                        ToastUtil.show(FeedBackActivity.this,R.string.send_success);
+//                        finish();
+//                    } else {
+//                        commitByEmail();
+//                    }
+//                }
+//            });
         } catch (PackageManager.NameNotFoundException e) {
             ToastUtil.show(FeedBackActivity.this,R.string.send_error);
         }

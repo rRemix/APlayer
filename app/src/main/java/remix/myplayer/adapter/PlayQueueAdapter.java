@@ -63,7 +63,7 @@ public class PlayQueueAdapter extends BaseAdapter<PlayQueueAdapter.PlayQueueHold
             holder.mDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PlayListUtil.deleteSong(audioId,Global.mPlayQueueID);
+                    PlayListUtil.deleteSong(audioId,Global.PlayQueueID);
 //                    if(mCursor.getInt(0) == MusicService.getCurrentMP3().getId()) {
 //                        Intent intent = new Intent(Constants.CTL_ACTION);
 //                        intent.putExtra("Control", Constants.NEXT);

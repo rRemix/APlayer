@@ -134,7 +134,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private Drawable mNormalIndicator;
     //Viewpager
     private PagerAdapter mAdapter;
-    private Bundle mBundle;
     private ArrayList<ImageView> mDotList;
 
     //当前播放的歌曲
@@ -404,8 +403,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             });
             coverSpring.setCurrentValue(1);
             coverSpring.setEndValue(0);
-            coverSpring.setRestSpeedThreshold(0.15f);
-            coverSpring.setRestDisplacementThreshold(0.15f);
+            coverSpring.setRestSpeedThreshold(0.08f);
+            coverSpring.setRestDisplacementThreshold(0.08f);
         } else {
             finish();
             overridePendingTransition(0,R.anim.audio_out);
@@ -609,9 +608,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      */
     private void setUpViewPager(){
         mAdapter = new PagerAdapter(getSupportFragmentManager());
-        mBundle = new Bundle();
-        mBundle.putInt("Width", mWidth);
-        mBundle.putSerializable("MP3Item", mInfo);
+        Bundle bundle = new Bundle();
+        bundle.putInt("Width", mWidth);
+        bundle.putSerializable("MP3Item", mInfo);
         //初始化所有fragment
         RecordFragment recordFragment = new RecordFragment();
         mAdapter.AddFragment(recordFragment);
@@ -697,7 +696,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
             }
         });
-        coverFragment.setArguments(mBundle);
+        coverFragment.setArguments(bundle);
 
         mAdapter.AddFragment(coverFragment);
         LrcFragment lrcFragment = new LrcFragment();
@@ -719,7 +718,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 });
             }
         });
-        lrcFragment.setArguments(mBundle);
+        lrcFragment.setArguments(bundle);
         mAdapter.AddFragment(lrcFragment);
 
         mPager.setAdapter(mAdapter);
