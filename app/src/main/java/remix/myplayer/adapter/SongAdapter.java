@@ -81,7 +81,7 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
                 mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)),
                 mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)),
                 mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
-                mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),0,"","",0,"");
+                mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),0,"","",0,"","",0);
 
         //获得当前播放的歌曲
         final MP3Item currentMP3 = MusicService.getCurrentMP3();

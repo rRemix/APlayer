@@ -57,7 +57,7 @@ public class SongChooseAdaper extends BaseAdapter<SongChooseAdaper.SongChooseHol
                     mCursor.getString(SongChooseActivity.mTitleIndex),
                     "",
                     mCursor.getInt(SongChooseActivity.mAlbumIdIndex),
-                    mCursor.getString(SongChooseActivity.mArtistIndex),0,"","",0,"");
+                    mCursor.getString(SongChooseActivity.mArtistIndex),0,"","",0,"","",0);
 
             //歌曲名
             String name = CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE);

@@ -16,19 +16,20 @@ public class MP3Item implements Serializable,Cloneable {
     public String Album;
     public int AlbumId;
     public String Artist;
-    public String AlbumArt;
     public long Duration;
     public String ReailTime;
     public String Url;
     public long Size;
     public String Year;
+    public String TitleKey;
+    public long AddTime;
     public MP3Item(){}
 
-    public MP3Item(int id, String displayname, String title, String album, int albumid, String artist, long duration, String reailTime, String url, long size, String albumart) {
-        this(id,displayname,title,album,albumid,artist,duration,reailTime,url,size,albumart,null);
-    }
 
-    public MP3Item(int id, String displayname, String title, String album, int albumid, String artist, long duration, String reailTime, String url, long size, String albumart,String year){
+
+    public MP3Item(int id, String displayname, String title, String album,
+                   int albumid, String artist, long duration, String realTime,
+                   String url, long size,String year,String titleKey,long addTime){
         Id = id;
         Title = title;
         Displayname = displayname;
@@ -36,11 +37,12 @@ public class MP3Item implements Serializable,Cloneable {
         AlbumId = albumid;
         Artist = artist;
         Duration = duration;
-        ReailTime = reailTime;
+        ReailTime = realTime;
         Url = url;
         Size = size;
-        AlbumArt = albumart;
         Year = year;
+        TitleKey = titleKey;
+        AddTime = addTime;
     }
 
     public MP3Item(MP3Item info) {
@@ -52,12 +54,13 @@ public class MP3Item implements Serializable,Cloneable {
         this.Album = info.getAlbum();
         this.AlbumId = info.getAlbumId();
         this.Artist = info.getArtist();
-        this.AlbumArt = info.getAlbumArt();
         this.Duration = info.getDuration();
         this.ReailTime = info.getReailTime();
         this.Url = info.getUrl();
         this.Size = info.getSize();
         this.Year = info.getYear();
+        this.TitleKey = info.getTitleKey();
+        this.AddTime = info.getAddTime();
     }
 
     @Override
@@ -80,7 +83,6 @@ public class MP3Item implements Serializable,Cloneable {
                 ", Album='" + Album + '\'' +
                 ", AlbumId=" + AlbumId +
                 ", Artist='" + Artist + '\'' +
-                ", AlbumArt='" + AlbumArt + '\'' +
                 ", Duration=" + Duration +
                 ", ReailTime='" + ReailTime + '\'' +
                 ", Url='" + Url + '\'' +
@@ -95,6 +97,21 @@ public class MP3Item implements Serializable,Cloneable {
         return temp.getId() == this.getId();
     }
 
+    public long getAddTime() {
+        return AddTime;
+    }
+
+    public void setAddTime(long addTime) {
+        AddTime = addTime;
+    }
+
+    public String getTitleKey() {
+        return TitleKey;
+    }
+
+    public void setTitleKey(String titleKey) {
+        TitleKey = titleKey;
+    }
 
     public void setYear(String year){
         Year = year;
@@ -116,13 +133,6 @@ public class MP3Item implements Serializable,Cloneable {
 
     public void setAlbumId(int albumId){AlbumId = albumId;}
 
-    public String getAlbumArt() {
-        return AlbumArt;
-    }
-
-    public void setAlbumArt(String albumBitmap) {
-        AlbumArt = albumBitmap;
-    }
 
     public String getReailTime() {
         return ReailTime;

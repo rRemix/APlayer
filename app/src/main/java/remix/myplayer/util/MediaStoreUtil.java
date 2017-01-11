@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import remix.myplayer.R;
-import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.model.Genre;
 import remix.myplayer.model.MP3Item;
 
@@ -400,8 +399,9 @@ public class MediaStoreUtil {
                 CommonUtil.getTime(duration),
                 cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)),
                 cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE)),
-                null,
-                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.YEAR)));
+                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.YEAR)),
+                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE_KEY)),
+                cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)));
     }
 
 
@@ -721,6 +721,10 @@ public class MediaStoreUtil {
         return ids;
     }
 
+    /**
+     * 获得从曲库移除的歌曲的sql语句
+     * @return
+     */
     public static String getDeleteID(){
         Set<String> deleteId = SPUtil.getStringSet(mContext,"Setting","DeleteID");
         if(deleteId == null || deleteId.size() == 0)
@@ -734,4 +738,5 @@ public class MediaStoreUtil {
         }
         return stringBuilder.toString();
     }
+
 }

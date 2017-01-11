@@ -118,7 +118,7 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
         });
         mRecyclerView.setAdapter(mAdapter);
         //显示当前排序方式
-        mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "名字" : "添加时间");
+        mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "按字母" : "按添加时间");
         mAscDesc.setText(!ASCDESC.equals(" desc") ? "升序" : "降序");
         return rootView;
     }
@@ -150,7 +150,7 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
                 } else {
                     SORT = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
                 }
-                mSort.setText(SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "名字" : "添加时间");
+                mSort.setText(SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "按字母" : "按添加时间");
                 getLoaderManager().restartLoader(LOADER_ID,null,this);
                 SPUtil.putValue(mContext,"Setting","Sort",SORT);
                 break;
@@ -233,7 +233,6 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
     public SongAdapter getAdapter(){
         return (SongAdapter) mAdapter;
     }
-
 
     @Override
     public void OnDelete() {

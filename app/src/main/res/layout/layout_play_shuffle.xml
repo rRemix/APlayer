@@ -27,6 +27,7 @@
             android:textColor="@color/default_textview_color"
             android:layout_marginLeft="@dimen/d16_size" />
     </LinearLayout>
+
     <ImageView
         android:id="@+id/divider"
         android:layout_alignParentBottom="true"
@@ -36,17 +37,25 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="升序"
+        android:textColor="?attr/colorAccent"
         android:id="@+id/asc_desc"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:layout_marginRight="@dimen/d12_size"/>
+    <View
+        android:layout_width="@dimen/d1_size"
+        android:layout_height="@dimen/d18_size"
+        android:background="?attr/divider_color"
+        android:layout_toLeftOf="@id/asc_desc"
+        android:layout_centerVertical="true"
+        android:id="@+id/divider_1"
+        android:layout_marginRight="@dimen/d12_size"
+        android:layout_marginLeft="@dimen/d12_size"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="名字"
+        android:textColor="?attr/colorAccent"
         android:id="@+id/sort"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/asc_desc"
-        android:layout_marginRight="@dimen/d12_size"/>
+        android:layout_toLeftOf="@id/divider_1" />
 </RelativeLayout>

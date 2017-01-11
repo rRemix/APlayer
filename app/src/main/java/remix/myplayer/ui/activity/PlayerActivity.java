@@ -233,7 +233,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true,this);
                 StatusBarUtil.setTransparent(this);
             } else {
-                StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.white_f2f2f2));
+                StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.statusbar_gray_color));
             }
         } else {
             StatusBarUtil.setTransparent(this);
