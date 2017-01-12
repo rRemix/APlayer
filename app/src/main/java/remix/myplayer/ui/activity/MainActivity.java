@@ -153,6 +153,16 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     };
 
     @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if(mMultiChoice.isShow()){

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<translate
+<set
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:interpolator="@android:anim/decelerate_interpolator"
-    android:duration="500"
-    android:fromYDelta="0"
-    android:toYDelta="100%p" />
+    android:duration="@integer/DialogAnimDuration"
+    android:fillAfter="true">
+    <translate android:fromYDelta="0"
+        android:toYDelta="20%p"/>
+    <alpha
+        android:fromAlpha="1.0"
+        android:toAlpha="0.0"/>
+</set>

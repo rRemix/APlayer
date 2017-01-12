@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.util.DisplayMetrics;
@@ -22,6 +23,9 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -341,6 +345,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         outState.putParcelable("Rect",mOriginRect);
     }
 
+    private final int DURATION = 260;
+    private Interpolator INTERPOLATOR = new DecelerateInterpolator();
     @Override
     public void onBackPressed() {
         if(mPager.getCurrentItem() == 1){
@@ -350,61 +356,44 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mIsBacking = true;
             mAnimCover.setImageURI(mUri);
 
-            Spring alphaSpring = SpringSystem.create().createSpring();
-            alphaSpring.addListener(new SimpleSpringListener(){
-                @Override
-                public void onSpringActivate(Spring spring) {
-                    if(mContainer == null)
-                        return;
-                    mContainer.setAlpha((float) spring.getCurrentValue());
-                }
-                @Override
-                public void onSpringUpdate(Spring spring) {
-                    if(mContainer == null)
-                        return;
-                    mContainer.setAlpha((float) spring.getCurrentValue());
-                }
-
-                @Override
-                public void onSpringAtRest(Spring spring) {
-                    finish();
-                    overridePendingTransition(0,0);
-                }
-            });
-            alphaSpring.setCurrentValue(1);
-            alphaSpring.setEndValue(0.15f);
-            alphaSpring.setRestSpeedThreshold(0.10f);
-            alphaSpring.setRestDisplacementThreshold(0.10f);
-
-            final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
-            final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
-            final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
-            final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
-            Spring coverSpring = SpringSystem.create().createSpring();
-            coverSpring.addListener(new SimpleSpringListener(){
-                @Override
-                public void onSpringUpdate(Spring spring) {
-                    if(mAnimCover == null)
-                        return;
-                    final double currentVal = spring.getCurrentValue();
-                    mAnimCover.setTranslationX((float) (transitionX * currentVal));
-                    mAnimCover.setTranslationY((float) (transitionY * currentVal));
-                    mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
-                    mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
-                }
-                @Override
-                public void onSpringActivate(Spring spring) {
-                    mAnimCover.setVisibility(View.VISIBLE);
-                    //隐藏fragment中的image
-                    if(mAdapter.getItem(1) instanceof CoverFragment){
-                        ((CoverFragment) mAdapter.getItem(1)).hideImage();
-                    }
-                }
-            });
-            coverSpring.setCurrentValue(1);
-            coverSpring.setEndValue(0);
-            coverSpring.setRestSpeedThreshold(0.08f);
-            coverSpring.setRestDisplacementThreshold(0.08f);
+            final View decorView = getWindow().getDecorView();
+            decorView.animate()
+                    .setDuration(DURATION)
+                    .setInterpolator(INTERPOLATOR)
+                    .alpha(0f)
+                    .withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            overridePendingTransition(0,0);
+                            finish();
+                        }
+                    })
+                    .start();
+            mAnimCover.animate()
+                    .setDuration(DURATION)
+                    .setInterpolator(INTERPOLATOR)
+                    .translationX(0)
+                    .translationY(0)
+                    .scaleX(1)
+                    .scaleY(1)
+                    .withStartAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAnimCover.setVisibility(View.VISIBLE);
+                            //隐藏fragment中的image
+                            if(mAdapter.getItem(1) instanceof CoverFragment){
+                                ((CoverFragment) mAdapter.getItem(1)).hideImage();
+                            }
+                        }
+                    })
+                    .withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            overridePendingTransition(0,0);
+                            finish();
+                        }
+                    })
+                    .start();
         } else {
             finish();
             overridePendingTransition(0,R.anim.audio_out);
@@ -663,8 +652,25 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
                 final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
 
-                final Spring scaleXSpring = SpringSystem.create().createSpring();
-                scaleXSpring.addListener(new SimpleSpringListener(){
+//                mAnimCover.animate()
+//                        .setDuration(DURATION)
+//                        .setInterpolator(INTERPOLATOR)
+//                        .translationX(mTransitionBundle.getFloat(TRANSITION_X))
+//                        .translationY(mTransitionBundle.getFloat(TRANSITION_Y))
+//                        .scaleX(mScaleBundle.getFloat(SCALE_WIDTH))
+//                        .scaleY(mScaleBundle.getFloat(SCALE_HEIGHT))
+//                        .withEndAction(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                if (mAdapter.getItem(1) instanceof CoverFragment) {
+//                                    ((CoverFragment) mAdapter.getItem(1)).showImage();
+//                                }
+//                                //隐藏动画用的封面
+//                                mAnimCover.setVisibility(View.GONE);
+//                            }
+//                        }).start();
+                final Spring spring = SpringSystem.create().createSpring();
+                spring.addListener(new SimpleSpringListener(){
                     @Override
                     public void onSpringUpdate(Spring spring) {
                         if(mAnimCover == null)
@@ -689,10 +695,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                         overridePendingTransition(0, 0);
                     }
                 });
-                scaleXSpring.setCurrentValue(0);
-                scaleXSpring.setEndValue(1);
-                scaleXSpring.setRestSpeedThreshold(0.99f);
-                scaleXSpring.setRestDisplacementThreshold(0.99f);
+                spring.setCurrentValue(0);
+                spring.setEndValue(1);
+                spring.setRestSpeedThreshold(0.99f);
+                spring.setRestDisplacementThreshold(0.99f);
 
             }
         });
