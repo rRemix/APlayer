@@ -87,8 +87,10 @@ public class SearchLRC {
                     CommonUtil.getSongJsonObject(URLEncoder.encode(mInfo.getTitle(), "utf-8"),
                             URLEncoder.encode(mInfo.getArtist(), "utf-8"),mInfo.getDuration());
             if(response != null && response.length() > 0){
-                JSONObject jsonObject = response.getJSONArray("candidates").getJSONObject(0);
-                return new LrcRequest(jsonObject.getInt("id"),jsonObject.getString("accesskey"));
+                if(response.getJSONArray("candidates").length() > 0){
+                    JSONObject jsonObject = response.getJSONArray("candidates").getJSONObject(0);
+                    return new LrcRequest(jsonObject.getInt("id"),jsonObject.getString("accesskey"));
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -157,6 +159,8 @@ public class SearchLRC {
         //没有缓存，下载并解析歌词
         //1.酷狗
         LrcRequest lrcParam = getLrcParam();
+        if(lrcParam == null || TextUtils.isEmpty(lrcParam.AccessKey))
+            return null;
         //2.歌词迷
 //        String lrcUrl = getLrcUrl();
         URL url;

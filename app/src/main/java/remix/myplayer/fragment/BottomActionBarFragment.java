@@ -90,7 +90,6 @@ public class BottomActionBarFragment extends BaseFragment{
                 intent.putExtra("FromActivity",true);
                 intent.putExtra("Rect",mCoverRect);
 
-                // 这里指定了共享的视图元素
                 ActivityOptionsCompat options = ActivityOptionsCompat
                         .makeSceneTransitionAnimation(getActivity(), mCover, "image");
                 ActivityCompat.startActivity(getActivity(), intent, options.toBundle());

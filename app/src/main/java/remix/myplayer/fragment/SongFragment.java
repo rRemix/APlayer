@@ -118,8 +118,8 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
         });
         mRecyclerView.setAdapter(mAdapter);
         //显示当前排序方式
-        mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "按字母" : "按添加时间");
-        mAscDesc.setText(!ASCDESC.equals(" desc") ? "升序" : "降序");
+        mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "按添加时间" : "按字母");
+        mAscDesc.setText(!ASCDESC.equals(" asc") ? "降序" : "升序");
         return rootView;
     }
 
@@ -140,7 +140,7 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
                 } else {
                     ASCDESC = " asc";
                 }
-                mAscDesc.setText(ASCDESC.equals(" desc") ? "升序" : "降序");
+                mAscDesc.setText(!ASCDESC.equals(" asc") ? "降序" : "升序");
                 getLoaderManager().restartLoader(LOADER_ID,null,this);
                 SPUtil.putValue(mContext,"Setting","AscDesc", ASCDESC);
                 break;
@@ -150,7 +150,7 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
                 } else {
                     SORT = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
                 }
-                mSort.setText(SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "按字母" : "按添加时间");
+                mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "按添加时间" : "按字母" );
                 getLoaderManager().restartLoader(LOADER_ID,null,this);
                 SPUtil.putValue(mContext,"Setting","Sort",SORT);
                 break;

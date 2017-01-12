@@ -187,8 +187,8 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         //读取之前的排序方式
         SORT = SPUtil.getValue(this,"Setting","SubDirSort",NAME);
         ASC_DESC = SPUtil.getValue(this,"Setting","SubDirAscDesc",ASC);
-        mAscDesc.setText(ASC_DESC == ASC ? "升序" : "降序");
-        mSort.setText(SORT == NAME ?  "按字母" : "按添加时间");
+        mAscDesc.setText(ASC_DESC != ASC ? "降序" : "升序");
+        mSort.setText(SORT != NAME ?  "按添加时间" : "按字母");
         //读取歌曲列表
         new GetSongList().start();
         //初始化底部状态栏
@@ -316,7 +316,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                     SORT = NAME;
                 }
                 SPUtil.putValue(this,"Setting","SubDirSort",SORT);
-                mSort.setText(SORT == NAME ?  "按字母" : "按添加时间");
+                mSort.setText(SORT != NAME ?  "按添加时间" : "按字母");
                 new GetSongList(false).start();
                 break;
             case R.id.asc_desc:
@@ -326,7 +326,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                     ASC_DESC = ASC;
                 }
                 SPUtil.putValue(this,"Setting","SubDirAscDesc",ASC_DESC);
-                mAscDesc.setText(ASC_DESC == ASC ? "升序" : "降序");
+                mAscDesc.setText(ASC_DESC != ASC ? "降序" : "升序");
                 new GetSongList(false).start();
                 break;
         }
