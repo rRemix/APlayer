@@ -22,7 +22,7 @@ public class BaseAppwidget extends AppWidgetProvider {
         intent.putExtra("Control",operation);
         intent.putExtra("FromWidget",true);
         intent.setComponent(componentName);
-        return PendingIntent.getService(context,operation,intent,0);
+        return PendingIntent.getService(context,operation,intent,PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     protected boolean hasInstances(Context context) {

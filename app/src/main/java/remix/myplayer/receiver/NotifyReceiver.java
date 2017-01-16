@@ -58,7 +58,7 @@ public class NotifyReceiver extends BroadcastReceiver {
     private void UpdateNotify(final Context context) {
         mRemoteBigView = new RemoteViews(context.getPackageName(),  R.layout.notification_big);
         mRemoteView = new RemoteViews(context.getPackageName(),R.layout.notification);
-        mIsplay = MusicService.getIsplay();
+        mIsplay = MusicService.isPlay();
 
         if(!Global.isNotifyShowing() && !mIsplay)
             return;

@@ -38,7 +38,7 @@ public class LockScreenListener {
                 return;
             }
             String action = intent.getAction();
-            if (action.equals(Intent.ACTION_SCREEN_ON) && MusicService.getIsplay()) {
+            if (action.equals(Intent.ACTION_SCREEN_ON) && MusicService.isPlay()) {
                 try {
                     Intent intent1 = new Intent(context, LockScreenActivity.class);
                     intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringChain;
 import com.facebook.rebound.SpringSystem;
 
 import butterknife.BindView;
@@ -98,6 +99,7 @@ public class CoverFragment extends BaseFragment {
             int offsetX = (mWidth +  mImage.getWidth()) >> 1;
             final double startValue = 0;
             final double endValue = operation == Constants.PREV ? offsetX : -offsetX;
+
             //封面移动动画
             final Spring outAnim = SpringSystem.create().createSpring();
             outAnim.addListener(new SimpleSpringListener(){
@@ -128,8 +130,7 @@ public class CoverFragment extends BaseFragment {
                     inAnim.setEndValue(1);
                 }
             });
-            outAnim.setRestDisplacementThreshold(50);
-            outAnim.setRestSpeedThreshold(50);
+            outAnim.setOvershootClampingEnabled(true);
             outAnim.setCurrentValue(startValue);
             outAnim.setEndValue(endValue);
         } else {

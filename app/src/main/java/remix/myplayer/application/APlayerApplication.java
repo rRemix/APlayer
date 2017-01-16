@@ -2,7 +2,6 @@ package remix.myplayer.application;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Environment;
 
 import com.facebook.common.internal.Supplier;
 import com.facebook.common.util.ByteConstants;
@@ -16,7 +15,6 @@ import com.umeng.socialize.UMShareAPI;
 
 import cn.bmob.v3.Bmob;
 import remix.myplayer.BuildConfig;
-import remix.myplayer.R;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.LockScreenListener;
@@ -24,15 +22,12 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.CrashHandler;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.ErrUtil;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.SPUtil;
 
 /**
  * Created by taeja on 16-3-16.
@@ -44,10 +39,19 @@ import remix.myplayer.util.SPUtil;
 public class APlayerApplication extends android.app.Application {
     private static Context mContext;
 
+
     @Override
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
+        initUtil();
+        initTheme();
+        startService(new Intent(this, MusicService.class));
+        //监听锁屏
+        new LockScreenListener(getApplicationContext()).beginListen();
+        //友盟异常捕获
+        MobclickAgent.setCatchUncaughtExceptions(true);
+        MobclickAgent.setDebugMode(BuildConfig.DEBUG);
         //字体
         CommonUtil.setFontSize(this);
         //友盟分享
@@ -60,55 +64,6 @@ public class APlayerApplication extends android.app.Application {
         //异常捕获
         CrashHandler crashHandler = CrashHandler.getInstance();
         crashHandler.init(this);
-        startService(new Intent(this, MusicService.class));
-        //监听锁屏
-        new LockScreenListener(getApplicationContext()).beginListen();
-        //友盟异常捕获
-        MobclickAgent.setCatchUncaughtExceptions(true);
-        MobclickAgent.setDebugMode(BuildConfig.DEBUG);
-        initTheme();
-        initUtil();
-        loadData();
-
-    }
-
-    /**
-     * 读取歌曲id列表与播放队列
-     */
-    public void loadData() {
-        new Thread() {
-            @Override
-            public void run() {
-                final boolean isFirst = SPUtil.getValue(getApplicationContext(), "Setting", "First", true);
-                //第一次启动软件
-                if(isFirst){
-                    try {
-                        //保存默认主题设置
-                        SPUtil.putValue(mContext,"Setting","ThemeMode", ThemeStore.DAY);
-                        SPUtil.putValue(mContext,"Setting","ThemeColor",ThemeStore.THEME_BLUE);
-                        //添加我的收藏列表
-                        Global.PlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
-                        SPUtil.putValue(mContext,"Setting","PlayQueueID",Global.PlayQueueID);
-                        Global.MyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
-                        SPUtil.putValue(mContext,"Setting","MyLoveID",Global.MyLoveID);
-                    } catch (Exception e){
-                        CommonUtil.uploadException("新建我的收藏列表错误:" + Global.PlayQueueID,e);
-                    }
-                }else {
-                    Global.PlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
-                    Global.MyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);
-                    Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
-                    Global.PlayList = PlayListUtil.getAllPlayListInfo();
-                    Global.RecentlyID = SPUtil.getValue(mContext,"Setting","RecentlyID",-1);
-                }
-                //读取sd卡歌曲id
-                Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
-                //保存所有目录名字包含lyric的目录
-                if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-                    CommonUtil.getLyricDir(Environment.getExternalStorageDirectory());
-                }
-            }
-        }.start();
     }
 
     private void initUtil() {

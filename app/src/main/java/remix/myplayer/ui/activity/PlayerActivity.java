@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.util.DisplayMetrics;
@@ -25,7 +24,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -227,16 +225,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     @Override
     protected void setStatusBar() {
         if(ThemeStore.isDay()){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                StatusBarUtil.setTransparent(this);
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            } else if(Build.MANUFACTURER.equals("Meizu")){
+            if(Build.MANUFACTURER.equals("Meizu")){
                 StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this,true);
                 StatusBarUtil.setTransparent(this);
             } else if (Build.MANUFACTURER.equals("Xiaomi")){
                 StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true,this);
                 StatusBarUtil.setTransparent(this);
-            } else {
+            }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                StatusBarUtil.setTransparent(this);
+                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            }  else {
                 StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.statusbar_gray_color));
             }
         } else {
@@ -256,7 +254,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
         //获是否正在播放和正在播放的歌曲
         mInfo = MusicService.getCurrentMP3();
-        mIsPlay = MusicService.getIsplay();
+        mIsPlay = MusicService.isPlay();
 
         setUpSize();
         setUpTop();
@@ -324,9 +322,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         super.onResume();
         //更新界面
         mIsRunning = true;
-//        UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
+//        UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
         if(mNeedUpdateUI){
-            UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
+            UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
             mNeedUpdateUI = false;
         }
         //更新进度条
@@ -345,13 +343,18 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         outState.putParcelable("Rect",mOriginRect);
     }
 
-    private final int DURATION = 260;
-    private Interpolator INTERPOLATOR = new DecelerateInterpolator();
+//    private final int DURATION = 260;
+//    private Interpolator INTERPOLATOR = new DecelerateInterpolator();
     @Override
     public void onBackPressed() {
+        if(mFromNotify){
+            finish();
+            overridePendingTransition(0,R.anim.audio_out);
+        }
         if(mPager.getCurrentItem() == 1){
-            if(mIsBacking || mAnimCover == null)
-                return;
+            if(mIsBacking || mAnimCover == null){
+               return;
+            }
             //更新动画控件封面 保证退场动画的封面与fragment中封面一致
             mIsBacking = true;
             mAnimCover.setImageURI(mUri);
@@ -379,49 +382,46 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //                }
 //            });
 //            alphaSpring.setCurrentValue(1);
-//            alphaSpring.setEndValue(0.15f);
-//            alphaSpring.setRestSpeedThreshold(0.10f);
-//            alphaSpring.setRestDisplacementThreshold(0.10f);
+//            alphaSpring.setEndValue(0);
+//            alphaSpring.setOvershootClampingEnabled(true);
 
-//            final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
-//            final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
-//            final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
-//            final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
-//            Spring coverSpring = SpringSystem.create().createSpring();
-//            coverSpring.addListener(new SimpleSpringListener(){
-//                @Override
-//                public void onSpringUpdate(Spring spring) {
-//                    if(mAnimCover == null)
-//                        return;
-//                    final double currentVal = spring.getCurrentValue();
-//                    mAnimCover.setTranslationX((float) (transitionX * currentVal));
-//                    mAnimCover.setTranslationY((float) (transitionY * currentVal));
-//                    mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
-//                    mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
-//                }
-//                @Override
-//                public void onSpringActivate(Spring spring) {
-//                    mAnimCover.setVisibility(View.VISIBLE);
-//                    //隐藏fragment中的image
-//                    if(mAdapter.getItem(1) instanceof CoverFragment){
-//                        ((CoverFragment) mAdapter.getItem(1)).hideImage();
-//                    }
-//                }
-//
-//                @Override
-//                public void onSpringAtRest(Spring spring) {
-//                    finish();
-//                    overridePendingTransition(0,0);
-//                }
-//            });
-//            coverSpring.setCurrentValue(1);
-//            coverSpring.setEndValue(0);
-//            coverSpring.setRestSpeedThreshold(0.04f);
-//            coverSpring.setRestDisplacementThreshold(0.04f);
+            final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
+            final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
+            final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
+            final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
+            Spring coverSpring = SpringSystem.create().createSpring();
+            coverSpring.addListener(new SimpleSpringListener(){
+                @Override
+                public void onSpringUpdate(Spring spring) {
+                    if(mAnimCover == null)
+                        return;
+                    final double currentVal = spring.getCurrentValue();
+                    mAnimCover.setTranslationX((float) (transitionX * currentVal));
+                    mAnimCover.setTranslationY((float) (transitionY * currentVal));
+                    mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
+                    mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
+                }
+                @Override
+                public void onSpringActivate(Spring spring) {
+                    mAnimCover.setVisibility(View.VISIBLE);
+                    //隐藏fragment中的image
+                    if(mAdapter.getItem(1) instanceof CoverFragment){
+                        ((CoverFragment) mAdapter.getItem(1)).hideImage();
+                    }
+                }
+
+                @Override
+                public void onSpringAtRest(Spring spring) {
+                    finish();
+                    overridePendingTransition(0,0);
+                }
+            });
+            coverSpring.setCurrentValue(1);
+            coverSpring.setEndValue(0);
+            coverSpring.setOvershootClampingEnabled(true);
 
 //            final View decorView = getWindow().getDecorView();
-//            decorView.setAlpha(0.5f);
-//            decorView.animate()
+//            mContainer.animate()
 //                    .setDuration(DURATION)
 //                    .setInterpolator(INTERPOLATOR)
 //                    .alpha(0f)
@@ -433,31 +433,31 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //                        }
 //                    })
 //                    .start();
-            mAnimCover.animate()
-                    .setDuration(DURATION)
-                    .setInterpolator(INTERPOLATOR)
-                    .translationX(0)
-                    .translationY(0)
-                    .scaleX(1)
-                    .scaleY(1)
-                    .withStartAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            mAnimCover.setVisibility(View.VISIBLE);
-                            //隐藏fragment中的image
-                            if(mAdapter.getItem(1) instanceof CoverFragment){
-                                ((CoverFragment) mAdapter.getItem(1)).hideImage();
-                            }
-                        }
-                    })
-                    .withEndAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            finish();
-                            overridePendingTransition(0,0);
-                        }
-                    })
-                    .start();
+//            mAnimCover.animate()
+//                    .setDuration(DURATION)
+//                    .setInterpolator(INTERPOLATOR)
+//                    .translationX(0)
+//                    .translationY(0)
+//                    .scaleX(1)
+//                    .scaleY(1)
+//                    .withStartAction(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            mAnimCover.setVisibility(View.VISIBLE);
+//                            //隐藏fragment中的image
+//                            if(mAdapter.getItem(1) instanceof CoverFragment){
+//                                ((CoverFragment) mAdapter.getItem(1)).hideImage();
+//                            }
+//                        }
+//                    })
+//                    .withEndAction(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            finish();
+//                            overridePendingTransition(0,0);
+//                        }
+//                    })
+//                    .start();
         } else {
             finish();
             overridePendingTransition(0,R.anim.audio_out);
@@ -671,13 +671,24 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         coverFragment.setInflateFinishListener(new OnInflateFinishListener() {
             @Override
             public void onViewInflateFinish(View view) {
+                //从通知栏启动只设置位置信息并隐藏
+                //不用启动动画
+                if (mFromNotify) {
+                    if (mAdapter.getItem(1) instanceof CoverFragment)
+                        ((CoverFragment) mAdapter.getItem(1)).showImage();
+                    //隐藏动画用的封面并设置位置信息
+                    mAnimCover.setVisibility(View.GONE);
+                    return;
+                }
+
                 if(mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
                     //获取传入的界面信息
                     mOriginRect = getIntent().getParcelableExtra("Rect");
                 }
 
-                if(mOriginRect == null)
+                if(mOriginRect == null) {
                     return;
+                }
                 // 获取上一个界面中，图片的宽度和高度
                 mOriginWidth = mOriginRect.width();
                 mOriginHeight = mOriginRect.height();
@@ -692,21 +703,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 // 计算图片缩放比例和位移距离
                 getMoveInfo(mDestRect);
 
-                //从通知栏启动只设置位置信息并隐藏
-                //不用启动动画
-                if (mFromNotify) {
-                    if (mAdapter.getItem(1) instanceof CoverFragment)
-                        ((CoverFragment) mAdapter.getItem(1)).showImage();
-                    //隐藏动画用的封面并设置位置信息
-                    mAnimCover.setVisibility(View.GONE);
-                    mAnimCover.setPivotX(0);
-                    mAnimCover.setPivotY(0);
-                    mAnimCover.setTranslationX(mTransitionBundle.getFloat(TRANSITION_X));
-                    mAnimCover.setTranslationY(mTransitionBundle.getFloat(TRANSITION_Y));
-                    mAnimCover.setScaleX(mScaleBundle.getFloat(SCALE_WIDTH));
-                    mAnimCover.setScaleY(mScaleBundle.getFloat(SCALE_HEIGHT));
-                    return;
-                }
 
                 mAnimCover.setPivotX(0);
                 mAnimCover.setPivotY(0);
@@ -716,54 +712,53 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
                 final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
 
-                mAnimCover.animate()
-                        .setDuration(DURATION)
-                        .setInterpolator(INTERPOLATOR)
-                        .translationX(mTransitionBundle.getFloat(TRANSITION_X))
-                        .translationY(mTransitionBundle.getFloat(TRANSITION_Y))
-                        .scaleX(mScaleBundle.getFloat(SCALE_WIDTH))
-                        .scaleY(mScaleBundle.getFloat(SCALE_HEIGHT))
-                        .withEndAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mAdapter.getItem(1) instanceof CoverFragment) {
-                                    ((CoverFragment) mAdapter.getItem(1)).showImage();
-                                }
-                                //隐藏动画用的封面
-                                mAnimCover.setVisibility(View.GONE);
-                            }
-                        }).start();
+//                mAnimCover.animate()
+//                        .setDuration(DURATION)
+//                        .setInterpolator(INTERPOLATOR)
+//                        .translationX(mTransitionBundle.getFloat(TRANSITION_X))
+//                        .translationY(mTransitionBundle.getFloat(TRANSITION_Y))
+//                        .scaleX(mScaleBundle.getFloat(SCALE_WIDTH))
+//                        .scaleY(mScaleBundle.getFloat(SCALE_HEIGHT))
+//                        .withEndAction(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                if (mAdapter.getItem(1) instanceof CoverFragment) {
+//                                    ((CoverFragment) mAdapter.getItem(1)).showImage();
+//                                }
+//                                //隐藏动画用的封面
+//                                mAnimCover.setVisibility(View.GONE);
+//                            }
+//                        }).start();
 
-//                final Spring spring = SpringSystem.create().createSpring();
-//                spring.addListener(new SimpleSpringListener(){
-//                    @Override
-//                    public void onSpringUpdate(Spring spring) {
-//                        if(mAnimCover == null)
-//                            return;
-//                        final double currentVal = spring.getCurrentValue();
-//                        mAnimCover.setTranslationX((float) (transitionX * currentVal));
-//                        mAnimCover.setTranslationY((float) (transitionY * currentVal));
-//                        mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
-//                        mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
-//                    }
-//                    @Override
-//                    public void onSpringAtRest(Spring spring) {
-//                        //入场动画结束时显示fragment中的封面
-//                        if (mAdapter.getItem(1) instanceof CoverFragment) {
-//                            ((CoverFragment) mAdapter.getItem(1)).showImage();
-//                        }
-//                        //隐藏动画用的封面
-//                        mAnimCover.setVisibility(View.GONE);
-//                    }
-//                    @Override
-//                    public void onSpringActivate(Spring spring) {
-//                        overridePendingTransition(0, 0);
-//                    }
-//                });
-//                spring.setCurrentValue(0);
-//                spring.setEndValue(1);
-//                spring.setRestSpeedThreshold(0.99f);
-//                spring.setRestDisplacementThreshold(0.99f);
+                final Spring spring = SpringSystem.create().createSpring();
+                spring.addListener(new SimpleSpringListener(){
+                    @Override
+                    public void onSpringUpdate(Spring spring) {
+                        if(mAnimCover == null)
+                            return;
+                        final double currentVal = spring.getCurrentValue();
+                        mAnimCover.setTranslationX((float) (transitionX * currentVal));
+                        mAnimCover.setTranslationY((float) (transitionY * currentVal));
+                        mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
+                        mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
+                    }
+                    @Override
+                    public void onSpringAtRest(Spring spring) {
+                        //入场动画结束时显示fragment中的封面
+                        if (mAdapter.getItem(1) instanceof CoverFragment) {
+                            ((CoverFragment) mAdapter.getItem(1)).showImage();
+                        }
+                        //隐藏动画用的封面
+                        mAnimCover.setVisibility(View.GONE);
+                    }
+                    @Override
+                    public void onSpringActivate(Spring spring) {
+                        overridePendingTransition(0, 0);
+                    }
+                });
+                spring.setCurrentValue(0);
+                spring.setEndValue(1);
+                spring.setOvershootClampingEnabled(true);
 
             }
         });
@@ -886,7 +881,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         public void run() {
             while (mIsRunning) {
                 int temp = MusicService.getProgress();
-                if (MusicService.getIsplay() && temp > 0 && temp < mDuration) {
+                if (MusicService.isPlay() && temp > 0 && temp < mDuration) {
                     mCurrentTime = temp;
                     mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
                     try {

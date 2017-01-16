@@ -104,7 +104,7 @@ public class ColumnView extends View {
         public void handleMessage(Message msg) {
 //            Log.d(TAG,"action:" + msg.what);
 //            Log.d(TAG,"info:" + msg.obj.toString());
-//            Log.d(TAG,"isplay:" + MusicService.getIsplay());
+//            Log.d(TAG,"isplay:" + MusicService.isPlay());
             for(int i = 0 ; i < mObjectAnimList.size(); i++){
                 int from = mHeightList.get(i);
                 int to = msg.what == STARTANIM ? new Random().nextInt(mRawHeight) : (int)(mRawHeight * 0.1);

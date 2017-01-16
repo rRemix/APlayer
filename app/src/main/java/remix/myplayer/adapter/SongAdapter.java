@@ -94,10 +94,10 @@ public class SongAdapter extends BaseAdapter<SongAdapter.SongViewHolder>{
                     ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
             holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.INVISIBLE);
             //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
-            if(MusicService.getIsplay() && !holder.mColumnView.getStatus() && highlight){
+            if(MusicService.isPlay() && !holder.mColumnView.getStatus() && highlight){
                 holder.mColumnView.startAnim();
             }
-            else if(!MusicService.getIsplay() && holder.mColumnView.getStatus()){
+            else if(!MusicService.isPlay() && holder.mColumnView.getStatus()){
                 holder.mColumnView.stopAnim();
             }
         }

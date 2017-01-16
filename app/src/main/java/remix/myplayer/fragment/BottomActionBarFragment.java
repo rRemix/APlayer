@@ -86,7 +86,7 @@ public class BottomActionBarFragment extends BaseFragment{
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("MP3Item",MusicService.getCurrentMP3());
                 intent.putExtras(bundle);
-                intent.putExtra("Isplay",MusicService.getIsplay());
+                intent.putExtra("isPlay",MusicService.isPlay());
                 intent.putExtra("FromActivity",true);
                 intent.putExtra("Rect",mCoverRect);
 

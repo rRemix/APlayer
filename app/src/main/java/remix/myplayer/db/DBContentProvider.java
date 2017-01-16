@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import remix.myplayer.application.APlayerApplication;
-import remix.myplayer.util.LogUtil;
 
 /**
  * @ClassName

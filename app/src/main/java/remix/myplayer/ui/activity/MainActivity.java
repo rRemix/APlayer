@@ -170,7 +170,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
         mIsRunning = true;
         //更新UI
-        UpdateUI(MusicService.getCurrentMP3(), MusicService.getIsplay());
+        UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
     }
 
     @Override
@@ -202,14 +202,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         setUpViewColor();
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-
-        mIsFirstAfterInstall = SPUtil.getValue(this, "Setting", "First", true);
-        SPUtil.putValue(this, "Setting", "First", false);
-
-        if(mIsFirstCreateActivity)
-            initLastSong();
-
-        mBottomBar.UpdateBottomStatus(MusicService.getCurrentMP3(),  MusicService.getIsplay());
+        initBottombar();
 
         BmobUpdateAgent.setUpdateOnlyWifi(false);
         BmobUpdateAgent.update(this);
@@ -217,55 +210,27 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     }
 
     /**
-     * 初始化上一次退出时播放的歌曲
-     * 默认为第一首歌曲
+     * 初始化底部显示控件
      */
-    private void initLastSong() {
-        //第一次打开软件，播放队列以及正在播放歌曲都为空
-        mIsFirstCreateActivity = false;
-        if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
-            return;
-
-        //读取上次退出时正在播放的歌曲的id
-        int lastId = SPUtil.getValue(this,"Setting","LastSongId",0);
-        //上次退出时正在播放的歌曲是否还存在
-        boolean isLastSongExist = false;
-        //上次退出时正在播放的歌曲的pos
-        int pos = 0;
-        //查找上次退出时的歌曲是否还存在
-        for(int i = 0; i < Global.PlayQueue.size(); i++){
-            if(lastId == Global.PlayQueue.get(i)){
-                isLastSongExist = true;
-                pos = i;
-                break;
-            }
-        }
-
-        boolean isPlay = !mIsFirst && MusicService.getIsplay();
-        mIsFirst = false;
+    private void initBottombar() {
+        int lastId = SPUtil.getValue(mContext,"Setting","LastSongId",-1);
         MP3Item item;
-        //上次退出时保存的正在播放的歌曲未失效
-        if(isLastSongExist && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
-            mBottomBar.UpdateBottomStatus(item, isPlay);
-            updateHeader(item,isPlay);
-            MusicService.initDataSource(item,pos);
-        }else {
-            if(Global.PlayQueue.size() > 0){
-                //重新找到一个歌曲id
-                int id =  Global.PlayQueue.get(0);
-                for(int i = 0; i < Global.PlayQueue.size() ; i++){
-                    id = Global.PlayQueue.get(i);
-                    if (id != lastId)
-                        break;
-                }
-                item = MediaStoreUtil.getMP3InfoById(id);
-                mBottomBar.UpdateBottomStatus(item,isPlay);
-                updateHeader(item,isPlay);
-                SPUtil.putValue(this,"Setting","LastSongId",id);
-                MusicService.initDataSource(item,0);
+        if(lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
+            mBottomBar.UpdateBottomStatus(item,  MusicService.isPlay());
+        } else {
+            if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
+                return ;
+            int id =  Global.PlayQueue.get(0);
+            for(int i = 0; i < Global.PlayQueue.size() ; i++){
+                id = Global.PlayQueue.get(i);
+                if (id != lastId)
+                    break;
+            }
+            item = MediaStoreUtil.getMP3InfoById(id);
+            if(item != null){
+                mBottomBar.UpdateBottomStatus(item,  MusicService.isPlay());
             }
         }
-
     }
 
     @Override

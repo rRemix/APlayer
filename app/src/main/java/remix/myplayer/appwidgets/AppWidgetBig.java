@@ -37,7 +37,7 @@ public class AppWidgetBig extends BaseAppwidget {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-//        context.startService(new Intent(context,MusicService.class));
+        context.startService(new Intent(context,MusicService.class));
         mAppIds = appWidgetIds;
         mRemoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_big);
         buildAction(context, mRemoteViews);
@@ -60,7 +60,7 @@ public class AppWidgetBig extends BaseAppwidget {
         }
         mRemoteViews.setTextViewText(R.id.notify_song, temp.getTitle());
         //播放暂停按钮
-        mRemoteViews.setImageViewResource(R.id.appwidget_toggle,MusicService.getIsplay() ? R.drawable.notify_pause : R.drawable.notify_play);
+        mRemoteViews.setImageViewResource(R.id.appwidget_toggle,MusicService.isPlay() ? R.drawable.notify_pause : R.drawable.notify_play);
         //歌曲名和歌手名
         mRemoteViews.setTextViewText(R.id.appwidget_title,temp.getTitle());
         mRemoteViews.setTextViewText(R.id.appwidget_artist,temp.getArtist());

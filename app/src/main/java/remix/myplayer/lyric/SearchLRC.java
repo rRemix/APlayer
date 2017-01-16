@@ -4,7 +4,6 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Base64;
 
-
 import org.json.JSONException;
 import org.json.JSONObject;
 

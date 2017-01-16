@@ -232,7 +232,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         }
         //更新播放按钮
         if(mPlayButton != null){
-            mPlayButton.setImageResource(MusicService.getIsplay() ? R.drawable.lock_btn_pause : R.drawable.lock_btn_play);
+            mPlayButton.setImageResource(MusicService.isPlay() ? R.drawable.lock_btn_pause : R.drawable.lock_btn_play);
         }
         //标题
         if(mSong != null) {

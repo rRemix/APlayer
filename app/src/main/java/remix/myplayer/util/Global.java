@@ -176,4 +176,14 @@ public class Global {
      * 所有可能的歌词目录
      */
     public static ArrayList<File> LyricDir = new ArrayList<>();
+
+    /**
+     * 上次退出时正在播放的歌曲的id
+     */
+    public static int LastSongID = -1;
+
+    /**
+     * 上次退出时正在播放的歌曲的pos
+     */
+    public static int LastSongPos = 0;
 }

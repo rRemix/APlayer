@@ -195,7 +195,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         mBottombar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
             return;
-        mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.getIsplay());
+        mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.isPlay());
 
     }
 
