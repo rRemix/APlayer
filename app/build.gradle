@@ -41,15 +41,15 @@ android {
 
     productFlavors {
         qihu360{}
-        assistant91{}
-        baidu{}
-        anzhuomarket{}
-        chuizi{}
-        wandoujia{}
-        meizu{}
-        xiaomi{}
-        tencent{}
-        kuan{}
+//        assistant91{}
+//        baidu{}
+//        anzhuomarket{}
+//        chuizi{}
+//        wandoujia{}
+//        meizu{}
+//        xiaomi{}
+//        tencent{}
+//        kuan{}
         productFlavors.all { flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
         }

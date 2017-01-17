@@ -21,19 +21,18 @@ import java.util.Comparator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ChildHolderAdapter;
 import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.SPUtil;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -52,10 +51,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
     private String mArg;
     private ArrayList<MP3Item> mInfoList;
 
-    @BindView(R.id.sort)
-    TextView mSort;
-    @BindView(R.id.asc_desc)
-    TextView mAscDesc;
     //歌曲数目与标题
     @BindView(R.id.childholder_item_num)
     TextView mNum;
@@ -71,15 +66,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
     private static ChildHolderActivity mInstance = null;
     private MaterialDialog mMDDialog;
 
-    //当前是升序还是降序 0:升序 1:降序
-    private int ASC_DESC = 0;
-    private final int ASC = 0;
-    private final int DESC = 1;
-    //当前是按字母排序还是添加时间 0:字母 1:时间
-    private int SORT = 0;
-    private final int NAME = 0;
-    private final int ADDTIME = 1;
-
     //更新
     private static final int START = 0;
     private static final int END = 1;
@@ -93,6 +79,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                 case Constants.UPDATE_ADAPTER:
                     if(mInfoList == null)
                         return;
+                    mRecyclerView.setAdapter(mAdapter);
                     mAdapter.setList(mInfoList);
                     mNum.setText(mInfoList.size() + "首歌曲");
                     break;
@@ -103,7 +90,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                     break;
                 case END:
                     if(mMDDialog != null && mMDDialog.isShowing()){
-                        findViewById(R.id.top_bar).setVisibility(mInfoList != null && mInfoList.size() > 0 ? View.VISIBLE : View.GONE);
                         mMDDialog.dismiss();
                     }
                     break;
@@ -125,6 +111,22 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         mArg = getIntent().getStringExtra("Title");
 
         mAdapter = new ChildHolderAdapter(this,mType,mArg,mMultiChoice);
+        mAdapter.setCallback(new SortChangeCallback() {
+            @Override
+            public void SortChange(String sort) {
+            }
+            @Override
+            public void AscDescChange(String ascDesc) {
+            }
+            @Override
+            public void SortChange(int sort) {
+                new GetSongList(false).start();
+            }
+            @Override
+            public void AscDescChange(int ascdesc) {
+                new GetSongList(false).start();
+            }
+        });
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -155,7 +157,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                 mMultiChoice.itemAddorRemoveWithLongClick(view,position,songid, TAG,mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
             }
         });
-        mRecyclerView.setAdapter(mAdapter);
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -184,11 +186,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                 .progress(true, 0)
                 .backgroundColorAttr(R.attr.background_color_3)
                 .progressIndeterminateStyle(false).build();
-        //读取之前的排序方式
-        SORT = SPUtil.getValue(this,"Setting","SubDirSort",NAME);
-        ASC_DESC = SPUtil.getValue(this,"Setting","SubDirAscDesc",ASC);
-        mAscDesc.setText(ASC_DESC != ASC ? "降序" : "升序");
-        mSort.setText(SORT != NAME ?  "按添加时间" : "按字母");
+
         //读取歌曲列表
         new GetSongList().start();
         //初始化底部状态栏
@@ -237,20 +235,20 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                 if(o1 == null || o2 == null)
                     return 0;
                 //当前是按名字排序
-                if(SORT == NAME){
+                if(ChildHolderAdapter.SORT == ChildHolderAdapter.NAME){
                     if(TextUtils.isEmpty(o1.getTitleKey()) || TextUtils.isEmpty(o2.getTitleKey()))
                         return 0;
-                    if(ASC_DESC == ASC){
+                    if(ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC){
                         return o1.getTitleKey().compareTo(o2.getTitleKey());
                     } else {
                         return o2.getTitleKey().compareTo(o1.getTitleKey());
                     }
-                } else if(SORT == ADDTIME){
+                } else if(ChildHolderAdapter.SORT == ChildHolderAdapter.ADDTIME){
                     //当前是按添加时间排序
                     if(o1.getAddTime() == o2.getAddTime()){
                         return 0;
                     }
-                    if(ASC_DESC == ASC){
+                    if(ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC){
                         return  o1.getAddTime() > o2.getAddTime() ? 1 : -1;
                     } else {
                         return  o2.getAddTime() > o1.getAddTime() ? 1 : -1;
@@ -293,44 +291,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                 break;
         }
         return mInfoList;
-    }
-
-    @OnClick({R.id.play_shuffle,R.id.sort,R.id.asc_desc})
-    public void onClick(View v){
-        switch (v.getId()){
-            case R.id.play_shuffle:
-                MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
-                Intent intent = new Intent(Constants.CTL_ACTION);
-                intent.putExtra("Control", Constants.NEXT);
-                intent.putExtra("shuffle",true);
-                //设置正在播放列表
-                ArrayList<Integer> ids = new ArrayList<>();
-                for (MP3Item info : mInfoList)
-                    ids.add(info.getId());
-                Global.setPlayQueue(ids,this,intent);
-                break;
-            case R.id.sort:
-                if(SORT == NAME){
-                    SORT = ADDTIME;
-                } else if(SORT == ADDTIME){
-                    SORT = NAME;
-                }
-                SPUtil.putValue(this,"Setting","SubDirSort",SORT);
-                mSort.setText(SORT != NAME ?  "按添加时间" : "按字母");
-                new GetSongList(false).start();
-                break;
-            case R.id.asc_desc:
-                if(ASC_DESC == ASC){
-                    ASC_DESC = DESC;
-                } else if(ASC_DESC == DESC){
-                    ASC_DESC = ASC;
-                }
-                SPUtil.putValue(this,"Setting","SubDirAscDesc",ASC_DESC);
-                mAscDesc.setText(ASC_DESC != ASC ? "降序" : "升序");
-                new GetSongList(false).start();
-                break;
-        }
-
     }
 
     //更新界面

@@ -21,19 +21,15 @@ import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
-import remix.myplayer.service.MusicService;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-3-4.
@@ -50,8 +46,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
     private static int LOADER_ID = 1;
 
     private SongAdapter mAdapter;
-    @BindView(R.id.top_bar)
-    View mShuffle;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
     private Cursor mCursor;
@@ -79,12 +73,10 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
         setContentView(R.layout.activity_recently);
         ButterKnife.bind(this);
 
-        findView(R.id.divider).setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.GONE);
-
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mAdapter = new SongAdapter(RecetenlyActivity.this, mMultiChoice,SongAdapter.RECENTLY);
+        mAdapter = new SongAdapter(this, mCursor,mMultiChoice,SongAdapter.RECENTLY);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -106,13 +98,11 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG,Constants.SONG);
             }
         });
-        mRecyclerView.setAdapter(mAdapter);
+
         DeleteHelper.addCallback(this);
         getLoaderManager().initLoader(++LOADER_ID, null, this);
         setUpToolbar(mToolBar,getString(R.string.recently));
-        //隐藏排序方式
-        findView(R.id.sort).setVisibility(View.GONE);
-        findView(R.id.asc_desc).setVisibility(View.GONE);
+
     }
 
     /**
@@ -134,22 +124,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
             onBackPress();
         } else {
             finish();
-        }
-    }
-
-    @OnClick({R.id.play_shuffle})
-    public void OnClick(View v){
-        switch (v.getId()){
-            case R.id.play_shuffle:
-                if(mIdList == null || mIdList.size() == 0){
-                    ToastUtil.show(this,R.string.no_song);
-                    return;
-                }
-                MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
-                Intent intent = new Intent(Constants.CTL_ACTION);
-                intent.putExtra("Control", Constants.NEXT);
-                Global.setPlayQueue(mIdList,this,intent);
-                break;
         }
     }
 
@@ -181,8 +155,8 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
             return;
         //查询完毕后保存结果，并设置查询索引
         mCursor = data;
-        mShuffle.setVisibility(mCursor != null && mCursor.getCount() > 0 ? View.VISIBLE : View.GONE);
         mIdList = MediaStoreUtil.getSongIdListByCursor(mCursor);
+        mRecyclerView.setAdapter(mAdapter);
         mAdapter.setCursor(mCursor);
     }
 

@@ -2,18 +2,10 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.theme.Theme;
-import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.Constants;
 
 /**
  * @ClassName

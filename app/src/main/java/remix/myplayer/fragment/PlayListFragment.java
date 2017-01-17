@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,19 +16,17 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.db.PlayLists;
+import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -47,16 +46,6 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
     @BindView(R.id.playlist_recycleview)
     RecyclerView mRecyclerView;
 
-    //列表显示与网格显示切换
-    @BindView(R.id.list_model)
-    ImageView mListModelBtn;
-    @BindView(R.id.grid_model)
-    ImageView mGridModelBtn;
-    @BindView(R.id.divider)
-    View mDivider;
-    //当前列表模式 1:列表 2:网格
-    public static int ListModel = 2;
-
     private static int LOADER_ID = 0;
     private MultiChoice mMultiChoice;
 
@@ -72,14 +61,17 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
         View rootView = inflater.inflate(R.layout.fragment_playlist,null);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-        ListModel = SPUtil.getValue(getActivity(),"Setting","PlayListModel",Constants.GRID_MODEL);
-        mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
-        mRecyclerView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
         mAdapter = new PlayListAdapter(getActivity(),mMultiChoice);
+        ((PlayListAdapter)mAdapter).setModeChangeCallback(new ModeChangeCallback() {
+            @Override
+            public void OnModeChange(final int mode) {
+                mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+                mRecyclerView.setAdapter(mAdapter);
+            }
+        });
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -105,17 +97,14 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,getPlayListId(position),TAG,Constants.PLAYLIST);
             }
         });
-        mRecyclerView.setAdapter(mAdapter);
 
-        //模式切换按钮
-        mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-        mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+        int model = SPUtil.getValue(getActivity(),"Setting","PlayListModel",Constants.GRID_MODEL);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+
         return rootView;
     }
 
-    public static synchronized int getModel(){
-        return ListModel;
-    }
 
     private int getPlayListId(int position){
         int playListId = -1;
@@ -141,26 +130,6 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
         return count;
     }
 
-    //打开添加播放列表的Dialog
-    @OnClick({R.id.list_model,R.id.grid_model})
-    public void onClick(View v){
-        switch (v.getId()){
-            case R.id.list_model:
-            case R.id.grid_model:
-                int newModel = v.getId() == R.id.list_model ? Constants.LIST_MODEL : Constants.GRID_MODEL;
-                if(newModel == ListModel)
-                    return;
-                ListModel = newModel;
-                mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-                mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-                mRecyclerView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-                mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
-                SPUtil.putValue(getActivity(),"Setting","PlayListModel",ListModel);
-                break;
-
-        }
-    }
-
     @Override
     public RecyclerView.Adapter getAdapter() {
         return mAdapter;
@@ -183,7 +152,8 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
             mPlayListIDIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns._ID);
             mPlayListNameIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns.NAME);
             mPlayListSongCountIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns.COUNT);
-            mAdapter.setCursor(data);
+            mRecyclerView.setAdapter(mAdapter);
+            mAdapter.setCursor(mCursor);
         } catch (Exception e){
             e.printStackTrace();
         }

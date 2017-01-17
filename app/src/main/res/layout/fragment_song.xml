@@ -8,9 +8,6 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <include layout="@layout/layout_topbar_1"/>
-
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/d1_size"

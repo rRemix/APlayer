@@ -2,9 +2,9 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.LayoutRes;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +15,6 @@ import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.SPUtil;
 
 /**
  * @ClassName
@@ -25,18 +24,18 @@ import remix.myplayer.util.SPUtil;
  */
 
 public abstract class HeaderAdapter extends BaseAdapter<BaseViewHolder> {
-    public static final int TYPE_HEADER = 0;
-    public static final int TYPE_NORMAL = 1;
+    static final int TYPE_HEADER = 0;
+    static final int TYPE_NORMAL = 1;
     protected MultiChoice mMultiChoice;
     View mHeaderView;
     ModeChangeCallback mModeChangeCallback;
     //当前列表模式 1:列表 2:网格
     int ListModel = 2;
 
-    public HeaderAdapter( Context context,Cursor cursor, MultiChoice multiChoice) {
+    HeaderAdapter(Context context, Cursor cursor, MultiChoice multiChoice, @LayoutRes int layoutId) {
         super(context,cursor);
         this.mMultiChoice = multiChoice;
-        mHeaderView = LayoutInflater.from(context).inflate(R.layout.layout_topbar_2,null);
+        mHeaderView = LayoutInflater.from(context).inflate(layoutId,null);
     }
 
     public void setModeChangeCallback(ModeChangeCallback modeChangeCallback){
@@ -63,6 +62,10 @@ public abstract class HeaderAdapter extends BaseAdapter<BaseViewHolder> {
         return ListModel;
     }
 
+    @Override
+    public int getItemCount() {
+        return mCursor != null && mCursor.getCount() > 0 ? super.getItemCount() + 1 : 0;
+    }
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
@@ -84,7 +87,7 @@ public abstract class HeaderAdapter extends BaseAdapter<BaseViewHolder> {
      * @param headerHolder
      * @param v
      */
-    public void switchMode(AlbumAdater.HeaderHolder headerHolder, View v){
+    void switchMode(AlbumAdater.HeaderHolder headerHolder, View v){
         int newModel = v.getId() == R.id.list_model ? Constants.LIST_MODEL : Constants.GRID_MODEL;
         if(newModel == ListModel)
             return;
@@ -98,5 +101,5 @@ public abstract class HeaderAdapter extends BaseAdapter<BaseViewHolder> {
         }
     }
 
-    public abstract void saveMode();
+    protected void saveMode(){}
 }

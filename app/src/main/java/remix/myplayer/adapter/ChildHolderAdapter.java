@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.service.MusicService;
@@ -29,26 +30,45 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.Global;
+import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-6-24.
  */
-public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler> {
+public class ChildHolderAdapter extends HeaderAdapter {
     private ArrayList<MP3Item> mInfoList;
     private int mType;
     private String mArg;
     private MultiChoice mMultiChoice;
     private Drawable mDefaultDrawable;
     private Drawable mSelectDrawable;
+    private SortChangeCallback mCallback;
+    //当前是升序还是降序 0:升序 1:降序
+    public static int ASC_DESC = 0;
+    public static final int ASC = 0;
+    public static final int DESC = 1;
+    //当前是按字母排序还是添加时间 0:字母 1:时间
+    public static int SORT = 0;
+    public static final int NAME = 0;
+    public static final int ADDTIME = 1;
     public ChildHolderAdapter(Context context, int type, String arg,MultiChoice multiChoice){
-        super(context);
+        super(context,null,multiChoice,R.layout.layout_topbar_1);
         this.mContext = context;
         this.mType = type;
         this.mArg = arg;
         this.mMultiChoice = multiChoice;
+        //读取之前的排序方式
+        SORT = SPUtil.getValue(context,"Setting","SubDirSort",NAME);
+        ASC_DESC = SPUtil.getValue(context,"Setting","SubDirAscDesc",ASC);
         int size = DensityUtil.dip2px(mContext,60);
         mDefaultDrawable = Theme.getShape(GradientDrawable.RECTANGLE,Color.TRANSPARENT,size,size);
         mSelectDrawable = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getSelectColor(),size,size);
+    }
+
+    public void setCallback(SortChangeCallback callback){
+        mCallback = callback;
     }
 
     public void setList(ArrayList<MP3Item> list){
@@ -57,15 +77,40 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
     }
 
     @Override
-    public ViewHoler onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHoler(LayoutInflater.from(mContext).inflate(R.layout.item_child_holder,null,false));
+    public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
+        return viewType == TYPE_HEADER ?
+                new SongAdapter.HeaderHolder(mHeaderView) :
+                new ChildHolderViewHoler(LayoutInflater.from(mContext).inflate(R.layout.item_child_holder,parent,false));
     }
 
     @Override
-    public void onBindViewHolder(final ViewHoler holder, int position) {
-        if(mInfoList == null || position >= mInfoList.size())
+    public void onBind(final BaseViewHolder baseHolder, int position) {
+        if(position == 0){
+            final SongAdapter.HeaderHolder headerHolder = (SongAdapter.HeaderHolder) baseHolder;
+            //没有歌曲时隐藏
+            if(mInfoList == null || mInfoList.size() == 0){
+                headerHolder.mRoot.setVisibility(View.GONE);
+                return;
+            }
+            //显示当前排序方式
+            headerHolder.mAscDesc.setText(ASC_DESC != ASC ? "降序" : "升序");
+            headerHolder.mSort.setText(SORT != NAME ?  "按添加时间" : "按字母");
+            View.OnClickListener listener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    OnClick(headerHolder,v);
+                }
+            };
+            headerHolder.mSort.setOnClickListener(listener);
+            headerHolder.mAscDesc.setOnClickListener(listener);
+            headerHolder.mShuffle.setOnClickListener(listener);
             return;
-        final MP3Item temp = mInfoList.get(position);
+        }
+
+        if(mInfoList == null || position > mInfoList.size())
+            return;
+        final ChildHolderViewHoler holder = (ChildHolderViewHoler) baseHolder;
+        final MP3Item temp = mInfoList.get(position - 1);
         if(temp == null || temp.getId() < 0 || temp.Title.equals(mContext.getString(R.string.song_lose_effect))) {
             holder.mTitle.setText(R.string.song_lose_effect);
             holder.mColumnView.setVisibility(View.INVISIBLE);
@@ -135,13 +180,21 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
             holder.mContainer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition());
+                    if(holder.getAdapterPosition() - 1 < 0){
+                        ToastUtil.show(mContext,"参数错误");
+                        return;
+                    }
+                    mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition() - 1);
                 }
             });
             holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition());
+                    if(holder.getAdapterPosition() - 1 < 0){
+                        ToastUtil.show(mContext,"参数错误");
+                        return true;
+                    }
+                    mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition() - 1);
                     return true;
                 }
             });
@@ -157,10 +210,42 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
 
     @Override
     public int getItemCount() {
-        return mInfoList == null ? 0 : mInfoList.size();
+        return mInfoList != null ? mInfoList.size() + 1 : 0;
     }
 
-    static class ViewHoler extends BaseViewHolder {
+    public void OnClick(SongAdapter.HeaderHolder headerHolder, View v){
+        switch (v.getId()){
+            case R.id.play_shuffle:
+                MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
+                Intent intent = new Intent(Constants.CTL_ACTION);
+                intent.putExtra("Control", Constants.NEXT);
+                intent.putExtra("shuffle",true);
+                Global.setPlayQueue(Global.AllSongList,mContext,intent);
+                break;
+            case R.id.sort:
+                if(SORT == NAME){
+                    SORT = ADDTIME;
+                } else if(SORT == ADDTIME){
+                    SORT = NAME;
+                }
+                SPUtil.putValue(mContext,"Setting","SubDirSort",SORT);
+                headerHolder.mSort.setText(SORT != NAME ?  "按添加时间" : "按字母");
+                mCallback.SortChange(SORT);
+                break;
+            case R.id.asc_desc:
+                if(ASC_DESC == ASC){
+                    ASC_DESC = DESC;
+                } else if(ASC_DESC == DESC){
+                    ASC_DESC = ASC;
+                }
+                SPUtil.putValue(mContext,"Setting","SubDirAscDesc",ASC_DESC);
+                headerHolder.mAscDesc.setText(ASC_DESC != ASC ? "降序" : "升序");
+                mCallback.AscDescChange(ASC_DESC);
+                break;
+        }
+    }
+
+    static class ChildHolderViewHoler extends BaseViewHolder {
         @BindView(R.id.sq)
         View mSQ;
         @BindView(R.id.album_holder_item_title)
@@ -170,7 +255,7 @@ public class ChildHolderAdapter extends BaseAdapter<ChildHolderAdapter.ViewHoler
         @BindView(R.id.song_columnview)
         ColumnView mColumnView;
         public View mContainer;
-        ViewHoler(View itemView) {
+        ChildHolderViewHoler(View itemView) {
             super(itemView);
             mContainer = itemView;
         }

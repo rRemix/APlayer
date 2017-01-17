@@ -36,6 +36,7 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2015/12/22.
@@ -46,7 +47,7 @@ import remix.myplayer.util.SPUtil;
  */
 public class ArtistAdapter extends HeaderAdapter{
     public ArtistAdapter(Cursor cursor, Context context,MultiChoice multiChoice) {
-        super(context,cursor,multiChoice);
+        super(context,cursor,multiChoice,R.layout.layout_topbar_2);
         ListModel =  SPUtil.getValue(context,"Setting","ArtistModel",Constants.GRID_MODEL);
     }
 
@@ -64,6 +65,10 @@ public class ArtistAdapter extends HeaderAdapter{
     public void onBind(final BaseViewHolder baseHolder, final int position) {
         if(position == 0){
             final AlbumAdater.HeaderHolder headerHolder = (AlbumAdater.HeaderHolder) baseHolder;
+            if(mCursor == null || mCursor.getCount() == 0){
+                headerHolder.mRoot.setVisibility(View.GONE);
+                return;
+            }
             //设置图标
             headerHolder.mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
             headerHolder.mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
@@ -112,6 +117,10 @@ public class ArtistAdapter extends HeaderAdapter{
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if(holder.getAdapterPosition() - 1 < 0){
+                            ToastUtil.show(mContext,"参数错误");
+                            return;
+                        }
                         mOnItemClickLitener.onItemClick(holder.mContainer,position);
                     }
                 });
@@ -119,6 +128,10 @@ public class ArtistAdapter extends HeaderAdapter{
                 holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
+                        if(holder.getAdapterPosition() - 1 < 0){
+                            ToastUtil.show(mContext,"参数错误");
+                            return true;
+                        }
                         mOnItemClickLitener.onItemLongClick(holder.mContainer,position);
                         return true;
                     }

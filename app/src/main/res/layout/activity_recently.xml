@@ -11,8 +11,6 @@
         <include layout="@layout/toolbar_multi"/>
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/layout_topbar_1"/>
-
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/d1_size"

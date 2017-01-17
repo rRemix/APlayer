@@ -20,7 +20,6 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadImage;
-import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
@@ -32,6 +31,8 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-1-15.
@@ -40,28 +41,58 @@ import remix.myplayer.util.PlayListUtil;
 /**
  * 播放列表的适配器
  */
-public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder> {
+public class PlayListAdapter extends HeaderAdapter {
     private MultiChoice mMultiChoice;
 
     public PlayListAdapter(Context context,MultiChoice multiChoice) {
-        super(context);
+        super(context,null,multiChoice,R.layout.layout_topbar_2);
+        ListModel =  SPUtil.getValue(context,"Setting","PlayListModel",Constants.GRID_MODEL);
         this.mMultiChoice = multiChoice;
     }
 
+
     @Override
-    public int getItemViewType(int position) {
-        return PlayListFragment.getModel();
-    }
-    @Override
-    public PlayListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
+        if(viewType == TYPE_HEADER){
+            return new AlbumAdater.HeaderHolder(mHeaderView);
+        }
         return viewType == Constants.LIST_MODEL ?
                 new PlayListListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_recycle_list,parent,false)) :
                 new PlayListGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_recycle_grid,parent,false));
     }
 
     @Override
-    public void onBindViewHolder(final PlayListHolder holder, final int position) {
-        if(mCursor.moveToPosition(position)){
+    public void onBind(final BaseViewHolder baseHolder, final int position) {
+        if(position == 0){
+            final AlbumAdater.HeaderHolder headerHolder = (AlbumAdater.HeaderHolder) baseHolder;
+            if(mCursor == null || mCursor.getCount() == 0){
+                headerHolder.mRoot.setVisibility(View.GONE);
+                return;
+            }
+            //设置图标
+            headerHolder.mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
+            headerHolder.mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mGridModelBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switchMode(headerHolder,v);
+                }
+            });
+            headerHolder.mListModelBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switchMode(headerHolder,v);
+                }
+            });
+            return;
+        }
+
+        if(!(baseHolder instanceof PlayListHolder)){
+            return;
+        }
+        final PlayListHolder holder = (PlayListHolder) baseHolder;
+        if(mCursor.moveToPosition(position - 1)){
             final PlayListInfo info = PlayListUtil.getPlayListInfo(mCursor);
             if(info == null)
                 return;
@@ -74,6 +105,10 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
                 holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if(holder.getAdapterPosition() - 1 < 0){
+                            ToastUtil.show(mContext,"参数错误");
+                            return;
+                        }
                         mOnItemClickLitener.onItemClick(holder.mContainer,holder.getAdapterPosition());
                     }
                 });
@@ -81,6 +116,10 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
                 holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
+                        if(holder.getAdapterPosition() - 1 < 0){
+                            ToastUtil.show(mContext,"参数错误");
+                            return true;
+                        }
                         mOnItemClickLitener.onItemLongClick(holder.mContainer,holder.getAdapterPosition());
                         return true;
                     }
@@ -106,8 +145,8 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
                 });
                 //点击效果
                 int size = DensityUtil.dip2px(mContext,45);
-                Drawable defaultDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-                Drawable selectDrawable = Theme.getShape(PlayListFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
+                Drawable defaultDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+                Drawable selectDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
                 holder.mButton.setBackground(Theme.getPressDrawable(
                         defaultDrawable,
                         selectDrawable,
@@ -119,7 +158,7 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
 
             //背景点击效果
             holder.mContainer.setBackground(
-                    Theme.getPressAndSelectedStateListRippleDrawable(PlayListFragment.getModel(), mContext));
+                    Theme.getPressAndSelectedStateListRippleDrawable(ListModel, mContext));
 
             //是否处于选中状态
             if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&
@@ -130,7 +169,7 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
             }
 
             //设置padding
-            if(PlayListFragment.ListModel == 2 && holder.mRoot != null){
+            if(ListModel == 2 && holder.mRoot != null){
                 if(position % 2 == 0){
                     holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4));
                 } else {

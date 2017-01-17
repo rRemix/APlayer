@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -17,11 +16,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ArtistAdapter;
 import remix.myplayer.helper.DeleteHelper;
@@ -30,7 +27,6 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
-import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
@@ -44,7 +40,7 @@ import remix.myplayer.util.SPUtil;
  */
 public class ArtistFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback{
     @BindView(R.id.artist_recycleview)
-    RecyclerView mRecycleView;
+    RecyclerView mRecyclerView;
     private MultiChoice mMultiChoice;
     //艺术家与艺术家id的索引
     public static int mArtistIdIndex = -1;
@@ -81,13 +77,8 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
         ((ArtistAdapter)mAdapter).setModeChangeCallback(new ModeChangeCallback() {
             @Override
             public void OnModeChange(final int mode) {
-                new Handler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mRecycleView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-                        mRecycleView.setAdapter(mAdapter);
-                    }
-                });
+                mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+                mRecyclerView.setAdapter(mAdapter);
             }
         });
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
@@ -116,8 +107,8 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
         });
 
         int model = SPUtil.getValue(getActivity(),"Setting","ArtistModel",Constants.GRID_MODEL);
-        mRecycleView.setLayoutManager(model == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-        mRecycleView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         return rootView;
     }
 
@@ -153,7 +144,7 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
             //设置查询索引
             mArtistIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
             mArtistIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            mRecycleView.setAdapter(mAdapter);
+            mRecyclerView.setAdapter(mAdapter);
             mAdapter.setCursor(mCursor);
         } catch (Exception e){
             e.printStackTrace();

@@ -37,6 +37,7 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 
 /**
@@ -48,7 +49,7 @@ import remix.myplayer.util.SPUtil;
  */
 public class AlbumAdater extends HeaderAdapter  {
     public AlbumAdater(Cursor cursor, Context context,MultiChoice multiChoice) {
-        super(context,cursor,multiChoice);
+        super(context,cursor,multiChoice,R.layout.layout_topbar_2);
         ListModel =  SPUtil.getValue(context,"Setting","AlbumModel",Constants.GRID_MODEL);
     }
 
@@ -66,6 +67,10 @@ public class AlbumAdater extends HeaderAdapter  {
     public void onBind(final BaseViewHolder baseHolder, final int position) {
         if(position == 0){
             final HeaderHolder headerHolder = (HeaderHolder) baseHolder;
+            if(mCursor == null || mCursor.getCount() == 0){
+                headerHolder.mRoot.setVisibility(View.GONE);
+                return;
+            }
             //设置图标
             headerHolder.mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
             headerHolder.mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
@@ -117,14 +122,22 @@ public class AlbumAdater extends HeaderAdapter  {
                 albumHolder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mOnItemClickLitener.onItemClick(albumHolder.mContainer,albumHolder.getAdapterPosition());
+                        if(albumHolder.getAdapterPosition() - 1 < 0){
+                            ToastUtil.show(mContext,"参数错误");
+                            return;
+                        }
+                        mOnItemClickLitener.onItemClick(albumHolder.mContainer,albumHolder.getAdapterPosition() - 1);
                     }
                 });
                 //多选菜单
                 albumHolder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        mOnItemClickLitener.onItemLongClick(albumHolder.mContainer,albumHolder.getAdapterPosition());
+                        if(albumHolder.getAdapterPosition() - 1 < 0){
+                            ToastUtil.show(mContext,"参数错误");
+                            return true;
+                        }
+                        mOnItemClickLitener.onItemLongClick(albumHolder.mContainer,albumHolder.getAdapterPosition() - 1);
                         return true;
                     }
                 });
@@ -236,8 +249,10 @@ public class AlbumAdater extends HeaderAdapter  {
         ImageButton mGridModelBtn;
         @BindView(R.id.divider)
         View mDivider;
+        View mRoot;
         HeaderHolder(View itemView) {
             super(itemView);
+            mRoot = itemView;
         }
     }
 }
