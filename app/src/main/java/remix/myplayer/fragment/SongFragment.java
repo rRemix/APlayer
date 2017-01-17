@@ -57,7 +57,7 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
     TextView mSort;
     @BindView(R.id.asc_desc)
     TextView mAscDesc;
-    @BindView(R.id.shuffle_container)
+    @BindView(R.id.top_bar)
     View mShuffle;
     private static int LOADER_ID = 0;
     public static final String TAG = SongFragment.class.getSimpleName();
@@ -118,6 +118,7 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
         //显示当前排序方式
         mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "按添加时间" : "按字母");
         mAscDesc.setText(!ASCDESC.equals(" asc") ? "降序" : "升序");
+        rootView.findViewById(R.id.top_bar).setVisibility(View.GONE);
         return rootView;
     }
 

@@ -168,20 +168,18 @@ public class MusicService extends BaseService implements Playback {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        LogUtil.e("AppWidget","onStartComman  receiver:" + mControlRecevier + " intent.extra:" + intent.getExtras());
-        if(mControlRecevier == null){
-            mControlRecevier = new ControlReceiver();
-            registerReceiver(mControlRecevier,new IntentFilter(Constants.CTL_ACTION));
-        }
-        if(intent.getExtras() != null && intent.getExtras().getBoolean("FromWidget",false)){
-            mControlRecevier.onReceive(null,intent);
-        }
+//        if(mControlRecevier == null){
+//            mControlRecevier = new ControlReceiver();
+//            registerReceiver(mControlRecevier,new IntentFilter(Constants.CTL_ACTION));
+//        }
+//        if(intent.getExtras() != null && intent.getExtras().getBoolean("FromWidget",false)){
+//            mControlRecevier.onReceive(null,intent);
+//        }
         return super.onStartCommand(intent,flags,startId);
     }
 
     @Override
     public void onCreate() {
-        LogUtil.e("AppWidget","onCreate");
         super.onCreate();
         mContext = getApplicationContext();
         mInstance = this;

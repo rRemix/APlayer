@@ -12,37 +12,37 @@
         <include layout="@layout/toolbar_multi"/>
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/layout_play_shuffle"/>
+    <include layout="@layout/layout_topbar_1"/>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/d1_size"
         android:background="?attr/divider_color"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:background="?attr/background_color_main"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="10"
-            android:id="@+id/child_holder_recyclerView"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="@dimen/d10_size"
-            android:id="@+id/album_holder_item_num"
-            android:textColor="?attr/text_color"
-            android:textSize="@dimen/s12_size"
-            android:text=""
-            android:layout_gravity="center_horizontal"/>
+        android:layout_height="match_parent">
         <fragment android:name="remix.myplayer.fragment.BottomActionBarFragment"
             android:id="@+id/bottom_actionbar_new"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/item_height" />
-    </LinearLayout>
+            android:layout_height="@dimen/item_height"
+            android:layout_alignParentBottom="true"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/childholder_item_num"
+            android:textColor="?attr/text_color"
+            android:textSize="@dimen/s12_size"
+            android:layout_above="@id/bottom_actionbar_new"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/d14_size"
+            android:layout_marginBottom="@dimen/d24_size"/>
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/child_holder_recyclerView"
+            android:layout_above="@id/childholder_item_num"/>
+    </RelativeLayout>
 
 </LinearLayout>

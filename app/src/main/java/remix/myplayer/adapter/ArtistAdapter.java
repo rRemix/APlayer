@@ -35,6 +35,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by Remix on 2015/12/22.
@@ -43,27 +44,49 @@ import remix.myplayer.util.DensityUtil;
 /**
  * 艺术家界面的适配器
  */
-public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
-    private MultiChoice mMultiChoice;
-
+public class ArtistAdapter extends HeaderAdapter{
     public ArtistAdapter(Cursor cursor, Context context,MultiChoice multiChoice) {
-        super(context,cursor);
-        this.mMultiChoice = multiChoice;
+        super(context,cursor,multiChoice);
+        ListModel =  SPUtil.getValue(context,"Setting","ArtistModel",Constants.GRID_MODEL);
     }
 
     @Override
-    public int getItemViewType(int position) {
-        return ArtistFragment.getModel();
-    }
-    @Override
-    public ArtistHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
+        if(viewType == TYPE_HEADER){
+            return new AlbumAdater.HeaderHolder(mHeaderView);
+        }
         return viewType == Constants.LIST_MODEL ?
-                new ArtistListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_artist_recycle_list,parent,false)) :
-                new ArtistGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_artist_recycle_grid,parent,false));
+                new ArtistAdapter.ArtistListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_artist_recycle_list,parent,false)) :
+                new ArtistAdapter.ArtistGridHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_artist_recycle_grid,parent,false));
     }
 
     @Override
-    public void onBindViewHolder(final ArtistHolder holder, final int position) {
+    public void onBind(final BaseViewHolder baseHolder, final int position) {
+        if(position == 0){
+            final AlbumAdater.HeaderHolder headerHolder = (AlbumAdater.HeaderHolder) baseHolder;
+            //设置图标
+            headerHolder.mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
+            headerHolder.mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+            headerHolder.mGridModelBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switchMode(headerHolder,v);
+                }
+            });
+            headerHolder.mListModelBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switchMode(headerHolder,v);
+                }
+            });
+            return;
+        }
+
+        if(!(baseHolder instanceof ArtistHolder)){
+            return;
+        }
+        final ArtistHolder holder = (ArtistHolder) baseHolder;
         if(mCursor.moveToPosition(position)) {
             try {
                 //设置歌手名
@@ -79,7 +102,7 @@ public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
 
                 //item点击效果
                 holder.mContainer.setBackground(
-                        Theme.getPressAndSelectedStateListRippleDrawable(ArtistFragment.getModel(),mContext));
+                        Theme.getPressAndSelectedStateListRippleDrawable(ListModel,mContext));
 
             } catch (Exception e){
                 e.printStackTrace();
@@ -108,8 +131,8 @@ public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
 
                 //按钮点击效果
                 int size = DensityUtil.dip2px(mContext,45);
-                Drawable defaultDrawable = Theme.getShape(ArtistFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-                Drawable selectDrawable = Theme.getShape(ArtistFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
+                Drawable defaultDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+                Drawable selectDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
                 holder.mButton.setBackground(Theme.getPressDrawable(
                         defaultDrawable,
                         selectDrawable,
@@ -146,13 +169,18 @@ public class ArtistAdapter extends BaseAdapter<ArtistAdapter.ArtistHolder>{
         }
 
         //设置padding
-        if(ArtistFragment.ListModel == 2 && holder.mRoot != null){
+        if(ListModel == 2 && holder.mRoot != null){
             if(position % 2 == 0){
                 holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4));
             } else {
                 holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4));
             }
         }
+    }
+
+    @Override
+    public void saveMode() {
+        SPUtil.putValue(mContext,"Setting","ArtistModel",ListModel);
     }
 
     public static class ArtistHolder extends BaseViewHolder {

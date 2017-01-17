@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -24,6 +25,7 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ArtistAdapter;
 import remix.myplayer.helper.DeleteHelper;
+import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
@@ -43,25 +45,14 @@ import remix.myplayer.util.SPUtil;
 public class ArtistFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback{
     @BindView(R.id.artist_recycleview)
     RecyclerView mRecycleView;
-
+    private MultiChoice mMultiChoice;
     //艺术家与艺术家id的索引
     public static int mArtistIdIndex = -1;
     public static int mArtistIndex = -1;
 
     public static final String TAG = ArtistFragment.class.getSimpleName();
-    private MultiChoice mMultiChoice;
 
     private static int LOADER_ID = 0;
-
-    //列表显示与网格显示切换
-    @BindView(R.id.list_model)
-    ImageView mListModelBtn;
-    @BindView(R.id.grid_model)
-    ImageView mGridModelBtn;
-    @BindView(R.id.divider)
-    View mDivider;
-    //当前列表模式 1:列表 2:网格
-    public static int ListModel = 2;
 
     @Override
     public void onAttach(Context context) {
@@ -82,15 +73,23 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
         View rootView = inflater.inflate(R.layout.fragment_artist,null);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-        ListModel = SPUtil.getValue(getActivity(),"Setting","ArtistModel",Constants.GRID_MODEL);
-        mDivider.findViewById(R.id.divider).setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
-        mRecycleView.setLayoutManager(ListModel == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-        mRecycleView.setItemAnimator(new DefaultItemAnimator());
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
 
         mAdapter = new ArtistAdapter(mCursor,getActivity(),mMultiChoice);
+        ((ArtistAdapter)mAdapter).setModeChangeCallback(new ModeChangeCallback() {
+            @Override
+            public void OnModeChange(final int mode) {
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRecycleView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+                        mRecycleView.setAdapter(mAdapter);
+                    }
+                });
+            }
+        });
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -107,41 +106,21 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
                         startActivity(intent);
                     }
                 }
-
             }
-
             @Override
             public void onItemLongClick(View view, int position) {
                 int artistId = getArtsitId(position);
                 if(getUserVisibleHint() && artistId > 0)
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,artistId,TAG,Constants.ARTIST);
-
             }
         });
-        mRecycleView.setAdapter(mAdapter);
 
-        mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-        mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
+        int model = SPUtil.getValue(getActivity(),"Setting","ArtistModel",Constants.GRID_MODEL);
+        mRecycleView.setLayoutManager(model == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+        mRecycleView.setItemAnimator(new DefaultItemAnimator());
         return rootView;
     }
 
-    public static synchronized int getModel(){
-        return ListModel;
-    }
-
-    @OnClick({R.id.list_model,R.id.grid_model})
-    public void onSwitch(View v){
-        int newModel = v.getId() == R.id.list_model ? Constants.LIST_MODEL : Constants.GRID_MODEL;
-        if(newModel == ListModel)
-            return;
-
-        ListModel = newModel;
-        mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-        mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-        mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
-        mRecycleView.setLayoutManager(ListModel == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-        SPUtil.putValue(getActivity(),"Setting","ArtistModel",ListModel);
-    }
 
     private int getArtsitId(int position){
         int artistId = -1;
@@ -174,6 +153,7 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
             //设置查询索引
             mArtistIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
             mArtistIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+            mRecycleView.setAdapter(mAdapter);
             mAdapter.setCursor(mCursor);
         } catch (Exception e){
             e.printStackTrace();

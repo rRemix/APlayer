@@ -35,18 +35,6 @@ public abstract class BaseAdapter<T extends BaseViewHolder> extends RecyclerView
         this.mCursor = cursor;
     }
 
-    protected void setButtonBg(View view, int size, Drawable defaultDrawable, Drawable selectDrawable){
-        Theme.getShape(AlbumFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT,size,size);
-        Theme.getShape(AlbumFragment.getModel() == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getRippleColor(),size,size);
-        view.setBackground(Theme.getPressDrawable(
-                defaultDrawable,
-                selectDrawable,
-                ThemeStore.getRippleColor(),
-                null,
-                null));
-    }
-
-
     public void setOnItemClickLitener(OnItemClickListener l) {
         this.mOnItemClickLitener = l;
     }

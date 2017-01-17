@@ -119,7 +119,7 @@ public class PlayListAdapter extends BaseAdapter<PlayListAdapter.PlayListHolder>
 
             //背景点击效果
             holder.mContainer.setBackground(
-                    Theme.getPressAndSelectedStateListRippleDrawable(AlbumFragment.getModel(), mContext));
+                    Theme.getPressAndSelectedStateListRippleDrawable(PlayListFragment.getModel(), mContext));
 
             //是否处于选中状态
             if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&

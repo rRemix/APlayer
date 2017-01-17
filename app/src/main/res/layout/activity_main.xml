@@ -11,55 +11,50 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <RelativeLayout
+        <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+            <android.support.design.widget.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/material_color_primary">
+                <include layout="@layout/toolbar"/>
+                <include layout="@layout/toolbar_multi"/>
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/tab_height"
+                    style="@style/CustomTabLayout" />
+            </android.support.design.widget.AppBarLayout>
+
+            <!--中间四个fragment-->
+            <android.support.v4.view.ViewPager
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/ViewPager"
+                android:background="?attr/background_color_main"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+            <ImageView
+                android:id="@+id/add"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_floatingbtn_day"
+                android:background="@color/transparent"
+                android:layout_gravity="bottom|right"
+                android:layout_marginRight="@dimen/d30_size"
+                android:layout_marginBottom="@dimen/d20_size"/>
+
             <!-- 底部自定义ationbar -->
             <fragment android:name="remix.myplayer.fragment.BottomActionBarFragment"
                 android:id="@+id/bottom_actionbar_new"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/item_height"
-                android:layout_alignParentBottom="true"/>
-            <android.support.design.widget.CoordinatorLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_above="@id/bottom_actionbar_new">
-                <android.support.design.widget.AppBarLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/material_color_primary">
+                android:layout_gravity="bottom"
+                app:layout_behavior="remix.myplayer.ui.FootBehavior"/>
+        </android.support.design.widget.CoordinatorLayout>
 
-                    <include layout="@layout/toolbar"/>
-                    <include layout="@layout/toolbar_multi"/>
-
-                    <android.support.design.widget.TabLayout
-                        android:id="@+id/tabs"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/tab_height"
-                        style="@style/CustomTabLayout" />
-
-                </android.support.design.widget.AppBarLayout>
-
-                <!--中间四个fragment-->
-                <android.support.v4.view.ViewPager
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/ViewPager"
-                    android:background="?attr/background_color_main"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-
-                <ImageView
-                    android:id="@+id/add"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/icon_floatingbtn_day"
-                    android:background="@color/transparent"
-                    android:layout_gravity="bottom|right"
-                    android:layout_marginRight="@dimen/d30_size"
-                    android:layout_marginBottom="@dimen/d20_size"/>
-            </android.support.design.widget.CoordinatorLayout>
-        </RelativeLayout>
     </LinearLayout>
 
 

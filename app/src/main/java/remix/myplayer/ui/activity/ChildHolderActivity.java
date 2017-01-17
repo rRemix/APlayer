@@ -57,7 +57,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
     @BindView(R.id.asc_desc)
     TextView mAscDesc;
     //歌曲数目与标题
-    @BindView(R.id.album_holder_item_num)
+    @BindView(R.id.childholder_item_num)
     TextView mNum;
     @BindView(R.id.child_holder_recyclerView)
     RecyclerView mRecyclerView;
@@ -103,7 +103,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                     break;
                 case END:
                     if(mMDDialog != null && mMDDialog.isShowing()){
-                        findViewById(R.id.shuffle_container).setVisibility(mInfoList != null && mInfoList.size() > 0 ? View.VISIBLE : View.GONE);
+                        findViewById(R.id.top_bar).setVisibility(mInfoList != null && mInfoList.size() > 0 ? View.VISIBLE : View.GONE);
                         mMDDialog.dismiss();
                     }
                     break;

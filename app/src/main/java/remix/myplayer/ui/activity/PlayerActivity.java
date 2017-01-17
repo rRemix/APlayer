@@ -22,8 +22,6 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -408,17 +406,18 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     if(mAdapter.getItem(1) instanceof CoverFragment){
                         ((CoverFragment) mAdapter.getItem(1)).hideImage();
                     }
-                }
 
+                }
                 @Override
                 public void onSpringAtRest(Spring spring) {
                     finish();
                     overridePendingTransition(0,0);
                 }
             });
+            coverSpring.setOvershootClampingEnabled(true);
             coverSpring.setCurrentValue(1);
             coverSpring.setEndValue(0);
-            coverSpring.setOvershootClampingEnabled(true);
+
 
 //            final View decorView = getWindow().getDecorView();
 //            mContainer.animate()
@@ -703,7 +702,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 // 计算图片缩放比例和位移距离
                 getMoveInfo(mDestRect);
 
-
                 mAnimCover.setPivotX(0);
                 mAnimCover.setPivotY(0);
 
@@ -756,9 +754,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                         overridePendingTransition(0, 0);
                     }
                 });
+                spring.setOvershootClampingEnabled(true);
                 spring.setCurrentValue(0);
                 spring.setEndValue(1);
-                spring.setOvershootClampingEnabled(true);
 
             }
         });

@@ -50,7 +50,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
     private static int LOADER_ID = 1;
 
     private SongAdapter mAdapter;
-    @BindView(R.id.shuffle_container)
+    @BindView(R.id.top_bar)
     View mShuffle;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
