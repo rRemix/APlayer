@@ -38,6 +38,14 @@ import remix.myplayer.util.ToastUtil;
  * Created by taeja on 16-6-24.
  */
 public class ChildHolderAdapter extends HeaderAdapter {
+    //升序
+    public static final int ASC = 0;
+    //降序
+    public static final int DESC = 1;
+    //按字母排序
+    public static final int NAME = 0;
+    //按添加时间排序
+    public static final int ADDTIME = 1;
     private ArrayList<MP3Item> mInfoList;
     private int mType;
     private String mArg;
@@ -47,12 +55,9 @@ public class ChildHolderAdapter extends HeaderAdapter {
     private SortChangeCallback mCallback;
     //当前是升序还是降序 0:升序 1:降序
     public static int ASC_DESC = 0;
-    public static final int ASC = 0;
-    public static final int DESC = 1;
     //当前是按字母排序还是添加时间 0:字母 1:时间
     public static int SORT = 0;
-    public static final int NAME = 0;
-    public static final int ADDTIME = 1;
+
     public ChildHolderAdapter(Context context, int type, String arg,MultiChoice multiChoice){
         super(context,null,multiChoice,R.layout.layout_topbar_1);
         this.mContext = context;
@@ -60,8 +65,8 @@ public class ChildHolderAdapter extends HeaderAdapter {
         this.mArg = arg;
         this.mMultiChoice = multiChoice;
         //读取之前的排序方式
-        SORT = SPUtil.getValue(context,"Setting","SubDirSort",NAME);
-        ASC_DESC = SPUtil.getValue(context,"Setting","SubDirAscDesc",ASC);
+        SORT = SPUtil.getValue(context,"Setting","SubDirSort", NAME);
+        ASC_DESC = SPUtil.getValue(context,"Setting","SubDirAscDesc", ASC);
         int size = DensityUtil.dip2px(mContext,60);
         mDefaultDrawable = Theme.getShape(GradientDrawable.RECTANGLE,Color.TRANSPARENT,size,size);
         mSelectDrawable = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getSelectColor(),size,size);
@@ -230,7 +235,7 @@ public class ChildHolderAdapter extends HeaderAdapter {
                 }
                 SPUtil.putValue(mContext,"Setting","SubDirSort",SORT);
                 headerHolder.mSort.setText(SORT != NAME ?  "按添加时间" : "按字母");
-                mCallback.SortChange(SORT);
+                mCallback.SortChange();
                 break;
             case R.id.asc_desc:
                 if(ASC_DESC == ASC){
@@ -240,7 +245,7 @@ public class ChildHolderAdapter extends HeaderAdapter {
                 }
                 SPUtil.putValue(mContext,"Setting","SubDirAscDesc",ASC_DESC);
                 headerHolder.mAscDesc.setText(ASC_DESC != ASC ? "降序" : "升序");
-                mCallback.AscDescChange(ASC_DESC);
+                mCallback.SortChange();
                 break;
         }
     }

@@ -77,7 +77,7 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
         holder.mRoot.setSelected(mSelectIndex == position);
         holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(mContext,
                         Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerEffectColor()),
-                        Theme.getShape(GradientDrawable.RECTANGLE, ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.gray_343438)),
+                        Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerDefaultColor()),
                         ThemeStore.getDrawerEffectColor()));
 
     }

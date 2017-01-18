@@ -5,8 +5,5 @@ package remix.myplayer.interfaces;
  */
 
 public interface SortChangeCallback {
-    void SortChange(String sort);
-    void AscDescChange(String ascDesc);
-    void SortChange(int sort);
-    void AscDescChange(int ascdesc);
+    void SortChange();
 }

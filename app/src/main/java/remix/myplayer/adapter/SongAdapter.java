@@ -46,7 +46,9 @@ import remix.myplayer.util.ToastUtil;
  * Created by Remix on 2016/4/11.
  */
 public class SongAdapter extends HeaderAdapter{
+    //升序还是降序
     public static String ASCDESC = " asc";
+    //按字母排序还是按添加时间排序
     public static String SORT = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
 
     private MultiChoice mMultiChoice;
@@ -62,11 +64,11 @@ public class SongAdapter extends HeaderAdapter{
         this.mMultiChoice = multiChoice;
         this.mType = type;
         int size = DensityUtil.dip2px(mContext,60);
+        mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
+        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getSelectColor(),size,size);
         //读取排序方式
         ASCDESC = SPUtil.getValue(context,"Setting","AscDesc"," asc");
         SORT = SPUtil.getValue(context,"Setting","Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-        mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
-        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getSelectColor(),size,size);
     }
 
     public void setChangeCallback(SortChangeCallback callback){
@@ -249,7 +251,7 @@ public class SongAdapter extends HeaderAdapter{
                 }
                 headerHolder.mAscDesc.setText(!ASCDESC.equals(" asc") ? "降序" : "升序");
                 SPUtil.putValue(mContext,"Setting","AscDesc", ASCDESC);
-                mCallback.AscDescChange(ASCDESC);
+                mCallback.SortChange();
                 break;
             case R.id.sort:
                 if(SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER)){
@@ -259,7 +261,7 @@ public class SongAdapter extends HeaderAdapter{
                 }
                 headerHolder.mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "按添加时间" : "按字母" );
                 SPUtil.putValue(mContext,"Setting","Sort",SORT);
-                mCallback.SortChange(SORT);
+                mCallback.SortChange();
                 break;
         }
     }

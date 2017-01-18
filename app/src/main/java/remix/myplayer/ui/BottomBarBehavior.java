@@ -17,15 +17,15 @@ import remix.myplayer.util.DensityUtil;
  * @Date 2017/1/17 09:16
  */
 
-public class FootBehavior extends CoordinatorLayout.Behavior<View> {
+public class BottomBarBehavior extends CoordinatorLayout.Behavior<View> {
     private Context mContext;
 
-    public FootBehavior() {
+    public BottomBarBehavior() {
         super();
         mContext = APlayerApplication.getContext();
     }
 
-    public FootBehavior(Context context, AttributeSet attrs) {
+    public BottomBarBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
     }

@@ -229,6 +229,11 @@ public class ThemeStore {
         return ColorUtil.getColor(ThemeStore.isDay() ? R.color.drawer_selected_day : R.color.drawer_selected_night);
     }
 
+    @ColorInt
+    public static int getDrawerDefaultColor(){
+        return ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.gray_343438);
+    }
+
     public static com.afollestad.materialdialogs.Theme getMDDialogTheme(){
         return isDay() ? com.afollestad.materialdialogs.Theme.LIGHT : com.afollestad.materialdialogs.Theme.DARK;
     }

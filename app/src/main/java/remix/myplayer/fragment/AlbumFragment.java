@@ -175,7 +175,6 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
         return (AlbumAdater) mAdapter;
     }
 
-
     @Override
     public void OnDelete() {
         getLoaderManager().initLoader(++LOADER_ID, null, this);

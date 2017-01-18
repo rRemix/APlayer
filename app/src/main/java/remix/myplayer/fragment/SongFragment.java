@@ -84,20 +84,10 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
         mAdapter = new SongAdapter(getActivity(),mCursor,mMultiChoice, SongAdapter.ALLSONG);
         ((SongAdapter)mAdapter).setChangeCallback(new SortChangeCallback() {
             @Override
-            public void SortChange(String sort) {
+            public void SortChange() {
                 getLoaderManager().restartLoader(LOADER_ID,null,SongFragment.this);
             }
 
-            @Override
-            public void AscDescChange(String ascDesc) {
-                getLoaderManager().restartLoader(LOADER_ID,null,SongFragment.this);
-            }
-            @Override
-            public void SortChange(int sort) {
-            }
-            @Override
-            public void AscDescChange(int ascdesc) {
-            }
         });
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override

@@ -113,17 +113,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         mAdapter = new ChildHolderAdapter(this,mType,mArg,mMultiChoice);
         mAdapter.setCallback(new SortChangeCallback() {
             @Override
-            public void SortChange(String sort) {
-            }
-            @Override
-            public void AscDescChange(String ascDesc) {
-            }
-            @Override
-            public void SortChange(int sort) {
-                new GetSongList(false).start();
-            }
-            @Override
-            public void AscDescChange(int ascdesc) {
+            public void SortChange() {
                 new GetSongList(false).start();
             }
         });

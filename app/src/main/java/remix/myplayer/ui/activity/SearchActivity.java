@@ -114,6 +114,7 @@ public class SearchActivity extends ToolbarActivity {
         mSearchResRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         UpdateUI();
+
     }
 
 

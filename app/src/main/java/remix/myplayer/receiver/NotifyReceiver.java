@@ -79,9 +79,9 @@ public class NotifyReceiver extends BroadcastReceiver {
                 mRemoteBigView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.night_textcolor_primary));
                 mRemoteView.setTextColor(R.id.notify_song, ColorUtil.getColor(R.color.night_textcolor_primary));
                 //背景
-                mRemoteBigView.setImageViewResource(R.id.notify_bg, R.drawable.bg_black);
+                mRemoteBigView.setImageViewResource(R.id.notify_bg, R.drawable.bg_notification_black);
                 mRemoteBigView.setViewVisibility(R.id.notify_bg,View.VISIBLE);
-                mRemoteView.setImageViewResource(R.id.notify_bg, R.drawable.bg_black);
+                mRemoteView.setImageViewResource(R.id.notify_bg, R.drawable.bg_notification_black);
                 mRemoteView.setViewVisibility(R.id.notify_bg,View.VISIBLE);
             }
             //设置播放按钮

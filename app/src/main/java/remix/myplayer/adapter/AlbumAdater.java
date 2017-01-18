@@ -93,7 +93,7 @@ public class AlbumAdater extends HeaderAdapter  {
         if(!(baseHolder instanceof AlbumHolder)){
             return;
         }
-        final AlbumHolder albumHolder = (AlbumHolder) baseHolder;
+        final AlbumHolder holder = (AlbumHolder) baseHolder;
         if(mCursor.moveToPosition(position - 1)) {
             try {
 
@@ -101,73 +101,73 @@ public class AlbumAdater extends HeaderAdapter  {
                 String artist = CommonUtil.processInfo(mCursor.getString(AlbumFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
                 String album = CommonUtil.processInfo(mCursor.getString(AlbumFragment.mAlbumIndex),CommonUtil.ALBUMTYPE);
 
-                albumHolder.mText1.setText(album);
-                albumHolder.mText2.setText(artist);
+                holder.mText1.setText(album);
+                holder.mText2.setText(artist);
                 //设置封面
                 int albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
-                albumHolder.mImage.setImageURI(Uri.EMPTY);
-                new AsynLoadImage(albumHolder.mImage).execute(albumid,Constants.URL_ALBUM);
-                if(albumHolder instanceof AlbumListHolder){
-                    new AsynLoadSongNum(albumHolder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);
+                holder.mImage.setImageURI(Uri.EMPTY);
+                new AsynLoadImage(holder.mImage).execute(albumid,Constants.URL_ALBUM);
+                if(holder instanceof AlbumListHolder){
+                    new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);
                 }
             } catch (Exception e){
                 e.printStackTrace();
             }
 
            //背景点击效果
-            albumHolder.mContainer.setBackground(
+            holder.mContainer.setBackground(
                     Theme.getPressAndSelectedStateListRippleDrawable(ListModel, mContext));
 
             if(mOnItemClickLitener != null) {
-                albumHolder.mContainer.setOnClickListener(new View.OnClickListener() {
+                holder.mContainer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(albumHolder.getAdapterPosition() - 1 < 0){
+                        if(holder.getAdapterPosition() - 1 < 0){
                             ToastUtil.show(mContext,"参数错误");
                             return;
                         }
-                        mOnItemClickLitener.onItemClick(albumHolder.mContainer,albumHolder.getAdapterPosition() - 1);
+                        mOnItemClickLitener.onItemClick(holder.mContainer,holder.getAdapterPosition() - 1);
                     }
                 });
                 //多选菜单
-                albumHolder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
+                holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        if(albumHolder.getAdapterPosition() - 1 < 0){
+                        if(holder.getAdapterPosition() - 1 < 0){
                             ToastUtil.show(mContext,"参数错误");
                             return true;
                         }
-                        mOnItemClickLitener.onItemLongClick(albumHolder.mContainer,albumHolder.getAdapterPosition() - 1);
+                        mOnItemClickLitener.onItemLongClick(holder.mContainer,holder.getAdapterPosition() - 1);
                         return true;
                     }
                 });
             }
 
-            if(albumHolder.mButton != null) {
+            if(holder.mButton != null) {
                 //着色
                 int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
-                Theme.TintDrawable(albumHolder.mButton,R.drawable.list_icn_more,tintColor);
+                Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
 
                 //点击效果
                 int size = DensityUtil.dip2px(mContext,45);
                 Drawable defaultDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
                 Drawable selectDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
-                albumHolder.mButton.setBackground(Theme.getPressDrawable(
+                holder.mButton.setBackground(Theme.getPressDrawable(
                         defaultDrawable,
                         selectDrawable,
                         ThemeStore.getRippleColor(),
                         null,
                         null));
 
-                albumHolder.mButton.setOnClickListener(new View.OnClickListener() {
+                holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if(mMultiChoice.isShow())
                             return;
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
-                        final PopupMenu popupMenu = new PopupMenu(wrapper,albumHolder.mButton,Gravity.END);
+                        final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
                         popupMenu.getMenuInflater().inflate(R.menu.album_menu, popupMenu.getMenu());
-                        mCursor.moveToPosition(albumHolder.getAdapterPosition());
+                        mCursor.moveToPosition(holder.getAdapterPosition());
                         popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
                                 mCursor.getInt(AlbumFragment.mAlbumIdIndex),
                                 Constants.ALBUM,
@@ -180,23 +180,23 @@ public class AlbumAdater extends HeaderAdapter  {
             //是否处于选中状态
             if(MultiChoice.TAG.equals(AlbumFragment.TAG) &&
                     mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
-                mMultiChoice.AddView(albumHolder.mContainer);
+                mMultiChoice.AddView(holder.mContainer);
             } else {
-                albumHolder.mContainer.setSelected(false);
+                holder.mContainer.setSelected(false);
             }
 
             //半圆着色
             if(ListModel == Constants.GRID_MODEL){
-                Theme.TintDrawable(albumHolder.mHalfCircle,R.drawable.icon_half_circular_left,
+                Theme.TintDrawable(holder.mHalfCircle,R.drawable.icon_half_circular_left,
                         ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.night_background_color_main));
             }
 
             //设置padding
-            if(ListModel == 2 && albumHolder.mRoot != null){
+            if(ListModel == 2 && holder.mRoot != null){
                 if(position % 2 == 0){
-                    albumHolder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4));
+                    holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4));
                 } else {
-                    albumHolder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4));
+                    holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4));
                 }
             }
         }

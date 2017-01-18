@@ -19,15 +19,13 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration{
     private Drawable mDivider;
     private int mOrientation;
 
-    public DividerItemDecoration(Context context,int orientation)
-    {
+    public DividerItemDecoration(Context context,int orientation) {
         final TypedArray a = context.obtainStyledAttributes(ATTRS);
         mDivider = a.getDrawable(0);
         a.recycle();
         setOrienttation(orientation);
     }
-    public void setOrienttation(int orienttation)
-    {
+    public void setOrienttation(int orienttation) {
         if(orienttation != HORIZONTAL_LIST && orienttation != VERTICAL_LIST)
             throw new IllegalArgumentException("invalid orientation");
         mOrientation = orienttation;
@@ -46,8 +44,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration{
         final int right = parent.getWidth() - parent.getPaddingRight();
         final int childCount = parent.getChildCount();
 
-        for(int i = 0 ; i < childCount ;i++)
-        {
+        for(int i = 0 ; i < childCount ;i++) {
             final View child = parent.getChildAt(i);
             final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)child.getLayoutParams();
             final int top = child.getBottom() + params.bottomMargin;
