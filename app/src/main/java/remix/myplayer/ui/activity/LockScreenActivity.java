@@ -276,6 +276,8 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                 Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
                     @Override
                     public void onGenerated(Palette palette) {
+                        if(palette == null)
+                            return;
                         mSwatch = palette.getMutedSwatch();//柔和 暗色
                         if(mSwatch == null)
                             mSwatch = new Palette.Swatch(Color.GRAY,100);

@@ -14,6 +14,7 @@ import com.umeng.socialize.PlatformConfig;
 import com.umeng.socialize.UMShareAPI;
 
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.BuildConfig;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
@@ -39,7 +40,6 @@ import remix.myplayer.util.PlayListUtil;
 public class APlayerApplication extends android.app.Application {
     private static Context mContext;
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -59,6 +59,8 @@ public class APlayerApplication extends android.app.Application {
         Config.DEBUG = BuildConfig.DEBUG;
         //bomb
         Bmob.initialize(this, "0c070110fffa9e88a1362643fb9d4d64");
+        BmobUpdateAgent.setUpdateOnlyWifi(false);
+        BmobUpdateAgent.update(this);
         //禁止默认的页面统计方式
         MobclickAgent.openActivityDurationTrack(false);
         //异常捕获

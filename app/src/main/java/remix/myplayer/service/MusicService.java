@@ -11,7 +11,6 @@ import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -867,9 +866,9 @@ public class MusicService extends BaseService implements Playback {
                 initLastSong();
 
                 //保存所有目录名字包含lyric的目录
-                if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-                    CommonUtil.getLyricDir(Environment.getExternalStorageDirectory());
-                }
+//                if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+//                    CommonUtil.getLyricDir(Environment.getExternalStorageDirectory());
+//                }
             }
         }.start();
 

@@ -524,6 +524,7 @@ public class CommonUtil {
      * 保存所有名字包含lyric的目录
      */
     public static void getLyricDir(File searchFile){
+
         //判断SD卡是否存在
         if (Environment.getExternalStorageState().equals(
                 Environment.MEDIA_MOUNTED)) {
