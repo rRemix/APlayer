@@ -309,7 +309,7 @@ public class MusicService extends BaseService implements Playback {
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-                CommonUtil.uploadException("MediaPlayerError",new Exception("what:" + what + " extra:" + extra));
+//                CommonUtil.uploadException("MediaPlayerError",new Exception("what:" + what + " extra:" + extra));
                 LogUtil.e("AppWidget", "what = " + what + " extar = " + extra);
                 return true;
             }

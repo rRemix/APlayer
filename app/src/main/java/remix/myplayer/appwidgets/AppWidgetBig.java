@@ -119,6 +119,7 @@ public class AppWidgetBig extends BaseAppwidget {
             }
             @Override
             protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+                mRemoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
                 pushUpdate(context,mAppIds,mRemoteViews);
             }
         }, CallerThreadExecutor.getInstance());

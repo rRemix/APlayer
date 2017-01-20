@@ -87,7 +87,7 @@
     <string name="create_dir_error">创建目录失败</string>
     <string name="need_permission">应用需要必要的运行权限</string>
     <string name="play_now">正在播放: %s</string>
-    <string name="default_lrc_path">默认扫描所有名字包含lyric的目录</string>
+    <string name="default_lrc_path">默认扫描所有歌词文件</string>
     <string name="lrc_tip">%s</string>
     <string name="cache_szie">%1$2.2f MB</string>
     <string name="confirm_clear_cache">确认清除缓存?</string>

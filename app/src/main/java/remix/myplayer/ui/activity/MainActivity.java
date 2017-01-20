@@ -201,8 +201,13 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         setUpViewColor();
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        initBottombar();
-
+        //延迟一点时间 等待初始化完成
+        mRefreshHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initBottombar();
+            }
+        },800);
     }
 
     /**

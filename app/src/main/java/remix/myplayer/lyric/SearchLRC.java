@@ -1,6 +1,7 @@
 package remix.myplayer.lyric;
 
 import android.database.Cursor;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -26,7 +27,9 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.DiskLruCache;
+import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by Remix on 2015/12/7.
@@ -123,38 +126,37 @@ public class SearchLRC {
         //优先在线搜索歌词
         //搜索歌词，如果存在下载并解析歌词
         LrcRequest lrcParam = getLrcParam();
-        if(lrcParam == null || TextUtils.isEmpty(lrcParam.AccessKey))
-            return null;
-        URL url;
-        try {
-            url = new URL("http://lyrics.kugou.com/download?ver=1&client=pc&id=" + lrcParam.ID + "&accesskey=" + lrcParam.AccessKey + "&fmt=lrc&charset=utf8");
-            HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-            httpConn.setConnectTimeout(10000);
-            httpConn.connect();
-            br = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
-            StringBuffer stringBuffer = new StringBuffer(128);
-            String s;
-            while ((s = br.readLine()) != null){
-                stringBuffer.append(s);
-            }
-            if(TextUtils.isEmpty(stringBuffer)){
-                return null;
-            }
-            br = new BufferedReader(
-                    new InputStreamReader(new ByteArrayInputStream(Base64.decode(new JSONObject(stringBuffer.toString()).getString("content"), Base64.DEFAULT))));
-
-            return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }  finally {
-            if(br != null)
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+        if(lrcParam != null && !TextUtils.isEmpty(lrcParam.AccessKey)){
+            try {
+                URL url = new URL("http://lyrics.kugou.com/download?ver=1&client=pc&id=" + lrcParam.ID + "&accesskey=" + lrcParam.AccessKey + "&fmt=lrc&charset=utf8");
+                HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+                httpConn.setConnectTimeout(10000);
+                httpConn.connect();
+                br = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
+                StringBuffer stringBuffer = new StringBuffer(128);
+                String s;
+                while ((s = br.readLine()) != null){
+                    stringBuffer.append(s);
                 }
+                if(TextUtils.isEmpty(stringBuffer)){
+                    return null;
+                }
+                br = new BufferedReader(
+                        new InputStreamReader(new ByteArrayInputStream(Base64.decode(new JSONObject(stringBuffer.toString()).getString("content"), Base64.DEFAULT))));
+
+                return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }  finally {
+                if(br != null)
+                    try {
+                        br.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+            }
         }
 
         //在线无资源，搜索本地
@@ -183,63 +185,74 @@ public class SearchLRC {
      */
     private String getlocalLrcPath() {
         //查找本地目录
-        Cursor allLrcFiles = null;
-        try {
-            allLrcFiles = APlayerApplication.getContext().getContentResolver().
-                    query(MediaStore.Files.getContentUri("external"),
-                            null,
-                            MediaStore.Files.FileColumns.DATA + " like ?",
-                            new String[]{"%.lrc"},
-                            null);
-            if(allLrcFiles == null || !(allLrcFiles.getCount() > 0))
-                return "";
-            while (allLrcFiles.moveToNext()){
-                File file = new File(allLrcFiles.getString(allLrcFiles.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
-                if (file.exists() && file.canRead()) {
-                    BufferedReader lrcBr = null;
-                    try {
-                        lrcBr = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-                        String fileName = file.getName();
-                        //先判断是否包含歌手名和歌曲名
-                        if(fileName.contains(mSongName) || fileName.contains(mSongName.toUpperCase())
-                                && (fileName.contains(mArtistName) || fileName.contains(mArtistName.toUpperCase()))){
-                            return file.getAbsolutePath();
-                        }
-                        //读取前五行歌词内容进行判断
-                        String lrcLine = "";
-                        boolean hasArtist = false;
-                        boolean hasTitle = false;
-                        for(int j = 0 ; j < 5;j++){
-                            if((lrcLine = lrcBr.readLine()) == null)
-                                break;
-                            LogUtil.d("LrcLine","LrcLine:" + lrcLine);
-                            if(lrcLine.contains(mSongName))
-                                hasArtist = true;
-                            if(lrcLine.contains(mArtistName))
-                                hasTitle = true;
-                        }
-                        if(hasArtist && hasTitle){
-                            return file.getAbsolutePath();
-                        }
-                    } catch(Exception e) {
-                        CommonUtil.uploadException("查找歌词文件错误",e);
-                    } finally {
+        String searchPath =  SPUtil.getValue(APlayerApplication.getContext(),"Setting","LrcSearchPath","");
+        if(searchPath.equals("") && !TextUtils.isEmpty(mInfo.getUrl())){
+            //没有设置歌词路径
+            Cursor allLrcFiles = null;
+            try {
+                allLrcFiles = APlayerApplication.getContext().getContentResolver().
+                        query(MediaStore.Files.getContentUri("external"),
+                                null,
+                                MediaStore.Files.FileColumns.DATA + " like ?",
+                                new String[]{"%.lrc"},
+                                null);
+                if(allLrcFiles == null || !(allLrcFiles.getCount() > 0))
+                    return "";
+                while (allLrcFiles.moveToNext()){
+                    File file = new File(allLrcFiles.getString(allLrcFiles.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
+                    if (file.exists() && file.canRead()) {
+                        BufferedReader lrcBr = null;
                         try {
-                            if(lrcBr != null){
-                                lrcBr.close();
+                            lrcBr = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+                            String fileName = file.getName();
+                            //先判断是否包含歌手名和歌曲名
+                            if(fileName.contains(mSongName) || fileName.contains(mSongName.toUpperCase())
+                                    && (fileName.contains(mArtistName) || fileName.contains(mArtistName.toUpperCase()))){
+                                return file.getAbsolutePath();
                             }
-                        } catch (Exception e){
-                            e.printStackTrace();
+                            //读取前五行歌词内容进行判断
+                            String lrcLine = "";
+                            boolean hasArtist = false;
+                            boolean hasTitle = false;
+                            for(int j = 0 ; j < 5;j++){
+                                if((lrcLine = lrcBr.readLine()) == null)
+                                    break;
+                                LogUtil.d("LrcLine","LrcLine:" + lrcLine);
+                                if(lrcLine.contains(mSongName))
+                                    hasArtist = true;
+                                if(lrcLine.contains(mArtistName))
+                                    hasTitle = true;
+                            }
+                            if(hasArtist && hasTitle){
+                                return file.getAbsolutePath();
+                            }
+                        } catch(Exception e) {
+                            CommonUtil.uploadException("查找歌词文件错误",e);
+                        } finally {
+                            try {
+                                if(lrcBr != null){
+                                    lrcBr.close();
+                                }
+                            } catch (Exception e){
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
+            }catch (Exception e){
+                e.printStackTrace();
+            } finally {
+                if(allLrcFiles != null && !allLrcFiles.isClosed())
+                    allLrcFiles.close();
             }
-        }catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            if(allLrcFiles != null && !allLrcFiles.isClosed())
-                allLrcFiles.close();
+        } else {
+            //已设置歌词路径
+            CommonUtil.searchFile(APlayerApplication.getContext(),mSongName,mArtistName, new File(searchPath));
+            if(!TextUtils.isEmpty(Global.CurrentLrcPath)){
+                return Global.CurrentLrcPath;
+            }
         }
+
         return "";
     }
 

@@ -147,11 +147,12 @@ public class NotifyReceiver extends BroadcastReceiver {
                 }
                 @Override
                 protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+                    mRemoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
+                    mRemoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
                     pushNotify(context);
                 }
             }, CallerThreadExecutor.getInstance());
         }
-
     }
 
     private void pushNotify(Context context) {

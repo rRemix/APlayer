@@ -116,8 +116,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             }
         });
 
-        if(!SPUtil.getValue(this,"Setting","LrcPath","").equals("")) {
-            mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcPath","")));
+        if(!SPUtil.getValue(this,"Setting","LrcSearchPath","").equals("")) {
+            mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcSearchPath","")));
         }
 
         //主题颜色指示器
@@ -180,7 +180,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     @Override
     public void onFolderSelection(@NonNull FolderChooserDialog dialog, @NonNull File folder) {
-        boolean success = SPUtil.putValue(this,"Setting","LrcPath",folder.getAbsolutePath());
+        boolean success = SPUtil.putValue(this,"Setting","LrcSearchPath",folder.getAbsolutePath());
         ToastUtil.show(this, success ? R.string.setting_success : R.string.setting_error, Toast.LENGTH_SHORT);
         mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcPath","")));
     }
