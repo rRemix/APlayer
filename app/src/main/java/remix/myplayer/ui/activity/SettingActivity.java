@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -37,6 +38,8 @@ import cn.bmob.v3.update.UpdateResponse;
 import cn.bmob.v3.update.UpdateStatus;
 import remix.myplayer.R;
 import remix.myplayer.db.DBOpenHelper;
+import remix.myplayer.listener.LockScreenListener;
+import remix.myplayer.listener.ShakeListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -63,7 +66,12 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     @BindView(R.id.setting_clear_text)
     TextView mCache;
     @BindView(R.id.setting_lockscreen_switch)
-    SwitchCompat mSwitch;
+    SwitchCompat mLockScreenSwitch;
+    @BindView(R.id.setting_navaigation_switch)
+    SwitchCompat mNaviSwitch;
+    @BindView(R.id.setting_shake_switch)
+    SwitchCompat mShakeSwitch;
+
     //是否需要重建activity
     private boolean mNeedRecreate = false;
     //是否需要刷新adapter
@@ -107,15 +115,46 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             mFromColorChoose = savedInstanceState.getBoolean("fromColorChoose");
         }
 
-        //锁屏是否显示
-        mSwitch.setChecked(SPUtil.getValue(this,"Setting","LockScreenOn",true));
-        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        //锁屏是否显示 导航栏是否变色 是否启用摇一摇切歌
+        final String[] keyWord = new String[]{"LockScreenOn","ColorNavigation","Shake"};
+        ButterKnife.apply(new SwitchCompat[]{mLockScreenSwitch, mNaviSwitch, mShakeSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SPUtil.putValue(SettingActivity.this,"Setting","LockScreenOn",isChecked);
+            public void apply(@NonNull SwitchCompat view, final int index) {
+                //只有锁屏默认开启，其余默认都关闭
+                view.setChecked(SPUtil.getValue(mContext,"Setting",keyWord[index],index == 0));
+                //5.0以上才支持变色导航栏
+                if(index == 1){
+                    view.setEnabled(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+                }
+                view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        SPUtil.putValue(SettingActivity.this,"Setting",keyWord[index],isChecked);
+                        //设置导航栏变色后需要重启activity
+                        if(index == 1){
+                            mNeedRecreate = true;
+                            mHandler.sendEmptyMessage(RECREATE);
+                        }
+                        //开启或关闭 锁屏
+                        if(index == 0){
+                            if(isChecked)
+                                LockScreenListener.getInstance(mContext).beginListen();
+                            else
+                                LockScreenListener.getInstance(mContext).stopListen();
+                        }
+                        //开启或者关闭 或者摇一摇
+                        if(index == 2){
+                            if(isChecked)
+                                ShakeListener.getInstance(mContext).beginListen();
+                            else
+                                ShakeListener.getInstance(mContext).stopListen();
+                        }
+                    }
+                });
             }
         });
 
+        //歌词搜索路径
         if(!SPUtil.getValue(this,"Setting","LrcSearchPath","").equals("")) {
             mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcSearchPath","")));
         }
@@ -187,7 +226,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_container,
             R.id.setting_feedback_container,R.id.setting_about_container, R.id.setting_update_container,
-            R.id.setting_eq_container,R.id.setting_lrc_container,R.id.setting_clear_container,R.id.setting_donate_container})
+            R.id.setting_lockscreen_container,
+            R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
+            R.id.setting_lrc_container,R.id.setting_clear_container,R.id.setting_donate_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -224,6 +265,19 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .chooseButton(R.string.choose_folder)
                         .allowNewFolder(false,R.string.new_folder)
                         .show();
+                break;
+            //锁屏显示
+            case R.id.setting_lockscreen_container:
+                mLockScreenSwitch.setChecked(!mLockScreenSwitch.isChecked());
+                break;
+            //导航栏变色
+            case R.id.setting_navigation_container:
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    mNaviSwitch.setChecked(!mNaviSwitch.isChecked());
+                break;
+            //摇一摇
+            case R.id.setting_shake_container:
+                mShakeSwitch.setChecked(!mShakeSwitch.isChecked());
                 break;
             //选择主色调
             case R.id.setting_color_container:

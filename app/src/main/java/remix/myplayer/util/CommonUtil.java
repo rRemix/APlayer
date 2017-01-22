@@ -274,14 +274,14 @@ public class CommonUtil {
      * 判断是否连续点击
      * @return
      */
-    private static long lastClickTime;
+    private static long mLastClickTime;
     public static boolean isFastDoubleClick() {
         long time = System.currentTimeMillis();
-        long timeD = time - lastClickTime;
-        if ( 0 < timeD && timeD < 400) {
+        long timeD = time - mLastClickTime;
+        if ( 0 < timeD && timeD < 500) {
             return true;
         }
-        lastClickTime = time;
+        mLastClickTime = time;
         return false;
     }
 

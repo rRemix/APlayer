@@ -171,8 +171,8 @@ public class EQActivity extends ToolbarActivity {
         mToolBar.addView(mSwitch);
 
         mSwitch.setChecked(mEnable);
-//        Theme.TintDrawable(mSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
-//        Theme.TintDrawable(mSwitch.getTrackDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
+//        Theme.TintDrawable(mLockScreenSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
+//        Theme.TintDrawable(mLockScreenSwitch.getTrackDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -248,8 +248,8 @@ public class EQActivity extends ToolbarActivity {
 
         if(mSwitch != null) {
             mSwitch.setChecked(enable);
-//            mSwitch.setThumbResource(enable ? R.drawable.timer_btn_seleted_btn : R.drawable.timer_btn_normal_btn);
-//            mSwitch.setTrackResource(enable ? R.drawable.timer_btn_seleted_focus : R.drawable.timer_btn_normal_focus);
+//            mLockScreenSwitch.setThumbResource(enable ? R.drawable.timer_btn_seleted_btn : R.drawable.timer_btn_normal_btn);
+//            mLockScreenSwitch.setTrackResource(enable ? R.drawable.timer_btn_seleted_focus : R.drawable.timer_btn_normal_focus);
         }
 //        mBassBoost.setEnabled(mEnable);
 //        if(mBassBoost.getStrengthSupported()){

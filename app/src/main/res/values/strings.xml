@@ -115,7 +115,7 @@
     <string name="updat_error">查询出错或查询超时</string>
     <string name="update_ignore">该版本已被忽略更新</string>
     <string name="no_update">当前已经是最新版本</string>
-    <string name="v1_1_2">v1.1.4</string>
+    <string name="version">v1.1.4.1</string>
     <string name="search">搜索</string>
     <string name="timer_close">定时关闭</string>
     <string name="feedback_contact_hint">请输入您的微信号/QQ号</string>
@@ -126,6 +126,10 @@
     <string name="lrc_scan">歌词扫描</string>
     <string name="lockscreen_show">锁屏显示</string>
     <string name="lockscreen_is_show">锁屏状态下是否显示封面</string>
+    <string name="navigation_color">导航栏变色</string>
+    <string name="navigation_is_show">导航栏是否跟随主题色变化(仅支持安卓5.0以上)</string>
+    <string name="shake">摇一摇</string>
+    <string name="shake_tip">摇一摇手机切换歌曲</string>
     <string name="color">色彩</string>
     <string name="theme_color">主题色</string>
     <string name="theme_color_info">所有页面主色调</string>

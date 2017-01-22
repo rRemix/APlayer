@@ -14,11 +14,17 @@ import remix.myplayer.util.SPUtil;
  */
 public class LockScreenListener {
     private Context mContext;
-    public static LockScreenListener mInstance;
-    private ScreenReceiver mReceiver;
-    public LockScreenListener(Context context){
+    private static LockScreenListener mInstance;
+    private static ScreenReceiver mReceiver;
+    private LockScreenListener(Context context){
         mContext = context;
         mInstance = this;
+    }
+    public synchronized static LockScreenListener getInstance(Context context){
+        if(mInstance == null){
+            mInstance = new LockScreenListener(context);
+        }
+        return mInstance;
     }
     public void beginListen(){
         mReceiver = new ScreenReceiver();
@@ -28,8 +34,10 @@ public class LockScreenListener {
         mContext.registerReceiver(mReceiver,filter);
     }
     public void stopListen(){
-        mContext.unregisterReceiver(mReceiver);
-        mReceiver = null;
+        if(mContext != null && mReceiver != null){
+            mContext.unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
     }
     class ScreenReceiver extends BroadcastReceiver {
         @Override
@@ -46,7 +54,6 @@ public class LockScreenListener {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         }
     }

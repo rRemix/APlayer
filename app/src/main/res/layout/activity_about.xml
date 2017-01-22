@@ -41,6 +41,6 @@
             android:layout_height="wrap_content"
             android:textColor="?attr/text_color"
             android:textSize="@dimen/s15_size"
-            android:text="@string/v1_1_2"/>
+            android:text="@string/version"/>
     </RelativeLayout>
 </LinearLayout>
