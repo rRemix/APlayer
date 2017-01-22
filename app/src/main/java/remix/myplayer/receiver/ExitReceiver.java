@@ -9,6 +9,7 @@ import com.umeng.analytics.MobclickAgent;
 
 import remix.myplayer.db.DBManager;
 import remix.myplayer.listener.LockScreenListener;
+import remix.myplayer.listener.ShakeListener;
 import remix.myplayer.manager.ActivityManager;
 import remix.myplayer.manager.ServiceManager;
 
@@ -29,10 +30,9 @@ public class ExitReceiver extends BroadcastReceiver {
             ServiceManager.StopAll();
             //关闭通知
             ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
-            //停止锁屏监听
-            if(LockScreenListener.mInstance != null){
-                LockScreenListener.mInstance.stopListen();
-            }
+            //停止锁屏和摇一摇监听
+            LockScreenListener.getInstance(context).stopListen();
+            ShakeListener.getInstance(context).stopListen();
             MobclickAgent.onKillProcess(context);
             //关闭所有activity
             ActivityManager.FinishAll();

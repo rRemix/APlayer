@@ -19,6 +19,7 @@ import remix.myplayer.BuildConfig;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.LockScreenListener;
+import remix.myplayer.listener.ShakeListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
@@ -29,6 +30,7 @@ import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by taeja on 16-3-16.
@@ -48,7 +50,13 @@ public class APlayerApplication extends android.app.Application {
         initTheme();
         startService(new Intent(this, MusicService.class));
         //监听锁屏
-        new LockScreenListener(getApplicationContext()).beginListen();
+        if(SPUtil.getValue(this,"Setting","LockScreenOn",false)){
+            LockScreenListener.getInstance(mContext).beginListen();
+        }
+        //摇一摇
+        if(SPUtil.getValue(this,"Setting","Shake",false)){
+            ShakeListener.getInstance(mContext).beginListen();
+        }
         //友盟异常捕获
         MobclickAgent.setCatchUncaughtExceptions(true);
         MobclickAgent.setDebugMode(BuildConfig.DEBUG);

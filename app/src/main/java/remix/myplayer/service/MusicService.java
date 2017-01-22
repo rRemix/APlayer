@@ -27,6 +27,8 @@ import remix.myplayer.appwidgets.AppWidgetSmall;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.UpdateHelper;
+import remix.myplayer.listener.LockScreenListener;
+import remix.myplayer.listener.ShakeListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.observer.DBObserver;
 import remix.myplayer.observer.MediaStoreObserver;
@@ -383,6 +385,11 @@ public class MusicService extends BaseService implements Playback {
         getContentResolver().unregisterContentObserver(mMediaStoreObserver);
         getContentResolver().unregisterContentObserver(mPlayListObserver);
         getContentResolver().unregisterContentObserver(mPlayListSongObserver);
+        //停止锁屏和摇一摇监听
+        if(SPUtil.getValue(mContext,"Setting","LockScreenOn",false))
+            LockScreenListener.getInstance(mContext).stopListen();
+        if(SPUtil.getValue(mContext,"Setting","Shake",false))
+            ShakeListener.getInstance(mContext).stopListen();
         //关闭通知
         ((NotificationManager) APlayerApplication.getContext().getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
     }
@@ -714,11 +721,13 @@ public class MusicService extends BaseService implements Playback {
      * @param playModel
      */
     public static void setPlayModel(int playModel) {
-        mPlayModel = playModel;
-        SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
-        //保存正在播放和下一首歌曲
-        SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
-        SPUtil.putValue(mContext,"Setting","LastSongId",mCurrentId);
+        if(!CommonUtil.isFastDoubleClick()){
+            mPlayModel = playModel;
+            SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
+            //保存正在播放和下一首歌曲
+            SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
+            SPUtil.putValue(mContext,"Setting","LastSongId",mCurrentId);
+        }
     }
 
     /**

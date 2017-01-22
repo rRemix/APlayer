@@ -3,6 +3,8 @@ package remix.myplayer.ui.activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.MediaStore;
@@ -15,6 +17,7 @@ import remix.myplayer.BuildConfig;
 import remix.myplayer.R;
 import remix.myplayer.manager.ActivityManager;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 
 /**
@@ -94,6 +97,7 @@ public class BaseActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //将该activity添加到ActivityManager,用于退出程序时关闭
         ActivityManager.AddActivity(this);
+        setNavigationBarColor();
     }
 
     @Override
@@ -102,8 +106,25 @@ public class BaseActivity extends AppCompatActivity {
         setStatusBar();
     }
 
+    /**
+     * 设置状态栏颜色
+     */
     protected void setStatusBar() {
         StatusBarUtil.setColorNoTranslucent(this, ThemeStore.getMaterialPrimaryDarkColor());
+    }
+
+    /**
+     * 设置导航栏颜色
+     */
+    protected void setNavigationBarColor(){
+        //导航栏变色
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if(SPUtil.getValue(this,"Setting","ColorNavigation",false)){
+                getWindow().setNavigationBarColor(ThemeStore.getMaterialPrimaryColor());
+            } else {
+                getWindow().setNavigationBarColor(Color.BLACK);
+            }
+        }
     }
 
     @Override
