@@ -24,7 +24,6 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import remix.myplayer.R;
-import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.PlayerActivity;
@@ -182,7 +181,6 @@ public class NotifyReceiver extends BroadcastReceiver {
             stackBuilder.addParentStack(PlayerActivity.class);
             stackBuilder.addNextIntent(result);
             stackBuilder.editIntentAt(1).putExtra("Notify", true);
-            stackBuilder.editIntentAt(1).putExtra("Rect", BottomActionBarFragment.getCoverRect());
             stackBuilder.editIntentAt(0).putExtra("Notify", true);
             PendingIntent resultPendingIntent =
                     stackBuilder.getPendingIntent(

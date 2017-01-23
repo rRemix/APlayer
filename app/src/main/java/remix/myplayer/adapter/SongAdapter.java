@@ -218,14 +218,14 @@ public class SongAdapter extends HeaderAdapter{
 
         if(mType == ALLSONG){
             if(MultiChoice.TAG.equals(SongFragment.TAG) &&
-                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position - 1))){
                 mMultiChoice.AddView(holder.mContainer);
             } else {
                 holder.mContainer.setSelected(false);
             }
         } else {
             if(MultiChoice.TAG.equals(RecetenlyActivity.TAG) &&
-                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position - 1))){
                 mMultiChoice.AddView(holder.mContainer);
             } else {
                 holder.mContainer.setSelected(false);

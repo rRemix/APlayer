@@ -35,8 +35,6 @@ import remix.myplayer.util.MediaStoreUtil;
  */
 
 public class AppWidgetSmall extends BaseAppwidget {
-    private int[] mAppIds;
-    private RemoteViews mRemoteViews;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {

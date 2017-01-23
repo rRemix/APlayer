@@ -179,7 +179,7 @@ public class AlbumAdater extends HeaderAdapter  {
 
             //是否处于选中状态
             if(MultiChoice.TAG.equals(AlbumFragment.TAG) &&
-                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position - 1))){
                 mMultiChoice.AddView(holder.mContainer);
             } else {
                 holder.mContainer.setSelected(false);

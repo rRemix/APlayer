@@ -92,7 +92,7 @@ public class ArtistAdapter extends HeaderAdapter{
             return;
         }
         final ArtistHolder holder = (ArtistHolder) baseHolder;
-        if(mCursor.moveToPosition(position)) {
+        if(mCursor.moveToPosition(position - 1)) {
             try {
                 //设置歌手名
                 String artist = CommonUtil.processInfo(mCursor.getString(ArtistFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
@@ -175,7 +175,7 @@ public class ArtistAdapter extends HeaderAdapter{
 
         //是否处于选中状态
         if(MultiChoice.TAG.equals(ArtistFragment.TAG) &&
-                mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+                mMultiChoice.mSelectedPosition.contains(new MultiPosition(position - 1))){
             mMultiChoice.AddView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);

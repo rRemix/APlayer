@@ -23,6 +23,7 @@ import java.util.Random;
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.appwidgets.AppWidgetBig;
+import remix.myplayer.appwidgets.AppWidgetMedium;
 import remix.myplayer.appwidgets.AppWidgetSmall;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
@@ -92,9 +93,10 @@ public class MusicService extends BaseService implements Playback {
     /** MediaPlayer 负责歌曲的播放等 */
     private static MediaPlayer mMediaPlayer;
 
-    /** 更新桌面部件 */
-    private AppWidgetBig mAppWidgetBig;
+    /** 桌面部件 */
+    private AppWidgetMedium mAppWidgetMedium;
     private AppWidgetSmall mAppWidgetSmall;
+    private AppWidgetBig mAppWidgetBig;
 
     /** AudiaoManager */
     private AudioManager mAudioManager;
@@ -130,8 +132,8 @@ public class MusicService extends BaseService implements Playback {
             if(msg.what == Constants.UPDATE_UI) {
                 UpdateHelper.update(mCurrentInfo,mIsplay);
             }
-            if(mAppWidgetBig != null)
-                mAppWidgetBig.updateWidget(mContext);
+            if(mAppWidgetMedium != null)
+                mAppWidgetMedium.updateWidget(mContext);
             if(mAppWidgetSmall != null){
                 mAppWidgetSmall.updateWidget(mContext);
             }
@@ -236,7 +238,7 @@ public class MusicService extends BaseService implements Playback {
         mPlayModel = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
 
         //桌面部件
-        mAppWidgetBig = new AppWidgetBig();
+        mAppWidgetMedium = new AppWidgetMedium();
         mAppWidgetSmall = new AppWidgetSmall();
 
         //初始化Receiver
@@ -503,6 +505,10 @@ public class MusicService extends BaseService implements Playback {
                 case "BigWidget":
                     if(mAppWidgetBig != null)
                         mAppWidgetBig.updateWidget(context);
+                    break;
+                case "MediumWidget":
+                    if(mAppWidgetMedium != null)
+                        mAppWidgetMedium.updateWidget(context);
                     break;
                 case "SmallWidget":
                     if(mAppWidgetSmall != null)
