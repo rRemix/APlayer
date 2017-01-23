@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.widget.RemoteViews;
 
 import remix.myplayer.util.Constants;
 
@@ -17,6 +18,9 @@ import remix.myplayer.util.Constants;
  */
 
 public class BaseAppwidget extends AppWidgetProvider {
+    protected int[] mAppIds;
+    protected RemoteViews mRemoteViews;
+
     protected PendingIntent buildPendingIntent(Context context,ComponentName componentName,int operation) {
         Intent intent = new Intent(Constants.CTL_ACTION);
         intent.putExtra("Control",operation);

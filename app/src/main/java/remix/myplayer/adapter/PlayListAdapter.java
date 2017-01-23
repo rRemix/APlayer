@@ -50,7 +50,6 @@ public class PlayListAdapter extends HeaderAdapter {
         this.mMultiChoice = multiChoice;
     }
 
-
     @Override
     public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
         if(viewType == TYPE_HEADER){
@@ -162,7 +161,7 @@ public class PlayListAdapter extends HeaderAdapter {
 
             //是否处于选中状态
             if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&
-                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position - 1))){
                 mMultiChoice.AddView(holder.mContainer);
             } else {
                 holder.mContainer.setSelected(false);

@@ -120,20 +120,24 @@ public class BottomActionBarFragment extends BaseFragment{
         if(mp3Item == null)
             return;
         //歌曲名 艺术家
-        mTitle.setText(mp3Item.getTitle());
-        mArtist.setText(mp3Item.getArtist());
+        if(mTitle != null)
+            mTitle.setText(mp3Item.getTitle());
+        if(mArtist != null)
+            mArtist.setText(mp3Item.getArtist());
+        //封面
+        MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
         //设置按钮着色
+        if(mPlayButton == null)
+            return;
         if(isPlaying) {
             Theme.TintDrawable(mPlayButton,
                     R.drawable.bf_btn_stop,
                     ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
-        } else {
+        } else{
             Theme.TintDrawable(mPlayButton,
                     R.drawable.bf_btn_play,
                     ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
         }
-        //封面
-        MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
     }
 
     public static Rect getCoverRect(){

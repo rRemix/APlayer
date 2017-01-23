@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,18 +57,18 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
             return ;
         //根据当前索引 获得对应的文件夹名字
         Iterator it = Global.FolderMap.keySet().iterator();
-        String temp = null;
+        String temp = "";
         for(int i = 0 ; i <= position ; i++) {
             if(it.hasNext())
                 temp = it.next().toString();
         }
+        if(TextUtils.isEmpty(temp))
+            return;
         //设置文件夹名字 路径名 歌曲数量
-        if(temp != null){
-            holder.mName.setText(temp.substring(temp.lastIndexOf("/")+ 1,temp.length()));
-            holder.mPath.setText(temp);
-            if(Global.FolderMap.get(temp) != null)
-                holder.mCount.setText(Global.FolderMap.get(temp).size()+ "首");
-        }
+        holder.mName.setText(temp.substring(temp.lastIndexOf("/")+ 1,temp.length()));
+        holder.mPath.setText(temp);
+        if(Global.FolderMap.get(temp) != null)
+            holder.mCount.setText(Global.FolderMap.get(temp).size()+ "首");
         //根据主题模式 设置图片
         if(holder.mImg != null) {
             holder.mImg.setImageDrawable(Theme.TintDrawable(mContext.getResources().getDrawable(R.drawable.icon_folder),ThemeStore.isDay() ? Color.BLACK : Color.WHITE));
@@ -129,7 +130,6 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
             holder.mContainer.setSelected(false);
         }
     }
-
 
     @Override
     public int getItemCount() {

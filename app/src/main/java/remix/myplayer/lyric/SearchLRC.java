@@ -1,7 +1,6 @@
 package remix.myplayer.lyric;
 
 import android.database.Cursor;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -123,8 +122,27 @@ public class SearchLRC {
                 }
         }
 
-        //优先在线搜索歌词
-        //搜索歌词，如果存在下载并解析歌词
+        //如果设置了歌词搜索目录，优先搜索本地
+        if(!TextUtils.isEmpty(SPUtil.getValue(APlayerApplication.getContext(),"Setting","LrcSearchPath",""))){
+            String localLrcPath = getlocalLrcPath(false);
+            if(!localLrcPath.equals("")){
+                try {
+                    br = new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath)));
+                    return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } finally {
+                    if(br != null)
+                        try {
+                            br.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                }
+            }
+        }
+
+        //在线搜索歌词，如果存在下载并解析歌词
         LrcRequest lrcParam = getLrcParam();
         if(lrcParam != null && !TextUtils.isEmpty(lrcParam.AccessKey)){
             try {
@@ -160,7 +178,7 @@ public class SearchLRC {
         }
 
         //在线无资源，搜索本地
-        String localLrcPath = getlocalLrcPath();
+        String localLrcPath = getlocalLrcPath(true);
         if(!localLrcPath.equals("")){
             try {
                 br = new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath)));
@@ -183,10 +201,19 @@ public class SearchLRC {
      * 搜索本地所有歌词文件
      * @return
      */
-    private String getlocalLrcPath() {
+    private String getlocalLrcPath(boolean searchAll) {
         //查找本地目录
         String searchPath =  SPUtil.getValue(APlayerApplication.getContext(),"Setting","LrcSearchPath","");
-        if(searchPath.equals("") && !TextUtils.isEmpty(mInfo.getUrl())){
+        if(mInfo == null)
+            return "";
+        if(!TextUtils.isEmpty(searchPath)){
+            //已设置歌词路径
+            CommonUtil.searchFile(APlayerApplication.getContext(),mSongName,mArtistName, new File(searchPath));
+            if(!TextUtils.isEmpty(Global.CurrentLrcPath)){
+                return Global.CurrentLrcPath;
+            }
+
+        } else if (searchAll){
             //没有设置歌词路径
             Cursor allLrcFiles = null;
             try {
@@ -244,12 +271,6 @@ public class SearchLRC {
             } finally {
                 if(allLrcFiles != null && !allLrcFiles.isClosed())
                     allLrcFiles.close();
-            }
-        } else {
-            //已设置歌词路径
-            CommonUtil.searchFile(APlayerApplication.getContext(),mSongName,mArtistName, new File(searchPath));
-            if(!TextUtils.isEmpty(Global.CurrentLrcPath)){
-                return Global.CurrentLrcPath;
             }
         }
 

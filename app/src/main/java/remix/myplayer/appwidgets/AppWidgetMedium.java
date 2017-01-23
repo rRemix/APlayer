@@ -28,13 +28,10 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
- * @ClassName
- * @Description
- * @Author Xiaoborui
- * @Date 2017/1/23 10:58
+ * Created by Remix on 2016/12/20.
  */
 
-public class AppWidgetBig extends BaseAppwidget {
+public class AppWidgetMedium extends BaseAppwidget {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -44,7 +41,7 @@ public class AppWidgetBig extends BaseAppwidget {
         buildAction(context, mRemoteViews);
         pushUpdate(context,appWidgetIds,mRemoteViews);
         Intent intent = new Intent(Constants.WIDGET_UPDATE);
-        intent.putExtra("WidgetName","BigWidget");
+        intent.putExtra("WidgetName","MediumWidget");
         intent.putExtra("WidgetIds",appWidgetIds);
         intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         context.sendBroadcast(intent);
@@ -74,35 +71,6 @@ public class AppWidgetBig extends BaseAppwidget {
                         .build();
         DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);
 
-//        dataSource.subscribe(new BaseDataSubscriber<CloseableReference<CloseableImage>>() {
-//            @Override
-//            protected void onNewResultImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-//                if(!dataSource.isFinished())
-//                    return;
-//                CloseableReference<CloseableImage> result = dataSource.getResult();
-//                if(result != null ){
-//                    try {
-//                        CloseableImage closeableImage = result.get();
-//                        if(closeableImage instanceof CloseableBitmap){
-//                            Bitmap bitmap = Bitmap.createBitmap(((CloseableBitmap) closeableImage).getUnderlyingBitmap());
-//                            if(bitmap != null) {
-//                                mRemoteViews.setImageViewBitmap(R.id.appwidget_image, bitmap);
-//                            } else {
-//                                mRemoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
-//                            }
-//                            pushUpdate(context,mAppIds,mRemoteViews);
-//                        }
-//                    }catch (Exception e){
-//                        LogUtil.e(e.toString());
-//                    }
-//                }
-//            }
-//            @Override
-//            protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-//                pushUpdate(context,mAppIds,mRemoteViews);
-//            }
-//        }, CallerThreadExecutor.getInstance());
-
         dataSource.subscribe(new BaseBitmapDataSubscriber() {
             @Override
             protected void onNewResultImpl(Bitmap bitmap) {
@@ -129,7 +97,7 @@ public class AppWidgetBig extends BaseAppwidget {
     private void buildAction(Context context, RemoteViews views) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        views.setOnClickPendingIntent(R.id.appwidget_text_container, PendingIntent.getActivity(context,0,intent,PendingIntent.FLAG_UPDATE_CURRENT));
+        views.setOnClickPendingIntent(R.id.appwidget_text_container,PendingIntent.getActivity(context,0,intent,PendingIntent.FLAG_UPDATE_CURRENT));
         ComponentName componentName = new ComponentName(context,MusicService.class);
         views.setOnClickPendingIntent(R.id.appwidget_toggle,buildPendingIntent(context,componentName,Constants.TOGGLE));
         views.setOnClickPendingIntent(R.id.appwidget_prev,buildPendingIntent(context,componentName, Constants.PREV));
@@ -144,4 +112,5 @@ public class AppWidgetBig extends BaseAppwidget {
         }
         appWidgetManager.updateAppWidget(new ComponentName(context, getClass()), remoteViews);
     }
+
 }
