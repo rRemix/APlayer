@@ -3,6 +3,7 @@ package remix.myplayer.ui.activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -225,10 +226,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         if(ThemeStore.isDay()){
             if(Build.MANUFACTURER.equals("Meizu")){
                 StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this,true);
-                StatusBarUtil.setTransparent(this);
+                StatusBarUtil.setColorNoTranslucent(this, Color.WHITE);
             } else if (Build.MANUFACTURER.equals("Xiaomi")){
                 StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true,this);
-                StatusBarUtil.setTransparent(this);
+                StatusBarUtil.setColorNoTranslucent(this, Color.WHITE);
             }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 StatusBarUtil.setTransparent(this);
                 getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);

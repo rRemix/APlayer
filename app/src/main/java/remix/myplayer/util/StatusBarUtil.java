@@ -46,11 +46,6 @@ public class StatusBarUtil {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
             return;
 
-        //魅族
-        if(Build.MANUFACTURER.equals("Meizu")){
-            setColorForKitkat(activity, color, statusBarAlpha);
-            return;
-        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setColorForLollipop(activity, color, statusBarAlpha);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -99,6 +94,7 @@ public class StatusBarUtil {
             return;
         }
         Window window = activity.getWindow();
+
         //4.4 全透明状态栏
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);

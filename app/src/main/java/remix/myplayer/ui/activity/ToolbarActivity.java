@@ -52,6 +52,4 @@ public class ToolbarActivity extends BaseActivity {
         finish();
     }
 
-
-
 }

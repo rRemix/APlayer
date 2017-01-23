@@ -127,7 +127,7 @@
     <string name="lockscreen_show">锁屏显示</string>
     <string name="lockscreen_is_show">锁屏状态下是否显示封面</string>
     <string name="navigation_color">导航栏变色</string>
-    <string name="navigation_is_show">导航栏是否跟随主题色变化(仅支持安卓5.0以上)</string>
+    <string name="navigation_is_show">导航栏是否跟随主题色变化</string>
     <string name="shake">摇一摇</string>
     <string name="shake_tip">摇一摇手机切换歌曲</string>
     <string name="color">色彩</string>
@@ -152,5 +152,6 @@
     <string name="sleep_timer">睡眠定时</string>
     <string name="eq">均衡器</string>
     <string name="collect">收藏</string>
+    <string name="only_lollopop">仅支持安卓5.0及以上</string>
 
 </resources>

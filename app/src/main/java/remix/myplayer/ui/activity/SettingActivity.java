@@ -272,8 +272,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //导航栏变色
             case R.id.setting_navigation_container:
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    mNaviSwitch.setChecked(!mNaviSwitch.isChecked());
+                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
+                    ToastUtil.show(this,getString(R.string.only_lollopop));
+                    return;
+                }
+                mNaviSwitch.setChecked(!mNaviSwitch.isChecked());
                 break;
             //摇一摇
             case R.id.setting_shake_container:
