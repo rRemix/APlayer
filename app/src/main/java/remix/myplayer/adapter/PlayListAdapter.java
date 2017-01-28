@@ -108,7 +108,7 @@ public class PlayListAdapter extends HeaderAdapter {
                             ToastUtil.show(mContext,"参数错误");
                             return;
                         }
-                        mOnItemClickLitener.onItemClick(holder.mContainer,holder.getAdapterPosition());
+                        mOnItemClickLitener.onItemClick(holder.mContainer,holder.getAdapterPosition() - 1);
                     }
                 });
                 //多选菜单
@@ -119,7 +119,7 @@ public class PlayListAdapter extends HeaderAdapter {
                             ToastUtil.show(mContext,"参数错误");
                             return true;
                         }
-                        mOnItemClickLitener.onItemLongClick(holder.mContainer,holder.getAdapterPosition());
+                        mOnItemClickLitener.onItemLongClick(holder.mContainer,holder.getAdapterPosition() - 1);
                         return true;
                     }
                 });

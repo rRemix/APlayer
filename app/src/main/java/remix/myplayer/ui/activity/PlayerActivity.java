@@ -17,6 +17,7 @@ import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -37,6 +38,7 @@ import com.facebook.rebound.SpringSystem;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -224,10 +226,25 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     @Override
     protected void setStatusBar() {
         if(ThemeStore.isDay()){
+            //获得miui版本
+            String miui = "";
+            int miuiVersion = 0;
+            if(Build.MANUFACTURER.equals("Xiaomi")){
+                try {
+                    Class<?> c = Class.forName("android.os.SystemProperties");
+                    Method get = c.getMethod("get", String.class, String.class );
+                    miui = (String)(get.invoke(c, "ro.miui.ui.version.name", "unknown" ));
+                    if(!TextUtils.isEmpty(miui) && miui.length() >= 2 && TextUtils.isDigitsOnly(miui.substring(1,2))){
+                        miuiVersion = Integer.valueOf(miui.substring(1,2));
+                    }
+                }catch (Exception e){
+                    CommonUtil.uploadException("miui版本解析错误",e);
+                }
+            }
             if(Build.MANUFACTURER.equals("Meizu")){
                 StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this,true);
                 StatusBarUtil.setColorNoTranslucent(this, Color.WHITE);
-            } else if (Build.MANUFACTURER.equals("Xiaomi")){
+            } else if (Build.MANUFACTURER.equals("Xiaomi") && miuiVersion >= 6 ){
                 StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true,this);
                 StatusBarUtil.setColorNoTranslucent(this, Color.WHITE);
             }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
@@ -240,7 +257,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             StatusBarUtil.setTransparent(this);
         }
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

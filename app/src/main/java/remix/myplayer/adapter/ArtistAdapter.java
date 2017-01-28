@@ -121,7 +121,7 @@ public class ArtistAdapter extends HeaderAdapter{
                             ToastUtil.show(mContext,"参数错误");
                             return;
                         }
-                        mOnItemClickLitener.onItemClick(holder.mContainer,position);
+                        mOnItemClickLitener.onItemClick(holder.mContainer,position - 1);
                     }
                 });
                 //多选菜单
@@ -132,7 +132,7 @@ public class ArtistAdapter extends HeaderAdapter{
                             ToastUtil.show(mContext,"参数错误");
                             return true;
                         }
-                        mOnItemClickLitener.onItemLongClick(holder.mContainer,position);
+                        mOnItemClickLitener.onItemLongClick(holder.mContainer,position - 1);
                         return true;
                     }
                 });

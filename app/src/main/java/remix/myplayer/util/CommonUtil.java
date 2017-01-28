@@ -241,7 +241,8 @@ public class CommonUtil {
             if(origin == null || origin.equals("") || origin.contains("unknown") ){
                 return mContext.getString(R.string.unknow_song);
             } else {
-                return origin.lastIndexOf(".") > 0 ? origin.substring(0, origin.lastIndexOf(".")) : origin;
+//                return origin.lastIndexOf(".") > 0 ? origin.substring(0, origin.lastIndexOf(".")) : origin;
+                return origin;
             }
         } else{
             if(origin == null || origin.equals("") || origin.contains("unknown") ){
