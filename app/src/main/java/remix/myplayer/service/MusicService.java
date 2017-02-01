@@ -547,7 +547,6 @@ public class MusicService extends BaseService implements Playback {
                 if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
                     return;
                 if(CommonUtil.isFastDoubleClick()) {
-                    ToastUtil.show(mContext,R.string.not_operate_fast);
                     return;
                 }
             }

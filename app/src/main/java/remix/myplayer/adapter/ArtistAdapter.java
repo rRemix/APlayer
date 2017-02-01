@@ -156,12 +156,11 @@ public class ArtistAdapter extends HeaderAdapter{
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(mMultiChoice.isShow())
+                        if(mMultiChoice.isShow() || !mCursor.moveToPosition(holder.getAdapterPosition() - 1))
                             return;
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                         popupMenu.getMenuInflater().inflate(R.menu.artist_menu, popupMenu.getMenu());
-                        mCursor.moveToPosition(holder.getAdapterPosition());
                         popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
                                 mCursor.getInt(ArtistFragment.mArtistIdIndex),
                                 Constants.ARTIST,

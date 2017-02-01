@@ -71,6 +71,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     SwitchCompat mNaviSwitch;
     @BindView(R.id.setting_shake_switch)
     SwitchCompat mShakeSwitch;
+    @BindView(R.id.setting_lrc_priority_switch)
+    SwitchCompat mLrcPrioritySwitch;
 
     //是否需要重建activity
     private boolean mNeedRecreate = false;
@@ -116,8 +118,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
 
         //锁屏是否显示 导航栏是否变色 是否启用摇一摇切歌
-        final String[] keyWord = new String[]{"LockScreenOn","ColorNavigation","Shake"};
-        ButterKnife.apply(new SwitchCompat[]{mLockScreenSwitch, mNaviSwitch, mShakeSwitch}, new ButterKnife.Action<SwitchCompat>() {
+        final String[] keyWord = new String[]{"LockScreenOn","ColorNavigation","Shake","OnlineLrc"};
+        ButterKnife.apply(new SwitchCompat[]{mLockScreenSwitch, mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
                 //只有锁屏默认开启，其余默认都关闭
@@ -130,24 +132,29 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         SPUtil.putValue(SettingActivity.this,"Setting",keyWord[index],isChecked);
-                        //设置导航栏变色后需要重启activity
-                        if(index == 1){
-                            mNeedRecreate = true;
-                            mHandler.sendEmptyMessage(RECREATE);
-                        }
-                        //开启或关闭 锁屏
-                        if(index == 0){
-                            if(isChecked)
-                                LockScreenListener.getInstance(mContext).beginListen();
-                            else
-                                LockScreenListener.getInstance(mContext).stopListen();
-                        }
-                        //开启或者关闭 或者摇一摇
-                        if(index == 2){
-                            if(isChecked)
-                                ShakeListener.getInstance(mContext).beginListen();
-                            else
-                                ShakeListener.getInstance(mContext).stopListen();
+                        switch (index){
+                            //设置导航栏变色后需要重启activity
+                            case 0:
+                                if(isChecked)
+                                    LockScreenListener.getInstance(mContext).beginListen();
+                                else
+                                    LockScreenListener.getInstance(mContext).stopListen();
+                                break;
+                            //开启或关闭 锁屏
+                            case 1:
+                                mNeedRecreate = true;
+                                mHandler.sendEmptyMessage(RECREATE);
+                                break;
+                            //开启或者关闭 或者摇一摇
+                            case 2:
+                                if(isChecked)
+                                    ShakeListener.getInstance(mContext).beginListen();
+                                else
+                                    ShakeListener.getInstance(mContext).stopListen();
+                                break;
+                            //设置歌词搜索优先级
+                            case 3:
+                                break;
                         }
                     }
                 });
@@ -173,7 +180,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 });
 
         //分根线颜色
-        ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),findView(R.id.setting_divider_3)},
+        ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),
+                findView(R.id.setting_divider_3),findView(R.id.setting_divider_4)},
                 new ButterKnife.Action<View>() {
                     @Override
                     public void apply(@NonNull View view, int index) {
@@ -202,7 +210,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         super.onPause();
     }
 
-
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
@@ -226,9 +233,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_container,
             R.id.setting_feedback_container,R.id.setting_about_container, R.id.setting_update_container,
-            R.id.setting_lockscreen_container,
+            R.id.setting_lockscreen_container,R.id.setting_lrc_priority_container,
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
-            R.id.setting_lrc_container,R.id.setting_clear_container,R.id.setting_donate_container})
+            R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -260,11 +267,15 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .show();
                 break;
             //歌词扫描路径
-            case R.id.setting_lrc_container:
+            case R.id.setting_lrc_path_container:
                 new FolderChooserDialog.Builder(this)
                         .chooseButton(R.string.choose_folder)
                         .allowNewFolder(false,R.string.new_folder)
                         .show();
+                break;
+            //歌词搜索优先级
+            case R.id.setting_lrc_priority_container:
+                mLrcPrioritySwitch.setChecked(!mLrcPrioritySwitch.isChecked());
                 break;
             //锁屏显示
             case R.id.setting_lockscreen_container:
