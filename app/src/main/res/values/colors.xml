@@ -89,10 +89,14 @@
     <color name="normal_tab_text_color">#99ffffff</color>
     <color name="search_hint_text_color">#33ffffff</color>
 
-    <color name="lrc_normal_day">#e8e8e8</color>
-    <color name="lrc_highlight_day">#4a4a4a</color>
-    <color name="lrc_normal_night">#7e7e7e</color>
-    <color name="lrc_highlight_night">#e5e5e5</color>
+    <!--<color name="lrc_normal_day">#e8e8e8</color>-->
+    <!--<color name="lrc_highlight_day">#4a4a4a</color>-->
+    <!--<color name="lrc_normal_night">#7e7e7e</color>-->
+    <!--<color name="lrc_highlight_night">#e5e5e5</color>-->
+    <color name="lrc_normal_day">@color/day_textcolor</color>
+    <color name="lrc_highlight_day">@color/day_textcolor_primary</color>
+    <color name="lrc_normal_night">@color/night_textcolor</color>
+    <color name="lrc_highlight_night">@color/night_textcolor_primary</color>
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>
     <color name="day_textcolor">@color/gray_6d6c69</color>

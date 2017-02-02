@@ -79,7 +79,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                 case Constants.UPDATE_ADAPTER:
                     if(mInfoList == null)
                         return;
-                    mRecyclerView.setAdapter(mAdapter);
                     mAdapter.setList(mInfoList);
                     mNum.setText(mInfoList.size() + "首歌曲");
                     break;
@@ -150,6 +149,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(mAdapter);
 
         //歌曲数目与标题
         if(mType != Constants.FOLDER) {

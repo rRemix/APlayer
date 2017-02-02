@@ -15,6 +15,8 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
@@ -60,7 +62,7 @@ public class SongAdapter extends HeaderAdapter{
     private SortChangeCallback mCallback;
 
     public SongAdapter(Context context, Cursor cursor, MultiChoice multiChoice, int type) {
-        super(context,cursor,multiChoice,R.layout.layout_topbar_1);
+        super(context,cursor,multiChoice);
         this.mMultiChoice = multiChoice;
         this.mType = type;
         int size = DensityUtil.dip2px(mContext,60);
@@ -78,7 +80,7 @@ public class SongAdapter extends HeaderAdapter{
     @Override
     public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
         return viewType == TYPE_HEADER ?
-                new HeaderHolder(mHeaderView) :
+                new HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_1,parent,false)) :
                 new SongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_song_recycle,parent,false));
     }
 
@@ -241,7 +243,21 @@ public class SongAdapter extends HeaderAdapter{
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 intent.putExtra("Control", Constants.NEXT);
                 intent.putExtra("shuffle",true);
-                Global.setPlayQueue(Global.AllSongList,mContext,intent);
+                if(mType == ALLSONG){
+                    if(Global.AllSongList == null || Global.AllSongList.size() == 0){
+                        ToastUtil.show(mContext,R.string.no_song);
+                        return;
+                    }
+                    Global.setPlayQueue(Global.AllSongList,mContext,intent);
+                } else {
+                    ArrayList<Integer> IdList = MediaStoreUtil.getSongIdListByCursor(mCursor);
+                    if(IdList == null || IdList.size() == 0){
+                        ToastUtil.show(mContext,R.string.no_song);
+                        return;
+                    }
+                    Global.setPlayQueue(IdList,mContext,intent);
+                }
+
                 break;
             case R.id.asc_desc:
                 if(ASCDESC.equals(" asc")){

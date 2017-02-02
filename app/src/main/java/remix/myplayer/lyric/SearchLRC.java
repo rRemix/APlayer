@@ -42,13 +42,22 @@ public class SearchLRC {
     private static final String LRC_REQUEST_ROOT = "http://s.geci.me/lrc/";
     private ILrcParser mLrcBuilder;
     private MP3Item mInfo;
-    private String mSongName;
+    private String mTitle;
     private String mArtistName;
+    private String mDisplayName;
 
     public SearchLRC(MP3Item item) {
         mInfo = item;
-        mSongName = mInfo.getTitle();
+        mTitle = mInfo.getTitle();
         mArtistName = mInfo.getArtist();
+        try {
+            if(!TextUtils.isEmpty(mInfo.getDisplayname())){
+                mDisplayName = mInfo.getDisplayname().substring(0,mInfo.getDisplayname().lastIndexOf('.'));
+            }
+        } catch (Exception e){
+            CommonUtil.uploadException("displayName",e);
+            mDisplayName = mTitle;
+        }
         mLrcBuilder = new DefaultLrcParser();
     }
 
@@ -106,9 +115,9 @@ public class SearchLRC {
         BufferedReader br = null;
         //先判断该歌曲是否有缓存
         try {
-            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(CommonUtil.hashKeyForDisk(mSongName + "/" + mArtistName));
+            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(CommonUtil.hashKeyForDisk(mTitle + "/" + mArtistName));
              if(snapShot != null && (br = new BufferedReader(new InputStreamReader(snapShot.getInputStream(0)))) != null ){
-                return mLrcBuilder.getLrcRows(br,false,mSongName,mArtistName);
+                return mLrcBuilder.getLrcRows(br,false, mTitle,mArtistName);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -129,25 +138,25 @@ public class SearchLRC {
                 if(!TextUtils.isEmpty(onlineLrcContent)){
                     br = new BufferedReader(
                             new InputStreamReader(new ByteArrayInputStream(Base64.decode(onlineLrcContent, Base64.DEFAULT))));
-                    return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
+                    return mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName);
                 } else {
                     String localLrcPath = getlocalLrcPath();
                     if(!localLrcPath.equals("")){
                         br = new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath)));
-                        return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
+                        return mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName);
                     }
                 }
             } else {
                 String localLrcPath = getlocalLrcPath();
                 if(!localLrcPath.equals("")){
                     br = new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath)));
-                    return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
+                    return mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName);
                 } else {
                     String onlineLrcContent = getOnlineLrcContent();
                     if(!TextUtils.isEmpty(onlineLrcContent)){
                         br = new BufferedReader(
                                 new InputStreamReader(new ByteArrayInputStream(Base64.decode(onlineLrcContent, Base64.DEFAULT))));
-                        return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
+                        return mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName);
                     }
                 }
             }
@@ -214,7 +223,7 @@ public class SearchLRC {
             return "";
         if(!TextUtils.isEmpty(searchPath)){
             //已设置歌词路径
-            CommonUtil.searchFile(APlayerApplication.getContext(),mSongName,mArtistName, new File(searchPath));
+            CommonUtil.searchFile(APlayerApplication.getContext(), mDisplayName,mTitle,mArtistName, new File(searchPath));
             if(!TextUtils.isEmpty(Global.CurrentLrcPath)){
                 return Global.CurrentLrcPath;
             }
@@ -234,7 +243,7 @@ public class SearchLRC {
                 while (allLrcFiles.moveToNext()){
                     File file = new File(allLrcFiles.getString(allLrcFiles.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
                     if (file.exists() && file.canRead()) {
-                        if(CommonUtil.isRightLrc(file,mSongName,mArtistName)){
+                        if(CommonUtil.isRightLrc(file, mDisplayName,mTitle,mArtistName)){
                             return file.getAbsolutePath();
                         }
                     }

@@ -126,7 +126,8 @@ public class BottomActionBarFragment extends BaseFragment{
         if(mArtist != null)
             mArtist.setText(mp3Item.getArtist());
         //封面
-        MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
+        if(mCover != null)
+            MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
         //设置按钮着色
         if(mPlayButton == null)
             return;

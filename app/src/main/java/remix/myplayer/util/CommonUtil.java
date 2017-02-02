@@ -23,7 +23,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -277,12 +276,12 @@ public class CommonUtil {
      * @return
      */
     private static long mLastClickTime;
+    private static final int INTERVAL = 500;
     public static boolean isFastDoubleClick() {
         long time = System.currentTimeMillis();
         long timeInterval = time - mLastClickTime;
-        if ( 0 < timeInterval && timeInterval < 300) {
+        if(0 < timeInterval && timeInterval < INTERVAL)
             return true;
-        }
         mLastClickTime = time;
         return false;
     }
@@ -551,7 +550,7 @@ public class CommonUtil {
      * @param songName
      * @param searchPath
      */
-    public static void searchFile(Context context,String songName,String artistName,File searchPath) {
+    public static void searchFile(Context context,String displayName,String songName,String artistName,File searchPath) {
         //判断SD卡是否存在
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File[] files = searchPath.listFiles();
@@ -560,10 +559,10 @@ public class CommonUtil {
             for(File file : files){
                 if (file.isDirectory()){
                     if(file.canRead()){
-                        searchFile(context,songName,artistName,file);
+                        searchFile(context,displayName,songName,artistName,file);
                     }
                 } else {
-                    if(isRightLrc(file,songName,artistName)){
+                    if(isRightLrc(file,displayName,songName,artistName)){
                         Global.CurrentLrcPath = file.getAbsolutePath();
                         return;
                     }
@@ -627,20 +626,27 @@ public class CommonUtil {
     /**
      * 判断是否是相匹配的歌词
      * @param file
-     * @param songName
-     * @param artistName
+     * @param title
+     * @param artist
      * @return
      */
-    public static boolean isRightLrc(File file,String songName,String artistName){
+    public static boolean isRightLrc(File file,String displayName,String title,String artist){
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
             String prefix = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1);
-            String fileName = file.getName();
+            String fileName = file.getName().substring(0,file.getName().lastIndexOf('.'));
             if(prefix.equals("lrc") ){
-                //先判断是否包含歌手名和歌曲名
-                if(fileName.contains(songName) || fileName.contains(songName.toUpperCase())
-                        && (fileName.contains(artistName) || fileName.contains(artistName.toUpperCase()))){
+                //判断歌词文件名与歌曲文件名是否一致
+                if(fileName.toUpperCase().equals(displayName.toUpperCase())) {
+                    return true;
+                }
+                //判断是否包含歌手名和歌曲名
+                if(fileName.contains(title) || fileName.contains(title.toUpperCase())
+                        && (fileName.contains(artist) || fileName.contains(artist.toUpperCase()))){
+                    return true;
+                }
+                if(fileName.toUpperCase().contains(title.toUpperCase()) && fileName.toUpperCase().contains(artist.toUpperCase())){
                     return true;
                 }
                 //读取前五行歌词内容进行判断
@@ -650,19 +656,17 @@ public class CommonUtil {
                 for(int i = 0 ; i < 5;i++){
                     if((lrcLine = br.readLine()) == null)
                         break;
-                    if(lrcLine.contains(artistName))
+                    if(lrcLine.contains("ar") && lrcLine.toUpperCase().contains(artist.toUpperCase()) )
                         hasArtist = true;
-                    if(lrcLine.contains(songName))
+                    if(lrcLine.contains("ti") && lrcLine.toUpperCase().contains(title.toUpperCase()))
                         hasTitle = true;
                 }
                 if(hasArtist && hasTitle){
                     return true;
                 }
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            CommonUtil.uploadException("查找本地歌词错误",e);
         } finally {
             try {
                 if(br != null){
@@ -675,18 +679,17 @@ public class CommonUtil {
         return false;
     }
 
-
     /**
-     * 手动上传异常
+     * 手动上传日志信息
      */
-    public static void uploadException(String title,Exception e){
+    public static void uploadException(String title,String content){
         try {
             if(!CommonUtil.isNetWorkConnected()){
-
+                return;
             }
             PackageManager pm = APlayerApplication.getContext().getPackageManager();
             PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
-            Feedback feedback =  new Feedback(e.toString(),
+            Feedback feedback =  new Feedback(content,
                     title,
                     pi.versionName,
                     pi.versionCode + "",
@@ -702,8 +705,39 @@ public class CommonUtil {
                 public void done(String s, BmobException e) {
                 }
             });
-        } catch (PackageManager.NameNotFoundException e1) {
-            e1.printStackTrace();
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 手动上传异常
+     */
+    public static void uploadException(String title,Exception exception){
+        try {
+            if(!CommonUtil.isNetWorkConnected()){
+                return;
+            }
+            PackageManager pm = APlayerApplication.getContext().getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
+            Feedback feedback =  new Feedback(exception.toString(),
+                    title,
+                    pi.versionName,
+                    pi.versionCode + "",
+                    Build.DISPLAY,
+                    Build.CPU_ABI + "," + Build.CPU_ABI2,
+                    Build.MANUFACTURER,
+                    Build.MODEL,
+                    Build.VERSION.RELEASE,
+                    Build.VERSION.SDK_INT + ""
+            );
+            feedback.save(new SaveListener<String>() {
+                @Override
+                public void done(String s, BmobException e) {
+                }
+            });
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
         }
     }
 

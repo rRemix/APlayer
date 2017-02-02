@@ -726,13 +726,18 @@ public class MusicService extends BaseService implements Playback {
      * @param playModel
      */
     public static void setPlayModel(int playModel) {
-        if(!CommonUtil.isFastDoubleClick()){
-            mPlayModel = playModel;
-            SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
-            //保存正在播放和下一首歌曲
-            SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
-            SPUtil.putValue(mContext,"Setting","LastSongId",mCurrentId);
-        }
+        mPlayModel = playModel;
+        SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
+        //保存正在播放和下一首歌曲
+        SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
+        SPUtil.putValue(mContext,"Setting","LastSongId",mCurrentId);
+//        if(!CommonUtil.isFastDoubleClick()){
+//            mPlayModel = playModel;
+//            SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
+//            //保存正在播放和下一首歌曲
+//            SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
+//            SPUtil.putValue(mContext,"Setting","LastSongId",mCurrentId);
+//        }
     }
 
     /**

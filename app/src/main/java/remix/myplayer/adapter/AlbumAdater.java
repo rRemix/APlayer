@@ -49,14 +49,14 @@ import remix.myplayer.util.ToastUtil;
  */
 public class AlbumAdater extends HeaderAdapter  {
     public AlbumAdater(Cursor cursor, Context context,MultiChoice multiChoice) {
-        super(context,cursor,multiChoice,R.layout.layout_topbar_2);
+        super(context,cursor,multiChoice);
         ListModel =  SPUtil.getValue(context,"Setting","AlbumModel",Constants.GRID_MODEL);
     }
 
     @Override
     public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
         if(viewType == TYPE_HEADER){
-            return new HeaderHolder(mHeaderView);
+            return new HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2,parent,false));
         }
         return viewType == Constants.LIST_MODEL ?
                 new AlbumListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_album_recycle_list,parent,false)) :
@@ -192,7 +192,7 @@ public class AlbumAdater extends HeaderAdapter  {
 
             //设置padding
             if(ListModel == 2 && holder.mRoot != null){
-                if(position % 2 == 0){
+                if(position % 2 == 1){
                     holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4));
                 } else {
                     holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4));

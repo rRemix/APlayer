@@ -2,10 +2,8 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.annotation.LayoutRes;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,15 +25,13 @@ public abstract class HeaderAdapter extends BaseAdapter<BaseViewHolder> {
     static final int TYPE_HEADER = 0;
     static final int TYPE_NORMAL = 1;
     protected MultiChoice mMultiChoice;
-    View mHeaderView;
     ModeChangeCallback mModeChangeCallback;
     //当前列表模式 1:列表 2:网格
     int ListModel = 2;
 
-    HeaderAdapter(Context context, Cursor cursor, MultiChoice multiChoice, @LayoutRes int layoutId) {
+    HeaderAdapter(Context context, Cursor cursor, MultiChoice multiChoice) {
         super(context,cursor);
         this.mMultiChoice = multiChoice;
-        mHeaderView = LayoutInflater.from(context).inflate(layoutId,null);
     }
 
     public void setModeChangeCallback(ModeChangeCallback modeChangeCallback){
