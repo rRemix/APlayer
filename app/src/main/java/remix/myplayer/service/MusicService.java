@@ -995,13 +995,13 @@ public class MusicService extends BaseService implements Playback {
     }
 
     private void releaseWakeLock(){
-        if(mWakeLock != null && mWakeLock.isHeld())
-            mWakeLock.release();
+//        if(mWakeLock != null && mWakeLock.isHeld())
+//            mWakeLock.release();
     }
 
     private void acquireWakeLock(){
-        if(mWakeLock != null)
-            mWakeLock.acquire(30000L);
+//        if(mWakeLock != null)
+//            mWakeLock.acquire(30000L);
     }
 
     /**
