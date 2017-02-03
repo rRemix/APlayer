@@ -36,7 +36,7 @@ public class LrcFragment extends BaseFragment {
     private MP3Item mInfo;
     @BindView(R.id.lrc_view)
     LrcView mLrcView;
-    //歌词列表
+    //歌词
     private List<LrcRow> mLrcList;
     private Handler mHandler = new Handler() {
         @Override
@@ -68,7 +68,6 @@ public class LrcFragment extends BaseFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPageName = LrcFragment.class.getSimpleName();
-
     }
 
     @Nullable
@@ -80,6 +79,9 @@ public class LrcFragment extends BaseFragment {
         if(mOnFindListener != null)
             mOnFindListener.onViewInflateFinish(mLrcView);
         mInfo = (MP3Item)getArguments().getSerializable("MP3Item");
+        if(mLrcList != null && mLrcList.size() > 0){
+            mHandler.sendEmptyMessage(UPDATE_LRC);
+        }
 
         return rootView;
     }
@@ -96,6 +98,7 @@ public class LrcFragment extends BaseFragment {
     class DownloadThread extends Thread {
         @Override
         public void run() {
+
             mHandler.sendEmptyMessage(SEARCHING);
             SearchLRC searchLRC = new SearchLRC(mInfo);
             List<LrcRow> temp = searchLRC.getLrc();

@@ -45,7 +45,7 @@ public class PlayListAdapter extends HeaderAdapter {
     private MultiChoice mMultiChoice;
 
     public PlayListAdapter(Context context,MultiChoice multiChoice) {
-        super(context,null,multiChoice,R.layout.layout_topbar_2);
+        super(context,null,multiChoice);
         ListModel =  SPUtil.getValue(context,"Setting","PlayListModel",Constants.GRID_MODEL);
         this.mMultiChoice = multiChoice;
     }
@@ -53,7 +53,7 @@ public class PlayListAdapter extends HeaderAdapter {
     @Override
     public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
         if(viewType == TYPE_HEADER){
-            return new AlbumAdater.HeaderHolder(mHeaderView);
+            return new AlbumAdater.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2,parent,false));
         }
         return viewType == Constants.LIST_MODEL ?
                 new PlayListListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_playlist_recycle_list,parent,false)) :
@@ -108,7 +108,7 @@ public class PlayListAdapter extends HeaderAdapter {
                             ToastUtil.show(mContext,"参数错误");
                             return;
                         }
-                        mOnItemClickLitener.onItemClick(holder.mContainer,holder.getAdapterPosition());
+                        mOnItemClickLitener.onItemClick(holder.mContainer,holder.getAdapterPosition() - 1);
                     }
                 });
                 //多选菜单
@@ -119,7 +119,7 @@ public class PlayListAdapter extends HeaderAdapter {
                             ToastUtil.show(mContext,"参数错误");
                             return true;
                         }
-                        mOnItemClickLitener.onItemLongClick(holder.mContainer,holder.getAdapterPosition());
+                        mOnItemClickLitener.onItemLongClick(holder.mContainer,holder.getAdapterPosition() - 1);
                         return true;
                     }
                 });
@@ -169,7 +169,7 @@ public class PlayListAdapter extends HeaderAdapter {
 
             //设置padding
             if(ListModel == 2 && holder.mRoot != null){
-                if(position % 2 == 0){
+                if(position % 2 == 1){
                     holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4));
                 } else {
                     holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4));

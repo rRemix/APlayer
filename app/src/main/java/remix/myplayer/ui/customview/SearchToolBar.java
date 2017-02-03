@@ -3,13 +3,11 @@ package remix.myplayer.ui.customview;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.Handler;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -45,15 +43,15 @@ public class SearchToolBar extends Toolbar {
         mEditText = (EditText)findViewById(R.id.search_input);
         //设置EditText光标与下划线颜色
         mEditText.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-        //弹出键盘
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mEditText.requestFocus();
-                InputMethodManager inputManager = (InputMethodManager)mEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputManager.showSoftInput(mEditText, 0);
-            }
-        },500);
+//        //弹出键盘
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mEditText.requestFocus();
+//                InputMethodManager inputManager = (InputMethodManager)mEditText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+//                inputManager.showSoftInput(mEditText, 0);
+//            }
+//        },500);
         mEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -99,9 +97,7 @@ public class SearchToolBar extends Toolbar {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         init();
     }
-    public void UpdateContent(String text){
-        mEditText.setText(text);
-    }
+
     public void addSearchListener(SearchListener listener){
         mSearchListener = listener;
     }

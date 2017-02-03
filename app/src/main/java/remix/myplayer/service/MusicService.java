@@ -547,7 +547,6 @@ public class MusicService extends BaseService implements Playback {
                 if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
                     return;
                 if(CommonUtil.isFastDoubleClick()) {
-                    ToastUtil.show(mContext,R.string.not_operate_fast);
                     return;
                 }
             }
@@ -727,13 +726,18 @@ public class MusicService extends BaseService implements Playback {
      * @param playModel
      */
     public static void setPlayModel(int playModel) {
-        if(!CommonUtil.isFastDoubleClick()){
-            mPlayModel = playModel;
-            SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
-            //保存正在播放和下一首歌曲
-            SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
-            SPUtil.putValue(mContext,"Setting","LastSongId",mCurrentId);
-        }
+        mPlayModel = playModel;
+        SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
+        //保存正在播放和下一首歌曲
+        SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
+        SPUtil.putValue(mContext,"Setting","LastSongId",mCurrentId);
+//        if(!CommonUtil.isFastDoubleClick()){
+//            mPlayModel = playModel;
+//            SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
+//            //保存正在播放和下一首歌曲
+//            SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
+//            SPUtil.putValue(mContext,"Setting","LastSongId",mCurrentId);
+//        }
     }
 
     /**

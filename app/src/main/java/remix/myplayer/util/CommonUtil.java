@@ -241,7 +241,8 @@ public class CommonUtil {
             if(origin == null || origin.equals("") || origin.contains("unknown") ){
                 return mContext.getString(R.string.unknow_song);
             } else {
-                return origin.lastIndexOf(".") > 0 ? origin.substring(0, origin.lastIndexOf(".")) : origin;
+//                return origin.lastIndexOf(".") > 0 ? origin.substring(0, origin.lastIndexOf(".")) : origin;
+                return origin;
             }
         } else{
             if(origin == null || origin.equals("") || origin.contains("unknown") ){
@@ -275,12 +276,12 @@ public class CommonUtil {
      * @return
      */
     private static long mLastClickTime;
+    private static final int INTERVAL = 500;
     public static boolean isFastDoubleClick() {
         long time = System.currentTimeMillis();
-        long timeD = time - mLastClickTime;
-        if ( 0 < timeD && timeD < 500) {
+        long timeInterval = time - mLastClickTime;
+        if(0 < timeInterval && timeInterval < INTERVAL)
             return true;
-        }
         mLastClickTime = time;
         return false;
     }
@@ -549,79 +550,146 @@ public class CommonUtil {
      * @param songName
      * @param searchPath
      */
-    public static void searchFile(Context context,String songName,String artistName,File searchPath) {
+    public static void searchFile(Context context,String displayName,String songName,String artistName,File searchPath) {
         //判断SD卡是否存在
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File[] files = searchPath.listFiles();
             if(files == null || files.length == 0)
                 return;
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    //如果目录可读就执行（一定要加，不然会挂掉）
+            for(File file : files){
+                if (file.isDirectory()){
                     if(file.canRead()){
-                        searchFile(context,songName,artistName,file);  //如果是目录，递归查找
+                        searchFile(context,displayName,songName,artistName,file);
                     }
                 } else {
-                    //判断是文件
-                    BufferedReader br = null;
-                    try {
-                        br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-                        String prefix = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1);
-                        String fileName = file.getName();
-                        if(prefix.equals("lrc") ){
-                            //先判断是否包含歌手名和歌曲名
-                            if(fileName.contains(songName) || fileName.contains(songName.toUpperCase())
-                                    && (fileName.contains(artistName) || fileName.contains(artistName.toUpperCase()))){
-                                Global.CurrentLrcPath = file.getAbsolutePath();
-                                LogUtil.d("Lrc","LrcPath:" + Global.CurrentLrcPath);
-                                return;
-                            }
-                            //读取前五行歌词内容进行判断
-                            String lrcLine = "";
-                            boolean hasArtist = false;
-                            boolean hasTitle = false;
-                            for(int i = 0 ; i < 5;i++){
-                                if((lrcLine = br.readLine()) == null)
-                                    break;
-                                LogUtil.d("LrcLine","LrcLine:" + lrcLine);
-                                if(lrcLine.contains(artistName))
-                                    hasArtist = true;
-                                if(lrcLine.contains(songName))
-                                    hasTitle = true;
-                            }
-                            if(hasArtist && hasTitle){
-                                Global.CurrentLrcPath = file.getAbsolutePath();
-                                LogUtil.d("Lrc","LrcPath:" + Global.CurrentLrcPath);
-                                return;
-                            }
-                        }
-                    } catch(Exception e) {
-                        uploadException("查找歌词文件错误",e);
-                    } finally {
-                        try {
-                            if(br != null){
-                                br.close();
-                            }
-                        } catch (Exception e){
-                            e.printStackTrace();
-                        }
+                    if(isRightLrc(file,displayName,songName,artistName)){
+                        Global.CurrentLrcPath = file.getAbsolutePath();
+                        return;
                     }
                 }
             }
+//            for (File file : files) {
+//                if (file.isDirectory()) {
+//                    //如果目录可读就执行（一定要加，不然会挂掉）
+//                    if(file.canRead()){
+//                        searchFile(context,songName,artistName,file);  //如果是目录，递归查找
+//                    }
+//                } else {
+//                    //判断是文件
+//                    BufferedReader br = null;
+//                    try {
+//                        br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+//                        String prefix = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1);
+//                        String fileName = file.getName();
+//                        if(prefix.equals("lrc") ){
+//                            //先判断是否包含歌手名和歌曲名
+//                            if(fileName.toUpperCase().contains(songName.toUpperCase()) &&
+//                                    fileName.toUpperCase().contains(artistName.toUpperCase())){
+//                                Global.CurrentLrcPath = file.getAbsolutePath();
+//                                LogUtil.d("Lrc","LrcPath:" + Global.CurrentLrcPath);
+//                            }
+//                            //读取前五行歌词内容进行判断
+//                            String lrcLine = "";
+//                            boolean hasArtist = false;
+//                            boolean hasTitle = false;
+//                            for(int i = 0 ; i < 5;i++){
+//                                if((lrcLine = br.readLine()) == null)
+//                                    break;
+//                                LogUtil.d("LrcLine","LrcLine:" + lrcLine);
+//                                if(lrcLine.contains(artistName))
+//                                    hasArtist = true;
+//                                if(lrcLine.contains(songName))
+//                                    hasTitle = true;
+//                            }
+//                            if(hasArtist && hasTitle){
+//                                Global.CurrentLrcPath = file.getAbsolutePath();
+//                                LogUtil.d("Lrc","LrcPath:" + Global.CurrentLrcPath);
+//                                return;
+//                            }
+//                        }
+//                    } catch(Exception e) {
+//                        uploadException("查找歌词文件错误",e);
+//                    } finally {
+//                        try {
+//                            if(br != null){
+//                                br.close();
+//                            }
+//                        } catch (Exception e){
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 
     /**
-     * 手动上传异常
+     * 判断是否是相匹配的歌词
+     * @param file
+     * @param title
+     * @param artist
+     * @return
      */
-    public static void uploadException(String title,Exception e){
+    public static boolean isRightLrc(File file,String displayName,String title,String artist){
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String prefix = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1);
+            String fileName = file.getName().substring(0,file.getName().lastIndexOf('.'));
+            if(prefix.equals("lrc") ){
+                //判断歌词文件名与歌曲文件名是否一致
+                if(fileName.toUpperCase().equals(displayName.toUpperCase())) {
+                    return true;
+                }
+                //判断是否包含歌手名和歌曲名
+                if(fileName.contains(title) || fileName.contains(title.toUpperCase())
+                        && (fileName.contains(artist) || fileName.contains(artist.toUpperCase()))){
+                    return true;
+                }
+                if(fileName.toUpperCase().contains(title.toUpperCase()) && fileName.toUpperCase().contains(artist.toUpperCase())){
+                    return true;
+                }
+                //读取前五行歌词内容进行判断
+                String lrcLine = "";
+                boolean hasArtist = false;
+                boolean hasTitle = false;
+                for(int i = 0 ; i < 5;i++){
+                    if((lrcLine = br.readLine()) == null)
+                        break;
+                    if(lrcLine.contains("ar") && lrcLine.toUpperCase().contains(artist.toUpperCase()) )
+                        hasArtist = true;
+                    if(lrcLine.contains("ti") && lrcLine.toUpperCase().contains(title.toUpperCase()))
+                        hasTitle = true;
+                }
+                if(hasArtist && hasTitle){
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            CommonUtil.uploadException("查找本地歌词错误",e);
+        } finally {
+            try {
+                if(br != null){
+                    br.close();
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 手动上传日志信息
+     */
+    public static void uploadException(String title,String content){
         try {
             if(!CommonUtil.isNetWorkConnected()){
-
+                return;
             }
             PackageManager pm = APlayerApplication.getContext().getPackageManager();
             PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
-            Feedback feedback =  new Feedback(e.toString(),
+            Feedback feedback =  new Feedback(content,
                     title,
                     pi.versionName,
                     pi.versionCode + "",
@@ -637,8 +705,39 @@ public class CommonUtil {
                 public void done(String s, BmobException e) {
                 }
             });
-        } catch (PackageManager.NameNotFoundException e1) {
-            e1.printStackTrace();
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 手动上传异常
+     */
+    public static void uploadException(String title,Exception exception){
+        try {
+            if(!CommonUtil.isNetWorkConnected()){
+                return;
+            }
+            PackageManager pm = APlayerApplication.getContext().getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
+            Feedback feedback =  new Feedback(exception.toString(),
+                    title,
+                    pi.versionName,
+                    pi.versionCode + "",
+                    Build.DISPLAY,
+                    Build.CPU_ABI + "," + Build.CPU_ABI2,
+                    Build.MANUFACTURER,
+                    Build.MODEL,
+                    Build.VERSION.RELEASE,
+                    Build.VERSION.SDK_INT + ""
+            );
+            feedback.save(new SaveListener<String>() {
+                @Override
+                public void done(String s, BmobException e) {
+                }
+            });
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
         }
     }
 

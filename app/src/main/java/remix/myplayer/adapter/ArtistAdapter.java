@@ -47,14 +47,14 @@ import remix.myplayer.util.ToastUtil;
  */
 public class ArtistAdapter extends HeaderAdapter{
     public ArtistAdapter(Cursor cursor, Context context,MultiChoice multiChoice) {
-        super(context,cursor,multiChoice,R.layout.layout_topbar_2);
+        super(context,cursor,multiChoice);
         ListModel =  SPUtil.getValue(context,"Setting","ArtistModel",Constants.GRID_MODEL);
     }
 
     @Override
     public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
         if(viewType == TYPE_HEADER){
-            return new AlbumAdater.HeaderHolder(mHeaderView);
+            return new AlbumAdater.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2,parent,false));
         }
         return viewType == Constants.LIST_MODEL ?
                 new ArtistAdapter.ArtistListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_artist_recycle_list,parent,false)) :
@@ -121,7 +121,7 @@ public class ArtistAdapter extends HeaderAdapter{
                             ToastUtil.show(mContext,"参数错误");
                             return;
                         }
-                        mOnItemClickLitener.onItemClick(holder.mContainer,position);
+                        mOnItemClickLitener.onItemClick(holder.mContainer,position - 1);
                     }
                 });
                 //多选菜单
@@ -132,7 +132,7 @@ public class ArtistAdapter extends HeaderAdapter{
                             ToastUtil.show(mContext,"参数错误");
                             return true;
                         }
-                        mOnItemClickLitener.onItemLongClick(holder.mContainer,position);
+                        mOnItemClickLitener.onItemLongClick(holder.mContainer,position - 1);
                         return true;
                     }
                 });
@@ -156,12 +156,11 @@ public class ArtistAdapter extends HeaderAdapter{
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(mMultiChoice.isShow())
+                        if(mMultiChoice.isShow() || !mCursor.moveToPosition(holder.getAdapterPosition() - 1))
                             return;
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
                         popupMenu.getMenuInflater().inflate(R.menu.artist_menu, popupMenu.getMenu());
-                        mCursor.moveToPosition(holder.getAdapterPosition());
                         popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
                                 mCursor.getInt(ArtistFragment.mArtistIdIndex),
                                 Constants.ARTIST,
@@ -183,7 +182,7 @@ public class ArtistAdapter extends HeaderAdapter{
 
         //设置padding
         if(ListModel == 2 && holder.mRoot != null){
-            if(position % 2 == 0){
+            if(position % 2 == 1){
                 holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4));
             } else {
                 holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4));

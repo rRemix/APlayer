@@ -49,14 +49,14 @@ import remix.myplayer.util.ToastUtil;
  */
 public class AlbumAdater extends HeaderAdapter  {
     public AlbumAdater(Cursor cursor, Context context,MultiChoice multiChoice) {
-        super(context,cursor,multiChoice,R.layout.layout_topbar_2);
+        super(context,cursor,multiChoice);
         ListModel =  SPUtil.getValue(context,"Setting","AlbumModel",Constants.GRID_MODEL);
     }
 
     @Override
     public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
         if(viewType == TYPE_HEADER){
-            return new HeaderHolder(mHeaderView);
+            return new HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2,parent,false));
         }
         return viewType == Constants.LIST_MODEL ?
                 new AlbumListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_album_recycle_list,parent,false)) :
@@ -162,12 +162,11 @@ public class AlbumAdater extends HeaderAdapter  {
                 holder.mButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(mMultiChoice.isShow())
+                        if(mMultiChoice.isShow() || !mCursor.moveToPosition(holder.getAdapterPosition() - 1))
                             return;
                         Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                         final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
                         popupMenu.getMenuInflater().inflate(R.menu.album_menu, popupMenu.getMenu());
-                        mCursor.moveToPosition(holder.getAdapterPosition());
                         popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
                                 mCursor.getInt(AlbumFragment.mAlbumIdIndex),
                                 Constants.ALBUM,
@@ -193,7 +192,7 @@ public class AlbumAdater extends HeaderAdapter  {
 
             //设置padding
             if(ListModel == 2 && holder.mRoot != null){
-                if(position % 2 == 0){
+                if(position % 2 == 1){
                     holder.mRoot.setPadding(DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4));
                 } else {
                     holder.mRoot.setPadding(DensityUtil.dip2px(mContext,3),DensityUtil.dip2px(mContext,4),DensityUtil.dip2px(mContext,6),DensityUtil.dip2px(mContext,4));

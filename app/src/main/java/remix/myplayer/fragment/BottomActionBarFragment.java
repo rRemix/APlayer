@@ -27,6 +27,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;
+import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -121,11 +122,12 @@ public class BottomActionBarFragment extends BaseFragment{
             return;
         //歌曲名 艺术家
         if(mTitle != null)
-            mTitle.setText(mp3Item.getTitle());
+            mTitle.setText(CommonUtil.processInfo(mp3Item.getTitle(),CommonUtil.SONGTYPE));
         if(mArtist != null)
             mArtist.setText(mp3Item.getArtist());
         //封面
-        MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
+        if(mCover != null)
+            MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
         //设置按钮着色
         if(mPlayButton == null)
             return;

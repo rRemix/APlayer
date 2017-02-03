@@ -14,7 +14,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="@dimen/d16_size"
         android:id="@+id/play_shuffle">
-        <ImageButton
+        <ImageView
             android:id="@+id/play_shuffle_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

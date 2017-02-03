@@ -74,8 +74,6 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
         final View rootView = inflater.inflate(R.layout.fragment_song,null);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
@@ -109,6 +107,11 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG,Constants.SONG);
             }
         });
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(mAdapter);
+
         return rootView;
     }
 
@@ -161,7 +164,6 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
             mAlbumIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM);
             mSongId = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
             mAlbumIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-            mRecyclerView.setAdapter(mAdapter);
             mAdapter.setCursor(mCursor);
             setAllSongList();
         } catch (Exception e){

@@ -59,7 +59,7 @@ public class ChildHolderAdapter extends HeaderAdapter {
     public static int SORT = 0;
 
     public ChildHolderAdapter(Context context, int type, String arg,MultiChoice multiChoice){
-        super(context,null,multiChoice,R.layout.layout_topbar_1);
+        super(context,null,multiChoice);
         this.mContext = context;
         this.mType = type;
         this.mArg = arg;
@@ -84,7 +84,7 @@ public class ChildHolderAdapter extends HeaderAdapter {
     @Override
     public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
         return viewType == TYPE_HEADER ?
-                new SongAdapter.HeaderHolder(mHeaderView) :
+                new SongAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_1,parent,false)) :
                 new ChildHolderViewHoler(LayoutInflater.from(mContext).inflate(R.layout.item_child_holder,parent,false));
     }
 
@@ -225,7 +225,15 @@ public class ChildHolderAdapter extends HeaderAdapter {
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 intent.putExtra("Control", Constants.NEXT);
                 intent.putExtra("shuffle",true);
-                Global.setPlayQueue(Global.AllSongList,mContext,intent);
+                //设置正在播放列表
+                ArrayList<Integer> IDList = new ArrayList<>();
+                for (MP3Item info : mInfoList)
+                    IDList.add(info.getId());
+                if(IDList == null || IDList.size() == 0){
+                    ToastUtil.show(mContext,R.string.no_song);
+                    return;
+                }
+                Global.setPlayQueue(IDList,mContext,intent);
                 break;
             case R.id.sort:
                 if(SORT == NAME){

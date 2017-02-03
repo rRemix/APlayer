@@ -12,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -43,13 +42,22 @@ public class SearchLRC {
     private static final String LRC_REQUEST_ROOT = "http://s.geci.me/lrc/";
     private ILrcParser mLrcBuilder;
     private MP3Item mInfo;
-    private String mSongName;
+    private String mTitle;
     private String mArtistName;
+    private String mDisplayName;
 
     public SearchLRC(MP3Item item) {
         mInfo = item;
-        mSongName = mInfo.getTitle();
+        mTitle = mInfo.getTitle();
         mArtistName = mInfo.getArtist();
+        try {
+            if(!TextUtils.isEmpty(mInfo.getDisplayname())){
+                mDisplayName = mInfo.getDisplayname().substring(0,mInfo.getDisplayname().lastIndexOf('.'));
+            }
+        } catch (Exception e){
+            CommonUtil.uploadException("displayName",e);
+            mDisplayName = mTitle;
+        }
         mLrcBuilder = new DefaultLrcParser();
     }
 
@@ -107,9 +115,9 @@ public class SearchLRC {
         BufferedReader br = null;
         //先判断该歌曲是否有缓存
         try {
-            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(CommonUtil.hashKeyForDisk(mSongName + "/" + mArtistName));
+            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(CommonUtil.hashKeyForDisk(mTitle + "/" + mArtistName));
              if(snapShot != null && (br = new BufferedReader(new InputStreamReader(snapShot.getInputStream(0)))) != null ){
-                return mLrcBuilder.getLrcRows(br,false,mSongName,mArtistName);
+                return mLrcBuilder.getLrcRows(br,false, mTitle,mArtistName);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -122,28 +130,56 @@ public class SearchLRC {
                 }
         }
 
-        //如果设置了歌词搜索目录，优先搜索本地
-        if(!TextUtils.isEmpty(SPUtil.getValue(APlayerApplication.getContext(),"Setting","LrcSearchPath",""))){
-            String localLrcPath = getlocalLrcPath(false);
-            if(!localLrcPath.equals("")){
-                try {
+        try {
+            //是否优先搜索在线歌词
+            boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting","OnlineLrc",false);
+            if(onlineFirst){
+                String onlineLrcContent = getOnlineLrcContent();
+                if(!TextUtils.isEmpty(onlineLrcContent)){
+                    br = new BufferedReader(
+                            new InputStreamReader(new ByteArrayInputStream(Base64.decode(onlineLrcContent, Base64.DEFAULT))));
+                    return mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName);
+                } else {
+                    String localLrcPath = getlocalLrcPath();
+                    if(!localLrcPath.equals("")){
+                        br = new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath)));
+                        return mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName);
+                    }
+                }
+            } else {
+                String localLrcPath = getlocalLrcPath();
+                if(!localLrcPath.equals("")){
                     br = new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath)));
-                    return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } finally {
-                    if(br != null)
-                        try {
-                            br.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                    return mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName);
+                } else {
+                    String onlineLrcContent = getOnlineLrcContent();
+                    if(!TextUtils.isEmpty(onlineLrcContent)){
+                        br = new BufferedReader(
+                                new InputStreamReader(new ByteArrayInputStream(Base64.decode(onlineLrcContent, Base64.DEFAULT))));
+                        return mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName);
+                    }
                 }
             }
+        }catch (Exception e){
+            LogUtil.e(TAG,e.toString());
+        } finally {
+            if (br != null)
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
+        return null;
+    }
 
-        //在线搜索歌词，如果存在下载并解析歌词
+    /**
+     * 获得在线歌词
+     * @return
+     */
+    private String getOnlineLrcContent(){
         LrcRequest lrcParam = getLrcParam();
+        BufferedReader br = null;
         if(lrcParam != null && !TextUtils.isEmpty(lrcParam.AccessKey)){
             try {
                 URL url = new URL("http://lyrics.kugou.com/download?ver=1&client=pc&id=" + lrcParam.ID + "&accesskey=" + lrcParam.AccessKey + "&fmt=lrc&charset=utf8");
@@ -159,33 +195,12 @@ public class SearchLRC {
                 if(TextUtils.isEmpty(stringBuffer)){
                     return null;
                 }
-                br = new BufferedReader(
-                        new InputStreamReader(new ByteArrayInputStream(Base64.decode(new JSONObject(stringBuffer.toString()).getString("content"), Base64.DEFAULT))));
-
-                return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
+                return new JSONObject(stringBuffer.toString()).getString("content");
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }  finally {
-                if(br != null)
-                    try {
-                        br.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-            }
-        }
-
-        //在线无资源，搜索本地
-        String localLrcPath = getlocalLrcPath(true);
-        if(!localLrcPath.equals("")){
-            try {
-                br = new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath)));
-                return mLrcBuilder.getLrcRows(br,true,mSongName,mArtistName);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } finally {
                 if(br != null)
                     try {
                         br.close();
@@ -201,20 +216,20 @@ public class SearchLRC {
      * 搜索本地所有歌词文件
      * @return
      */
-    private String getlocalLrcPath(boolean searchAll) {
+    private String getlocalLrcPath() {
         //查找本地目录
         String searchPath =  SPUtil.getValue(APlayerApplication.getContext(),"Setting","LrcSearchPath","");
         if(mInfo == null)
             return "";
         if(!TextUtils.isEmpty(searchPath)){
             //已设置歌词路径
-            CommonUtil.searchFile(APlayerApplication.getContext(),mSongName,mArtistName, new File(searchPath));
+            CommonUtil.searchFile(APlayerApplication.getContext(), mDisplayName,mTitle,mArtistName, new File(searchPath));
             if(!TextUtils.isEmpty(Global.CurrentLrcPath)){
                 return Global.CurrentLrcPath;
             }
 
-        } else if (searchAll){
-            //没有设置歌词路径
+        } else{
+            //没有设置歌词路径 搜索所有歌词文件
             Cursor allLrcFiles = null;
             try {
                 allLrcFiles = APlayerApplication.getContext().getContentResolver().
@@ -228,41 +243,8 @@ public class SearchLRC {
                 while (allLrcFiles.moveToNext()){
                     File file = new File(allLrcFiles.getString(allLrcFiles.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
                     if (file.exists() && file.canRead()) {
-                        BufferedReader lrcBr = null;
-                        try {
-                            lrcBr = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-                            String fileName = file.getName();
-                            //先判断是否包含歌手名和歌曲名
-                            if(fileName.contains(mSongName) || fileName.contains(mSongName.toUpperCase())
-                                    && (fileName.contains(mArtistName) || fileName.contains(mArtistName.toUpperCase()))){
-                                return file.getAbsolutePath();
-                            }
-                            //读取前五行歌词内容进行判断
-                            String lrcLine = "";
-                            boolean hasArtist = false;
-                            boolean hasTitle = false;
-                            for(int j = 0 ; j < 5;j++){
-                                if((lrcLine = lrcBr.readLine()) == null)
-                                    break;
-                                LogUtil.d("LrcLine","LrcLine:" + lrcLine);
-                                if(lrcLine.contains(mSongName))
-                                    hasArtist = true;
-                                if(lrcLine.contains(mArtistName))
-                                    hasTitle = true;
-                            }
-                            if(hasArtist && hasTitle){
-                                return file.getAbsolutePath();
-                            }
-                        } catch(Exception e) {
-                            CommonUtil.uploadException("查找歌词文件错误",e);
-                        } finally {
-                            try {
-                                if(lrcBr != null){
-                                    lrcBr.close();
-                                }
-                            } catch (Exception e){
-                                e.printStackTrace();
-                            }
+                        if(CommonUtil.isRightLrc(file, mDisplayName,mTitle,mArtistName)){
+                            return file.getAbsolutePath();
                         }
                     }
                 }
