@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -737,6 +738,32 @@ public class MediaStoreUtil {
             i++;
         }
         return stringBuilder.toString();
+    }
+
+    /**
+     * 根据路径获得歌曲id
+     * @param url
+     * @return
+     */
+    public static int getSongIdByUrl(String url){
+        if(TextUtils.isEmpty(url))
+            return -1;
+        Cursor cursor = null;
+        try {
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    new String[]{MediaStore.Audio.Media._ID},
+                    MediaStore.Audio.Media.DATA + "=?",
+                    new String[]{url},
+                    null);
+            if(cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()){
+                return cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed()){
+                cursor.close();
+            }
+        }
+        return -1;
     }
 
 }

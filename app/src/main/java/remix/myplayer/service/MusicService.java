@@ -13,6 +13,7 @@ import android.media.audiofx.AudioEffect;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.view.KeyEvent;
@@ -140,6 +141,8 @@ public class MusicService extends BaseService implements Playback {
         }
     };
 
+    /**电源锁*/
+    private PowerManager.WakeLock mWakeLock;
 
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
@@ -192,6 +195,9 @@ public class MusicService extends BaseService implements Playback {
     private void init() {
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
         Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
+        //电源锁
+        mWakeLock = ((PowerManager)getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,getClass().getSimpleName());
+        mWakeLock.setReferenceCounted(false);
         //监听audiofocus
         mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
             //记录焦点变化之前是否在播放;
@@ -302,6 +308,7 @@ public class MusicService extends BaseService implements Playback {
                 Global.setOperation(Constants.NEXT);
                 //更新通知栏
                 sendBroadcast(new Intent(Constants.NOTIFY));
+                acquireWakeLock();
             }
         });
         mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -384,6 +391,7 @@ public class MusicService extends BaseService implements Playback {
         unregisterReceiver(mControlRecevier);
         unregisterReceiver(mHeadSetReceiver);
         unregisterReceiver(mWidgetReceiver);
+        releaseWakeLock();
         getContentResolver().unregisterContentObserver(mMediaStoreObserver);
         getContentResolver().unregisterContentObserver(mPlayListObserver);
         getContentResolver().unregisterContentObserver(mPlayListSongObserver);
@@ -953,6 +961,7 @@ public class MusicService extends BaseService implements Playback {
             }
         }
     }
+
     /**
      * 剩余的计时时间
      * @return
@@ -962,6 +971,7 @@ public class MusicService extends BaseService implements Playback {
             return mMillisUntilFinish;
         }
     }
+
     /**
      * 定时关闭计时器
      */
@@ -982,6 +992,16 @@ public class MusicService extends BaseService implements Playback {
             //时间到后发送关闭程序的广播
             sendBroadcast(new Intent(Constants.EXIT));
         }
+    }
+
+    private void releaseWakeLock(){
+        if(mWakeLock != null && mWakeLock.isHeld())
+            mWakeLock.release();
+    }
+
+    private void acquireWakeLock(){
+        if(mWakeLock != null)
+            mWakeLock.acquire(30000L);
     }
 
     /**

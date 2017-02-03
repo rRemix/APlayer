@@ -34,6 +34,7 @@ import com.facebook.rebound.SpringSystem;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -110,6 +111,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private Handler mRefreshHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
+            if(msg.what == -100){
+                ToastUtil.show(mContext,msg.obj.toString());
+            }
             if(msg.what == Constants.RECREATE_ACTIVITY) {
                 recreate();
             }
@@ -192,7 +196,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        //播放的service
         setUpToolbar(mToolBar);
         setUpPager();
         setUpTab();
@@ -206,8 +209,23 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             @Override
             public void run() {
                 initBottombar();
+                final Intent param = getIntent();
+                if(param != null && param.getData() != null){
+                    int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
+                    if(id < 0)
+                        return;
+                    Intent intent = new Intent(Constants.CTL_ACTION);
+                    Bundle arg = new Bundle();
+                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                    arg.putInt("Position", 0);
+                    intent.putExtras(arg);
+                    ArrayList<Integer> list = new ArrayList<>();
+                    list.add(id);
+                    Global.setPlayQueue(list,mContext,intent);
+                }
             }
         },800);
+
     }
 
     /**
