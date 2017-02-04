@@ -4,9 +4,11 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +17,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.github.promeg.pinyinhelper.Pinyin;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadImage;
+import remix.myplayer.db.PlayLists;
 import remix.myplayer.fragment.PlayListFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
@@ -41,7 +46,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 播放列表的适配器
  */
-public class PlayListAdapter extends HeaderAdapter {
+public class PlayListAdapter extends HeaderAdapter implements FastScrollRecyclerView.SectionedAdapter{
     private MultiChoice mMultiChoice;
 
     public PlayListAdapter(Context context,MultiChoice multiChoice) {
@@ -177,6 +182,18 @@ public class PlayListAdapter extends HeaderAdapter {
             }
         }
 
+    }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        if(position == 0)
+            return "";
+        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position - 1)){
+            String name = mCursor.getString(mCursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
+            return !TextUtils.isEmpty(name) ? (Pinyin.toPinyin(name.charAt(0))).toUpperCase().substring(0,1)  : "";
+        }
+        return "";
     }
 
     static class PlayListHolder extends BaseViewHolder {

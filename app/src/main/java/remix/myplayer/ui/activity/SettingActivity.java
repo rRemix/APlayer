@@ -38,8 +38,7 @@ import cn.bmob.v3.update.UpdateResponse;
 import cn.bmob.v3.update.UpdateStatus;
 import remix.myplayer.R;
 import remix.myplayer.db.DBOpenHelper;
-import remix.myplayer.listener.LockScreenListener;
-import remix.myplayer.listener.ShakeListener;
+import remix.myplayer.listener.ShakeDector;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -135,10 +134,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         switch (index){
                             //设置导航栏变色后需要重启activity
                             case 0:
-                                if(isChecked)
-                                    LockScreenListener.getInstance(mContext).beginListen();
-                                else
-                                    LockScreenListener.getInstance(mContext).stopListen();
+//                                if(isChecked)
+//                                    LockScreenListener.getInstance(mContext).beginListen();
+//                                else
+//                                    LockScreenListener.getInstance(mContext).stopListen();
                                 break;
                             //开启或关闭 锁屏
                             case 1:
@@ -148,9 +147,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             //开启或者关闭 或者摇一摇
                             case 2:
                                 if(isChecked)
-                                    ShakeListener.getInstance(mContext).beginListen();
+                                    ShakeDector.getInstance(mContext).beginListen();
                                 else
-                                    ShakeListener.getInstance(mContext).stopListen();
+                                    ShakeDector.getInstance(mContext).stopListen();
                                 break;
                             //设置歌词搜索优先级
                             case 3:

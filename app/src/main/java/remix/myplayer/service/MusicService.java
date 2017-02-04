@@ -30,7 +30,7 @@ import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.LockScreenListener;
-import remix.myplayer.listener.ShakeListener;
+import remix.myplayer.listener.ShakeDector;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.observer.DBObserver;
 import remix.myplayer.observer.MediaStoreObserver;
@@ -399,7 +399,7 @@ public class MusicService extends BaseService implements Playback {
         if(SPUtil.getValue(mContext,"Setting","LockScreenOn",false))
             LockScreenListener.getInstance(mContext).stopListen();
         if(SPUtil.getValue(mContext,"Setting","Shake",false))
-            ShakeListener.getInstance(mContext).stopListen();
+            ShakeDector.getInstance(mContext).stopListen();
         //关闭通知
         ((NotificationManager) APlayerApplication.getContext().getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
     }

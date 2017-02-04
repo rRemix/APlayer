@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/background_grid_color">
 
-    <android.support.v7.widget.RecyclerView
+    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/artist_recycleview">
-
-    </android.support.v7.widget.RecyclerView>
+        android:id="@+id/artist_recycleview"
+        app:fastScrollAutoHide="true"
+        app:fastScrollAutoHideDelay="@integer/AutoHideDelay"
+        app:fastScrollPopupBackgroundSize="@dimen/fastScrollPopupSize"
+        app:fastScrollPopupBgColor="?attr/colorAccent"
+        app:fastScrollPopupTextSize="@dimen/fastScrollPopupTextSize"
+        app:fastScrollPopupTextColor="?attr/text_color_primary"
+        app:fastScrollThumbColor="?attr/colorAccent"/>
 </LinearLayout>

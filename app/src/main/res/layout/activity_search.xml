@@ -60,7 +60,8 @@
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/search_result_native" />
+            android:id="@+id/search_result_native"
+            android:scrollbars="vertical"/>
         <TextView
             android:id="@+id/search_result_blank"
             android:layout_width="wrap_content"

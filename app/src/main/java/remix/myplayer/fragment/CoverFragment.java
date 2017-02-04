@@ -69,6 +69,7 @@ public class CoverFragment extends BaseFragment {
                 return true;
             }
         });
+        mImage.setAspectRatio(1);
         mImage.getHierarchy().setFailureImage(ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night);
 
         return rootView;

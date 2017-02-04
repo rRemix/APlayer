@@ -18,7 +18,7 @@ import remix.myplayer.util.Constants;
  * @Date 2017/1/22 10:27
  */
 
-public class ShakeListener {
+public class ShakeDector {
     private SensorManager mSensorManager;
     private Context mContext;
     private SensorListener mSensorListener;
@@ -32,14 +32,14 @@ public class ShakeListener {
     //每500ms最多响应一次操作
     private boolean mHasMessage = false;
 
-    private static ShakeListener mInstance;
-    private ShakeListener(Context context){
+    private static ShakeDector mInstance;
+    private ShakeDector(Context context){
         mContext = context;
     }
 
-    public synchronized static ShakeListener getInstance(Context context){
+    public synchronized static ShakeDector getInstance(Context context){
         if(mInstance == null){
-            mInstance = new ShakeListener(context);
+            mInstance = new ShakeDector(context);
         }
         return mInstance;
     }

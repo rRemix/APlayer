@@ -6,7 +6,10 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +17,15 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.github.promeg.pinyinhelper.Pinyin;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.MP3Item;
@@ -47,7 +53,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * Created by Remix on 2016/4/11.
  */
-public class SongAdapter extends HeaderAdapter{
+public class SongAdapter extends HeaderAdapter implements FastScrollRecyclerView.SectionedAdapter{
     //升序还是降序
     public static String ASCDESC = " asc";
     //按字母排序还是按添加时间排序
@@ -130,20 +136,20 @@ public class SongAdapter extends HeaderAdapter{
         final MP3Item currentMP3 = MusicService.getCurrentMP3();
         //判断该歌曲是否是正在播放的歌曲
         //如果是,高亮该歌曲，并显示动画
-        if(currentMP3 != null){
-            boolean highlight = temp.getId() == MusicService.getCurrentMP3().getId();
-            holder.mName.setTextColor(highlight ?
-                    ThemeStore.getAccentColor():
-                    ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-            holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.INVISIBLE);
-            //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
-            if(MusicService.isPlay() && !holder.mColumnView.getStatus() && highlight){
-                holder.mColumnView.startAnim();
-            }
-            else if(!MusicService.isPlay() && holder.mColumnView.getStatus()){
-                holder.mColumnView.stopAnim();
-            }
-        }
+//        if(currentMP3 != null){
+//            boolean highlight = temp.getId() == MusicService.getCurrentMP3().getId();
+//            holder.mName.setTextColor(highlight ?
+//                    ThemeStore.getAccentColor():
+//                    ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+//            holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.INVISIBLE);
+//            //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
+//            if(MusicService.isPlay() && !holder.mColumnView.getStatus() && highlight){
+//                holder.mColumnView.startAnim();
+//            }
+//            else if(!MusicService.isPlay() && holder.mColumnView.getStatus()){
+//                holder.mColumnView.stopAnim();
+//            }
+//        }
 
         try {
             //是否为无损
@@ -160,8 +166,9 @@ public class SongAdapter extends HeaderAdapter{
             holder.mOther.setText(artist + "-" + album);
 
             //封面
-//            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(),Constants.URL_ALBUM);
-            MediaStoreUtil.setImageUrl(holder.mImage,temp.getAlbumId());
+            holder.mImage.setImageURI(Uri.EMPTY);
+            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(),Constants.URL_ALBUM);
+//            MediaStoreUtil.setImageUrl(holder.mImage,temp.getAlbumId());
             //背景点击效果
             holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 
@@ -280,6 +287,18 @@ public class SongAdapter extends HeaderAdapter{
                 mCallback.SortChange();
                 break;
         }
+    }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        if(position == 0)
+            return "";
+        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position - 1)){
+            String title = mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+            return !TextUtils.isEmpty(title) ? (Pinyin.toPinyin(title.charAt(0))).toUpperCase().substring(0,1)  : "";
+        }
+        return "";
     }
 
     static class SongViewHolder extends BaseViewHolder{

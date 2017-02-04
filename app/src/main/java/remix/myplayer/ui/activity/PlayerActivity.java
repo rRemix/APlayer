@@ -524,7 +524,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                         currentmodel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
                 //刷新下一首
                 if(currentmodel != Constants.PLAY_SHUFFLE && MusicService.getNextMP3() != null){
-                    mNextSong.setText(MusicService.getNextMP3().getTitle());
+                    mNextSong.setText("下一首：" + MusicService.getNextMP3().getTitle());
                 }
                 ToastUtil.show(this,msg);
                 break;

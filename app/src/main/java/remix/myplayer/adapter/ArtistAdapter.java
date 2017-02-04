@@ -7,9 +7,12 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +22,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.github.promeg.pinyinhelper.Pinyin;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import butterknife.BindView;
 import remix.myplayer.R;
@@ -45,7 +50,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 艺术家界面的适配器
  */
-public class ArtistAdapter extends HeaderAdapter{
+public class ArtistAdapter extends HeaderAdapter implements FastScrollRecyclerView.SectionedAdapter{
     public ArtistAdapter(Cursor cursor, Context context,MultiChoice multiChoice) {
         super(context,cursor,multiChoice);
         ListModel =  SPUtil.getValue(context,"Setting","ArtistModel",Constants.GRID_MODEL);
@@ -193,6 +198,18 @@ public class ArtistAdapter extends HeaderAdapter{
     @Override
     public void saveMode() {
         SPUtil.putValue(mContext,"Setting","ArtistModel",ListModel);
+    }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        if(position == 0)
+            return "";
+        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position - 1)){
+            String artist = mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+            return !TextUtils.isEmpty(artist) ? (Pinyin.toPinyin(artist.charAt(0))).toUpperCase().substring(0,1)  : "";
+        }
+        return "";
     }
 
     public static class ArtistHolder extends BaseViewHolder {

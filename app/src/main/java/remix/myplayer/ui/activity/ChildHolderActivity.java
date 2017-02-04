@@ -6,13 +6,13 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
     @BindView(R.id.childholder_item_num)
     TextView mNum;
     @BindView(R.id.child_holder_recyclerView)
-    RecyclerView mRecyclerView;
+    FastScrollRecyclerView mRecyclerView;
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
 
@@ -289,8 +289,8 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         //底部状态兰
         mBottombar.UpdateBottomStatus(MP3Item, isplay);
         //更新高亮歌曲
-        if(mAdapter != null)
-            mAdapter.notifyDataSetChanged();
+//        if(mAdapter != null)
+//            mAdapter.notifyDataSetChanged();
     }
 
     @Override

@@ -12,10 +12,11 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,7 +41,7 @@ import remix.myplayer.util.SPUtil;
  */
 public class AlbumFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback {
     @BindView(R.id.album_recycleview)
-    RecyclerView mRecyclerView;
+    FastScrollRecyclerView mRecyclerView;
 
     //专辑名 专辑id 艺术家对应的索引
     public static int mAlbumIdIndex = -1;

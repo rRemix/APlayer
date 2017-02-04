@@ -5,11 +5,16 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.github.promeg.pinyinhelper.Pinyin;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
@@ -37,7 +42,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * Created by taeja on 16-6-24.
  */
-public class ChildHolderAdapter extends HeaderAdapter {
+public class ChildHolderAdapter extends HeaderAdapter implements FastScrollRecyclerView.SectionedAdapter{
     //升序
     public static final int ASC = 0;
     //降序
@@ -127,21 +132,22 @@ public class ChildHolderAdapter extends HeaderAdapter {
             final MP3Item currentMP3 = MusicService.getCurrentMP3();
             //判断该歌曲是否是正在播放的歌曲
             //如果是,高亮该歌曲，并显示动画
-            if(currentMP3 != null){
-                boolean highlight = temp.getId() == currentMP3.getId();
-                holder.mTitle.setTextColor(highlight ?
-                        ThemeStore.getAccentColor() :
-                        ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-                holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.INVISIBLE);
+//            if(currentMP3 != null){
+//                boolean highlight = temp.getId() == currentMP3.getId();
+//                holder.mTitle.setTextColor(highlight ?
+//                        ThemeStore.getAccentColor() :
+//                        ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+//                holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.INVISIBLE);
+//
+//                //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
+//                if(MusicService.isPlay() && !holder.mColumnView.getStatus() && highlight){
+//                    holder.mColumnView.startAnim();
+//                }
+//                else if(!MusicService.isPlay() && holder.mColumnView.getStatus()){
+//                    holder.mColumnView.stopAnim();
+//                }
+//            }
 
-                //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
-                if(MusicService.isPlay() && !holder.mColumnView.getStatus() && highlight){
-                    holder.mColumnView.startAnim();
-                }
-                else if(!MusicService.isPlay() && holder.mColumnView.getStatus()){
-                    holder.mColumnView.stopAnim();
-                }
-            }
             //是否无损
             String prefix = temp.getDisplayname().substring(temp.getDisplayname().lastIndexOf(".") + 1);
             holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
@@ -256,6 +262,18 @@ public class ChildHolderAdapter extends HeaderAdapter {
                 mCallback.SortChange();
                 break;
         }
+    }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        if(position == 0)
+            return "";
+        if(mInfoList != null && mInfoList.size() > 0 && position < mInfoList.size() && mInfoList.get(position - 1) != null){
+            String title = mInfoList.get(position).getTitle();
+            return !TextUtils.isEmpty(title) ? (Pinyin.toPinyin(title.charAt(0))).toUpperCase().substring(0,1)  : "";
+        }
+        return "";
     }
 
     static class ChildHolderViewHoler extends BaseViewHolder {

@@ -75,5 +75,7 @@ dependencies {
     compile 'com.soundcloud.android:android-crop:1.0.1@aar'
     compile 'cn.bmob.android:bmob-sdk:3.5.0'
     compile 'com.jakewharton:butterknife:8.4.0'
+    compile 'com.simplecityapps:recyclerview-fastscroll:1.0.11'
+    compile 'com.github.promeg:tinypinyin:2.0.1'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
 }

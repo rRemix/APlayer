@@ -18,7 +18,6 @@
         fresco:failureImage="?attr/default_album"
         fresco:failureImageScaleType="centerCrop"
         fresco:roundAsCircle="true"
-        fresco:fadeDuration="0"
         android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/d16_size"
         android:layout_marginRight="@dimen/d16_size"/>
