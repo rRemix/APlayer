@@ -176,6 +176,9 @@
 -keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
  rx.internal.util.atomic.LinkedQueueNode consumerNode;
 }
+# ---- FastScrollRecycleView ----
+-keep class com.simplecityapps.recyclerview_fastscroll.** { *; }
+# ---- END FastScrollRecycleView ----
 
 # 如果你需要兼容6.0系统，请不要混淆org.apache.http.legacy.jar
 -dontwarn android.net.compatibility.**

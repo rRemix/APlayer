@@ -289,6 +289,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         //底部状态兰
         mBottombar.UpdateBottomStatus(MP3Item, isplay);
         //更新高亮歌曲
+//        if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
 //        if(mAdapter != null)
 //            mAdapter.notifyDataSetChanged();
     }

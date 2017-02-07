@@ -2,6 +2,7 @@ package remix.myplayer.asynctask;
 
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -30,8 +31,8 @@ public class AsynLoadImage extends AsyncTask<Object,Integer,String> {
 
     @Override
     protected void onPostExecute(String url) {
-        if(mImage != null && url != null) {
-            mImage.setImageURI(Uri.parse("file://" + url));
+        if(mImage != null && !TextUtils.isEmpty(url)) {
+            mImage.setImageURI(Uri.parse(url));
         }
     }
 }

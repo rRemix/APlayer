@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -45,7 +46,6 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.RecordShareActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -194,14 +194,12 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     //分享歌曲到qq
     private void shareSongtoQQ() {
         Bundle bundle = new Bundle();
-        String album_url = MediaStoreUtil.getImageUrl(mInfo.getAlbumId() + "",Constants.URL_ALBUM);
-
         bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
         bundle.putString(QQShare.SHARE_TO_QQ_TITLE, mInfo.getTitle());
         bundle.putString(QQShare.SHARE_TO_QQ_SUMMARY, mInfo.getArtist());
 
         bundle.putString(QQShare.SHARE_TO_QQ_TARGET_URL, "http://music.baidu.com/" + "search?key=" + URLEncoder.encode(mInfo.getTitle()));
-        bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, album_url != null ? album_url : Uri.parse("res://remix.myplayer/" + R.drawable.album_empty_bg_day).toString());
+        bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, !TextUtils.isEmpty(mImageUrl) ? mImageUrl : Uri.parse("res://remix.myplayer/" + R.drawable.album_empty_bg_day).toString());
         bundle.putString(QQShare.SHARE_TO_QQ_APP_NAME, getResources().getString(R.string.app_name));
         mTencentApi.shareToQQ(ShareDialog.this, bundle, mQQListener);
     }

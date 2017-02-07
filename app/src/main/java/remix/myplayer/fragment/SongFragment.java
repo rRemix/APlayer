@@ -146,7 +146,7 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
         return  new CursorLoader(getActivity(),
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null,
-                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID(),
+                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
                 null,
                 SongAdapter.SORT + SongAdapter.ASCDESC);
     }

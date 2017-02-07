@@ -136,7 +136,7 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
                     new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,
                             MediaStore.Audio.Media.ALBUM,
                             MediaStore.Audio.Media.ARTIST},
-                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
+                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
                     null,
                     MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
         } catch (Exception e){

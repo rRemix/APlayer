@@ -567,6 +567,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if (!mIsRunning)
             return;
         mBottomBar.UpdateBottomStatus(mp3Item, isplay);
+//        if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
 //        mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ALLSONG_ADAPTER);
         updateHeader(mp3Item,isplay);
     }

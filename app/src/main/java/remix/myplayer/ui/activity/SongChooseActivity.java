@@ -101,7 +101,7 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
                 new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.ARTIST,
                         MediaStore.Audio.Media.ARTIST_ID, MediaStore.Audio.Media.TITLE,
                         MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.DISPLAY_NAME,MediaStore.Audio.Media.ALBUM_ID},
-                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getDeleteID(),null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
     }
 
     @Override

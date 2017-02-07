@@ -136,6 +136,7 @@ public class SongAdapter extends HeaderAdapter implements FastScrollRecyclerView
         final MP3Item currentMP3 = MusicService.getCurrentMP3();
         //判断该歌曲是否是正在播放的歌曲
         //如果是,高亮该歌曲，并显示动画
+//        if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
 //        if(currentMP3 != null){
 //            boolean highlight = temp.getId() == MusicService.getCurrentMP3().getId();
 //            holder.mName.setTextColor(highlight ?
@@ -169,6 +170,7 @@ public class SongAdapter extends HeaderAdapter implements FastScrollRecyclerView
             holder.mImage.setImageURI(Uri.EMPTY);
             new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(),Constants.URL_ALBUM);
 //            MediaStoreUtil.setImageUrl(holder.mImage,temp.getAlbumId());
+
             //背景点击效果
             holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 

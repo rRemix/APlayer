@@ -74,8 +74,6 @@ public class Constants {
     //获得专辑封面类型
     public final static int URL_ALBUM = 0;
     public final static int URL_ARTIST = 1;
-    public final static int URL_SONGID = 2;
-    public final static int URL_NAME = 3;
     public final static int URL_PLAYLIST = 4;
     public final static String ACTION_BUTTON = "ACTION_BUTTON";
     public final static int NOTIFY_PREV = 0;
