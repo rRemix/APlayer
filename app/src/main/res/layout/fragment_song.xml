@@ -14,7 +14,7 @@
             android:layout_height="@dimen/d1_size"
             android:background="?attr/divider_color"/>
 
-        <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+        <remix.myplayer.ui.customview.fastscroll.recyclerview_fastscroll.views.FastScrollRecyclerView
             android:id="@+id/recyclerview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

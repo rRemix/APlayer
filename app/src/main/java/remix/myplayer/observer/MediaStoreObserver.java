@@ -23,17 +23,19 @@ public class MediaStoreObserver extends ContentObserver {
         mHandler = handler;
     }
 
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
+            mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+        }
+    };
 
     @Override
     public void onChange(boolean selfChange, Uri uri) {
         if(!selfChange){
-            new Thread(){
-                @Override
-                public void run() {
-                    Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
-                    mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-                }
-            }.start();
+            mHandler.removeCallbacks(mRunnable);
+            mHandler.postDelayed(mRunnable,500);
         }
     }
 

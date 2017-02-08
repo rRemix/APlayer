@@ -17,14 +17,15 @@
             <android.support.design.widget.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/material_color_primary">
+                android:background="?attr/material_color_primary"
+                android:id="@+id/appbar">
                 <include layout="@layout/toolbar"/>
                 <include layout="@layout/toolbar_multi"/>
                 <android.support.design.widget.TabLayout
                     android:id="@+id/tabs"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/tab_height"
-                    style="@style/CustomTabLayout" />
+                    style="@style/CustomTabLayout.Dark"/>
             </android.support.design.widget.AppBarLayout>
 
             <!--中间四个fragment-->

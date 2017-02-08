@@ -209,29 +209,29 @@ public class MediaStoreUtil {
      * @param type 查询类型
      * @return 专辑url
      */
-    public static String getImageUrl(String arg,int type) {
-        if(arg == null || arg.equals(""))
+    public static String getImageUrl(int arg,int type) {
+        if(arg <= 0)
             return null;
-        //如果是专辑或者艺术家，先查找本地缓存
+        //先查找本地缓存
         if(type == Constants.URL_ARTIST || type == Constants.URL_ALBUM || type == Constants.URL_PLAYLIST ){
-            File img = type == Constants.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(arg) * 255 + ""))
-                    : type == Constants.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(arg) * 255 + ""))
-                    : new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(arg) * 255 + ""));
+            File img = type == Constants.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(arg * 255 + ""))
+                    : type == Constants.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(arg* 255 + ""))
+                    : new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(arg * 255 + ""));
             if(img.exists()){
                 return "file://" + img.getAbsolutePath();
             }
             //没有设置过封面，对于播放列表类型的查找播放列表下所有歌曲，直到有一首歌曲存在封面
             if(type == Constants.URL_PLAYLIST){
-                ArrayList<Integer> songIdList = PlayListUtil.getIDList(Integer.valueOf(arg));
+                ArrayList<Integer> songIdList = PlayListUtil.getIDList(arg);
                 for (Integer songId : songIdList){
                     MP3Item item = MediaStoreUtil.getMP3InfoById(songId);
                     if(item == null)
                         continue;
                     String imgUrl = getAlbumUrlByAlbumId(item.getAlbumId());
-                    if(imgUrl != null && !imgUrl.equals("")) {
+                    if(!TextUtils.isEmpty(imgUrl)) {
                         File playlistImgFile = new File(imgUrl);
                         if(playlistImgFile.exists()) {
-                            return playlistImgFile.getAbsolutePath();
+                            return "file://" + playlistImgFile.getAbsolutePath();
                         }
                     }
                 }

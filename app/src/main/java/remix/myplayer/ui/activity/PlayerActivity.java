@@ -919,7 +919,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         int accentColor = ThemeStore.getAccentColor();
         int tintColor = ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b);
 
-
         LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
         //修改progress颜色
         ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_efeeed : R.color.gray_343438));

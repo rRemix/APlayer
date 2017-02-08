@@ -42,6 +42,17 @@
         <attr name="eqtextcolor" format="color|reference"/>
     </declare-styleable>
 
+    <declare-styleable name="FastScrollRecyclerView">
+        <attr name="fastScrollThumbColor" format="reference|color" />
+        <attr name="fastScrollTrackColor" format="reference|color" />
+        <attr name="fastScrollPopupBgColor" format="reference|color" />
+        <attr name="fastScrollPopupTextColor" format="reference|color" />
+        <attr name="fastScrollPopupTextSize" format="reference|dimension" />
+        <attr name="fastScrollPopupBackgroundSize" format="reference|dimension" />
+        <attr name="fastScrollAutoHide" format="reference|boolean" />
+        <attr name="fastScrollAutoHideDelay" format="reference|integer" />
+    </declare-styleable>
+
     <attr name="text_color_primary" format="color|reference"/>
     <attr name="text_color" format="color|reference"/>
     <attr name="background_color_main" format="color|reference"/>
@@ -67,4 +78,7 @@
     <attr name="material_color_secondry" format="color|reference"/>
     <!--分割线-->
     <attr name="divider_color" format="color|reference"/>
+    <!--光标-->
+    <attr name="textCursor" format="reference"/>
+    <attr name="tab" format="reference"/>
 </resources>

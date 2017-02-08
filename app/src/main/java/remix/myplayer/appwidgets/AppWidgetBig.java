@@ -69,7 +69,7 @@ public class AppWidgetBig extends BaseAppwidget {
         //设置封面
         int size = DensityUtil.dip2px(context,110);
         final ImageRequest imageRequest =
-                ImageRequestBuilder.newBuilderWithSource(Uri.parse(MediaStoreUtil.getImageUrl(temp.getAlbumId() + "",Constants.URL_ALBUM)))
+                ImageRequestBuilder.newBuilderWithSource(Uri.parse(MediaStoreUtil.getImageUrl(temp.getAlbumId(),Constants.URL_ALBUM)))
                         .setResizeOptions(new ResizeOptions(size,size))
                         .build();
         DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);

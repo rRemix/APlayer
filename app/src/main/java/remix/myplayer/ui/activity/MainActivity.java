@@ -53,6 +53,7 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnModeChangeListener;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -267,7 +268,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         super.setUpToolbar(toolbar,"");
         mToolBar.setTitle("");
 
-        mToolBar.setNavigationIcon(R.drawable.actionbar_menu);
+        int themeColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white);
+        toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.actionbar_menu,themeColor));
         mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -383,12 +385,25 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     //初始化custontab
     private void setUpTab() {
         //添加tab选项卡
+        boolean isLightColor = ThemeStore.isLightTheme();
+//        mTablayout = new TabLayout(new ContextThemeWrapper(this, !ColorUtil.isColorLight(ThemeStore.getMaterialPrimaryColor()) ? R.style.CustomTabLayout_Light : R.style.CustomTabLayout_Dark));
+//        mTablayout = new TabLayout(new ContextThemeWrapper(this,R.style.CustomTabLayout_Light));
+//        mTablayout.setLayoutParams(new AppBarLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,DensityUtil.dip2px(this,48)));
+//        mTablayout = new TabLayout(this);
         mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_song)));
         mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_album)));
         mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_artist)));
         mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_playlist)));
         //viewpager与tablayout关联
         mTablayout.setupWithViewPager(mViewPager);
+        mTablayout.setSelectedTabIndicatorColor(ColorUtil.getColor(isLightColor ? R.color.black : R.color.white));
+        mTablayout.setSelectedTabIndicatorHeight(DensityUtil.dip2px(this,3));
+        mTablayout.setTabTextColors(ColorUtil.getColor(isLightColor ? R.color.dark_normal_tab_text_color : R.color.light_normal_tab_text_color),
+                ColorUtil.getColor(isLightColor ? R.color.black : R.color.white));
+
+//        AppBarLayout appBarLayout = findView(R.id.appbar);
+//        appBarLayout.addView(mTablayout);
+
     }
 
     /**
@@ -480,6 +495,20 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         //抽屉
         mHeadRoot.setBackgroundColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : ColorUtil.getColor(R.color.night_background_color_main));
         mNavigationView.setBackgroundColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.gray_343438));
+
+//        GradientDrawable bg = new GradientDrawable();
+//        bg.setColor(ThemeStore.getAccentColor());
+//        bg.setColor(ThemeStore.isDay() ?
+//                !ColorUtil.isColorLight(ThemeStore.getMaterialPrimaryColor()) ? ThemeStore.getMaterialPrimaryDarkColor() : ColorUtil.getColor(R.color.black)
+//                : ColorUtil.getColor(R.color.gray_343438));
+//        bg.setCornerRadius(DensityUtil.dip2px(this,4));
+//        mHeadText.setBackground(bg);
+//        mHeadText.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.white_e5e5e5));
+//        //抽屉
+//        mHeadRoot.setBackgroundColor(ThemeStore.isDay() ?
+//                ColorUtil.isColorLight(ThemeStore.getMaterialPrimaryColor()) ? ColorUtil.getColor(R.color.md_white_primary_dark) : ThemeStore.getMaterialPrimaryColor() :
+//                ColorUtil.getColor(R.color.night_background_color_main));
+//        mNavigationView.setBackgroundColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.gray_343438));
     }
 
     @Override

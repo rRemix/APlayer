@@ -30,6 +30,7 @@ public class ThemeStore {
     public static final int THEME_INDIGO = 106;
     public static final int THEME_PLUM = 107;
     public static final int THEME_BLUE = 108;
+    public static final int THEME_WHITE = 109;
 
     /** 当前主题颜色 */
     public static int THEME_COLOR = THEME_BLUE;
@@ -85,6 +86,8 @@ public class ThemeStore {
             case THEME_BLUE:
                 colorRes = R.color.md_blue_primary;
                 break;
+            case THEME_WHITE:
+                colorRes = R.color.md_white_primary;
         }
         return colorRes;
     }
@@ -127,6 +130,8 @@ public class ThemeStore {
             case THEME_BLUE:
                 colorRes = R.color.md_blue_primary_dark;
                 break;
+            case THEME_WHITE:
+                colorRes = R.color.md_white_primary_dark;
         }
         return colorRes;
     }
@@ -165,7 +170,7 @@ public class ThemeStore {
 
     @ColorInt
     public static int getAccentColor(){
-        return ColorUtil.getColor(isDay() ? getMaterialPrimaryColorRes() : R.color.purple_555393);
+        return ColorUtil.getColor(isDay() ? (THEME_COLOR != THEME_WHITE ? getMaterialPrimaryColorRes() : R.color.black) : R.color.purple_555393);
     }
 
     @ColorInt
@@ -236,5 +241,10 @@ public class ThemeStore {
 
     public static com.afollestad.materialdialogs.Theme getMDDialogTheme(){
         return isDay() ? com.afollestad.materialdialogs.Theme.LIGHT : com.afollestad.materialdialogs.Theme.DARK;
+    }
+
+    public static boolean isLightTheme(){
+//        return THEME_COLOR == THEME_WHITE;
+        return ColorUtil.isColorLight(getMaterialPrimaryColor());
     }
 }

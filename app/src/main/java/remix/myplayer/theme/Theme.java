@@ -47,6 +47,9 @@ public class Theme {
         return thumbDrawable;
     }
 
+    public static Drawable TintDrawable(@DrawableRes int DrawRes,@ColorInt int color){
+        return TintDrawable(APlayerApplication.getContext().getResources().getDrawable(DrawRes),color,1.0f);
+    }
 
     /**
      * 为drawable着色

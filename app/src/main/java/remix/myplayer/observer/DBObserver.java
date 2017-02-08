@@ -17,6 +17,7 @@ public class DBObserver extends ContentObserver {
     private static OnChangeListener mPlayListListener;
     private static OnChangeListener mPlayListSongListener;
     private Handler mHandler;
+    private int mMatch;
     /**
      * Creates a content observer.
      *
@@ -27,33 +28,37 @@ public class DBObserver extends ContentObserver {
         mHandler = handler;
     }
 
+    private Runnable mRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            switch (mMatch){
+                //更新播放列表
+                case DBContentProvider.PLAY_LIST_MULTIPLE:
+                case DBContentProvider.PLAY_LIST_SINGLE:
+                    Global.PlayList = PlayListUtil.getAllPlayListInfo();
+                    if(mPlayListListener != null)
+                        mPlayListListener.OnChange();
+                    break;
+                //更新播放队列
+                case DBContentProvider.PLAY_LIST_SONG_MULTIPLE:
+                case DBContentProvider.PLAY_LIST_SONG_SINGLE:
+                    Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
+                    if(mPlayListSongListener != null)
+                        mPlayListSongListener.OnChange();
+                    break;
+            }
+            mHandler.sendEmptyMessage(Constants.UPDATE_CHILDHOLDER_ADAPTER);
+        }
+    };
 
     @Override
     public void onChange(boolean selfChange, final Uri uri) {
-
         if(!selfChange){
-            new Thread(){
-                @Override
-                public void run() {
-                    switch (DBContentProvider.mUriMatcher.match(uri)){
-                        //更新播放列表
-                        case DBContentProvider.PLAY_LIST_MULTIPLE:
-                        case DBContentProvider.PLAY_LIST_SINGLE:
-                            Global.PlayList = PlayListUtil.getAllPlayListInfo();
-                            if(mPlayListListener != null)
-                                mPlayListListener.OnChange();
-                            break;
-                        //更新播放队列
-                        case DBContentProvider.PLAY_LIST_SONG_MULTIPLE:
-                        case DBContentProvider.PLAY_LIST_SONG_SINGLE:
-                            Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
-                            if(mPlayListSongListener != null)
-                                mPlayListSongListener.OnChange();
-                            break;
-                    }
-                    mHandler.sendEmptyMessage(Constants.UPDATE_CHILDHOLDER_ADAPTER);
-                }
-            }.start();
+            mMatch = DBContentProvider.mUriMatcher.match(uri);
+            mHandler.removeCallbacks(mRunnable);
+            mHandler.postDelayed(mRunnable,500);
+
         }
     }
 

@@ -24,9 +24,12 @@ import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
+import remix.myplayer.ui.customview.fastscroll.recyclerview_fastscroll.views.FastScrollRecyclerView;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -44,7 +47,7 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
     public static int mPlayListSongCountIndex;
 
     @BindView(R.id.playlist_recycleview)
-    RecyclerView mRecyclerView;
+    FastScrollRecyclerView mRecyclerView;
 
     private static int LOADER_ID = 0;
     private MultiChoice mMultiChoice;
@@ -101,6 +104,10 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
         int model = SPUtil.getValue(getActivity(),"Setting","PlayListModel",Constants.GRID_MODEL);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+        mRecyclerView.setPopupTextColor(ThemeStore.isLightTheme()
+                ? ColorUtil.getColor(R.color.white)
+                : ThemeStore.getTextColorPrimary());
+        mRecyclerView.setAdapter(mAdapter);
 
         return rootView;
     }
@@ -152,7 +159,6 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
             mPlayListIDIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns._ID);
             mPlayListNameIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns.NAME);
             mPlayListSongCountIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns.COUNT);
-            mRecyclerView.setAdapter(mAdapter);
             mAdapter.setCursor(mCursor);
         } catch (Exception e){
             e.printStackTrace();

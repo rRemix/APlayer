@@ -37,6 +37,8 @@
     <color name="night_background_grid_color">#171719</color>
     <!--<color name="night_selected_color">@color/default_control_highlight</color>-->
 
+    <!--桌面部件背景色-->
+    <color name="widget_bg_color">#f9f9f9</color>
     <!--默认textview颜色-->
     <color name="default_textview_color">#727273</color>
     <!-- 抽屉ListView背景颜色-->
@@ -51,10 +53,6 @@
     <color name="gray_8d8c8e">#8d8c8e</color>
     <!--黑色字体-->
     <color name="black_1b1a1c">#1b1a1c</color>
-    <!-- 歌曲库标题选中与未选中-->
-    <!-- 定时器背景色-->
-    <!--光标颜色(灰))-->
-    <!--光标颜色(紫)-->
     <color name="black_1c1b19">#1c1b19</color>
     <color name="black_737373">#737373</color>
     <color name="gray_34353a">#34353a</color>
@@ -86,7 +84,8 @@
     <color name="white_e5e5e5">#e5e5e5</color>
     <color name="gray_6b6b6b">#6b6b6b</color>
     <color name="gray_343438">#343438</color>
-    <color name="normal_tab_text_color">#99ffffff</color>
+    <color name="light_normal_tab_text_color">#99ffffff</color>
+    <color name="dark_normal_tab_text_color">@color/night_textcolor</color>
     <color name="search_hint_text_color">#33ffffff</color>
 
     <!--<color name="lrc_normal_day">#e8e8e8</color>-->
@@ -155,4 +154,6 @@
     <color name="md_blue_primary">#698CF6</color>
     <color name="md_blue_primary_dark">#5C7EE4</color>
 
+    <color name="md_white_primary">#fefefe</color>
+    <color name="md_white_primary_dark">#e5e5e5</color>
 </resources>

@@ -34,7 +34,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_margin="@dimen/d14_size"
                     android:textSize="@dimen/s16_size"
-                    android:textColor="?attr/material_color_secondry" />
+                    android:textColor="?attr/colorAccent" />
                 <RelativeLayout
                     android:id="@+id/setting_filter_container"
                     android:layout_width="match_parent"
@@ -212,7 +212,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_margin="@dimen/d14_size"
                     android:textSize="@dimen/s16_size"
-                    android:textColor="?attr/material_color_secondry"/>
+                    android:textColor="?attr/colorAccent"/>
                 <RelativeLayout
                     android:id="@+id/setting_lrc_priority_container"
                     android:layout_width="match_parent"
@@ -309,7 +309,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_margin="@dimen/d14_size"
                     android:textSize="@dimen/s16_size"
-                    android:textColor="?attr/material_color_secondry" />
+                    android:textColor="?attr/colorAccent" />
                 <RelativeLayout
                     android:id="@+id/setting_color_container"
                     android:layout_width="match_parent"
@@ -401,7 +401,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_margin="@dimen/d14_size"
                     android:textSize="@dimen/s16_size"
-                    android:textColor="?attr/material_color_secondry" />
+                    android:textColor="?attr/colorAccent" />
                 <RelativeLayout
                     android:id="@+id/setting_eq_container"
                     android:layout_width="match_parent"

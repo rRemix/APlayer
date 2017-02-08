@@ -29,7 +29,7 @@
             android:gravity="left|top"
             android:textSize="@dimen/s16_size"
             android:textColor="@color/drawer_list_color"
-            android:textCursorDrawable="@drawable/bg_cursor_white"
+            android:textCursorDrawable="@drawable/bg_cursor_light"
             android:padding="@dimen/d4_size"
             android:layout_width="match_parent"
             android:layout_height="@dimen/d180_size"
@@ -51,7 +51,7 @@
             android:textColor="@color/drawer_list_color"
             android:hint="@string/feedback_contact_hint"
             android:textColorHint="@color/drawer_list_color"
-            android:textCursorDrawable="@drawable/bg_cursor_white"
+            android:textCursorDrawable="@drawable/bg_cursor_light"
             android:padding="@dimen/d4_size"/>
 
         <Button

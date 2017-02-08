@@ -42,6 +42,7 @@
         <item name="text_color">@color/night_textcolor</item>
         <item name="colorControlHighlight">@color/night_ripple_color</item>
         <item name="divider_color">@color/night_list_divier</item>
+        <item name="actionBarTabStyle">@style/CustomTabLayout.Dark</item>
     </style>
 
 
@@ -70,15 +71,27 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
-    <style name="CustomTabLayout" parent="Widget.Design.TabLayout">
+    <style name="CustomTabLayout.Light" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorColor">@color/white</item>
         <item name="tabIndicatorHeight">3dp</item>
-        <item name="tabTextAppearance">@style/CustomTabTextAppearance</item>
+        <item name="tabTextAppearance">@style/CustomTabTextAppearance.Light</item>
         <item name="tabSelectedTextColor">@color/white</item>
     </style>
-    <style name="CustomTabTextAppearance" parent="TextAppearance.Design.Tab">
+    <style name="CustomTabLayout.Dark" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorColor">@color/black</item>
+        <item name="tabIndicatorHeight">3dp</item>
+        <item name="tabTextAppearance">@style/CustomTabTextAppearance.Dark</item>
+        <item name="tabSelectedTextColor">@color/black</item>
+    </style>
+
+    <style name="CustomTabTextAppearance.Light" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">@dimen/s16_size</item>
-        <item name="android:textColor">@color/normal_tab_text_color</item>
+        <item name="android:textColor">@color/light_normal_tab_text_color</item>
+        <item name="textAllCaps">true</item>
+    </style>
+    <style name="CustomTabTextAppearance.Dark" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">@dimen/s16_size</item>
+        <item name="android:textColor">@color/dark_normal_tab_text_color</item>
         <item name="textAllCaps">true</item>
     </style>
 
@@ -153,7 +166,8 @@
         <item name="ripple_color">@color/day_ripple_color</item>
         <item name="divider_color">@color/day_list_divider</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Light</item>
-        <item name="android:windowAnimationStyle">@style/AnimActivity</item>
+        <item name="textCursor">@drawable/bg_cursor_light</item>
+        <item name="android:tabWidgetStyle">@style/CustomTabLayout.Light</item>
     </style>
 
 
@@ -180,11 +194,12 @@
         <item name="divider_color">@color/night_list_divier</item>
         <item name="stress_color">@color/purple_555393</item>
         <item name="android:popupMenuStyle">@style/Base.ThemeOverlay.AppCompat.Dark</item>
-        <item name="android:windowAnimationStyle">@style/AnimActivity</item>
         <item name="android:textColor">@color/purple_555393</item>
         <item name="colorControlActivated">@color/purple_555393</item>
         <item name="colorAccent">@color/purple_555393</item>
         <item name="colorControlHighlight">@color/night_ripple_color</item>
+        <item name="textCursor">@drawable/bg_cursor_light</item>
+        <item name="android:tabWidgetStyle">@style/CustomTabLayout.Light</item>
     </style>
 
     <style name="TimerDialogNightTheme" parent="NightTheme">
@@ -299,4 +314,17 @@
         <item name="android:textColor">@color/md_blue_primary</item>
     </style>
 
+    <style name="DayTheme.White" parent="@style/DayTheme">
+        <item name="material_color_primary">@color/md_white_primary</item>
+        <item name="material_color_secondry">@color/md_white_primary</item>
+        <item name="material_color_primary_dark">@color/md_white_primary_dark</item>
+        <item name="stress_color">@color/md_white_primary</item>
+        <item name="colorPrimary">@color/md_white_primary</item>
+        <item name="colorPrimaryDark">@color/md_white_primary_dark</item>
+        <item name="colorControlActivated">@color/black</item>
+        <item name="colorAccent">@color/black</item>
+        <item name="android:textColor">@color/day_textcolor_primary</item>
+        <item name="textCursor">@drawable/bg_cursor_dark</item>
+        <item name="android:tabWidgetStyle">@style/CustomTabLayout.Dark</item>
+    </style>
 </resources>

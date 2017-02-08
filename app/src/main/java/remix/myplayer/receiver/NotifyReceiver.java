@@ -94,7 +94,7 @@ public class NotifyReceiver extends BroadcastReceiver {
             //设置封面
             int size = DensityUtil.dip2px(context,120);
             ImageRequest imageRequest =
-                    ImageRequestBuilder.newBuilderWithSource(Uri.parse(MediaStoreUtil.getImageUrl(temp.getAlbumId() + "",Constants.URL_ALBUM)))
+                    ImageRequestBuilder.newBuilderWithSource(Uri.parse(MediaStoreUtil.getImageUrl(temp.getAlbumId(),Constants.URL_ALBUM)))
                     .setResizeOptions(new ResizeOptions(size,size))
                     .setProgressiveRenderingEnabled(true)
                     .build();

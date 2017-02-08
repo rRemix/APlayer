@@ -16,8 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
@@ -25,9 +23,12 @@ import remix.myplayer.adapter.AlbumAdater;
 import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
+import remix.myplayer.ui.customview.fastscroll.recyclerview_fastscroll.views.FastScrollRecyclerView;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
@@ -116,7 +117,10 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
         int model = SPUtil.getValue(getActivity(),"Setting","AlbumModel",Constants.GRID_MODEL);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(model == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setPopupTextColor(ThemeStore.isLightTheme()
+                ? ColorUtil.getColor(R.color.white)
+                : ThemeStore.getTextColorPrimary());
         return rootView;
     }
 
@@ -156,7 +160,7 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
             mAlbumIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
             mAlbumIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
             mArtistIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            mRecyclerView.setAdapter(mAdapter);
+
             mAdapter.setCursor(mCursor);
         } catch (Exception e){
             e.printStackTrace();

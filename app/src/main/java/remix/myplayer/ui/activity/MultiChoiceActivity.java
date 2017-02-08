@@ -19,10 +19,12 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
+import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.customview.TipPopupwindow;
 import remix.myplayer.ui.dialog.TimerDialog;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 
@@ -51,7 +53,6 @@ public class MultiChoiceActivity extends ToolbarActivity {
             @Override
             public void onUpdate(boolean multiShow) {
                 mMultiChoice.setShowing(multiShow);
-
                 mToolBar.setVisibility(multiShow ? View.GONE : View.VISIBLE);
                 mMultiToolBar.setVisibility(multiShow ? View.VISIBLE : View.GONE);
                 //清空
@@ -83,6 +84,7 @@ public class MultiChoiceActivity extends ToolbarActivity {
     @Override
     protected void setUpToolbar(Toolbar toolbar, String title) {
         super.setUpToolbar(toolbar,title);
+
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -102,7 +104,14 @@ public class MultiChoiceActivity extends ToolbarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.toolbar_menu,menu);
+        //主题颜色
+        int themeColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white);
+        for(int i = 0 ; i < menu.size();i++){
+            MenuItem menuItem = menu.getItem(i);
+            menuItem.setIcon(Theme.TintDrawable(menuItem.getIcon(),themeColor));
+        }
         return true;
     }
 

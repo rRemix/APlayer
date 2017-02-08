@@ -554,9 +554,9 @@ public class MusicService extends BaseService implements Playback {
                     || control == Constants.TOGGLE || control == Constants.PAUSE || control == Constants.START){
                 if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
                     return;
-                if(CommonUtil.isFastDoubleClick()) {
-                    return;
-                }
+//                if(CommonUtil.isFastDoubleClick()) {
+//                    return;
+//                }
             }
             LogUtil.e("AppWidget","control---:" + control);
 

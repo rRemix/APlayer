@@ -12,7 +12,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,9 +23,12 @@ import remix.myplayer.adapter.ArtistAdapter;
 import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
+import remix.myplayer.ui.customview.fastscroll.recyclerview_fastscroll.views.FastScrollRecyclerView;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
@@ -40,7 +42,7 @@ import remix.myplayer.util.SPUtil;
  */
 public class ArtistFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback{
     @BindView(R.id.artist_recycleview)
-    RecyclerView mRecyclerView;
+    FastScrollRecyclerView mRecyclerView;
     private MultiChoice mMultiChoice;
     //艺术家与艺术家id的索引
     public static int mArtistIdIndex = -1;
@@ -109,6 +111,10 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
         int model = SPUtil.getValue(getActivity(),"Setting","ArtistModel",Constants.GRID_MODEL);
         mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setPopupTextColor(ThemeStore.isLightTheme()
+                ? ColorUtil.getColor(R.color.white)
+                : ThemeStore.getTextColorPrimary());
+        mRecyclerView.setAdapter(mAdapter);
         return rootView;
     }
 
@@ -144,7 +150,7 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
             //设置查询索引
             mArtistIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
             mArtistIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            mRecyclerView.setAdapter(mAdapter);
+
             mAdapter.setCursor(mCursor);
         } catch (Exception e){
             e.printStackTrace();

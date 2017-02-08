@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.ui.customview.fastscroll.recyclerview_fastscroll.views.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;

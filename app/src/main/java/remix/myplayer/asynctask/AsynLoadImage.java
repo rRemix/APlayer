@@ -26,7 +26,7 @@ public class AsynLoadImage extends AsyncTask<Object,Integer,String> {
      */
     @Override
     protected String doInBackground(Object... params) {
-        return MediaStoreUtil.getImageUrl(params[0].toString(), (int)params[1]);
+        return MediaStoreUtil.getImageUrl((Integer) params[0], (int)params[1]);
     }
 
     @Override

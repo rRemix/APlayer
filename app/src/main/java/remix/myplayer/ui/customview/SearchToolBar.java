@@ -1,7 +1,6 @@
 package remix.myplayer.ui.customview;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -12,6 +11,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import remix.myplayer.R;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 
 /**
  * Created by taeja on 16-2-29.
@@ -40,9 +41,15 @@ public class SearchToolBar extends Toolbar {
     }
 
     private void init(){
+
         mEditText = (EditText)findViewById(R.id.search_input);
         //设置EditText光标与下划线颜色
-        mEditText.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        mEditText.getBackground().setColorFilter(
+                ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white),
+                PorterDuff.Mode.SRC_ATOP);
+        mEditText.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+        mEditText.setHintTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor : R.color.search_hint_text_color));
+
 //        //弹出键盘
 //        new Handler().postDelayed(new Runnable() {
 //            @Override

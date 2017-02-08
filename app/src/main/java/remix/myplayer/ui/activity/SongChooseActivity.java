@@ -17,6 +17,8 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongChooseAdaper;
 import remix.myplayer.interfaces.OnSongChooseListener;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -62,6 +64,9 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
         }
         mPlayListName = getIntent().getStringExtra("PlayListName");
 
+        TextView cancel = findView(R.id.cancel);
+        cancel.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+        mConfirm.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
         mAdapter = new SongChooseAdaper(this, new OnSongChooseListener() {
             @Override
             public void OnSongChoose(boolean isValid) {
