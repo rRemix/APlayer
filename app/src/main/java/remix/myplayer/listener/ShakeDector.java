@@ -8,7 +8,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 
-import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.util.Constants;
 
 /**
@@ -18,10 +17,10 @@ import remix.myplayer.util.Constants;
  * @Date 2017/1/22 10:27
  */
 
-public class ShakeDector {
+public class ShakeDector implements SensorEventListener{
     private SensorManager mSensorManager;
+    private Sensor mSensor;
     private Context mContext;
-    private SensorListener mSensorListener;
     private static final int UPTATE_INTERVAL_TIME = 50;
     private static final int SPEED_THRESHOLD = 30;
 
@@ -30,8 +29,16 @@ public class ShakeDector {
     private float mLastY;
     private float mLastZ;
     //每500ms最多响应一次操作
-    private boolean mHasMessage = false;
-
+    private final int TIME_DELAY = 500;
+    private boolean mDetect = false;
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Intent intent = new Intent(Constants.CTL_ACTION);
+            intent.putExtra("Control", Constants.NEXT);
+            mContext.sendBroadcast(intent);
+        }
+    };
     private static ShakeDector mInstance;
     private ShakeDector(Context context){
         mContext = context;
@@ -45,54 +52,50 @@ public class ShakeDector {
     }
 
     public void beginListen(){
+        mDetect = true;
         if(mSensorManager == null)
-            mSensorManager = (SensorManager) APlayerApplication.getContext().getSystemService(Context.SENSOR_SERVICE);
-        if(mSensorListener == null)
-            mSensorListener = new SensorListener();
-        mSensorManager.registerListener(mSensorListener,mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),SensorManager.SENSOR_DELAY_NORMAL);
+            mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+        if(mSensor == null)
+            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorManager.registerListener(this,mSensor,SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     public void stopListen(){
-        if(mSensorManager != null && mSensorListener != null)
-            mSensorManager.unregisterListener(mSensorListener);
+        mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+        mDetect = false;
+        mSensorManager.unregisterListener(this,mSensor);
     }
 
-    private class SensorListener implements SensorEventListener{
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            long currentUpdateTime = System.currentTimeMillis();
-            long timeInterval = currentUpdateTime - mLastUpdateTime;
-            if (timeInterval < UPTATE_INTERVAL_TIME) {
-                return;
-            }
-            mLastUpdateTime = currentUpdateTime;
-            // 计算传感器差值
-            float[] values = event.values;
-            float x = values[0];
-            float y = values[1];
-            float z = values[2];
-            float deltaX = x - mLastX;
-            float deltaY = y - mLastY;
-            float deltaZ = z - mLastZ;
-            double speed = (Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / timeInterval) * 100;
-            if(speed > SPEED_THRESHOLD && !mHasMessage){
-                mHasMessage = true;
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(Constants.CTL_ACTION);
-                        intent.putExtra("Control", Constants.NEXT);
-                        mContext.sendBroadcast(intent);
-                        mHasMessage = false;
-                    }
-                },500);
-            }
-            mLastX = x;
-            mLastY = y;
-            mLastZ = z;
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if(!mDetect)
+            return;
+        long currentUpdateTime = System.currentTimeMillis();
+        long timeInterval = currentUpdateTime - mLastUpdateTime;
+        if (timeInterval < UPTATE_INTERVAL_TIME) {
+            return;
         }
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        mLastUpdateTime = currentUpdateTime;
+        // 计算传感器差值
+        float[] values = event.values;
+        float x = values[0];
+        float y = values[1];
+        float z = values[2];
+        float deltaX = x - mLastX;
+        float deltaY = y - mLastY;
+        float deltaZ = z - mLastZ;
+        double speed = (Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / timeInterval) * 100;
+        if(speed > SPEED_THRESHOLD ){
+            new Handler().removeCallbacks(mRunnable);
+            new Handler().postDelayed(mRunnable,TIME_DELAY);
         }
+        mLastX = x;
+        mLastY = y;
+        mLastZ = z;
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }

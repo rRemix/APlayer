@@ -113,9 +113,9 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 
         //以当前时间创建log文件
         File file = new File(PATH + time + FILE_NAME_SUFFIX);
-
+        PrintWriter pw = null;
         try {
-            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+            pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
             //导出发生异常的时间
             pw.println(time);
             //导出手机信息
@@ -127,6 +127,10 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             pw.close();
         } catch (Exception e) {
             Log.e(TAG, "dump crash info failed");
+        } finally {
+            if(pw != null){
+                pw.close();
+            }
         }
     }
 

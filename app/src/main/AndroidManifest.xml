@@ -199,11 +199,11 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receiver.NotifyReceiver">
-            <intent-filter>
-                <action android:name="remix.music.NOTIFY" />
-            </intent-filter>
-        </receiver>
+        <!--<receiver android:name=".receiver.NotifyReceiver">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="remix.music.NOTIFY" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
         <receiver android:name=".receiver.ExitReceiver">
             <intent-filter>
                 <action android:name="remix.music.EXIT" />

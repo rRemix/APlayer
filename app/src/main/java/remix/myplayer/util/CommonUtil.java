@@ -642,10 +642,10 @@ public class CommonUtil {
                     return true;
                 }
                 //判断是否包含歌手名和歌曲名
-                if(fileName.contains(title) || fileName.contains(title.toUpperCase())
-                        && (fileName.contains(artist) || fileName.contains(artist.toUpperCase()))){
-                    return true;
-                }
+//                if(fileName.contains(title) || fileName.contains(title.toUpperCase())
+//                        && (fileName.contains(artist) || fileName.contains(artist.toUpperCase()))){
+//                    return true;
+//                }
                 if(fileName.toUpperCase().contains(title.toUpperCase()) && fileName.toUpperCase().contains(artist.toUpperCase())){
                     return true;
                 }

@@ -159,7 +159,7 @@ public class NotifyReceiver extends BroadcastReceiver {
         buildNotitication(context);
         if(mNotificationManager == null)
             mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(0, mNotification);
+        mNotificationManager.notify(MusicService.NOTIFICATION_ID, mNotification);
         Global.setNotifyShowing(true);
     }
 
