@@ -23,12 +23,10 @@ import remix.myplayer.adapter.AlbumAdater;
 import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
-import remix.myplayer.ui.customview.fastscroll.recyclerview_fastscroll.views.FastScrollRecyclerView;
-import remix.myplayer.util.ColorUtil;
+import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
@@ -118,9 +116,7 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(model == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setPopupTextColor(ThemeStore.isLightTheme()
-                ? ColorUtil.getColor(R.color.white)
-                : ThemeStore.getTextColorPrimary());
+
         return rootView;
     }
 

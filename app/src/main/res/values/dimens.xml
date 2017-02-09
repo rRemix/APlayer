@@ -82,6 +82,14 @@
     <dimen name="appwidget_small_button_height">48dp</dimen>
     <dimen name="appwidget_big_button_height">60dp</dimen>
 
-    <dimen name="fastScrollPopupSize">56dp</dimen>
-    <dimen name="fastScrollPopupTextSize">16sp</dimen>
+
+    <dimen name="fastscroll_bubble_radius">44dp</dimen>
+    <dimen name="fastscroll_bubble_size">70dp</dimen>
+    <dimen name="fastscroll_bubble_textsize">30sp</dimen>
+
+    <dimen name="fastscroll_handle_height">40dp</dimen>
+    <dimen name="fastscroll_handle_width">4dp</dimen>
+    <dimen name="fastscroll_handle_radius">2dp</dimen>
+    <dimen name="fastscroll_track_width">1dp</dimen>
+    <dimen name="fastscroll_scrollbar_padding">8dp</dimen>
 </resources>

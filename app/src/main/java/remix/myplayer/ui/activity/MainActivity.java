@@ -4,6 +4,7 @@ package remix.myplayer.ui.activity;
 import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -487,11 +488,14 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private void setUpViewColor() {
         //正在播放文字的背景
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(ThemeStore.getAccentColor());
-        bg.setColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryDarkColor() : ColorUtil.getColor(R.color.gray_343438));
+        bg.setColor(ThemeStore.isDay() ?
+                ThemeStore.isLightTheme() ? Color.TRANSPARENT : ThemeStore.getMaterialPrimaryDarkColor() :
+                ColorUtil.getColor(R.color.gray_343438));
         bg.setCornerRadius(DensityUtil.dip2px(this,4));
         mHeadText.setBackground(bg);
-        mHeadText.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.white_e5e5e5));
+        mHeadText.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ?
+                ThemeStore.isLightTheme() ? R.color.black : R.color.white :
+                R.color.white_e5e5e5));
         //抽屉
         mHeadRoot.setBackgroundColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : ColorUtil.getColor(R.color.night_background_color_main));
         mNavigationView.setBackgroundColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.gray_343438));

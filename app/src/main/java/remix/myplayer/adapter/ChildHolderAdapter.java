@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +28,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.customview.ColumnView;
-import remix.myplayer.ui.customview.fastscroll.recyclerview_fastscroll.views.FastScrollRecyclerView;
+import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -42,7 +41,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * Created by taeja on 16-6-24.
  */
-public class ChildHolderAdapter extends HeaderAdapter implements FastScrollRecyclerView.SectionedAdapter{
+public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.SectionIndexer{
     //升序
     public static final int ASC = 0;
     //降序
@@ -265,9 +264,8 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScrollRecyc
         }
     }
 
-    @NonNull
     @Override
-    public String getSectionName(int position) {
+    public String getSectionText(int position) {
         if(position == 0)
             return "";
         if(mInfoList != null && mInfoList.size() > 0 && position < mInfoList.size() && mInfoList.get(position - 1) != null){

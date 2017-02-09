@@ -24,12 +24,10 @@ import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
-import remix.myplayer.ui.customview.fastscroll.recyclerview_fastscroll.views.FastScrollRecyclerView;
-import remix.myplayer.util.ColorUtil;
+import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -104,9 +102,6 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
         int model = SPUtil.getValue(getActivity(),"Setting","PlayListModel",Constants.GRID_MODEL);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
-        mRecyclerView.setPopupTextColor(ThemeStore.isLightTheme()
-                ? ColorUtil.getColor(R.color.white)
-                : ThemeStore.getTextColorPrimary());
         mRecyclerView.setAdapter(mAdapter);
 
         return rootView;

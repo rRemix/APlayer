@@ -10,7 +10,6 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.umeng.analytics.MobclickAgent;
@@ -27,6 +26,7 @@ import remix.myplayer.helper.DeleteHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.MP3Item;
+import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -47,7 +47,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
 
     private SongAdapter mAdapter;
     @BindView(R.id.recyclerview)
-    RecyclerView mRecyclerView;
+    FastScrollRecyclerView mRecyclerView;
     private Cursor mCursor;
     private ArrayList<Integer> mIdList = new ArrayList<>();
 
@@ -73,9 +73,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
         setContentView(R.layout.activity_recently);
         ButterKnife.bind(this);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
         mAdapter = new SongAdapter(this, mCursor,mMultiChoice,SongAdapter.RECENTLY);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
@@ -98,6 +95,10 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG,Constants.SONG);
             }
         });
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(mAdapter);
 
         DeleteHelper.addCallback(this);
         getLoaderManager().initLoader(++LOADER_ID, null, this);
@@ -156,7 +157,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
         //查询完毕后保存结果，并设置查询索引
         mCursor = data;
         mIdList = MediaStoreUtil.getSongIdListByCursor(mCursor);
-        mRecyclerView.setAdapter(mAdapter);
         mAdapter.setCursor(mCursor);
     }
 

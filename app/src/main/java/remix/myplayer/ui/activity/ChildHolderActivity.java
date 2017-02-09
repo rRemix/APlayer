@@ -28,7 +28,9 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.customview.fastscroll.recyclerview_fastscroll.views.FastScrollRecyclerView;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -150,6 +152,9 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setBubbleTextColor(ThemeStore.isLightTheme()
+                ? ColorUtil.getColor(R.color.white)
+                : ThemeStore.getTextColorPrimary());
 
         //歌曲数目与标题
         if(mType != Constants.FOLDER) {

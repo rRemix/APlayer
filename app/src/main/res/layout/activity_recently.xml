@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <android.support.design.widget.AppBarLayout
@@ -16,11 +18,18 @@
         android:layout_height="@dimen/d1_size"
         android:background="?attr/divider_color"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview"
-        android:background="?attr/background_color_3"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical"/>
+        android:layout_height="match_parent">
+        <remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView
+            android:id="@+id/recyclerview"
+            android:background="?attr/background_color_3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:bubbleColor="?attr/colorAccent"
+            app:handleColor="?attr/colorAccent"
+            app:hideScrollbar="true"
+            app:showTrack="true"/>
+    </RelativeLayout>
 
 </LinearLayout>

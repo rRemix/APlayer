@@ -43,14 +43,12 @@
     </declare-styleable>
 
     <declare-styleable name="FastScrollRecyclerView">
-        <attr name="fastScrollThumbColor" format="reference|color" />
-        <attr name="fastScrollTrackColor" format="reference|color" />
-        <attr name="fastScrollPopupBgColor" format="reference|color" />
-        <attr name="fastScrollPopupTextColor" format="reference|color" />
-        <attr name="fastScrollPopupTextSize" format="reference|dimension" />
-        <attr name="fastScrollPopupBackgroundSize" format="reference|dimension" />
-        <attr name="fastScrollAutoHide" format="reference|boolean" />
-        <attr name="fastScrollAutoHideDelay" format="reference|integer" />
+        <attr name="hideScrollbar" format="boolean" />
+        <attr name="showTrack" format="boolean" />
+        <attr name="trackColor" format="color|reference" />
+        <attr name="handleColor" format="color|reference" />
+        <attr name="bubbleColor" format="color|reference" />
+        <attr name="bubbleTextColor" format="color|reference" />
     </declare-styleable>
 
     <attr name="text_color_primary" format="color|reference"/>

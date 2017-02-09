@@ -608,8 +608,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser)
-                    mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ONLY);
+//                if(fromUser)
+                mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ONLY);
                 if(mLrcView != null)
                     mLrcView.seekTo(progress,true,fromUser);
             }
@@ -620,9 +620,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 //没有播放拖动进度条无效
-                if(!mIsPlay){
-                    seekBar.setProgress(0);
-                }
+//                if(!mIsPlay){
+//                    seekBar.setProgress(0);
+//                }
                 MusicService.setProgress(seekBar.getProgress());
                 mIsDragSeekBar = false;
             }

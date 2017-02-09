@@ -8,7 +8,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -36,7 +35,7 @@ import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.customview.fastscroll.recyclerview_fastscroll.views.FastScrollRecyclerView;
+import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -52,7 +51,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 专辑界面的适配器
  */
-public class AlbumAdater extends HeaderAdapter implements FastScrollRecyclerView.SectionedAdapter {
+public class AlbumAdater extends HeaderAdapter implements FastScroller.SectionIndexer {
     public AlbumAdater(Cursor cursor, Context context,MultiChoice multiChoice) {
         super(context,cursor,multiChoice);
         ListModel =  SPUtil.getValue(context,"Setting","AlbumModel",Constants.GRID_MODEL);
@@ -211,9 +210,8 @@ public class AlbumAdater extends HeaderAdapter implements FastScrollRecyclerView
         SPUtil.putValue(mContext,"Setting","AlbumModel",ListModel);
     }
 
-    @NonNull
     @Override
-    public String getSectionName(int position) {
+    public String getSectionText(int position) {
         if(position == 0)
             return "";
         if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position - 1)){

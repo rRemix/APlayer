@@ -314,6 +314,10 @@ public class MusicService extends BaseService implements Playback {
         mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
+                if(mFirstFlag){
+                    mFirstFlag = false;
+                    return;
+                }
                 play();
             }
         });
@@ -354,10 +358,12 @@ public class MusicService extends BaseService implements Playback {
         try {
             if(mMediaPlayer == null) {
                 mMediaPlayer = new MediaPlayer();
-                mMediaPlayer.setDataSource(mCurrentInfo.getUrl());
             }
+            mMediaPlayer.setDataSource(mCurrentInfo.getUrl());
+            mMediaPlayer.prepareAsync();
         } catch (IOException e) {
             LogUtil.e("AppWidget","initDataSourceError:" + e);
+            mFirstFlag = false;
             e.printStackTrace();
         }
         //初始化下一首歌曲
@@ -396,10 +402,10 @@ public class MusicService extends BaseService implements Playback {
         getContentResolver().unregisterContentObserver(mPlayListObserver);
         getContentResolver().unregisterContentObserver(mPlayListSongObserver);
         //停止锁屏和摇一摇监听
-        if(SPUtil.getValue(mContext,"Setting","LockScreenOn",false))
-            LockScreenListener.getInstance(mContext).stopListen();
-        if(SPUtil.getValue(mContext,"Setting","Shake",false))
-            ShakeDector.getInstance(mContext).stopListen();
+//        if(SPUtil.getValue(mContext,"Setting","LockScreenOn",false))
+        LockScreenListener.getInstance(mContext).stopListen();
+//        if(SPUtil.getValue(mContext,"Setting","Shake",false))
+        ShakeDector.getInstance(mContext).stopListen();
         //关闭通知
         ((NotificationManager) APlayerApplication.getContext().getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
     }
@@ -458,12 +464,12 @@ public class MusicService extends BaseService implements Playback {
             LogUtil.e("AppWidget","currentInfo:" + mCurrentInfo);
             if(mCurrentInfo == null)
                 return;
-            if(mFirstFlag) {
-                LogUtil.e("AppWidget","prepareAndPlay");
-                prepareAndPlay(mCurrentInfo.getUrl());
-                mFirstFlag = false;
-                return;
-            }
+//            if(mFirstFlag) {
+//                LogUtil.e("AppWidget","prepareAndPlay");
+//                prepareAndPlay(mCurrentInfo.getUrl());
+//                mFirstFlag = false;
+//                return;
+//            }
             LogUtil.e("AppWidget","play");
             play();
         }
@@ -639,7 +645,7 @@ public class MusicService extends BaseService implements Playback {
                     mMediaPlayer.setDataSource(path);
 
                     mMediaPlayer.prepareAsync();
-                    mFirstFlag = false;
+//                    mFirstFlag = false;
                     mIsplay = true;
                     mIsIniting = false;
                 }
@@ -920,6 +926,7 @@ public class MusicService extends BaseService implements Playback {
             for(int i = 0; i < Global.PlayQueue.size(); i++){
                 if(lastId == Global.PlayQueue.get(i)){
                     isLastSongExist = true;
+                    pos = i;
                     break;
                 }
             }

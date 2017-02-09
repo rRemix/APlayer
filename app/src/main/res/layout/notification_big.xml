@@ -17,8 +17,8 @@
         android:orientation="horizontal">
         <ImageView
             android:id="@+id/notify_image"
-            android:layout_width="@dimen/d120_size"
-            android:layout_height="@dimen/d120_size"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
             android:layout_centerVertical="true"
             android:src="@drawable/album_empty_bg_day"
             android:scaleType="centerCrop"

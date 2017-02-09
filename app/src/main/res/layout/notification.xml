@@ -18,9 +18,10 @@
         <ImageView
             android:id="@+id/notify_image"
             android:layout_width="@dimen/d64_size"
-            android:layout_height="match_parent"
+            android:layout_height="@dimen/d64_size"
             android:src="@drawable/album_empty_bg_day"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop"
+            android:layout_gravity="center_vertical"/>
 
         <LinearLayout
             android:layout_marginLeft="@dimen/d12_size"

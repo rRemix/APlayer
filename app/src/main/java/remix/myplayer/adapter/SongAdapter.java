@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +34,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.RecetenlyActivity;
 import remix.myplayer.ui.customview.ColumnView;
-import remix.myplayer.ui.customview.fastscroll.recyclerview_fastscroll.views.FastScrollRecyclerView;
+import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -53,7 +52,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * Created by Remix on 2016/4/11.
  */
-public class SongAdapter extends HeaderAdapter implements FastScrollRecyclerView.SectionedAdapter{
+public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIndexer{
     //升序还是降序
     public static String ASCDESC = " asc";
     //按字母排序还是按添加时间排序
@@ -291,9 +290,9 @@ public class SongAdapter extends HeaderAdapter implements FastScrollRecyclerView
         }
     }
 
-    @NonNull
+
     @Override
-    public String getSectionName(int position) {
+    public String getSectionText(int position) {
         if(position == 0)
             return "";
         if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position - 1)){
