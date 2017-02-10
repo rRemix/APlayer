@@ -188,7 +188,7 @@ public class CoverFragment extends BaseFragment {
 //                        msg.obj = Uri.parse("file://" + coverPath);
 //                        mHandler.sendMessage(msg);
 //                    }
-//                }.start();
+//                }.startListen();
 
             }
         } catch (Exception e){

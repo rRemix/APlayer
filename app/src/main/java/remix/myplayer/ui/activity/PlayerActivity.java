@@ -448,7 +448,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //                            overridePendingTransition(0,0);
 //                        }
 //                    })
-//                    .start();
+//                    .startListen();
 //            mAnimCover.animate()
 //                    .setDuration(DURATION)
 //                    .setInterpolator(INTERPOLATOR)
@@ -473,7 +473,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //                            overridePendingTransition(0,0);
 //                        }
 //                    })
-//                    .start();
+//                    .startListen();
         } else {
             finish();
             overridePendingTransition(0,R.anim.audio_out);
@@ -743,7 +743,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //                                //隐藏动画用的封面
 //                                mAnimCover.setVisibility(View.GONE);
 //                            }
-//                        }).start();
+//                        }).startListen();
 
                 final Spring spring = SpringSystem.create().createSpring();
                 spring.addListener(new SimpleSpringListener(){

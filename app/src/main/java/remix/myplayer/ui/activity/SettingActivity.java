@@ -38,7 +38,7 @@ import cn.bmob.v3.update.UpdateResponse;
 import cn.bmob.v3.update.UpdateStatus;
 import remix.myplayer.R;
 import remix.myplayer.db.DBOpenHelper;
-import remix.myplayer.listener.ShakeDector;
+import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -147,9 +147,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             //开启或者关闭 或者摇一摇
                             case 2:
                                 if(isChecked)
-                                    ShakeDector.getInstance(mContext).beginListen();
+                                    ShakeDetector.getInstance(mContext).beginListen();
                                 else
-                                    ShakeDector.getInstance(mContext).stopListen();
+                                    ShakeDetector.getInstance(mContext).stopListen();
                                 break;
                             //设置歌词搜索优先级
                             case 3:

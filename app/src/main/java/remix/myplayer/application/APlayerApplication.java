@@ -18,8 +18,6 @@ import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.BuildConfig;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
-import remix.myplayer.listener.LockScreenListener;
-import remix.myplayer.listener.ShakeDector;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
@@ -30,7 +28,6 @@ import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.SPUtil;
 
 /**
  * Created by taeja on 16-3-16.
@@ -49,12 +46,6 @@ public class APlayerApplication extends android.app.Application {
         initUtil();
         initTheme();
         startService(new Intent(this, MusicService.class));
-        //监听锁屏
-        LockScreenListener.getInstance(mContext).beginListen();
-        //摇一摇
-        if(SPUtil.getValue(this,"Setting","Shake",false)){
-            ShakeDector.getInstance(mContext).beginListen();
-        }
         //友盟异常捕获
         MobclickAgent.setCatchUncaughtExceptions(true);
         MobclickAgent.setDebugMode(BuildConfig.DEBUG);

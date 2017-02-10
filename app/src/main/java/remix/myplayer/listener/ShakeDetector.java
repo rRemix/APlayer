@@ -17,7 +17,7 @@ import remix.myplayer.util.Constants;
  * @Date 2017/1/22 10:27
  */
 
-public class ShakeDector implements SensorEventListener{
+public class ShakeDetector implements SensorEventListener{
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private Context mContext;
@@ -39,31 +39,41 @@ public class ShakeDector implements SensorEventListener{
             mContext.sendBroadcast(intent);
         }
     };
-    private static ShakeDector mInstance;
-    private ShakeDector(Context context){
+    private static ShakeDetector mInstance;
+    private ShakeDetector(Context context){
         mContext = context;
     }
 
-    public synchronized static ShakeDector getInstance(Context context){
+    public synchronized static ShakeDetector getInstance(Context context){
         if(mInstance == null){
-            mInstance = new ShakeDector(context);
+            mInstance = new ShakeDetector(context);
         }
         return mInstance;
     }
 
     public void beginListen(){
         mDetect = true;
+        //已经开始监听？
+        if(mSensor != null)
+            return;
         if(mSensorManager == null)
             mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
-        if(mSensor == null)
-            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorManager.registerListener(this,mSensor,SensorManager.SENSOR_DELAY_NORMAL);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if(mSensor != null) {
+            mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
     public void stopListen(){
-        mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
         mDetect = false;
-        mSensorManager.unregisterListener(this,mSensor);
+        if(mSensor != null){
+            if(mSensorManager == null)
+                mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+            mSensorManager.unregisterListener(this,mSensor);
+            mSensorManager = null;
+            mSensor = null;
+        }
+
     }
 
     @Override

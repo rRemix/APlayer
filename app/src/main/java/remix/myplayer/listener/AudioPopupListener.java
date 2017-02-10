@@ -263,31 +263,39 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         PlayListUtil.addSong(info) > 0 ? mContext.getString(R.string.add_song_playlist_success, 1,Constants.MYLOVE) : mContext.getString(R.string.add_song_playlist_error));
                 break;
             case R.id.menu_delete:
-//                try {
-//                    new MaterialDialog.Builder(mContext)
-//                            .content(mContext.getString(R.string.confirm_delete_playlist,"曲库"))
-//                            .positiveText(R.string.confirm)
-//                            .negativeText(R.string.cancel)
-//                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-//                                @Override
-//                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-//                                    if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG)){
-//                                        if(PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)){
-//                                            ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
-//                                        }
-//                                    } else {
-//                                        ToastUtil.show(mContext, mContext.getString(R.string.delete_error));
-//                                    }
-//                                }
-//                            })
-//                            .backgroundColorAttr(R.attr.background_color_3)
-//                            .positiveColorAttr(R.attr.text_color_primary)
-//                            .negativeColorAttr(R.attr.text_color_primary)
-//                            .contentColorAttr(R.attr.text_color_primary)
-//                            .show();
-//                } catch (Exception e){
-//                    e.printStackTrace();
-//                }
+                try {
+                    new MaterialDialog.Builder(mContext)
+                            .content(R.string.confirm_delete_from_library)
+                            .positiveText(R.string.confirm)
+                            .negativeText(R.string.cancel)
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0){
+                                        if(PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)){
+                                            ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
+                                            //移除的是正在播放的歌曲
+                                            if(MusicService.getCurrentMP3() == null)
+                                                return;
+                                            if(mInfo.getId() == MusicService.getCurrentMP3().getId() && Global.PlayQueue.size() >= 2){
+                                                Intent intent = new Intent(Constants.CTL_ACTION);
+                                                intent.putExtra("Control", Constants.NEXT);
+                                                mContext.sendBroadcast(intent);
+                                            }
+                                        }
+                                    } else {
+                                        ToastUtil.show(mContext, mContext.getString(R.string.delete_error));
+                                    }
+                                }
+                            })
+                            .backgroundColorAttr(R.attr.background_color_3)
+                            .positiveColorAttr(R.attr.text_color_primary)
+                            .negativeColorAttr(R.attr.text_color_primary)
+                            .contentColorAttr(R.attr.text_color_primary)
+                            .show();
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
                 break;
 //            case R.id.menu_vol:
 //                AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);

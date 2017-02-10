@@ -211,7 +211,7 @@ public class EQActivity extends ToolbarActivity {
 //                Message msg = new Message();
 //                mHandler.sendMessage(msg);
 //            }
-//        }.start();
+//        }.startListen();
 
     }
 

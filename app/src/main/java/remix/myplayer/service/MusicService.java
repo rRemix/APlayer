@@ -48,7 +48,7 @@ import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.LockScreenListener;
-import remix.myplayer.listener.ShakeDector;
+import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.observer.DBObserver;
 import remix.myplayer.observer.MediaStoreObserver;
@@ -188,7 +188,7 @@ public class MusicService extends BaseService implements Playback {
         super.onTaskRemoved(rootIntent);
         if(mNotify != null)
             mNotify.cancel();
-        ShakeDector.getInstance(mContext).stopListen();
+        ShakeDetector.getInstance(APlayerApplication.getContext()).stopListen();
     }
 
     @Override
@@ -269,8 +269,14 @@ public class MusicService extends BaseService implements Playback {
         };
         //播放模式
         mPlayModel = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
-
+        //监听锁屏
+        LockScreenListener.getInstance(mContext).beginListen();
+        //摇一摇
+        if(SPUtil.getValue(this,"Setting","Shake",false)){
+            ShakeDetector.getInstance(mContext).beginListen();
+        }
         //桌面部件
+        mAppWidgetBig = new AppWidgetBig();
         mAppWidgetMedium = new AppWidgetMedium();
         mAppWidgetSmall = new AppWidgetSmall();
 
@@ -433,7 +439,7 @@ public class MusicService extends BaseService implements Playback {
 //        if(SPUtil.getValue(mContext,"Setting","LockScreenOn",false))
         LockScreenListener.getInstance(mContext).stopListen();
 //        if(SPUtil.getValue(mContext,"Setting","Shake",false))
-        ShakeDector.getInstance(mContext).stopListen();
+        ShakeDetector.getInstance(mContext).stopListen();
 
         mNotify.cancel();
     }

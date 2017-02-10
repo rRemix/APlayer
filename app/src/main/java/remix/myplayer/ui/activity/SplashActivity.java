@@ -50,10 +50,10 @@ public class SplashActivity extends BaseActivity {
 //                /** 更新最近添加列表 */
 //                //不是第一次打开软件，先删除原来的数据
 //                if(!isFirst){
-//                    long start = System.currentTimeMillis();
+//                    long startListen = System.currentTimeMillis();
 //                    PlayListUtil.deleteMultiSongs(PlayListUtil.getIDList(Global.RecentlyID),Global.RecentlyID);
 //                    PlayListUtil.deletePlayList(SPUtil.getValue(SplashActivity.this,"Setting","RecentlyID",-1));
-//                    long time = System.currentTimeMillis() - start;
+//                    long time = System.currentTimeMillis() - startListen;
 //                    LogUtil.d("DELETE","time:" + time);
 //                }
 //                //新建最近添加列表

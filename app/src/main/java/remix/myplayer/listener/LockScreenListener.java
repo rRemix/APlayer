@@ -34,10 +34,10 @@ public class LockScreenListener {
         mContext.registerReceiver(mReceiver,filter);
     }
     public void stopListen(){
-//        if(mContext != null && mReceiver != null){
-//            mContext.unregisterReceiver(mReceiver);
-//            mReceiver = null;
-//        }
+        if(mContext != null && mReceiver != null){
+            mContext.unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
     }
     class ScreenReceiver extends BroadcastReceiver {
         @Override
