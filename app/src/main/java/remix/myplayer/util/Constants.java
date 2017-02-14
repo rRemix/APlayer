@@ -45,23 +45,23 @@ public class Constants {
     public final static int NEXT = 3;
     public final static int PAUSE = 4;
     public final static int START = 5;
+    public final static int CHANGE_MODEL = 6;
     //播放模式
-    public final static int PLAY_LOOP = 6;
-    public final static int PLAY_SHUFFLE = 7;
-    public final static int PLAY_REPEATONE = 8;
-    //当前状态
-    public final static int STATUS_PLAY = 0x010;
-    public final static int STATUS_PAUSE = 0x011;
+    public final static int PLAY_LOOP = 50;
+    public final static int PLAY_SHUFFLE = 51;
+    public final static int PLAY_REPEATONE = 52;
     //更新seekbar、已播放时间、未播放时间
     public final static int UPDATE_TIME_ALL = 0x010;
     //更新已播放时间、未播放时间
     public final static int UPDATE_TIME_ONLY = 0x011;
+    //更新桌面部件
+    public final static int UPDATE_APPWIDGET=  0x100;
     //更新播放信息
     public final static int UPDATE_UI = 0x101;
     //更新音量
     public final static int UPDATE_VOL = 0x102;
     //更新背景
-    public final static int UPDATE_BG = 0x102;
+    public final static int UPDATE_BG = 0x103;
 
     //腾讯Api Id
     public final static String TECENT_APIID = "1105030910";

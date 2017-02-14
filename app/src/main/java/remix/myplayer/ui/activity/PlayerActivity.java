@@ -515,7 +515,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 MobclickAgent.onEvent(this,"PlayModel");
                 int currentmodel = MusicService.getPlayModel();
                 currentmodel = (currentmodel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentmodel);
-                MusicService.setPlayModel(currentmodel);
+                MusicService.getInstance().setPlayModel(currentmodel);
                 mPlayModel.setImageResource(currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                         currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                                 R.drawable.play_btn_loop_one);

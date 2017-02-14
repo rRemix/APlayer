@@ -247,7 +247,7 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
     private void OnClick(HeaderHolder headerHolder, View v){
         switch (v.getId()){
             case R.id.play_shuffle:
-                MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
+                MusicService.getInstance().setPlayModel(Constants.PLAY_SHUFFLE);
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 intent.putExtra("Control", Constants.NEXT);
                 intent.putExtra("shuffle",true);

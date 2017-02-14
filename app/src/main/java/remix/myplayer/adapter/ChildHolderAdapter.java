@@ -227,7 +227,7 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
     public void OnClick(SongAdapter.HeaderHolder headerHolder, View v){
         switch (v.getId()){
             case R.id.play_shuffle:
-                MusicService.setPlayModel(Constants.PLAY_SHUFFLE);
+                MusicService.getInstance().setPlayModel(Constants.PLAY_SHUFFLE);
                 Intent intent = new Intent(Constants.CTL_ACTION);
                 intent.putExtra("Control", Constants.NEXT);
                 intent.putExtra("shuffle",true);

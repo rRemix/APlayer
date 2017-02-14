@@ -51,10 +51,11 @@
             android:maxLines="1"/>
     </RelativeLayout>
 
-    <ImageView
+    <ProgressBar
+        android:id="@+id/appwidget_seekbar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/d2_size"
-        android:background="@color/md_blue_primary"/>
+        android:layout_height="@dimen/d4_size" />
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

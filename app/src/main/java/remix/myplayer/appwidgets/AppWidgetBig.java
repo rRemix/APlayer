@@ -136,12 +136,4 @@ public class AppWidgetBig extends BaseAppwidget {
         views.setOnClickPendingIntent(R.id.appwidget_next,buildPendingIntent(context,componentName,Constants.NEXT));
     }
 
-    private void pushUpdate(Context context, int[] appWidgetId, RemoteViews remoteViews) {
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        if (appWidgetId != null) {
-            appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-            return;
-        }
-        appWidgetManager.updateAppWidget(new ComponentName(context, getClass()), remoteViews);
-    }
 }
