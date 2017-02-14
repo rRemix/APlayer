@@ -1,75 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:gravity="top"
-    android:background="#aa000000"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:rowCount="3"
-    android:columnCount="2">
-    <ImageView android:id="@+id/appwidget_image"
-        android:layout_width="@dimen/appwidget_small_image_size"
-        android:layout_height="@dimen/appwidget_small_image_size"
-        android:scaleType="centerCrop" />
-    <LinearLayout android:gravity="center_horizontal"
-        android:layout_gravity="fill_horizontal"
-        android:orientation="horizontal"
-        android:focusable="true">
-        <ImageButton android:id="@+id/appwidget_prev"
-            android:background="?android:attr/selectableItemBackground"
-            android:src="@drawable/notify_prev"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/appwidget_small_button_height"
-            android:layout_weight="1" />
-        <ImageButton android:id="@+id/appwidget_toggle"
-            android:background="?android:attr/selectableItemBackground"
-            android:src="@drawable/notify_play"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/appwidget_small_button_height"
-            android:layout_weight="1" />
-        <ImageButton android:id="@+id/appwidget_next"
-            android:background="?android:attr/selectableItemBackground"
-            android:src="@drawable/notify_next"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/appwidget_small_button_height"
-            android:layout_weight="1" />
-    </LinearLayout>
+    android:layout_height="@dimen/app_widget_small_height"
+    android:background="@color/appwidget_background_color"
+    android:orientation="horizontal">
+    <ImageView
+        android:id="@+id/appwidget_image"
+        android:layout_width="@dimen/app_widget_small_image_size"
+        android:layout_height="@dimen/app_widget_small_image_size"
+        android:scaleType="centerCrop"
+        android:src="@drawable/album_empty_bg_day"
+        android:layout_marginLeft="@dimen/d8_size"
+        android:layout_marginRight="@dimen/d8_size"
+        android:layout_gravity="center_vertical"/>
+
     <LinearLayout
-        android:layout_gravity="fill_horizontal"
-        android:background="@color/white"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_columnSpan="2" />
-    <LinearLayout android:gravity="center_vertical"
-        android:layout_gravity="fill"
-        android:orientation="horizontal"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:focusable="true"
-        android:layout_columnSpan="2">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
         <TextView
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:textColor="@color/night_textcolor_primary"
-            android:gravity="center_vertical"
-            android:id="@+id/appwidget_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxLines="1" />
-        <TextView android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textColor="@color/night_textcolor_primary"
-            android:gravity="center_vertical"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:text=" - "/>
-        <TextView
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textColor="@color/night_textcolor_primary"
-            android:gravity="center_vertical"
+            android:visibility="gone"
             android:id="@+id/appwidget_artist"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxLines="1" />
+            android:textSize="@dimen/s12_size"
+            android:textColor="@color/appwidget_title_color"
+            android:maxLines="1"
+            android:layout_marginTop="@dimen/d4_size"
+            android:id="@+id/appwidget_title"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/d2_size"
+            android:layout_marginTop="@dimen/d4_size"
+            android:background="@color/md_blue_primary"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginRight="@dimen/d8_size">
+            <ImageButton android:id="@+id/appwidget_model"
+                android:background="@drawable/bg_common_borderless_ripple"
+                android:src="@drawable/widget_btn_loop_normal"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/app_widget_small_button_height"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"/>
+            <ImageButton android:id="@+id/appwidget_love"
+                android:background="@drawable/bg_common_borderless_ripple"
+                android:src="@drawable/widget_btn_like_nor"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/app_widget_small_button_height"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"/>
+            <ImageButton android:id="@+id/appwidget_toggle"
+                android:background="@drawable/bg_common_borderless_ripple"
+                android:src="@drawable/widget_btn_play_normal"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/app_widget_small_button_height"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="@dimen/d22_size"
+                android:layout_marginRight="@dimen/d22_size"/>
+            <ImageButton android:id="@+id/appwidget_prev"
+                android:background="@drawable/bg_common_borderless_ripple"
+                android:src="@drawable/widget_btn_previous_normal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/appwidget_toggle"
+                android:layout_centerVertical="true"/>
+            <ImageButton android:id="@+id/appwidget_next"
+                android:background="@drawable/bg_common_borderless_ripple"
+                android:src="@drawable/widget_btn_next_normal"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/app_widget_small_button_height"
+                android:layout_toRightOf="@id/appwidget_toggle"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
     </LinearLayout>
-</GridLayout>
+</LinearLayout>

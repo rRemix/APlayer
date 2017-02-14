@@ -222,7 +222,7 @@
             android:authorities="remix.myplayer"
             android:exported="false" />
 
-         <!--&lt;!&ndash;桌面部件&ndash;&gt;-->
+         <!--桌面部件-->
          <!--<receiver android:name=".appwidgets.AppWidgetBig">-->
              <!--<intent-filter>-->
                 <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>-->
@@ -230,20 +230,20 @@
              <!--<meta-data android:name="android.appwidget.provider"-->
                 <!--android:resource="@xml/appwidget_big_info" />-->
          <!--</receiver>-->
-        <!--<receiver android:name=".appwidgets.AppWidgetMedium">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>-->
-            <!--</intent-filter>-->
-            <!--<meta-data android:name="android.appwidget.provider"-->
-                <!--android:resource="@xml/appwidget_medium_info" />-->
-        <!--</receiver>-->
-        <!--<receiver android:name=".appwidgets.AppWidgetSmall">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>-->
-            <!--</intent-filter>-->
-            <!--<meta-data android:name="android.appwidget.provider"-->
-                <!--android:resource="@xml/appwidget_small_info" />-->
-        <!--</receiver>-->
+        <receiver android:name=".appwidgets.AppWidgetMedium">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/appwidget_medium_info" />
+        </receiver>
+        <receiver android:name=".appwidgets.AppWidgetSmall">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/appwidget_small_info" />
+        </receiver>
 
     </application>
 

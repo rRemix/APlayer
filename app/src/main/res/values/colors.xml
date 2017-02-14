@@ -97,6 +97,11 @@
     <color name="lrc_normal_night">@color/night_textcolor</color>
     <color name="lrc_highlight_night">@color/night_textcolor_primary</color>
 
+    <color name="appwidget_title_color">#252525</color>
+    <color name="appwidget_artist_color">#a9a9a9</color>
+    <color name="appwidget_progress_color">#a8a8a8</color>
+    <color name="appwidget_background_color">#f9f9f9</color>
+
     <color name="day_textcolor_primary">@color/black_1c1b19</color>
     <color name="day_textcolor">@color/gray_6d6c69</color>
     <color name="day_background_color_main">@color/white</color>

@@ -38,6 +38,8 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
@@ -153,14 +155,32 @@ public class MusicService extends BaseService implements Playback {
         public void handleMessage(Message msg) {
             if(msg.what == Constants.UPDATE_UI) {
                 UpdateHelper.update(mCurrentInfo,mIsplay);
-            }
-            if(mAppWidgetMedium != null)
-                mAppWidgetMedium.updateWidget(mContext);
-            if(mAppWidgetSmall != null){
-                mAppWidgetSmall.updateWidget(mContext);
+                if(!isPlay()){
+                    if(mWidgetTimer != null){
+                        mWidgetTimer.cancel();
+                        mWidgetTimer = null;
+                    }
+                } else {
+                    if(mWidgetTimer != null){
+                        mWidgetTimer.cancel();
+                    }
+                    mWidgetTimer = new Timer();
+                    mWidgetTimer.schedule(mWidgetTask,0,1000);
+                }
+                if(mAppWidgetMedium != null)
+                    mAppWidgetMedium.updateWidget(mContext);
+                if(mAppWidgetSmall != null){
+                    mAppWidgetSmall.updateWidget(mContext);
+                }
             }
         }
     };
+
+    /** 播放线程*/
+    private PlayThread mPlayThread = new PlayThread();
+
+    /** 准备线程*/
+    private PrepareThread mPrepareThread = new PrepareThread();
 
     /**电源锁*/
     private PowerManager.WakeLock mWakeLock;
@@ -465,6 +485,9 @@ public class MusicService extends BaseService implements Playback {
      */
     @Override
     public void play() {
+//        if(mPlayThread == null)
+//            mPlayThread = new PlayThread();
+//        mPlayThread.start();
         new Thread(){
             @Override
             public void run(){
@@ -481,6 +504,10 @@ public class MusicService extends BaseService implements Playback {
                 //保存当前播放的下一首播放的歌曲的id
                 SPUtil.putValue(mContext,"Setting","LastSongId", mCurrentId);
                 SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
+                if(mWidgetTimer == null){
+                    mWidgetTimer = new Timer();
+                    mWidgetTimer.schedule(mWidgetTask,0,1000);
+                }
             }
         }.start();
     }
@@ -514,6 +541,7 @@ public class MusicService extends BaseService implements Playback {
         mLastPlayedTime = System.currentTimeMillis();
         //更新所有界面
         update(Global.getOperation());
+
     }
 
     /**
@@ -577,12 +605,8 @@ public class MusicService extends BaseService implements Playback {
             Global.setOperation(control);
             //先判断是否是关闭通知栏
             if(intent.getExtras().getBoolean("Close")){
-//                NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-//                manager.cancel(0);
                 Global.setNotifyShowing(false);
                 pause();
-                //更新ui
-                mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
                 mNotify.cancel();
                 return;
             }
@@ -663,6 +687,9 @@ public class MusicService extends BaseService implements Playback {
      * @param path 播放歌曲的路径
      */
     private void prepareAndPlay(final String path) {
+//        if(mPrepareThread == null)
+//            mPrepareThread = new PrepareThread();
+//        mPrepareThread.start(path);
         new Thread(){
             @Override
             public void run() {
@@ -677,7 +704,6 @@ public class MusicService extends BaseService implements Playback {
                     mMediaPlayer.setDataSource(path);
 
                     mMediaPlayer.prepareAsync();
-//                    mFirstFlag = false;
                     mIsplay = true;
                     mIsIniting = false;
                 }
@@ -686,7 +712,6 @@ public class MusicService extends BaseService implements Playback {
                 }
             }
         }.start();
-
     }
 
     /**
@@ -1033,11 +1058,17 @@ public class MusicService extends BaseService implements Playback {
         }
     }
 
+    /**
+     * 释放电源锁
+     */
     private void releaseWakeLock(){
         if(mWakeLock != null && mWakeLock.isHeld())
             mWakeLock.release();
     }
 
+    /**
+     * 获得电源锁
+     */
     private void acquireWakeLock(){
         if(mWakeLock != null)
             mWakeLock.acquire(30000L);
@@ -1289,6 +1320,73 @@ public class MusicService extends BaseService implements Playback {
             stopForeground(true);
             mNotificationManager.cancelAll();
             mNotifyMode = NOTIFY_MODE_NONE;
+        }
+    }
+
+    /** 更新桌面部件进度*/
+    private Timer mWidgetTimer;
+    private TimerTask mWidgetTask = new TimerTask() {
+        @Override
+        public void run() {
+            if(!mIsplay)
+                return;
+            if(mAppWidgetSmall != null)
+                mAppWidgetSmall.updateWidget(mContext);
+            if(mAppWidgetMedium != null)
+                mAppWidgetMedium.updateWidget(mContext);
+        }
+    };
+
+    private class PlayThread extends Thread{
+        @Override
+        public void run() {
+            mAudioFouus = mAudioManager.requestAudioFocus(
+                    mAudioFocusListener,
+                    AudioManager.STREAM_MUSIC,
+                    AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+            if(!mAudioFouus)
+                return;
+            mIsplay = true;
+            mMediaPlayer.start();
+            //更新所有界面
+            update(Global.getOperation());
+            //保存当前播放的下一首播放的歌曲的id
+            SPUtil.putValue(mContext,"Setting","LastSongId", mCurrentId);
+            SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
+            if(mWidgetTimer == null){
+                mWidgetTimer = new Timer();
+                mWidgetTimer.schedule(mWidgetTask,0,1000);
+            }
+        }
+
+    }
+
+    private class PrepareThread extends Thread{
+        private String mPath;
+        @Override
+        public void run() {
+            try {
+                mAudioFouus =  mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
+                        AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+                LogUtil.e("AppWidget","hasAudioFocus:" + mAudioFouus + " path:" + mPath + " mediaplayer:" + mMediaPlayer);
+                if(!mAudioFouus)
+                    return;
+                mIsIniting = true;
+                mMediaPlayer.reset();
+                mMediaPlayer.setDataSource(mPath);
+
+                mMediaPlayer.prepareAsync();
+                mIsplay = true;
+                mIsIniting = false;
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void start(String path){
+            mPath = path;
+            start();
         }
     }
 }

@@ -23,6 +23,7 @@ import remix.myplayer.R;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.MainActivity;
+import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.MediaStoreUtil;
@@ -62,6 +63,26 @@ public class AppWidgetMedium extends BaseAppwidget {
         //歌曲名和歌手名
         mRemoteViews.setTextViewText(R.id.appwidget_title,temp.getTitle());
         mRemoteViews.setTextViewText(R.id.appwidget_artist,temp.getArtist());
+        //时间
+        long currentTime = MusicService.getProgress();
+        long remainTime = MusicService.getDuration() - MusicService.getProgress();
+        if(currentTime > 0 && remainTime > 0){
+            mRemoteViews.setTextViewText(R.id.appwidget_progress, CommonUtil.getTime(currentTime) + "/" + CommonUtil.getTime(remainTime));
+        }
+        //进度
+//        ClipDrawable clipDrawable = new ClipDrawable(Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getMaterialPrimaryColor()),
+//                Gravity.CLIP_HORIZONTAL,
+//                ClipDrawable.HORIZONTAL);
+//        clipDrawable.setLevel((int) (10000 * currentTime / MusicService.getDuration()));
+//        Bitmap bitmap = Bitmap.createBitmap(
+//                        clipDrawable.getIntrinsicWidth(),
+//                        clipDrawable.getIntrinsicHeight(),
+//                        clipDrawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
+//        Canvas canvas = new Canvas(bitmap);
+//        clipDrawable.setBounds(0, 0, clipDrawable.getIntrinsicWidth(),
+//                clipDrawable.getIntrinsicHeight());
+//        clipDrawable.draw(canvas);
+//        mRemoteViews.setImageViewBitmap(R.id.appwidget_progress,bitmap);
 
         //设置封面
         int size = DensityUtil.dip2px(context,110);
