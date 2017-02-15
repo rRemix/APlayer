@@ -54,8 +54,10 @@
     <ProgressBar
         android:id="@+id/appwidget_seekbar"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:progressDrawable="@drawable/bg_appwidget_progress"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/d4_size" />
+        android:layout_height="@dimen/d2_size"
+        android:layout_marginLeft="@dimen/d8_size"/>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -65,21 +67,21 @@
             android:background="@drawable/bg_common_borderless_ripple"
             android:src="@drawable/widget_btn_loop_normal"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/app_widget_small_button_height"
+            android:layout_height="@dimen/app_widget_medium_button_height"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"/>
         <ImageButton android:id="@+id/appwidget_love"
             android:background="@drawable/bg_common_borderless_ripple"
             android:src="@drawable/widget_btn_like_nor"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/app_widget_small_button_height"
+            android:layout_height="@dimen/app_widget_medium_button_height"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"/>
         <ImageButton android:id="@+id/appwidget_toggle"
             android:background="@drawable/bg_common_borderless_ripple"
             android:src="@drawable/widget_btn_play_normal"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/app_widget_small_button_height"
+            android:layout_height="@dimen/app_widget_medium_button_height"
             android:layout_centerInParent="true"
             android:layout_marginLeft="@dimen/d40_size"
             android:layout_marginRight="@dimen/d40_size"/>
@@ -87,14 +89,14 @@
             android:background="@drawable/bg_common_borderless_ripple"
             android:src="@drawable/widget_btn_previous_normal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/app_widget_medium_button_height"
             android:layout_toLeftOf="@id/appwidget_toggle"
             android:layout_centerVertical="true"/>
         <ImageButton android:id="@+id/appwidget_next"
             android:background="@drawable/bg_common_borderless_ripple"
             android:src="@drawable/widget_btn_next_normal"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/app_widget_small_button_height"
+            android:layout_height="@dimen/app_widget_medium_button_height"
             android:layout_toRightOf="@id/appwidget_toggle"
             android:layout_centerVertical="true"/>
     </RelativeLayout>

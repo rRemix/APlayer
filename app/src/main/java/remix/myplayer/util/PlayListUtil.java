@@ -378,6 +378,10 @@ public class PlayListUtil {
         return mp3list;
     }
 
+    /**
+     * 获得所有移除歌曲的id
+     * @return
+     */
     public static String getDeleteID(){
         Set<String> deleteId = SPUtil.getStringSet(mContext,"Setting","DeleteID");
         if(deleteId == null || deleteId.size() == 0)
@@ -390,5 +394,32 @@ public class PlayListUtil {
             i++;
         }
         return stringBuilder.toString();
+    }
+
+    /**
+     * 是否收藏了该歌曲
+     */
+    public static final int EXIST = 1;
+    public static final int NONEXIST = 2;
+    public static final int ERROR = 3;
+    public static int isLove(int audioId){
+        Cursor cursor = null;
+        try {
+            cursor = mContext.getContentResolver().query(PlayListSongs.CONTENT_URI,null, PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=" + Global.MyLoveID ,null,null);
+            if(cursor != null && cursor.getCount() > 0){
+                while (cursor.moveToNext()){
+                    int id = cursor.getInt(cursor.getColumnIndex(PlayListSongs.PlayListSongColumns.AUDIO_ID));
+                    if(id == audioId){
+                        return EXIST;
+                    }
+                }
+            }
+        } catch (Exception e){
+            return ERROR;
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
+        }
+        return NONEXIST;
     }
 }

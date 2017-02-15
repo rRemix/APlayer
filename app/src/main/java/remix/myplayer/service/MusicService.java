@@ -52,6 +52,7 @@ import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.observer.DBObserver;
 import remix.myplayer.observer.MediaStoreObserver;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
@@ -165,9 +166,9 @@ public class MusicService extends BaseService implements Playback {
      */
     private void updateAppwidget() {
         if(mAppWidgetMedium != null)
-            mAppWidgetMedium.updateWidget(mContext,true);
+            mAppWidgetMedium.updateWidget(mContext,null,true);
         if(mAppWidgetSmall != null){
-            mAppWidgetSmall.updateWidget(mContext,true);
+            mAppWidgetSmall.updateWidget(mContext,null,true);
         }
         //暂停停止更新进度条和时间
         if(!isPlay()){
@@ -270,7 +271,6 @@ public class MusicService extends BaseService implements Playback {
                     }
                     mMediaPlayer.setVolume(1.0f,1.0f);
                 }
-
                 //暂停播放
                 if(focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
                         focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK){
@@ -280,7 +280,6 @@ public class MusicService extends BaseService implements Playback {
                         pause();
                     }
                 }
-
                 //失去audiofocus 暂停播放
                 if(focusChange == AudioManager.AUDIOFOCUS_LOSS){
                     mAudioFouus = false;
@@ -575,18 +574,19 @@ public class MusicService extends BaseService implements Playback {
         @Override
         public void onReceive(Context context, Intent intent) {
             String str = intent.getStringExtra("WidgetName");
+            int[] appIds = intent.getIntArrayExtra("WidgetIds");
             switch (str){
                 case "BigWidget":
-                    if(mAppWidgetBig != null)
-                        mAppWidgetBig.updateWidget(context);
+//                    if(mAppWidgetBig != null)
+//                        mAppWidgetBig.updateWidget(context);
                     break;
                 case "MediumWidget":
                     if(mAppWidgetMedium != null)
-                        mAppWidgetMedium.updateWidget(context,true);
+                        mAppWidgetMedium.updateWidget(context,appIds,true);
                     break;
                 case "SmallWidget":
                     if(mAppWidgetSmall != null)
-                        mAppWidgetSmall.updateWidget(context,true);
+                        mAppWidgetSmall.updateWidget(context,appIds,true);
                     break;
             }
         }
@@ -654,6 +654,16 @@ public class MusicService extends BaseService implements Playback {
                     mPlayModel = (mPlayModel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++mPlayModel);
                     setPlayModel(mPlayModel);
                     break;
+                //取消或者添加收藏
+                case Constants.LOVE:
+                    int exist = PlayListUtil.isLove(mCurrentId);
+                    if(exist == PlayListUtil.EXIST){
+                        PlayListUtil.deleteSong(mCurrentId,Global.MyLoveID);
+                    } else if (exist == PlayListUtil.NONEXIST){
+                        PlayListUtil.addSong(new PlayListSongInfo(mCurrentInfo.getId(), Global.MyLoveID,Constants.MYLOVE));
+                    }
+                    updateAppwidget();
+                    break;
                 default:break;
             }
         }
@@ -664,10 +674,8 @@ public class MusicService extends BaseService implements Playback {
      * @param control
      */
     private void update(int control){
-        if(control != Constants.PLAY_LOOP &&
-                control != Constants.PLAY_SHUFFLE &&
-                control != Constants.PLAY_REPEATONE &&
-                control != Constants.CHANGE_MODEL) {
+        if(control == Constants.PLAYSELECTEDSONG || control == Constants.PREV || control == Constants.NEXT
+                || control == Constants.TOGGLE || control == Constants.PAUSE || control == Constants.START) {
             //更新ui
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
             //更新通知栏
@@ -1325,9 +1333,9 @@ public class MusicService extends BaseService implements Playback {
         @Override
         public void run() {
             if(mAppWidgetSmall != null)
-                mAppWidgetSmall.updateWidget(mContext,false);
+                mAppWidgetSmall.updateWidget(mContext,null,false);
             if(mAppWidgetMedium != null)
-                mAppWidgetMedium.updateWidget(mContext,false);
+                mAppWidgetMedium.updateWidget(mContext,null,false);
         }
     }
 

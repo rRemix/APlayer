@@ -253,11 +253,6 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         new BlurThread().start();
     }
 
-
-    @Override
-    public void onBackPressed() {
-    }
-
     //高斯模糊线程
     class BlurThread extends Thread{
         @Override

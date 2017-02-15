@@ -33,8 +33,7 @@ import remix.myplayer.util.MediaStoreUtil;
  */
 
 public class BaseAppwidget extends AppWidgetProvider {
-    protected int[] mAppIds;
-    protected RemoteViews mRemoteViews;
+//    protected int[] mAppIds;
     protected Bitmap mBitmap;
 
     protected PendingIntent buildPendingIntent(Context context,ComponentName componentName,int operation) {
@@ -50,15 +49,15 @@ public class BaseAppwidget extends AppWidgetProvider {
         return appIds != null && appIds.length > 0;
     }
 
-    protected void updateCover(final Context context,int albumId,boolean reloadCover){
+    protected void updateCover(final Context context, final RemoteViews remoteViews,final int[] appWidgetIds,int albumId, boolean reloadCover){
         //设置封面
         if(!reloadCover){
             if(mBitmap != null) {
-                mRemoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
+                remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
             } else {
-                mRemoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
+                remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
             }
-            pushUpdate(context,mAppIds,mRemoteViews);
+            pushUpdate(context,appWidgetIds,remoteViews);
         } else {
             int size = DensityUtil.dip2px(context,72);
             final ImageRequest imageRequest =
@@ -71,25 +70,34 @@ public class BaseAppwidget extends AppWidgetProvider {
                 @Override
                 protected void onNewResultImpl(Bitmap bitmap) {
                     try {
+                        if(mBitmap != null && !mBitmap.isRecycled()){
+                            mBitmap.recycle();
+                            mBitmap = null;
+                        }
                         mBitmap = Bitmap.createBitmap(bitmap);
                         if(mBitmap != null) {
-                            mRemoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
+                            remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
                         } else {
-                            mRemoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
+                            remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
                         }
-                        pushUpdate(context,mAppIds,mRemoteViews);
+                        pushUpdate(context,appWidgetIds,remoteViews);
                     } catch (Exception e){
                         e.printStackTrace();
                     }
                 }
                 @Override
                 protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-                    mRemoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
-                    pushUpdate(context,mAppIds,mRemoteViews);
+                    if(mBitmap != null && !mBitmap.isRecycled()){
+                        mBitmap.recycle();
+                    }
+                    mBitmap = null;
+                    remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
+                    pushUpdate(context,appWidgetIds,remoteViews);
                 }
             }, CallerThreadExecutor.getInstance());
         }
     }
+
 
     protected void pushUpdate(Context context, int[] appWidgetId, RemoteViews remoteViews) {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);

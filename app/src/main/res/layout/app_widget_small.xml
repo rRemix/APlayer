@@ -17,12 +17,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-        <TextView
-            android:visibility="gone"
-            android:id="@+id/appwidget_artist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        android:orientation="vertical"
+        android:gravity="left">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,8 +30,10 @@
         <ProgressBar
             android:id="@+id/appwidget_seekbar"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:progressDrawable="@drawable/bg_appwidget_progress"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/d4_size" />
+            android:layout_height="@dimen/d2_size"
+            android:layout_marginTop="@dimen/d4_size" />
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -60,13 +58,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/app_widget_small_button_height"
                 android:layout_centerInParent="true"
-                android:layout_marginLeft="@dimen/d22_size"
-                android:layout_marginRight="@dimen/d22_size"/>
+                android:layout_marginLeft="@dimen/d24_size"
+                android:layout_marginRight="@dimen/d24_size"/>
             <ImageButton android:id="@+id/appwidget_prev"
                 android:background="@drawable/bg_common_borderless_ripple"
                 android:src="@drawable/widget_btn_previous_normal"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/app_widget_small_button_height"
                 android:layout_toLeftOf="@id/appwidget_toggle"
                 android:layout_centerVertical="true"/>
             <ImageButton android:id="@+id/appwidget_next"

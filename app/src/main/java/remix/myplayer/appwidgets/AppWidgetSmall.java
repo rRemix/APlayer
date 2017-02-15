@@ -12,6 +12,7 @@ import remix.myplayer.model.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.PlayListUtil;
 
 /**
  * @ClassName
@@ -24,40 +25,46 @@ public class AppWidgetSmall extends BaseAppwidget {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        context.startService(new Intent(context,MusicService.class));
-        mAppIds = appWidgetIds;
-        mRemoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_small);
-        buildAction(context, mRemoteViews);
-        pushUpdate(context,appWidgetIds,mRemoteViews);
+        defaultAppWidget(context,appWidgetIds);
         Intent intent = new Intent(Constants.WIDGET_UPDATE);
         intent.putExtra("WidgetName","SmallWidget");
         intent.putExtra("WidgetIds",appWidgetIds);
-        intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+        intent.setFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);
         context.sendBroadcast(intent);
     }
 
-    public void updateWidget(final Context context,boolean reloadCover){
+    private void defaultAppWidget(Context context, int[] appWidgetIds) {
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_small);
+        buildAction(context,remoteViews);
+        pushUpdate(context,appWidgetIds,remoteViews);
+    }
+
+    public void updateWidget(final Context context,final int[] appWidgetIds, boolean reloadCover){
         MP3Item temp = MusicService.getCurrentMP3();
         if(temp == null || !hasInstances(context))
             return;
-        if(mRemoteViews == null) {
-            mRemoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_small);
-            buildAction(context,mRemoteViews);
-        }
-        mRemoteViews.setTextViewText(R.id.notify_song, temp.getTitle());
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_small);
+        buildAction(context,remoteViews);
+
+        remoteViews.setTextViewText(R.id.notify_song, temp.getTitle());
         //播放暂停按钮
-        mRemoteViews.setImageViewResource(R.id.appwidget_toggle,MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
+        remoteViews.setImageViewResource(R.id.appwidget_toggle,MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
         //歌曲名和歌手名
-        mRemoteViews.setTextViewText(R.id.appwidget_title,temp.getTitle());
-        mRemoteViews.setTextViewText(R.id.appwidget_artist,temp.getArtist());
+        remoteViews.setTextViewText(R.id.appwidget_title,temp.getTitle());
+        //是否收藏
+        remoteViews.setImageViewResource(R.id.appwidget_love,
+                PlayListUtil.isLove(temp.getId()) == PlayListUtil.EXIST ? R.drawable.widget_btn_like_prs : R.drawable.widget_btn_like_nor);
         //播放模式
-        mRemoteViews.setImageViewResource(R.id.appwidget_model,MusicService.getPlayModel() == Constants.PLAY_LOOP ?
-                R.drawable.play_btn_loop :  MusicService.getPlayModel() == Constants.PLAY_REPEATONE ? R.drawable.play_btn_loop_one : R.drawable.play_btn_shuffle);
+        remoteViews.setImageViewResource(R.id.appwidget_model,MusicService.getPlayModel() == Constants.PLAY_LOOP ?
+                R.drawable.widget_btn_loop_normal :  MusicService.getPlayModel() == Constants.PLAY_REPEATONE ? R.drawable.widget_btn_one_normal : R.drawable.widget_btn_shuffle_normal);
+        //是否收藏
+        remoteViews.setImageViewResource(R.id.appwidget_love,
+                PlayListUtil.isLove(temp.getId()) == PlayListUtil.EXIST ? R.drawable.widget_btn_like_prs : R.drawable.widget_btn_like_nor);
         //进度
-        mRemoteViews.setProgressBar(R.id.appwidget_seekbar,(int)temp.getDuration(), MusicService.getProgress(),false);
+        remoteViews.setProgressBar(R.id.appwidget_seekbar,(int)temp.getDuration(), MusicService.getProgress(),false);
 
         //设置封面
-        updateCover(context,temp.getAlbumId(),reloadCover);
+        updateCover(context,remoteViews,appWidgetIds,temp.getAlbumId(),reloadCover);
     }
 
     private void buildAction(Context context, RemoteViews views) {

@@ -633,6 +633,11 @@ public class CommonUtil {
     public static boolean isRightLrc(File file,String displayName,String title,String artist){
         BufferedReader br = null;
         try {
+            if(file == null || !file.canRead())
+                return false;
+            if(TextUtils.isEmpty(file.getAbsolutePath()) || TextUtils.isEmpty(displayName) ||
+                    TextUtils.isEmpty(title) || TextUtils.isEmpty(artist))
+                return false;
             br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
             String prefix = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1);
             String fileName = file.getName().substring(0,file.getName().lastIndexOf('.'));

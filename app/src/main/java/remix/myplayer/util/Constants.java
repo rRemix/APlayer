@@ -46,6 +46,7 @@ public class Constants {
     public final static int PAUSE = 4;
     public final static int START = 5;
     public final static int CHANGE_MODEL = 6;
+    public final static int LOVE = 7;
     //播放模式
     public final static int PLAY_LOOP = 50;
     public final static int PLAY_SHUFFLE = 51;

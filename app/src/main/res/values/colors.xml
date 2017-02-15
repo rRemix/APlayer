@@ -101,6 +101,9 @@
     <color name="appwidget_artist_color">#a9a9a9</color>
     <color name="appwidget_progress_color">#a8a8a8</color>
     <color name="appwidget_background_color">#f9f9f9</color>
+    <color name="appwidget_track_color">#e2e2e2</color>
+    <color name="appwidget_track_start_color">#96b9ff</color>
+    <color name="appwidget_track_end_color">#5179f5</color>
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>
     <color name="day_textcolor">@color/gray_6d6c69</color>
