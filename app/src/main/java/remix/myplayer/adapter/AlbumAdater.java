@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -109,7 +108,6 @@ public class AlbumAdater extends HeaderAdapter implements FastScroller.SectionIn
                 holder.mText2.setText(artist);
                 //设置封面
                 int albumid = mCursor.getInt(AlbumFragment.mAlbumIdIndex);
-                holder.mImage.setImageURI(Uri.EMPTY);
                 new AsynLoadImage(holder.mImage).execute(albumid,Constants.URL_ALBUM);
                 if(holder instanceof AlbumListHolder){
                     new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);

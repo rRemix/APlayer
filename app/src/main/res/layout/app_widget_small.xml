@@ -33,7 +33,7 @@
             android:progressDrawable="@drawable/bg_appwidget_progress"
             android:layout_width="match_parent"
             android:layout_height="@dimen/d2_size"
-            android:layout_marginTop="@dimen/d4_size" />
+            android:layout_marginTop="@dimen/d6_size" />
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -58,8 +58,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/app_widget_small_button_height"
                 android:layout_centerInParent="true"
-                android:layout_marginLeft="@dimen/d24_size"
-                android:layout_marginRight="@dimen/d24_size"/>
+                android:layout_marginLeft="@dimen/d28_size"
+                android:layout_marginRight="@dimen/d28_size"/>
             <ImageButton android:id="@+id/appwidget_prev"
                 android:background="@drawable/bg_common_borderless_ripple"
                 android:src="@drawable/widget_btn_previous_normal"

@@ -179,7 +179,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      */
     private static Rect mDestRect = new Rect();
     /**
-     *
+     * 下拉关闭
      */
     private boolean mIsBacking = false;
     private float mEventY1;
@@ -283,8 +283,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mAnimCover.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
         mAnimCover.getHierarchy().setFailureImage(ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night, ScalingUtils.ScaleType.CENTER_CROP);
         mContainer.addView(mAnimCover);
+
         //设置封面
-        MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
+        if(mInfo != null)
+            MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
 
         //恢复位置信息
         if(savedInstanceState != null){
@@ -875,23 +877,13 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             if(MusicService.getNextMP3() != null){
                 mNextSong.setText("下一首：" + MusicService.getNextMP3().getTitle());
             }
-            new Thread(){
-                @Override
-                public void run() {
-                    File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(),Constants.URL_ALBUM);
-                    if(imgFile.exists()) {
-                        mUri = Uri.parse("file:///" +  imgFile);
-                    } else {
-                        mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
-                    }
-                    mCoverHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
-                }
-            }.start();
+            if(mCoverRunnable == null)
+                mCoverRunnable = new CoverRunnalbe();
+            mCoverHandler.post(mCoverRunnable);
         }
         //更新按钮状态
         UpdatePlayButton(isplay);
     }
-
 
     //更新进度条线程
     class ProgeressThread extends Thread {
@@ -951,5 +943,23 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mNextSong.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_a8a8a8 : R.color.white_e5e5e5));
     }
 
+    private CoverRunnalbe mCoverRunnable = new CoverRunnalbe();
+    private class CoverRunnalbe implements Runnable{
+        @Override
+        public void run() {
+            if(mInfo == null || (mInfo = MusicService.getCurrentMP3()) == null){
+                mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
+            } else {
+                File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(),Constants.URL_ALBUM);
+                if(imgFile.exists()) {
+                    mUri = Uri.parse("file:///" +  imgFile);
+                } else {
+                    mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
+                }
+            }
+            mCoverHandler.removeMessages(UPDATE_COVER);
+            mCoverHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+        }
+    }
 
 }

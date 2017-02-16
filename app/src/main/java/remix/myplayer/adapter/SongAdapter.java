@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -132,7 +131,7 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
                 mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),0,"","",0,"","",0);
 
         //获得当前播放的歌曲
-        final MP3Item currentMP3 = MusicService.getCurrentMP3();
+//        final MP3Item currentMP3 = MusicService.getCurrentMP3();
         //判断该歌曲是否是正在播放的歌曲
         //如果是,高亮该歌曲，并显示动画
 //        if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
@@ -166,9 +165,7 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
             holder.mOther.setText(artist + "-" + album);
 
             //封面
-            holder.mImage.setImageURI(Uri.EMPTY);
             new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(),Constants.URL_ALBUM);
-//            MediaStoreUtil.setImageUrl(holder.mImage,temp.getAlbumId());
 
             //背景点击效果
             holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));

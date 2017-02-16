@@ -1,6 +1,5 @@
 package remix.myplayer.appwidgets;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -62,9 +61,8 @@ public class AppWidgetBig extends BaseAppwidget {
 
         //设置时间
         long currentTime = MusicService.getProgress();
-        long remainTime = temp.getDuration() - MusicService.getProgress();
-        if(currentTime > 0 && remainTime > 0){
-            remoteViews.setTextViewText(R.id.appwidget_progress, CommonUtil.getTime(currentTime) + "/" + CommonUtil.getTime(remainTime));
+        if(currentTime > 0){
+            remoteViews.setTextViewText(R.id.appwidget_progress, CommonUtil.getTime(currentTime));
         }
         //进度
         remoteViews.setProgressBar(R.id.appwidget_seekbar,(int)temp.getDuration(),(int)currentTime,false);
@@ -74,8 +72,7 @@ public class AppWidgetBig extends BaseAppwidget {
 
     private void buildAction(Context context, RemoteViews views) {
         Intent intent = new Intent(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        views.setOnClickPendingIntent(R.id.appwidget_text_container, PendingIntent.getActivity(context,0,intent,PendingIntent.FLAG_UPDATE_CURRENT));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ComponentName componentName = new ComponentName(context,MusicService.class);
         views.setOnClickPendingIntent(R.id.appwidget_toggle,buildPendingIntent(context,componentName,Constants.TOGGLE));
         views.setOnClickPendingIntent(R.id.appwidget_prev,buildPendingIntent(context,componentName, Constants.PREV));

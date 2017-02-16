@@ -1,63 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="#aa000000"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/appwidget_background_color"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <ImageView android:id="@+id/appwidget_image"
+    android:layout_height="@dimen/app_widget_big_hieght"
+    android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/app_widget_big_image_size">
+        <ImageView android:id="@+id/appwidget_image"
+            android:src="@drawable/album_empty_bg_day"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:background="@color/appwidget_big_bar_color"
+            android:gravity="center_vertical">
+            <TextView
+                android:id="@+id/appwidget_progress"
+                android:gravity="center"
+                android:layout_width="@dimen/d32_size"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/d4_size"
+                android:layout_marginLeft="@dimen/d4_size"
+                android:textSize="@dimen/s12_size"
+                android:textColor="@color/appwidget_progress_color"
+                android:maxLines="1"/>
+            <ProgressBar
+                android:id="@+id/appwidget_seekbar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:progressDrawable="@drawable/bg_appwidget_progress"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/d2_size" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-        android:padding="16dp"
-        android:gravity="center_vertical">
-        <ImageButton
-            android:id="@+id/appwidget_prev"
+        android:layout_marginLeft="@dimen/d12_size"
+        android:layout_marginRight="@dimen/d12_size">
+        <ImageButton android:id="@+id/appwidget_model"
+            android:background="@drawable/bg_common_borderless_ripple"
+            android:src="@drawable/widget_btn_loop_normal"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/appwidget_big_button_height"
-            android:layout_weight="1"
-            android:src="@drawable/notify_prev"
-            android:background="?android:attr/selectableItemBackground"/>
-        <ImageButton
-            android:id="@+id/appwidget_toggle"
+            android:layout_height="@dimen/app_widget_big_button_height"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"/>
+        <ImageButton android:id="@+id/appwidget_love"
+            android:background="@drawable/bg_common_borderless_ripple"
+            android:src="@drawable/widget_btn_like_nor"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/appwidget_big_button_height"
-            android:layout_weight="1"
-            android:src="@drawable/notify_play"
-            android:background="?android:attr/selectableItemBackground"/>
-        <ImageButton
-            android:id="@+id/appwidget_next"
+            android:layout_height="@dimen/app_widget_big_button_height"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"/>
+        <ImageButton android:id="@+id/appwidget_toggle"
+            android:background="@drawable/bg_common_borderless_ripple"
+            android:src="@drawable/widget_btn_play_normal"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/appwidget_big_button_height"
-            android:layout_weight="1"
-            android:src="@drawable/notify_next"
-            android:background="?android:attr/selectableItemBackground"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:orientation="vertical"
-        android:layout_alignParentTop="true"
-        android:id="@+id/appwidget_text_container">
-        <TextView
-            android:id="@+id/appwidget_title"
+            android:layout_height="@dimen/app_widget_big_button_height"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="@dimen/d48_size"
+            android:layout_marginRight="@dimen/d48_size"/>
+        <ImageButton android:id="@+id/appwidget_prev"
+            android:background="@drawable/bg_common_borderless_ripple"
+            android:src="@drawable/widget_btn_previous_normal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/s24_size"
-            android:textColor="@color/night_textcolor_primary"
-            android:maxLines="1"/>
-        <TextView
-            android:layout_marginTop="@dimen/d4_size"
-            android:id="@+id/appwidget_artist"
+            android:layout_height="@dimen/app_widget_big_button_height"
+            android:layout_toLeftOf="@id/appwidget_toggle"
+            android:layout_centerVertical="true"/>
+        <ImageButton android:id="@+id/appwidget_next"
+            android:background="@drawable/bg_common_borderless_ripple"
+            android:src="@drawable/widget_btn_next_normal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/s18_size"
-            android:textColor="@color/night_textcolor"
-            android:maxLines="1"/>
-    </LinearLayout>
-</RelativeLayout>
+            android:layout_height="@dimen/app_widget_big_button_height"
+            android:layout_toRightOf="@id/appwidget_toggle"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
+</LinearLayout>

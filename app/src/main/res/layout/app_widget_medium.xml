@@ -57,7 +57,8 @@
         android:progressDrawable="@drawable/bg_appwidget_progress"
         android:layout_width="match_parent"
         android:layout_height="@dimen/d2_size"
-        android:layout_marginLeft="@dimen/d8_size"/>
+        android:layout_marginLeft="@dimen/d8_size"
+        android:layout_marginTop="@dimen/d4_size"/>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

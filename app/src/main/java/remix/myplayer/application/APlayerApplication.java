@@ -80,7 +80,7 @@ public class APlayerApplication extends android.app.Application {
                 .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {
                     @Override
                     public MemoryCacheParams get() {
-                        return new MemoryCacheParams(cacheSize, 20,cacheSize,10, 5 * ByteConstants.MB);
+                        return new MemoryCacheParams(cacheSize, 15,cacheSize,10, 2 * ByteConstants.MB);
                     }
                 })
                 .build();

@@ -3,7 +3,8 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/d8_size">
 
     <!--<FrameLayout-->
         <!--android:visibility="invisible"-->
@@ -56,7 +57,7 @@
             fresco:failureImageScaleType="centerCrop"
             fresco:actualImageScaleType="centerCrop"
             fresco:fadeDuration="0"
-            android:layout_gravity="top|center_horizontal"/>
+            android:layout_gravity="top|center_horizontal" />
     </FrameLayout>
 
 </RelativeLayout>

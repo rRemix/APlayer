@@ -128,7 +128,7 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
             holder.mColumnView.setVisibility(View.VISIBLE);
             holder.mButton.setVisibility(View.VISIBLE);
             //获得正在播放的歌曲
-            final MP3Item currentMP3 = MusicService.getCurrentMP3();
+//            final MP3Item currentMP3 = MusicService.getCurrentMP3();
             //判断该歌曲是否是正在播放的歌曲
             //如果是,高亮该歌曲，并显示动画
 //            if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
