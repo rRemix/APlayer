@@ -67,7 +67,8 @@ public class ColorChooseDialog extends BaseDialogActivity {
         drawable.setColor(ColorUtil.getColor(mdColor));
 
         ImageView check = (ImageView) colorItem.findViewById(R.id.color_choose_item_check);
-        check.setVisibility(isColorChoose(mdColor) ? View.VISIBLE : View.GONE);
+        check.setVisibility(isColorChoose(themeColor) ? View.VISIBLE : View.GONE);
+
         TextView colorTextView = (TextView) colorItem.findViewById(R.id.color_choose_item_text);
         colorTextView.setText(colorText);
         colorTextView.setTextColor(ThemeStore.getTextColorPrimary());
@@ -79,11 +80,11 @@ public class ColorChooseDialog extends BaseDialogActivity {
 
     /**
      * 判断是否是选中的颜色
-     * @param colorRes
+     * @param color
      * @return
      */
-    private boolean isColorChoose(@ColorRes int colorRes){
-        return colorRes == ThemeStore.MATERIAL_COLOR_PRIMARY;
+    private boolean isColorChoose(int color){
+        return color == ThemeStore.THEME_COLOR;
     }
 
 

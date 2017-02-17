@@ -2,7 +2,6 @@ package remix.myplayer.ui.activity;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -120,12 +119,8 @@ public class BaseActivity extends AppCompatActivity {
      */
     protected void setNavigationBarColor(){
         //导航栏变色
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if(SPUtil.getValue(this,"Setting","ColorNavigation",false)){
-                getWindow().setNavigationBarColor(ThemeStore.getMaterialPrimaryColor());
-            } else {
-                getWindow().setNavigationBarColor(Color.BLACK);
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil.getValue(this,"Setting","ColorNavigation",false)) {
+            getWindow().setNavigationBarColor(ThemeStore.getAccentColor());
         }
     }
 

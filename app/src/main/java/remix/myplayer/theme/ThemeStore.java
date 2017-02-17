@@ -244,7 +244,7 @@ public class ThemeStore {
     }
 
     public static boolean isLightTheme(){
-//        return THEME_COLOR == THEME_WHITE;
-        return ColorUtil.isColorLight(getMaterialPrimaryColor());
+        return isDay()&& (THEME_COLOR == THEME_WHITE);
+//        return ColorUtil.isColorLight(getMaterialPrimaryColor());
     }
 }

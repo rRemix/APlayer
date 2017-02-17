@@ -44,6 +44,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.ColorChooseDialog;
 import remix.myplayer.ui.dialog.FolderChooserDialog;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
@@ -166,7 +167,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
 
         //主题颜色指示器
-        ((GradientDrawable)mColorSrc.getDrawable()).setColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : Color.TRANSPARENT);
+        ((GradientDrawable)mColorSrc.getDrawable()).setColor(
+                ThemeStore.isDay() ? ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.md_white_primary_dark) : ThemeStore.getMaterialPrimaryColor() : Color.TRANSPARENT);
         //初始化箭头颜色
         final int arrowColor = ThemeStore.getAccentColor();
         ButterKnife.apply( new ImageView[]{findView(R.id.setting_eq_arrow),findView(R.id.setting_feedback_arrow),

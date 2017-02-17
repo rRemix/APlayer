@@ -215,8 +215,9 @@ public class MusicService extends BaseService implements Playback {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        if(mNotify != null)
-            mNotify.cancel();
+        if(mNotify == null)
+            mNotify = new Notify();
+        mNotify.cancel();
         ShakeDetector.getInstance(APlayerApplication.getContext()).stopListen();
     }
 
@@ -1300,6 +1301,8 @@ public class MusicService extends BaseService implements Playback {
 
         public void cancel(){
             stopForeground(true);
+            if(mNotificationManager == null)
+                mNotificationManager = (NotificationManager)mContext.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancelAll();
             mNotifyMode = NOTIFY_MODE_NONE;
         }
