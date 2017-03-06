@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="ActivityAnimDuration">350</integer>
+    <integer name="ActivityAnimDuration">330</integer>
     <integer name="DialogAnimDuration">250</integer>
     <integer name="PlayerActivityAnimDuration">200</integer>
     <integer name="AutoHideDelay">600</integer>

@@ -3,6 +3,8 @@ package remix.myplayer.ui.activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -15,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
+import android.support.v7.graphics.Palette;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
@@ -155,7 +158,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private boolean mFromActivity = false;
     //是否需要更新
     private boolean mNeedUpdateUI = true;
-
+    //是否开启变色背景
+    private boolean mDiscolour = false;
     private static final String SCALE_WIDTH = "SCALE_WIDTH";
     private static final String SCALE_HEIGHT = "SCALE_HEIGHT";
     private static final String TRANSITION_X = "TRANSITION_X";
@@ -201,15 +205,25 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 mSeekBar.setProgress(mCurrentTime);
         }
     };
-    /** 更新封面的Handler */
+    /** 更新封面与背景的Handler */
     private Uri mUri;
-    private final int UPDATE_COVER = 0;
+    private final int UPDATE_COVER = 100;
+    private final int UPDATE_BG = 101;
+    private Bitmap mRawBitMap;
+
+    private Palette.Swatch mSwatch;
     private Handler mCoverHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == UPDATE_COVER){
                 ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,mUri,!mFistStart);
                 mFistStart = false;
+            }
+            if(msg.what == UPDATE_BG){
+                //修改背景颜色
+                int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
+                int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
+                mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
             }
         }
     };
@@ -225,6 +239,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     @Override
     protected void setStatusBar() {
+        //是否开启背景变色
+        mDiscolour = SPUtil.getValue(this,"Setting","Discolour",false) && ThemeStore.isDay();
         if(ThemeStore.isDay()){
             //获得miui版本
             String miui = "";
@@ -243,15 +259,24 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             }
             if(Build.MANUFACTURER.equals("Meizu")){
                 StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this,true);
-                StatusBarUtil.setColorNoTranslucent(this, Color.WHITE);
+                if(mDiscolour)
+                    StatusBarUtil.setTransparent(this);
+                else
+                    StatusBarUtil.setColorNoTranslucent(this, Color.WHITE);
             } else if (Build.MANUFACTURER.equals("Xiaomi") && miuiVersion >= 6 ){
                 StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true,this);
-                StatusBarUtil.setColorNoTranslucent(this, Color.WHITE);
+                if(mDiscolour)
+                    StatusBarUtil.setTransparent(this);
+                else
+                    StatusBarUtil.setColorNoTranslucent(this, Color.WHITE);
             }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 StatusBarUtil.setTransparent(this);
                 getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
             }  else {
-                StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.statusbar_gray_color));
+                if(mDiscolour)
+                    StatusBarUtil.setTransparent(this);
+                else
+                    StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.statusbar_gray_color));
             }
         } else {
             StatusBarUtil.setTransparent(this);
@@ -289,7 +314,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
 
         //恢复位置信息
-        if(savedInstanceState != null){
+        if(savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null){
             mOriginRect = savedInstanceState.getParcelable("Rect");
         }
 
@@ -360,8 +385,13 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         outState.putParcelable("Rect",mOriginRect);
     }
 
-//    private final int DURATION = 260;
-//    private Interpolator INTERPOLATOR = new DecelerateInterpolator();
+//    @Override
+//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        if(savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null)
+//            mOriginRect = savedInstanceState.getParcelable("Rect");
+//    }
+
     @Override
     public void onBackPressed() {
         if(mFromNotify){
@@ -375,32 +405,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             //更新动画控件封面 保证退场动画的封面与fragment中封面一致
             mIsBacking = true;
             mAnimCover.setImageURI(mUri);
-
-//            final View decorView = getWindow().getDecorView();
-//            Spring alphaSpring = SpringSystem.create().createSpring();
-//            alphaSpring.addListener(new SimpleSpringListener(){
-//                @Override
-//                public void onSpringActivate(Spring spring) {
-//                    if(decorView == null)
-//                        return;
-//                    decorView.setAlpha((float) spring.getCurrentValue());
-//                }
-//                @Override
-//                public void onSpringUpdate(Spring spring) {
-//                    if(decorView == null)
-//                        return;
-//                    decorView.setAlpha((float) spring.getCurrentValue());
-//                }
-//
-//                @Override
-//                public void onSpringAtRest(Spring spring) {
-//                    finish();
-//                    overridePendingTransition(0,0);
-//                }
-//            });
-//            alphaSpring.setCurrentValue(1);
-//            alphaSpring.setEndValue(0);
-//            alphaSpring.setOvershootClampingEnabled(true);
 
             final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
             final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
@@ -436,46 +440,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             coverSpring.setOvershootClampingEnabled(true);
             coverSpring.setCurrentValue(1);
             coverSpring.setEndValue(0);
-
-
-//            final View decorView = getWindow().getDecorView();
-//            mContainer.animate()
-//                    .setDuration(DURATION)
-//                    .setInterpolator(INTERPOLATOR)
-//                    .alpha(0f)
-//                    .withEndAction(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            finish();
-//                            overridePendingTransition(0,0);
-//                        }
-//                    })
-//                    .startListen();
-//            mAnimCover.animate()
-//                    .setDuration(DURATION)
-//                    .setInterpolator(INTERPOLATOR)
-//                    .translationX(0)
-//                    .translationY(0)
-//                    .scaleX(1)
-//                    .scaleY(1)
-//                    .withStartAction(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            mAnimCover.setVisibility(View.VISIBLE);
-//                            //隐藏fragment中的image
-//                            if(mAdapter.getItem(1) instanceof CoverFragment){
-//                                ((CoverFragment) mAdapter.getItem(1)).hideImage();
-//                            }
-//                        }
-//                    })
-//                    .withEndAction(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            finish();
-//                            overridePendingTransition(0,0);
-//                        }
-//                    })
-//                    .startListen();
         } else {
             finish();
             overridePendingTransition(0,R.anim.audio_out);
@@ -729,24 +693,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
                 final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
 
-//                mAnimCover.animate()
-//                        .setDuration(DURATION)
-//                        .setInterpolator(INTERPOLATOR)
-//                        .translationX(mTransitionBundle.getFloat(TRANSITION_X))
-//                        .translationY(mTransitionBundle.getFloat(TRANSITION_Y))
-//                        .scaleX(mScaleBundle.getFloat(SCALE_WIDTH))
-//                        .scaleY(mScaleBundle.getFloat(SCALE_HEIGHT))
-//                        .withEndAction(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                if (mAdapter.getItem(1) instanceof CoverFragment) {
-//                                    ((CoverFragment) mAdapter.getItem(1)).showImage();
-//                                }
-//                                //隐藏动画用的封面
-//                                mAnimCover.setVisibility(View.GONE);
-//                            }
-//                        }).startListen();
-
                 final Spring spring = SpringSystem.create().createSpring();
                 spring.addListener(new SimpleSpringListener(){
                     @Override
@@ -947,10 +893,45 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private class CoverRunnalbe implements Runnable{
         @Override
         public void run() {
+            updateCover();
+            updateBg();
+        }
+
+        private void updateBg() {
+            if(!mDiscolour)
+                return;
+            //更新背景
+            try {
+                mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
+                if(mRawBitMap == null)
+                    mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
+
+//                StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
+//                mNewBitMap = mStackBlurManager.process(40);
+
+                Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
+                    @Override
+                    public void onGenerated(Palette palette) {
+                        if(palette == null || palette.getMutedSwatch() == null){
+                            mSwatch = new Palette.Swatch(Color.GRAY,100);
+                        } else {
+                            mSwatch = palette.getMutedSwatch();//柔和 暗色
+                        }
+                        mCoverHandler.removeMessages(UPDATE_BG);
+                        mCoverHandler.sendEmptyMessage(UPDATE_BG);
+                    }
+                });
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        private void updateCover() {
+            //更新封面
             if(mInfo == null || (mInfo = MusicService.getCurrentMP3()) == null){
                 mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
             } else {
-                File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(),Constants.URL_ALBUM);
+                File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(), Constants.URL_ALBUM);
                 if(imgFile.exists()) {
                     mUri = Uri.parse("file:///" +  imgFile);
                 } else {

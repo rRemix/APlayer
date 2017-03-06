@@ -97,4 +97,6 @@
     <dimen name="fastscroll_handle_radius">2dp</dimen>
     <dimen name="fastscroll_track_width">1dp</dimen>
     <dimen name="fastscroll_scrollbar_padding">8dp</dimen>
+
+    <dimen name="cover_margin_top">38dp</dimen>
 </resources>

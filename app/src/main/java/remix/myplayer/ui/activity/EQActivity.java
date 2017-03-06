@@ -27,6 +27,7 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.EQSeekBar;
+import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
@@ -70,67 +71,57 @@ public class EQActivity extends ToolbarActivity {
         new Thread(){
             @Override
             public void run() {
-                int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
-                LogUtil.d(TAG,"AudioSessionId:" + AudioSessionId);
-                if(AudioSessionId  == 0) {
-                    ToastUtil.show(APlayerApplication.getContext(),R.string.eq_initial_failed);
-                    return;
-                }
-                //是否启用音效设置
-                mEnable = SPUtil.getValue(APlayerApplication.getContext(),"Setting","EnableEQ",false) & Global.getHeadsetOn();
-                mInitialEnable = SPUtil.getValue(APlayerApplication.getContext(),"Setting","InitialEnableEQ",false);
-
-                //EQ
-                mEqualizer = new Equalizer(0, AudioSessionId);
-                mEqualizer.setEnabled(mEnable);
-//                //重低音
-//                mBassBoost = new BassBoost(0,AudioSessionId);
-//                mBassBoost.setEnabled(mEnable);
-//                mBassBoostLevel = (short)SPUtil.getValue(APlayerApplication.getContext(),"setting","BassBoostLevel",0);
-//                if(mEnable && mBassBoost.getStrengthSupported()){
-//                    mBassBoost.setStrength(mBassBoostLevel);
-//                }
-//                //环绕音效
-//                mVirtualizer = new Virtualizer(0,AudioSessionId);
-//                mVirtualizeLevel = (short)SPUtil.getValue(APlayerApplication.getContext(),"setting","VirtualizeLevel",0);
-//                mVirtualizer.setEnabled(mEnable);
-//                if(mEnable && mVirtualizer.getStrengthSupported()){
-//                    mVirtualizer.setStrength(mVirtualizeLevel);
-//                }
-
-                //得到当前Equalizer引擎所支持的控制频率的标签数目。
-                mBandNumber = mEqualizer.getNumberOfBands();
-
-                //得到之前存储的每个频率的db值
-                for(short i = 0 ; i < mBandNumber; i++){
-                    short temp = (short)(SPUtil.getValue(APlayerApplication.getContext(),"Setting","Band" + i,0));
-                    mBandFrequencys.add(temp);
-                    if (mEnable){
-                        mEqualizer.setBandLevel(i,temp);
+                try {
+                    int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
+                    LogUtil.d(TAG,"AudioSessionId:" + AudioSessionId);
+                    if(AudioSessionId  == 0) {
+                        ToastUtil.show(APlayerApplication.getContext(),R.string.eq_initial_failed);
+                        return;
                     }
-                }
+                    //是否启用音效设置
+                    mEnable = SPUtil.getValue(APlayerApplication.getContext(),"Setting","EnableEQ",false) & Global.getHeadsetOn();
+                    mInitialEnable = SPUtil.getValue(APlayerApplication.getContext(),"Setting","InitialEnableEQ",false);
 
-                //得到的最小频率
-                mMinEQLevel = mEqualizer.getBandLevelRange()[0];
-                //得到的最大频率
-                mMaxEQLevel = mEqualizer.getBandLevelRange()[1];
-                for (short i = 0; i < mBandNumber; i++) {
-                    //通过标签可以顺次的获得所有支持的频率的名字比如 60Hz 230Hz
-                    mCenterFres.add(mEqualizer.getCenterFreq(i) / 1000);
-                }
+                    //EQ
+                    mEqualizer = new Equalizer(0, AudioSessionId);
+                    mEqualizer.setEnabled(mEnable);
 
-                //获得所有预设的音效
-                for(short i = 0 ; i < mEqualizer.getNumberOfPresets() ; i++){
-                    mPreSettings.put(mEqualizer.getPresetName(i),i);
-                }
+                    //得到当前Equalizer引擎所支持的控制频率的标签数目。
+                    mBandNumber = mEqualizer.getNumberOfBands();
 
-                //获得所有频率值
-                short temp = (short) ((mMaxEQLevel - mMinEQLevel) / 30);
-                for(short i = 0 ; i < 31; i++){
-                    mBandLevels.add((short)(1500 - (i * temp)));
+                    //得到之前存储的每个频率的db值
+                    for(short i = 0 ; i < mBandNumber; i++){
+                        short temp = (short)(SPUtil.getValue(APlayerApplication.getContext(),"Setting","Band" + i,0));
+                        mBandFrequencys.add(temp);
+                        if (mEnable){
+                            mEqualizer.setBandLevel(i,temp);
+                        }
+                    }
+
+                    //得到的最小频率
+                    mMinEQLevel = mEqualizer.getBandLevelRange()[0];
+                    //得到的最大频率
+                    mMaxEQLevel = mEqualizer.getBandLevelRange()[1];
+                    for (short i = 0; i < mBandNumber; i++) {
+                        //通过标签可以顺次的获得所有支持的频率的名字比如 60Hz 230Hz
+                        mCenterFres.add(mEqualizer.getCenterFreq(i) / 1000);
+                    }
+
+                    //获得所有预设的音效
+                    for(short i = 0 ; i < mEqualizer.getNumberOfPresets() ; i++){
+                        mPreSettings.put(mEqualizer.getPresetName(i),i);
+                    }
+
+                    //获得所有频率值
+                    short temp = (short) ((mMaxEQLevel - mMinEQLevel) / 30);
+                    for(short i = 0 ; i < 31; i++){
+                        mBandLevels.add((short)(1500 - (i * temp)));
+                    }
+                    //初始化完成
+                    mHasInitial = true;
+                }catch (Exception e){
+                    CommonUtil.uploadException("均衡器初始化失败",e);
                 }
-                //初始化完成
-                mHasInitial = true;
             }
 
         }.start();

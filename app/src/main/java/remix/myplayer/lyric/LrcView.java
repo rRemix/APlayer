@@ -124,7 +124,7 @@ public class LrcView extends View implements ILrcView{
 		mPaintForHighLightLrc.setAntiAlias(true);
 		mPaintForHighLightLrc.setColor(mCurColorForHightLightLrc);
 
-        mCurSizeForHightLightLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,18, APlayerApplication.getContext().getResources().getDisplayMetrics());
+        mCurSizeForHightLightLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,19, APlayerApplication.getContext().getResources().getDisplayMetrics());
 		mPaintForHighLightLrc.setTextSize(mCurSizeForHightLightLrc);
 		mPaintForHighLightLrc.setFakeBoldText(true);
 
@@ -132,12 +132,12 @@ public class LrcView extends View implements ILrcView{
         mPaintForOtherLrc.setAntiAlias(true);
 		mPaintForOtherLrc.setColor(mCurColorForOtherLrc);
 
-        mCurSizeForOtherLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,12, APlayerApplication.getContext().getResources().getDisplayMetrics());
+        mCurSizeForOtherLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,13, APlayerApplication.getContext().getResources().getDisplayMetrics());
 		mPaintForOtherLrc.setTextSize(mCurSizeForOtherLrc);
 
 		mPaintForTimeLine = new Paint();
         mPaintForTimeLine.setAntiAlias(true);
-        mCurSizeForTimeLine = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,12, APlayerApplication.getContext().getResources().getDisplayMetrics());
+        mCurSizeForTimeLine = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,13, APlayerApplication.getContext().getResources().getDisplayMetrics());
         mPaintForTimeLine.setTextSize(mCurSizeForTimeLine);
 		mPaintForTimeLine.setColor(mTimeLineColor);
 
