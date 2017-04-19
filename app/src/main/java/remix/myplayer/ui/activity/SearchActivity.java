@@ -134,7 +134,7 @@ public class SearchActivity extends ToolbarActivity {
             cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.ARTIST,MediaStore.Audio.Media.ALBUM_ID},
                     selection,
-                    new String[]{mkey + "%",mkey + "%",mkey + "%"}, null);
+                    new String[]{"%" + mkey + "%","%" + mkey + "%","%" + mkey + "%"}, null);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -8,9 +8,10 @@
     <uses-permission android:name="android.permission.BROADCAST_STICKY"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!--<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />-->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
 
     <application
         android:name=".application.APlayerApplication"
@@ -114,9 +115,6 @@
             android:name=".ui.activity.SettingActivity"
             android:theme="@style/ActivityStyle" />
         <activity
-            android:name=".ui.activity.ThemeActivity"
-            android:theme="@style/ActivityStyle" />
-        <activity
             android:name=".ui.activity.SongChooseActivity"
             android:theme="@style/ActivityStyle" />
         <activity
@@ -194,11 +192,11 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
-        <receiver android:name=".receiver.LineCtlReceiver">
-            <intent-filter android:priority="1000">
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
+        <!--<receiver android:name=".receiver.LineCtlReceiver">-->
+            <!--<intent-filter android:priority="1000">-->
+                <!--<action android:name="android.intent.action.MEDIA_BUTTON" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
         <!--<receiver android:name=".receiver.NotifyReceiver">-->
             <!--<intent-filter>-->
                 <!--<action android:name="remix.music.NOTIFY" />-->
@@ -214,6 +212,7 @@
                 <action android:name="remix.music.SOUNDEFFECT_ACTION" />
             </intent-filter>
         </receiver>
+
 
         <service android:name=".service.MusicService" />
 
@@ -244,6 +243,7 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/appwidget_small_info" />
         </receiver>
+
 
     </application>
 

@@ -51,16 +51,16 @@ public class SearchResAdapter extends BaseAdapter<SearchResAdapter.SearchResHold
         }
     }
 
-    public static class SearchResHolder extends BaseViewHolder {
+    static class SearchResHolder extends BaseViewHolder {
         @BindView(R.id.reslist_item)
-        public RelativeLayout mRooView;
+        RelativeLayout mRooView;
         @BindView(R.id.search_image)
-        public SimpleDraweeView mImage;
+        SimpleDraweeView mImage;
         @BindView(R.id.search_name)
-        public TextView mName;
+        TextView mName;
         @BindView(R.id.search_detail)
-        public TextView mOther;
-        public SearchResHolder(View itemView){
+        TextView mOther;
+        SearchResHolder(View itemView){
            super(itemView);
         }
     }

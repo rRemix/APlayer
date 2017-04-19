@@ -82,7 +82,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                     if(mInfoList == null)
                         return;
                     mAdapter.setList(mInfoList);
-                    mNum.setText(mInfoList.size() + "首歌曲");
+                    mNum.setText(getString(R.string.song_count,mInfoList.size()));
                     break;
                 case START:
                     if(mMDDialog != null && !mMDDialog.isShowing()){
@@ -274,7 +274,8 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                 break;
             //文件夹名
             case Constants.FOLDER:
-                mInfoList = MediaStoreUtil.getMP3ListByIds(Global.FolderMap.get(mArg));
+//                mInfoList = MediaStoreUtil.getMP3ListByIds(Global.FolderMap.get(mArg));
+                mInfoList = MediaStoreUtil.getMP3ListByFolderName(mArg);
                 break;
             //播放列表名
             case Constants.PLAYLIST:

@@ -17,7 +17,7 @@
             android:gravity="left"
             android:textColor="#50452f"
             android:textSize="@dimen/s14_size"
-            android:hint="写点什么吧"
+            android:hint="@string/write_something"
             android:padding="@dimen/d15_size"
             android:textCursorDrawable="@null"
             android:background="@null"/>

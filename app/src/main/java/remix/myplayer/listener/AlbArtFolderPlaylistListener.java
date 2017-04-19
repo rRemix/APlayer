@@ -49,7 +49,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
             //播放
             case R.id.menu_play:
                 if((idList == null || idList.size() == 0)){
-                    ToastUtil.show(mContext,R.string.list_isempty);
+                    ToastUtil.show(mContext,R.string.list_is_empty);
                     return true;
                 }
                 Intent intent = new Intent(Constants.CTL_ACTION);
@@ -62,7 +62,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
             //添加到播放队列
             case R.id.menu_add:
                 if((idList == null || idList.size() == 0)){
-                    ToastUtil.show(mContext,R.string.list_isempty);
+                    ToastUtil.show(mContext,R.string.list_is_empty);
                     return true;
                 }
                 ToastUtil.show(mContext,mContext.getString(R.string.add_song_playinglist_success,Global.AddSongToPlayQueue(idList)));

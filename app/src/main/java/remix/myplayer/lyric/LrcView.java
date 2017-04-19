@@ -225,6 +225,8 @@ public class LrcView extends View implements ILrcView{
 	/**事件的上一次的y坐标**/
 	private float lastY;
 	private float lastX;
+	/**事件的上一次时间*/
+	private long lastTime;
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if(mLrcRows == null || mLrcRows.size() == 0){
@@ -234,10 +236,11 @@ public class LrcView extends View implements ILrcView{
 		case MotionEvent.ACTION_DOWN:
 			firstY = event.getRawY();
 			lastX = event.getRawX();
+            lastTime = System.currentTimeMillis();
 			break;
 		case MotionEvent.ACTION_MOVE:
 			if(!canDrag){
-				if(Math.abs(event.getRawY() - firstY) > mTouchSlop && Math.abs(event.getRawY()-firstY) > Math.abs(event.getRawX()-lastX)){
+				if(Math.abs(event.getRawY() - firstY) > mTouchSlop && Math.abs(event.getRawY() - firstY) > Math.abs(event.getRawX() - lastX)){
 					canDrag = true;
 					mIsDrawTimeLine = true;
 					mScroller.forceFinished(true);
@@ -251,17 +254,17 @@ public class LrcView extends View implements ILrcView{
 				float offset = event.getRawY() - lastY;//偏移量
 				if( getScrollY() - offset < 0){ 
 					if(offset > 0){
-						offset = offset/3;
+						offset = offset / 3;
 					}
-				}else if(getScrollY() - offset >mLrcRows.size()*(mCurSizeForOtherLrc+mCurPadding)-mCurPadding){
+				}else if(getScrollY() - offset > mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding){
 					if(offset < 0 ){
-						offset = offset/3;
+						offset = offset / 3;
 					}
 				}
-				scrollBy(getScrollX(), -(int) offset);
+				scrollBy(getScrollX(), -(int)offset);
 				lastY = event.getRawY();
-				int currentRow = (int) (getScrollY()/(mCurSizeForOtherLrc+mCurPadding));
-				currentRow = Math.min(currentRow, mLrcRows.size()-1);
+				int currentRow = (int) (getScrollY() / (mCurSizeForOtherLrc+mCurPadding));
+				currentRow = Math.min(currentRow, mLrcRows.size() - 1);
 				currentRow = Math.max(currentRow, 0);
 				seekTo(mLrcRows.get(currentRow).getTime(), false,false);
 				return true;
@@ -271,9 +274,9 @@ public class LrcView extends View implements ILrcView{
 		case MotionEvent.ACTION_UP:
 		case MotionEvent.ACTION_CANCEL:
 			if(!canDrag){
-				if(onLrcClickListener != null){
-					onLrcClickListener.onClick();
-				}
+                if(onLrcClickListener != null){
+                    onLrcClickListener.onClick();
+                }
 			}else{
 				if(onSeekToListener!= null && mCurRow != -1){
 					onSeekToListener.onSeekTo(mLrcRows.get(mCurRow).getTime());
@@ -478,6 +481,7 @@ public class LrcView extends View implements ILrcView{
 
 	public interface OnLrcClickListener{
 		void onClick();
+        void onLongClick();
 	}
 
 	public void log(Object o){

@@ -63,7 +63,7 @@
             android:id="@+id/feedback_submit"
             android:textColor="@color/white"
             android:textSize="@dimen/d14_size"
-            android:text="提交"/>
+            android:text="@string/submit"/>
 
     </LinearLayout>
 

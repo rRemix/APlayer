@@ -99,4 +99,7 @@
     <dimen name="fastscroll_scrollbar_padding">8dp</dimen>
 
     <dimen name="cover_margin_top">38dp</dimen>
+
+    <dimen name="float_height">72dp</dimen>
+    <dimen name="float_text_size">20sp</dimen>
 </resources>

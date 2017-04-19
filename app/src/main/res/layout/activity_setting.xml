@@ -82,8 +82,7 @@
                         android:gravity="center_vertical"
                         android:layout_centerVertical="true"
                         android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="@dimen/d16_size"
-                        android:layout_marginRight="@dimen/d16_size">
+                        android:layout_marginLeft="@dimen/d16_size">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -92,21 +91,13 @@
                             android:textSize="@dimen/s16_size"
                             android:layout_marginBottom="@dimen/d2_size"/>
                         <TextView
+                            android:id="@+id/setting_lockscreen_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/lockscreen_is_show"
+                            android:text="@string/choose_or_close_lockscreen"
                             android:textColor="?attr/text_color"
                             android:textSize="@dimen/s14_size"/>
                     </LinearLayout>
-                    <android.support.v7.widget.SwitchCompat
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textOn=""
-                        android:textOff=""
-                        android:id="@+id/setting_lockscreen_switch"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentBottom="true"
-                        android:layout_marginRight="@dimen/d14_size"/>
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -213,6 +204,49 @@
                     android:layout_margin="@dimen/d14_size"
                     android:textSize="@dimen/s16_size"
                     android:textColor="?attr/colorAccent"/>
+                <RelativeLayout
+                    android:visibility="gone"
+                    android:id="@+id/setting_lrc_float_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/setting_lrc_title"
+                    android:paddingTop="@dimen/d10_size"
+                    android:paddingBottom="@dimen/d10_size"
+                    android:background="?attr/background_common">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_vertical"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="@dimen/d16_size"
+                        android:layout_marginRight="@dimen/d16_size">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/float_lrc"
+                            android:textColor="?attr/text_color_primary"
+                            android:textSize="@dimen/s16_size"
+                            android:layout_marginBottom="@dimen/d2_size"/>
+                        <TextView
+                            android:id="@+id/setting_lrc_float_tip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="?attr/text_color"
+                            android:textSize="@dimen/s14_size"/>
+                    </LinearLayout>
+                    <android.support.v7.widget.SwitchCompat
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOn=""
+                        android:textOff=""
+                        android:id="@+id/setting_lrc_float_switch"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginRight="@dimen/d14_size"/>
+                </RelativeLayout>
+
                 <RelativeLayout
                     android:id="@+id/setting_lrc_priority_container"
                     android:layout_width="match_parent"

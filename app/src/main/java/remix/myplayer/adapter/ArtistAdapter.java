@@ -120,7 +120,7 @@ public class ArtistAdapter extends HeaderAdapter implements FastScroller.Section
                     @Override
                     public void onClick(View v) {
                         if(holder.getAdapterPosition() - 1 < 0){
-                            ToastUtil.show(mContext,"参数错误");
+                            ToastUtil.show(mContext,R.string.illegal_arg);
                             return;
                         }
                         mOnItemClickLitener.onItemClick(holder.mContainer,position - 1);
@@ -131,7 +131,7 @@ public class ArtistAdapter extends HeaderAdapter implements FastScroller.Section
                     @Override
                     public boolean onLongClick(View v) {
                         if(holder.getAdapterPosition() - 1 < 0){
-                            ToastUtil.show(mContext,"参数错误");
+                            ToastUtil.show(mContext,R.string.illegal_arg);
                             return true;
                         }
                         mOnItemClickLitener.onItemLongClick(holder.mContainer,position - 1);

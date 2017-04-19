@@ -45,17 +45,17 @@ public class LrcFragment extends BaseFragment {
                 return;
             //是否正在搜索
             if(msg.what == SEARCHING){
-                mLrcView.setText("正在搜索");
+                mLrcView.setText(getString(R.string.searching));
 
             } else if(msg.what == UPDATE_LRC) {
                 //更新歌词
                 mLrcView.setLrcRows(mLrcList);
             } else if (msg.what == NO_LRC) {
                 //没有找到歌词
-                mLrcView.setText("暂无歌词");
+                mLrcView.setText(getString(R.string.no_lrc));
             } else if (msg.what == NO_NETWORK) {
                 //没用网络
-                mLrcView.setText("请检查网络连接");
+                mLrcView.setText(getString(R.string.check_network));
             }
         }
     };

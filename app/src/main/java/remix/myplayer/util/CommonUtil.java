@@ -1,6 +1,8 @@
 package remix.myplayer.util;
 
+import android.app.ActivityManager;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -55,6 +57,36 @@ public class CommonUtil {
 
     public static void setContext(Context context) {
         mContext = context;
+    }
+
+    /**
+     * 注销receiver
+     */
+    public static void unregisterReceiver(Context context, BroadcastReceiver receiver){
+        try {
+            if(context != null){
+                context.unregisterReceiver(receiver);
+                receiver = null;
+            }
+        } catch (Exception e){
+            LogUtil.e("unregisterReceiver error",e.toString());
+        }
+    }
+
+    /**
+     * 判断列表是否为空
+     */
+    public static boolean isEmptyList(List list){
+        return list == null || list.size() == 0;
+    }
+
+    /**
+     * 判断当前界面是否是桌面
+     */
+    public static boolean isForeground(Context context) {
+        ActivityManager mActivityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> rti = mActivityManager.getRunningTasks(1);
+        return !isEmptyList(rti) && rti.get(0).topActivity.getPackageName().equals(context.getPackageName());
     }
 
     /**
@@ -546,11 +578,10 @@ public class CommonUtil {
 
     /**
      * 查找歌曲的lrc文件
-     * @param context
      * @param songName
      * @param searchPath
      */
-    public static void searchFile(Context context,String displayName,String songName,String artistName,File searchPath) {
+    public static void searchFile(String displayName,String songName,String artistName,File searchPath) {
         //判断SD卡是否存在
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File[] files = searchPath.listFiles();
@@ -559,7 +590,7 @@ public class CommonUtil {
             for(File file : files){
                 if (file.isDirectory()){
                     if(file.canRead()){
-                        searchFile(context,displayName,songName,artistName,file);
+                        searchFile(displayName,songName,artistName,file);
                     }
                 } else {
                     if(isRightLrc(file,displayName,songName,artistName)){
@@ -638,40 +669,46 @@ public class CommonUtil {
             if(TextUtils.isEmpty(file.getAbsolutePath()) || TextUtils.isEmpty(displayName) ||
                     TextUtils.isEmpty(title) || TextUtils.isEmpty(artist))
                 return false;
+            //暂时忽略网易云的歌词
+            if(file.getAbsolutePath().contains("netease/cloudmusic/"))
+                return false;
             br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            String prefix = file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1);
-            String fileName = file.getName().substring(0,file.getName().lastIndexOf('.'));
-            if(prefix.equals("lrc") ){
-                //判断歌词文件名与歌曲文件名是否一致
-                if(fileName.toUpperCase().equals(displayName.toUpperCase())) {
-                    return true;
+            String fileName = file.getName().indexOf('.') > 0 ?
+                    file.getName().substring(0,file.getName().lastIndexOf('.')) : file.getName();
+            //判断歌词文件名与歌曲文件名是否一致
+            if(fileName.toUpperCase().equals(displayName.toUpperCase())) {
+                return true;
+            }
+            //判断是否包含歌手名和歌曲名
+            if(fileName.toUpperCase().contains(title.toUpperCase()) && fileName.toUpperCase().contains(artist.toUpperCase())){
+                return true;
+            }
+            //读取前五行歌词内容进行判断
+            String lrcLine = "";
+            boolean hasArtist = false;
+            boolean hasTitle = false;
+            for(int i = 0 ; i < 5;i++){
+                if((lrcLine = br.readLine()) == null)
+                    break;
+                if(lrcLine.contains("ar") && lrcLine.toUpperCase().contains(artist.toUpperCase())) {
+                    hasArtist = true;
+                    continue;
                 }
-                //判断是否包含歌手名和歌曲名
-//                if(fileName.contains(title) || fileName.contains(title.toUpperCase())
-//                        && (fileName.contains(artist) || fileName.contains(artist.toUpperCase()))){
-//                    return true;
-//                }
-                if(fileName.toUpperCase().contains(title.toUpperCase()) && fileName.toUpperCase().contains(artist.toUpperCase())){
-                    return true;
-                }
-                //读取前五行歌词内容进行判断
-                String lrcLine = "";
-                boolean hasArtist = false;
-                boolean hasTitle = false;
-                for(int i = 0 ; i < 5;i++){
-                    if((lrcLine = br.readLine()) == null)
-                        break;
-                    if(lrcLine.contains("ar") && lrcLine.toUpperCase().contains(artist.toUpperCase()) )
-                        hasArtist = true;
-                    if(lrcLine.contains("ti") && lrcLine.toUpperCase().contains(title.toUpperCase()))
-                        hasTitle = true;
-                }
-                if(hasArtist && hasTitle){
-                    return true;
+                if(lrcLine.contains("ti") && lrcLine.toUpperCase().contains(title.toUpperCase())) {
+                    hasTitle = true;
                 }
             }
+            String str;
+            StringBuilder sb = new StringBuilder();
+            while ((str = br.readLine()) != null){
+                LogUtil.d("Lrc","lrcLine:" + str);
+                sb.append(str);
+            }
+            if(hasArtist && hasTitle){
+                return true;
+            }
         } catch (Exception e) {
-            CommonUtil.uploadException("查找本地歌词错误",e);
+
         } finally {
             try {
                 if(br != null){

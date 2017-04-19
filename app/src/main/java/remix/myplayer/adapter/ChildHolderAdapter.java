@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.model.MultiPosition;
@@ -58,9 +59,9 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
     private Drawable mSelectDrawable;
     private SortChangeCallback mCallback;
     //当前是升序还是降序 0:升序 1:降序
-    public static int ASC_DESC = 0;
+    public static int ASC_DESC = SPUtil.getValue(APlayerApplication.getContext(),"Setting","SubDirAscDesc", ASC);
     //当前是按字母排序还是添加时间 0:字母 1:时间
-    public static int SORT = 0;
+    public static int SORT = SPUtil.getValue(APlayerApplication.getContext(),"Setting","SubDirSort", NAME);
 
     public ChildHolderAdapter(Context context, int type, String arg,MultiChoice multiChoice){
         super(context,null,multiChoice);
@@ -68,9 +69,6 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
         this.mType = type;
         this.mArg = arg;
         this.mMultiChoice = multiChoice;
-        //读取之前的排序方式
-        SORT = SPUtil.getValue(context,"Setting","SubDirSort", NAME);
-        ASC_DESC = SPUtil.getValue(context,"Setting","SubDirAscDesc", ASC);
         int size = DensityUtil.dip2px(mContext,60);
         mDefaultDrawable = Theme.getShape(GradientDrawable.RECTANGLE,Color.TRANSPARENT,size,size);
         mSelectDrawable = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getSelectColor(),size,size);
@@ -102,8 +100,8 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
                 return;
             }
             //显示当前排序方式
-            headerHolder.mAscDesc.setText(ASC_DESC != ASC ? "降序" : "升序");
-            headerHolder.mSort.setText(SORT != NAME ?  "按添加时间" : "按字母");
+            headerHolder.mAscDesc.setText(ASC_DESC != ASC ? R.string.sort_as_desc : R.string.sort_as_asc);
+            headerHolder.mSort.setText(SORT != NAME ?  R.string.sort_as_add_time : R.string.sort_as_letter);
             View.OnClickListener listener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -192,7 +190,7 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
                 @Override
                 public void onClick(View v) {
                     if(holder.getAdapterPosition() - 1 < 0){
-                        ToastUtil.show(mContext,"参数错误");
+                        ToastUtil.show(mContext,R.string.illegal_arg);
                         return;
                     }
                     mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition() - 1);
@@ -202,7 +200,7 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
                 @Override
                 public boolean onLongClick(View v) {
                     if(holder.getAdapterPosition() - 1 < 0){
-                        ToastUtil.show(mContext,"参数错误");
+                        ToastUtil.show(mContext,R.string.illegal_arg);
                         return true;
                     }
                     mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition() - 1);
@@ -248,7 +246,7 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
                     SORT = NAME;
                 }
                 SPUtil.putValue(mContext,"Setting","SubDirSort",SORT);
-                headerHolder.mSort.setText(SORT != NAME ?  "按添加时间" : "按字母");
+                headerHolder.mSort.setText(SORT != NAME ?  R.string.sort_as_add_time : R.string.sort_as_letter);
                 mCallback.SortChange();
                 break;
             case R.id.asc_desc:
@@ -258,7 +256,7 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
                     ASC_DESC = ASC;
                 }
                 SPUtil.putValue(mContext,"Setting","SubDirAscDesc",ASC_DESC);
-                headerHolder.mAscDesc.setText(ASC_DESC != ASC ? "降序" : "升序");
+                headerHolder.mAscDesc.setText(ASC_DESC != ASC ? R.string.sort_as_desc : R.string.sort_as_asc);
                 mCallback.SortChange();
                 break;
         }

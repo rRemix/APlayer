@@ -65,14 +65,18 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     TextView mLrcPath;
     @BindView(R.id.setting_clear_text)
     TextView mCache;
-    @BindView(R.id.setting_lockscreen_switch)
-    SwitchCompat mLockScreenSwitch;
+    @BindView(R.id.setting_lockscreen_text)
+    TextView mLockScreenText;
     @BindView(R.id.setting_navaigation_switch)
     SwitchCompat mNaviSwitch;
     @BindView(R.id.setting_shake_switch)
     SwitchCompat mShakeSwitch;
     @BindView(R.id.setting_lrc_priority_switch)
     SwitchCompat mLrcPrioritySwitch;
+    @BindView(R.id.setting_lrc_float_switch)
+    SwitchCompat mFloatLrcSwitch;
+    @BindView(R.id.setting_lrc_float_tip)
+    TextView mFloatLrcTip;
 
     //是否需要重建activity
     private boolean mNeedRecreate = false;
@@ -94,7 +98,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 mCache.setText(getString(R.string.cache_szie,mCacheSize / 1024f / 1024));
             }
             if(msg.what == CLEARFINISH){
-                ToastUtil.show(SettingActivity.this,"清除成功");
+                ToastUtil.show(SettingActivity.this,getString(R.string.clear_success));
                 mCache.setText("0MB");
                 mLrcPath.setText(R.string.default_lrc_path);
             }
@@ -108,7 +112,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
-        setUpToolbar(mToolbar,"设置");
+        setUpToolbar(mToolbar,getString(R.string.setting));
 
         //读取重启aitivity之前的数据
         if(savedInstanceState != null){
@@ -117,9 +121,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             mFromColorChoose = savedInstanceState.getBoolean("fromColorChoose");
         }
 
-        //锁屏是否显示 导航栏是否变色 是否启用摇一摇切歌
-        final String[] keyWord = new String[]{"LockScreenOn","ColorNavigation","Shake","OnlineLrc"};
-        ButterKnife.apply(new SwitchCompat[]{mLockScreenSwitch, mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch}, new ButterKnife.Action<SwitchCompat>() {
+        //导航栏是否变色 是否启用摇一摇切歌
+        final String[] keyWord = new String[]{"ColorNavigation","Shake","OnlineLrc","FloatLrc"};
+        ButterKnife.apply(new SwitchCompat[]{ mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch,mFloatLrcSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
                 //只有锁屏默认开启，其余默认都关闭
@@ -133,27 +137,28 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         SPUtil.putValue(SettingActivity.this,"Setting",keyWord[index],isChecked);
                         switch (index){
-                            //设置导航栏变色后需要重启activity
+                            //变色导航栏
                             case 0:
-//                                if(isChecked)
-//                                    LockScreenListener.getInstance(mContext).beginListen();
-//                                else
-//                                    LockScreenListener.getInstance(mContext).stopListen();
-                                break;
-                            //开启或关闭 锁屏
-                            case 1:
                                 mNeedRecreate = true;
                                 mHandler.sendEmptyMessage(RECREATE);
                                 break;
-                            //开启或者关闭 或者摇一摇
-                            case 2:
+                            //摇一摇
+                            case 1:
                                 if(isChecked)
                                     ShakeDetector.getInstance(mContext).beginListen();
                                 else
                                     ShakeDetector.getInstance(mContext).stopListen();
                                 break;
                             //设置歌词搜索优先级
+                            case 2:
+                                break;
+                            //桌面歌词
                             case 3:
+                                mFloatLrcTip.setText(isChecked ? R.string.opened_float_lrc : R.string.closed_float_lrc);
+                                Intent intent = new Intent(Constants.CTL_ACTION);
+                                intent.putExtra("FloatLrc",mFloatLrcSwitch.isChecked());
+                                intent.putExtra("Control",Constants.TOGGLE_FLOAT_LRC);
+                                sendBroadcast(intent);
                                 break;
                         }
                     }
@@ -165,6 +170,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         if(!SPUtil.getValue(this,"Setting","LrcSearchPath","").equals("")) {
             mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcSearchPath","")));
         }
+        //桌面歌词
+        mFloatLrcTip.setText(mFloatLrcSwitch.isChecked() ? R.string.opened_float_lrc : R.string.closed_float_lrc);
 
         //主题颜色指示器
         ((GradientDrawable)mColorSrc.getDrawable()).setColor(
@@ -234,7 +241,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_container,
             R.id.setting_feedback_container,R.id.setting_about_container, R.id.setting_update_container,
-            R.id.setting_lockscreen_container,R.id.setting_lrc_priority_container,
+            R.id.setting_lockscreen_container,R.id.setting_lrc_priority_container,R.id.setting_lrc_float_container,
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
             R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container})
     public void onClick(View v){
@@ -267,6 +274,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .positiveColorAttr(R.attr.text_color_primary)
                         .show();
                 break;
+            //桌面歌词
+            case R.id.setting_lrc_float_container:
+                mFloatLrcSwitch.setChecked(!mFloatLrcSwitch.isChecked());
+                break;
             //歌词扫描路径
             case R.id.setting_lrc_path_container:
                 new FolderChooserDialog.Builder(this)
@@ -280,7 +291,28 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //锁屏显示
             case R.id.setting_lockscreen_container:
-                mLockScreenSwitch.setChecked(!mLockScreenSwitch.isChecked());
+                //0:软件锁屏 1:系统锁屏 2:关闭
+                new MaterialDialog.Builder(this).title(R.string.lockscreen_show)
+                    .titleColorAttr(R.attr.text_color_primary)
+                    .positiveText(R.string.choose)
+                    .positiveColorAttr(R.attr.text_color_primary)
+                    .buttonRippleColorAttr(R.attr.ripple_color)
+                    .items(new String[]{getString(R.string.aplayer_lockscreen), getString(R.string.system_lockscreen), getString(R.string.close)})
+                    .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"Setting","LockScreenOn",Constants.APLAYER_LOCKSCREEN) ,
+                            new MaterialDialog.ListCallbackSingleChoice() {
+                                @Override
+                                public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                    SPUtil.putValue(SettingActivity.this,"Setting","LockScreenOn",which);
+                                    Intent intent = new Intent(Constants.CTL_ACTION);
+                                    intent.putExtra("Control",Constants.TOGGLE_MEDIASESSION);
+                                    sendBroadcast(intent);
+                                    return true;
+                                }
+                            })
+                    .backgroundColorAttr(R.attr.background_color_3)
+                    .itemsColorAttr(R.attr.text_color_primary)
+                    .theme(ThemeStore.getMDDialogTheme())
+                    .show();
                 break;
             //导航栏变色
             case R.id.setting_navigation_container:

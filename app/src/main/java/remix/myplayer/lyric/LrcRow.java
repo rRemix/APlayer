@@ -64,7 +64,7 @@ public class LrcRow implements Comparable<LrcRow>{
 	 * @return
 	 */
 	public static List<LrcRow> createRows(String lrcLine){
-		if(!lrcLine.startsWith("[") || lrcLine.indexOf("]") != 9){
+		if(!lrcLine.startsWith("[") || (lrcLine.indexOf("]") != 9 && lrcLine.indexOf(']') != 10)){
 			return null;
 		}
 		//最后一个"]" 
@@ -76,12 +76,11 @@ public class LrcRow implements Comparable<LrcRow>{
 		// -03:33.02--00:36.37-
 		String times = lrcLine.substring(0, lastIndexOfRightBracket + 1).replace("[", "-").replace("]", "-");
 		String[] timesArray = times.split("-");
-		List<LrcRow> lrcRows = new ArrayList<LrcRow>();
+		List<LrcRow> lrcRows = new ArrayList<>();
 		for (String tem : timesArray) {
 			if(TextUtils.isEmpty(tem.trim())){
 				continue;
 			}
-			//
 			try{
 				LrcRow lrcRow = new LrcRow(tem, formatTime(tem), content);
 				lrcRows.add(lrcRow);
@@ -106,7 +105,7 @@ public class LrcRow implements Comparable<LrcRow>{
 	}
 	@Override
 	public int compareTo(LrcRow anotherLrcRow) {
-		return (int) (this.time - anotherLrcRow.time);
+		return this.time - anotherLrcRow.time;
 	}
 	@Override
 	public String toString() {

@@ -1,79 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/app_widget_small_height"
-    android:background="@color/appwidget_background_color"
-    android:orientation="horizontal">
+    android:background="@color/appwidget_background_color">
     <ImageView
-        android:id="@+id/appwidget_image"
-        android:layout_width="@dimen/app_widget_small_image_size"
-        android:layout_height="@dimen/app_widget_small_image_size"
-        android:scaleType="centerCrop"
-        android:src="@drawable/album_empty_bg_day"
-        android:layout_marginLeft="@dimen/d8_size"
-        android:layout_marginRight="@dimen/d8_size"
-        android:layout_gravity="center_vertical"/>
-
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent"
+        android:id="@+id/appwidget_clickable"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="left">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/s12_size"
-            android:textColor="@color/appwidget_title_color"
-            android:maxLines="1"
-            android:layout_marginTop="@dimen/d4_size"
-            android:id="@+id/appwidget_title"/>
-        <ProgressBar
-            android:id="@+id/appwidget_seekbar"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:progressDrawable="@drawable/bg_appwidget_progress"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/d2_size"
-            android:layout_marginTop="@dimen/d6_size" />
-        <RelativeLayout
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/appwidget_image"
+            android:layout_width="@dimen/app_widget_small_image_size"
+            android:layout_height="@dimen/app_widget_small_image_size"
+            android:scaleType="centerCrop"
+            android:src="@drawable/album_empty_bg_day"
+            android:layout_marginLeft="@dimen/d8_size"
+            android:layout_marginRight="@dimen/d8_size"
+            android:layout_gravity="center_vertical"/>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginRight="@dimen/d8_size">
-            <ImageButton android:id="@+id/appwidget_model"
-                android:background="@drawable/bg_common_borderless_ripple"
-                android:src="@drawable/widget_btn_loop_normal"
+            android:orientation="vertical"
+            android:gravity="left">
+            <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/app_widget_small_button_height"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"/>
-            <ImageButton android:id="@+id/appwidget_love"
-                android:background="@drawable/bg_common_borderless_ripple"
-                android:src="@drawable/widget_btn_like_nor"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/app_widget_small_button_height"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"/>
-            <ImageButton android:id="@+id/appwidget_toggle"
-                android:background="@drawable/bg_common_borderless_ripple"
-                android:src="@drawable/widget_btn_play_normal"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/app_widget_small_button_height"
-                android:layout_centerInParent="true"
-                android:layout_marginLeft="@dimen/d24_size"
-                android:layout_marginRight="@dimen/d24_size"/>
-            <ImageButton android:id="@+id/appwidget_prev"
-                android:background="@drawable/bg_common_borderless_ripple"
-                android:src="@drawable/widget_btn_previous_normal"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/app_widget_small_button_height"
-                android:layout_toLeftOf="@id/appwidget_toggle"
-                android:layout_centerVertical="true"/>
-            <ImageButton android:id="@+id/appwidget_next"
-                android:background="@drawable/bg_common_borderless_ripple"
-                android:src="@drawable/widget_btn_next_normal"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/app_widget_small_button_height"
-                android:layout_toRightOf="@id/appwidget_toggle"
-                android:layout_centerVertical="true"/>
-        </RelativeLayout>
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/s12_size"
+                android:textColor="@color/appwidget_title_color"
+                android:maxLines="1"
+                android:layout_marginTop="@dimen/d4_size"
+                android:id="@+id/appwidget_title"/>
+            <ProgressBar
+                android:id="@+id/appwidget_seekbar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:progressDrawable="@drawable/bg_appwidget_progress"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/d2_size"
+                android:layout_marginTop="@dimen/d6_size" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="@dimen/d8_size">
+                <ImageButton android:id="@+id/appwidget_model"
+                    android:background="@drawable/bg_common_borderless_ripple"
+                    android:src="@drawable/widget_btn_loop_normal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/app_widget_small_button_height"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"/>
+                <ImageButton android:id="@+id/appwidget_love"
+                    android:background="@drawable/bg_common_borderless_ripple"
+                    android:src="@drawable/widget_btn_like_nor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/app_widget_small_button_height"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"/>
+                <ImageButton android:id="@+id/appwidget_toggle"
+                    android:background="@drawable/bg_common_borderless_ripple"
+                    android:src="@drawable/widget_btn_play_normal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/app_widget_small_button_height"
+                    android:layout_centerInParent="true"
+                    android:layout_marginLeft="@dimen/d24_size"
+                    android:layout_marginRight="@dimen/d24_size"/>
+                <ImageButton android:id="@+id/appwidget_prev"
+                    android:background="@drawable/bg_common_borderless_ripple"
+                    android:src="@drawable/widget_btn_previous_normal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/app_widget_small_button_height"
+                    android:layout_toLeftOf="@id/appwidget_toggle"
+                    android:layout_centerVertical="true"/>
+                <ImageButton android:id="@+id/appwidget_next"
+                    android:background="@drawable/bg_common_borderless_ripple"
+                    android:src="@drawable/widget_btn_next_normal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/app_widget_small_button_height"
+                    android:layout_toRightOf="@id/appwidget_toggle"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>

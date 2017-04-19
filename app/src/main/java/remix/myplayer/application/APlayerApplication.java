@@ -28,6 +28,7 @@ import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by taeja on 16-3-16.
@@ -63,6 +64,15 @@ public class APlayerApplication extends android.app.Application {
         //异常捕获
         CrashHandler crashHandler = CrashHandler.getInstance();
         crashHandler.init(this);
+
+        try {
+            if(SPUtil.getValue(this,"Setting","LockScreenTemp",true)){
+                SPUtil.putValue(this,"Setting","LockScreenTemp",false);
+                SPUtil.deleteValue(this,"Setting","LockScreenOn");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void initUtil() {
@@ -85,7 +95,6 @@ public class APlayerApplication extends android.app.Application {
                 })
                 .build();
         Fresco.initialize(this,config);
-
     }
 
     /**

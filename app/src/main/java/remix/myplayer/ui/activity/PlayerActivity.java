@@ -385,12 +385,12 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         outState.putParcelable("Rect",mOriginRect);
     }
 
-//    @Override
-//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//        if(savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null)
-//            mOriginRect = savedInstanceState.getParcelable("Rect");
-//    }
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(mOriginRect == null && savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null)
+            mOriginRect = savedInstanceState.getParcelable("Rect");
+    }
 
     @Override
     public void onBackPressed() {
@@ -549,7 +549,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private void setUpSeekBar() {
         if(mInfo == null)
             return;
-
         //初始化已播放时间与剩余时间
         mDuration = (int)mInfo.getDuration();
         final int temp = MusicService.getProgress();
@@ -735,6 +734,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 if (!(view instanceof LrcView))
                     return;
                 mLrcView = (LrcView) view;
+                mLrcView.setOnLrcClickListener(new LrcView.OnLrcClickListener() {
+                    @Override
+                    public void onClick() {
+//                        ToastUtil.show(mContext,"click");
+                    }
+                    @Override
+                    public void onLongClick() {
+//                        ToastUtil.show(mContext,"long click");
+                    }
+                });
                 mLrcView.setOnSeekToListener(new LrcView.OnSeekToListener() {
                     @Override
                     public void onSeekTo(int progress) {
@@ -821,7 +830,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mSeekBar.setMax(mDuration);
             //更新下一首歌曲
             if(MusicService.getNextMP3() != null){
-                mNextSong.setText("下一首：" + MusicService.getNextMP3().getTitle());
+                mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
             }
             if(mCoverRunnable == null)
                 mCoverRunnable = new CoverRunnalbe();
@@ -832,13 +841,15 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     }
 
     //更新进度条线程
-    class ProgeressThread extends Thread {
+    private class ProgeressThread extends Thread {
         @Override
         public void run() {
             while (mIsRunning) {
-                int temp = MusicService.getProgress();
-                if (MusicService.isPlay() && temp > 0 && temp < mDuration) {
-                    mCurrentTime = temp;
+                if(!MusicService.isPlay())
+                    continue;
+                int progress = MusicService.getProgress();
+                if (progress > 0 && progress < mDuration) {
+                    mCurrentTime = progress;
                     mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
                     try {
                         sleep(1000);

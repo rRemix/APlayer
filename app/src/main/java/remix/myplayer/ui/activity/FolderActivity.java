@@ -84,7 +84,7 @@ public class FolderActivity extends MultiChoiceActivity {
         });
         mRecyclerView.setAdapter(mAdapter);
 
-        setUpToolbar(mToolBar,"文件夹");
+        setUpToolbar(mToolBar,getString(R.string.folder));
     }
 
     public void updateList() {

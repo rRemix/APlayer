@@ -143,9 +143,9 @@ public class RecordShareActivity extends BaseActivity {
 
 
         mProgressDialog = new MaterialDialog.Builder(this)
-                .title("请稍候")
+                .title(R.string.please_wait)
                 .titleColorRes(R.color.day_textcolor_primary)
-                .content("图片处理中")
+                .content(R.string.processing_picture)
                 .contentColorRes(R.color.day_textcolor_primary)
                 .progress(true, 0)
                 .backgroundColorRes(R.color.day_background_color_3)

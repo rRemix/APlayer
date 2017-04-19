@@ -8,13 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.widget.RemoteViews;
 
 import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
@@ -33,7 +33,6 @@ import remix.myplayer.util.MediaStoreUtil;
  */
 
 public class BaseAppwidget extends AppWidgetProvider {
-//    protected int[] mAppIds;
     protected Bitmap mBitmap;
 
     protected PendingIntent buildPendingIntent(Context context,ComponentName componentName,int operation) {
@@ -59,10 +58,10 @@ public class BaseAppwidget extends AppWidgetProvider {
             }
             pushUpdate(context,appWidgetIds,remoteViews);
         } else {
-            int size = DensityUtil.dip2px(context,72);
-            final ImageRequest imageRequest =
-                    ImageRequestBuilder.newBuilderWithSource(Uri.parse( MediaStoreUtil.getImageUrl(albumId,Constants.URL_ALBUM)))
-                            .setResizeOptions(new ResizeOptions(size,size))
+            final int size = DensityUtil.dip2px(context,72);
+            final String uri = MediaStoreUtil.getImageUrl(albumId,Constants.URL_ALBUM);
+            ImageRequest imageRequest =
+                    ImageRequestBuilder.newBuilderWithSource(!TextUtils.isEmpty(uri) ? Uri.parse(uri) : Uri.EMPTY)
                             .build();
             DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);
 
@@ -74,7 +73,7 @@ public class BaseAppwidget extends AppWidgetProvider {
                             mBitmap.recycle();
                             mBitmap = null;
                         }
-                        mBitmap = Bitmap.createBitmap(bitmap);
+                        mBitmap = Bitmap.createScaledBitmap(bitmap,size,size,true);
                         if(mBitmap != null) {
                             remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
                         } else {

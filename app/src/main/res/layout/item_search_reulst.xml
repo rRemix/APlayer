@@ -33,7 +33,6 @@
             android:id="@+id/search_name"
             android:textColor="?attr/text_color_primary"
             android:textSize="@dimen/s14_size"
-            android:text="歌曲名"
             android:layout_marginBottom="@dimen/d5_szie"
             android:lines="1"
             android:ellipsize="end"/>
@@ -43,7 +42,6 @@
             android:layout_height="wrap_content"
             android:textColor="?attr/text_color"
             android:textSize="@dimen/s12_size"
-            android:text="歌手与专辑"
             android:lines="1"
             android:ellipsize="end"/>
     </LinearLayout>

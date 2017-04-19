@@ -100,6 +100,9 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
     public boolean onMenuItemClick(MenuItem item) {
         MobclickAgent.onEvent(mContext,item.getItemId() == R.id.menu_edit ? "SongEdit" : "SongDetail" );
         switch (item.getItemId()){
+//            case R.id.menu_lrc:
+//
+//                break;
             case R.id.menu_edit:
                 MaterialDialog editDialog = new MaterialDialog.Builder(mContext)
                         .title(R.string.song_edit)
@@ -119,8 +122,8 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                     ToastUtil.show(mContext,R.string.song_not_empty);
                                     return;
                                 }
-                                artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString() : "未知歌手";
-                                album = mAlbumLayout.getEditText() != null ? mAlbumLayout.getEditText().getText().toString() : "未知歌曲";
+                                artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString() : mContext.getString(R.string.unknow_artist);
+                                album = mAlbumLayout.getEditText() != null ? mAlbumLayout.getEditText().getText().toString() : mContext.getString(R.string.unknow_album);
                                 year = mYearLayout.getEditText() != null ? mYearLayout.getEditText().getText().toString() : " ";
                                 genre = mGenreLayout.getEditText() != null ? mGenreLayout.getEditText().getText().toString() : "";
 
@@ -167,7 +170,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                             mSongLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
                             mSongLayout.getEditText().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
                         }
-                        mSongLayout.getEditText().addTextChangedListener(new TextInputEditWatcher(mSongLayout,"歌曲名不能为空"));
+                        mSongLayout.getEditText().addTextChangedListener(new TextInputEditWatcher(mSongLayout,mContext.getString(R.string.song_not_empty)));
                         mSongLayout.getEditText().setText(mInfo.getTitle());
                     }
                     if(mAlbumLayout.getEditText() != null) {

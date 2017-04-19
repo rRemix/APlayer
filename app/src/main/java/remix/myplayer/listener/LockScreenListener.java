@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.LockScreenActivity;
+import remix.myplayer.util.CommonUtil;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 
 /**
@@ -34,15 +36,12 @@ public class LockScreenListener {
         mContext.registerReceiver(mReceiver,filter);
     }
     public void stopListen(){
-        if(mContext != null && mReceiver != null){
-            mContext.unregisterReceiver(mReceiver);
-            mReceiver = null;
-        }
+        CommonUtil.unregisterReceiver(mContext,mReceiver);
     }
     class ScreenReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(!SPUtil.getValue(mContext,"Setting","LockScreenOn",true)){
+            if(SPUtil.getValue(context,"Setting","LockScreenOn", Constants.APLAYER_LOCKSCREEN) != Constants.APLAYER_LOCKSCREEN){
                 return;
             }
             String action = intent.getAction();

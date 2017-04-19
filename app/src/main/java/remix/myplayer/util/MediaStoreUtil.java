@@ -407,6 +407,29 @@ public class MediaStoreUtil {
                 cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)));
     }
 
+    /**
+     * 根据文件夹名字
+     * @return
+     */
+    public static ArrayList<MP3Item> getMP3ListByFolderName(String folderName){
+        Cursor cursor = null;
+        ArrayList<MP3Item> list = new ArrayList<>();
+        try {
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    null,
+                    MediaStore.Audio.Media.DATA + " like ?",
+                    new String[]{folderName + "%"},null,null);
+            if(cursor != null && cursor.getCount() > 0){
+                while (cursor.moveToNext()){
+                    list.add(getMP3Info(cursor));
+                }
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
+        }
+        return list;
+    }
 
     /**
      * 根据多个歌曲id返回多个歌曲详细信息

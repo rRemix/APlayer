@@ -4,6 +4,9 @@ package remix.myplayer.util;
  * Created by taeja on 16-2-17.
  */
 
+import remix.myplayer.R;
+import remix.myplayer.application.APlayerApplication;
+
 /**
  * 常量值
  */
@@ -11,11 +14,11 @@ public class Constants {
     //应用包名
     public final static String PACKAGE_NAME = "remix.myplayer";
     //播放队列
-    public final static String PLAY_QUEUE = "播放队列";
+    public final static String PLAY_QUEUE = APlayerApplication.getContext().getString(R.string.play_queue);
     //最近添加
-    public final static String RECENTLY = "最近添加";
+    public final static String RECENTLY = APlayerApplication.getContext().getString(R.string.recently);
     //我的收藏
-    public final static String MYLOVE = "我的收藏";
+    public final static String MYLOVE = APlayerApplication.getContext().getString(R.string.my_favorite);
 
     //显示模式 1:列表 2:网格
     public final static int LIST_MODEL = 1;
@@ -47,6 +50,7 @@ public class Constants {
     public final static int START = 5;
     public final static int CHANGE_MODEL = 6;
     public final static int LOVE = 7;
+    public final static int TOGGLE_MEDIASESSION = 8;
     //播放模式
     public final static int PLAY_LOOP = 50;
     public final static int PLAY_SHUFFLE = 51;
@@ -63,6 +67,7 @@ public class Constants {
     public final static int UPDATE_VOL = 0x102;
     //更新背景
     public final static int UPDATE_BG = 0x103;
+
 
     //腾讯Api Id
     public final static String TECENT_APIID = "1105030910";
@@ -82,17 +87,16 @@ public class Constants {
     public final static int NOTIFY_NEXT = 2;
     //刷新适配器
     public final static int NOTIFYDATACHANGED = 0;
-    //今天添加或者最近一周
-    public final static int DAY = 0;
-    public final static int WEEK = 1;
 
-    public final static int MAINACTIVITY = 0;
-    public final static int AUDIOHOLDERACTIVITY = 1;
-    public final static int CHILDHOLDERACTIVITY = 2;
-    public final static int RECENTLYACTIVITY = 3;
-    public final static int PLAYLISTACTIVITY = 4;
-    public final static int LOCKSCREENACTIIVITY = 5;
 
+    //更新桌面歌词内容
+    public static final int UPDATE_FLOAT_LRC_CONTENT = 500;
+    //移除桌面歌词
+    public static final int REMOVE_FLOAT_LRC = 501;
+    //添加桌面歌词
+    public static final int CREATE_FLOAT_LRC = 502;
+    //开启或者关闭桌面歌词
+    public static final int TOGGLE_FLOAT_LRC = 503;
 
     //扫描文件默认大小设置
     public static int SCAN_SIZE = 0;
@@ -128,5 +132,8 @@ public class Constants {
     //更新子目录适配器
     public final static int UPDATE_CHILDHOLDER_ADAPTER = 105;
 
-
+    //0:软件锁屏 1:系统锁屏 2:关闭
+    public final static int APLAYER_LOCKSCREEN = 0;
+    public final static int SYSTEM_LOCKSCREEN = 1;
+    public final static int CLOSE_LOCKSCREEN = 2;
 }

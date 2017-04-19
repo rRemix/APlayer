@@ -248,7 +248,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         }
         //下一首
         if(mNextSong != null && MusicService.getNextMP3() != null)
-            mNextSong.setText("下一首：" + MusicService.getNextMP3().getTitle());
+            mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
 
         new BlurThread().start();
     }

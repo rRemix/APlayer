@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    xmlns:app="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/d64_size"
     android:id="@+id/item_root"
@@ -39,7 +39,6 @@
         android:layout_width="@dimen/d18_size"
         android:layout_height="@dimen/d16_size"
         app:columnwidth="@dimen/d2_size"
-        app:columncolor="@color/purple_782899"
         app:columnnum="4"
         android:id="@+id/song_columnview"
         android:layout_toLeftOf="@id/song_button"

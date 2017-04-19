@@ -52,10 +52,11 @@ public class SearchLRC {
         mArtistName = mInfo.getArtist();
         try {
             if(!TextUtils.isEmpty(mInfo.getDisplayname())){
-                mDisplayName = mInfo.getDisplayname().substring(0,mInfo.getDisplayname().lastIndexOf('.'));
+                String temp = mInfo.getDisplayname();
+                mDisplayName = temp.indexOf('.') > 0 ? temp.substring(0,temp.lastIndexOf('.')) : temp;
             }
         } catch (Exception e){
-            CommonUtil.uploadException("displayName",e);
+            CommonUtil.uploadException("SearchLrc Init Error","DisPlayName:" + item.getDisplayname() + " Title:" + item.getTitle());
             mDisplayName = mTitle;
         }
         mLrcBuilder = new DefaultLrcParser();
@@ -86,14 +87,18 @@ public class SearchLRC {
     }
 
     /**
+     * 获取所有歌词列表
+     */
+
+
+    /**
      * 获取酷狗歌词接口的参数
      * @return
      */
     public LrcRequest getLrcParam(){
         //酷狗
         try {
-            JSONObject response =
-                    CommonUtil.getSongJsonObject(URLEncoder.encode(mInfo.getTitle(), "utf-8"),
+            JSONObject response = CommonUtil.getSongJsonObject(URLEncoder.encode(mInfo.getTitle(), "utf-8"),
                             URLEncoder.encode(mInfo.getArtist(), "utf-8"),mInfo.getDuration());
             if(response != null && response.length() > 0){
                 if(response.getJSONArray("candidates").length() > 0){
@@ -223,7 +228,7 @@ public class SearchLRC {
             return "";
         if(!TextUtils.isEmpty(searchPath)){
             //已设置歌词路径
-            CommonUtil.searchFile(APlayerApplication.getContext(), mDisplayName,mTitle,mArtistName, new File(searchPath));
+            CommonUtil.searchFile(mDisplayName,mTitle,mArtistName, new File(searchPath));
             if(!TextUtils.isEmpty(Global.CurrentLrcPath)){
                 return Global.CurrentLrcPath;
             }
@@ -235,8 +240,10 @@ public class SearchLRC {
                 allLrcFiles = APlayerApplication.getContext().getContentResolver().
                         query(MediaStore.Files.getContentUri("external"),
                                 null,
-                                MediaStore.Files.FileColumns.DATA + " like ?",
-                                new String[]{"%.lrc"},
+                                MediaStore.Files.FileColumns.DATA + " like ? or " +
+                                MediaStore.Files.FileColumns.DATA + " like ? or " +
+                                MediaStore.Files.FileColumns.DATA + " like ? ",
+                                new String[]{"%lyric%","%Lyric%","%.lrc"},
                                 null);
                 if(allLrcFiles == null || !(allLrcFiles.getCount() > 0))
                     return "";

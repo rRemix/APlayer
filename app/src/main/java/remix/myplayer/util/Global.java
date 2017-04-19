@@ -13,6 +13,8 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import remix.myplayer.R;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.PlayListInfo;
 import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.service.MusicService;
@@ -103,7 +105,11 @@ public class Global {
      * @param newQueueIdList
      * @return
      */
-    public static void setPlayQueue(final ArrayList<Integer> newQueueIdList) {
+    public synchronized static void setPlayQueue(final ArrayList<Integer> newQueueIdList) {
+        if(newQueueIdList == null || newQueueIdList.size() == 0){
+            ToastUtil.show(APlayerApplication.getContext(),APlayerApplication.getContext().getString(R.string.try_set_empty_list));
+            return;
+        }
         new Thread(){
             @Override
             public void run() {
@@ -112,11 +118,18 @@ public class Global {
                 ArrayList<Integer> oriPlayQueue = (ArrayList<Integer>) PlayQueue.clone();
                 PlayQueue.clear();
                 PlayQueue.addAll(newQueueIdList);
+                int deleteRow = 0;
+                int addRow = 0;
+                try {
+                    deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue, PlayQueueID);
+                    addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
+                } catch (Exception e){
+                    CommonUtil.uploadException("setPlayQueue Error",e);
+                } finally {
+                    if(deleteRow == 0 || addRow == 0)
+                        CommonUtil.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
+                }
 
-                int deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue, PlayQueueID);
-                long start = System.currentTimeMillis();
-                int addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
-                LogUtil.d("DeleteTest","Time:" + (System.currentTimeMillis() - start) + "  addRow:" + addRow + "  deleteRow:" + deleteRow);
             }
         }.start();
     }
@@ -126,7 +139,11 @@ public class Global {
      * @param newQueueIdList
      * @return
      */
-    public static void setPlayQueue(final ArrayList<Integer> newQueueIdList, final Context context, final Intent intent) {
+    public synchronized static void setPlayQueue(final ArrayList<Integer> newQueueIdList, final Context context, final Intent intent) {
+        if(newQueueIdList == null || newQueueIdList.size() == 0){
+            ToastUtil.show(context,context.getString(R.string.try_set_empty_list));
+            return;
+        }
         if (newQueueIdList.equals(PlayQueue)) {
             context.sendBroadcast(intent);
             return;
@@ -142,10 +159,18 @@ public class Global {
         new Thread(){
             @Override
             public void run() {
-                int deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue, PlayQueueID);
-                LogUtil.d("DBTest","deleteRow:" + deleteRow);
-                int addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
-                LogUtil.d("DBTest","addRow:" + addRow );
+                int deleteRow = 0;
+                int addRow = 0;
+                try {
+                    deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue, PlayQueueID);
+                    addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
+                } catch (Exception e){
+                    CommonUtil.uploadException("setPlayQueue Error",e);
+                } finally {
+                    if(deleteRow == 0 || addRow == 0)
+                        CommonUtil.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
+                }
+
             }
         }.start();
     }

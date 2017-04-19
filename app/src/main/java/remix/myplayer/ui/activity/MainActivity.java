@@ -295,7 +295,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                         .backgroundColorAttr(R.attr.background_color_3)
                         .contentColorAttr(R.attr.text_color_primary)
                         .inputRange(1,15)
-                        .input("", "本地歌单" + Global.PlayList.size(), new MaterialDialog.InputCallback() {
+                        .input("", getString(R.string.local_list) + Global.PlayList.size(), new MaterialDialog.InputCallback() {
                             @Override
                             public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                                 int newPlayListId = -1;

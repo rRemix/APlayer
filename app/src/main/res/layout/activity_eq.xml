@@ -53,7 +53,7 @@
                 android:onClick="onReset"
                 android:id="@+id/eq_reset"
                 android:layout_gravity="center"
-                android:text="重置"
+                android:text="@string/reset"
                 android:textColor="@color/white"
                 android:textSize="@dimen/s16_size" />
         </LinearLayout>

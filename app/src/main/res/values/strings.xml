@@ -7,6 +7,13 @@
     <string name="tab_artist">歌手</string>
     <string name="tab_playlist">列表</string>
 
+    <string name="drawer_song">歌曲库</string>
+    <string name="drawer_recently">最近添加</string>
+    <string name="drawer_folder">文件夹</string>
+    <string name="drawer_night">夜间模式</string>
+    <string name="drawer_setting">设置</string>
+
+
     <string name="from_aplayer">来自APlayer播放器</string>
     <string name="about">关于APlayer</string>
     <string name="model_random">随机播放</string>
@@ -21,7 +28,8 @@
     <string name="back">返回</string>
     <string name="feedback">APlayer意见与反馈</string>
     <string name="my_favorite">我的收藏</string>
-    <string name="list_isempty">该列表为空</string>
+    <string name="list_is_empty">列表为空</string>
+    <string name="folder">文件夹</string>
     <string name="recently">最近添加</string>
     <string name="no_song">暂无歌曲</string>
     <string name="share_error">分享失败</string>
@@ -115,17 +123,18 @@
     <string name="updat_error">查询出错或查询超时</string>
     <string name="update_ignore">该版本已被忽略更新</string>
     <string name="no_update">当前已经是最新版本</string>
-    <string name="version">v1.1.6</string>
+    <string name="version">v1.1.6.1</string>
     <string name="search">搜索</string>
     <string name="timer_close">定时关闭</string>
     <string name="feedback_contact_hint">请输入您的微信号/QQ号</string>
+    <string name="lrc_choose">选择歌词来源</string>
     <string name="song_detail">歌曲详情</string>
     <string name="song_edit">音乐标签编辑</string>
     <string name="common">常规</string>
     <string name="lrc">歌词</string>
     <string name="music_filter">音频过滤</string>
     <string name="lrc_scan">歌词扫描路径</string>
-    <string name="lockscreen_show">锁屏显示</string>
+    <string name="lockscreen_show">锁屏设置</string>
     <string name="lrc_priority">歌词搜索</string>
     <string name="lrc_priorty_tip">是否优先搜索在线歌词</string>
     <string name="lockscreen_is_show">锁屏状态下是否显示封面</string>
@@ -156,5 +165,49 @@
     <string name="eq">均衡器</string>
     <string name="collect">收藏</string>
     <string name="only_lollopop">仅支持安卓5.0及以上</string>
-
+    <string name="aplayer_lockscreen">软件锁屏</string>
+    <string name="system_lockscreen">系统锁屏</string>
+    <string name="choose_or_close_lockscreen">选择锁屏显示方式或者关闭锁屏</string>
+    <string name="cant_play_this_sont">无法播放该歌曲</string>
+    <string name="try_set_empty_list">将设置的播放列表为空</string>
+    <string name="illegal_arg">参数错误</string>
+    <string name="sort_as_asc">升序</string>
+    <string name="sort_as_desc">降序</string>
+    <string name="sort_as_letter">按字母</string>
+    <string name="sort_as_add_time">按添加时间</string>
+    <string name="song_count">%d首歌曲</string>
+    <string name="song_count_1">%d首</string>
+    <string name="song_count_2">%1$s    %2$d首</string>
+    <string name="searching">正在搜索</string>
+    <string name="no_lrc">暂无歌词</string>
+    <string name="check_network">请检查网络连接</string>
+    <string name="local_list">本地歌单</string>
+    <string name="next_song">下一首:%s</string>
+    <string name="please_wait">请稍候</string>
+    <string name="processing_picture">图片处理中</string>
+    <string name="clear_success">清除成功</string>
+    <string name="setting">设置</string>
+    <string name="reset">重置</string>
+    <string name="submit">提交</string>
+    <string name="add_local_list">添加到本地歌单</string>
+    <string name="new_list">新建歌单...</string>
+    <string name="song_path">歌曲路径:</string>
+    <string name="song_name">歌曲名:</string>
+    <string name="file_size">文件大小:</string>
+    <string name="format">格式:</string>
+    <string name="length">长度:</string>
+    <string name="bitrate">比特率:</string>
+    <string name="sample_rate">采样率:</string>
+    <string name="please_input_song_name">请输入歌曲名</string>
+    <string name="please_input_album">请输入专辑</string>
+    <string name="please_input_artist">请输入艺术家</string>
+    <string name="please_input_year">请输入年代</string>
+    <string name="please_input_genre">请输入流派</string>
+    <string name="write_something">写点什么吧</string>
+    <string name="song_sheet">歌单</string>
+    <string name="play_failed">播放失败:</string>
+    <string name="cant_request_audio_focus">无法获得音频焦点</string>
+    <string name="float_lrc">桌面歌词</string>
+    <string name="closed_float_lrc">已关闭桌面歌词</string>
+    <string name="opened_float_lrc">已开启桌面歌词，可通过双击桌面歌词关闭</string>
 </resources>

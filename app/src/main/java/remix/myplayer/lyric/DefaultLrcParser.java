@@ -70,7 +70,7 @@ public class DefaultLrcParser implements ILrcParser {
             e.printStackTrace();
         } finally {
             try {
-                if (bufferedReader != null)
+                if(bufferedReader != null)
                     bufferedReader.close();
             } catch (Exception e) {
                 e.printStackTrace();

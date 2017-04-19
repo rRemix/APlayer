@@ -31,7 +31,8 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
     public int mSelectIndex = 0;
     private int[] mImgs = new int[]{R.drawable.drawer_icon_musicbox,R.drawable.drawer_icon_recently,R.drawable.darwer_icon_folder,
                                     R.drawable.darwer_icon_night,R.drawable.darwer_icon_set};
-    private String[] mTitles = new String[]{"歌曲库","最近添加","文件夹","夜间模式","设置"};
+    private int[] mTitles = new int[]{R.string.drawer_song,R.string.drawer_recently,
+                                    R.string.drawer_folder,R.string.drawer_night,R.string.drawer_setting};
     public DrawerAdapter(Context Context) {
         super(Context);
     }

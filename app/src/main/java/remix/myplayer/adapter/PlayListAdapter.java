@@ -100,7 +100,7 @@ public class PlayListAdapter extends HeaderAdapter implements FastScroller.Secti
             if(info == null)
                 return;
             holder.mName.setText(info.Name);
-            holder.mOther.setText(info.Count + "首歌曲");
+            holder.mOther.setText(mContext.getString(R.string.song_count,info.Count));
             //设置专辑封面
             new AsynLoadImage(holder.mImage).execute(info._Id,Constants.URL_PLAYLIST);
 
@@ -109,7 +109,7 @@ public class PlayListAdapter extends HeaderAdapter implements FastScroller.Secti
                     @Override
                     public void onClick(View v) {
                         if(holder.getAdapterPosition() - 1 < 0){
-                            ToastUtil.show(mContext,"参数错误");
+                            ToastUtil.show(mContext,R.string.illegal_arg);
                             return;
                         }
                         mOnItemClickLitener.onItemClick(holder.mContainer,holder.getAdapterPosition() - 1);
@@ -120,7 +120,7 @@ public class PlayListAdapter extends HeaderAdapter implements FastScroller.Secti
                     @Override
                     public boolean onLongClick(View v) {
                         if(holder.getAdapterPosition() - 1 < 0){
-                            ToastUtil.show(mContext,"参数错误");
+                            ToastUtil.show(mContext,R.string.illegal_arg);
                             return true;
                         }
                         mOnItemClickLitener.onItemLongClick(holder.mContainer,holder.getAdapterPosition() - 1);

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="?attr/background_color_3">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -11,8 +11,8 @@
         android:layout_gravity="center_horizontal"
         android:text="@string/play_queue"
         android:textSize="@dimen/s16_size"
-        android:textColor="@color/black"
-        android:background="@color/night_interval_color" />
+        android:textColor="?attr/text_color_primary"
+        android:background="?attr/divider_color" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/bottom_actionbar_play_list"

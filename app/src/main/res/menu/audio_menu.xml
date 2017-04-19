@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:enabled="true">
+        <!--<item android:title="@string/lrc_choose"-->
+            <!--android:id="@+id/menu_lrc"/>-->
         <item android:title="@string/song_edit"
             android:id="@+id/menu_edit"/>
         <item android:title="@string/song_detail"

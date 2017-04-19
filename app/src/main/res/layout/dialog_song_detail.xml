@@ -12,7 +12,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:text="歌曲路径: "
+            android:text="@string/song_path"
             android:textStyle="bold"
             android:textColor="@color/black_737373"/>
         <TextView
@@ -20,8 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373"
-            android:text="123123123123123"/>
+            android:textColor="@color/black_737373" />
     </LinearLayout>
 
     <LinearLayout
@@ -33,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:text="歌曲名: "
+            android:text="@string/song_name"
             android:textStyle="bold"
             android:textColor="@color/black_737373"/>
         <TextView
@@ -41,8 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373"
-            android:text="123123123123123"/>
+            android:textColor="@color/black_737373" />
     </LinearLayout>
 
     <LinearLayout
@@ -54,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:text="文件大小: "
+            android:text="@string/file_size"
             android:textStyle="bold"
             android:textColor="@color/black_737373"/>
         <TextView
@@ -62,8 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373"
-            android:text="123123123123123"/>
+            android:textColor="@color/black_737373" />
     </LinearLayout>
 
     <LinearLayout
@@ -75,7 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:text="格式: "
+            android:text="@string/format"
             android:textStyle="bold"
             android:textColor="@color/black_737373"/>
         <TextView
@@ -83,8 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373"
-            android:text="123123123123123"/>
+            android:textColor="@color/black_737373" />
     </LinearLayout>
 
     <LinearLayout
@@ -96,7 +92,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:text="长度: "
+            android:text="@string/length"
             android:textStyle="bold"
             android:textColor="@color/black_737373"/>
         <TextView
@@ -117,7 +113,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:text="比特率: "
+            android:text="@string/bitrate"
             android:textStyle="bold"
             android:textColor="@color/black_737373"/>
         <TextView
@@ -125,8 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373"
-            android:text="123123123123123"/>
+            android:textColor="@color/black_737373" />
     </LinearLayout>
 
     <LinearLayout
@@ -138,7 +133,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:text="采样率: "
+            android:text="@string/sample_rate"
             android:textStyle="bold"
             android:textColor="@color/black_737373"/>
         <TextView
@@ -146,8 +141,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/s16_size"
-            android:textColor="@color/black_737373"
-            android:text="123123123123123"/>
+            android:textColor="@color/black_737373" />
     </LinearLayout>
 
 </LinearLayout>

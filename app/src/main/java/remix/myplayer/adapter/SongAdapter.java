@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.fragment.SongFragment;
 import remix.myplayer.interfaces.SortChangeCallback;
@@ -53,9 +54,9 @@ import remix.myplayer.util.ToastUtil;
  */
 public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIndexer{
     //升序还是降序
-    public static String ASCDESC = " asc";
+    public static String ASCDESC = SPUtil.getValue(APlayerApplication.getContext(),"Setting","AscDesc"," asc");
     //按字母排序还是按添加时间排序
-    public static String SORT = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
+    public static String SORT = SPUtil.getValue(APlayerApplication.getContext(),"Setting","Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
 
     private MultiChoice mMultiChoice;
     private int mType;
@@ -72,9 +73,6 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
         int size = DensityUtil.dip2px(mContext,60);
         mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
         mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getSelectColor(),size,size);
-        //读取排序方式
-        ASCDESC = SPUtil.getValue(context,"Setting","AscDesc"," asc");
-        SORT = SPUtil.getValue(context,"Setting","Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
     }
 
     public void setChangeCallback(SortChangeCallback callback){
@@ -103,8 +101,8 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
                 headerHolder.mSortContainer.setVisibility(View.GONE);
             }
             //显示当前排序方式
-            headerHolder.mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "按添加时间" : "按字母");
-            headerHolder.mAscDesc.setText(!ASCDESC.equals(" asc") ? "降序" : "升序");
+            headerHolder.mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? R.string.sort_as_add_time : R.string.sort_as_letter);
+            headerHolder.mAscDesc.setText(!ASCDESC.equals(" asc") ? R.string.sort_as_desc : R.string.sort_as_asc);
             View.OnClickListener listener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -204,7 +202,7 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
                 @Override
                 public void onClick(View v) {
                     if(holder.getAdapterPosition() - 1 < 0){
-                        ToastUtil.show(mContext,"参数错误");
+                        ToastUtil.show(mContext,R.string.illegal_arg);
                         return;
                     }
                     mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition() - 1);
@@ -214,7 +212,7 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
                 @Override
                 public boolean onLongClick(View v) {
                     if(holder.getAdapterPosition() - 1 < 0){
-                        ToastUtil.show(mContext,"参数错误");
+                        ToastUtil.show(mContext,R.string.illegal_arg);
                         return true;
                     }
                     mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition() - 1);
@@ -270,17 +268,19 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
                 } else {
                     ASCDESC = " asc";
                 }
-                headerHolder.mAscDesc.setText(!ASCDESC.equals(" asc") ? "降序" : "升序");
+                headerHolder.mAscDesc.setText(!ASCDESC.equals(" asc") ? R.string.sort_as_desc : R.string.sort_as_asc);
                 SPUtil.putValue(mContext,"Setting","AscDesc", ASCDESC);
                 mCallback.SortChange();
                 break;
             case R.id.sort:
+//                ASCDESC = SPUtil.getValue(context,"Setting","AscDesc"," asc");
+//                SORT = SPUtil.getValue(context,"Setting","Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
                 if(SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER)){
                     SORT = MediaStore.Audio.Media.DATE_ADDED;
                 } else {
                     SORT = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
                 }
-                headerHolder.mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? "按添加时间" : "按字母" );
+                headerHolder.mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? R.string.sort_as_add_time : R.string.sort_as_letter);
                 SPUtil.putValue(mContext,"Setting","Sort",SORT);
                 mCallback.SortChange();
                 break;

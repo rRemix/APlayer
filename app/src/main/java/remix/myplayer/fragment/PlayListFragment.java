@@ -79,7 +79,7 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
                 String name = getPlayListName(position);
                 if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,getPlayListId(position),TAG)){
                     if(getPlayListSongCount(position) == 0) {
-                        ToastUtil.show(getActivity(),getString(R.string.list_isempty));
+                        ToastUtil.show(getActivity(),getString(R.string.list_is_empty));
                         return;
                     }
                     Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
