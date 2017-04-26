@@ -18,6 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Set;
 
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.LrcRequest;
@@ -45,6 +46,7 @@ public class SearchLRC {
     private String mTitle;
     private String mArtistName;
     private String mDisplayName;
+    private String mManualPath;
 
     public SearchLRC(MP3Item item) {
         mInfo = item;
@@ -60,6 +62,11 @@ public class SearchLRC {
             mDisplayName = mTitle;
         }
         mLrcBuilder = new DefaultLrcParser();
+    }
+
+    public SearchLRC(MP3Item item,String manualPath){
+        this(item);
+        mManualPath = manualPath;
     }
 
     public int getSongID(){
@@ -87,11 +94,6 @@ public class SearchLRC {
     }
 
     /**
-     * 获取所有歌词列表
-     */
-
-
-    /**
      * 获取酷狗歌词接口的参数
      * @return
      */
@@ -116,9 +118,35 @@ public class SearchLRC {
      * 根据歌词id,发送请求并解析歌词
      * @return 歌词信息list
      */
-    public List<LrcRow> getLrc(){
+    public List<LrcRow> getLrc(String lrcPath){
+        //判断是否是忽略的歌词
+        Set<String> ignoreLrcId = SPUtil.getStringSet(APlayerApplication.getContext(),"Setting","IgnoreLrcID");
+        if(ignoreLrcId != null && ignoreLrcId.size() > 0){
+            for (String id : ignoreLrcId){
+                if((mInfo.getId() + "").equals(id)){
+                    return null;
+                }
+            }
+        }
         BufferedReader br = null;
-        //先判断该歌曲是否有缓存
+        //manualPath不为空说明为手动设置歌词
+        try {
+            if(!lrcPath.equals("")){
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(lrcPath)));
+                return mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName);
+            }
+        } catch (Exception e){
+            LogUtil.e(TAG,e.toString());
+        } finally {
+            if (br != null)
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+
+        //搜索时判断该歌曲是否有缓存
         try {
             DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(CommonUtil.hashKeyForDisk(mTitle + "/" + mArtistName));
              if(snapShot != null && (br = new BufferedReader(new InputStreamReader(snapShot.getInputStream(0)))) != null ){
@@ -135,6 +163,7 @@ public class SearchLRC {
                 }
         }
 
+        //搜索歌词
         try {
             //是否优先搜索在线歌词
             boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting","OnlineLrc",false);
@@ -166,7 +195,8 @@ public class SearchLRC {
                 }
             }
         }catch (Exception e){
-            LogUtil.e(TAG,e.toString());
+//            LogUtil.e(TAG,e.toString());
+            CommonUtil.uploadException("Search Error",e);
         } finally {
             if (br != null)
                 try {

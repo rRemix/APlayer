@@ -698,12 +698,6 @@ public class CommonUtil {
                     hasTitle = true;
                 }
             }
-            String str;
-            StringBuilder sb = new StringBuilder();
-            while ((str = br.readLine()) != null){
-                LogUtil.d("Lrc","lrcLine:" + str);
-                sb.append(str);
-            }
             if(hasArtist && hasTitle){
                 return true;
             }

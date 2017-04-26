@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.KeyEvent;
 
-import java.util.Timer;
-
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
 
@@ -17,31 +15,23 @@ import remix.myplayer.util.LogUtil;
 /**
  * 接收线控的广播
  */
-public class LineCtlReceiver extends BroadcastReceiver {
-    private final static String TAG = "LineCtlReceiver";
+public class MediaButtonReceiver extends BroadcastReceiver {
+    private final static String TAG = "MediaButtonReceiver";
     //按下了几次
     private static int mCount = 0;
-    //每次按下时间
-    private long mSingleTime = 0;
-    //连续n次按下总计时间
-    private long mTotalTime = 0;
-    //两次按下间隔时间
-    private long mIntervalTime = 0;
-    //上一次按下的时间
-    private long mLastTime = 0;
-    private Timer mTimer = new Timer();
     @Override
     public void onReceive(final Context context, Intent intent) {
-        Intent intent_ctl = null;
+        if(intent == null)
+            return;
         KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-        if(event == null) return;
-
+        if(event == null)
+            return;
         //过滤按下事件
         boolean isActionUp = (event.getAction()==KeyEvent.ACTION_UP);
         if(!isActionUp) {
             return;
         }
-
+        Intent intent_ctl = null;
         int keyCode = event.getKeyCode();
         if(keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ||
                 keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ||
@@ -55,8 +45,6 @@ public class LineCtlReceiver extends BroadcastReceiver {
             return;
         }
 
-
-        mSingleTime = event.getEventTime() - event.getDownTime();//按键按下到松开的时长
         LogUtil.d(TAG,"count=" + mCount);
         //如果是第一次按下，开启一条线程去判断用户操作
         if(mCount == 0){
@@ -65,8 +53,7 @@ public class LineCtlReceiver extends BroadcastReceiver {
                 public void run() {
                     try {
                         sleep(800);
-                        int arg = -1;
-                        arg = mCount == 1 ? Constants.TOGGLE : mCount == 2 ? Constants.NEXT : Constants.PREV;
+                        int arg = mCount == 1 ? Constants.TOGGLE : mCount == 2 ? Constants.NEXT : Constants.PREV;
                         mCount = 0;
                         Intent intent = new Intent(Constants.CTL_ACTION);
                         intent.putExtra("Control", arg);

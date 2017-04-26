@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.MediaStore;
@@ -231,8 +232,7 @@ public class MusicService extends BaseService implements Playback {
     private void init() {
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
         Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
-        //handler
-        mUpdateUIHandler = new UpdateUIHandler();
+        mUpdateUIHandler = new UpdateUIHandler(getMainLooper());
         //电源锁
         mWakeLock = ((PowerManager)getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,getClass().getSimpleName());
         mWakeLock.setReferenceCounted(false);
@@ -324,7 +324,7 @@ public class MusicService extends BaseService implements Playback {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 if(mPlayModel == Constants.PLAY_REPEATONE){
-                    prepareAndPlay(mCurrentInfo.getUrl());
+                    prepare(mCurrentInfo.getUrl());
                 } else {
                     playNextOrPrev(true);
                 }
@@ -475,7 +475,7 @@ public class MusicService extends BaseService implements Playback {
 //                    return;
 //                }
 //                if (mFirstFlag) {
-//                    prepareAndPlay(mCurrentInfo.getUrl());
+//                    prepare(mCurrentInfo.getUrl());
 //                } else {
 //                    play();
 //                }
@@ -523,7 +523,7 @@ public class MusicService extends BaseService implements Playback {
             return;
         }
 //        mIsplay = true;
-        prepareAndPlay(mCurrentInfo.getUrl());
+        prepare(mCurrentInfo.getUrl());
         updateNextSong();
     }
 
@@ -720,7 +720,7 @@ public class MusicService extends BaseService implements Playback {
      * 准备播放
      * @param path 播放歌曲的路径
      */
-    private void prepareAndPlay(final String path) {
+    private void prepare(final String path) {
         try {
             mAudioFouus =  mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
                     AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
@@ -740,7 +740,7 @@ public class MusicService extends BaseService implements Playback {
         } catch (Exception e){
             if(mContext != null)
                 ToastUtil.show(mContext,getString(R.string.play_failed) + e.toString());
-            CommonUtil.uploadException("prepareAndPlay",e);
+            CommonUtil.uploadException("prepare",e);
         }
 
     }
@@ -787,7 +787,7 @@ public class MusicService extends BaseService implements Playback {
             return;
         }
         mIsplay = true;
-        prepareAndPlay(mCurrentInfo.getUrl());
+        prepare(mCurrentInfo.getUrl());
         updateNextSong();
     }
 
@@ -1131,7 +1131,7 @@ public class MusicService extends BaseService implements Playback {
         //根据操作判断是否需要更新歌词
         int control = Global.Operation;
         if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcList.isEmpty())
-            mLrcList = new SearchLRC(mCurrentInfo).getLrc();
+            mLrcList = new SearchLRC(mCurrentInfo).getLrc("");
         if(mUpdateFloatLrcThread == null) {
             mUpdateFloatLrcThread = new UpdateFloatLrcThread();
             mUpdateFloatLrcThread.start();
@@ -1236,15 +1236,20 @@ public class MusicService extends BaseService implements Playback {
                 dataSource.subscribe(new BaseBitmapDataSubscriber() {
                     @Override
                     protected void onNewResultImpl(Bitmap bitmap) {
-                        Bitmap result = Bitmap.createScaledBitmap(bitmap,size,size,true);
-                        if(result != null) {
-                            mRemoteBigView.setImageViewBitmap(R.id.notify_image, result);
-                            mRemoteView.setImageViewBitmap(R.id.notify_image,result);
-                        } else {
-                            mRemoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
-                            mRemoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
+                        try {
+                            Bitmap result = Bitmap.createScaledBitmap(bitmap,size,size,true);
+                            if(result != null) {
+                                mRemoteBigView.setImageViewBitmap(R.id.notify_image, result);
+                                mRemoteView.setImageViewBitmap(R.id.notify_image,result);
+                            } else {
+                                mRemoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
+                                mRemoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
+                            }
+                        } catch (Exception e){
+                            CommonUtil.uploadException("PushNotify Error",e);
+                        } finally {
+                            pushNotify(context);
                         }
-                        pushNotify(context);
                     }
                     @Override
                     protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
@@ -1536,6 +1541,8 @@ public class MusicService extends BaseService implements Playback {
         private HeadSetRunnable mHeadsetRunnable;
         @Override
         public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+            if(mediaButtonEvent == null)
+                return true;
             KeyEvent event = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
             if(event == null)
                 return  true;
@@ -1578,6 +1585,10 @@ public class MusicService extends BaseService implements Playback {
     }
 
     private class UpdateUIHandler extends Handler{
+        public UpdateUIHandler(Looper looper) {
+            super(looper);
+        }
+
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){

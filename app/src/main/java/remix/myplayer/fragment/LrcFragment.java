@@ -94,14 +94,23 @@ public class LrcFragment extends BaseFragment {
         new DownloadThread().start();
     }
 
+    public void UpdateLrc(String lrcPath){
+        new DownloadThread(lrcPath).start();
+    }
 
-    class DownloadThread extends Thread {
+
+    private class DownloadThread extends Thread {
+        public String mManualPath;
+        DownloadThread(String manualPath){
+            mManualPath = manualPath;
+        }
+        DownloadThread(){}
         @Override
         public void run() {
-
             mHandler.sendEmptyMessage(SEARCHING);
             SearchLRC searchLRC = new SearchLRC(mInfo);
-            List<LrcRow> temp = searchLRC.getLrc();
+            //manualPath不为空说明为手动设置歌词
+            List<LrcRow> temp = searchLRC.getLrc(mManualPath);
             if(searchLRC.getSongID() == mInfo.getId()){
                 mLrcList = temp;
                 if(mLrcList == null || mLrcList.size() == 0) {
@@ -110,7 +119,6 @@ public class LrcFragment extends BaseFragment {
                 }
                 mHandler.sendEmptyMessage(UPDATE_LRC);
             }
-
         }
     }
 

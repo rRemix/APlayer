@@ -34,6 +34,8 @@
 #保护注解
 -keepattributes *Annotation*
 -keepattributes Signature
+#崩溃信息
+-keepattributes SourceFile,LineNumberTable
 
 #友盟推送
 -dontwarn com.taobao.**
@@ -69,6 +71,7 @@
 -keepclassmembers class * {
     public <init> (org.json.JSONObject);
 }
+
 
 #友盟分享
 -keep public interface com.facebook.**

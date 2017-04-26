@@ -126,7 +126,7 @@ public class Global {
                 } catch (Exception e){
                     CommonUtil.uploadException("setPlayQueue Error",e);
                 } finally {
-                    if(deleteRow == 0 || addRow == 0)
+                    if(addRow == 0)
                         CommonUtil.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
                 }
 
@@ -167,7 +167,7 @@ public class Global {
                 } catch (Exception e){
                     CommonUtil.uploadException("setPlayQueue Error",e);
                 } finally {
-                    if(deleteRow == 0 || addRow == 0)
+                    if(addRow == 0)
                         CommonUtil.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
                 }
 

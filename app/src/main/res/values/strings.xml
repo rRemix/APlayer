@@ -123,7 +123,7 @@
     <string name="updat_error">查询出错或查询超时</string>
     <string name="update_ignore">该版本已被忽略更新</string>
     <string name="no_update">当前已经是最新版本</string>
-    <string name="version">v1.1.6.1</string>
+    <string name="version">v1.1.6.3</string>
     <string name="search">搜索</string>
     <string name="timer_close">定时关闭</string>
     <string name="feedback_contact_hint">请输入您的微信号/QQ号</string>
@@ -210,4 +210,7 @@
     <string name="float_lrc">桌面歌词</string>
     <string name="closed_float_lrc">已关闭桌面歌词</string>
     <string name="opened_float_lrc">已开启桌面歌词，可通过双击桌面歌词关闭</string>
+    <string name="confirm_ignore_lrc">确认忽略歌词?</string>
+    <string name="ignore_lrc">忽略歌词</string>
+    <string name="select_lrc">手动选择</string>
 </resources>

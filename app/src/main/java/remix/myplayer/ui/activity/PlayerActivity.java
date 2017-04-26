@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.view.ContextThemeWrapper;
@@ -33,6 +34,8 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
@@ -43,6 +46,7 @@ import com.umeng.analytics.MobclickAgent;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,6 +66,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.AudioViewPager;
 import remix.myplayer.ui.customview.playpause.PlayPauseView;
+import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.PlayQueueDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -80,7 +85,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 播放界面
  */
-public class PlayerActivity extends BaseActivity implements UpdateHelper.Callback{
+public class PlayerActivity extends BaseActivity implements UpdateHelper.Callback,FileChooserDialog.FileCallback{
     private static final String TAG = "PlayerActivity";
     //是否正在运行
     public static boolean mIsRunning;
@@ -646,7 +651,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         bundle.putInt("Width", mWidth);
         bundle.putSerializable("MP3Item", mInfo);
         //初始化所有fragment
-        RecordFragment recordFragment = new RecordFragment();
+        final RecordFragment recordFragment = new RecordFragment();
         mAdapter.AddFragment(recordFragment);
         CoverFragment coverFragment = new CoverFragment();
         coverFragment.setInflateFinishListener(new OnInflateFinishListener() {
@@ -727,7 +732,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         coverFragment.setArguments(bundle);
 
         mAdapter.AddFragment(coverFragment);
-        LrcFragment lrcFragment = new LrcFragment();
+        final LrcFragment lrcFragment = new LrcFragment();
         lrcFragment.setOnInflateFinishListener(new OnInflateFinishListener() {
             @Override
             public void onViewInflateFinish(View view) {
@@ -737,11 +742,47 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 mLrcView.setOnLrcClickListener(new LrcView.OnLrcClickListener() {
                     @Override
                     public void onClick() {
-//                        ToastUtil.show(mContext,"click");
                     }
                     @Override
                     public void onLongClick() {
-//                        ToastUtil.show(mContext,"long click");
+                        new MaterialDialog.Builder(mContext)
+                                .items(getString(R.string.ignore_lrc),getString(R.string.select_lrc))
+                                .itemsColorAttr(R.attr.text_color_primary)
+                                .backgroundColorAttr(R.attr.background_color_3)
+                                .itemsCallback(new MaterialDialog.ListCallback() {
+                                    @Override
+                                    public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
+                                        if(position == 0) {
+                                            //忽略这首歌的歌词
+                                            new MaterialDialog.Builder(mContext)
+                                                    .negativeText(R.string.cancel)
+                                                    .negativeColorAttr(R.attr.text_color_primary)
+                                                    .positiveText(R.string.confirm)
+                                                    .positiveColorAttr(R.attr.text_color_primary)
+                                                    .title(R.string.confirm_ignore_lrc)
+                                                    .titleColorAttr(R.attr.text_color_primary)
+                                                    .backgroundColorAttr(R.attr.background_color_3)
+                                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                                        @Override
+                                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                            Set<String> ignoreLrcID = SPUtil.getStringSet(mContext, "Setting", "IgnoreLrcID");
+                                                            if (mInfo != null && ignoreLrcID != null) {
+                                                                ignoreLrcID.add(mInfo.getId() + "");
+                                                                SPUtil.putStringSet(mContext, "Setting", "IgnoreLrcID", ignoreLrcID);
+                                                                lrcFragment.UpdateLrc(mInfo);
+                                                            }
+                                                        }
+                                                    })
+                                                    .show();
+                                        }else {
+                                            //手动选择歌词
+                                            new FileChooserDialog.Builder(PlayerActivity.this)
+                                                    .extensionsFilter(".lrc")
+                                                    .show();
+                                        }
+                                    }
+                                })
+                                .show();
                     }
                 });
                 mLrcView.setOnSeekToListener(new LrcView.OnSeekToListener() {
@@ -755,7 +796,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     }
                 });
                 mLrcView.setHighLightColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_highlight_day : R.color.lrc_highlight_night));
-                mLrcView.setOtherColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
+                mLrcView.setOtherColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_highlight_day : R.color.lrc_highlight_night));
                 mLrcView.setTimeLineColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
             }
         });
@@ -954,4 +995,27 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         }
     }
 
+    /**
+     * 选择歌词文件
+     * @param dialog
+     * @param file
+     */
+    @Override
+    public void onFileSelection(@NonNull FileChooserDialog dialog, @NonNull File file) {
+        //如果之前忽略过该歌曲的歌词，取消忽略
+        Set<String> ignoreLrcId = SPUtil.getStringSet(this,"Setting","IgnoreLrcID");
+        if(ignoreLrcId != null && ignoreLrcId.size() > 0){
+            for (String id : ignoreLrcId){
+                if((mInfo.getId() + "").equals(id)){
+                    ignoreLrcId.remove(mInfo.getId() + "");
+                    SPUtil.putStringSet(this,"Setting","IgnoreLrcID",ignoreLrcId);
+                }
+            }
+        }
+        ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(file.getAbsolutePath());
+    }
+
+    @Override
+    public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
+    }
 }

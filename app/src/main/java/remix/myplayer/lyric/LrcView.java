@@ -113,7 +113,6 @@ public class LrcView extends View implements ILrcView{
 		init();
 	}
 
-
 	/**
 	 * 初始化画笔等
 	 */
@@ -141,7 +140,6 @@ public class LrcView extends View implements ILrcView{
         mPaintForTimeLine.setTextSize(mCurSizeForTimeLine);
 		mPaintForTimeLine.setColor(mTimeLineColor);
 
-
 		mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
 	}
 
@@ -153,6 +151,7 @@ public class LrcView extends View implements ILrcView{
 			//画默认的显示文字
 			float textWidth = mPaintForOtherLrc.measureText(mText);
 			float textX = (getWidth() - textWidth ) / 2;
+            mPaintForOtherLrc.setAlpha(0xff);
 			canvas.drawText(mText, textX, getHeight() / 2, mPaintForOtherLrc);
 			return;
 		}
@@ -161,20 +160,19 @@ public class LrcView extends View implements ILrcView{
 			mTotleDrawRow = (int) (getHeight() / (mCurSizeForOtherLrc + mCurPadding)) + 4;
 		}
 		//因为不需要将所有歌词画出来
-		int minRaw = mCurRow - (mTotleDrawRow-1) / 2;
-		int maxRaw = mCurRow + (mTotleDrawRow-1) / 2;
+		int minRaw = mCurRow - (mTotleDrawRow - 1) / 2;
+		int maxRaw = mCurRow + (mTotleDrawRow - 1) / 2;
 		minRaw = Math.max(minRaw, 0); //处理上边界
 		maxRaw = Math.min(maxRaw, mLrcRows.size() - 1); //处理下边界
-		//实现渐变的最大歌词行数
-		int count = Math.max(maxRaw - mCurRow, mCurRow - minRaw);
-		//两行歌词间字体颜色变化的透明度
-		if(count == 0)
-			count = 1;
-		int alpha = (0xFF - 0x10) / count;
+//		//实现渐变的最大歌词行数
+//		int count = Math.max(maxRaw - mCurRow, mCurRow - minRaw);
+//		//两行歌词间字体颜色变化的透明度
+//		if(count == 0)
+//			count = 1;
+//		int alpha = (0xFF - 0x10) / count;
 		//画出来的第一行歌词的y坐标
 		float rowY = getHeight() / 2 + minRaw*(mCurSizeForOtherLrc + mCurPadding);
 		for (int i = minRaw; i <= maxRaw; i++) {
-
 			if(i == mCurRow){//画高亮歌词
 				//因为有缩放效果，所有需要动态设置歌词的字体大小
 				float textSize = mCurSizeForOtherLrc + (mCurSizeForHightLightLrc - mCurSizeForOtherLrc) * mCurFraction;
@@ -198,6 +196,12 @@ public class LrcView extends View implements ILrcView{
 				}else{//画其他的歌词
 					mPaintForOtherLrc.setTextSize(mCurSizeForOtherLrc);
 				}
+				//计算歌词透明度
+                int alpha = 0xff;
+                if(i != mCurRow){
+                    alpha = (int) (0xff /  Math.pow(Math.abs(i - mCurRow),1.2f));
+                }
+                mPaintForOtherLrc.setAlpha(alpha);
 				String text = mLrcRows.get(i).getContent();
 				float textWidth = mPaintForOtherLrc.measureText(text);
 				float textX = (getWidth() - textWidth) / 2;
@@ -227,72 +231,88 @@ public class LrcView extends View implements ILrcView{
 	private float lastX;
 	/**事件的上一次时间*/
 	private long lastTime;
+	/** 长按runnable*/
+	private Runnable longPressRunnable = new LongPressRunnable();
+
+    private class LongPressRunnable implements Runnable{
+        @Override
+        public void run() {
+            if(onLrcClickListener != null) {
+                onLrcClickListener.onLongClick();
+            }
+        }
+    }
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if(mLrcRows == null || mLrcRows.size() == 0){
 			return false;
 		}
 		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			firstY = event.getRawY();
-			lastX = event.getRawX();
-            lastTime = System.currentTimeMillis();
-			break;
-		case MotionEvent.ACTION_MOVE:
-			if(!canDrag){
-				if(Math.abs(event.getRawY() - firstY) > mTouchSlop && Math.abs(event.getRawY() - firstY) > Math.abs(event.getRawX() - lastX)){
-					canDrag = true;
-					mIsDrawTimeLine = true;
-					mScroller.forceFinished(true);
-					stopScrollLrc();
-					mCurFraction = 1;
-				}
-				lastY = event.getRawY();
-			}
-
-			if(canDrag){
-				float offset = event.getRawY() - lastY;//偏移量
-				if( getScrollY() - offset < 0){ 
-					if(offset > 0){
-						offset = offset / 3;
-					}
-				}else if(getScrollY() - offset > mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding){
-					if(offset < 0 ){
-						offset = offset / 3;
-					}
-				}
-				scrollBy(getScrollX(), -(int)offset);
-				lastY = event.getRawY();
-				int currentRow = (int) (getScrollY() / (mCurSizeForOtherLrc+mCurPadding));
-				currentRow = Math.min(currentRow, mLrcRows.size() - 1);
-				currentRow = Math.max(currentRow, 0);
-				seekTo(mLrcRows.get(currentRow).getTime(), false,false);
-				return true;
-			}
-			lastY = event.getRawY();
-			break;
-		case MotionEvent.ACTION_UP:
-		case MotionEvent.ACTION_CANCEL:
-			if(!canDrag){
-                if(onLrcClickListener != null){
-                    onLrcClickListener.onClick();
+            case MotionEvent.ACTION_DOWN:
+                firstY = event.getRawY();
+                lastX = event.getRawX();
+                lastTime = System.currentTimeMillis();
+                longPressRunnable = new LongPressRunnable();
+                postDelayed(longPressRunnable, ViewConfiguration.getLongPressTimeout());
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if(!canDrag){
+                    if(Math.abs(event.getRawY() - firstY) > mTouchSlop && Math.abs(event.getRawY() - firstY) > Math.abs(event.getRawX() - lastX)){
+                        canDrag = true;
+                        mIsDrawTimeLine = true;
+                        mScroller.forceFinished(true);
+                        stopScrollLrc();
+                        mCurFraction = 1;
+                    }
+                    lastY = event.getRawY();
                 }
-			}else{
-				if(onSeekToListener!= null && mCurRow != -1){
-					onSeekToListener.onSeekTo(mLrcRows.get(mCurRow).getTime());
-				}
-				if(getScrollY() < 0){
-					smoothScrollTo(0,DURATION_FOR_ACTION_UP);
-				}else if(getScrollY() > mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding){
-					smoothScrollTo((int) (mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding),DURATION_FOR_ACTION_UP);
-				}
 
-				canDrag = false;
-				mIsDrawTimeLine = false;
-				invalidate();
-			}
-			break;
-		}
+                if(canDrag){
+                    removeCallbacks(longPressRunnable);
+                    float offset = event.getRawY() - lastY;//偏移量
+                    if( getScrollY() - offset < 0){
+                        if(offset > 0){
+                            offset = offset / 3;
+                        }
+                    }else if(getScrollY() - offset > mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding){
+                        if(offset < 0 ){
+                            offset = offset / 3;
+                        }
+                    }
+                    scrollBy(getScrollX(), -(int)offset);
+                    lastY = event.getRawY();
+                    int currentRow = (int) (getScrollY() / (mCurSizeForOtherLrc+mCurPadding));
+                    currentRow = Math.min(currentRow, mLrcRows.size() - 1);
+                    currentRow = Math.max(currentRow, 0);
+                    seekTo(mLrcRows.get(currentRow).getTime(), false,false);
+                    return true;
+                }
+                lastY = event.getRawY();
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                if(!canDrag){
+                    if(longPressRunnable == null && onLrcClickListener != null){
+                        onLrcClickListener.onClick();
+                    }
+                    removeCallbacks(longPressRunnable);
+                    longPressRunnable = null;
+                }else{
+                    if(onSeekToListener!= null && mCurRow != -1){
+                        onSeekToListener.onSeekTo(mLrcRows.get(mCurRow).getTime());
+                    }
+                    if(getScrollY() < 0){
+                        smoothScrollTo(0,DURATION_FOR_ACTION_UP);
+                    }else if(getScrollY() > mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding){
+                        smoothScrollTo((int) (mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding),DURATION_FOR_ACTION_UP);
+                    }
+
+                    canDrag = false;
+                    mIsDrawTimeLine = false;
+                    invalidate();
+                }
+             break;
+        }
 		return true;
 	}
 	/**

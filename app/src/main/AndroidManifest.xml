@@ -192,11 +192,11 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
-        <!--<receiver android:name=".receiver.LineCtlReceiver">-->
-            <!--<intent-filter android:priority="1000">-->
-                <!--<action android:name="android.intent.action.MEDIA_BUTTON" />-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
+        <receiver android:name=".receiver.MediaButtonReceiver">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
         <!--<receiver android:name=".receiver.NotifyReceiver">-->
             <!--<intent-filter>-->
                 <!--<action android:name="remix.music.NOTIFY" />-->
