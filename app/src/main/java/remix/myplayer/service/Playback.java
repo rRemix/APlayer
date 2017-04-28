@@ -13,5 +13,5 @@ public interface Playback {
     void playNext();
     void playPrevious();
     void play();
-    void pause();
+    void pause(boolean updateMediasessionOnly);
 }

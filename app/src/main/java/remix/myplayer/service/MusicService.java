@@ -465,7 +465,7 @@ public class MusicService extends BaseService implements Playback {
     @Override
     public void toggle() {
         if(mMediaPlayer.isPlaying()) {
-            pause();
+            pause(false);
         } else {
             play();
 //            try {
@@ -493,13 +493,15 @@ public class MusicService extends BaseService implements Playback {
      * 暂停
      */
     @Override
-    public void pause() {
+    public void pause(boolean updateMediasessionOnly) {
         mIsplay = false;
         mMediaPlayer.pause();
         //记录最后一次播放的时间
         mLastPlayedTime = System.currentTimeMillis();
-        //更新所有界面
-        update(Global.Operation);
+        if(updateMediasessionOnly)
+            updateMediaSession(Global.Operation);
+        else
+            update(Global.Operation);
     }
 
     /**
@@ -565,7 +567,7 @@ public class MusicService extends BaseService implements Playback {
             //先判断是否是关闭通知栏
             if(intent.getExtras().getBoolean("Close")){
                 Global.setNotifyShowing(false);
-                pause();
+                pause(false);
                 mNotify.cancel();
                 return;
             }
@@ -601,7 +603,7 @@ public class MusicService extends BaseService implements Playback {
                     break;
                 //暂停
                 case Constants.PAUSE:
-                    pause();
+                    pause(false);
                     break;
                 //继续播放
                 case Constants.START:
@@ -729,7 +731,7 @@ public class MusicService extends BaseService implements Playback {
                 return;
             }
             if(isPlay()){
-                pause();
+                pause(true);
             }
             mIsIniting = true;
             mMediaPlayer.reset();
@@ -1517,7 +1519,7 @@ public class MusicService extends BaseService implements Playback {
                 mNeedContinue = mIsplay;
                 if(mIsplay && mMediaPlayer != null){
                     Global.setOperation(Constants.TOGGLE);
-                    pause();
+                    pause(false);
                 }
             }
             //失去audiofocus 暂停播放
@@ -1525,7 +1527,7 @@ public class MusicService extends BaseService implements Playback {
                 mAudioFouus = false;
                 if(mIsplay && mMediaPlayer != null) {
                     Global.setOperation(Constants.TOGGLE);
-                    pause();
+                    pause(false);
                 }
             }
             //通知更新ui

@@ -165,6 +165,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private boolean mNeedUpdateUI = true;
     //是否开启变色背景
     private boolean mDiscolour = false;
+
     private static final String SCALE_WIDTH = "SCALE_WIDTH";
     private static final String SCALE_HEIGHT = "SCALE_HEIGHT";
     private static final String TRANSITION_X = "TRANSITION_X";
@@ -873,9 +874,13 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             if(MusicService.getNextMP3() != null){
                 mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
             }
-            if(mCoverRunnable == null)
-                mCoverRunnable = new CoverRunnalbe();
-            mCoverHandler.post(mCoverRunnable);
+            new Thread(){
+                @Override
+                public void run() {
+                    updateBg();
+                    updateCover();
+                }
+            }.start();
         }
         //更新按钮状态
         UpdatePlayButton(isplay);
@@ -940,59 +945,63 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 DensityUtil.dip2px(this,2),0,0,DensityUtil.dip2px(this,288),DensityUtil.dip2px(this,38),1));
         mNextSong.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_a8a8a8 : R.color.white_e5e5e5));
     }
+//
+//    private CoverRunnalbe mCoverRunnable = new CoverRunnalbe();
+//    private class CoverRunnalbe implements Runnable{
+//        @Override
+//        public void run() {
+//            updateCover();
+//            updateBg();
+//        }
+//    }
 
-    private CoverRunnalbe mCoverRunnable = new CoverRunnalbe();
-    private class CoverRunnalbe implements Runnable{
-        @Override
-        public void run() {
-            updateCover();
-            updateBg();
-        }
-
-        private void updateBg() {
-            if(!mDiscolour)
-                return;
-            //更新背景
-            try {
-                mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
-                if(mRawBitMap == null)
-                    mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
+    //更新背景
+    private void updateBg() {
+        if(!mDiscolour)
+            return;
+        //更新背景
+        try {
+            mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
+            if(mRawBitMap == null)
+                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
 
 //                StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
 //                mNewBitMap = mStackBlurManager.process(40);
 
-                Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
-                    @Override
-                    public void onGenerated(Palette palette) {
-                        if(palette == null || palette.getMutedSwatch() == null){
-                            mSwatch = new Palette.Swatch(Color.GRAY,100);
-                        } else {
-                            mSwatch = palette.getMutedSwatch();//柔和 暗色
-                        }
-                        mCoverHandler.removeMessages(UPDATE_BG);
-                        mCoverHandler.sendEmptyMessage(UPDATE_BG);
+            Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
+                @Override
+                public void onGenerated(Palette palette) {
+                    if(palette == null || palette.getMutedSwatch() == null){
+                        mSwatch = new Palette.Swatch(Color.GRAY,100);
+                    } else {
+                        mSwatch = palette.getMutedSwatch();//柔和 暗色
                     }
-                });
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-
-        private void updateCover() {
-            //更新封面
-            if(mInfo == null || (mInfo = MusicService.getCurrentMP3()) == null){
-                mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
-            } else {
-                File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(), Constants.URL_ALBUM);
-                if(imgFile.exists()) {
-                    mUri = Uri.parse("file:///" +  imgFile);
-                } else {
-                    mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
+                    mCoverHandler.removeMessages(UPDATE_BG);
+                    mCoverHandler.sendEmptyMessage(UPDATE_BG);
                 }
-            }
-            mCoverHandler.removeMessages(UPDATE_COVER);
-            mCoverHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+            });
+        } catch (Exception e){
+            e.printStackTrace();
         }
+    }
+
+    /**
+     * 更新封面
+     */
+    private void updateCover() {
+        //更新封面
+        if(mInfo == null || (mInfo = MusicService.getCurrentMP3()) == null){
+            mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
+        } else {
+            File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(), Constants.URL_ALBUM);
+            if(imgFile.exists()) {
+                mUri = Uri.parse("file:///" +  imgFile);
+            } else {
+                mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
+            }
+        }
+        mCoverHandler.removeMessages(UPDATE_COVER);
+        mCoverHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
     }
 
     /**

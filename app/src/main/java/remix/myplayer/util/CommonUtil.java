@@ -672,7 +672,6 @@ public class CommonUtil {
             //暂时忽略网易云的歌词
             if(file.getAbsolutePath().contains("netease/cloudmusic/"))
                 return false;
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
             String fileName = file.getName().indexOf('.') > 0 ?
                     file.getName().substring(0,file.getName().lastIndexOf('.')) : file.getName();
             //判断歌词文件名与歌曲文件名是否一致
@@ -684,6 +683,7 @@ public class CommonUtil {
                 return true;
             }
             //读取前五行歌词内容进行判断
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
             String lrcLine = "";
             boolean hasArtist = false;
             boolean hasTitle = false;
@@ -702,7 +702,7 @@ public class CommonUtil {
                 return true;
             }
         } catch (Exception e) {
-
+            CommonUtil.uploadException("isRightLrc",e);
         } finally {
             try {
                 if(br != null){

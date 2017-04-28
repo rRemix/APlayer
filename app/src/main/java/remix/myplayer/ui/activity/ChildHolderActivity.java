@@ -244,9 +244,9 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                         return 0;
                     }
                     if(ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC){
-                        return  o1.getAddTime() > o2.getAddTime() ? 1 : -1;
+                        return Long.valueOf(o1.getAddTime()).compareTo(o2.getAddTime());
                     } else {
-                        return  o2.getAddTime() > o1.getAddTime() ? 1 : -1;
+                        return Long.valueOf(o2.getAddTime()).compareTo(o1.getAddTime());
                     }
                 } else {
                     return 0;

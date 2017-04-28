@@ -147,8 +147,12 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
 //            }
 
             //是否无损
-            String prefix = temp.getDisplayname().substring(temp.getDisplayname().lastIndexOf(".") + 1);
-            holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
+            if(!TextUtils.isEmpty(temp.getDisplayname())){
+                String prefix = temp.getDisplayname().substring(temp.getDisplayname().lastIndexOf(".") + 1);
+                holder.mSQ.setVisibility(!TextUtils.isEmpty(prefix) && (prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")) ? View.VISIBLE : View.GONE);
+            } else {
+                holder.mSQ.setVisibility(View.GONE);
+            }
 
             //设置标题
             holder.mTitle.setText(CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE));
