@@ -45,7 +45,7 @@ public class SplashActivity extends BaseActivity {
                     Global.MyLoveID = SPUtil.getValue(SplashActivity.this,"Setting","MyLoveID",-1);
                     Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
                     Global.PlayList = PlayListUtil.getAllPlayListInfo();
-                    Global.RecentlyID = SPUtil.getValue(SplashActivity.this,"Setting","RecentlyID",-1);
+//                    Global.RecentlyID = SPUtil.getValue(SplashActivity.this,"Setting","RecentlyID",-1);
                 }
 //                /** 更新最近添加列表 */
 //                //不是第一次打开软件，先删除原来的数据

@@ -60,7 +60,7 @@ public abstract class HeaderAdapter extends BaseAdapter<BaseViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mCursor != null && mCursor.getCount() > 0 ? super.getItemCount() + 1 : 0;
+        return mCursor != null && !mCursor.isClosed() && mCursor.getCount() > 0 ? super.getItemCount() + 1 : 0;
     }
 
     @Override

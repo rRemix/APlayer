@@ -13,8 +13,6 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import remix.myplayer.R;
-import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.PlayListInfo;
 import remix.myplayer.model.PlayListSongInfo;
 import remix.myplayer.service.MusicService;
@@ -107,7 +105,8 @@ public class Global {
      */
     public synchronized static void setPlayQueue(final ArrayList<Integer> newQueueIdList) {
         if(newQueueIdList == null || newQueueIdList.size() == 0){
-            ToastUtil.show(APlayerApplication.getContext(),APlayerApplication.getContext().getString(R.string.try_set_empty_list));
+//            ToastUtil.show(APlayerApplication.getContext(),APlayerApplication.getContext().getString(R.string.try_set_empty_list));
+            CommonUtil.uploadException("SetEmptyQueue","");
             return;
         }
         new Thread(){
@@ -126,8 +125,7 @@ public class Global {
                 } catch (Exception e){
                     CommonUtil.uploadException("setPlayQueue Error",e);
                 } finally {
-                    if(addRow == 0)
-                        CommonUtil.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
+
                 }
 
             }
@@ -141,7 +139,8 @@ public class Global {
      */
     public synchronized static void setPlayQueue(final ArrayList<Integer> newQueueIdList, final Context context, final Intent intent) {
         if(newQueueIdList == null || newQueueIdList.size() == 0){
-            ToastUtil.show(context,context.getString(R.string.try_set_empty_list));
+//            ToastUtil.show(context,context.getString(R.string.try_set_empty_list));
+            CommonUtil.uploadException("设置空播放列表","");
             return;
         }
         if (newQueueIdList.equals(PlayQueue)) {
@@ -167,8 +166,7 @@ public class Global {
                 } catch (Exception e){
                     CommonUtil.uploadException("setPlayQueue Error",e);
                 } finally {
-                    if(addRow == 0)
-                        CommonUtil.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
+
                 }
 
             }

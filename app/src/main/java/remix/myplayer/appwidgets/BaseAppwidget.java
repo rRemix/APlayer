@@ -15,12 +15,14 @@ import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import remix.myplayer.R;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.MediaStoreUtil;
@@ -62,6 +64,7 @@ public class BaseAppwidget extends AppWidgetProvider {
             final String uri = MediaStoreUtil.getImageUrl(albumId,Constants.URL_ALBUM);
             ImageRequest imageRequest =
                     ImageRequestBuilder.newBuilderWithSource(!TextUtils.isEmpty(uri) ? Uri.parse(uri) : Uri.EMPTY)
+                            .setResizeOptions(new ResizeOptions(size,size))
                             .build();
             DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);
 
@@ -73,7 +76,7 @@ public class BaseAppwidget extends AppWidgetProvider {
                             mBitmap.recycle();
                             mBitmap = null;
                         }
-                        mBitmap = Bitmap.createScaledBitmap(bitmap,size,size,true);
+                        mBitmap = MusicService.copy(bitmap);
                         if(mBitmap != null) {
                             remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
                         } else {

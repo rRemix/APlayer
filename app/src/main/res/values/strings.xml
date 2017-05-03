@@ -213,4 +213,5 @@
     <string name="confirm_ignore_lrc">确认忽略歌词?</string>
     <string name="ignore_lrc">忽略歌词</string>
     <string name="select_lrc">手动选择</string>
+    <string name="path_empty">播放路径为空</string>
 </resources>

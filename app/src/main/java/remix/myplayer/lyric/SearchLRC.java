@@ -24,11 +24,11 @@ import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.LrcRequest;
 import remix.myplayer.model.MP3Item;
 import remix.myplayer.util.CommonUtil;
-import remix.myplayer.util.DiskCache;
-import remix.myplayer.util.DiskLruCache;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.cache.DiskCache;
+import remix.myplayer.util.cache.DiskLruCache;
 
 /**
  * Created by Remix on 2015/12/7.

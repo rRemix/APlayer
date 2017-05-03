@@ -35,10 +35,10 @@ import remix.myplayer.ui.dialog.ShareDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.cache.DiskCache;
 
 /**
  * Created by taeja on 16-3-14.

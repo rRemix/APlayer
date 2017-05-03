@@ -664,7 +664,7 @@ public class CommonUtil {
     public static boolean isRightLrc(File file,String displayName,String title,String artist){
         BufferedReader br = null;
         try {
-            if(file == null || !file.canRead())
+            if(file == null || !file.canRead() || !file.isFile())
                 return false;
             if(TextUtils.isEmpty(file.getAbsolutePath()) || TextUtils.isEmpty(displayName) ||
                     TextUtils.isEmpty(title) || TextUtils.isEmpty(artist))
@@ -684,10 +684,10 @@ public class CommonUtil {
             }
             //读取前五行歌词内容进行判断
             br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            String lrcLine = "";
             boolean hasArtist = false;
             boolean hasTitle = false;
             for(int i = 0 ; i < 5;i++){
+                String lrcLine = "";
                 if((lrcLine = br.readLine()) == null)
                     break;
                 if(lrcLine.contains("ar") && lrcLine.toUpperCase().contains(artist.toUpperCase())) {

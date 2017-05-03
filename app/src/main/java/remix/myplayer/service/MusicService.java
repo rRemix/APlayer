@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.media.AudioManager;
 import android.media.MediaExtractor;
@@ -40,6 +39,7 @@ import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.request.ImageRequest;
@@ -511,8 +511,11 @@ public class MusicService extends BaseService implements Playback {
      */
     @Override
     public void playSelectSong(int position){
-        if((mCurrentIndex = position) == -1 || (mCurrentIndex > Global.PlayQueue.size() - 1))
+        if((mCurrentIndex = position) == -1 || (mCurrentIndex > Global.PlayQueue.size() - 1)) {
+            CommonUtil.uploadException("playSelectSong","position:" + position + (" playQueueSize:" + Global.PlayQueue != null ? Global.PlayQueue.size() : "null"));
+            ToastUtil.show(mContext,R.string.illegal_arg);
             return;
+        }
 
         mCurrentId = Global.PlayQueue.get(mCurrentIndex);
         mCurrentInfo = MediaStoreUtil.getMP3InfoById(mCurrentId);
@@ -575,8 +578,11 @@ public class MusicService extends BaseService implements Playback {
             if(control == Constants.PLAYSELECTEDSONG || control == Constants.PREV || control == Constants.NEXT
                     || control == Constants.TOGGLE || control == Constants.PAUSE || control == Constants.START){
                 if(Global.PlayQueue == null || Global.PlayQueue.size() == 0) {
-                    ToastUtil.show(mContext,R.string.list_is_empty);
-                    return;
+//                    ToastUtil.show(mContext,R.string.list_is_empty);
+//                    return;
+                    //列表为空，尝试读取
+                    Global.PlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
+                    Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
                 }
 //                if(CommonUtil.isFastDoubleClick()) {
 //                    return;
@@ -694,25 +700,47 @@ public class MusicService extends BaseService implements Playback {
                     .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY_PAUSE |
                             PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).build());
         } else {
-            Bitmap bitmap = MediaStoreUtil.getAlbumBitmap(mCurrentInfo.getAlbumId(),false);
-            if(bitmap == null)
-                bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_day);
-            mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
-                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM,mCurrentInfo.getAlbum())
-                    .putString(MediaMetadataCompat.METADATA_KEY_ARTIST,mCurrentInfo.getArtist())
-                    .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST,mCurrentInfo.getArtist())
-                    .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE,mCurrentInfo.getDisplayname())
-                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,mCurrentInfo.getDuration())
-                    .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER,mCurrentIndex)
-                    .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS,Global.PlayQueue != null ? Global.PlayQueue.size() : 0)
-                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mCurrentInfo.getTitle())
-                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, bitmap)
-                    .build());
-
             mMediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
                     .setState(playState,getProgress(),1.0f)
                     .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY_PAUSE |
                             PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).build());
+
+
+            final String uri = MediaStoreUtil.getImageUrl(mCurrentInfo.getAlbumId(),Constants.URL_ALBUM);
+            ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(!TextUtils.isEmpty(uri) ? Uri.parse(uri) : Uri.EMPTY)
+                        .build();
+            DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);
+            dataSource.subscribe(new BaseBitmapDataSubscriber() {
+                @Override
+                protected void onNewResultImpl(Bitmap bitmap) {
+                    mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
+                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM,mCurrentInfo.getAlbum())
+                            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST,mCurrentInfo.getArtist())
+                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST,mCurrentInfo.getArtist())
+                            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE,mCurrentInfo.getDisplayname())
+                            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,mCurrentInfo.getDuration())
+                            .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER,mCurrentIndex)
+                            .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS,Global.PlayQueue != null ? Global.PlayQueue.size() : 0)
+                            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART,copy(bitmap))
+                            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mCurrentInfo.getTitle())
+                            .build());
+                }
+
+                @Override
+                protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+                    mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
+                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM,mCurrentInfo.getAlbum())
+                            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST,mCurrentInfo.getArtist())
+                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST,mCurrentInfo.getArtist())
+                            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE,mCurrentInfo.getDisplayname())
+                            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,mCurrentInfo.getDuration())
+                            .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER,mCurrentIndex)
+                            .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS,Global.PlayQueue != null ? Global.PlayQueue.size() : 0)
+                            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART,null)
+                            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mCurrentInfo.getTitle())
+                            .build());
+                }
+            }, CallerThreadExecutor.getInstance());
 
         }
     }
@@ -724,6 +752,10 @@ public class MusicService extends BaseService implements Playback {
      */
     private void prepare(final String path) {
         try {
+            if(TextUtils.isEmpty(path)){
+                ToastUtil.show(mContext,getString(R.string.path_empty));
+                return;
+            }
             mAudioFouus =  mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
                     AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
             if(!mAudioFouus) {
@@ -740,8 +772,7 @@ public class MusicService extends BaseService implements Playback {
             mIsplay = true;
             mIsIniting = false;
         } catch (Exception e){
-            if(mContext != null)
-                ToastUtil.show(mContext,getString(R.string.play_failed) + e.toString());
+            ToastUtil.show(mContext,getString(R.string.play_failed) + e.toString());
             CommonUtil.uploadException("prepare",e);
         }
 
@@ -982,14 +1013,14 @@ public class MusicService extends BaseService implements Playback {
                         SPUtil.putValue(mContext,"Setting","ThemeMode", ThemeStore.DAY);
                         SPUtil.putValue(mContext,"Setting","ThemeColor",ThemeStore.THEME_BLUE);
                     } catch (Exception e){
-                        CommonUtil.uploadException("新建我的收藏列表错误:" + Global.PlayQueueID,e);
+                        CommonUtil.uploadException("新建列表错误",e);
                     }
                 }else {
                     Global.PlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
                     Global.MyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);
                     Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
                     Global.PlayList = PlayListUtil.getAllPlayListInfo();
-                    Global.RecentlyID = SPUtil.getValue(mContext,"Setting","RecentlyID",-1);
+//                    Global.RecentlyID = SPUtil.getValue(mContext,"Setting","RecentlyID",-1);
                     mShowFloatLrc = SPUtil.getValue(mContext,"Setting","FloatLrc",false);
                     //播放模式
                     mPlayModel = SPUtil.getValue(mContext,"Setting", "PlayModel",Constants.PLAY_LOOP);
@@ -1141,6 +1172,27 @@ public class MusicService extends BaseService implements Playback {
     }
 
     /**
+     * 复制bitmap
+     * @param bitmap
+     * @return
+     */
+    public static Bitmap copy(Bitmap bitmap) {
+        if(bitmap == null){
+            return null;
+        }
+        Bitmap.Config config = bitmap.getConfig();
+        if (config == null) {
+            config = Bitmap.Config.RGB_565;
+        }
+        try {
+            return bitmap.copy(config, false);
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * 更新桌面部件
      */
     private void updateAppwidget() {
@@ -1230,8 +1282,7 @@ public class MusicService extends BaseService implements Playback {
                 final String uri = MediaStoreUtil.getImageUrl(temp.getAlbumId(),Constants.URL_ALBUM);
                 ImageRequest imageRequest =
                         ImageRequestBuilder.newBuilderWithSource(!TextUtils.isEmpty(uri) ? Uri.parse(uri) : Uri.EMPTY)
-//                                .setResizeOptions(new ResizeOptions(size,size))
-//                                .setProgressiveRenderingEnabled(true)
+                                .setResizeOptions(new ResizeOptions(size,size))
                                 .build();
                 DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);
 
@@ -1239,7 +1290,7 @@ public class MusicService extends BaseService implements Playback {
                     @Override
                     protected void onNewResultImpl(Bitmap bitmap) {
                         try {
-                            Bitmap result = Bitmap.createScaledBitmap(bitmap,size,size,true);
+                            Bitmap result = copy(bitmap);
                             if(result != null) {
                                 mRemoteBigView.setImageViewBitmap(R.id.notify_image, result);
                                 mRemoteView.setImageViewBitmap(R.id.notify_image,result);

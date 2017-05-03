@@ -4,7 +4,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import remix.myplayer.util.MediaStoreUtil;
 
@@ -32,7 +37,22 @@ public class AsynLoadImage extends AsyncTask<Object,Integer,String> {
     @Override
     protected void onPostExecute(String url) {
         if(mImage != null && !TextUtils.isEmpty(url)) {
-            mImage.setImageURI(Uri.parse(url));
+            ImageRequest imageRequest = null;
+            if(mImage.getWidth() > 0 && mImage.getHeight() > 0){
+                imageRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(url))
+                        .setResizeOptions(new ResizeOptions(mImage.getWidth(),mImage.getHeight()))
+                        .build();
+            } else {
+                imageRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(url))
+                        .build();
+            }
+            DraweeController controller = Fresco.newDraweeControllerBuilder()
+                    .setImageRequest(imageRequest)
+                    .setOldController(mImage.getController())
+                    .build();
+
+            mImage.setController(controller);
+//            mImage.setImageURI(Uri.parse(url));
         }
     }
 }

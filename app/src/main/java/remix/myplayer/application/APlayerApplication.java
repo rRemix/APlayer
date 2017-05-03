@@ -23,12 +23,12 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.CrashHandler;
-import remix.myplayer.util.DiskCache;
 import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.cache.DiskCache;
 
 /**
  * Created by taeja on 16-3-16.
@@ -44,6 +44,7 @@ public class APlayerApplication extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
+
         initUtil();
         initTheme();
         startService(new Intent(this, MusicService.class));
@@ -90,7 +91,7 @@ public class APlayerApplication extends android.app.Application {
                 .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {
                     @Override
                     public MemoryCacheParams get() {
-                        return new MemoryCacheParams(cacheSize, 15,cacheSize,10, 2 * ByteConstants.MB);
+                        return new MemoryCacheParams(cacheSize, Integer.MAX_VALUE,cacheSize,Integer.MAX_VALUE, 5 * ByteConstants.MB);
                     }
                 })
                 .build();

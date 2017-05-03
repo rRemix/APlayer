@@ -1,4 +1,4 @@
-package remix.myplayer.util;
+package remix.myplayer.util.cache;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 import remix.myplayer.R;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2016/6/14.

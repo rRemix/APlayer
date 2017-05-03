@@ -214,6 +214,11 @@ public class PlayListAdapter extends HeaderAdapter implements FastScroller.Secti
         }
     }
 
+    @Override
+    protected void saveMode() {
+        SPUtil.putValue(mContext,"Setting","PlayListModel",ListModel);
+    }
+
     static class PlayListListHolder extends PlayListHolder{
         PlayListListHolder(View itemView) {
             super(itemView);
