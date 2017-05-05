@@ -399,6 +399,8 @@ public class MusicService extends BaseService implements Playback {
 
     private void unInit(){
         if(mMediaPlayer != null) {
+            if(isPlay())
+                pause(false);
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
