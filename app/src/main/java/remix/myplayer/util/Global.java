@@ -104,22 +104,22 @@ public class Global {
      * @return
      */
     public synchronized static void setPlayQueue(final ArrayList<Integer> newQueueIdList) {
-        if(newQueueIdList == null || newQueueIdList.size() == 0){
-            CommonUtil.uploadException("SetEmptyQueue","");
-            return;
-        }
+
         new Thread(){
             @Override
             public void run() {
+                if(newQueueIdList == null || newQueueIdList.size() == 0){
+                    CommonUtil.uploadException("SetEmptyQueue","");
+                    return;
+                }
                 if (newQueueIdList.equals(PlayQueue))
                     return;
-                ArrayList<Integer> oriPlayQueue = (ArrayList<Integer>) PlayQueue.clone();
                 PlayQueue.clear();
                 PlayQueue.addAll(newQueueIdList);
                 int deleteRow = 0;
                 int addRow = 0;
                 try {
-                    deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue, PlayQueueID);
+                    deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
                     addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
                 } catch (Exception e){
                     CommonUtil.uploadException("setPlayQueue Error",e);
@@ -138,29 +138,29 @@ public class Global {
      * @return
      */
     public synchronized static void setPlayQueue(final ArrayList<Integer> newQueueIdList, final Context context, final Intent intent) {
-        if(newQueueIdList == null || newQueueIdList.size() == 0){
-            CommonUtil.uploadException("SetEmptyQueue","");
-            return;
-        }
-        if (newQueueIdList.equals(PlayQueue)) {
-            context.sendBroadcast(intent);
-            return;
-        }
 
-        final ArrayList<Integer> oriPlayQueue = (ArrayList<Integer>) PlayQueue.clone();
-        PlayQueue.clear();
-        PlayQueue.addAll(newQueueIdList);
-        if(intent.getBooleanExtra("shuffle",false)){
-            MusicService.updateNextSong();
-        }
-        context.sendBroadcast(intent);
         new Thread(){
             @Override
             public void run() {
+                if(newQueueIdList == null || newQueueIdList.size() == 0){
+                    CommonUtil.uploadException("SetEmptyQueue","");
+                    return;
+                }
+                if (newQueueIdList.equals(PlayQueue)) {
+                    context.sendBroadcast(intent);
+                    return;
+                }
+
+                PlayQueue.clear();
+                PlayQueue.addAll(newQueueIdList);
+                if(intent.getBooleanExtra("shuffle",false)){
+                    MusicService.updateNextSong();
+                }
+                context.sendBroadcast(intent);
                 int deleteRow = 0;
                 int addRow = 0;
                 try {
-                    deleteRow = PlayListUtil.deleteMultiSongs(oriPlayQueue, PlayQueueID);
+                    deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
                     addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
                 } catch (Exception e){
                     CommonUtil.uploadException("setPlayQueue Error",e);

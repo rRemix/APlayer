@@ -190,32 +190,44 @@ public class PlayListUtil {
     }
 
     /**
+     * 删除表下所有数据
+     */
+    public static int clearTable(String tablename){
+        return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI, PlayListSongs.PlayListSongColumns.PLAY_LIST_NAME + "=?",new String[]{tablename});
+    }
+
+    /**
      * 删除多首歌曲
      * @param IdList
      * @param playlistId
      * @return
      */
     public static int deleteMultiSongs(ArrayList<Integer> IdList,int playlistId){
-        if(IdList == null || IdList.size() == 0)
-            return 0;
-        String where = "";
-        String[] whereArgs = new String[IdList.size() + 1];
-        for(int i = 0 ; i < IdList.size() + 1;i++) {
-            if (i != IdList.size()) {
-                if (i == 0) {
-                    where += "(";
+        try {
+            if(IdList == null || IdList.size() == 0)
+                return 0;
+            String where = "";
+            String[] whereArgs = new String[IdList.size() + 1];
+            for(int i = 0 ; i < IdList.size() + 1;i++) {
+                if (i != IdList.size()) {
+                    if (i == 0) {
+                        where += "(";
+                    }
+                    where += (PlayListSongs.PlayListSongColumns.AUDIO_ID + "=?");
+                    if (i != IdList.size() - 1) {
+                        where += " or ";
+                    }
+                    whereArgs[i] = IdList.get(i) + "";
+                }else {
+                    where += (") and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?");
+                    whereArgs[i] = playlistId + "";
                 }
-                where += (PlayListSongs.PlayListSongColumns.AUDIO_ID + "=?");
-                if (i != IdList.size() - 1) {
-                    where += " or ";
-                }
-                whereArgs[i] = IdList.get(i) + "";
-            }else {
-                where += (") and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?");
-                whereArgs[i] = playlistId + "";
             }
+            return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI,where,whereArgs);
+        } catch (Exception e){
+            e.printStackTrace();
         }
-        return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI,where,whereArgs);
+        return 0;
     }
 
 

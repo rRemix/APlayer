@@ -43,7 +43,7 @@ public class DBObserver extends ContentObserver {
                 //更新播放队列
                 case DBContentProvider.PLAY_LIST_SONG_MULTIPLE:
                 case DBContentProvider.PLAY_LIST_SONG_SINGLE:
-                    Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
+//                    Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
                     if(mPlayListSongListener != null)
                         mPlayListSongListener.OnChange();
                     break;
