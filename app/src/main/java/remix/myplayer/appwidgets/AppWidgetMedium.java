@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import remix.myplayer.R;
-import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.CommonUtil;

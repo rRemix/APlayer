@@ -13,8 +13,8 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import remix.myplayer.model.PlayListInfo;
-import remix.myplayer.model.PlayListSongInfo;
+import remix.myplayer.model.mp3.PlayListInfo;
+import remix.myplayer.model.mp3.PlayListSongInfo;
 import remix.myplayer.service.MusicService;
 
 /**
@@ -104,7 +104,6 @@ public class Global {
      * @return
      */
     public synchronized static void setPlayQueue(final ArrayList<Integer> newQueueIdList) {
-
         new Thread(){
             @Override
             public void run() {
@@ -138,7 +137,6 @@ public class Global {
      * @return
      */
     public synchronized static void setPlayQueue(final ArrayList<Integer> newQueueIdList, final Context context, final Intent intent) {
-
         new Thread(){
             @Override
             public void run() {

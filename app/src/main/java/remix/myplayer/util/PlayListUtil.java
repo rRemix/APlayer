@@ -13,10 +13,9 @@ import java.util.Set;
 import remix.myplayer.R;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
-import remix.myplayer.model.MP3Item;
-import remix.myplayer.model.PlayListInfo;
-import remix.myplayer.model.PlayListSongInfo;
-
+import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.PlayListInfo;
+import remix.myplayer.model.mp3.PlayListSongInfo;
 
 
 /**

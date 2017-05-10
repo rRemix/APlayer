@@ -13,7 +13,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -57,6 +57,14 @@ public class PlayQueueAdapter extends BaseAdapter<PlayQueueAdapter.PlayQueueHold
                 holder.mSong.setText(CommonUtil.processInfo(item.getTitle(),CommonUtil.SONGTYPE));
                 holder.mArtist.setText(CommonUtil.processInfo(item.getArtist(),CommonUtil.ARTISTTYPE));
                 holder.mArtist.setVisibility(View.VISIBLE);
+//                //高亮
+//                if(MusicService.getCurrentMP3() != null && MusicService.getCurrentMP3().getId() == item.getId()){
+//                    holder.mHighLight.setVisibility(View.VISIBLE);
+//                    holder.mSong.setTextColor(ThemeStore.getAccentColor());
+//                } else {
+//                    holder.mHighLight.setVisibility(View.GONE);
+//                    holder.mSong.setTextColor(ThemeStore.getTextColorPrimary());
+//                }
             }
 
             //删除按钮
@@ -91,6 +99,8 @@ public class PlayQueueAdapter extends BaseAdapter<PlayQueueAdapter.PlayQueueHold
         TextView mArtist;
         @BindView(R.id.playqueue_delete)
         ImageView mDelete;
+        @BindView(R.id.item_highlight)
+        ImageView mHighLight;
         @BindView(R.id.item_root)
         RelativeLayout mContainer;
         public PlayQueueHolder(View v) {

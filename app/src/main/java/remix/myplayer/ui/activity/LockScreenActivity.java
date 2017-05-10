@@ -28,7 +28,7 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.CtrlButtonListener;
-import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.util.Constants;

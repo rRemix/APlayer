@@ -29,7 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.dialog.ShareDialog;
 import remix.myplayer.util.ColorUtil;

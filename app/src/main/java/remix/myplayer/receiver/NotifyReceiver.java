@@ -24,7 +24,7 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import remix.myplayer.R;
-import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;

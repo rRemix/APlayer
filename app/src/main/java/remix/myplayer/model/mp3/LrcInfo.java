@@ -1,4 +1,4 @@
-package remix.myplayer.model;
+package remix.myplayer.model.mp3;
 
 /**
  * Created by Remix on 2015/12/8.

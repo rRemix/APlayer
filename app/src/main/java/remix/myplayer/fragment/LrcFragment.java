@@ -17,7 +17,7 @@ import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.lyric.LrcRow;
 import remix.myplayer.lyric.LrcView;
 import remix.myplayer.lyric.SearchLRC;
-import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.mp3.MP3Item;
 
 /**
  * Created by Remix on 2015/12/2.

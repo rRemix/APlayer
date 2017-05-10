@@ -19,7 +19,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.interfaces.OnSongChooseListener;
-import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.ui.activity.SongChooseActivity;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;

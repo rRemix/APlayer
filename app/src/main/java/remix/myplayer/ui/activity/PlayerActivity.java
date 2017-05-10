@@ -60,7 +60,7 @@ import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.lyric.LrcView;
-import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;

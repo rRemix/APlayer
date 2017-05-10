@@ -9,8 +9,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 21
-        versionName "1.1.6.5"
+        versionCode 22
+        versionName "1.1.6.6"
         vectorDrawables.useSupportLibrary = true
     }
 

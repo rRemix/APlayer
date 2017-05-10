@@ -25,8 +25,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 import remix.myplayer.R;
-import remix.myplayer.model.Genre;
-import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.mp3.Genre;
+import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.util.cache.DiskCache;
 
 /**

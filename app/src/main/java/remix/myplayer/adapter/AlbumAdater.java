@@ -30,7 +30,7 @@ import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.fragment.AlbumFragment;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
-import remix.myplayer.model.MultiPosition;
+import remix.myplayer.model.mp3.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;

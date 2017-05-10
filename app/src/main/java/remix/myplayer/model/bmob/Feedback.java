@@ -1,4 +1,4 @@
-package remix.myplayer.model;
+package remix.myplayer.model.bmob;
 
 import cn.bmob.v3.BmobObject;
 
@@ -7,16 +7,16 @@ import cn.bmob.v3.BmobObject;
  */
 
 public class Feedback extends BmobObject {
-    private String Content;
-    private String AppVersion;
-    private String AppVersionCode;
-    private String CpuABI;
-    private String DeviceManufacturer;
-    private String DeviceModel;
-    private String ReleaseVersion;
-    private String SdkVersion;
-    private String Display;
-    private String Contact;
+    public String Content;
+    public String AppVersion;
+    public String AppVersionCode;
+    public String CpuABI;
+    public String DeviceManufacturer;
+    public String DeviceModel;
+    public String ReleaseVersion;
+    public String SdkVersion;
+    public String Display;
+    public String Contact;
 
     public Feedback(String content,String contact, String appVersion, String appVersionCode,String display, String cpuABI, String deviceManufacturer, String deviceModel, String releaseVersion, String sdkVersion) {
         super();

@@ -14,8 +14,6 @@ import android.widget.TextView;
 
 import com.umeng.analytics.MobclickAgent;
 
-import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
@@ -23,8 +21,8 @@ import remix.myplayer.adapter.SearchResAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.customview.SearchToolBar;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-1-22.
@@ -91,18 +89,13 @@ public class SearchActivity extends ToolbarActivity {
         mSearchResAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if (mCursor != null && mCursor.getCount() > 0 && mCursor.moveToFirst()) {
-                    ArrayList<Integer> list = new ArrayList<>();
-                    for(int i = 0 ; i < mCursor.getCount(); i++) {
-                        mCursor.moveToPosition(i);
-                        list.add(mCursor.getInt(mIdIndex));
-                    }
+                if(!mCursor.isClosed() && mCursor.moveToPosition(position)){
                     Intent intent = new Intent(Constants.CTL_ACTION);
-                    Bundle arg = new Bundle();
-                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                    arg.putInt("Position", position);
-                    intent.putExtras(arg);
-                    Global.setPlayQueue(list,SearchActivity.this,intent);
+                    intent.putExtra("Control",Constants.PLAY_TEMP);
+                    intent.putExtra("MP3Item",MediaStoreUtil.getMP3InfoById(mCursor.getInt(mIdIndex)));
+                    sendBroadcast(intent);
+                } else {
+                    ToastUtil.show(mContext,R.string.illegal_arg);
                 }
             }
             @Override

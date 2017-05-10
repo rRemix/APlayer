@@ -75,7 +75,7 @@ public class EQActivity extends ToolbarActivity {
                     int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
                     LogUtil.d(TAG,"AudioSessionId:" + AudioSessionId);
                     if(AudioSessionId  == 0) {
-                        ToastUtil.show(APlayerApplication.getContext(),R.string.eq_initial_failed);
+                        CommonUtil.uploadException("AudioSessionId","is zero");
                         return;
                     }
                     //是否启用音效设置

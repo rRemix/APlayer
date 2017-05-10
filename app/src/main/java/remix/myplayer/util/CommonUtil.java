@@ -42,7 +42,7 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
-import remix.myplayer.model.Feedback;
+import remix.myplayer.model.bmob.Error;
 import remix.myplayer.util.thumb.SearchCover;
 
 /**
@@ -554,29 +554,6 @@ public class CommonUtil {
     }
 
     /**
-     * 保存所有名字包含lyric的目录
-     */
-    public static void getLyricDir(File searchFile){
-
-        //判断SD卡是否存在
-        if (Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED)) {
-            File[] files = searchFile.listFiles();
-            if(files == null || files.length == 0)
-                return;
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    if(file.canRead() && file.getName().contains("lyric")){
-                        //保存
-                        Global.LyricDir.add(file);
-                    }
-                    getLyricDir(file);
-                }
-            }
-        }
-    }
-
-    /**
      * 查找歌曲的lrc文件
      * @param songName
      * @param searchPath
@@ -588,10 +565,8 @@ public class CommonUtil {
             if(files == null || files.length == 0)
                 return;
             for(File file : files){
-                if (file.isDirectory()){
-                    if(file.canRead()){
-                        searchFile(displayName,songName,artistName,file);
-                    }
+                if (file.isDirectory() && file.canRead()){
+                    searchFile(displayName,songName,artistName,file);
                 } else {
                     if(isRightLrc(file,displayName,songName,artistName)){
                         Global.CurrentLrcPath = file.getAbsolutePath();
@@ -718,15 +693,14 @@ public class CommonUtil {
     /**
      * 手动上传日志信息
      */
-    public static void uploadException(String title,String content){
+    public static void uploadException(String title,String description){
         try {
             if(!CommonUtil.isNetWorkConnected()){
                 return;
             }
             PackageManager pm = APlayerApplication.getContext().getPackageManager();
             PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
-            Feedback feedback =  new Feedback(content,
-                    title,
+            Error error = new Error(title,description,
                     pi.versionName,
                     pi.versionCode + "",
                     Build.DISPLAY,
@@ -734,9 +708,8 @@ public class CommonUtil {
                     Build.MANUFACTURER,
                     Build.MODEL,
                     Build.VERSION.RELEASE,
-                    Build.VERSION.SDK_INT + ""
-            );
-            feedback.save(new SaveListener<String>() {
+                    Build.VERSION.SDK_INT + "");
+            error.save(new SaveListener<String>() {
                 @Override
                 public void done(String s, BmobException e) {
                 }
@@ -756,8 +729,7 @@ public class CommonUtil {
             }
             PackageManager pm = APlayerApplication.getContext().getPackageManager();
             PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
-            Feedback feedback =  new Feedback(exception.toString(),
-                    title,
+            Error error = new Error(title,exception.toString(),
                     pi.versionName,
                     pi.versionCode + "",
                     Build.DISPLAY,
@@ -765,9 +737,8 @@ public class CommonUtil {
                     Build.MANUFACTURER,
                     Build.MODEL,
                     Build.VERSION.RELEASE,
-                    Build.VERSION.SDK_INT + ""
-            );
-            feedback.save(new SaveListener<String>() {
+                    Build.VERSION.SDK_INT + "");
+            error.save(new SaveListener<String>() {
                 @Override
                 public void done(String s, BmobException e) {
                 }

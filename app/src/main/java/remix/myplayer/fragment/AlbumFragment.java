@@ -156,7 +156,6 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
             mAlbumIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
             mAlbumIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
             mArtistIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-
             mAdapter.setCursor(mCursor);
         } catch (Exception e){
             e.printStackTrace();

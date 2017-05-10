@@ -1,4 +1,4 @@
-package remix.myplayer.model;
+package remix.myplayer.model.mp3;
 
 /**
  * @ClassName

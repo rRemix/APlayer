@@ -53,7 +53,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import remix.myplayer.R;
-import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.appwidgets.AppWidgetBig;
 import remix.myplayer.appwidgets.AppWidgetMedium;
 import remix.myplayer.appwidgets.AppWidgetSmall;
@@ -64,8 +63,9 @@ import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.lyric.LrcRow;
 import remix.myplayer.lyric.SearchLRC;
-import remix.myplayer.model.MP3Item;
-import remix.myplayer.model.PlayListSongInfo;
+import remix.myplayer.model.mp3.FloatLrcContent;
+import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.PlayListSongInfo;
 import remix.myplayer.observer.DBObserver;
 import remix.myplayer.observer.MediaStoreObserver;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
@@ -318,7 +318,6 @@ public class MusicService extends BaseService implements Playback {
     private void setUpMediaPlayer() {
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
-        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -329,8 +328,6 @@ public class MusicService extends BaseService implements Playback {
                     playNextOrPrev(true);
                 }
                 Global.setOperation(Constants.NEXT);
-                //更新通知栏
-                sendBroadcast(new Intent(Constants.NOTIFY));
                 acquireWakeLock();
             }
         });
@@ -347,13 +344,18 @@ public class MusicService extends BaseService implements Playback {
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
-//                if(mMediaPlayer != null)
-//                    mMediaPlayer.release();
-//                setUpMediaPlayer();
-                CommonUtil.uploadException("MediaPlayerError","what:" + what + " extra:" + extra);
-//                if(mContext != null)
-//                    ToastUtil.show(mContext,R.string.cant_play_this_sont);
-                return true;
+                try {
+                    if(what == MediaPlayer.MEDIA_ERROR_SERVER_DIED){
+                        if(mMediaPlayer != null)
+                            mMediaPlayer.release();
+                        setUpMediaPlayer();
+                    }
+                } catch (Exception e){
+                    CommonUtil.uploadException("Error In OnError Callback",e.toString());
+                } finally {
+                    CommonUtil.uploadException("MediaPlayerError","what:" + what + " extra:" + extra);
+                }
+                return false;
             }
         });
     }
@@ -382,7 +384,7 @@ public class MusicService extends BaseService implements Playback {
         //桌面歌词
         updateFloatLrc();
         //初始化下一首歌曲
-        mNextId = SPUtil.getValue(APlayerApplication.getContext(),"Setting","NextSongId",-1);
+        mNextId = SPUtil.getValue(mContext,"Setting","NextSongId",-1);
         if(mNextId == -1){
             mNextIndex = mCurrentIndex;
             updateNextSong();
@@ -655,6 +657,14 @@ public class MusicService extends BaseService implements Playback {
                             break;
                     }
                     break;
+                //临时播放一首歌曲
+                case Constants.PLAY_TEMP:
+                    MP3Item temp = (MP3Item) intent.getSerializableExtra("MP3Item");
+                    if(temp != null){
+                        mCurrentInfo = temp;
+                        prepare(mCurrentInfo.getUrl());
+                    }
+                    break;
                 default:break;
             }
         }
@@ -676,7 +686,8 @@ public class MusicService extends BaseService implements Playback {
      */
     private void update(int control){
         if(control == Constants.PLAYSELECTEDSONG || control == Constants.PREV || control == Constants.NEXT
-                || control == Constants.TOGGLE || control == Constants.PAUSE || control == Constants.START) {
+                || control == Constants.TOGGLE || control == Constants.PAUSE || control == Constants.START
+                || control == Constants.PLAY_TEMP) {
             //更新ui
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
             //更新通知栏
@@ -770,6 +781,7 @@ public class MusicService extends BaseService implements Playback {
             mIsIniting = true;
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(path);
+            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.prepareAsync();
             mIsplay = true;
             mIsIniting = false;
@@ -997,7 +1009,7 @@ public class MusicService extends BaseService implements Playback {
         new Thread(){
             @Override
             public void run() {
-                final boolean isFirst = SPUtil.getValue(getApplicationContext(), "Setting", "First", true);
+                final boolean isFirst = SPUtil.getValue(mContext, "Setting", "First", true);
                 SPUtil.putValue(mContext,"Setting","First",false);
                 //读取sd卡歌曲id
                 Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
@@ -1022,8 +1034,7 @@ public class MusicService extends BaseService implements Playback {
                     Global.MyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);
                     Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
                     Global.PlayList = PlayListUtil.getAllPlayListInfo();
-//                    Global.RecentlyID = SPUtil.getValue(mContext,"Setting","RecentlyID",-1);
-                    mShowFloatLrc = SPUtil.getValue(mContext,"Setting","FloatLrc",false);
+                    mShowFloatLrc = SPUtil.getValue(mContext,"Setting","FloatLrc",true);
                     //播放模式
                     mPlayModel = SPUtil.getValue(mContext,"Setting", "PlayModel",Constants.PLAY_LOOP);
                     //摇一摇
@@ -1159,8 +1170,8 @@ public class MusicService extends BaseService implements Playback {
      * 更新桌面歌词
      */
     private void updateFloatLrc() {
-        if(true)
-            return;
+//        if(true)
+//            return;
         if(!mShowFloatLrc)
             return;
         //根据操作判断是否需要更新歌词
@@ -1419,8 +1430,9 @@ public class MusicService extends BaseService implements Playback {
     /** 更新桌面歌词*/
     private static final int LRC_THRESHOLD = 400;
     private static final int LRC_INTERVAL = 400;
-    public String mCurrentLrc;
+//    public String mCurrentLrc;
     private UpdateFloatLrcThread mUpdateFloatLrcThread;
+    private FloatLrcContent mCurrentLrc = new FloatLrcContent();
     private class UpdateFloatLrcThread extends Thread{
         @Override
         public void run() {
@@ -1430,54 +1442,36 @@ public class MusicService extends BaseService implements Playback {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if(CommonUtil.isForeground(mContext) && isFloatLrcShowing()){
-                    mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
-                } else if(!CommonUtil.isForeground(mContext) && !isFloatLrcShowing()){
-                    mUpdateUIHandler.sendEmptyMessage(Constants.CREATE_FLOAT_LRC);
-                }
-                Message target = mUpdateUIHandler.obtainMessage();
-                target.what = Constants.UPDATE_FLOAT_LRC_CONTENT;
-                if(mLrcList == null || mLrcList.size() == 0 || mFloatLrcView == null) {
-                    target.obj = mContext.getString(R.string.no_lrc);
-                    target.sendToTarget();
-                    continue;
-                }
-                int progress = getProgress();
-                for(int i = 0 ; i < mLrcList.size();i++){
-                    LrcRow lrcRow = mLrcList.get(i);
-                    int temp = progress - lrcRow.getTime();
-
-                    if(Math.abs(temp) < LRC_THRESHOLD || (i == 0 && temp < 0)){
-                        //查找到歌词
-
-                        //判断当前歌词内容是否是超出屏幕宽度
-                        //如果超出则只显示当前这一行歌词，并将歌词截断
-                        // 否则同时显示下一句歌词
-                        String currentLrc = lrcRow.getContent();
-                        try {
-                            if(mFloatLrcView.getPaint().measureText(currentLrc) > mContext.getResources().getDisplayMetrics().widthPixels){
-                                //截断歌词
-                                for(int end = currentLrc.length(); end >= 0 ; end--){
-                                    String subString = currentLrc.substring(0,end);
-                                    if(mFloatLrcView.getPaint().measureText(subString) <= mContext.getResources().getDisplayMetrics().widthPixels) {
-                                        target.obj = currentLrc.substring(0, end)  + currentLrc.substring(end + 1);
-                                        break;
-                                    }
-                                }
-
-                            } else {
-                                if(i + 1 < mLrcList.size()){
-                                    target.obj = lrcRow.getContent() + "\r\n" + mLrcList.get(i + 1).getContent();
-                                } else {
-                                    target.obj = lrcRow.getContent();
-                                }
-                            }
-                        } catch (Exception e){
-                            CommonUtil.uploadException("updateFloatLrc",e);
-                            target.obj = currentLrc;
+                //当前应用在前台
+                if(CommonUtil.isForeground(mContext)){
+                    if(isFloatLrcShowing())
+                        mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
+                } else{
+                    if(!isFloatLrcShowing()) {
+                        mUpdateUIHandler.sendEmptyMessage(Constants.CREATE_FLOAT_LRC);
+                    } else {
+                        Message target = mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT);
+                        if(mLrcList == null || mLrcList.size() == 0 || mFloatLrcView == null) {
+                            mCurrentLrc.Line1 = mContext.getString(R.string.no_lrc);
+                            mCurrentLrc.Line2 = "";
+                            target.sendToTarget();
+                            continue;
                         }
-                        target.sendToTarget();
-                        break;
+                        int progress = getProgress();
+                        for(int i = 0 ; i < mLrcList.size();i++){
+                            LrcRow lrcRow = mLrcList.get(i);
+                            int temp = progress - lrcRow.getTime();
+                            if(Math.abs(temp) < LRC_THRESHOLD || (i == 0 && temp < 0)){
+                                try {
+                                    mCurrentLrc.Line1 = mLrcList.get(i).getContent();
+                                    mCurrentLrc.Line2 = (i + 1 < mLrcList.size() ? mLrcList.get(i + 1).getContent() : "");
+                                } catch (Exception e){
+                                    CommonUtil.uploadException("updateFloatLrc",e);
+                                }
+                                target.sendToTarget();
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -1489,12 +1483,12 @@ public class MusicService extends BaseService implements Playback {
      */
     private void createFloatLrc(){
         final WindowManager.LayoutParams param = new WindowManager.LayoutParams();
-        param.type = WindowManager.LayoutParams.TYPE_PHONE;
+        param.type = WindowManager.LayoutParams.TYPE_TOAST;
         param.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         param.format = PixelFormat.RGBA_8888;
         param.gravity = Gravity.TOP;
         param.width = mContext.getResources().getDisplayMetrics().widthPixels;
-        param.height = DensityUtil.dip2px(mContext,72);
+        param.height = getResources().getDimensionPixelSize(R.dimen.float_height);
         param.x = SPUtil.getValue(mContext,"Setting","FloatX",0);
         param.y = SPUtil.getValue(mContext,"Setting","FloatY",0);
         if(mFloatLrcView != null){
@@ -1502,8 +1496,8 @@ public class MusicService extends BaseService implements Playback {
             mFloatLrcView = null;
         }
         mFloatLrcView = new FloatLrcView(mContext);
-        if(!TextUtils.isEmpty(mCurrentLrc))
-            mFloatLrcView.setText(mCurrentLrc);
+        if(mCurrentLrc != null)
+            mFloatLrcView.setText(mCurrentLrc.Line1,mCurrentLrc.Line2);
         mWindowManager.addView(mFloatLrcView,param);
     }
 
@@ -1640,7 +1634,7 @@ public class MusicService extends BaseService implements Playback {
     }
 
     private class UpdateUIHandler extends Handler{
-        public UpdateUIHandler(Looper looper) {
+        UpdateUIHandler(Looper looper) {
             super(looper);
         }
 
@@ -1654,8 +1648,10 @@ public class MusicService extends BaseService implements Playback {
                     break;
                 case Constants.UPDATE_FLOAT_LRC_CONTENT:
                     if(mFloatLrcView != null){
-                        mFloatLrcView.setText(msg.obj.toString());
-                        mCurrentLrc = msg.obj.toString();
+//                        mFloatLrcView.setText(msg.obj.toString());
+//                        mCurrentLrc = msg.obj.toString();
+                        if(mCurrentLrc != null)
+                            mFloatLrcView.setText(mCurrentLrc.Line1,mCurrentLrc.Line2);
                     }
                     break;
                 case Constants.REMOVE_FLOAT_LRC:

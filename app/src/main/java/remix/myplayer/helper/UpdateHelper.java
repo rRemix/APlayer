@@ -2,7 +2,7 @@ package remix.myplayer.helper;
 
 import java.util.ArrayList;
 
-import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.mp3.MP3Item;
 
 /**
  * @ClassName

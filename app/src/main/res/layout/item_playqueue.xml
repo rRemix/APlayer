@@ -5,6 +5,18 @@
     android:background="?attr/background_common"
     android:id="@+id/item_root">
     <ImageView
+        android:id="@+id/item_highlight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:src="@drawable/act_btn_search"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="@dimen/d4_size"
+        android:layout_marginRight="@dimen/d4_size"
+        android:visibility="gone"/>
+
+    <ImageView
         android:layout_width="@dimen/d24_size"
         android:layout_height="@dimen/d24_size"
         android:layout_alignParentRight="true"

@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Set;
 
 import remix.myplayer.application.APlayerApplication;
-import remix.myplayer.model.LrcRequest;
-import remix.myplayer.model.MP3Item;
+import remix.myplayer.model.mp3.LrcRequest;
+import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;

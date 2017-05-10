@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="@dimen/float_height">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/widget_control"
+        android:background="@color/float_control_color"
+        android:visibility="invisible">
+        <ImageView
+            android:id="@+id/widget_close"
+            android:layout_width="@dimen/float_image_size"
+            android:layout_height="@dimen/float_image_size"
+            android:background="@color/transparent"
+            android:src="@drawable/ic_widget_close"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="@dimen/float_image_margin"
+            android:layout_marginRight="@dimen/float_image_margin" />
+        <ImageView
+            android:id="@+id/widget_lock"
+            android:layout_width="@dimen/float_image_size"
+            android:layout_height="@dimen/float_image_size"
+            android:background="@color/transparent"
+            android:src="@drawable/ic_widget_lock"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="@dimen/float_image_margin"
+            android:layout_marginLeft="@dimen/float_image_margin" />
+        <RelativeLayout
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@color/gray_b7b7b7" />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="@dimen/float_text_size"
+        android:maxLines="1"
+        android:layout_marginTop="@dimen/d24_size"
+        android:paddingTop="@dimen/d12_size"
+        android:paddingLeft="@dimen/float_text_padding"
+        android:paddingRight="@dimen/float_text_padding"
+        android:id="@+id/widget_line1"
+        android:layout_alignParentTop="true"
+        android:layout_below="@id/widget_control"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="@dimen/float_text_size"
+        android:maxLines="1"
+        android:paddingTop="@dimen/d4_size"
+        android:paddingBottom="@dimen/d12_size"
+        android:paddingLeft="@dimen/float_text_padding"
+        android:paddingRight="@dimen/float_text_padding"
+        android:id="@+id/widget_line2"
+        android:layout_below="@id/widget_line1"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"/>
+</RelativeLayout>
