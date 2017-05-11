@@ -101,8 +101,8 @@
     <dimen name="cover_margin_top">38dp</dimen>
 
     <dimen name="float_height">160dp</dimen>
-    <dimen name="float_text_padding">30dp</dimen>
+    <dimen name="float_text_padding">24dp</dimen>
     <dimen name="float_image_margin">8dp</dimen>
-    <dimen name="float_text_size">20sp</dimen>
+    <dimen name="float_text_size">22sp</dimen>
     <dimen name="float_image_size">24dp</dimen>
 </resources>

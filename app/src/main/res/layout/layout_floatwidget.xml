@@ -35,33 +35,35 @@
             android:background="@color/gray_b7b7b7" />
     </RelativeLayout>
 
-    <TextView
+    <remix.myplayer.ui.customview.floatwidget.FloatTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
         android:textSize="@dimen/float_text_size"
         android:maxLines="1"
-        android:layout_marginTop="@dimen/d24_size"
-        android:paddingTop="@dimen/d12_size"
-        android:paddingLeft="@dimen/float_text_padding"
-        android:paddingRight="@dimen/float_text_padding"
+        android:layout_marginTop="@dimen/d32_size"
+        android:layout_marginLeft="@dimen/float_text_padding"
+        android:layout_marginRight="@dimen/float_text_padding"
         android:id="@+id/widget_line1"
         android:layout_alignParentTop="true"
         android:layout_below="@id/widget_control"
         android:layout_centerHorizontal="true"
-        android:gravity="center"/>
+        android:textStyle="bold"
+        android:ellipsize="none"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
         android:textSize="@dimen/float_text_size"
         android:maxLines="1"
-        android:paddingTop="@dimen/d4_size"
-        android:paddingBottom="@dimen/d12_size"
-        android:paddingLeft="@dimen/float_text_padding"
-        android:paddingRight="@dimen/float_text_padding"
+        android:layout_marginTop="@dimen/d8_size"
+        android:layout_marginBottom="@dimen/d12_size"
+        android:layout_marginLeft="@dimen/float_text_padding"
+        android:layout_marginRight="@dimen/float_text_padding"
         android:id="@+id/widget_line2"
         android:layout_below="@id/widget_line1"
         android:layout_centerHorizontal="true"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:textStyle="bold"
+        android:ellipsize="end"/>
 </RelativeLayout>

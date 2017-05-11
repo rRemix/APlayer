@@ -74,7 +74,7 @@ import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.ui.activity.PlayerActivity;
-import remix.myplayer.ui.customview.FloatLrcView;
+import remix.myplayer.ui.customview.floatwidget.FloatLrcView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -1429,10 +1429,11 @@ public class MusicService extends BaseService implements Playback {
 
     /** 更新桌面歌词*/
     private static final int LRC_THRESHOLD = 400;
-    private static final int LRC_INTERVAL = 400;
+    private static final int LRC_INTERVAL = 300;
 //    public String mCurrentLrc;
     private UpdateFloatLrcThread mUpdateFloatLrcThread;
     private FloatLrcContent mCurrentLrc = new FloatLrcContent();
+    private LrcRow EMPTY_ROW = new LrcRow("",0,"");
     private class UpdateFloatLrcThread extends Thread{
         @Override
         public void run() {
@@ -1452,8 +1453,8 @@ public class MusicService extends BaseService implements Playback {
                     } else {
                         Message target = mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT);
                         if(mLrcList == null || mLrcList.size() == 0 || mFloatLrcView == null) {
-                            mCurrentLrc.Line1 = mContext.getString(R.string.no_lrc);
-                            mCurrentLrc.Line2 = "";
+                            mCurrentLrc.Line1.setContent(getResources().getString(R.string.no_lrc));
+                            mCurrentLrc.Line2 = EMPTY_ROW;
                             target.sendToTarget();
                             continue;
                         }
@@ -1461,16 +1462,25 @@ public class MusicService extends BaseService implements Playback {
                         for(int i = 0 ; i < mLrcList.size();i++){
                             LrcRow lrcRow = mLrcList.get(i);
                             int temp = progress - lrcRow.getTime();
-                            if(Math.abs(temp) < LRC_THRESHOLD || (i == 0 && temp < 0)){
+                            if(i == 0 && temp < 0){
+                                if(mCurrentInfo == null)
+                                    break;
+                                mCurrentLrc.Line1 = new LrcRow("",0,mCurrentInfo.getTitle());
+                                mCurrentLrc.Line2 = new LrcRow("",0,mCurrentInfo.getArtist() + " - " + mCurrentInfo.getAlbum());
+                                target.sendToTarget();
+                            } else if(Math.abs(temp) < LRC_THRESHOLD){
                                 try {
-                                    mCurrentLrc.Line1 = mLrcList.get(i).getContent();
-                                    mCurrentLrc.Line2 = (i + 1 < mLrcList.size() ? mLrcList.get(i + 1).getContent() : "");
+                                    mCurrentLrc.Line1 = mLrcList.get(i);
+                                    mCurrentLrc.Line2 = (i + 1 < mLrcList.size() ? mLrcList.get(i + 1) : EMPTY_ROW);
                                 } catch (Exception e){
                                     CommonUtil.uploadException("updateFloatLrc",e);
                                 }
                                 target.sendToTarget();
                                 break;
                             }
+//                            if(Math.abs(temp) < LRC_THRESHOLD || (i == 0 && temp < 0)){
+//
+//                            }
                         }
                     }
                 }
@@ -1496,8 +1506,8 @@ public class MusicService extends BaseService implements Playback {
             mFloatLrcView = null;
         }
         mFloatLrcView = new FloatLrcView(mContext);
-        if(mCurrentLrc != null)
-            mFloatLrcView.setText(mCurrentLrc.Line1,mCurrentLrc.Line2);
+//        if(mCurrentLrc != null)
+//            mFloatLrcView.setText(mCurrentLrc.Line1,mCurrentLrc.Line2);
         mWindowManager.addView(mFloatLrcView,param);
     }
 

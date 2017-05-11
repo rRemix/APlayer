@@ -2,6 +2,8 @@ package remix.myplayer.model.mp3;
 
 import java.io.Serializable;
 
+import remix.myplayer.lyric.LrcRow;
+
 /**
  * @ClassName
  * @Description
@@ -10,6 +12,6 @@ import java.io.Serializable;
  */
 
 public class FloatLrcContent implements Serializable {
-    public String Line1;
-    public String Line2;
+    public LrcRow Line1;
+    public LrcRow Line2;
 }
