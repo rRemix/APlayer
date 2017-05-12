@@ -3,7 +3,6 @@ package remix.myplayer.ui.customview.floatwidget;
 import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.os.Message;
@@ -91,7 +90,7 @@ public class FloatLrcView extends RelativeLayout {
 
     private void setUpTextView() {
         mLine1.setTextColor(ThemeStore.getAccentColor());
-        mLine2.setTextColor(Color.WHITE);
+        mLine2.setTextColor(ThemeStore.getAccentColor());
     }
 
     public void setText(LrcRow lrc1, LrcRow lrc2) {

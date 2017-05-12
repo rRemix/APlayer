@@ -48,7 +48,7 @@
         android:layout_alignParentTop="true"
         android:layout_below="@id/widget_control"
         android:layout_centerHorizontal="true"
-        android:textStyle="bold"
+        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
         android:ellipsize="none"/>
     <TextView
         android:layout_width="match_parent"
@@ -64,6 +64,6 @@
         android:layout_below="@id/widget_line1"
         android:layout_centerHorizontal="true"
         android:gravity="center"
-        android:textStyle="bold"
+        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
         android:ellipsize="end"/>
 </RelativeLayout>
