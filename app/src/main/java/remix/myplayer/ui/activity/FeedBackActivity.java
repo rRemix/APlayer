@@ -58,8 +58,6 @@ public class FeedBackActivity extends ToolbarActivity {
 
         mSubmit.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0,ThemeStore.getAccentColor()));
         mContent.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0, ColorUtil.getColor(R.color.gray_e2e2e2)));
-        mContact.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0, ColorUtil.getColor(R.color.gray_e2e2e2)));
-        Theme.setTint(mContent,ThemeStore.getMaterialPrimaryColor(),false);
         Theme.setTint(mContact,ThemeStore.getMaterialPrimaryColor(),false);
     }
 

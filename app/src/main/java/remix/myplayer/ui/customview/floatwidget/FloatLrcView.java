@@ -60,6 +60,12 @@ public class FloatLrcView extends RelativeLayout {
     ImageView mClock;
     @BindView(R.id.widget_close)
     ImageView mClose;
+    @BindView(R.id.widget_next)
+    ImageView mNext;
+    @BindView(R.id.widget_play)
+    ImageView mPlay;
+    @BindView(R.id.widget_prev)
+    ImageView mPrev;
 
     public FloatLrcView(Context context) {
         super(context);
@@ -85,7 +91,6 @@ public class FloatLrcView extends RelativeLayout {
         ButterKnife.bind(this, root);
         addView(root);
         setUpTextView();
-
     }
 
     private void setUpTextView() {
@@ -212,21 +217,32 @@ public class FloatLrcView extends RelativeLayout {
         return true;
     }
 
-    @OnClick({R.id.widget_close, R.id.widget_lock})
+    public void setPlayIcon(boolean play){
+        mPlay.setImageResource(play ? R.drawable.notify_pause : R.drawable.notify_play);
+    }
+
+    @OnClick({R.id.widget_close, R.id.widget_lock,R.id.widget_next,R.id.widget_play,R.id.widget_prev})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             //关闭桌面歌词
             case R.id.widget_close:
                 SPUtil.putValue(mContext,"Setting","FloatLrc",false);
-                Intent intent = new Intent(Constants.CTL_ACTION);
-                intent.putExtra("FloatLrc",false);
-                intent.putExtra("Control",Constants.TOGGLE_FLOAT_LRC);
-                mContext.sendBroadcast(intent);
+                Intent closeIntent = new Intent(Constants.CTL_ACTION);
+                closeIntent.putExtra("FloatLrc",false);
+                closeIntent.putExtra("Control",Constants.TOGGLE_FLOAT_LRC);
+                mContext.sendBroadcast(closeIntent);
                 break;
             //是否锁定
             case R.id.widget_lock:
                 mCanMove = !mCanMove;
                 ToastUtil.show(mContext,mCanMove ? R.string.float_unlock : R.string.float_lock);
+                break;
+            case R.id.widget_next:
+            case R.id.widget_play:
+            case R.id.widget_prev:
+                Intent ctlIntent = new Intent(Constants.CTL_ACTION);
+                ctlIntent.putExtra("Control",view.getId() == R.id.widget_next ? Constants.NEXT : view.getId() == R.id.widget_prev ? Constants.PREV : Constants.TOGGLE);
+                mContext.sendBroadcast(ctlIntent);
                 break;
         }
     }

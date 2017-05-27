@@ -67,7 +67,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
         setContentView(R.layout.dialog_addto_playlist);
         ButterKnife.bind(this);
 
-        mAudioID = (int)getIntent().getExtras().getLong("Id");
+        mAudioID = getIntent().getExtras().getInt("Id");
 
         mAdapter = new AddtoPlayListAdapter(this);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {

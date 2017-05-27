@@ -53,7 +53,7 @@ public class BaseAppwidget extends AppWidgetProvider {
     protected void updateCover(final Context context, final RemoteViews remoteViews,final int[] appWidgetIds,int albumId, boolean reloadCover){
         //设置封面
         if(!reloadCover){
-            if(mBitmap != null) {
+            if(mBitmap != null && !mBitmap.isRecycled()) {
                 remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
             } else {
                 remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);

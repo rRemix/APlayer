@@ -32,7 +32,35 @@
             android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:background="@color/gray_b7b7b7" />
+            android:background="@color/gray_b7b7b7">
+            <ImageView
+                android:id="@+id/widget_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:src="@drawable/notify_play"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="@dimen/d16_size"
+                android:layout_marginRight="@dimen/d16_size"
+                android:layout_marginTop="@dimen/d8_size"/>
+            <ImageView
+                android:id="@+id/widget_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:src="@drawable/notify_next"
+                android:layout_toRightOf="@id/widget_play"
+                android:layout_alignTop="@id/widget_play"/>
+            <ImageView
+                android:id="@+id/widget_prev"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:src="@drawable/notify_prev"
+                android:layout_toLeftOf="@id/widget_play"
+                android:layout_alignTop="@id/widget_play"/>
+        </RelativeLayout>
     </RelativeLayout>
 
     <remix.myplayer.ui.customview.floatwidget.FloatTextView

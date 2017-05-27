@@ -205,7 +205,6 @@
                     android:textSize="@dimen/s16_size"
                     android:textColor="?attr/colorAccent"/>
                 <RelativeLayout
-                    android:visibility="gone"
                     android:id="@+id/setting_lrc_float_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -234,7 +233,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="?attr/text_color"
-                            android:textSize="@dimen/s14_size"/>
+                            android:textSize="@dimen/s14_size"
+                            android:text="@string/opened_float_lrc"/>
                     </LinearLayout>
                     <android.support.v7.widget.SwitchCompat
                         android:layout_width="wrap_content"
@@ -251,7 +251,7 @@
                     android:id="@+id/setting_lrc_priority_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/setting_lrc_title"
+                    android:layout_below="@id/setting_lrc_float_container"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
                     android:background="?attr/background_common">

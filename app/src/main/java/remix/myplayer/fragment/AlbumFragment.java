@@ -56,7 +56,6 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
     public void onAttach(Context context) {
         super.onAttach(context);
         getLoaderManager().initLoader(++LOADER_ID, null, (LoaderManager.LoaderCallbacks) this);
-
     }
 
     @Override

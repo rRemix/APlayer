@@ -77,5 +77,7 @@ dependencies {
     compile 'cn.bmob.android:bmob-sdk:3.5.0'
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'com.github.promeg:tinypinyin:2.0.1'
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
 }

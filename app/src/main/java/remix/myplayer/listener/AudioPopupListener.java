@@ -227,13 +227,15 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                     //歌曲格式
                     if(mDetailMime != null){
                         String path = mInfo.getUrl();
-                        String extension;
-                        if(path.lastIndexOf('.') > -1 && path.lastIndexOf('.') < path.length() - 1){
-                            extension = mInfo.getUrl().substring(mInfo.getUrl().lastIndexOf('.') + 1 ,mInfo.getUrl().length());
-                        } else {
-                            extension = CommonUtil.getType(MusicService.getRateInfo(Constants.MIME));
+                        if(!TextUtils.isEmpty(path)){
+                            String extension;
+                            if(path.lastIndexOf('.') > -1 && path.lastIndexOf('.') < path.length() - 1){
+                                extension = mInfo.getUrl().substring(mInfo.getUrl().lastIndexOf('.') + 1 ,mInfo.getUrl().length());
+                            } else {
+                                extension = CommonUtil.getType(MusicService.getRateInfo(Constants.MIME));
+                            }
+                            mDetailMime.setText(extension);
                         }
-                        mDetailMime.setText(extension);
                     }
                     //歌曲时长
                     if(mDetailDuration != null)

@@ -291,6 +291,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         mFromActivity =  getIntent().getBooleanExtra("FromActivity",false);
 
@@ -339,6 +340,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 return false;
             }
         });
+
+        if(SPUtil.getValue(this,"Setting","LrcHint",true)){
+            SPUtil.putValue(this,"Setting","LrcHint",false);
+            new MaterialDialog.Builder(mContext)
+                    .content(R.string.lc_operation_hint)
+                    .contentColorAttr(R.attr.text_color_primary)
+                    .positiveColorAttr(R.attr.text_color_primary)
+                    .backgroundColorAttr(R.attr.background_color_3)
+                    .show();
+        }
     }
 
     /**
@@ -403,6 +414,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         if(mFromNotify){
             finish();
             overridePendingTransition(0,R.anim.audio_out);
+            return;
         }
         if(mPager.getCurrentItem() == 1){
             if(mIsBacking || mAnimCover == null){

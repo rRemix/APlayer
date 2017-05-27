@@ -129,7 +129,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 //只有锁屏默认开启，其余默认都关闭
                 view.setChecked(SPUtil.getValue(mContext,"Setting",keyWord[index],index == 0));
                 //5.0以上才支持变色导航栏
-                if(index == 1){
+                if(index == 0){
                     view.setEnabled(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
                 }
                 view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

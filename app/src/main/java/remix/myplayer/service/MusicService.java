@@ -103,7 +103,7 @@ public class MusicService extends BaseService implements Playback {
     private static boolean mFirstFlag = true;
 
     /** 是否正在设置mediapplayer的datasource */
-    private static boolean mIsIniting = false;
+    private static boolean mIsInitialized = false;
 
     /** 播放模式 */
     private static int mPlayModel = Constants.PLAY_LOOP;
@@ -185,7 +185,6 @@ public class MusicService extends BaseService implements Playback {
     private DBObserver mPlayListSongObserver;
     private static Context mContext;
 
-
     public MusicService(){}
     public MusicService(Context context) {
         mContext = context;
@@ -251,7 +250,10 @@ public class MusicService extends BaseService implements Playback {
         mControlRecevier = new ControlReceiver();
         registerReceiver(mControlRecevier,new IntentFilter(Constants.CTL_ACTION));
         mHeadSetReceiver = new HeadsetPlugReceiver();
-        registerReceiver(mHeadSetReceiver,new IntentFilter(Intent.ACTION_HEADSET_PLUG));
+        IntentFilter noisyFileter = new IntentFilter();
+        noisyFileter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+        noisyFileter.addAction(Intent.ACTION_HEADSET_PLUG);
+        registerReceiver(mHeadSetReceiver,noisyFileter);
         mWidgetReceiver = new WidgetReceiver();
         registerReceiver(mWidgetReceiver,new IntentFilter(Constants.WIDGET_UPDATE));
 
@@ -289,6 +291,7 @@ public class MusicService extends BaseService implements Playback {
         mMediaExtractor = new MediaExtractor();
 
         //初始化音效设置
+
         Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mMediaPlayer.getAudioSessionId());
         if(!CommonUtil.isIntentAvailable(this,i)){
@@ -341,15 +344,19 @@ public class MusicService extends BaseService implements Playback {
                 play();
             }
         });
+
         mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
                 try {
-                    if(what == MediaPlayer.MEDIA_ERROR_SERVER_DIED){
-                        if(mMediaPlayer != null)
-                            mMediaPlayer.release();
-                        setUpMediaPlayer();
+                    mIsInitialized = false;
+                    if(mMediaPlayer != null)
+                        mMediaPlayer.release();
+                    setUpMediaPlayer();
+                    if(mContext != null){
+                        ToastUtil.show(mContext,R.string.mediaplayer_error,what,extra);
                     }
+                    return true;
                 } catch (Exception e){
                     CommonUtil.uploadException("Error In OnError Callback",e.toString());
                 } finally {
@@ -413,6 +420,7 @@ public class MusicService extends BaseService implements Playback {
         mMediaSession.setActive(false);
         mMediaSession.release();
         mNotify.cancel();
+        mUpdateUIHandler.removeCallbacksAndMessages(null);
         CommonUtil.unregisterReceiver(this,mControlRecevier);
         CommonUtil.unregisterReceiver(this,mHeadSetReceiver);
         CommonUtil.unregisterReceiver(this,mWidgetReceiver);
@@ -778,18 +786,18 @@ public class MusicService extends BaseService implements Playback {
             if(isPlay()){
                 pause(true);
             }
-            mIsIniting = true;
+            mIsInitialized = false;
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(path);
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.prepareAsync();
             mIsplay = true;
-            mIsIniting = false;
+            mIsInitialized = true;
         } catch (Exception e){
             ToastUtil.show(mContext,getString(R.string.play_failed) + e.toString());
             CommonUtil.uploadException("prepare",e);
+            mIsInitialized = false;
         }
-
     }
 
     /**
@@ -974,13 +982,13 @@ public class MusicService extends BaseService implements Playback {
      * @return
      */
     public static int getProgress() {
-        if(mMediaPlayer != null && !mIsIniting)
+        if(mMediaPlayer != null && mIsInitialized)
             return mMediaPlayer.getCurrentPosition();
         return 0;
     }
 
     public static long getDuration(){
-        if(mMediaPlayer != null && !mIsIniting){
+        if(mMediaPlayer != null && mIsInitialized){
             return mMediaPlayer.getDuration();
         }
         return 0;
@@ -1178,6 +1186,9 @@ public class MusicService extends BaseService implements Playback {
         int control = Global.Operation;
         if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcList.isEmpty())
             mLrcList = new SearchLRC(mCurrentInfo).getLrc("");
+        if(mFloatLrcView != null){
+            mFloatLrcView.setPlayIcon(mIsplay);
+        }
         if(mUpdateFloatLrcThread == null) {
             mUpdateFloatLrcThread = new UpdateFloatLrcThread();
             mUpdateFloatLrcThread.start();
