@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.umeng.analytics.MobclickAgent;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,14 +23,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ChildHolderAdapter;
-import remix.myplayer.fragment.BottomActionBarFragment;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
+import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -65,38 +67,13 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
     private BottomActionBarFragment mBottombar;
 
     private ChildHolderAdapter mAdapter;
-    private static ChildHolderActivity mInstance = null;
+    private static WeakReference<ChildHolderActivity> mRef;
     private MaterialDialog mMDDialog;
 
     //更新
     private static final int START = 0;
     private static final int END = 1;
-    private Handler mRefreshHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what){
-                case Constants.CLEAR_MULTI:
-                    mMultiChoice.clearSelectedViews();
-                    break;
-                case Constants.UPDATE_ADAPTER:
-                    if(mInfoList == null)
-                        return;
-                    mAdapter.setList(mInfoList);
-                    mNum.setText(getString(R.string.song_count,mInfoList.size()));
-                    break;
-                case START:
-                    if(mMDDialog != null && !mMDDialog.isShowing()){
-                        mMDDialog.show();
-                    }
-                    break;
-                case END:
-                    if(mMDDialog != null && mMDDialog.isShowing()){
-                        mMDDialog.dismiss();
-                    }
-                    break;
-            }
-        }
-    };
+    private RefreshHandler mRefreshHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,8 +81,8 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         setContentView(R.layout.activity_child_holder);
         ButterKnife.bind(this);
 
-        mInstance = this;
-
+        mRef = new WeakReference<>(this);
+        mRefreshHandler = new RefreshHandler();
         //参数id，类型，标题
         mId = getIntent().getIntExtra("Id", -1);
         mType = getIntent().getIntExtra("Type", -1);
@@ -323,13 +300,46 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         mIsRunning = false;
     }
 
+
     public void updateList() {
         if(mIsRunning)
             new GetSongList().start();
     }
 
     public static ChildHolderActivity getInstance(){
-        return mInstance;
+        return mRef != null ? mRef.get() : null;
+    }
+
+    private static class RefreshHandler extends Handler{
+        @Override
+        public void handleMessage(Message msg) {
+            final ChildHolderActivity activity = mRef.get();
+            if(activity == null)
+                return;
+            final MultiChoice multiChoice = activity.mMultiChoice;
+            final MaterialDialog dialog = activity.mMDDialog;
+            switch (msg.what){
+                case Constants.CLEAR_MULTI:
+                    multiChoice.clearSelectedViews();
+                    break;
+                case Constants.UPDATE_ADAPTER:
+                    if(activity.mInfoList == null)
+                        return;
+                    activity.mAdapter.setList(activity.mInfoList);
+                    activity.mNum.setText(activity.getString(R.string.song_count,activity.mInfoList.size()));
+                    break;
+                case START:
+                    if(dialog != null && !dialog.isShowing()){
+                        dialog.show();
+                    }
+                    break;
+                case END:
+                    if(dialog != null && dialog.isShowing()){
+                        dialog.dismiss();
+                    }
+                    break;
+            }
+        }
     }
 
 }

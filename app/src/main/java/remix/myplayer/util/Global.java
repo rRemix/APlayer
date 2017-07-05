@@ -152,7 +152,7 @@ public class Global {
                 PlayQueue.clear();
                 PlayQueue.addAll(newQueueIdList);
                 if(intent.getBooleanExtra("shuffle",false)){
-                    MusicService.updateNextSong();
+                    MusicService.getInstance().updateNextSong();
                 }
                 context.sendBroadcast(intent);
                 int deleteRow = 0;

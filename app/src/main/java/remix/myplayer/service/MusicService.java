@@ -174,11 +174,13 @@ public class MusicService extends BaseService implements Playback {
     /** WindowManager 控制悬浮窗*/
     private WindowManager mWindowManager;
     /** 是否显示桌面歌词*/
-    private boolean mShowFloatLrc = true;
+    private boolean mShowFloatLrc = false;
     /** 桌面歌词控件*/
     private FloatLrcView mFloatLrcView;
     /** 当前歌词*/
     private List<LrcRow> mLrcList = new ArrayList<>();
+    /** 已经生成过的随机数 用于随机播放模式*/
+    private List<Integer> mRandomList = new ArrayList<>();
 
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
@@ -391,19 +393,20 @@ public class MusicService extends BaseService implements Playback {
         //桌面歌词
         updateFloatLrc();
         //初始化下一首歌曲
-        mNextId = SPUtil.getValue(mContext,"Setting","NextSongId",-1);
-        if(mNextId == -1){
-            mNextIndex = mCurrentIndex;
-            updateNextSong();
-        } else {
-            //查找上次退出时保存的下一首歌曲是否还存在
-            //如果不存在，重新设置下一首歌曲
-            mNextIndex = Global.PlayQueue.indexOf(mNextId);
-            mNextInfo = MediaStoreUtil.getMP3InfoById(mNextId);
-            if(mNextInfo != null)
-                return;
-            updateNextSong();
-        }
+        updateNextSong();
+//        mNextId = SPUtil.getValue(mContext,"Setting","NextSongId",-1);
+//        if(mNextId == -1){
+//            mNextIndex = mCurrentIndex;
+//            updateNextSong();
+//        } else {
+//            //查找上次退出时保存的下一首歌曲是否还存在
+//            //如果不存在，重新设置下一首歌曲
+//            mNextIndex = Global.PlayQueue.indexOf(mNextId);
+//            mNextInfo = MediaStoreUtil.getMP3InfoById(mNextId);
+//            if(mNextInfo != null)
+//                return;
+//            updateNextSong();
+//        }
     }
 
     private void unInit(){
@@ -467,7 +470,7 @@ public class MusicService extends BaseService implements Playback {
         update(Global.getOperation());
         //保存当前播放的下一首播放的歌曲的id
         SPUtil.putValue(mContext,"Setting","LastSongId", mCurrentId);
-        SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
+//        SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
     }
 
 
@@ -801,14 +804,43 @@ public class MusicService extends BaseService implements Playback {
     }
 
     /**
-     * 根据当前播放列表的长度，得到一个随机数
+     * 得到一个随机数
      * @return
      */
-    private static int getShuffle(){
-        if(Global.PlayQueue.size() <= 1)
-            return 0;
-        return new Random().nextInt(Global.PlayQueue.size() - 1);
+    private int getShuffle(){
+        if(!mRandomList.contains(mCurrentId))
+            mRandomList.add(mCurrentId);
+        //先判断是否已经随机循环完播放队列并且将当前播放的歌曲添加到RandomList
+        if (mRandomList.size() == Global.PlayQueue.size() || mRandomList.size() == 0) {
+            mRandomList.clear();
+        }
+        //从未用到过的歌曲id中取出一个
+        //并将取出的索引添加到mRandomList 标志这首歌曲已经被随机播放过
+        int nextId = 0;
+        List<Integer> tempList = (List<Integer>) Global.PlayQueue.clone();
+        if (tempList != null && tempList.size() > 0) {
+            tempList.removeAll(mRandomList);
+            nextId = tempList.get(new Random().nextInt(tempList.size()));
+        }
+        return nextId;
     }
+
+//    /**
+//     * 生成随机播放列表
+//     * @param current
+//     */
+//    private void makeShuffleList(final int current) {
+//        mRandomList = (List<Integer>) Global.PlayQueue.clone();
+//        if (mRandomList.isEmpty())
+//            return;
+//        if (current >= 0) {
+//            int temp = mRandomList.remove(current);
+//            Collections.shuffle(mRandomList);
+//            mRandomList.add(0, temp);
+//        } else {
+//            Collections.shuffle(mRandomList);
+//        }
+//    }
 
     /**
      * 根据当前播放模式，切换到上一首或者下一首
@@ -836,20 +868,20 @@ public class MusicService extends BaseService implements Playback {
             mNextIndex = mCurrentIndex;
             mNextId = mCurrentId;
         }
-
+        updateNextSong();
         if(mCurrentInfo == null) {
             ToastUtil.show(mContext,R.string.song_lose_effect);
             return;
         }
         mIsplay = true;
         prepare(mCurrentInfo.getUrl());
-        updateNextSong();
+
     }
 
     /**
      * 更新下一首歌曲
      */
-    public static void updateNextSong(){
+    public void updateNextSong(){
         if(Global.PlayQueue == null || Global.PlayQueue.size() == 0){
             ToastUtil.show(mContext,R.string.list_is_empty);
             return;
@@ -857,12 +889,23 @@ public class MusicService extends BaseService implements Playback {
         if(mPlayModel == Constants.PLAY_LOOP || mPlayModel == Constants.PLAY_REPEATONE){
             if ((++mNextIndex) > Global.PlayQueue.size() - 1)
                 mNextIndex = 0;
+            if(mNextIndex <= Global.PlayQueue.size()){
+                mNextId = Global.PlayQueue.get(mNextIndex);
+            }
         } else{
-            mNextIndex = getShuffle();
+            mNextId = getShuffle();
+            mNextIndex = Global.PlayQueue.indexOf(mNextId);
         }
-        if(mNextIndex <= Global.PlayQueue.size()){
-            mNextId = Global.PlayQueue.get(mNextIndex);
-        }
+
+//        if(mPlayModel == Constants.PLAY_SHUFFLE){
+//            if ((++mNextIndex) > mRandomList.size() - 1)
+//                mNextIndex = 0;
+//            mNextId = mRandomList.get(mNextIndex);
+//        } else {
+//            if ((++mNextIndex) > Global.PlayQueue.size() - 1)
+//                mNextIndex = 0;
+//            mNextId = Global.PlayQueue.get(mNextIndex);
+//        }
         mNextInfo = MediaStoreUtil.getMP3InfoById(mNextId);
     }
 
@@ -891,8 +934,11 @@ public class MusicService extends BaseService implements Playback {
         updateAppwidget();
         SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
         //保存正在播放和下一首歌曲
-        SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
+//        SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
         SPUtil.putValue(mContext,"Setting","LastSongId",mCurrentId);
+        if(mPlayModel == Constants.PLAY_SHUFFLE){
+            mRandomList.clear();
+        }
 //        if(!CommonUtil.isFastDoubleClick()){
 //            mPlayModel = playModel;
 //            SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
@@ -1178,13 +1224,13 @@ public class MusicService extends BaseService implements Playback {
      * 更新桌面歌词
      */
     private void updateFloatLrc() {
-//        if(true)
-//            return;
+        if(true)
+            return;
         if(!mShowFloatLrc)
             return;
         //根据操作判断是否需要更新歌词
         int control = Global.Operation;
-        if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcList.isEmpty())
+        if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcList == null)
             mLrcList = new SearchLRC(mCurrentInfo).getLrc("");
         if(mFloatLrcView != null){
             mFloatLrcView.setPlayIcon(mIsplay);

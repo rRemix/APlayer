@@ -1,4 +1,4 @@
-package remix.myplayer.fragment;
+package remix.myplayer.ui.fragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -53,7 +53,7 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        getLoaderManager().initLoader(LOADER_ID, null, (LoaderManager.LoaderCallbacks) this);
+        getLoaderManager().initLoader(LOADER_ID++, null, (LoaderManager.LoaderCallbacks) this);
     }
 
     @Nullable

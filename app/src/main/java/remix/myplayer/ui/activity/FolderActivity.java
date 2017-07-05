@@ -12,6 +12,8 @@ import android.view.View;
 
 import com.umeng.analytics.MobclickAgent;
 
+import java.lang.ref.WeakReference;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
@@ -31,25 +33,17 @@ public class FolderActivity extends MultiChoiceActivity {
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
 
-    private static FolderActivity mInstance;
     private FolderAdapter mAdapter;
     private boolean mIsRunning = false;
+    private static WeakReference<FolderActivity> mRef;
     public static final String TAG = FolderActivity.class.getSimpleName();
-    //更新
-    private Handler mRefreshHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            if(msg.what == Constants.CLEAR_MULTI){
-                mMultiChoice.clearSelectedViews();
-            }
-        }
-    };
+    private RefreshHandler mRefreshHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         MobclickAgent.onEvent(this,"Folder");
         super.onCreate(savedInstanceState);
-        mInstance = this;
+        mRef = new WeakReference<>(this);
         initViews();
     }
 
@@ -60,6 +54,7 @@ public class FolderActivity extends MultiChoiceActivity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        mRefreshHandler = new RefreshHandler();
         mAdapter = new FolderAdapter(this,mMultiChoice);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
@@ -124,6 +119,16 @@ public class FolderActivity extends MultiChoiceActivity {
     }
 
     public static FolderActivity getInstance() {
-        return mInstance;
+        return mRef != null ? mRef.get() : null;
+    }
+
+    private static class RefreshHandler extends Handler{
+        @Override
+        public void handleMessage(Message msg) {
+            final FolderActivity activity = mRef.get();
+            if(msg.what == Constants.CLEAR_MULTI && activity != null){
+                activity.mMultiChoice.clearSelectedViews();
+            }
+        }
     }
 }

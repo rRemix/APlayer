@@ -33,9 +33,9 @@ public class MediaStoreObserver extends ContentObserver {
 
     @Override
     public void onChange(boolean selfChange, Uri uri) {
-        if(!selfChange){
+        if(!selfChange && Uri.parse("content://media/external").equals(uri)){
             mHandler.removeCallbacks(mRunnable);
-            mHandler.postDelayed(mRunnable,500);
+            mHandler.postDelayed(mRunnable,800);
         }
     }
 

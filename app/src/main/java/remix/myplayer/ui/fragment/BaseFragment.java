@@ -1,4 +1,4 @@
-package remix.myplayer.fragment;
+package remix.myplayer.ui.fragment;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;

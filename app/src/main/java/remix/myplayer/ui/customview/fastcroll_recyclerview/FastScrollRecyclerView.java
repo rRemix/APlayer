@@ -135,6 +135,7 @@ public class FastScrollRecyclerView extends RecyclerView {
 
         if (parent instanceof ViewGroup) {
             ViewGroup viewGroup = (ViewGroup) parent;
+            viewGroup.removeView(mFastScroller);
             viewGroup.addView(mFastScroller);
             mFastScroller.setLayoutParams(viewGroup);
         }

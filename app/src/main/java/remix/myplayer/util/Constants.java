@@ -137,4 +137,7 @@ public class Constants {
     public final static int APLAYER_LOCKSCREEN = 0;
     public final static int SYSTEM_LOCKSCREEN = 1;
     public final static int CLOSE_LOCKSCREEN = 2;
+
+    //是否开启屏幕常亮
+    public final static String KEY_SCREEN_ALWAYS_ON = "key_screen_always_on";
 }

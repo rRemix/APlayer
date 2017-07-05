@@ -53,9 +53,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
-import remix.myplayer.fragment.CoverFragment;
-import remix.myplayer.fragment.LrcFragment;
-import remix.myplayer.fragment.RecordFragment;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.listener.AudioPopupListener;
@@ -68,6 +65,9 @@ import remix.myplayer.ui.customview.AudioViewPager;
 import remix.myplayer.ui.customview.playpause.PlayPauseView;
 import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.PlayQueueDialog;
+import remix.myplayer.ui.fragment.CoverFragment;
+import remix.myplayer.ui.fragment.LrcFragment;
+import remix.myplayer.ui.fragment.RecordFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -515,7 +515,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             //打开正在播放列表
             case R.id.playbar_playinglist:
                 MobclickAgent.onEvent(this,"PlayingList");
-                startActivity(new Intent(this,PlayQueueDialog.class));
+                Intent intent = new Intent(this,PlayQueueDialog.class);
+                startActivity(intent);
                 break;
             //关闭
             case R.id.top_hide:
@@ -759,39 +760,42 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     @Override
                     public void onLongClick() {
                         new MaterialDialog.Builder(mContext)
-                                .items(getString(R.string.ignore_lrc),getString(R.string.select_lrc))
+                                .items(getString(R.string.ignore_lrc), getString(R.string.select_lrc))
                                 .itemsColorAttr(R.attr.text_color_primary)
                                 .backgroundColorAttr(R.attr.background_color_3)
                                 .itemsCallback(new MaterialDialog.ListCallback() {
                                     @Override
                                     public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
-                                        if(position == 0) {
-                                            //忽略这首歌的歌词
-                                            new MaterialDialog.Builder(mContext)
-                                                    .negativeText(R.string.cancel)
-                                                    .negativeColorAttr(R.attr.text_color_primary)
-                                                    .positiveText(R.string.confirm)
-                                                    .positiveColorAttr(R.attr.text_color_primary)
-                                                    .title(R.string.confirm_ignore_lrc)
-                                                    .titleColorAttr(R.attr.text_color_primary)
-                                                    .backgroundColorAttr(R.attr.background_color_3)
-                                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                                        @Override
-                                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                            Set<String> ignoreLrcID = SPUtil.getStringSet(mContext, "Setting", "IgnoreLrcID");
-                                                            if (mInfo != null && ignoreLrcID != null) {
-                                                                ignoreLrcID.add(mInfo.getId() + "");
-                                                                SPUtil.putStringSet(mContext, "Setting", "IgnoreLrcID", ignoreLrcID);
-                                                                lrcFragment.UpdateLrc(mInfo);
+                                        switch (position){
+                                            case 0:
+                                                //忽略这首歌的歌词
+                                                new MaterialDialog.Builder(mContext)
+                                                        .negativeText(R.string.cancel)
+                                                        .negativeColorAttr(R.attr.text_color_primary)
+                                                        .positiveText(R.string.confirm)
+                                                        .positiveColorAttr(R.attr.text_color_primary)
+                                                        .title(R.string.confirm_ignore_lrc)
+                                                        .titleColorAttr(R.attr.text_color_primary)
+                                                        .backgroundColorAttr(R.attr.background_color_3)
+                                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                                            @Override
+                                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                                                Set<String> ignoreLrcID = SPUtil.getStringSet(mContext, "Setting", "IgnoreLrcID");
+                                                                if (mInfo != null && ignoreLrcID != null) {
+                                                                    ignoreLrcID.add(mInfo.getId() + "");
+                                                                    SPUtil.putStringSet(mContext, "Setting", "IgnoreLrcID", ignoreLrcID);
+                                                                    lrcFragment.UpdateLrc(mInfo);
+                                                                }
                                                             }
-                                                        }
-                                                    })
-                                                    .show();
-                                        }else {
-                                            //手动选择歌词
-                                            new FileChooserDialog.Builder(PlayerActivity.this)
-                                                    .extensionsFilter(".lrc")
-                                                    .show();
+                                                        })
+                                                        .show();
+                                                break;
+                                            case 1:
+                                                //手动选择歌词
+                                                new FileChooserDialog.Builder(PlayerActivity.this)
+                                                        .extensionsFilter(".lrc")
+                                                        .show();
+                                                break;
                                         }
                                     }
                                 })
@@ -849,6 +853,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     mPager.setIntercept(false);
                 if (mLrcView != null)
                     mLrcView.setViewPagerScroll(false);
+                //歌词界面常亮
+                if(position == 2 && SPUtil.getValue(mContext,"Setting",Constants.KEY_SCREEN_ALWAYS_ON,false)){
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                }
             }
 
             @Override
@@ -1014,6 +1022,12 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         }
         mCoverHandler.removeMessages(UPDATE_COVER);
         mCoverHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     /**

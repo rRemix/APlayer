@@ -37,6 +37,7 @@ import cn.bmob.v3.update.BmobUpdateAgent;
 import cn.bmob.v3.update.UpdateResponse;
 import cn.bmob.v3.update.UpdateStatus;
 import remix.myplayer.R;
+import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.service.MusicService;
@@ -77,6 +78,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     SwitchCompat mFloatLrcSwitch;
     @BindView(R.id.setting_lrc_float_tip)
     TextView mFloatLrcTip;
+    @BindView(R.id.setting_screen_switch)
+    SwitchCompat mScreenSwitch;
 
     //是否需要重建activity
     private boolean mNeedRecreate = false;
@@ -122,8 +125,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
 
         //导航栏是否变色 是否启用摇一摇切歌
-        final String[] keyWord = new String[]{"ColorNavigation","Shake","OnlineLrc","FloatLrc"};
-        ButterKnife.apply(new SwitchCompat[]{ mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch,mFloatLrcSwitch}, new ButterKnife.Action<SwitchCompat>() {
+        final String[] keyWord = new String[]{"ColorNavigation","Shake","OnlineLrc","FloatLrc",Constants.KEY_SCREEN_ALWAYS_ON};
+        ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch,mFloatLrcSwitch,mScreenSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
                 //只有锁屏默认开启，其余默认都关闭
@@ -151,6 +154,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //设置歌词搜索优先级
                             case 2:
+                                SPUtil.putValue(APlayerApplication.getContext(),"Setting","OnlineLrc",isChecked);
                                 break;
                             //桌面歌词
                             case 3:
@@ -159,6 +163,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 intent.putExtra("FloatLrc",mFloatLrcSwitch.isChecked());
                                 intent.putExtra("Control",Constants.TOGGLE_FLOAT_LRC);
                                 sendBroadcast(intent);
+                                break;
+                            //屏幕常亮
+                            case 4:
+                                SPUtil.putValue(mContext,"Setting",Constants.KEY_SCREEN_ALWAYS_ON,isChecked);
                                 break;
                         }
                     }
@@ -243,7 +251,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_feedback_container,R.id.setting_about_container, R.id.setting_update_container,
             R.id.setting_lockscreen_container,R.id.setting_lrc_priority_container,R.id.setting_lrc_float_container,
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
-            R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container})
+            R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container,
+            R.id.setting_screen_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -288,6 +297,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             //歌词搜索优先级
             case R.id.setting_lrc_priority_container:
                 mLrcPrioritySwitch.setChecked(!mLrcPrioritySwitch.isChecked());
+                break;
+            //屏幕常亮
+            case R.id.setting_screen_container:
+                mScreenSwitch.setChecked(!mScreenSwitch.isChecked());
                 break;
             //锁屏显示
             case R.id.setting_lockscreen_container:
