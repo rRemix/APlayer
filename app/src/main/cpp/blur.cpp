@@ -1,5 +1,8 @@
+//
+// Created by Remix on 2017/8/8.
+//
 #include <jni.h>
-#include <string.h>
+#include <string>
 #include <stdio.h>
 #include <android/log.h>
 #include <android/bitmap.h>
@@ -14,9 +17,6 @@
       __typeof__ (max) _max__ = (max); \
       _a__ < _min__ ? _min__ : _a__ > _max__ ? _max__ : _a__; })
 
-// Based heavily on http://vitiy.info/Code/stackblur.cpp
-// See http://vitiy.info/stackblur-algorithm-multi-threaded-blur-for-cpp/
-// Stack Blur Algorithm by Mario Klingemann <mario@quasimondo.com>
 
 static unsigned short const stackblur_mul[255] =
 {
@@ -66,7 +66,7 @@ void stackblurJob(unsigned char* src,                ///< input image data
                   int cores,                         ///< total number of working threads
                   int core,                          ///< current thread number
                   int step                           ///< step of processing (1,2)
-                  )
+)
 {
     unsigned int x, y, xp, yp, i;
     unsigned int sp;
@@ -294,37 +294,35 @@ void stackblurJob(unsigned char* src,                ///< input image data
     }
 }
 
-JNIEXPORT void JNICALL Java_com_enrique_stackblur_NativeBlurProcess_functionToBlur(JNIEnv* env, jclass clzz, jobject bitmapOut, jint radius, jint threadCount, jint threadIndex, jint round) {
-    // Properties
-    AndroidBitmapInfo   infoOut;
-    void*               pixelsOut;
+extern "C"
+JNIEXPORT void JNICALL Java_remix_myplayer_ui_blur_NativeBlurProcess_functionToBlur(JNIEnv* env, jclass clzz, jobject bitmapOut, jint radius, jint threadCount, jint threadIndex, jint round) {
+
+    AndroidBitmapInfo infoOut;
+    void* pixelsOut;
 
     int ret;
 
-    // Get image info
-    if ((ret = AndroidBitmap_getInfo(env, bitmapOut, &infoOut)) != 0) {
-        LOGE("AndroidBitmap_getInfo() failed ! error=%d", ret);
+    //获得图片信息
+    if((ret = AndroidBitmap_getInfo(env,bitmapOut,&infoOut)) != 0){
+        LOGE("AndroidBitmap_getInfo() failed ! error=%d",ret);
+        return;
+    }
+    //检查图片格式
+    if(infoOut.format != ANDROID_BITMAP_FORMAT_RGBA_8888){
+        LOGE("Bitmap formao is not RGBA_8888!");
+        LOGE("==> %d",infoOut.format);
         return;
     }
 
-    // Check image
-    if (infoOut.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-        LOGE("Bitmap format is not RGBA_8888!");
-        LOGE("==> %d", infoOut.format);
-        return;
-    }
-
-    // Lock all images
-    if ((ret = AndroidBitmap_lockPixels(env, bitmapOut, &pixelsOut)) != 0) {
-        LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
+    //锁定bitmap
+    if((ret = AndroidBitmap_lockPixels(env,bitmapOut,&pixelsOut)) != 0){
+        LOGE("AndroidBitmap_lockPixels() failed ! error:%d",ret);
         return;
     }
 
     int h = infoOut.height;
     int w = infoOut.width;
-
-    stackblurJob((unsigned char*)pixelsOut, w, h, radius, threadCount, threadIndex, round);
-
-    // Unlocks everything
-    AndroidBitmap_unlockPixels(env, bitmapOut);
+    stackblurJob((unsigned char*)pixelsOut,w,h,radius,threadCount,threadIndex,round);
+    //解除锁定
+    AndroidBitmap_unlockPixels(env,bitmapOut);
 }

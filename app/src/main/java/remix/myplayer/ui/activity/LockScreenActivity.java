@@ -19,9 +19,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.enrique.stackblur.StackBlurManager;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.umeng.analytics.MobclickAgent;
+
+import java.lang.ref.WeakReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,6 +32,7 @@ import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
+import remix.myplayer.ui.blur.StackBlurManager;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
@@ -90,21 +92,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     //是否正在播放
     private static boolean mIsPlay = false;
     private Palette.Swatch mSwatch;
-    private Handler mBlurHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            //设置背景
-            mImageBackground.setImageBitmap(mNewBitMap);
-            //变化字体颜色
-            if(mSong != null && mArtist != null ){
-                mSong.setTextColor(mSongColor);
-                mArtist.setTextColor(mArtistColor);
-                mNextSong.setTextColor(mSongColor);
-                mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT,0,2,mSongColor,0,0,1));
-            }
-
-        }
-    };
+    private BlurHandler mBlurHandler;
 
     @Override
     protected void setUpTheme() {
@@ -123,6 +111,9 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
 
         if((mInfo = MusicService.getCurrentMP3()) == null)
             return;
+
+        mBlurHandler = new BlurHandler(this);
+
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
         mWidth = metric.widthPixels;
@@ -253,8 +244,32 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         new BlurThread().start();
     }
 
+    private static class BlurHandler extends Handler{
+        private final WeakReference<LockScreenActivity> mRef;
+
+        public BlurHandler(LockScreenActivity activity) {
+            this.mRef = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            if(mRef.get() == null)
+                return;
+            LockScreenActivity activity = mRef.get();
+            //设置背景
+            activity.mImageBackground.setImageBitmap(activity.mNewBitMap);
+            //变化字体颜色
+            if(activity.mSong != null && activity.mArtist != null ){
+                activity.mSong.setTextColor(activity.mSongColor);
+                activity.mArtist.setTextColor(activity.mArtistColor);
+                activity.mNextSong.setTextColor(activity.mSongColor);
+                activity.mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT,0,2,activity.mSongColor,0,0,1));
+            }
+        }
+    }
+
     //高斯模糊线程
-    class BlurThread extends Thread{
+    private class BlurThread extends Thread{
         @Override
         public void run() {
             if (mInfo == null)
@@ -263,10 +278,9 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                 mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
                 if(mRawBitMap == null)
                     mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
-
                 StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
-                mStackBlurManager.process(40);
-                mNewBitMap = mStackBlurManager.returnBlurredImage();
+
+                mNewBitMap = mStackBlurManager.processNatively(40);
 
                 Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
                     @Override

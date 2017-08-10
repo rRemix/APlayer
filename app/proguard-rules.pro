@@ -83,29 +83,24 @@
 -dontwarn com.umeng.**
 
 # fresco
--keep class android.support.v4.** { *; }
--keep interface android.support.v4.app.** { *; }
--dontwarn okio.**
--dontwarn com.squareup.wire.**
--dontwarn com.umeng.update.**
--dontwarn android.support.v4.**
--keep class okio.** {*;}
--keep class com.squareup.wire.** {*;}
--dontwarn com.squareup.okhttp.**
--dontwarn okhttp3.**
--dontwarn javax.annotation.**
--dontwarn com.android.volley.toolbox.**
 -keep,allowobfuscation @interface com.facebook.common.internal.DoNotStrip
 -keep @com.facebook.common.internal.DoNotStrip class *
 -keepclassmembers class * {
     @com.facebook.common.internal.DoNotStrip *;
 }
+
+# Keep native methods
 -keepclassmembers class * {
     native <methods>;
 }
--keep class com.facebook.imagepipeline.animated.factory.AnimatedFactoryImpl {
-    public AnimatedFactoryImpl(com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory,com.facebook.imagepipeline.core.ExecutorSupplier);
-}
+
+-dontwarn okio.**
+-dontwarn com.squareup.okhttp.**
+-dontwarn okhttp3.**
+-dontwarn javax.annotation.**
+-dontwarn com.android.volley.toolbox.**
+-dontwarn com.facebook.infer.**
+
 # 腾讯
 -keep class com.tencent.open.TDialog$*
 -keep class com.tencent.open.TDialog$* {*;}

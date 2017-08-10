@@ -24,12 +24,9 @@
  */
 
 
-package com.enrique.stackblur;
+package remix.myplayer.ui.blur;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.v8.renderscript.RSRuntimeException;
-import android.util.Log;
 
 import java.io.FileOutputStream;
 import java.util.concurrent.ExecutorService;
@@ -112,32 +109,5 @@ public class StackBlurManager {
 		return _result;
 	}
 
-	/**
-	 * Process the image using renderscript if possible
-	 * Fall back to native if renderscript is not available
-	 * @param context renderscript requires an android context
-	 * @param radius
-	 */
-	public Bitmap processRenderScript(Context context, float radius) {
-		BlurProcess blurProcess;
-		// The renderscript support library doesn't have .so files for ARMv6.
-		// Remember if there is an error creating the renderscript context,
-		// and fall back to NativeBlurProcess
-		if(hasRS) {
-			try {
-				blurProcess = new RSBlurProcess(context);
-			} catch (RSRuntimeException e) {
-				if(BuildConfig.DEBUG) {
-					Log.i("StackBlurManager", "Falling back to Native Blur", e);
-				}
-				blurProcess = new NativeBlurProcess();
-				hasRS = false;
-			}
-		}
-		else {
-			blurProcess = new NativeBlurProcess();
-		}
-		_result = blurProcess.blur(_image, radius);
-		return _result;
-	}
+
 }

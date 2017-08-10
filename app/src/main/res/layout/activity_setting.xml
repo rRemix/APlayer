@@ -211,8 +211,7 @@
                     android:layout_below="@id/setting_lrc_title"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
-                    android:background="?attr/background_common"
-                    android:visibility="gone">
+                    android:background="?attr/background_common">
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -252,7 +251,7 @@
                     android:id="@+id/setting_lrc_priority_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/setting_lrc_title"
+                    android:layout_below="@id/setting_lrc_float_container"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
                     android:background="?attr/background_common">

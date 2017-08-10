@@ -70,4 +70,9 @@ public class SPUtil {
         editor.clear().apply();
     }
 
+    public static class SPKEY{
+        public static final String CAN_MOVE = "can_move";
+        public static final String FLOAT_TEXT_SIZE = "float_text_size";
+    }
+
 }

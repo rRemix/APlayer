@@ -1,4 +1,4 @@
-package com.enrique.stackblur;
+package remix.myplayer.ui.blur;
 
 import android.graphics.Bitmap;
 

@@ -7,6 +7,7 @@ import android.graphics.PointF;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.lyric.LrcRow;
 import remix.myplayer.model.mp3.FloatLrcContent;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
@@ -47,15 +49,15 @@ public class FloatLrcView extends RelativeLayout {
     private Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
-            mControlContainer.setVisibility(INVISIBLE);
+            mPanel.setVisibility(INVISIBLE);
         }
     };
     @BindView(R.id.widget_line1)
     FloatTextView mLine1;
     @BindView(R.id.widget_line2)
     TextView mLine2;
-    @BindView(R.id.widget_control)
-    View mControlContainer;
+    @BindView(R.id.widget_pannel)
+    View mPanel;
     @BindView(R.id.widget_lock)
     ImageView mClock;
     @BindView(R.id.widget_close)
@@ -66,6 +68,14 @@ public class FloatLrcView extends RelativeLayout {
     ImageView mPlay;
     @BindView(R.id.widget_prev)
     ImageView mPrev;
+    @BindView(R.id.widget_color_recyclerview)
+    RecyclerView mRecyclerView;
+    @BindView(R.id.widget_control_container)
+    View mControlContainer;
+    @BindView(R.id.widget_lrc_container)
+    View mLrcSettingContainer;
+    //当前字体大小
+    private int mTextSizeType = FloatTextSize.MEDIUM;
 
     public FloatLrcView(Context context) {
         super(context);
@@ -90,6 +100,8 @@ public class FloatLrcView extends RelativeLayout {
         View root = LayoutInflater.from(mContext).inflate(R.layout.layout_floatwidget, null);
         ButterKnife.bind(this, root);
         addView(root);
+        mCanMove = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.CAN_MOVE,true);
+        mTextSizeType = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_SIZE,FloatTextSize.MEDIUM);
         setUpTextView();
     }
 
@@ -194,15 +206,15 @@ public class FloatLrcView extends RelativeLayout {
             case MotionEvent.ACTION_CANCEL:
                 if(!mIsDragging ){
                     //点击后隐藏或者显示操作栏
-                    if (mControlContainer.isShown()) {
-                        mControlContainer.setVisibility(INVISIBLE);
+                    if (mPanel.isShown()) {
+                        mPanel.setVisibility(INVISIBLE);
                     } else {
-                        mControlContainer.setVisibility(VISIBLE);
+                        mPanel.setVisibility(VISIBLE);
                         mHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
                     }
                 } else {
                     //滑动
-                    if(mControlContainer.isShown()){
+                    if(mPanel.isShown()){
                         mHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
                     }
                     //保存y坐标
@@ -221,7 +233,8 @@ public class FloatLrcView extends RelativeLayout {
         mPlay.setImageResource(play ? R.drawable.notify_pause : R.drawable.notify_play);
     }
 
-    @OnClick({R.id.widget_close, R.id.widget_lock,R.id.widget_next,R.id.widget_play,R.id.widget_prev})
+    @OnClick({R.id.widget_close, R.id.widget_lock,R.id.widget_next,R.id.widget_play,R.id.widget_prev,
+                R.id.widget_lrc_bigger,R.id.widget_lrc_smaller,R.id.widget_setting})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             //关闭桌面歌词
@@ -236,6 +249,11 @@ public class FloatLrcView extends RelativeLayout {
             case R.id.widget_lock:
                 mCanMove = !mCanMove;
                 ToastUtil.show(mContext,mCanMove ? R.string.float_unlock : R.string.float_lock);
+                SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.CAN_MOVE,mCanMove);
+                break;
+            //歌词字体、大小设置
+            case R.id.widget_setting:
+                mLrcSettingContainer.setVisibility(mLrcSettingContainer.getVisibility() == GONE ? VISIBLE : GONE);
                 break;
             case R.id.widget_next:
             case R.id.widget_play:
@@ -243,6 +261,18 @@ public class FloatLrcView extends RelativeLayout {
                 Intent ctlIntent = new Intent(Constants.CTL_ACTION);
                 ctlIntent.putExtra("Control",view.getId() == R.id.widget_next ? Constants.NEXT : view.getId() == R.id.widget_prev ? Constants.PREV : Constants.TOGGLE);
                 mContext.sendBroadcast(ctlIntent);
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mPlay.setImageResource(MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
+                    }
+                },100);
+                break;
+            //字体放大、缩小
+            case R.id.widget_lrc_bigger:
+
+                break;
+            case R.id.widget_lrc_smaller:
                 break;
         }
     }
@@ -264,5 +294,11 @@ public class FloatLrcView extends RelativeLayout {
                 default:break;
             }
         }
+    }
+
+    private static class FloatTextSize{
+        static final int SMALL = 1;
+        static final int MEDIUM = 2;
+        static final int BIG = 3;
     }
 }

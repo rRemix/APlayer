@@ -1088,7 +1088,7 @@ public class MusicService extends BaseService implements Playback {
                     Global.MyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);
                     Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
                     Global.PlayList = PlayListUtil.getAllPlayListInfo();
-                    mShowFloatLrc = SPUtil.getValue(mContext,"Setting","FloatLrc",true);
+                    mShowFloatLrc = SPUtil.getValue(mContext,"Setting","FloatLrc",false);
                     //播放模式
                     mPlayModel = SPUtil.getValue(mContext,"Setting", "PlayModel",Constants.PLAY_LOOP);
                     //摇一摇
@@ -1224,8 +1224,6 @@ public class MusicService extends BaseService implements Playback {
      * 更新桌面歌词
      */
     private void updateFloatLrc() {
-        if(true)
-            return;
         if(!mShowFloatLrc)
             return;
         //根据操作判断是否需要更新歌词
@@ -1535,9 +1533,6 @@ public class MusicService extends BaseService implements Playback {
                                 target.sendToTarget();
                                 break;
                             }
-//                            if(Math.abs(temp) < LRC_THRESHOLD || (i == 0 && temp < 0)){
-//
-//                            }
                         }
                     }
                 }

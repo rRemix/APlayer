@@ -135,6 +135,7 @@
 
     <color name="float_text_color">@color/md_blue_primary</color>
     <color name="float_control_color">#9f000000</color>
+    <color name="float_divider_color">#d4d4d4</color>
 
     <color name="md_night_primary">@color/background_color_3</color>
     <color name="md_night_primary_dark">@color/background_color_3</color>

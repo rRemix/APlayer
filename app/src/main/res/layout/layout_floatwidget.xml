@@ -1,97 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="@dimen/float_height">
+    android:layout_height="wrap_content"
+    android:background="@color/white">
+    <ImageView
+        android:id="@+id/widget_close"
+        android:layout_width="@dimen/float_image_size"
+        android:layout_height="@dimen/float_image_size"
+        android:background="@color/transparent"
+        android:src="@drawable/widget_btn_close"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/float_image_margin"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/widget_line_container"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_below="@id/widget_close">
+        <remix.myplayer.ui.customview.floatwidget.FloatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="@dimen/float_text_size"
+            android:maxLines="1"
+            android:layout_marginLeft="@dimen/float_text_padding"
+            android:layout_marginRight="@dimen/float_text_padding"
+            android:layout_marginTop="@dimen/d4_size"
+            android:id="@+id/widget_line1"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+            android:ellipsize="none"/>
+
+        <remix.myplayer.ui.customview.floatwidget.FloatTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="@dimen/float_text_small_size"
+            android:maxLines="1"
+            android:layout_marginTop="@dimen/d6_size"
+            android:layout_marginBottom="@dimen/d12_size"
+            android:layout_marginLeft="@dimen/float_text_padding"
+            android:layout_marginRight="@dimen/float_text_padding"
+            android:id="@+id/widget_line2"
+            android:layout_below="@id/widget_line1"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
+            android:ellipsize="end"/>
+
+    </LinearLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/widget_control"
-        android:background="@color/float_control_color"
-        android:visibility="invisible">
-        <ImageView
-            android:id="@+id/widget_close"
-            android:layout_width="@dimen/float_image_size"
-            android:layout_height="@dimen/float_image_size"
-            android:background="@color/transparent"
-            android:src="@drawable/ic_widget_close"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="@dimen/float_image_margin"
-            android:layout_marginRight="@dimen/float_image_margin" />
-        <ImageView
-            android:id="@+id/widget_lock"
-            android:layout_width="@dimen/float_image_size"
-            android:layout_height="@dimen/float_image_size"
-            android:background="@color/transparent"
-            android:src="@drawable/ic_widget_lock"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="@dimen/float_image_margin"
-            android:layout_marginLeft="@dimen/float_image_margin" />
+        android:layout_height="wrap_content"
+        android:id="@+id/widget_pannel"
+        android:layout_below="@id/widget_line_container">
+
         <RelativeLayout
-            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:background="@color/gray_b7b7b7">
+            android:id="@+id/widget_control_container">
             <ImageView
                 android:id="@+id/widget_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
-                android:src="@drawable/notify_play"
-                android:layout_alignParentTop="true"
+                android:src="@drawable/widget_btn_play_normal"
                 android:layout_centerHorizontal="true"
-                android:layout_marginLeft="@dimen/d16_size"
-                android:layout_marginRight="@dimen/d16_size"
-                android:layout_marginTop="@dimen/d8_size"/>
+                android:layout_marginLeft="@dimen/d24_size"
+                android:layout_marginRight="@dimen/d24_size"
+                android:layout_marginTop="@dimen/d8_size"
+                android:layout_centerVertical="true"/>
             <ImageView
                 android:id="@+id/widget_next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
-                android:src="@drawable/notify_next"
+                android:src="@drawable/widget_btn_next_normal"
                 android:layout_toRightOf="@id/widget_play"
-                android:layout_alignTop="@id/widget_play"/>
+                android:layout_centerVertical="true"/>
             <ImageView
                 android:id="@+id/widget_prev"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
-                android:src="@drawable/notify_prev"
+                android:src="@drawable/widget_btn_previous_normal"
                 android:layout_toLeftOf="@id/widget_play"
-                android:layout_alignTop="@id/widget_play"/>
+                android:layout_centerVertical="true"/>
+            <ImageView
+                android:id="@+id/widget_lock"
+                android:layout_width="@dimen/float_image_size"
+                android:layout_height="@dimen/float_image_size"
+                android:background="@color/transparent"
+                android:src="@drawable/widget_btn_setting"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="@dimen/float_image_margin"
+                android:layout_marginLeft="@dimen/float_image_margin"
+                android:layout_centerVertical="true"/>
+            <ImageView
+                android:id="@+id/widget_setting"
+                android:layout_width="@dimen/float_image_size"
+                android:layout_height="@dimen/float_image_size"
+                android:background="@color/transparent"
+                android:src="@drawable/widget_btn_setting"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="@dimen/float_image_margin"
+                android:layout_marginRight="@dimen/float_image_margin"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/widget_lrc_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/widget_control_container"
+            android:paddingBottom="@dimen/float_image_margin"
+            android:paddingTop="@dimen/float_image_margin"
+            android:paddingLeft="@dimen/d12_size"
+            android:paddingRight="@dimen/d12_size">
+            <View
+                android:id="@+id/widget_divider"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/d1_size"
+                android:background="@color/float_divider_color"
+                android:layout_marginLeft="@dimen/float_image_margin"
+                android:layout_marginRight="@dimen/float_image_margin"
+                android:layout_marginBottom="@dimen/float_image_margin"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/widget_lrc_smaller"
+                android:layout_centerVertical="true"
+                android:src="@drawable/widget_btn_lrc_small"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="@dimen/float_image_margin"
+                android:layout_below="@id/widget_divider"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/widget_lrc_bigger"
+                android:layout_centerVertical="true"
+                android:src="@drawable/widget_btn_lrc_bigger"
+                android:layout_toLeftOf="@id/widget_lrc_smaller"
+                android:layout_marginRight="@dimen/d16_size"
+                android:layout_marginLeft="@dimen/d16_size"
+                android:layout_below="@id/widget_divider"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/widget_color_recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/widget_lrc_bigger"
+                android:layout_centerVertical="true"/>
         </RelativeLayout>
     </RelativeLayout>
 
-    <remix.myplayer.ui.customview.floatwidget.FloatTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:textSize="@dimen/float_text_size"
-        android:maxLines="1"
-        android:layout_marginTop="@dimen/d32_size"
-        android:layout_marginLeft="@dimen/float_text_padding"
-        android:layout_marginRight="@dimen/float_text_padding"
-        android:id="@+id/widget_line1"
-        android:layout_alignParentTop="true"
-        android:layout_below="@id/widget_control"
-        android:layout_centerHorizontal="true"
-        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-        android:ellipsize="none"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:textSize="@dimen/float_text_size"
-        android:maxLines="1"
-        android:layout_marginTop="@dimen/d8_size"
-        android:layout_marginBottom="@dimen/d12_size"
-        android:layout_marginLeft="@dimen/float_text_padding"
-        android:layout_marginRight="@dimen/float_text_padding"
-        android:id="@+id/widget_line2"
-        android:layout_below="@id/widget_line1"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-        android:ellipsize="end"/>
+
+
 </RelativeLayout>

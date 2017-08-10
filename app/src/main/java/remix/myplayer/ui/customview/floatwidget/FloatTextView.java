@@ -3,12 +3,14 @@ package remix.myplayer.ui.customview.floatwidget;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
 import remix.myplayer.lyric.LrcRow;
+import remix.myplayer.util.ColorUtil;
 
 /**
  * @ClassName
@@ -18,6 +20,8 @@ import remix.myplayer.lyric.LrcRow;
  */
 
 public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
+    /** 画笔*/
+    private Paint mPaint;
     /** 当前x坐标*/
     private float mCurTextXForHighLightLrc;
     /** 当前的歌词*/
@@ -38,12 +42,21 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
 
     public FloatTextView(Context context) {
         super(context);
+        init();
     }
     public FloatTextView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        init();
     }
+
+    private void init() {
+        mPaint = getPaint();
+        mPaint.setShadowLayer(10,2,2, Color.rgb(0xd4,0xd4,0xd4));
+    }
+
     public FloatTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init();
     }
 
 
