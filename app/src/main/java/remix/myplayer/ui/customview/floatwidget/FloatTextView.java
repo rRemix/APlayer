@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
 import remix.myplayer.lyric.LrcRow;
-import remix.myplayer.util.ColorUtil;
+import remix.myplayer.util.DensityUtil;
 
 /**
  * @ClassName
@@ -20,6 +20,7 @@ import remix.myplayer.util.ColorUtil;
  */
 
 public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
+    private Context mContext;
     /** 画笔*/
     private Paint mPaint;
     /** 当前x坐标*/
@@ -42,21 +43,24 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
 
     public FloatTextView(Context context) {
         super(context);
-        init();
+        init(context);
     }
     public FloatTextView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
-    private void init() {
+    private void init(Context context) {
+        mContext = context;
         mPaint = getPaint();
-        mPaint.setShadowLayer(10,2,2, Color.rgb(0xd4,0xd4,0xd4));
+//        int color = ThemeStore.getMaterialPrimaryColor();
+        mPaint.setShadowLayer(DensityUtil.dip2px(mContext,1f),DensityUtil.dip2px(mContext,1),DensityUtil.dip2px(mContext,1),
+                            Color.BLACK /**Color.rgb(0xd4,0xd4,0xd4)*/);
     }
 
     public FloatTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context);
     }
 
 

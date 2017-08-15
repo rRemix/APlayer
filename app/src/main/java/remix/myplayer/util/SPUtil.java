@@ -71,8 +71,14 @@ public class SPUtil {
     }
 
     public static class SPKEY{
+        //桌面歌词是否可移动
         public static final String CAN_MOVE = "can_move";
+        //桌面歌词字体大小
         public static final String FLOAT_TEXT_SIZE = "float_text_size";
+        //桌面歌词y坐标
+        public static final String FLOAT_Y = "float_y";
+        //桌面歌词的字体颜色
+        public static final String FLOAT_TEXT_COLOR = "float_text_color";
     }
 
 }

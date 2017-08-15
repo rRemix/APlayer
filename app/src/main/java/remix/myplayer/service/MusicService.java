@@ -32,6 +32,7 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.RemoteViews;
 
@@ -80,6 +81,7 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
@@ -181,6 +183,8 @@ public class MusicService extends BaseService implements Playback {
     private List<LrcRow> mLrcList = new ArrayList<>();
     /** 已经生成过的随机数 用于随机播放模式*/
     private List<Integer> mRandomList = new ArrayList<>();
+    /** service是否停止运行*/
+    private boolean mIsServiceStop = false;
 
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
@@ -207,11 +211,13 @@ public class MusicService extends BaseService implements Playback {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mIsServiceStop = true;
         unInit();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        mIsServiceStop = false;
         if(mControlRecevier == null){
             mControlRecevier = new ControlReceiver();
             registerReceiver(mControlRecevier,new IntentFilter(Constants.CTL_ACTION));
@@ -393,20 +399,20 @@ public class MusicService extends BaseService implements Playback {
         //桌面歌词
         updateFloatLrc();
         //初始化下一首歌曲
-        updateNextSong();
-//        mNextId = SPUtil.getValue(mContext,"Setting","NextSongId",-1);
-//        if(mNextId == -1){
-//            mNextIndex = mCurrentIndex;
-//            updateNextSong();
-//        } else {
-//            //查找上次退出时保存的下一首歌曲是否还存在
-//            //如果不存在，重新设置下一首歌曲
-//            mNextIndex = Global.PlayQueue.indexOf(mNextId);
-//            mNextInfo = MediaStoreUtil.getMP3InfoById(mNextId);
-//            if(mNextInfo != null)
-//                return;
-//            updateNextSong();
-//        }
+//        updateNextSong();
+        mNextId = SPUtil.getValue(mContext,"Setting","NextSongId",-1);
+        if(mNextId == -1){
+            mNextIndex = mCurrentIndex;
+            updateNextSong();
+        } else {
+            //查找上次退出时保存的下一首歌曲是否还存在
+            //如果不存在，重新设置下一首歌曲
+            mNextIndex = Global.PlayQueue.indexOf(mNextId);
+            mNextInfo = MediaStoreUtil.getMP3InfoById(mNextId);
+            if(mNextInfo != null)
+                return;
+            updateNextSong();
+        }
     }
 
     private void unInit(){
@@ -419,11 +425,14 @@ public class MusicService extends BaseService implements Playback {
         if(mMediaExtractor != null)
             mMediaExtractor.release();
 
+        mUpdateUIHandler.removeCallbacksAndMessages(null);
+        mShowFloatLrc = false;
+        removeFloatLrc();
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
         mMediaSession.setActive(false);
         mMediaSession.release();
         mNotify.cancel();
-        mUpdateUIHandler.removeCallbacksAndMessages(null);
+
         CommonUtil.unregisterReceiver(this,mControlRecevier);
         CommonUtil.unregisterReceiver(this,mHeadSetReceiver);
         CommonUtil.unregisterReceiver(this,mWidgetReceiver);
@@ -470,7 +479,7 @@ public class MusicService extends BaseService implements Playback {
         update(Global.getOperation());
         //保存当前播放的下一首播放的歌曲的id
         SPUtil.putValue(mContext,"Setting","LastSongId", mCurrentId);
-//        SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
+        SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
     }
 
 
@@ -483,24 +492,6 @@ public class MusicService extends BaseService implements Playback {
             pause(false);
         } else {
             play();
-//            try {
-//                if (mCurrentInfo == null) {
-//                    if(mContext != null)
-//                        ToastUtil.show(mContext, "toggleError---currentInfo:null");
-//                    return;
-//                }
-//                if (mFirstFlag) {
-//                    prepare(mCurrentInfo.getUrl());
-//                } else {
-//                    play();
-//                }
-//            } catch (Exception e) {
-//                if(mContext != null)
-//                    ToastUtil.show(mContext, "toggleError---" + e.toString());
-//                CommonUtil.uploadException("toggleError", e.toString());
-//            } finally {
-//                mFirstFlag = false;
-//            }
         }
     }
 
@@ -1523,14 +1514,12 @@ public class MusicService extends BaseService implements Playback {
                                 mCurrentLrc.Line1 = new LrcRow("",0,mCurrentInfo.getTitle());
                                 mCurrentLrc.Line2 = new LrcRow("",0,mCurrentInfo.getArtist() + " - " + mCurrentInfo.getAlbum());
                                 target.sendToTarget();
+                                LogUtil.d("DesktopLrc","sendToTarget");
                             } else if(Math.abs(temp) < LRC_THRESHOLD){
-                                try {
-                                    mCurrentLrc.Line1 = mLrcList.get(i);
-                                    mCurrentLrc.Line2 = (i + 1 < mLrcList.size() ? mLrcList.get(i + 1) : EMPTY_ROW);
-                                } catch (Exception e){
-                                    CommonUtil.uploadException("updateFloatLrc",e);
-                                }
+                                mCurrentLrc.Line1 = mLrcList.get(i);
+                                mCurrentLrc.Line2 = (i + 1 < mLrcList.size() ? mLrcList.get(i + 1) : EMPTY_ROW);
                                 target.sendToTarget();
+                                LogUtil.d("DesktopLrc","sendToTarget");
                                 break;
                             }
                         }
@@ -1543,24 +1532,29 @@ public class MusicService extends BaseService implements Playback {
     /**
      * 创建桌面歌词悬浮窗
      */
+    private boolean mIsFloatLrcInitializing = false;
     private void createFloatLrc(){
+        if(mIsFloatLrcInitializing)
+            return;
+        mIsFloatLrcInitializing = true;
         final WindowManager.LayoutParams param = new WindowManager.LayoutParams();
-        param.type = WindowManager.LayoutParams.TYPE_TOAST;
+//        param.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+        param.type = WindowManager.LayoutParams.TYPE_PHONE;
         param.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         param.format = PixelFormat.RGBA_8888;
         param.gravity = Gravity.TOP;
         param.width = mContext.getResources().getDisplayMetrics().widthPixels;
-        param.height = getResources().getDimensionPixelSize(R.dimen.float_height);
-        param.x = SPUtil.getValue(mContext,"Setting","FloatX",0);
-        param.y = SPUtil.getValue(mContext,"Setting","FloatY",0);
+        param.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        param.x = 0;
+        param.y = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_Y,0);
         if(mFloatLrcView != null){
             mWindowManager.removeView(mFloatLrcView);
             mFloatLrcView = null;
         }
         mFloatLrcView = new FloatLrcView(mContext);
-//        if(mCurrentLrc != null)
-//            mFloatLrcView.setText(mCurrentLrc.Line1,mCurrentLrc.Line2);
         mWindowManager.addView(mFloatLrcView,param);
+        mIsFloatLrcInitializing = false;
+        LogUtil.d("DesktopLrc","create desktop lrc");
     }
 
     /**
@@ -1710,8 +1704,6 @@ public class MusicService extends BaseService implements Playback {
                     break;
                 case Constants.UPDATE_FLOAT_LRC_CONTENT:
                     if(mFloatLrcView != null){
-//                        mFloatLrcView.setText(msg.obj.toString());
-//                        mCurrentLrc = msg.obj.toString();
                         if(mCurrentLrc != null)
                             mFloatLrcView.setText(mCurrentLrc.Line1,mCurrentLrc.Line2);
                     }

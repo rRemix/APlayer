@@ -12,8 +12,10 @@ import butterknife.ButterKnife;
  * @Date 2016/7/27 14:56
  */
 public class BaseViewHolder extends RecyclerView.ViewHolder {
+    public View mRoot;
     public BaseViewHolder(View itemView) {
         super(itemView);
         ButterKnife.bind(this,itemView);
+        mRoot = itemView;
     }
 }

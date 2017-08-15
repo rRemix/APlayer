@@ -1,7 +1,11 @@
 package remix.myplayer.theme;
 
+import android.graphics.Color;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
@@ -136,6 +140,10 @@ public class ThemeStore {
         return colorRes;
     }
 
+    public static int getThemeColor(){
+        return THEME_COLOR;
+    }
+
     /**
      * 保存当前主题颜色
      * @param themeColor
@@ -246,5 +254,69 @@ public class ThemeStore {
     public static boolean isLightTheme(){
         return isDay()&& (THEME_COLOR == THEME_WHITE);
 //        return ColorUtil.isColorLight(getMaterialPrimaryColor());
+    }
+
+    /**
+     * 获得所有的主题颜色
+     * @return
+     */
+    public static List<Integer> getAllThemeColor(){
+        List<Integer> themeColor = new ArrayList<>();
+        themeColor.add(THEME_RED);
+        themeColor.add(THEME_BROWN);
+        themeColor.add(THEME_NAVY);
+        themeColor.add(THEME_GREEN);
+        themeColor.add(THEME_YELLOW);
+        themeColor.add(THEME_PURPLE);
+        themeColor.add(THEME_INDIGO);
+        themeColor.add(THEME_PLUM);
+        themeColor.add(THEME_BLUE);
+
+        return themeColor;
+    }
+
+    /**
+     *
+     * @param theme
+     * @return
+     */
+    @ColorInt
+    public static int getThemeColorInt(int theme){
+        int colorRes = -1;
+        switch (theme){
+            case THEME_RED:
+                colorRes =  R.color.md_red_primary;
+                break;
+            case THEME_BROWN:
+                colorRes =  R.color.md_brown_primary;
+                break;
+            case THEME_NAVY:
+                colorRes =  R.color.md_navy_primary;
+                break;
+            case THEME_GREEN:
+                colorRes =  R.color.md_green_primary;
+                break;
+            case THEME_YELLOW:
+                colorRes =  R.color.md_yellow_primary;
+                break;
+            case THEME_PURPLE:
+                colorRes =  R.color.md_purple_primary;
+                break;
+            case THEME_INDIGO:
+                colorRes =  R.color.md_indigo_primary;
+                break;
+            case THEME_PLUM:
+                colorRes =  R.color.md_plum_primary;
+                break;
+            case THEME_BLUE:
+                colorRes = R.color.md_blue_primary;
+                break;
+            case THEME_WHITE:
+                colorRes = R.color.md_white_primary;
+                break;
+            default:
+                return Color.WHITE;
+        }
+        return ColorUtil.getColor(colorRes);
     }
 }

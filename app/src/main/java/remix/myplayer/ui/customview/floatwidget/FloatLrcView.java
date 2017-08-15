@@ -1,18 +1,19 @@
 package remix.myplayer.ui.customview.floatwidget;
 
-import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -24,6 +25,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
+import remix.myplayer.adapter.FloatColorAdapter;
+import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.lyric.LrcRow;
 import remix.myplayer.model.mp3.FloatLrcContent;
 import remix.myplayer.service.MusicService;
@@ -49,7 +52,8 @@ public class FloatLrcView extends RelativeLayout {
     private Runnable mHideRunnable = new Runnable() {
         @Override
         public void run() {
-            mPanel.setVisibility(INVISIBLE);
+            mPanel.setVisibility(GONE);
+            mLrcSettingContainer.setVisibility(GONE);
         }
     };
     @BindView(R.id.widget_line1)
@@ -69,13 +73,17 @@ public class FloatLrcView extends RelativeLayout {
     @BindView(R.id.widget_prev)
     ImageView mPrev;
     @BindView(R.id.widget_color_recyclerview)
-    RecyclerView mRecyclerView;
+    RecyclerView mColorRecyclerView;
     @BindView(R.id.widget_control_container)
     View mControlContainer;
     @BindView(R.id.widget_lrc_container)
     View mLrcSettingContainer;
+    private FloatColorAdapter mColorAdapter;
     //当前字体大小
-    private int mTextSizeType = FloatTextSize.MEDIUM;
+    private static final int SMALL = 1;
+    private static final int MEDIUM = 2;
+    private static final int BIG = 3;
+    private int mTextSizeType = MEDIUM;
 
     public FloatLrcView(Context context) {
         super(context);
@@ -100,14 +108,46 @@ public class FloatLrcView extends RelativeLayout {
         View root = LayoutInflater.from(mContext).inflate(R.layout.layout_floatwidget, null);
         ButterKnife.bind(this, root);
         addView(root);
-        mCanMove = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.CAN_MOVE,true);
-        mTextSizeType = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_SIZE,FloatTextSize.MEDIUM);
+
         setUpTextView();
+        setUpColor();
+    }
+
+    private void setUpColor() {
+        mColorRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                mColorRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
+                mColorAdapter = new FloatColorAdapter(mContext,mColorRecyclerView.getMeasuredWidth());
+                mColorAdapter.setOnItemClickLitener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        final int themeColor = ThemeStore.getAllThemeColor().get(position);
+                        mLine1.setTextColor(ThemeStore.getThemeColorInt(themeColor));
+                        mColorAdapter.setCurrentColor(themeColor);
+                        mColorAdapter.notifyDataSetChanged();
+                        resetHide();
+                    }
+
+                    @Override
+                    public void onItemLongClick(View view, int position) {
+
+                    }
+                });
+                mColorRecyclerView.setLayoutManager(new LinearLayoutManager(mContext,LinearLayoutManager.HORIZONTAL,false));
+                mColorRecyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+                mColorRecyclerView.setAdapter(mColorAdapter);
+                return true;
+            }
+        });
     }
 
     private void setUpTextView() {
-        mLine1.setTextColor(ThemeStore.getAccentColor());
-        mLine2.setTextColor(ThemeStore.getAccentColor());
+        mLine1.setTextColor(ThemeStore.getThemeColorInt(SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_COLOR,ThemeStore.getThemeColor())));
+        mLine1.setTextSize(mTextSizeType == SMALL ? 17 : mTextSizeType == BIG ? 19 : 18);
+        mLine2.setTextSize(mTextSizeType == SMALL ? 15 : mTextSizeType == BIG ? 17 : 16);
+        mCanMove = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.CAN_MOVE,true);
+        mTextSizeType = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_SIZE,MEDIUM);
     }
 
     public void setText(LrcRow lrc1, LrcRow lrc2) {
@@ -123,60 +163,8 @@ public class FloatLrcView extends RelativeLayout {
         }
     }
 
-    /**
-     * 判断需要设置的文本宽度，如果宽度该大于屏幕宽度，播放水平位移的动画
-     */
-    private boolean mIsAnimating = false;
-    public void checkWidth(final TextView textView, final LrcRow lrcRow){
-        if(textView == null || lrcRow == null)
-            return;
-        final float textWidth = textView.getPaint().measureText(lrcRow.getContent());
-        final int viewWidth = textView.getWidth();
-        if(textWidth < viewWidth){
-            textView.setText(lrcRow.getContent());
-            return;
-        }
-
-//        textView.setWidth((int) textWidth);
-        textView.setText(lrcRow.getContent());
-
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                textView.animate()
-                        .translationX(viewWidth - textWidth)
-                        .setDuration((long) (lrcRow.getTotalTime() * 0.6))
-                        .setListener(new Animator.AnimatorListener() {
-                            @Override
-                            public void onAnimationStart(Animator animation) {
-                                mIsAnimating = true;
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                textView.setWidth(viewWidth);
-                                textView.setTranslationX(0);
-                                mIsAnimating = false;
-                            }
-
-                            @Override
-                            public void onAnimationCancel(Animator animation) {
-
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animator animation) {
-
-                            }
-                        })
-                        .start();
-            }
-        },50);
-
-    }
-
     private static final int DISTANCE_THRESHOLD = 10;
-    private static final int DISMISS_THRESHOLD = 2000;
+    private static final int DISMISS_THRESHOLD = 4500;
     /** 当前是否正在拖动*/
     private boolean mIsDragging = false;
     /** 锁定了但是有移动的动作*/
@@ -220,7 +208,7 @@ public class FloatLrcView extends RelativeLayout {
                     //保存y坐标
                     params = (WindowManager.LayoutParams) getLayoutParams();
                     if (params != null)
-                        SPUtil.putValue(mContext, "Setting", "FloatY", params.y);
+                        SPUtil.putValue(mContext, "Setting", SPUtil.SPKEY.FLOAT_Y, params.y);
                 }
                 mHasDragAction = false;
                 mIsDragging = false;
@@ -230,7 +218,7 @@ public class FloatLrcView extends RelativeLayout {
     }
 
     public void setPlayIcon(boolean play){
-        mPlay.setImageResource(play ? R.drawable.notify_pause : R.drawable.notify_play);
+        mPlay.setImageResource(play ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
     }
 
     @OnClick({R.id.widget_close, R.id.widget_lock,R.id.widget_next,R.id.widget_play,R.id.widget_prev,
@@ -253,7 +241,8 @@ public class FloatLrcView extends RelativeLayout {
                 break;
             //歌词字体、大小设置
             case R.id.widget_setting:
-                mLrcSettingContainer.setVisibility(mLrcSettingContainer.getVisibility() == GONE ? VISIBLE : GONE);
+                mLrcSettingContainer.setVisibility(mLrcSettingContainer.isShown() ? GONE : VISIBLE);
+                resetHide();
                 break;
             case R.id.widget_next:
             case R.id.widget_play:
@@ -267,14 +256,44 @@ public class FloatLrcView extends RelativeLayout {
                         mPlay.setImageResource(MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
                     }
                 },100);
+                //操作后重置消息的时间
+                resetHide();
                 break;
             //字体放大、缩小
             case R.id.widget_lrc_bigger:
-
-                break;
             case R.id.widget_lrc_smaller:
+                boolean needRefresh = false;
+                if(view.getId() == R.id.widget_lrc_bigger ){
+                    //当前已经是最大字体
+                    if(mTextSizeType == BIG)
+                        break;
+                    mTextSizeType++;
+                    needRefresh = true;
+                }
+                if(view.getId() == R.id.widget_lrc_smaller){
+                    //当前已经是最小字体
+                    if(mTextSizeType == SMALL)
+                        break;
+                    mTextSizeType--;
+                    needRefresh = true;
+                }
+                if(needRefresh){
+                    mLine1.setTextSize(mTextSizeType == SMALL ? 17 : mTextSizeType == BIG ? 19 : 18);
+                    mLine2.setTextSize(mTextSizeType == SMALL ? 15 : mTextSizeType == BIG ? 17 : 16);
+                    SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_SIZE,mTextSizeType);
+                    //操作后重置消息的时间
+                    resetHide();
+                }
                 break;
         }
+    }
+
+    /**
+     * 操作后重置消息的时间
+     */
+    private void resetHide() {
+        mHandler.removeCallbacks(mHideRunnable);
+        mHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
     }
 
     private static final class FloatHandler extends Handler{
@@ -296,9 +315,4 @@ public class FloatLrcView extends RelativeLayout {
         }
     }
 
-    private static class FloatTextSize{
-        static final int SMALL = 1;
-        static final int MEDIUM = 2;
-        static final int BIG = 3;
-    }
 }

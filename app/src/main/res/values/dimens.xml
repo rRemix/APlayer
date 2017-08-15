@@ -106,4 +106,6 @@
     <dimen name="float_text_size">18sp</dimen>
     <dimen name="float_text_small_size">16sp</dimen>
     <dimen name="float_image_size">24dp</dimen>
+    <dimen name="float_button_size">36dp</dimen>
+    <dimen name="float_container_margin_top">80dp</dimen>
 </resources>
