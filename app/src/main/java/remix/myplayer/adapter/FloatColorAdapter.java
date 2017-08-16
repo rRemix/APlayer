@@ -72,6 +72,7 @@ public class FloatColorAdapter extends BaseAdapter<FloatColorAdapter.FloatColorH
         return holder;
     }
 
+
     @Override
     public void onBindViewHolder(FloatColorHolder holder, final int position) {
         final int themeColor = mColorList.get(position);

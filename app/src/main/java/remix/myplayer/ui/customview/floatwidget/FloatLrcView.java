@@ -1,11 +1,15 @@
 package remix.myplayer.ui.customview.floatwidget;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -31,6 +35,7 @@ import remix.myplayer.lyric.LrcRow;
 import remix.myplayer.model.mp3.FloatLrcContent;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -49,13 +54,6 @@ public class FloatLrcView extends RelativeLayout {
     private boolean mCanMove = true;
     private FloatLrcContent mLrcContent;
     private FloatHandler mHandler;
-    private Runnable mHideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            mPanel.setVisibility(GONE);
-            mLrcSettingContainer.setVisibility(GONE);
-        }
-    };
     @BindView(R.id.widget_line1)
     FloatTextView mLine1;
     @BindView(R.id.widget_line2)
@@ -84,6 +82,19 @@ public class FloatLrcView extends RelativeLayout {
     private static final int MEDIUM = 2;
     private static final int BIG = 3;
     private int mTextSizeType = MEDIUM;
+    private Runnable mHideRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mPanel.setVisibility(GONE);
+            mLrcSettingContainer.setVisibility(GONE);
+        }
+    };
+    private Runnable mLongClickRunnable = new Runnable() {
+        @Override
+        public void run() {
+            saveCanMove(true);
+        }
+    };
 
     public FloatLrcView(Context context) {
         super(context);
@@ -110,7 +121,6 @@ public class FloatLrcView extends RelativeLayout {
         addView(root);
 
         setUpTextView();
-        setUpColor();
     }
 
     private void setUpColor() {
@@ -148,6 +158,7 @@ public class FloatLrcView extends RelativeLayout {
         mLine2.setTextSize(mTextSizeType == SMALL ? 15 : mTextSizeType == BIG ? 17 : 16);
         mCanMove = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.CAN_MOVE,true);
         mTextSizeType = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_SIZE,MEDIUM);
+
     }
 
     public void setText(LrcRow lrc1, LrcRow lrc2) {
@@ -165,53 +176,60 @@ public class FloatLrcView extends RelativeLayout {
 
     private static final int DISTANCE_THRESHOLD = 10;
     private static final int DISMISS_THRESHOLD = 4500;
+    private static final int LONGCLICK_THRESHOLD = 1000;
     /** 当前是否正在拖动*/
     private boolean mIsDragging = false;
-    /** 锁定了但是有移动的动作*/
-    private boolean mHasDragAction = false;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                mIsDragging = false;
-                mLastPoint.set(event.getRawX(), event.getRawY());
-                mHandler.removeCallbacks(mHideRunnable);
+                if(mCanMove){
+                    mIsDragging = false;
+                    mLastPoint.set(event.getRawX(), event.getRawY());
+                    mHandler.removeCallbacks(mHideRunnable);
+                } else {
+                    mHandler.postDelayed(mLongClickRunnable,LONGCLICK_THRESHOLD);
+                }
+
                 break;
             case MotionEvent.ACTION_MOVE:
-                WindowManager.LayoutParams params = (WindowManager.LayoutParams) getLayoutParams();
-                if (Math.abs(event.getRawY() - mLastPoint.y) > DISTANCE_THRESHOLD ) {
-                    if(mCanMove){
+                if(mCanMove){
+                    WindowManager.LayoutParams params = (WindowManager.LayoutParams) getLayoutParams();
+                    if (Math.abs(event.getRawY() - mLastPoint.y) > DISTANCE_THRESHOLD ) {
                         params.y += (int) (event.getRawY() - mLastPoint.y);
                         mWindowManager.updateViewLayout(this, params);
                         mIsDragging = true;
-                    } else {
-                        mHasDragAction = true;
                     }
-                }
-                mLastPoint.set(event.getRawX(), event.getRawY());
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                if(!mIsDragging ){
-                    //点击后隐藏或者显示操作栏
-                    if (mPanel.isShown()) {
-                        mPanel.setVisibility(INVISIBLE);
-                    } else {
-                        mPanel.setVisibility(VISIBLE);
-                        mHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
-                    }
-                } else {
-                    //滑动
-                    if(mPanel.isShown()){
-                        mHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
-                    }
+                    mLastPoint.set(event.getRawX(), event.getRawY());
                     //保存y坐标
                     params = (WindowManager.LayoutParams) getLayoutParams();
                     if (params != null)
                         SPUtil.putValue(mContext, "Setting", SPUtil.SPKEY.FLOAT_Y, params.y);
                 }
-                mHasDragAction = false;
-                mIsDragging = false;
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                if(mCanMove){
+                    if(!mIsDragging ){
+                        //点击后隐藏或者显示操作栏
+                        if (mPanel.isShown()) {
+                            mPanel.setVisibility(INVISIBLE);
+                        } else {
+                            mPanel.setVisibility(VISIBLE);
+                            mHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
+                        }
+                    } else {
+                        //滑动
+                        if(mPanel.isShown()){
+                            mHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
+                        }
+
+                        mIsDragging = false;
+                    }
+                } else {
+                    mHandler.removeCallbacks(mLongClickRunnable);
+                }
                 break;
         }
         return true;
@@ -235,13 +253,14 @@ public class FloatLrcView extends RelativeLayout {
                 break;
             //是否锁定
             case R.id.widget_lock:
-                mCanMove = !mCanMove;
-                ToastUtil.show(mContext,mCanMove ? R.string.float_unlock : R.string.float_lock);
-                SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.CAN_MOVE,mCanMove);
+                saveCanMove(false);
+                mHandler.postDelayed(mHideRunnable,0);
                 break;
             //歌词字体、大小设置
             case R.id.widget_setting:
                 mLrcSettingContainer.setVisibility(mLrcSettingContainer.isShown() ? GONE : VISIBLE);
+                setUpColor();
+                //操作后重置消息的时间
                 resetHide();
                 break;
             case R.id.widget_next:
@@ -288,8 +307,14 @@ public class FloatLrcView extends RelativeLayout {
         }
     }
 
+    private void saveCanMove(boolean canMove){
+        mCanMove = canMove;
+        ToastUtil.show(mContext,mCanMove ? R.string.float_unlock : R.string.float_lock);
+        SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.CAN_MOVE,mCanMove);
+    }
+
     /**
-     * 操作后重置消息的时间
+     * 操作后重置消失的时间
      */
     private void resetHide() {
         mHandler.removeCallbacks(mHideRunnable);

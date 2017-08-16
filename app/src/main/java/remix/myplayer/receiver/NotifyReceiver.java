@@ -99,38 +99,6 @@ public class NotifyReceiver extends BroadcastReceiver {
                     .setProgressiveRenderingEnabled(true)
                     .build();
             DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);
-
-//            dataSource.subscribe(new BaseDataSubscriber<CloseableReference<CloseableImage>>() {
-//                @Override
-//                protected void onNewResultImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-//                    if(!dataSource.isFinished())
-//                        return;
-//                    CloseableReference<CloseableImage> result = dataSource.getResult();
-//                    if(result != null){
-//                        try {
-//                            CloseableImage closeableImage = result.get();
-//                            if(closeableImage instanceof CloseableBitmap){
-//                                Bitmap bitmap = Bitmap.createBitmap(((CloseableBitmap) closeableImage).getUnderlyingBitmap());
-//                                if(bitmap != null) {
-//                                    mRemoteBigView.setImageViewBitmap(R.id.notify_image, bitmap);
-//                                    mRemoteView.setImageViewBitmap(R.id.notify_image,bitmap);
-//                                } else {
-//                                    mRemoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
-//                                    mRemoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
-//                                }
-//                                pushNotify(context);
-//                            }
-//                        }catch (Exception e){
-//                            LogUtil.e(e.toString());
-//                        }
-//                    }
-//                }
-//                @Override
-//                protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-//                    pushNotify(context);
-//                }
-//            }, CallerThreadExecutor.getInstance());
-
             dataSource.subscribe(new BaseBitmapDataSubscriber() {
                 @Override
                 protected void onNewResultImpl(Bitmap bitmap) {

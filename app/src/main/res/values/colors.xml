@@ -133,7 +133,7 @@
     <color name="night_enable_track_color">@color/white</color>
     <color name="night_enable_text_color">@color/white</color>
 
-    <color name="float_text_color">@color/md_blue_primary</color>
+    <color name="float_text_color">#d4d4d4</color>
     <color name="float_control_color">#9f000000</color>
     <color name="float_divider_color">#d4d4d4</color>
 

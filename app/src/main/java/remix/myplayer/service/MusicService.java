@@ -47,6 +47,7 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -239,7 +240,7 @@ public class MusicService extends BaseService implements Playback {
     private void init() {
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
         Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
-        mUpdateUIHandler = new UpdateUIHandler(getMainLooper());
+        mUpdateUIHandler = new UpdateUIHandler(this);
         //电源锁
         mWakeLock = ((PowerManager)getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,getClass().getSimpleName());
         mWakeLock.setReferenceCounted(false);
@@ -1689,30 +1690,35 @@ public class MusicService extends BaseService implements Playback {
         }
     }
 
-    private class UpdateUIHandler extends Handler{
-        UpdateUIHandler(Looper looper) {
-            super(looper);
+    private static class UpdateUIHandler extends Handler{
+        private final WeakReference<MusicService> mRef;
+        UpdateUIHandler(MusicService service) {
+            super();
+            mRef = new WeakReference<>(service);
         }
 
         @Override
         public void handleMessage(Message msg) {
+            if(mRef.get() == null)
+                return;
+            MusicService musicService = mRef.get();
             switch (msg.what){
                 case Constants.UPDATE_UI:
-                    updateAppwidget();
-                    updateFloatLrc();
+                    musicService.updateAppwidget();
+                    musicService.updateFloatLrc();
                     UpdateHelper.update(mCurrentInfo,mIsplay);
                     break;
                 case Constants.UPDATE_FLOAT_LRC_CONTENT:
-                    if(mFloatLrcView != null){
-                        if(mCurrentLrc != null)
-                            mFloatLrcView.setText(mCurrentLrc.Line1,mCurrentLrc.Line2);
+                    if(musicService.mFloatLrcView != null){
+                        if(musicService.mCurrentLrc != null)
+                            musicService.mFloatLrcView.setText(musicService.mCurrentLrc.Line1,musicService.mCurrentLrc.Line2);
                     }
                     break;
                 case Constants.REMOVE_FLOAT_LRC:
-                    removeFloatLrc();
+                    musicService.removeFloatLrc();
                     break;
                 case Constants.CREATE_FLOAT_LRC:
-                    createFloatLrc();
+                    musicService.createFloatLrc();
                     break;
             }
         }
