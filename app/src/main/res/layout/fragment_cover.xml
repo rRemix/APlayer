@@ -3,61 +3,39 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginBottom="@dimen/d8_size">
-
-    <!--<FrameLayout-->
-        <!--android:visibility="invisible"-->
-        <!--android:id="@+id/cover_container"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_centerHorizontal="true">-->
-        <!--&lt;!&ndash;<ImageView&ndash;&gt;-->
-            <!--&lt;!&ndash;android:id="@+id/cover_shadow"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:src="@drawable/player_cover_shadow"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:layout_gravity="top|center_horizontal"/>&ndash;&gt;-->
-        <!--<com.facebook.drawee.view.SimpleDraweeView-->
-            <!--android:layout_marginStart="@dimen/d8_size"-->
-            <!--android:layout_marginEnd="@dimen/d8_size"-->
-            <!--android:layout_marginBottom="@dimen/d8_size"-->
-            <!--android:id="@+id/cover_image"-->
-            <!--android:visibility="invisible"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--fresco:failureImage="@drawable/album_empty_bg_day"-->
-            <!--fresco:failureImageScaleType="centerCrop"-->
-            <!--fresco:actualImageScaleType="centerCrop"-->
-            <!--fresco:fadeDuration="0"-->
-            <!--android:layout_gravity="top|center_horizontal"/>-->
-    <!--</FrameLayout>-->
+    android:layout_height="match_parent">
 
     <FrameLayout
         android:visibility="invisible"
         android:id="@+id/cover_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/d15_size"
-        android:layout_marginEnd="@dimen/d15_size"
-        android:layout_marginTop="@dimen/cover_margin_top"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/d24_size"
+        android:layout_marginRight="@dimen/d24_size"
+        android:layout_marginTop="@dimen/d12_size"
         android:layout_centerHorizontal="true">
-        <ImageView
+        <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/cover_shadow"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/player_cover_shadow"
-            android:layout_gravity="top|center_horizontal"/>
+            android:layout_gravity="top|center_horizontal"
+            android:visibility="gone"
+            android:layout_marginTop="@dimen/d8_size"
+            fresco:actualImageScaleType="centerCrop"
+            fresco:fadeDuration="0"
+            fresco:viewAspectRatio="1"/>
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/cover_image"
             android:visibility="invisible"
-            android:layout_width="@dimen/d264_size"
-            android:layout_height="@dimen/d264_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_margin="@dimen/d8_size"
             fresco:failureImage="@drawable/album_empty_bg_day"
             fresco:failureImageScaleType="centerCrop"
             fresco:actualImageScaleType="centerCrop"
             fresco:fadeDuration="0"
-            android:layout_gravity="top|center_horizontal" />
+            fresco:roundedCornerRadius="@dimen/d2_size"
+            fresco:viewAspectRatio="1"/>
     </FrameLayout>
-
 </RelativeLayout>

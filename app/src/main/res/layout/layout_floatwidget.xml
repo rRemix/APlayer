@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="invisible"
-        android:background="@color/white">
+        android:background="@drawable/bg_corner_float_lrc">
         <ImageView
             android:id="@+id/widget_close"
             android:layout_width="@dimen/float_image_size"
@@ -153,7 +153,7 @@
             android:textSize="@dimen/s16_size"
             android:maxLines="1"
             android:layout_marginTop="@dimen/d6_size"
-            android:layout_marginBottom="@dimen/d12_size"
+
             android:id="@+id/widget_line2"
             android:gravity="center"
             android:ellipsize="end"

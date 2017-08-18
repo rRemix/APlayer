@@ -81,13 +81,27 @@ public class CommonUtil {
     }
 
     /**
-     * 判断当前界面是否是桌面
+     * 判断app是否运行在前台
+     * @param context
+     * @return
      */
-    public static boolean isForeground(Context context) {
-        ActivityManager mActivityManager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> rti = mActivityManager.getRunningTasks(1);
-        return !isEmptyList(rti) && rti.get(0).topActivity.getPackageName().equals(context.getPackageName());
+    public static boolean isAppOnForeground(Context context) {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        String packageName = context.getPackageName();
+
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        if (appProcesses == null)
+            return false;
+
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.processName.equals(packageName)
+                    && appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                return true;
+            }
+        }
+        return false;
     }
+
 
     /**
      * 震动

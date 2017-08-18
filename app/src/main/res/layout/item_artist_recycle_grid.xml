@@ -24,7 +24,8 @@
             android:layout_marginTop="@dimen/d18_size"
             android:layout_marginRight="@dimen/d24_size"
             android:layout_marginLeft="@dimen/d24_size"
-            android:layout_marginBottom="@dimen/d18_size"/>
+            android:layout_marginBottom="@dimen/d18_size"
+            android:layout_centerHorizontal="true"/>
 
         <View
             android:id="@+id/divider"

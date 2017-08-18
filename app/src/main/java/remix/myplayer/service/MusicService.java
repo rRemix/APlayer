@@ -87,6 +87,7 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.floatpermission.FloatWindowManager;
 
 
 /**
@@ -817,23 +818,6 @@ public class MusicService extends BaseService implements Playback {
         return nextId;
     }
 
-//    /**
-//     * 生成随机播放列表
-//     * @param current
-//     */
-//    private void makeShuffleList(final int current) {
-//        mRandomList = (List<Integer>) Global.PlayQueue.clone();
-//        if (mRandomList.isEmpty())
-//            return;
-//        if (current >= 0) {
-//            int temp = mRandomList.remove(current);
-//            Collections.shuffle(mRandomList);
-//            mRandomList.add(0, temp);
-//        } else {
-//            Collections.shuffle(mRandomList);
-//        }
-//    }
-
     /**
      * 根据当前播放模式，切换到上一首或者下一首
      * @param isNext 是否是播放下一首
@@ -1490,8 +1474,12 @@ public class MusicService extends BaseService implements Playback {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                //判断是否有权限
+                if(!FloatWindowManager.getInstance().checkPermission(mContext)){
+                    return;
+                }
                 //当前应用在前台
-                if(CommonUtil.isForeground(mContext)){
+                if(CommonUtil.isAppOnForeground(mContext)){
                     if(isFloatLrcShowing())
                         mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
                 } else{
@@ -1500,7 +1488,7 @@ public class MusicService extends BaseService implements Playback {
                     } else {
                         Message target = mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT);
                         if(mLrcList == null || mLrcList.size() == 0 || mFloatLrcView == null) {
-                            mCurrentLrc.Line1.setContent(getResources().getString(R.string.no_lrc));
+                            mCurrentLrc.Line1 = new LrcRow("",0,getResources().getString(R.string.no_lrc));
                             mCurrentLrc.Line2 = EMPTY_ROW;
                             target.sendToTarget();
                             continue;
@@ -1535,12 +1523,15 @@ public class MusicService extends BaseService implements Playback {
      */
     private boolean mIsFloatLrcInitializing = false;
     private void createFloatLrc(){
+        if(!FloatWindowManager.getInstance().checkPermission(this)){
+            return;
+        }
         if(mIsFloatLrcInitializing)
             return;
         mIsFloatLrcInitializing = true;
         final WindowManager.LayoutParams param = new WindowManager.LayoutParams();
-//        param.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         param.type = WindowManager.LayoutParams.TYPE_PHONE;
+//        param.type = WindowManager.LayoutParams.TYPE_PHONE;
         param.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         param.format = PixelFormat.RGBA_8888;
         param.gravity = Gravity.TOP;

@@ -5,10 +5,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -24,7 +26,10 @@ import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.cache.DiskCache;
 import remix.myplayer.util.thumb.SearchCover;
 
 /**
@@ -39,7 +44,7 @@ public class CoverFragment extends BaseFragment {
     @BindView(R.id.cover_image)
     SimpleDraweeView mImage;
     @BindView(R.id.cover_shadow)
-    ImageView mShadow;
+    SimpleDraweeView mShadow;
     @BindView(R.id.cover_container)
     View mCoverContainer;
     private MP3Item mInfo;
@@ -52,7 +57,6 @@ public class CoverFragment extends BaseFragment {
         mPageName = CoverFragment.class.getSimpleName();
     }
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,17 +64,18 @@ public class CoverFragment extends BaseFragment {
         mWidth = getArguments().getInt("Width");
         View rootView = inflater.inflate(R.layout.fragment_cover,container,false);
         mUnBinder = ButterKnife.bind(this,rootView);
+
+        mImage.getHierarchy().setFailureImage(ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night);
         mImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
                 mImage.getViewTreeObserver().removeOnPreDrawListener(this);
                 if(mInflateFinishListener != null)
                     mInflateFinishListener.onViewInflateFinish(mImage);
+                mShadow.setImageURI(Uri.parse("res://remix.myplayer/" + R.drawable.player_cover_shadow));
                 return true;
             }
         });
-        mImage.setAspectRatio(1);
-        mImage.getHierarchy().setFailureImage(ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night);
 
         return rootView;
     }
@@ -135,7 +140,7 @@ public class CoverFragment extends BaseFragment {
             outAnim.setEndValue(endValue);
         } else {
             mImage.setImageURI(mUri);
-            mShadow.setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.INVISIBLE);
+//            mShadow.setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.INVISIBLE);
         }
     }
 
@@ -155,47 +160,6 @@ public class CoverFragment extends BaseFragment {
             mImage.setVisibility(View.VISIBLE);
         if(mCoverContainer != null)
             mCoverContainer.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * 判断该专辑id在本地数据库是否有封面
-     * 没有则查找缓存目录是否有下载
-     * 没有则下载
-     */
-    private void setImage(){
-        try {
-            final Message msg = new Message();
-            Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), mInfo.getAlbumId());
-
-            boolean exist = CommonUtil.isAlbumThumbExistInDB(uri);
-            if(false){
-                mImage.setImageURI(uri);
-            } else {
-                //查找缓存目录是否有，没有则去下载
-                mImage.setImageURI(Uri.parse(new SearchCover(mInfo.getDisplayname(),mInfo.getArtist(),SearchCover.COVER).getImgUrl()));
-//                String coverCahcePath = CommonUtil.getCoverInCache(mInfo.getAlbumId());
-//                if(coverCahcePath != null && !coverCahcePath.equals("")){
-////                    msg.obj = Uri.parse("file://" + coverCahcePath);
-////                    mHandler.sendMessage(msg);
-//                    mImage.setImageURI(Uri.parse("file://" + coverCahcePath));
-//                    return;
-//                }
-//                //下载
-//                new Thread(){
-//                    @Override
-//                    public void run() {
-//                        String coverPath = CommonUtil.downAlbumCover(mInfo.getDisplayname(),mInfo.getArtist(),mInfo.getAlbumId());
-//                        msg.obj = Uri.parse("file://" + coverPath);
-//                        mHandler.sendMessage(msg);
-//                    }
-//                }.startListen();
-
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
-
     }
 
 }

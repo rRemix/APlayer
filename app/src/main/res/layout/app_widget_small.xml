@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/app_widget_small_height"
-    android:background="@color/appwidget_background_color">
+    android:background="@drawable/bg_corner_app_widget">
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

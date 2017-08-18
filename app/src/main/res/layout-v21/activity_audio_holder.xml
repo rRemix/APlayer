@@ -75,7 +75,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true">
+                    android:layout_centerHorizontal="true"
+                    android:paddingTop="@dimen/d2_size">
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -88,13 +89,15 @@
                         android:layout_height="wrap_content"
                         android:layout_toLeftOf="@id/guide_02"
                         android:layout_alignTop="@id/guide_02"
-                        android:id="@+id/guide_01" />
+                        android:id="@+id/guide_01"
+                        android:layout_centerVertical="true"/>
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_toRightOf="@id/guide_02"
                         android:layout_alignTop="@id/guide_02"
-                        android:id="@+id/guide_03"/>
+                        android:id="@+id/guide_03"
+                        android:layout_centerVertical="true"/>
                 </RelativeLayout>
                 <!-- 中间三个页面 -->
                 <remix.myplayer.ui.customview.AudioViewPager

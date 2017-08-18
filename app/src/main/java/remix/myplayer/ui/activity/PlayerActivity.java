@@ -256,8 +256,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     Class<?> c = Class.forName("android.os.SystemProperties");
                     Method get = c.getMethod("get", String.class, String.class );
                     miui = (String)(get.invoke(c, "ro.miui.ui.version.name", "unknown" ));
-                    if(!TextUtils.isEmpty(miui) && miui.length() >= 2 && TextUtils.isDigitsOnly(miui.substring(1,2))){
-                        miuiVersion = Integer.valueOf(miui.substring(1,2));
+                    if(!TextUtils.isEmpty(miui) && miui.length() >= 2 && TextUtils.isDigitsOnly(miui.substring(1,miui.length()))){
+                        miuiVersion = Integer.valueOf(miui.substring(1,miui.length()));
                     }
                 }catch (Exception e){
                     CommonUtil.uploadException("miui版本解析错误",e);
@@ -269,7 +269,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     StatusBarUtil.setTransparent(this);
                 else
                     StatusBarUtil.setColorNoTranslucent(this, Color.WHITE);
-            } else if (Build.MANUFACTURER.equals("Xiaomi") && miuiVersion >= 6 ){
+            } else if (Build.MANUFACTURER.equals("Xiaomi") && miuiVersion >= 6 && miuiVersion < 9){
                 StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true,this);
                 if(mDiscolour)
                     StatusBarUtil.setTransparent(this);
@@ -291,7 +291,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
         mFromActivity =  getIntent().getBooleanExtra("FromActivity",false);
 

@@ -105,7 +105,8 @@ public class SearchLRC {
             if(response != null && response.length() > 0){
                 if(response.getJSONArray("candidates").length() > 0){
                     JSONObject jsonObject = response.getJSONArray("candidates").getJSONObject(0);
-                    return new LrcRequest(jsonObject.getInt("id"),jsonObject.getString("accesskey"));
+                    if(jsonObject.getInt("score") >= 60)
+                        return new LrcRequest(jsonObject.getInt("id"),jsonObject.getString("accesskey"));
                 }
             }
         }catch (Exception e){

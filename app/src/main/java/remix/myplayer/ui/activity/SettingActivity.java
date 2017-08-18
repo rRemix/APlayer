@@ -50,6 +50,7 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.floatpermission.FloatWindowManager;
 
 /**
  * @ClassName SettingActivity
@@ -284,7 +285,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //桌面歌词
             case R.id.setting_lrc_float_container:
-                mFloatLrcSwitch.setChecked(!mFloatLrcSwitch.isChecked());
+                if(FloatWindowManager.getInstance().checkPermission(this)){
+                    mFloatLrcSwitch.setChecked(!mFloatLrcSwitch.isChecked());
+                }
                 break;
             //歌词扫描路径
             case R.id.setting_lrc_path_container:
