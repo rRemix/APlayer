@@ -853,7 +853,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 if (mLrcView != null)
                     mLrcView.setViewPagerScroll(false);
                 //歌词界面常亮
-                if(position == 2 && SPUtil.getValue(mContext,"Setting",Constants.KEY_SCREEN_ALWAYS_ON,false)){
+                if(position == 2 && SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.SCREEN_ALWAYS_ON,false)){
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 }
             }
@@ -979,29 +979,26 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         if(!mDiscolour)
             return;
         //更新背景
-        try {
-            mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
-            if(mRawBitMap == null)
-                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
 
-//                StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
-//                mNewBitMap = mStackBlurManager.process(40);
+        mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
+        if(mRawBitMap == null)
+            mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
 
-            Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
-                @Override
-                public void onGenerated(Palette palette) {
-                    if(palette == null || palette.getMutedSwatch() == null){
-                        mSwatch = new Palette.Swatch(Color.GRAY,100);
-                    } else {
-                        mSwatch = palette.getMutedSwatch();//柔和 暗色
-                    }
-                    mCoverHandler.removeMessages(UPDATE_BG);
-                    mCoverHandler.sendEmptyMessage(UPDATE_BG);
+//            StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
+//            mNewBitMap = mStackBlurManager.process(40);
+
+        Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(Palette palette) {
+                if(palette == null || palette.getMutedSwatch() == null){
+                    mSwatch = new Palette.Swatch(Color.GRAY,100);
+                } else {
+                    mSwatch = palette.getMutedSwatch();//柔和 暗色
                 }
-            });
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+                mCoverHandler.removeMessages(UPDATE_BG);
+                mCoverHandler.sendEmptyMessage(UPDATE_BG);
+            }
+        });
     }
 
     /**

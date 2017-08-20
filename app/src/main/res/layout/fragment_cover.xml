@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="@dimen/d24_size"
         android:layout_marginRight="@dimen/d24_size"
-        android:layout_marginTop="@dimen/d12_size"
+        android:layout_marginTop="@dimen/d6_size"
         android:layout_centerHorizontal="true">
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/cover_shadow"

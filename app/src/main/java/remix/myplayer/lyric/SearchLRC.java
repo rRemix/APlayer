@@ -132,7 +132,7 @@ public class SearchLRC {
         BufferedReader br = null;
         //manualPath不为空说明为手动设置歌词
         try {
-            if(!lrcPath.equals("")){
+            if(!TextUtils.isEmpty(lrcPath)){
                 br = new BufferedReader(new InputStreamReader(new FileInputStream(lrcPath)));
                 return mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName);
             }

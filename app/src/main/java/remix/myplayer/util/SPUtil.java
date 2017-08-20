@@ -79,6 +79,8 @@ public class SPUtil {
         public static final String FLOAT_Y = "float_y";
         //桌面歌词的字体颜色
         public static final String FLOAT_TEXT_COLOR = "float_text_color";
+        //是否开启屏幕常亮
+        public final static String SCREEN_ALWAYS_ON = "key_screen_always_on";
     }
 
 }

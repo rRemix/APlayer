@@ -126,7 +126,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
 
         //导航栏是否变色 是否启用摇一摇切歌
-        final String[] keyWord = new String[]{"ColorNavigation","Shake","OnlineLrc","FloatLrc",Constants.KEY_SCREEN_ALWAYS_ON};
+        final String[] keyWord = new String[]{"ColorNavigation","Shake","OnlineLrc","FloatLrc", SPUtil.SPKEY.SCREEN_ALWAYS_ON};
         ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch,mFloatLrcSwitch,mScreenSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
@@ -138,7 +138,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        SPUtil.putValue(SettingActivity.this,"Setting",keyWord[index],isChecked);
                         switch (index){
                             //变色导航栏
                             case 0:
@@ -158,6 +157,13 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //桌面歌词
                             case 3:
+                                if(isChecked && !FloatWindowManager.getInstance().checkPermission(mContext)){
+                                    ToastUtil.show(mContext,R.string.plase_give_float_permission);
+                                    mFloatLrcSwitch.setOnCheckedChangeListener(null);
+                                    mFloatLrcSwitch.setChecked(false);
+                                    mFloatLrcSwitch.setOnCheckedChangeListener(null);
+                                    return;
+                                }
                                 mFloatLrcTip.setText(isChecked ? R.string.opened_float_lrc : R.string.closed_float_lrc);
                                 Intent intent = new Intent(Constants.CTL_ACTION);
                                 intent.putExtra("FloatLrc",mFloatLrcSwitch.isChecked());
@@ -166,9 +172,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //屏幕常亮
                             case 4:
-                                SPUtil.putValue(mContext,"Setting",Constants.KEY_SCREEN_ALWAYS_ON,isChecked);
+                                SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.SCREEN_ALWAYS_ON,isChecked);
                                 break;
                         }
+                        SPUtil.putValue(SettingActivity.this,"Setting",keyWord[index],isChecked);
                     }
                 });
             }
@@ -285,9 +292,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //桌面歌词
             case R.id.setting_lrc_float_container:
-                if(FloatWindowManager.getInstance().checkPermission(this)){
-                    mFloatLrcSwitch.setChecked(!mFloatLrcSwitch.isChecked());
-                }
+//                if((!mFloatLrcSwitch.isChecked() && FloatWindowManager.getInstance().checkPermission(this)) || mFloatLrcSwitch.isChecked()){
+//                    mFloatLrcSwitch.setChecked(!mFloatLrcSwitch.isChecked());
+//                }
+                mFloatLrcSwitch.setChecked(!mFloatLrcSwitch.isChecked());
                 break;
             //歌词扫描路径
             case R.id.setting_lrc_path_container:

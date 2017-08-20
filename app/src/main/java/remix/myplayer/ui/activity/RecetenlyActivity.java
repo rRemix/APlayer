@@ -130,7 +130,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
 
     @Override
     public void UpdateUI(MP3Item MP3Item, boolean isplay) {
-        mAdapter.notifyDataSetChanged();
+//        mAdapter.notifyDataSetChanged();
     }
 
     @Override
