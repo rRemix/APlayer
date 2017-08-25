@@ -249,9 +249,9 @@ public class CircleSeekBar extends AbsSeekBar {
         mShadowCirclePaint.setColor(ColorUtil.getColor(R.color.gray_b7b7b7));
         mShadowCirclePaint.setStrokeWidth(mProgressWidth);
         mShadowCirclePaint.setShadowLayer(DensityUtil.dip2px(mContext,2.5f),0,0,ColorUtil.getColor(R.color.gray_b7b7b7));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            setLayerType(LAYER_TYPE_SOFTWARE, mShadowCirclePaint);
-        }
+
+        setLayerType(LAYER_TYPE_SOFTWARE, mShadowCirclePaint);
+
 
         mThumbWidth = mThumbDrawable.getIntrinsicWidth();
         mThumbHeight = mThumbDrawable.getIntrinsicHeight();

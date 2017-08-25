@@ -6,6 +6,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -233,6 +235,13 @@ public class LrcView extends View implements ILrcView{
 	private long lastTime;
 	/** 长按runnable*/
 	private Runnable longPressRunnable = new LongPressRunnable();
+    private static class UIHandler extends Handler{
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+        }
+    }
+    private UIHandler handler = new UIHandler();
 
     private class LongPressRunnable implements Runnable{
         @Override
@@ -242,52 +251,64 @@ public class LrcView extends View implements ILrcView{
             }
         }
     }
+
+    private boolean hasLrc(){
+        return mLrcRows != null && mLrcRows.size() > 0;
+    }
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		if(mLrcRows == null || mLrcRows.size() == 0){
-			return false;
-		}
+//		if(mLrcRows == null || mLrcRows.size() == 0){
+//			return false;
+//		}
 		switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                firstY = event.getRawY();
-                lastX = event.getRawX();
-                lastTime = System.currentTimeMillis();
+            	//没有歌词
+                if(hasLrc()){
+                    firstY = event.getRawY();
+                    lastX = event.getRawX();
+                    lastTime = System.currentTimeMillis();
+                }
                 longPressRunnable = new LongPressRunnable();
-                postDelayed(longPressRunnable, ViewConfiguration.getLongPressTimeout());
+                handler.postDelayed(longPressRunnable, ViewConfiguration.getLongPressTimeout());
                 break;
             case MotionEvent.ACTION_MOVE:
-                if(!canDrag){
-                    if(Math.abs(event.getRawY() - firstY) > mTouchSlop && Math.abs(event.getRawY() - firstY) > Math.abs(event.getRawX() - lastX)){
-                        canDrag = true;
-                        mIsDrawTimeLine = true;
-                        mScroller.forceFinished(true);
-                        stopScrollLrc();
-                        mCurFraction = 1;
+                if(hasLrc()){
+                    if(!canDrag){
+                        if(Math.abs(event.getRawY() - firstY) > mTouchSlop && Math.abs(event.getRawY() - firstY) > Math.abs(event.getRawX() - lastX)){
+                            canDrag = true;
+                            mIsDrawTimeLine = true;
+                            mScroller.forceFinished(true);
+                            stopScrollLrc();
+                            mCurFraction = 1;
+                        }
+                        lastY = event.getRawY();
+                    }
+                    if(canDrag){
+                        handler.removeCallbacks(longPressRunnable);
+                        float offset = event.getRawY() - lastY;//偏移量
+                        if( getScrollY() - offset < 0){
+                            if(offset > 0){
+                                offset = offset / 3;
+                            }
+                        }else if(getScrollY() - offset > mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding){
+                            if(offset < 0 ){
+                                offset = offset / 3;
+                            }
+                        }
+                        scrollBy(getScrollX(), -(int)offset);
+                        lastY = event.getRawY();
+                        int currentRow = (int) (getScrollY() / (mCurSizeForOtherLrc+mCurPadding));
+                        currentRow = Math.min(currentRow, mLrcRows.size() - 1);
+                        currentRow = Math.max(currentRow, 0);
+                        seekTo(mLrcRows.get(currentRow).getTime(), false,false);
+                        return true;
                     }
                     lastY = event.getRawY();
+                } else {
+                    handler.removeCallbacks(longPressRunnable);
                 }
 
-                if(canDrag){
-                    removeCallbacks(longPressRunnable);
-                    float offset = event.getRawY() - lastY;//偏移量
-                    if( getScrollY() - offset < 0){
-                        if(offset > 0){
-                            offset = offset / 3;
-                        }
-                    }else if(getScrollY() - offset > mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding){
-                        if(offset < 0 ){
-                            offset = offset / 3;
-                        }
-                    }
-                    scrollBy(getScrollX(), -(int)offset);
-                    lastY = event.getRawY();
-                    int currentRow = (int) (getScrollY() / (mCurSizeForOtherLrc+mCurPadding));
-                    currentRow = Math.min(currentRow, mLrcRows.size() - 1);
-                    currentRow = Math.max(currentRow, 0);
-                    seekTo(mLrcRows.get(currentRow).getTime(), false,false);
-                    return true;
-                }
-                lastY = event.getRawY();
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:

@@ -182,7 +182,7 @@
     <string name="no_lrc">暂无歌词</string>
     <string name="check_network">请检查网络连接</string>
     <string name="local_list">本地歌单</string>
-    <string name="next_song">下一首:%s</string>
+    <string name="next_song">下一首: %s</string>
     <string name="please_wait">请稍候</string>
     <string name="processing_picture">图片处理中</string>
     <string name="clear_success">清除成功</string>

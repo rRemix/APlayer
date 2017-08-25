@@ -74,13 +74,18 @@ android {
     }
 }
 
+ext {
+    supportLibVersion = '24.2.1'
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
-    compile 'com.android.support:palette-v7:24.2.1'
-    compile 'com.android.support:cardview-v7:24.2.1'
+    compile "com.android.support:appcompat-v7:$supportLibVersion"
+    compile "com.android.support:design:$supportLibVersion"
+    compile "com.android.support:palette-v7:$supportLibVersion"
+    compile "com.android.support:cardview-v7:$supportLibVersion"
+
     compile 'com.facebook.fresco:fresco:1.3.0'
     compile 'com.facebook.rebound:rebound:0.3.8'
     compile 'com.umeng.analytics:analytics:latest.integration'

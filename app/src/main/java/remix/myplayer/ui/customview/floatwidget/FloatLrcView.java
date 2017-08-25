@@ -1,15 +1,11 @@
 package remix.myplayer.ui.customview.floatwidget;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -35,7 +31,6 @@ import remix.myplayer.lyric.LrcRow;
 import remix.myplayer.model.mp3.FloatLrcContent;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -120,7 +115,7 @@ public class FloatLrcView extends RelativeLayout {
         ButterKnife.bind(this, root);
         addView(root);
 
-        setUpTextView();
+        setUpView();
     }
 
     private void setUpColor() {
@@ -152,13 +147,13 @@ public class FloatLrcView extends RelativeLayout {
         });
     }
 
-    private void setUpTextView() {
+    private void setUpView() {
         mLine1.setTextColor(ThemeStore.getThemeColorInt(SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_COLOR,ThemeStore.getThemeColor())));
         mLine1.setTextSize(mTextSizeType == SMALL ? 17 : mTextSizeType == BIG ? 19 : 18);
         mLine2.setTextSize(mTextSizeType == SMALL ? 15 : mTextSizeType == BIG ? 17 : 16);
         mCanMove = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.CAN_MOVE,true);
         mTextSizeType = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_SIZE,MEDIUM);
-
+        setPlayIcon(MusicService.isPlay());
     }
 
     public void setText(LrcRow lrc1, LrcRow lrc2) {

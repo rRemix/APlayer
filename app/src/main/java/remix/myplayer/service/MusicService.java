@@ -78,6 +78,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.FolderActivity;
+import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.ui.customview.floatwidget.FloatLrcView;
 import remix.myplayer.util.ColorUtil;
@@ -338,13 +339,17 @@ public class MusicService extends BaseService implements Playback {
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                if(mPlayModel == Constants.PLAY_REPEATONE){
-                    prepare(mCurrentInfo.getUrl());
+                if(mCloseAfter){
+                    sendBroadcast(new Intent(Constants.EXIT));
                 } else {
-                    playNextOrPrev(true);
+                    if(mPlayModel == Constants.PLAY_REPEATONE){
+                        prepare(mCurrentInfo.getUrl());
+                    } else {
+                        playNextOrPrev(true);
+                    }
+                    Global.setOperation(Constants.NEXT);
+                    acquireWakeLock();
                 }
-                Global.setOperation(Constants.NEXT);
-                acquireWakeLock();
             }
         });
         mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -703,6 +708,9 @@ public class MusicService extends BaseService implements Playback {
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
             //更新通知栏
             mNotify.notify(mContext);
+            //更新桌面歌词播放按钮
+            if(mFloatLrcView != null)
+                mFloatLrcView.setPlayIcon(MusicService.isPlay());
             updateMediaSession(control);
         }
     }
@@ -1175,6 +1183,8 @@ public class MusicService extends BaseService implements Playback {
     /**
      * 定时关闭计时器
      */
+    //是否播放完毕
+    private boolean mCloseAfter;
     private class TimerUpdater extends CountDownTimer{
         TimerUpdater(long millisInFuture, long countDownInterval) {
             super(millisInFuture, countDownInterval);
@@ -1190,7 +1200,7 @@ public class MusicService extends BaseService implements Playback {
         @Override
         public void onFinish() {
             //时间到后发送关闭程序的广播
-            sendBroadcast(new Intent(Constants.EXIT));
+            mCloseAfter = true;
         }
     }
 
@@ -1231,9 +1241,7 @@ public class MusicService extends BaseService implements Playback {
         int control = Global.Operation;
         if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcList == null)
             mLrcList = new SearchLRC(mCurrentInfo).getLrc("");
-        if(mFloatLrcView != null){
-            mFloatLrcView.setPlayIcon(mIsplay);
-        }
+        LogUtil.d(TAG,"updateFloatLrc");
         if(mUpdateFloatLrcThread == null) {
             mUpdateFloatLrcThread = new UpdateFloatLrcThread();
             mUpdateFloatLrcThread.start();
@@ -1384,8 +1392,10 @@ public class MusicService extends BaseService implements Playback {
         }
 
         private void pushNotify(Context context) {
+
             buildAction(context);
             buildNotitication(context);
+
             if(mNotificationManager == null)
                 mNotificationManager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -1398,6 +1408,7 @@ public class MusicService extends BaseService implements Playback {
                 newNotifyMode = NOTIFY_MODE_NONE;
             }
             int notificationId = NOTIFICATION_ID;
+            mNotificationManager.notify(notificationId, mNotification);
             if (mNotifyMode != newNotifyMode) {
                 if (mNotifyMode == NOTIFY_MODE_FOREGROUND) {
                     stopForeground(newNotifyMode == NOTIFY_MODE_NONE);
@@ -1426,9 +1437,12 @@ public class MusicService extends BaseService implements Playback {
                         .setPriority(NotificationCompat.PRIORITY_MAX)
                         .setOngoing(mIsplay)
                         .setSmallIcon(R.drawable.notifbar_icon);
+                mBuilder.setCustomBigContentView(mRemoteBigView);
+                mBuilder.setCustomContentView(mRemoteView);
                 //点击通知栏打开播放界面
                 //后退回到主界面
                 Intent result = new Intent(context,PlayerActivity.class);
+
                 TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
                 stackBuilder.addParentStack(PlayerActivity.class);
                 stackBuilder.addNextIntent(result);
@@ -1440,7 +1454,11 @@ public class MusicService extends BaseService implements Playback {
                                 0,
                                 PendingIntent.FLAG_UPDATE_CURRENT
                         );
-//                PendingIntent pi = PendingIntent.getActivities(context, 0, new Intent[]{result}, PendingIntent.FLAG_CANCEL_CURRENT);
+
+//                Intent notifyIntent = new Intent(context,PlayerActivity.class);
+//                notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                PendingIntent pendingIntent = PendingIntent.getActivity(context,0,notifyIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+
                 mBuilder.setContentIntent(resultPendingIntent);
                 mNotification = mBuilder.build();
             } else {
@@ -1496,6 +1514,7 @@ public class MusicService extends BaseService implements Playback {
         @Override
         public void run() {
             while (mShowFloatLrc){
+//                LogUtil.d(TAG,"updateFloatThread");
                 try {
                     Thread.sleep(LRC_INTERVAL);
                 } catch (InterruptedException e) {
@@ -1507,8 +1526,8 @@ public class MusicService extends BaseService implements Playback {
                         mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
                 } else{
                     //当前正在播放
-                    if(!isPlay())
-                        return;
+//                    if(!isPlay())
+//                        continue;
                     if(!isFloatLrcShowing()) {
                         mUpdateUIHandler.sendEmptyMessage(Constants.CREATE_FLOAT_LRC);
                     } else {
