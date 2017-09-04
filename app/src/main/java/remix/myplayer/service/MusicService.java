@@ -80,6 +80,7 @@ import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.activity.PlayerActivity;
+import remix.myplayer.ui.activity.SettingActivity;
 import remix.myplayer.ui.customview.floatwidget.FloatLrcView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -305,7 +306,6 @@ public class MusicService extends BaseService implements Playback {
         mMediaExtractor = new MediaExtractor();
 
         //初始化音效设置
-
         Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mMediaPlayer.getAudioSessionId());
         if(!CommonUtil.isIntentAvailable(this,i)){
@@ -842,7 +842,6 @@ public class MusicService extends BaseService implements Playback {
             ToastUtil.show(mContext,getString(R.string.list_is_empty));
             return;
         }
-
         if(isNext){
             //如果是点击下一首 播放预先设置好的下一首歌曲
             mCurrentId = mNextId;
@@ -1199,8 +1198,11 @@ public class MusicService extends BaseService implements Playback {
 
         @Override
         public void onFinish() {
-            //时间到后发送关闭程序的广播
-            mCloseAfter = true;
+            //如果当前正在播放 播放完当前歌曲再关闭
+            if(mIsplay)
+                mCloseAfter = true;
+            else
+                sendBroadcast(new Intent(Constants.EXIT));
         }
     }
 
@@ -1231,10 +1233,9 @@ public class MusicService extends BaseService implements Playback {
      * 更新桌面歌词
      */
     private void updateFloatLrc() {
-        //判断是否有权限
-        if(!FloatWindowManager.getInstance().checkPermission(mContext)){
+        if (checkPermission())
             return;
-        }
+
         if(!mShowFloatLrc)
             return;
         //根据操作判断是否需要更新歌词
@@ -1246,6 +1247,20 @@ public class MusicService extends BaseService implements Playback {
             mUpdateFloatLrcThread = new UpdateFloatLrcThread();
             mUpdateFloatLrcThread.start();
         }
+    }
+
+    /**
+     * 判断是否有悬浮窗权限
+     * 没有权限关闭桌面歌词
+     * @return
+     */
+    private boolean checkPermission() {
+        //判断是否有权限
+        if(!FloatWindowManager.getInstance().checkPermission(mContext)){
+            closeFloatLrc();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -1392,7 +1407,6 @@ public class MusicService extends BaseService implements Playback {
         }
 
         private void pushNotify(Context context) {
-
             buildAction(context);
             buildNotitication(context);
 
@@ -1520,6 +1534,10 @@ public class MusicService extends BaseService implements Playback {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                //判断权限
+                if (checkPermission())
+                    return;
+
                 //当前应用在前台
                 if(CommonUtil.isAppOnForeground(mContext)){
                     if(isFloatLrcShowing())
@@ -1568,9 +1586,9 @@ public class MusicService extends BaseService implements Playback {
      */
     private boolean mIsFloatLrcInitializing = false;
     private void createFloatLrc(){
-        if(!FloatWindowManager.getInstance().checkPermission(this)){
+        if (checkPermission())
             return;
-        }
+
         if(mIsFloatLrcInitializing)
             return;
         mIsFloatLrcInitializing = true;
@@ -1616,7 +1634,10 @@ public class MusicService extends BaseService implements Playback {
      * 关闭桌面歌词
      */
     private void closeFloatLrc() {
+        SPUtil.putValue(mContext,"Setting","FloatLrc",false);
+        mShowFloatLrc = false;
         mUpdateFloatLrcThread = null;
+        mLrcList.clear();
         mUpdateUIHandler.removeMessages(Constants.CREATE_FLOAT_LRC);
         mUpdateUIHandler.sendEmptyMessageDelayed(Constants.REMOVE_FLOAT_LRC,LRC_INTERVAL);
     }
