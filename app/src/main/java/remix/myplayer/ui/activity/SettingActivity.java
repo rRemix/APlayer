@@ -161,7 +161,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     ToastUtil.show(mContext,R.string.plase_give_float_permission);
                                     mFloatLrcSwitch.setOnCheckedChangeListener(null);
                                     mFloatLrcSwitch.setChecked(false);
-                                    mFloatLrcSwitch.setOnCheckedChangeListener(null);
+                                    mFloatLrcSwitch.setOnCheckedChangeListener(this);
                                     return;
                                 }
                                 mFloatLrcTip.setText(isChecked ? R.string.opened_float_lrc : R.string.closed_float_lrc);

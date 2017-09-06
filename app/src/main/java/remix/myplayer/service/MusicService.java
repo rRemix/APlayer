@@ -19,6 +19,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
@@ -29,6 +30,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -45,6 +47,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
 import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.producers.ThreadHandoffProducer;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
@@ -192,6 +195,9 @@ public class MusicService extends BaseService implements Playback {
     private List<Integer> mRandomList = new ArrayList<>();
     /** service是否停止运行*/
     private boolean mIsServiceStop = false;
+    /** handlerThread*/
+    private HandlerThread mIOThread;
+    private IOHandler mIOHandler;
 
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
@@ -246,7 +252,13 @@ public class MusicService extends BaseService implements Playback {
     private void init() {
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
         Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
+
+        mIOThread = new HandlerThread("IO");
+        mIOThread.start();
+        mIOHandler = new IOHandler(this,mIOThread.getLooper());
+
         mUpdateUIHandler = new UpdateUIHandler(this);
+
         //电源锁
         mWakeLock = ((PowerManager)getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,getClass().getSimpleName());
         mWakeLock.setReferenceCounted(false);
@@ -272,29 +284,10 @@ public class MusicService extends BaseService implements Playback {
         mWidgetReceiver = new WidgetReceiver();
         registerReceiver(mWidgetReceiver,new IntentFilter(Constants.WIDGET_UPDATE));
 
-        //监听媒体库变化
-        Handler updateHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                //更新adapter
-                if(msg.what == Constants.UPDATE_ADAPTER){
-                    if(ChildHolderActivity.getInstance() != null ){
-                        ChildHolderActivity.getInstance().updateList();
-                    }
-                    if (FolderActivity.getInstance() != null ) {
-                        FolderActivity.getInstance().updateList();
-                    }
-                } else if(msg.what == Constants.UPDATE_CHILDHOLDER_ADAPTER){
-                    if(ChildHolderActivity.getInstance() != null ){
-                        ChildHolderActivity.getInstance().updateList();
-                    }
-                }
-            }
-        };
         //监听数据库变化
-        mMediaStoreObserver = new MediaStoreObserver(updateHandler);
-        mPlayListObserver = new DBObserver(updateHandler);
-        mPlayListSongObserver = new DBObserver(updateHandler);
+        mMediaStoreObserver = new MediaStoreObserver(mUpdateUIHandler);
+        mPlayListObserver = new DBObserver(mUpdateUIHandler);
+        mPlayListSongObserver = new DBObserver(mUpdateUIHandler);
         getContentResolver().registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,true, mMediaStoreObserver);
         getContentResolver().registerContentObserver(PlayLists.CONTENT_URI,true, mPlayListObserver);
         getContentResolver().registerContentObserver(PlayListSongs.CONTENT_URI,true,mPlayListSongObserver);
@@ -441,11 +434,18 @@ public class MusicService extends BaseService implements Playback {
 
         mUpdateUIHandler.removeCallbacksAndMessages(null);
         mShowFloatLrc = false;
-        removeFloatLrc();
+
+        if (Build.VERSION.SDK_INT >= 18) {
+            mIOThread.quitSafely();
+        } else {
+            mIOThread.quit();
+        }
+
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
         mMediaSession.setActive(false);
         mMediaSession.release();
         mNotify.cancel();
+        removeFloatLrc();
 
         CommonUtil.unregisterReceiver(this,mControlRecevier);
         CommonUtil.unregisterReceiver(this,mHeadSetReceiver);
@@ -1233,20 +1233,26 @@ public class MusicService extends BaseService implements Playback {
      * 更新桌面歌词
      */
     private void updateFloatLrc() {
-        if (checkPermission())
-            return;
-
-        if(!mShowFloatLrc)
-            return;
-        //根据操作判断是否需要更新歌词
-        int control = Global.Operation;
-        if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcList == null)
-            mLrcList = new SearchLRC(mCurrentInfo).getLrc("");
-        LogUtil.d(TAG,"updateFloatLrc");
-        if(mUpdateFloatLrcThread == null) {
-            mUpdateFloatLrcThread = new UpdateFloatLrcThread();
-            mUpdateFloatLrcThread.start();
-        }
+        mIOHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (MusicService.class){
+                    Log.d(TAG,"thread:" + Thread.currentThread().toString());
+                    if (checkPermission())
+                        return;
+                    if(!mShowFloatLrc)
+                        return;
+                    //根据操作判断是否需要更新歌词
+                    int control = Global.Operation;
+                    if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcList == null)
+                        mLrcList = new SearchLRC(mCurrentInfo).getLrc("");
+                    if(mUpdateFloatLrcThread == null) {
+                        mUpdateFloatLrcThread = new UpdateFloatLrcThread();
+                        mUpdateFloatLrcThread.start();
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -1396,6 +1402,7 @@ public class MusicService extends BaseService implements Playback {
                             pushNotify(context);
                         }
                     }
+
                     @Override
                     protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
                         mRemoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
@@ -1527,8 +1534,7 @@ public class MusicService extends BaseService implements Playback {
     private class UpdateFloatLrcThread extends Thread{
         @Override
         public void run() {
-            while (mShowFloatLrc){
-//                LogUtil.d(TAG,"updateFloatThread");
+            while (mShowFloatLrc && !mIsServiceStop){
                 try {
                     Thread.sleep(LRC_INTERVAL);
                 } catch (InterruptedException e) {
@@ -1637,7 +1643,8 @@ public class MusicService extends BaseService implements Playback {
         SPUtil.putValue(mContext,"Setting","FloatLrc",false);
         mShowFloatLrc = false;
         mUpdateFloatLrcThread = null;
-        mLrcList.clear();
+        if(mLrcList != null)
+            mLrcList.clear();
         mUpdateUIHandler.removeMessages(Constants.CREATE_FLOAT_LRC);
         mUpdateUIHandler.sendEmptyMessageDelayed(Constants.REMOVE_FLOAT_LRC,LRC_INTERVAL);
     }
@@ -1747,6 +1754,14 @@ public class MusicService extends BaseService implements Playback {
         }
     }
 
+    private static class IOHandler extends Handler{
+        private final WeakReference<MusicService> mRef;
+        IOHandler(MusicService service,Looper looper){
+            super(looper);
+            mRef = new WeakReference<>(service);
+        }
+    }
+
     private static class UpdateUIHandler extends Handler{
         private final WeakReference<MusicService> mRef;
         UpdateUIHandler(MusicService service) {
@@ -1776,6 +1791,19 @@ public class MusicService extends BaseService implements Playback {
                     break;
                 case Constants.CREATE_FLOAT_LRC:
                     musicService.createFloatLrc();
+                    break;
+                case Constants.UPDATE_ADAPTER:
+                    if(ChildHolderActivity.getInstance() != null ){
+                        ChildHolderActivity.getInstance().updateList();
+                    }
+                    if (FolderActivity.getInstance() != null ) {
+                        FolderActivity.getInstance().updateList();
+                    }
+                    break;
+                case Constants.UPDATE_CHILDHOLDER_ADAPTER:
+                    if(ChildHolderActivity.getInstance() != null ){
+                        ChildHolderActivity.getInstance().updateList();
+                    }
                     break;
             }
         }
