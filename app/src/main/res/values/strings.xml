@@ -156,7 +156,7 @@
     <string name="donate">支持我们</string>
     <string name="choose">选择</string>
     <string name="donate_tip">您的支持，是我们进步的动力。</string>
-    <string name="copy_account">复制支付宝账户(*博睿)</string>
+    <string name="jump_alipay_account">跳转支付宝</string>
     <string name="alread_copy">已复制到剪切板</string>
     <string name="confirm_delete_playlist">是否移除所选播放列表?</string>
     <string name="confirm_delete_from_playlist">是否从播放列表移除?</string>
@@ -221,4 +221,5 @@
     <string name="screen_always_on_title">歌词界面屏幕常亮</string>
     <string name="screen_always_on_tip">开启后切换到歌词界面屏幕将常亮</string>
     <string name="plase_give_float_permission">请在设置中授予悬浮窗权限</string>
+    <string name="jump_alipay_error">跳转失败\n已复制支付宝账户(*博睿)</string>
 </resources>

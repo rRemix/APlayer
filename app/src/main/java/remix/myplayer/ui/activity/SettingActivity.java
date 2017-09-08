@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
@@ -15,6 +16,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -45,6 +47,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.ColorChooseDialog;
 import remix.myplayer.ui.dialog.FolderChooserDialog;
+import remix.myplayer.util.AlipayUtil;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -423,16 +426,13 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 new MaterialDialog.Builder(this)
                         .title(R.string.donate)
                         .titleColorAttr(R.attr.text_color_primary)
-                        .positiveText(R.string.copy_account)
+                        .positiveText(R.string.jump_alipay_account)
                         .negativeText(R.string.cancel)
                         .content(R.string.donate_tip)
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                ClipboardManager clipboardManager = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
-                                ClipData clipData = ClipData.newPlainText("text", "lin_kin_p@163.com");
-                                clipboardManager.setPrimaryClip(clipData);
-                                ToastUtil.show(mContext,getString(R.string.alread_copy));
+                                AlipayUtil.startAlipayClient((Activity) mContext,"FKX01908X8ECOECIQZIL43");
                             }
                         })
                         .backgroundColorAttr(R.attr.background_color_3)
