@@ -37,17 +37,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.facebook.common.executors.CallerThreadExecutor;
-import com.facebook.common.internal.Objects;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
 import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.producers.ThreadHandoffProducer;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
@@ -81,9 +78,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.FolderActivity;
-import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.ui.activity.PlayerActivity;
-import remix.myplayer.ui.activity.SettingActivity;
 import remix.myplayer.ui.customview.floatwidget.FloatLrcView;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -196,8 +191,8 @@ public class MusicService extends BaseService implements Playback {
     /** service是否停止运行*/
     private boolean mIsServiceStop = false;
     /** handlerThread*/
-    private HandlerThread mIOThread;
-    private IOHandler mIOHandler;
+    private HandlerThread mGetLrcThread;
+    private LrcHandler mLyricHandler;
 
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
@@ -253,9 +248,9 @@ public class MusicService extends BaseService implements Playback {
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
         Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
 
-        mIOThread = new HandlerThread("IO");
-        mIOThread.start();
-        mIOHandler = new IOHandler(this,mIOThread.getLooper());
+        mGetLrcThread = new HandlerThread("IO");
+        mGetLrcThread.start();
+        mLyricHandler = new LrcHandler(this, mGetLrcThread.getLooper());
 
         mUpdateUIHandler = new UpdateUIHandler(this);
 
@@ -436,9 +431,9 @@ public class MusicService extends BaseService implements Playback {
         mShowFloatLrc = false;
 
         if (Build.VERSION.SDK_INT >= 18) {
-            mIOThread.quitSafely();
+            mGetLrcThread.quitSafely();
         } else {
-            mIOThread.quit();
+            mGetLrcThread.quit();
         }
 
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
@@ -559,8 +554,8 @@ public class MusicService extends BaseService implements Playback {
             int[] appIds = intent.getIntArrayExtra("WidgetIds");
             switch (str){
                 case "BigWidget":
-//                    if(mAppWidgetBig != null)
-//                        mAppWidgetBig.updateWidget(context,appIds,true);
+                    if(mAppWidgetBig != null)
+                        mAppWidgetBig.updateWidget(context,appIds,true);
                     break;
                 case "MediumWidget":
                     if(mAppWidgetMedium != null)
@@ -1233,7 +1228,7 @@ public class MusicService extends BaseService implements Playback {
      * 更新桌面歌词
      */
     private void updateFloatLrc() {
-        mIOHandler.post(new Runnable() {
+        mLyricHandler.post(new Runnable() {
             @Override
             public void run() {
                 synchronized (MusicService.class){
@@ -1298,8 +1293,8 @@ public class MusicService extends BaseService implements Playback {
             mAppWidgetMedium.updateWidget(mContext,null,true);
         if(mAppWidgetSmall != null)
             mAppWidgetSmall.updateWidget(mContext,null,true);
-//        if(mAppWidgetBig != null)
-//            mAppWidgetBig.updateWidget(mContext,null,true);
+        if(mAppWidgetBig != null)
+            mAppWidgetBig.updateWidget(mContext,null,true);
         //暂停停止更新进度条和时间
         if(!isPlay()){
             if(mWidgetTimer != null){
@@ -1523,10 +1518,9 @@ public class MusicService extends BaseService implements Playback {
         }
     }
 
-
     /** 更新桌面歌词*/
     private static final int LRC_THRESHOLD = 400;
-    private static final int LRC_INTERVAL = 300;
+    private static final int LRC_INTERVAL = 600;
 //    public String mCurrentLrc;
     private UpdateFloatLrcThread mUpdateFloatLrcThread;
     private FloatLrcContent mCurrentLrc = new FloatLrcContent();
@@ -1534,7 +1528,7 @@ public class MusicService extends BaseService implements Playback {
     private class UpdateFloatLrcThread extends Thread{
         @Override
         public void run() {
-            while (mShowFloatLrc && !mIsServiceStop){
+            while (mShowFloatLrc ){
                 try {
                     Thread.sleep(LRC_INTERVAL);
                 } catch (InterruptedException e) {
@@ -1543,7 +1537,10 @@ public class MusicService extends BaseService implements Playback {
                 //判断权限
                 if (checkPermission())
                     return;
-
+                if(mIsServiceStop){
+                    mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
+                    return;
+                }
                 //当前应用在前台
                 if(CommonUtil.isAppOnForeground(mContext)){
                     if(isFloatLrcShowing())
@@ -1659,8 +1656,8 @@ public class MusicService extends BaseService implements Playback {
                 mAppWidgetSmall.updateWidget(mContext,null,false);
             if(mAppWidgetMedium != null)
                 mAppWidgetMedium.updateWidget(mContext,null,false);
-//            if(mAppWidgetBig != null)
-//                mAppWidgetBig.updateWidget(mContext,null,false);
+            if(mAppWidgetBig != null)
+                mAppWidgetBig.updateWidget(mContext,null,false);
         }
     }
 
@@ -1754,9 +1751,9 @@ public class MusicService extends BaseService implements Playback {
         }
     }
 
-    private static class IOHandler extends Handler{
+    private static class LrcHandler extends Handler{
         private final WeakReference<MusicService> mRef;
-        IOHandler(MusicService service,Looper looper){
+        LrcHandler(MusicService service, Looper looper){
             super(looper);
             mRef = new WeakReference<>(service);
         }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,7 +49,7 @@ public class FloatLrcView extends RelativeLayout {
     private PointF mLastPoint = new PointF();
     private boolean mCanMove = true;
     private FloatLrcContent mLrcContent;
-    private FloatHandler mHandler;
+    private UIHandler mUIHandler;
     @BindView(R.id.widget_line1)
     FloatTextView mLine1;
     @BindView(R.id.widget_line2)
@@ -72,6 +73,8 @@ public class FloatLrcView extends RelativeLayout {
     @BindView(R.id.widget_lrc_container)
     View mLrcSettingContainer;
     private FloatColorAdapter mColorAdapter;
+    //当前Y坐标
+    private int mCurrentY;
     //当前字体大小
     private static final int SMALL = 1;
     private static final int MEDIUM = 2;
@@ -106,10 +109,11 @@ public class FloatLrcView extends RelativeLayout {
         init(context);
     }
 
+
     private void init(Context context) {
         mContext = context;
         mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        mHandler = new FloatHandler(this);
+        mUIHandler = new UIHandler(this);
 
         View root = LayoutInflater.from(mContext).inflate(R.layout.layout_floatwidget, null);
         ButterKnife.bind(this, root);
@@ -182,9 +186,9 @@ public class FloatLrcView extends RelativeLayout {
                 if(mCanMove){
                     mIsDragging = false;
                     mLastPoint.set(event.getRawX(), event.getRawY());
-                    mHandler.removeCallbacks(mHideRunnable);
+                    mUIHandler.removeCallbacks(mHideRunnable);
                 } else {
-                    mHandler.postDelayed(mLongClickRunnable,LONGCLICK_THRESHOLD);
+                    mUIHandler.postDelayed(mLongClickRunnable,LONGCLICK_THRESHOLD);
                 }
 
                 break;
@@ -198,9 +202,12 @@ public class FloatLrcView extends RelativeLayout {
                     }
                     mLastPoint.set(event.getRawX(), event.getRawY());
                     //保存y坐标
-                    params = (WindowManager.LayoutParams) getLayoutParams();
-                    if (params != null)
-                        SPUtil.putValue(mContext, "Setting", SPUtil.SPKEY.FLOAT_Y, params.y);
+//                    params = (WindowManager.LayoutParams) getLayoutParams();
+//                    if (params != null){
+//                        mCurrentY = params.y;
+//                        mSaveHandler.obtainMessage(SAVE_Y).sendToTarget();
+//                    }
+//                        SPUtil.putValue(mContext, "Setting", SPUtil.SPKEY.FLOAT_Y, params.y);
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -212,18 +219,21 @@ public class FloatLrcView extends RelativeLayout {
                             mPanel.setVisibility(INVISIBLE);
                         } else {
                             mPanel.setVisibility(VISIBLE);
-                            mHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
+                            mUIHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
                         }
                     } else {
                         //滑动
                         if(mPanel.isShown()){
-                            mHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
+                            mUIHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
                         }
 
                         mIsDragging = false;
                     }
+                    //保存y坐标
+                    WindowManager.LayoutParams params = (WindowManager.LayoutParams) getLayoutParams();
+                    SPUtil.putValue(mContext, "Setting", SPUtil.SPKEY.FLOAT_Y, params.y);
                 } else {
-                    mHandler.removeCallbacks(mLongClickRunnable);
+                    mUIHandler.removeCallbacks(mLongClickRunnable);
                 }
                 break;
         }
@@ -249,7 +259,7 @@ public class FloatLrcView extends RelativeLayout {
             //是否锁定
             case R.id.widget_lock:
                 saveCanMove(false);
-                mHandler.postDelayed(mHideRunnable,0);
+                mUIHandler.postDelayed(mHideRunnable,0);
                 break;
             //歌词字体、大小设置
             case R.id.widget_setting:
@@ -264,7 +274,7 @@ public class FloatLrcView extends RelativeLayout {
                 Intent ctlIntent = new Intent(Constants.CTL_ACTION);
                 ctlIntent.putExtra("Control",view.getId() == R.id.widget_next ? Constants.NEXT : view.getId() == R.id.widget_prev ? Constants.PREV : Constants.TOGGLE);
                 mContext.sendBroadcast(ctlIntent);
-                mHandler.postDelayed(new Runnable() {
+                mUIHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         mPlay.setImageResource(MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
@@ -312,13 +322,14 @@ public class FloatLrcView extends RelativeLayout {
      * 操作后重置消失的时间
      */
     private void resetHide() {
-        mHandler.removeCallbacks(mHideRunnable);
-        mHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
+        mUIHandler.removeCallbacks(mHideRunnable);
+        mUIHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
     }
 
-    private static final class FloatHandler extends Handler{
+    private static final int SAVE_Y = 10;
+    private static final class UIHandler extends Handler{
         private final WeakReference<FloatLrcView> mLrcView;
-        FloatHandler(final FloatLrcView lrcView){
+        UIHandler(final FloatLrcView lrcView){
             super();
             mLrcView = new WeakReference<>(lrcView);
         }
@@ -329,7 +340,6 @@ public class FloatLrcView extends RelativeLayout {
             if(floatLrcView == null)
                 return;
             switch (msg.what){
-
                 default:break;
             }
         }

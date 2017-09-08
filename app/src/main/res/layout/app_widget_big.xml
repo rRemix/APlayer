@@ -40,23 +40,23 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="@dimen/d12_size"
-        android:layout_marginRight="@dimen/d12_size">
+        android:layout_height="match_parent">
         <ImageButton android:id="@+id/appwidget_model"
             android:background="@drawable/bg_common_borderless_ripple"
             android:src="@drawable/widget_btn_loop_normal"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/app_widget_big_button_height"
             android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"/>
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/d12_size"/>
         <ImageButton android:id="@+id/appwidget_love"
             android:background="@drawable/bg_common_borderless_ripple"
             android:src="@drawable/widget_btn_like_nor"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/app_widget_big_button_height"
             android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"/>
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/d12_size"/>
         <ImageButton android:id="@+id/appwidget_toggle"
             android:background="@drawable/bg_common_borderless_ripple"
             android:src="@drawable/widget_btn_play_normal"

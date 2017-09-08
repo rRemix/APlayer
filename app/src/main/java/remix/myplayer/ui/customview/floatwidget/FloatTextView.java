@@ -32,7 +32,7 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     /***
      * 监听属性动画的数值值的改变
      */
-    ValueAnimator.AnimatorUpdateListener updateListener = new ValueAnimator.AnimatorUpdateListener() {
+    ValueAnimator.AnimatorUpdateListener mUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
@@ -73,7 +73,7 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     private void startScrollLrc(float endX,long duration){
         if(mAnimator == null){
             mAnimator = ValueAnimator.ofFloat(0,endX);
-            mAnimator.addUpdateListener(updateListener);
+            mAnimator.addUpdateListener(mUpdateListener);
         }else{
             mCurTextXForHighLightLrc = 0;
             mAnimator.cancel();
