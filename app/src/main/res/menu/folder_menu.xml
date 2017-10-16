@@ -5,7 +5,7 @@
             android:id="@+id/menu_play"/>
         <item android:title="加入播放队列"
             android:id="@+id/menu_add"/>
-        <item android:title="删除"
+        <item android:title="移除"
             android:id="@+id/menu_delete"/>
     </group>
 </menu>

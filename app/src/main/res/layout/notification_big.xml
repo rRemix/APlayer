@@ -58,7 +58,7 @@
                     android:layout_toLeftOf="@id/notify_close" />
             </RelativeLayout>
             <TextView
-                style="@style/TextAppearance.StatusBar.EventContent"
+                style="@android:style/TextAppearance.StatusBar.EventContent"
                 android:id="@+id/notify_artist_album"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

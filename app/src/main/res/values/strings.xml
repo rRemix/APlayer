@@ -118,7 +118,7 @@
     <string name="input_feedback_content">请填写反馈内容</string>
     <string name="playing">正在播放</string>
     <string name="set_filter_size">设置过滤文件大小</string>
-    <string name="delete">删除</string>
+    <string name="delete">移除</string>
     <string name="ring">铃声</string>
     <string name="join">加入</string>
     <string name="updat_error">查询出错或查询超时</string>

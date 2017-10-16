@@ -39,7 +39,7 @@
                 android:textSize="@dimen/s16_size"
                 android:layout_marginBottom="@dimen/d5_szie"/>
             <TextView
-                style="@style/TextAppearance.StatusBar.EventContent"
+                style="@android:style/TextAppearance.StatusBar.EventContent"
                 android:id="@+id/notify_artist_album"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
