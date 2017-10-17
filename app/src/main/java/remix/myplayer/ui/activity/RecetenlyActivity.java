@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity;
 
+import android.Manifest;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,6 +13,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.functions.Consumer;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.helper.MusicEventHelper;
@@ -44,6 +47,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
         LoaderManager.LoaderCallbacks<Cursor>{
     public static final String TAG = RecetenlyActivity.class.getSimpleName();
     private static int LOADER_ID = 0;
+    private boolean mHasPermission = false;
 
     private SongAdapter mAdapter;
     @BindView(R.id.recyclerview)
@@ -101,9 +105,8 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
         mRecyclerView.setAdapter(mAdapter);
 
         MusicEventHelper.addCallback(this);
-        getLoaderManager().initLoader(++LOADER_ID, null, this);
-        setUpToolbar(mToolBar,getString(R.string.recently));
 
+        setUpToolbar(mToolBar,getString(R.string.recently));
     }
 
     /**
@@ -170,6 +173,20 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
     protected void onResume() {
         MobclickAgent.onPageStart(RecetenlyActivity.class.getSimpleName());
         super.onResume();
+        new RxPermissions(this)
+                .request(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if(aBoolean != mHasPermission){
+                            mHasPermission = aBoolean;
+                            if(aBoolean){
+                                MusicEventHelper.onMediaStoreChanged();
+                                mHasPermission = true;
+                            }
+                        }
+                    }
+                });
         if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
@@ -196,6 +213,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
 
     @Override
     public void onMediaStoreChanged() {
-        getLoaderManager().initLoader(++LOADER_ID, null, this);
+        if(mHasPermission)
+            getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 }

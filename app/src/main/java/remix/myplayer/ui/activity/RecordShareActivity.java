@@ -1,13 +1,16 @@
 package remix.myplayer.ui.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -17,18 +20,22 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.functions.Consumer;
 import remix.myplayer.R;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.dialog.ShareDialog;
@@ -67,46 +74,55 @@ public class RecordShareActivity extends BaseActivity {
     @BindView(R.id.recordshare_container)
     LinearLayout mContainer;
 
+    private boolean mHasPermission = false;
     //当前正在播放的歌曲
     private MP3Item mInfo;
     //处理图片的进度条
     private MaterialDialog mProgressDialog;
     //处理状态
-    private final int START = 0;
-    private final int STOP = 1;
-    private final int COMPLETE = 2;
-    private final int ERROR = 3;
+    private static final int START = 0;
+    private static final int STOP = 1;
+    private static final int COMPLETE = 2;
+    private static final int ERROR = 3;
     //截屏文件
     private File mFile;
     //更新处理结果的Handler
-    private Handler mHandler = new Handler(){
+    private ProcessHandler mHandler;
+    private static class ProcessHandler extends Handler{
+        private WeakReference<RecordShareActivity> mRef;
+
+        public ProcessHandler(Looper looper,RecordShareActivity activity) {
+            super(looper);
+            mRef = new WeakReference<>(activity);
+        }
+
         @Override
         public void handleMessage(Message msg) {
+            RecordShareActivity activity = mRef != null ? mRef.get() : null;
+            if(activity == null)
+                return;
             switch (msg.what){
                 //开始处理
                 case START:
-                    if(mProgressDialog != null && !mProgressDialog.isShowing())
-                        mProgressDialog.show();
+                   activity.showLoading();
                     break;
                 //处理中止
                 case STOP:
-                    if(mProgressDialog != null)
-                        mProgressDialog.dismiss();
+                    activity.dismissLoading("");
                     break;
                 //处理完成
                 case COMPLETE:
-                    if(mFile != null)
-                        ToastUtil.show(RecordShareActivity.this,R.string.screenshot_save_at,mFile.getAbsoluteFile());
+                    if(activity.mFile != null)
+                        ToastUtil.show(activity,R.string.screenshot_save_at,activity.mFile.getAbsoluteFile());
                     break;
                 //处理错误
                 case ERROR:
-                    ToastUtil.show(RecordShareActivity.this,R.string.share_error);
-                    if(mProgressDialog != null)
-                        mProgressDialog.dismiss();
+                    activity.dismissLoading(activity.getString(R.string.share_error) + ":" + msg.obj);
                     break;
             }
         }
-    };
+    }
+
 
     @Override
     protected void setStatusBar() {
@@ -150,6 +166,8 @@ public class RecordShareActivity extends BaseActivity {
                 .progress(true, 0)
                 .backgroundColorRes(R.color.day_background_color_3)
                 .progressIndeterminateStyle(false).build();
+
+        mHandler = new ProcessHandler(getMainLooper(),this);
     }
 
     public static Bitmap getBg(){
@@ -171,11 +189,17 @@ public class RecordShareActivity extends BaseActivity {
     /**
      * 将图片保存到本地
      */
-    class ProcessThread extends Thread{
+    private class ProcessThread extends Thread{
         FileOutputStream fos = null;
         @Override
         public void run() {
             //开始处理,显示进度条
+            if(!mHasPermission){
+                Message errMsg = mHandler.obtainMessage(ERROR);
+                errMsg.obj = mContext.getString(R.string.please_give_access_external_storage_permission);
+                mHandler.sendMessage(errMsg);
+                return;
+            }
             mHandler.sendEmptyMessage(START);
 
             mBackgroudCache = mContainer.getDrawingCache(true);
@@ -192,18 +216,25 @@ public class RecordShareActivity extends BaseActivity {
                     mFile.createNewFile();
                 }
                 fos = new FileOutputStream(mFile);
-                if (fos != null) {
-                    mBackgroudCache.compress(Bitmap.CompressFormat.JPEG, 80, fos);
-                    fos.flush();
-                    fos.close();
-                }
+                mBackgroudCache.compress(Bitmap.CompressFormat.JPEG, 80, fos);
+                fos.flush();
+                fos.close();
                 //处理完成
                 mHandler.sendEmptyMessage(COMPLETE);
                 mHandler.sendEmptyMessage(STOP);
 
+                //打开分享的Dialog
+                Intent intent = new Intent(RecordShareActivity.this, ShareDialog.class);
+                Bundle arg = new Bundle();
+                arg.putInt("Type", Constants.SHARERECORD);
+                arg.putString("Url",mFile.getAbsolutePath());
+                arg.putSerializable("MP3Item",mInfo);
+                intent.putExtras(arg);
+                startActivity(intent);
             } catch (Exception e) {
-                mHandler.sendEmptyMessage(ERROR);
-                e.printStackTrace();
+                Message errMsg = mHandler.obtainMessage(ERROR);
+                errMsg.obj = e.toString();
+                mHandler.sendMessage(errMsg);
             } finally {
                 if(fos != null)
                     try {
@@ -212,21 +243,38 @@ public class RecordShareActivity extends BaseActivity {
                         e.printStackTrace();
                     }
             }
-
-            //打开分享的Dialog
-            Intent intent = new Intent(RecordShareActivity.this, ShareDialog.class);
-            Bundle arg = new Bundle();
-            arg.putInt("Type", Constants.SHARERECORD);
-            arg.putString("Url",mFile.getAbsolutePath());
-            arg.putSerializable("MP3Item",mInfo);
-            intent.putExtras(arg);
-            startActivity(intent);
         }
+    }
+
+    private void showLoading(){
+        if(mProgressDialog != null && !mProgressDialog.isShowing())
+            mProgressDialog.show();
+    }
+
+    private void dismissLoading(String error){
+        if(!TextUtils.isEmpty(error))
+            ToastUtil.show(mContext,error);
+        if(mProgressDialog != null)
+            mProgressDialog.dismiss();
     }
 
     public void onResume() {
         MobclickAgent.onPageStart(RecordShareActivity.class.getSimpleName());
         super.onResume();
+        new RxPermissions(this)
+                .request(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if(aBoolean != mHasPermission){
+                            mHasPermission = aBoolean;
+                            if(aBoolean){
+                                MusicEventHelper.onMediaStoreChanged();
+                                mHasPermission = true;
+                            }
+                        }
+                    }
+                });
     }
     public void onPause() {
         MobclickAgent.onPageEnd(RecetenlyActivity.class.getSimpleName());

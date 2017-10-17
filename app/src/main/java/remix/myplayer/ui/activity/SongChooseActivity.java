@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity;
 
+import android.Manifest;
 import android.content.CursorLoader;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -11,11 +12,15 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.functions.Consumer;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongChooseAdaper;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.OnSongChooseListener;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
@@ -31,9 +36,11 @@ import remix.myplayer.util.ToastUtil;
  * @Date 2016/10/21 09:34
  */
 
-public class SongChooseActivity extends BaseActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor> {
+public class SongChooseActivity extends BaseActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor>,
+                        MusicEventHelper.MusicEventCallback{
     public static final String TAG = SongChooseActivity.class.getSimpleName();
 
+    private boolean mHasPermission = false;
     private int mPlayListID;
     private String mPlayListName;
     Cursor mCursor = null;
@@ -74,11 +81,13 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
                 mConfirm.setClickable(isValid);
             }
         });
-        getLoaderManager().initLoader(++LOADER_ID, null, this);
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mConfirm.setAlpha(0.6f);
+
+        MusicEventHelper.addCallback(this);
     }
 
     @OnClick({R.id.confirm,R.id.cancel})
@@ -128,5 +137,36 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
     public void onLoaderReset(android.content.Loader<Cursor> loader) {
         if(mAdapter != null)
             mAdapter.setCursor(null);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicEventHelper.removeCallback(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new RxPermissions(this)
+                .request(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if(aBoolean != mHasPermission){
+                            mHasPermission = aBoolean;
+                            if(aBoolean){
+                                MusicEventHelper.onMediaStoreChanged();
+                                mHasPermission = true;
+                            }
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void onMediaStoreChanged() {
+        if(mHasPermission)
+            getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 }
