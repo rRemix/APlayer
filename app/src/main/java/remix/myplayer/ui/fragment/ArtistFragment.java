@@ -20,7 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ArtistAdapter;
-import remix.myplayer.helper.DeleteHelper;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.MultiChoice;
@@ -38,7 +38,7 @@ import remix.myplayer.util.SPUtil;
 /**
  * 艺术家Fragment
  */
-public class ArtistFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback{
+public class ArtistFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,MusicEventHelper.MusicEventCallback {
     @BindView(R.id.artist_recycleview)
     FastScrollRecyclerView mRecyclerView;
     private MultiChoice mMultiChoice;
@@ -47,8 +47,7 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
     public static int mArtistIndex = -1;
 
     public static final String TAG = ArtistFragment.class.getSimpleName();
-
-    private static int LOADER_ID = 0;
+    private static int LOADER_ID = 1000;
 
     @Override
     public void onAttach(Context context) {
@@ -141,16 +140,11 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
         if(data == null || loader.getId() != LOADER_ID)
             return;
         mCursor = data;
-        try {
-            //设置查询索引
-            mArtistIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
-            mArtistIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+        //设置查询索引
+        mArtistIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
+        mArtistIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
 
-            mAdapter.setCursor(mCursor);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-
+        mAdapter.setCursor(mCursor);
     }
 
     @Override
@@ -159,7 +153,7 @@ public class ArtistFragment extends CursorFragment implements LoaderManager.Load
     }
 
     @Override
-    public void OnDelete() {
+    public void onMediaStoreChanged() {
         getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 }

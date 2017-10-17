@@ -12,7 +12,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.ArrayList;
 
 import remix.myplayer.R;
-import remix.myplayer.helper.DeleteHelper;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.model.mp3.MultiPosition;
@@ -234,7 +234,7 @@ public class MultiChoice implements OnMultiItemClickListener {
         }
         ToastUtil.show(mContext,mContext.getString(R.string.delete_multi_song,num));
         if(num > 0){
-            DeleteHelper.delete();
+            MusicEventHelper.onMediaStoreChanged();
         }
         UpdateOptionMenu(false);
     }

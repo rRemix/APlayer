@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import remix.myplayer.adapter.BaseAdapter;
-import remix.myplayer.helper.DeleteHelper;
+import remix.myplayer.helper.MusicEventHelper;
 
 /**
  * Created by Remix on 2016/12/23.
@@ -21,8 +21,8 @@ public class CursorFragment extends BaseFragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(this instanceof DeleteHelper.Callback)
-            DeleteHelper.addCallback((DeleteHelper.Callback) this);
+        if(this instanceof MusicEventHelper.MusicEventCallback)
+            MusicEventHelper.addCallback((MusicEventHelper.MusicEventCallback) this);
 
         return super.onCreateView(inflater,container,savedInstanceState);
     }
@@ -30,8 +30,8 @@ public class CursorFragment extends BaseFragment{
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if(this instanceof DeleteHelper.Callback)
-            DeleteHelper.removeCallback((DeleteHelper.Callback) this);
+        if(this instanceof MusicEventHelper.MusicEventCallback)
+            MusicEventHelper.removeCallback((MusicEventHelper.MusicEventCallback) this);
     }
 
     @Override

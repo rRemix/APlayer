@@ -22,7 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
-import remix.myplayer.helper.DeleteHelper;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.mp3.MP3Item;
@@ -40,10 +40,10 @@ import remix.myplayer.util.MediaStoreUtil;
  * 目前为最近7天添加
  */
 public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelper.Callback,
-        DeleteHelper.Callback,
+        MusicEventHelper.MusicEventCallback,
         LoaderManager.LoaderCallbacks<Cursor>{
     public static final String TAG = RecetenlyActivity.class.getSimpleName();
-    private static int LOADER_ID = 1;
+    private static int LOADER_ID = 0;
 
     private SongAdapter mAdapter;
     @BindView(R.id.recyclerview)
@@ -100,7 +100,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
 
-        DeleteHelper.addCallback(this);
+        MusicEventHelper.addCallback(this);
         getLoaderManager().initLoader(++LOADER_ID, null, this);
         setUpToolbar(mToolBar,getString(R.string.recently));
 
@@ -152,7 +152,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
 
     @Override
     public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
-        if(loader.getId() != LOADER_ID || data == null)
+        if(loader.getId() != ++LOADER_ID || data == null)
             return;
         //查询完毕后保存结果，并设置查询索引
         mCursor = data;
@@ -191,11 +191,11 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
             mCursor.close();
             mCursor = null;
         }
-        DeleteHelper.removeCallback(this);
+        MusicEventHelper.removeCallback(this);
     }
 
     @Override
-    public void OnDelete() {
+    public void onMediaStoreChanged() {
         getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 }

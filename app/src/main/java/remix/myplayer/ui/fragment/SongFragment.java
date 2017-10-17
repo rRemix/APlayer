@@ -22,7 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
-import remix.myplayer.helper.DeleteHelper;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.ui.MultiChoice;
@@ -39,7 +39,7 @@ import remix.myplayer.util.MediaStoreUtil;
 /**
  * 全部歌曲的Fragment
  */
-public class SongFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback {
+public class SongFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,MusicEventHelper.MusicEventCallback {
     @BindView(R.id.recyclerview)
     FastScrollRecyclerView mRecyclerView;
     //歌曲名 艺术家 专辑名 专辑id 歌曲id对应的索引
@@ -50,7 +50,7 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
     public static int mAlbumIdIndex = -1;
     public static int mSongId = -1;
 
-    public static int LOADER_ID = 0;
+    private static int LOADER_ID = 10;
     public static final String TAG = SongFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
 
@@ -154,20 +154,17 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
     public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
         if(data == null || loader.getId() != LOADER_ID)
             return;
-        //保存查询结果，并设置查询索引
+//        if(mCursor != null && mCursor.getCount() == data.getCount())
+//            return;
         mCursor = data;
-        try {
-            mTitleIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
-            mDisPlayNameIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
-            mArtistIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
-            mAlbumIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM);
-            mSongId = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
-            mAlbumIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-            mAdapter.setCursor(mCursor);
-            setAllSongList();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        mTitleIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
+        mDisPlayNameIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
+        mArtistIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
+        mAlbumIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM);
+        mSongId = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
+        mAlbumIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+        mAdapter.setCursor(mCursor);
+        setAllSongList();
 
     }
 
@@ -191,7 +188,7 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
     }
 
     @Override
-    public void OnDelete() {
+    public void onMediaStoreChanged() {
         getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 }

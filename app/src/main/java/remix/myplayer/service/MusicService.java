@@ -63,6 +63,7 @@ import remix.myplayer.appwidgets.AppWidgetMedium;
 import remix.myplayer.appwidgets.AppWidgetSmall;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.listener.ShakeDetector;
@@ -75,9 +76,7 @@ import remix.myplayer.observer.DBObserver;
 import remix.myplayer.observer.MediaStoreObserver;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.EQActivity;
-import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.ui.customview.floatwidget.FloatLrcView;
 import remix.myplayer.util.ColorUtil;
@@ -191,8 +190,8 @@ public class MusicService extends BaseService implements Playback {
     /** service是否停止运行*/
     private boolean mIsServiceStop = false;
     /** handlerThread*/
-    private HandlerThread mGetLrcThread;
-    private LrcHandler mLyricHandler;
+    private HandlerThread mPlaybackThread;
+    private LrcHandler mPlaybackHandler;
 
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
@@ -248,9 +247,9 @@ public class MusicService extends BaseService implements Playback {
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
         Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
 
-        mGetLrcThread = new HandlerThread("IO");
-        mGetLrcThread.start();
-        mLyricHandler = new LrcHandler(this, mGetLrcThread.getLooper());
+        mPlaybackThread = new HandlerThread("IO");
+        mPlaybackThread.start();
+        mPlaybackHandler = new LrcHandler(this, mPlaybackThread.getLooper());
 
         mUpdateUIHandler = new UpdateUIHandler(this);
 
@@ -364,7 +363,7 @@ public class MusicService extends BaseService implements Playback {
                     }
                     return true;
                 } catch (Exception e){
-                    CommonUtil.uploadException("Error In OnError Callback",e.toString());
+                    CommonUtil.uploadException("Error In OnError MusicEventCallback",e.toString());
                 } finally {
                     CommonUtil.uploadException("MediaPlayerError","what:" + what + " extra:" + extra);
                 }
@@ -431,9 +430,9 @@ public class MusicService extends BaseService implements Playback {
         mShowFloatLrc = false;
 
         if (Build.VERSION.SDK_INT >= 18) {
-            mGetLrcThread.quitSafely();
+            mPlaybackThread.quitSafely();
         } else {
-            mGetLrcThread.quit();
+            mPlaybackThread.quit();
         }
 
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
@@ -1228,7 +1227,7 @@ public class MusicService extends BaseService implements Playback {
      * 更新桌面歌词
      */
     private void updateFloatLrc() {
-        mLyricHandler.post(new Runnable() {
+        mPlaybackHandler.post(new Runnable() {
             @Override
             public void run() {
                 synchronized (MusicService.class){
@@ -1790,17 +1789,16 @@ public class MusicService extends BaseService implements Playback {
                     musicService.createFloatLrc();
                     break;
                 case Constants.UPDATE_ADAPTER:
-                    if(ChildHolderActivity.getInstance() != null ){
-                        ChildHolderActivity.getInstance().updateList();
-                    }
-                    if (FolderActivity.getInstance() != null ) {
-                        FolderActivity.getInstance().updateList();
-                    }
+//                    if(ChildHolderActivity.getInstance() != null ){
+//                        ChildHolderActivity.getInstance().updateList();
+//                    }
+//                    if (FolderActivity.getInstance() != null ) {
+//                        FolderActivity.getInstance().updateList();
+//                    }
+                    MusicEventHelper.onMediaStoreChanged();
                     break;
                 case Constants.UPDATE_CHILDHOLDER_ADAPTER:
-                    if(ChildHolderActivity.getInstance() != null ){
-                        ChildHolderActivity.getInstance().updateList();
-                    }
+                    MusicEventHelper.onMediaStoreChanged();
                     break;
             }
         }

@@ -23,6 +23,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ChildHolderAdapter;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.SortChangeCallback;
@@ -45,7 +46,7 @@ import remix.myplayer.util.PlayListUtil;
 /**
  * 专辑、艺术家、文件夹、播放列表详情
  */
-public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHelper.Callback{
+public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHelper.Callback,MusicEventHelper.MusicEventCallback{
     public final static String TAG = ChildHolderActivity.class.getSimpleName();
     public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";
     private boolean mIsRunning = false;
@@ -167,6 +168,13 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
             return;
         mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.isPlay());
 
+        MusicEventHelper.addCallback(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicEventHelper.removeCallback(this);
     }
 
     @Override
@@ -176,6 +184,11 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         } else {
             finish();
         }
+    }
+
+    @Override
+    public void onMediaStoreChanged() {
+        updateList();
     }
 
     class GetSongList extends Thread{
@@ -299,7 +312,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         super.onStop();
         mIsRunning = false;
     }
-
 
     public void updateList() {
         if(mIsRunning)

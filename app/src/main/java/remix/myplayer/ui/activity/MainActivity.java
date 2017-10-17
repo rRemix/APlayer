@@ -301,20 +301,20 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                                 try {
                                     if(!TextUtils.isEmpty(input)){
                                         newPlayListId = PlayListUtil.addPlayList(input.toString());
-                                        ToastUtil.show(MainActivity.this, newPlayListId > 0 ?
+                                        ToastUtil.show(mContext, newPlayListId > 0 ?
                                                         R.string.add_playlist_success :
                                                         newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
                                                 Toast.LENGTH_SHORT);
                                         if(newPlayListId > 0){
                                             //跳转到添加歌曲界面
-                                            Intent intent = new Intent(MainActivity.this,SongChooseActivity.class);
+                                            Intent intent = new Intent(mContext,SongChooseActivity.class);
                                             intent.putExtra("PlayListID",newPlayListId);
                                             intent.putExtra("PlayListName",input.toString());
                                             startActivity(intent);
                                         }
                                     }
                                 } catch (Exception e){
-                                    CommonUtil.uploadException("新建" + input + "错误:" + newPlayListId,e);
+                                    ToastUtil.show(mContext,"创建播放列表错误:" + e.toString());
                                 }
                             }
                         })

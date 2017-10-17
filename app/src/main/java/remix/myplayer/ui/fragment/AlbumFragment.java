@@ -20,7 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.AlbumAdater;
-import remix.myplayer.helper.DeleteHelper;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.MultiChoice;
@@ -38,7 +38,7 @@ import remix.myplayer.util.SPUtil;
 /**
  * 专辑Fragment
  */
-public class AlbumFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,DeleteHelper.Callback {
+public class AlbumFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,MusicEventHelper.MusicEventCallback {
     @BindView(R.id.album_recycleview)
     FastScrollRecyclerView mRecyclerView;
 
@@ -48,9 +48,9 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
     public static int mArtistIndex = -1;
 
     private MultiChoice mMultiChoice;
-    private static int LOADER_ID = 0;
 
     public static final String TAG = AlbumFragment.class.getSimpleName();
+    private static int LOADER_ID = 100;
 
     @Override
     public void onAttach(Context context) {
@@ -150,15 +150,11 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
         if(data == null || loader.getId() != LOADER_ID)
             return;
         //查询完毕后保存结果，并设置查询索引
-        try {
-            mCursor = data;
-            mAlbumIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-            mAlbumIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-            mArtistIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            mAdapter.setCursor(mCursor);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        mCursor = data;
+        mAlbumIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+        mAlbumIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
+        mArtistIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+        mAdapter.setCursor(mCursor);
 
     }
 
@@ -175,7 +171,7 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
     }
 
     @Override
-    public void OnDelete() {
+    public void onMediaStoreChanged() {
         getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 }

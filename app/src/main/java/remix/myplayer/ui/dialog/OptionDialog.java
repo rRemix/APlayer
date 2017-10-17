@@ -26,7 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.helper.DeleteHelper;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -162,7 +162,7 @@ public class OptionDialog extends BaseDialogActivity {
                                             MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0 :
                                             PlayListUtil.deleteSong(mInfo.getId(),mPlayListName);
                                     if(deleteSuccess){
-                                        DeleteHelper.delete();
+                                        MusicEventHelper.onMediaStoreChanged();
                                     }
                                     ToastUtil.show(OptionDialog.this,deleteSuccess ? R.string.delete_success : R.string.delete_error);
                                     finish();

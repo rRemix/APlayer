@@ -47,7 +47,7 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
     @BindView(R.id.playlist_recycleview)
     FastScrollRecyclerView mRecyclerView;
 
-    private static int LOADER_ID = 0;
+    private static int LOADER_ID = 10000;
     private MultiChoice mMultiChoice;
 
     @Override
@@ -148,16 +148,11 @@ public class PlayListFragment extends CursorFragment implements LoaderManager.Lo
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(data == null)
             return;
-        //查询完毕后保存结果，并设置查询索引
-        try {
-            mCursor = data;
-            mPlayListIDIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns._ID);
-            mPlayListNameIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns.NAME);
-            mPlayListSongCountIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns.COUNT);
-            mAdapter.setCursor(mCursor);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        mCursor = data;
+        mPlayListIDIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns._ID);
+        mPlayListNameIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns.NAME);
+        mPlayListSongCountIndex = mCursor.getColumnIndex(PlayLists.PlayListColumns.COUNT);
+        mAdapter.setCursor(mCursor);
     }
 
     @Override

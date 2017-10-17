@@ -1,7 +1,6 @@
 package remix.myplayer.util;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -12,8 +11,6 @@ import android.content.res.Resources;
 import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.net.URISyntaxException;
 
 import remix.myplayer.R;
 

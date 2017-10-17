@@ -44,7 +44,7 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
     public static int mTitleIndex = -1;
     public static int mSongIdIndex = -1;
     public static int mDisPlayNameIndex = -1;
-    private static int LOADER_ID = 1;
+    private static int LOADER_ID = 0;
     @BindView(R.id.confirm)
     TextView mConfirm;
     @BindView(R.id.recyclerview)

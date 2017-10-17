@@ -4,6 +4,13 @@ import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Handler;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -26,16 +33,28 @@ public class MediaStoreObserver extends ContentObserver {
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
-            mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+            Observable.create(new ObservableOnSubscribe<Integer>() {
+                @Override
+                public void subscribe(@NonNull ObservableEmitter<Integer> e) throws Exception {
+                    Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
+                    e.onNext(1);
+                }
+            }).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Consumer<Integer>() {
+                @Override
+                public void accept(Integer integer) throws Exception {
+                    mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+                }
+            });
         }
     };
 
     @Override
     public void onChange(boolean selfChange, Uri uri) {
-        if(!selfChange && Uri.parse("content://media/external").equals(uri)){
+        if(!selfChange && uri != null && uri.toString().contains("content://media/external")){
             mHandler.removeCallbacks(mRunnable);
-            mHandler.postDelayed(mRunnable,800);
+            mHandler.postDelayed(mRunnable,600);
         }
     }
 

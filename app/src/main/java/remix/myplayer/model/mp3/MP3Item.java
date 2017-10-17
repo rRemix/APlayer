@@ -93,8 +93,7 @@ public class MP3Item implements Serializable,Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        MP3Item temp = (MP3Item)o;
-        return temp.getId() == this.getId();
+        return o instanceof MP3Item && ((MP3Item)o).getId() == this.getId();
     }
 
     public long getAddTime() {

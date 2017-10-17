@@ -1,17 +1,12 @@
 package remix.myplayer.ui.fragment;
 
-import android.content.ContentUris;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.annotation.Nullable;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
@@ -24,13 +19,8 @@ import remix.myplayer.R;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.LogUtil;
-import remix.myplayer.util.cache.DiskCache;
-import remix.myplayer.util.thumb.SearchCover;
 
 /**
  * Created by Remix on 2015/12/2.

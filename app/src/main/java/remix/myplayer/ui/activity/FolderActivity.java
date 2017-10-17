@@ -18,6 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.FolderAdapter;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -29,7 +30,7 @@ import remix.myplayer.util.Global;
  * @Author Xiaoborui
  * @Date 2016/10/8 09:46
  */
-public class FolderActivity extends MultiChoiceActivity {
+public class FolderActivity extends MultiChoiceActivity implements MusicEventHelper.MusicEventCallback{
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
 
@@ -80,6 +81,13 @@ public class FolderActivity extends MultiChoiceActivity {
         mRecyclerView.setAdapter(mAdapter);
 
         setUpToolbar(mToolBar,getString(R.string.folder));
+        MusicEventHelper.addCallback(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicEventHelper.removeCallback(this);
     }
 
     public void updateList() {
@@ -120,6 +128,11 @@ public class FolderActivity extends MultiChoiceActivity {
 
     public static FolderActivity getInstance() {
         return mRef != null ? mRef.get() : null;
+    }
+
+    @Override
+    public void onMediaStoreChanged() {
+        updateList();
     }
 
     private static class RefreshHandler extends Handler{
