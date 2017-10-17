@@ -38,7 +38,7 @@ import remix.myplayer.util.SPUtil;
 /**
  * 专辑Fragment
  */
-public class AlbumFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,MusicEventHelper.MusicEventCallback {
+public class AlbumFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>{
     @BindView(R.id.album_recycleview)
     FastScrollRecyclerView mRecyclerView;
 
@@ -55,7 +55,6 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        getLoaderManager().initLoader(++LOADER_ID, null, (LoaderManager.LoaderCallbacks) this);
     }
 
     @Override
@@ -172,6 +171,7 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
 
     @Override
     public void onMediaStoreChanged() {
-        getLoaderManager().initLoader(++LOADER_ID, null, this);
+        if(mHasPermission)
+            getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 }

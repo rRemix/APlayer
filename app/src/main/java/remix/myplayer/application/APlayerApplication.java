@@ -45,6 +45,7 @@ public class APlayerApplication extends android.app.Application {
 
     public static RefWatcher getRefWatcher(Context context) {
         APlayerApplication application = (APlayerApplication) context.getApplicationContext();
+
         return application.mRefWatcher;
     }
 

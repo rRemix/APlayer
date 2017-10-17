@@ -33,6 +33,8 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
 import com.soundcloud.android.crop.Crop;
+import com.tbruyelle.rxpermissions2.Permission;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,10 +42,12 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.functions.Consumer;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.asynctask.AsynLoadImage;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnModeChangeListener;
@@ -97,16 +101,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private PagerAdapter mPagerAdapter;
     //是否正在运行
     private static boolean mIsRunning = false;
-    //是否第一次启动
-    private boolean mIsFirst = true;
-    //是否是安装后第一次打开软件
-    private boolean mIsFirstAfterInstall = true;
-    //是否是第一次创建activity
-    private static boolean mIsFirstCreateActivity = true;
-    private static final int PERMISSIONCODE = 100;
-    private static final String[] PERMISSIONS = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.READ_PHONE_STATE};
 
     //设置界面
     private final int SETTING = 1;
@@ -177,10 +171,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

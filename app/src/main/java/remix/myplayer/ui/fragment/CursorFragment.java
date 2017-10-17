@@ -1,37 +1,51 @@
 package remix.myplayer.ui.fragment;
 
+import android.Manifest;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
+import com.tbruyelle.rxpermissions2.Permission;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import io.reactivex.functions.Consumer;
+import remix.myplayer.R;
 import remix.myplayer.adapter.BaseAdapter;
 import remix.myplayer.helper.MusicEventHelper;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2016/12/23.
  */
 
-public class CursorFragment extends BaseFragment{
+public abstract class CursorFragment extends BaseFragment implements MusicEventHelper.MusicEventCallback{
     protected Cursor mCursor;
     protected BaseAdapter mAdapter;
+    protected boolean mHasPermission = false;
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(this instanceof MusicEventHelper.MusicEventCallback)
-            MusicEventHelper.addCallback((MusicEventHelper.MusicEventCallback) this);
-
-        return super.onCreateView(inflater,container,savedInstanceState);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        MusicEventHelper.addCallback(this);
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if(this instanceof MusicEventHelper.MusicEventCallback)
-            MusicEventHelper.removeCallback((MusicEventHelper.MusicEventCallback) this);
+    public void onResume() {
+        super.onResume();
+        new RxPermissions(getActivity())
+                .request(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if(aBoolean != mHasPermission){
+                            mHasPermission = aBoolean;
+                            if(aBoolean){
+                                MusicEventHelper.onMediaStoreChanged();
+                                mHasPermission = true;
+                            }
+                        }
+                    }
+                });
     }
 
     @Override
@@ -44,4 +58,10 @@ public class CursorFragment extends BaseFragment{
             mCursor.close();
         }
     }
+
+    @Override
+    public void onMediaStoreChanged() {
+
+    }
+
 }

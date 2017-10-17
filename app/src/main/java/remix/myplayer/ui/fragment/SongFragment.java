@@ -39,7 +39,7 @@ import remix.myplayer.util.MediaStoreUtil;
 /**
  * 全部歌曲的Fragment
  */
-public class SongFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>,MusicEventHelper.MusicEventCallback {
+public class SongFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>{
     @BindView(R.id.recyclerview)
     FastScrollRecyclerView mRecyclerView;
     //歌曲名 艺术家 专辑名 专辑id 歌曲id对应的索引
@@ -54,11 +54,9 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
     public static final String TAG = SongFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        getLoaderManager().initLoader(++LOADER_ID, null, (LoaderManager.LoaderCallbacks) this);
     }
 
     @Override
@@ -189,6 +187,7 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
 
     @Override
     public void onMediaStoreChanged() {
-        getLoaderManager().initLoader(++LOADER_ID, null, this);
+        if(mHasPermission)
+            getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
 }
