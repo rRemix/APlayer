@@ -22,9 +22,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import remix.myplayer.R;
+import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.model.mp3.Genre;
 import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.util.cache.DiskCache;
@@ -46,6 +48,38 @@ public class MediaStoreUtil {
         mContext = context;
     }
 
+    public static List<MP3Item> getAllSong(){
+        ArrayList<MP3Item> songs = new ArrayList<>();
+        ContentResolver resolver = mContext.getContentResolver();
+        Cursor cursor = null;
+
+        //默认过滤文件大小500K
+        Constants.SCAN_SIZE = SPUtil.getValue(mContext,"Setting","ScanSize",-1);
+        if( Constants.SCAN_SIZE < 0) {
+            Constants.SCAN_SIZE = 500 * ByteConstants.KB;
+            SPUtil.putValue(mContext,"Setting","ScanSize",500 * ByteConstants.KB);
+        }
+        try {
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    null,
+                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
+                    null,
+                    SongAdapter.SORT + SongAdapter.ASCDESC);
+            if(cursor != null) {
+                while (cursor.moveToNext()) {
+                    songs.add(getMP3Info(cursor));
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
+        }
+
+        return songs;
+    }
+
     public static ArrayList<Integer> getAllSongsId() {
         ArrayList<Integer> allSongList = new ArrayList<>();
         ContentResolver resolver = mContext.getContentResolver();
@@ -60,7 +94,7 @@ public class MediaStoreUtil {
         try{
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{MediaStore.Audio.Media._ID},
+                    null,
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
                     null,
                     SPUtil.getValue(mContext,"Setting","Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER)

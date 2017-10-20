@@ -3,12 +3,11 @@ package remix.myplayer.ui.fragment;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,19 +16,36 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleObserver;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.R;
+import remix.myplayer.adapter.MainSongAdapter;
 import remix.myplayer.adapter.SongAdapter;
-import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.SortChangeCallback;
+import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
+import remix.myplayer.model.mp3.MP3Item;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -39,25 +55,14 @@ import remix.myplayer.util.MediaStoreUtil;
 /**
  * 全部歌曲的Fragment
  */
-public class SongFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class SongFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<List<MP3Item>>{
     @BindView(R.id.recyclerview)
     FastScrollRecyclerView mRecyclerView;
-    //歌曲名 艺术家 专辑名 专辑id 歌曲id对应的索引
-    public static int mDisPlayNameIndex = -1;
-    public static int mTitleIndex = -1;
-    public static int mArtistIndex = -1;
-    public static int mAlbumIndex = -1;
-    public static int mAlbumIdIndex = -1;
     public static int mSongId = -1;
 
     private static int LOADER_ID = 10;
     public static final String TAG = SongFragment.class.getSimpleName();
     private MultiChoice mMultiChoice;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,7 +81,7 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
 
-        mAdapter = new SongAdapter(getActivity(),mCursor,mMultiChoice, SongAdapter.ALLSONG);
+        mAdapter = new MainSongAdapter(getActivity(),mCursor,mMultiChoice, SongAdapter.ALLSONG);
         ((SongAdapter)mAdapter).setChangeCallback(new SortChangeCallback() {
             @Override
             public void SortChange() {
@@ -116,16 +121,14 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
      * 重新排序后需要重置全部歌曲列表
      */
     private synchronized void setAllSongList(){
-        if(mCursor == null)
+        if(mAdapter == null || ((MainSongAdapter)mAdapter).getData() == null)
             return;
         if(Global.AllSongList == null)
             Global.AllSongList = new ArrayList<>();
         else
             Global.AllSongList.clear();
-        for(int i = 0 ; i < mCursor.getCount();i++){
-            if(mCursor.moveToPosition(i)){
-                Global.AllSongList.add(mCursor.getInt(mSongId));
-            }
+        for(MP3Item mp3Item : ((MainSongAdapter)mAdapter).getData()){
+            Global.AllSongList.add(mp3Item.getId());
         }
     }
 
@@ -138,36 +141,26 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<List<MP3Item>> onCreateLoader(int id, Bundle args) {
         //查询所有歌曲
-        return  new CursorLoader(getActivity(),
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                null,
-                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
-                null,
-                SongAdapter.SORT + SongAdapter.ASCDESC);
+        return new AsyncSongLoader(mContext);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
+    public void onLoadFinished(Loader<List<MP3Item>> loader, final List<MP3Item> data) {
         if(data == null || loader.getId() != LOADER_ID)
             return;
-//        if(mCursor != null && mCursor.getCount() == data.getCount())
-//            return;
-        mCursor = data;
-        mTitleIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
-        mDisPlayNameIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
-        mArtistIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
-        mAlbumIndex = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM);
-        mSongId = mCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
-        mAlbumIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-        mAdapter.setCursor(mCursor);
-        setAllSongList();
-
+        ((MainSongAdapter)mAdapter).setData(data);
+        new Thread(){
+            @Override
+            public void run() {
+                setAllSongList();
+            }
+        }.start();
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<List<MP3Item>> loader) {
         if(mAdapter != null)
             mAdapter.setCursor(null);
     }
@@ -189,5 +182,16 @@ public class SongFragment extends CursorFragment implements LoaderManager.Loader
     public void onMediaStoreChanged() {
         if(mHasPermission)
             getLoaderManager().initLoader(++LOADER_ID, null, this);
+    }
+
+    private static class AsyncSongLoader extends WrappedAsyncTaskLoader<List<MP3Item>> {
+        private AsyncSongLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        public List<MP3Item> loadInBackground() {
+            return MediaStoreUtil.getAllSong();
+        }
     }
 }

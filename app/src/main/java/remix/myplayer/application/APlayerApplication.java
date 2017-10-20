@@ -1,13 +1,18 @@
 package remix.myplayer.application;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Bundle;
 
+import com.facebook.cache.disk.DiskCacheConfig;
 import com.facebook.common.internal.Supplier;
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.facebook.imageutils.BitmapUtil;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 import com.umeng.analytics.MobclickAgent;
@@ -85,6 +90,7 @@ public class APlayerApplication extends android.app.Application {
         } catch (Exception e){
             e.printStackTrace();
         }
+
     }
 
     private void initUtil() {
@@ -105,6 +111,7 @@ public class APlayerApplication extends android.app.Application {
                         return new MemoryCacheParams(cacheSize, Integer.MAX_VALUE,cacheSize,Integer.MAX_VALUE, 5 * ByteConstants.MB);
                     }
                 })
+                .setBitmapsConfig(Bitmap.Config.RGB_565)
                 .build();
         Fresco.initialize(this,config);
     }

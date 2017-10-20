@@ -18,6 +18,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import remix.myplayer.R;
@@ -58,13 +59,13 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
     //按字母排序还是按添加时间排序
     public static String SORT = SPUtil.getValue(APlayerApplication.getContext(),"Setting","Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
 
-    private MultiChoice mMultiChoice;
-    private int mType;
+    protected MultiChoice mMultiChoice;
+    protected int mType;
     public static final int ALLSONG = 0;
     public static final int RECENTLY = 1;
-    private Drawable mDefaultDrawable;
-    private Drawable mSelectDrawable;
-    private SortChangeCallback mCallback;
+    protected Drawable mDefaultDrawable;
+    protected Drawable mSelectDrawable;
+    protected SortChangeCallback mCallback;
 
     public SongAdapter(Context context, Cursor cursor, MultiChoice multiChoice, int type) {
         super(context,cursor,multiChoice);
@@ -239,7 +240,7 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
 
     }
 
-    private void OnClick(HeaderHolder headerHolder, View v){
+    protected void OnClick(HeaderHolder headerHolder, View v){
         switch (v.getId()){
             case R.id.play_shuffle:
                 MusicService.getInstance().setPlayModel(Constants.PLAY_SHUFFLE);
