@@ -34,6 +34,7 @@ public class Constants {
 
     public final static String THEME_ACTION = "remix.music.THEME_ACTION";
     public final static String CTL_ACTION = "remix.music.CTL_ACTION";
+    public final static String EVENT_ACTION = "remix.music.EVENT_ACTION";
     public final static String UPDATE_ACTION = "remix.music.UPDATE_ACTION";
     public final static String CONTROL_TIMER = "remix.music.CONTROL_TIMER";
     public final static String NOTIFY = "remix.music.NOTIFY";

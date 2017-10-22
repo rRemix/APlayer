@@ -1,0 +1,143 @@
+package remix.myplayer.ui.fragment;
+
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import java.util.List;
+
+import butterknife.ButterKnife;
+import io.reactivex.functions.Consumer;
+import remix.myplayer.adapter.HeaderAdapter;
+import remix.myplayer.helper.MusicEventHelper;
+import remix.myplayer.service.MusicService;
+import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.ui.activity.MultiChoiceActivity;
+
+/**
+ * Created by Remix on 2016/12/23.
+ */
+
+public abstract class LibraryFragment<D,A extends HeaderAdapter> extends BaseFragment implements MusicEventHelper.MusicEventCallback,LoaderManager.LoaderCallbacks<List<D>>{
+    protected A mAdapter;
+    protected boolean mHasPermission = false;
+    protected MultiChoice mMultiChoice;
+    private String[] mPermissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mHasPermission = hasPermissions();
+        if(mHasPermission)
+            onMediaStoreChanged();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        MusicEventHelper.addCallback(this);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(getLayoutID(),container,false);
+        mUnBinder = ButterKnife.bind(this,rootView);
+
+        if(getActivity() instanceof MultiChoiceActivity){
+            mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
+        }
+        initAdapter();
+        initView();
+
+        return rootView;
+    }
+
+    protected abstract int getLayoutID();
+    protected abstract void initAdapter();
+    protected abstract void initView();
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        new RxPermissions(getActivity())
+                .request(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if(aBoolean != mHasPermission){
+                            Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
+                            intent.putExtra("permission",aBoolean);
+                            mContext.sendBroadcast(intent);
+                        }
+                    }
+                });
+    }
+
+    protected boolean hasPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && mPermissions != null) {
+            for (String permission : mPermissions) {
+                if (mContext.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        MusicEventHelper.removeCallback(this);
+        if(mAdapter != null){
+            mAdapter.setDatas(null);
+        }
+    }
+
+    @Override
+    public void onMediaStoreChanged() {
+
+    }
+
+    @Override
+    public void onPermissionChanged(boolean has) {
+        if(has != mHasPermission){
+            mHasPermission = has;
+            onMediaStoreChanged();
+        }
+    }
+
+    @Override
+    public void onPlayListChanged() {
+
+    }
+
+    @Override
+    public Loader<List<D>> onCreateLoader(int id, Bundle args) {
+        return getLoader();
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<D>> loader, List<D> data) {
+        mAdapter.setDatas(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<D>> loader) {
+        if(mAdapter != null)
+            mAdapter.setDatas(null);
+    }
+
+    protected abstract Loader<List<D>> getLoader();
+}

@@ -7,13 +7,17 @@ import android.os.Handler;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import remix.myplayer.db.DBContentProvider;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.PlayListUtil;
 
 /**
  * Created by taeja on 16-3-30.
@@ -33,20 +37,15 @@ public class MediaStoreObserver extends ContentObserver {
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            Observable.create(new ObservableOnSubscribe<Integer>() {
-                @Override
-                public void subscribe(@NonNull ObservableEmitter<Integer> e) throws Exception {
-                    Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
-                    e.onNext(1);
-                }
-            }).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Consumer<Integer>() {
-                @Override
-                public void accept(Integer integer) throws Exception {
-                    mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-                }
-            });
+            Single.just(1)
+                    .observeOn(Schedulers.io())
+                    .subscribe(new Consumer<Integer>() {
+                        @Override
+                        public void accept(Integer integer) throws Exception {
+                            Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
+                            mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+                        }
+                    });
         }
     };
 
@@ -54,7 +53,7 @@ public class MediaStoreObserver extends ContentObserver {
     public void onChange(boolean selfChange, Uri uri) {
         if(!selfChange && uri != null && uri.toString().contains("content://media/external")){
             mHandler.removeCallbacks(mRunnable);
-            mHandler.postDelayed(mRunnable,600);
+            mHandler.postDelayed(mRunnable,400);
         }
     }
 

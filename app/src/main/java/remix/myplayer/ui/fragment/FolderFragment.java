@@ -53,7 +53,7 @@ public class FolderFragment extends BaseFragment {
         if(getActivity() instanceof MultiChoiceActivity){
             mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
         }
-        mAdapter = new FolderAdapter(getContext(),mMultiChoice);
+        mAdapter = new FolderAdapter(mContext,R.layout.item_folder_recycle,mMultiChoice);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {

@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * 歌曲信息
  */
-public class MP3Item implements Serializable,Cloneable {
+public class Song implements Serializable,Cloneable {
     public int Id;
     public String Title;
     public String Displayname;
@@ -23,13 +23,11 @@ public class MP3Item implements Serializable,Cloneable {
     public String Year;
     public String TitleKey;
     public long AddTime;
-    public MP3Item(){}
+    public Song(){}
 
-
-
-    public MP3Item(int id, String displayname, String title, String album,
-                   int albumid, String artist, long duration, String realTime,
-                   String url, long size,String year,String titleKey,long addTime){
+    public Song(int id, String displayname, String title, String album,
+                int albumid, String artist, long duration, String realTime,
+                String url, long size, String year, String titleKey, long addTime){
         Id = id;
         Title = title;
         Displayname = displayname;
@@ -45,7 +43,7 @@ public class MP3Item implements Serializable,Cloneable {
         AddTime = addTime;
     }
 
-    public MP3Item(MP3Item info) {
+    public Song(Song info) {
         if(info == null)
             return;
         this.Id = info.getId();
@@ -76,7 +74,7 @@ public class MP3Item implements Serializable,Cloneable {
 
     @Override
     public String toString() {
-        return "MP3Item{" +
+        return "Song{" +
                 "Id=" + Id +
                 ", Title='" + Title + '\'' +
                 ", Displayname='" + Displayname + '\'' +
@@ -93,7 +91,7 @@ public class MP3Item implements Serializable,Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof MP3Item && ((MP3Item)o).getId() == this.getId();
+        return o instanceof Song && ((Song)o).getId() == this.getId();
     }
 
     public long getAddTime() {

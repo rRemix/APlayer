@@ -21,7 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.listener.CtrlButtonListener;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -76,7 +76,7 @@ public class BottomActionBarFragment extends BaseFragment{
                 R.drawable.commom_playercontrols_bg,
                 ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.day_background_color_3 : R.color.night_background_color_3));
 
-        mBottomActionBar = (RelativeLayout)rootView.findViewById(R.id.bottom_action_bar);
+        mBottomActionBar = rootView.findViewById(R.id.bottom_action_bar);
         //点击打开播放界面
         mBottomActionBar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,7 +85,7 @@ public class BottomActionBarFragment extends BaseFragment{
                     return;
                 Intent intent = new Intent(v.getContext(), PlayerActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("MP3Item",MusicService.getCurrentMP3());
+                bundle.putSerializable("Song",MusicService.getCurrentMP3());
                 intent.putExtras(bundle);
                 intent.putExtra("isPlay",MusicService.isPlay());
                 intent.putExtra("FromActivity",true);
@@ -117,17 +117,17 @@ public class BottomActionBarFragment extends BaseFragment{
         return rootView;
     }
     //更新界面
-    public void UpdateBottomStatus(MP3Item mp3Item, boolean isPlaying) {
-        if(mp3Item == null)
+    public void UpdateBottomStatus(Song song, boolean isPlaying) {
+        if(song == null)
             return;
         //歌曲名 艺术家
         if(mTitle != null)
-            mTitle.setText(CommonUtil.processInfo(mp3Item.getTitle(),CommonUtil.SONGTYPE));
+            mTitle.setText(CommonUtil.processInfo(song.getTitle(),CommonUtil.SONGTYPE));
         if(mArtist != null)
-            mArtist.setText(mp3Item.getArtist());
+            mArtist.setText(song.getArtist());
         //封面
         if(mCover != null)
-            MediaStoreUtil.setImageUrl(mCover,mp3Item.getAlbumId());
+            MediaStoreUtil.setImageUrl(mCover, song.getAlbumId());
         //设置按钮着色
         if(mPlayButton == null)
             return;

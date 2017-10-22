@@ -26,8 +26,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.model.mp3.Genre;
-import remix.myplayer.model.mp3.MP3Item;
-import remix.myplayer.model.mp3.PlayListSongInfo;
+import remix.myplayer.model.mp3.PlayListSong;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.EQActivity;
@@ -48,7 +48,7 @@ import remix.myplayer.util.ToastUtil;
  */
 public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
     private Context mContext;
-    private MP3Item mInfo;
+    private Song mInfo;
     private View mEditRootView;
     @BindView(R.id.song_layout)
     @Nullable
@@ -91,7 +91,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
 
     private Genre mGenreInfo;
 
-    public AudioPopupListener(Context context,MP3Item info){
+    public AudioPopupListener(Context context,Song info){
         mContext = context;
         mInfo = info;
     }
@@ -263,7 +263,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 }
                 break;
             case R.id.menu_collect:
-                PlayListSongInfo info = new PlayListSongInfo(mInfo.getId(), Global.MyLoveID,Constants.MYLOVE);
+                PlayListSong info = new PlayListSong(mInfo.getId(), Global.MyLoveID,Constants.MYLOVE);
                 ToastUtil.show(mContext,
                         PlayListUtil.addSong(info) > 0 ? mContext.getString(R.string.add_song_playlist_success, 1,Constants.MYLOVE) : mContext.getString(R.string.add_song_playlist_error));
                 break;

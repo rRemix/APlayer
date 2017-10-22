@@ -1,6 +1,8 @@
 package remix.myplayer.ui.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,11 +16,16 @@ import android.widget.TextView;
 
 import com.umeng.analytics.MobclickAgent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SearchResAdapter;
+import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.ui.customview.SearchToolBar;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
@@ -32,18 +39,10 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 搜索界面，根据关键字，搜索歌曲名，艺术家，专辑中的记录
  */
-public class SearchActivity extends ToolbarActivity {
-    //查询索引
-    public static int mIdIndex = -1;
-    public static int mTitleIndex = -1;
-    public static int mArtistIndex = -1;
-    public static int mAlbumIndex = -1;
-    public static int mAlbumIdIndex = -1;
-    private Cursor mCursor = null;
-    private SearchResAdapter mSearchResAdapter = null;
+public class SearchActivity extends PermissActivity<Song,SearchResAdapter> {
+    private static int LOADER_ID = 20000;
     //搜索的关键字
-    private String mkey = "";
-
+    private String mkey;
     //搜索结果的listview
     @BindView(R.id.search_result_native)
     RecyclerView mSearchResRecyclerView;
@@ -67,14 +66,14 @@ public class SearchActivity extends ToolbarActivity {
         mSearchToolBar.addSearchListener(new SearchToolBar.SearchListener() {
             @Override
             public void onSearch(String key, boolean isclick) {
-                search(key);
+                if(!key.equals(mkey))
+                    search(key);
             }
 
             @Override
             public void onClear() {
                 //清空搜索结果，并更新界面
-                mCursor = null;
-                mSearchResAdapter.setCursor(mCursor);
+                mAdapter.setDatas(null);
                 mkey = "";
                 UpdateUI();
             }
@@ -85,16 +84,16 @@ public class SearchActivity extends ToolbarActivity {
             }
         });
 
-        mSearchResAdapter = new SearchResAdapter(this);
-        mSearchResAdapter.setOnItemClickLitener(new OnItemClickListener() {
+        mAdapter = new SearchResAdapter(this,R.layout.item_search_reulst);
+        mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if(!mCursor.isClosed() && mCursor.moveToPosition(position)){
+                if(mAdapter != null && mAdapter.getDatas() != null){
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     intent.putExtra("Control",Constants.PLAY_TEMP);
-                    intent.putExtra("MP3Item",MediaStoreUtil.getMP3InfoById(mCursor.getInt(mIdIndex)));
+                    intent.putExtra("Song",  mAdapter.getDatas().get(position));
                     sendBroadcast(intent);
-                } else {
+                }else {
                     ToastUtil.show(mContext,R.string.illegal_arg);
                 }
             }
@@ -102,7 +101,7 @@ public class SearchActivity extends ToolbarActivity {
             public void onItemLongClick(View view, int position) {
             }
         });
-        mSearchResRecyclerView.setAdapter(mSearchResAdapter);
+        mSearchResRecyclerView.setAdapter(mAdapter);
         mSearchResRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mSearchResRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -110,6 +109,35 @@ public class SearchActivity extends ToolbarActivity {
 
     }
 
+    @Override
+    public void onLoadFinished(Loader<List<Song>> loader, List<Song> data) {
+        super.onLoadFinished(loader,data);
+        //更新界面
+        UpdateUI();
+    }
+
+    @Override
+    protected Loader<List<Song>> getLoader() {
+        return new AsyncSearchLoader(mContext,mkey);
+    }
+
+    @Override
+    public void onMediaStoreChanged() {
+        if(mHasPermission)
+            getLoaderManager().initLoader(++LOADER_ID, null, this);
+        else{
+            if(mAdapter != null)
+                mAdapter.setDatas(null);
+        }
+    }
+
+    @Override
+    protected void setUpMultiChoice() {
+    }
+
+    @Override
+    protected void setUpClick() {
+    }
 
     /**
      * 搜索歌曲名，专辑，艺术家中包含该关键的记录
@@ -117,50 +145,46 @@ public class SearchActivity extends ToolbarActivity {
      */
     private void search(String key) {
         mkey = key;
-        if(mkey == null)
-            mkey = "";
-
-        Cursor cursor = null;
-        try {
-            String selection = MediaStore.Audio.Media.TITLE + " like ? " + "or " + MediaStore.Audio.Media.ARTIST + " like ? "
-                    + "or " + MediaStore.Audio.Media.ALBUM + " like ? and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection();
-            cursor = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.ARTIST,MediaStore.Audio.Media.ALBUM_ID},
-                    selection,
-                    new String[]{"%" + mkey + "%","%" + mkey + "%","%" + mkey + "%"}, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (cursor != null && cursor.getCount() > 0) {
-            mIdIndex = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
-            mTitleIndex = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            mArtistIndex = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            mAlbumIndex = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-            mAlbumIdIndex = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-            mCursor = cursor;
-            mSearchResAdapter.setCursor(mCursor);
-        } else {
-            mCursor = null;
-            mSearchResAdapter.setCursor(mCursor);
-        }
-        mSearchResAdapter.setCursor(mCursor);
-
-        //更新界面
-        UpdateUI();
+        getLoaderManager().initLoader(++LOADER_ID, null, this);
     }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(mCursor != null)
-            mCursor.close();
-        mSearchResAdapter.setCursor(null);
+
+    private static class AsyncSearchLoader extends AppWrappedAsyncTaskLoader<List<Song>> {
+        private String mkey;
+        private AsyncSearchLoader(Context context,String key) {
+            super(context);
+            mkey = key;
+        }
+
+        @Override
+        public List<Song> loadInBackground() {
+            Cursor cursor = null;
+            List<Song> songs = new ArrayList<>();
+            try {
+                String selection = MediaStore.Audio.Media.TITLE + " like ? " + "or " + MediaStore.Audio.Media.ARTIST + " like ? "
+                        + "or " + MediaStore.Audio.Media.ALBUM + " like ? and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection();
+                cursor = getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        null,
+                        selection,
+                        new String[]{"%" + mkey + "%","%" + mkey + "%","%" + mkey + "%"}, null);
+
+                if (cursor != null && cursor.getCount() > 0) {
+                    while (cursor.moveToNext()){
+                        songs.add(MediaStoreUtil.getMP3Info(cursor));
+                    }
+                }
+            }finally {
+                if(cursor != null && !cursor.isClosed())
+                    cursor.close();
+            }
+            return songs;
+        }
     }
 
     /**
      * 更新界面
      */
     private void UpdateUI(){
-        boolean flag = mCursor != null && mCursor.getCount() > 0;
+        boolean flag = mAdapter.getDatas() != null && mAdapter.getDatas().size() > 0;
         mSearchResRecyclerView.setVisibility(flag? View.VISIBLE : View.GONE);
         mSearchResBlank.setVisibility(flag? View.GONE :View.VISIBLE);
     }

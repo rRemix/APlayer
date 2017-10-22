@@ -2,30 +2,24 @@ package remix.myplayer.ui.fragment;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+
+import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.AlbumAdater;
-import remix.myplayer.helper.MusicEventHelper;
+import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.ui.MultiChoice;
+import remix.myplayer.model.mp3.Album;
 import remix.myplayer.ui.activity.ChildHolderActivity;
-import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
@@ -38,24 +32,12 @@ import remix.myplayer.util.SPUtil;
 /**
  * 专辑Fragment
  */
-public class AlbumFragment extends CursorFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class AlbumFragment extends LibraryFragment<Album,AlbumAdater>{
     @BindView(R.id.album_recycleview)
     FastScrollRecyclerView mRecyclerView;
 
-    //专辑名 专辑id 艺术家对应的索引
-    public static int mAlbumIdIndex = -1;
-    public static int mAlbumIndex = -1;
-    public static int mArtistIndex = -1;
-
-    private MultiChoice mMultiChoice;
-
     public static final String TAG = AlbumFragment.class.getSimpleName();
     private static int LOADER_ID = 100;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,19 +45,15 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
         mPageName = TAG;
     }
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-        View rootView = inflater.inflate(R.layout.fragment_album,null);
-        mUnBinder = ButterKnife.bind(this,rootView);
+    protected int getLayoutID() {
+        return R.layout.fragment_album;
+    }
 
-        if(getActivity() instanceof MultiChoiceActivity){
-           mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
-        }
-
-        mAdapter = new AlbumAdater(mCursor,getActivity(),mMultiChoice);
-        ((AlbumAdater)mAdapter).setModeChangeCallback(new ModeChangeCallback() {
+    @Override
+    protected void initAdapter() {
+        mAdapter = new AlbumAdater(mContext,R.layout.item_album_recycle_grid,mMultiChoice);
+        mAdapter.setModeChangeCallback(new ModeChangeCallback() {
             @Override
             public void OnModeChange(final int mode) {
                 mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
@@ -88,16 +66,15 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
                 int albumId = getAlbumID(position);
                 if(getUserVisibleHint() && albumId > 0 &&
                         !mMultiChoice.itemAddorRemoveWithClick(view,position,albumId,TAG)){
-                    if(mCursor != null && mCursor.moveToPosition(position)) {
-                        if(mCursor != null && mCursor.moveToPosition(position)) {
-                        int albumid = mCursor.getInt(mAlbumIdIndex);
-                        String title = mCursor.getString(mAlbumIndex);
+                    if(mAdapter.getDatas() != null){
+                        Album album = mAdapter.getDatas().get(position);
+                        int albumid = album.getAlbumID();
+                        String title = album.getAlbum();
                         Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
                         intent.putExtra("Id", albumid);
                         intent.putExtra("Title", title);
                         intent.putExtra("Type", Constants.ALBUM);
                         startActivity(intent);
-                        }
                     }
                 }
             }
@@ -109,69 +86,53 @@ public class AlbumFragment extends CursorFragment implements LoaderManager.Loade
                 }
             }
         });
+    }
 
+    @Override
+    protected void initView() {
         int model = SPUtil.getValue(getActivity(),"Setting","AlbumModel",Constants.GRID_MODEL);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(model == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
         mRecyclerView.setAdapter(mAdapter);
-
-        return rootView;
     }
 
     private int getAlbumID(int position){
         int albumId = -1;
-        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
-            albumId = mCursor.getInt(mAlbumIdIndex);
+        if(mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1){
+            albumId = mAdapter.getDatas().get(position).getAlbumID();
         }
         return albumId;
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        //根据专辑id 创建Loader
-        try {
-            return  new CursorLoader(getActivity(),MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,
-                            MediaStore.Audio.Media.ALBUM,
-                            MediaStore.Audio.Media.ARTIST},
-                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
-                    null,
-                    MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(data == null || loader.getId() != LOADER_ID)
-            return;
-        //查询完毕后保存结果，并设置查询索引
-        mCursor = data;
-        mAlbumIdIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-        mAlbumIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-        mArtistIndex = mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-        mAdapter.setCursor(mCursor);
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        if(mAdapter != null){
-            mAdapter.setCursor(null);
-        }
-    }
 
     @Override
     public AlbumAdater getAdapter(){
-        return (AlbumAdater) mAdapter;
+        return mAdapter;
     }
 
     @Override
     public void onMediaStoreChanged() {
         if(mHasPermission)
             getLoaderManager().initLoader(++LOADER_ID, null, this);
+        else{
+            if(mAdapter != null)
+                mAdapter.setDatas(null);
+        }
+    }
+
+    @Override
+    protected Loader<List<Album>> getLoader() {
+        return new AsyncAlbumLoader(mContext);
+    }
+
+    private static class AsyncAlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {
+        private AsyncAlbumLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        public List<Album> loadInBackground() {
+            return MediaStoreUtil.getALlAlbum();
+        }
     }
 }

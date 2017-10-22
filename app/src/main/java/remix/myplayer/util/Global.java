@@ -13,8 +13,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import remix.myplayer.model.mp3.PlayListInfo;
-import remix.myplayer.model.mp3.PlayListSongInfo;
+import remix.myplayer.model.mp3.PlayListSong;
 import remix.myplayer.service.MusicService;
 
 /**
@@ -60,7 +59,7 @@ public class Global {
     /**
      * 播放列表
      */
-    public static ArrayList<PlayListInfo> PlayList = new ArrayList<>();
+    public static ArrayList<remix.myplayer.model.mp3.PlayList> PlayList = new ArrayList<>();
 
     public static void setOperation(int operation){
         Operation = operation;
@@ -181,9 +180,9 @@ public class Global {
      * @return
      */
     public static int AddSongToPlayQueue(final ArrayList<Integer> rawAddList) {
-        ArrayList<PlayListSongInfo> infos = new ArrayList<>();
+        ArrayList<PlayListSong> infos = new ArrayList<>();
         for(Integer id : rawAddList){
-            infos.add(new PlayListSongInfo(id, PlayQueueID,Constants.PLAY_QUEUE));
+            infos.add(new PlayListSong(id, PlayQueueID,Constants.PLAY_QUEUE));
         }
         return PlayListUtil.addMultiSongs(infos);
     }

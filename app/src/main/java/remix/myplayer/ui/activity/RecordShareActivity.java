@@ -35,8 +35,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
 import remix.myplayer.R;
-import remix.myplayer.helper.MusicEventHelper;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.dialog.ShareDialog;
 import remix.myplayer.util.ColorUtil;
@@ -76,7 +76,7 @@ public class RecordShareActivity extends BaseActivity {
 
     private boolean mHasPermission = false;
     //当前正在播放的歌曲
-    private MP3Item mInfo;
+    private Song mInfo;
     //处理图片的进度条
     private MaterialDialog mProgressDialog;
     //处理状态
@@ -142,7 +142,7 @@ public class RecordShareActivity extends BaseActivity {
         //初始化控件
         mContainer.setDrawingCacheEnabled(true);
 
-        mInfo = (MP3Item)getIntent().getExtras().getSerializable("MP3Item");
+        mInfo = (Song)getIntent().getExtras().getSerializable("Song");
         if(mInfo == null)
             return;
 
@@ -228,7 +228,7 @@ public class RecordShareActivity extends BaseActivity {
                 Bundle arg = new Bundle();
                 arg.putInt("Type", Constants.SHARERECORD);
                 arg.putString("Url",mFile.getAbsolutePath());
-                arg.putSerializable("MP3Item",mInfo);
+                arg.putSerializable("Song",mInfo);
                 intent.putExtras(arg);
                 startActivity(intent);
             } catch (Exception e) {
@@ -262,16 +262,15 @@ public class RecordShareActivity extends BaseActivity {
         MobclickAgent.onPageStart(RecordShareActivity.class.getSimpleName());
         super.onResume();
         new RxPermissions(this)
-                .request(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .request(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean aBoolean) throws Exception {
                         if(aBoolean != mHasPermission){
                             mHasPermission = aBoolean;
-                            if(aBoolean){
-                                MusicEventHelper.onMediaStoreChanged();
-                                mHasPermission = true;
-                            }
+                            Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
+                            intent.putExtra("permission",mHasPermission);
+                            sendBroadcast(intent);
                         }
                     }
                 });

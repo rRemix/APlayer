@@ -1,9 +1,7 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -12,8 +10,10 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.ui.activity.SearchActivity;
+import remix.myplayer.asynctask.AsynLoadImage;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.util.CommonUtil;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -23,31 +23,25 @@ import remix.myplayer.util.MediaStoreUtil;
 /**
  * 搜索结果的适配器
  */
-public class SearchResAdapter extends BaseAdapter<SearchResAdapter.SearchResHolder> {
-    public SearchResAdapter(Context context){
-        super(context);
+public class SearchResAdapter extends BaseAdapter<Song,SearchResAdapter.SearchResHolder> {
+    public SearchResAdapter(Context context,int layoutId){
+        super(context,layoutId);
     }
 
-    @Override
-    public SearchResHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new SearchResHolder(LayoutInflater.from(mContext).inflate(R.layout.item_search_reulst,null));
-    }
 
     @Override
-    public void onBindViewHolder(final SearchResHolder holder, final int position) {
-        if(mCursor != null && mCursor.moveToPosition(position)) {
-            holder.mName.setText(CommonUtil.processInfo(mCursor.getString(SearchActivity.mTitleIndex),CommonUtil.SONGTYPE));
-            holder.mOther.setText(mCursor.getString(SearchActivity.mArtistIndex) + "-" + mCursor.getString(SearchActivity.mAlbumIndex));
-            //封面
-            MediaStoreUtil.setImageUrl(holder.mImage,mCursor.getInt(SearchActivity.mAlbumIdIndex));
-            if(mOnItemClickLitener != null && holder.mRooView != null){
-                holder.mRooView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition());
-                    }
-                });
-            }
+    protected void convert(final SearchResHolder holder, Song song, int position) {
+        holder.mName.setText(CommonUtil.processInfo(song.getTitle(),CommonUtil.SONGTYPE));
+        holder.mOther.setText(song.getArtist() + "-" + song.getAlbum());
+        //封面
+        new AsynLoadImage(holder.mImage).execute(song.getAlbumId(), Constants.URL_ALBUM);
+        if(mOnItemClickLitener != null && holder.mRooView != null){
+            holder.mRooView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition());
+                }
+            });
         }
     }
 

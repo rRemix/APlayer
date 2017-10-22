@@ -1,7 +1,6 @@
 package remix.myplayer.ui.activity;
 
 
-import android.Manifest;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.graphics.Color;
@@ -33,8 +32,6 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
 import com.soundcloud.android.crop.Crop;
-import com.tbruyelle.rxpermissions2.Permission;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,16 +39,17 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.asynctask.AsynLoadImage;
-import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnModeChangeListener;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -205,7 +203,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                     Global.setPlayQueue(list,mContext,intent);
                 }
             }
-        },800);
+        },600);
 
     }
 
@@ -214,7 +212,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      */
     private void initBottombar() {
         int lastId = SPUtil.getValue(mContext,"Setting","LastSongId",-1);
-        MP3Item item;
+        Song item;
         if(lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
             mBottomBar.UpdateBottomStatus(item,  MusicService.isPlay());
         } else {
@@ -401,7 +399,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
 
     private void setUpDrawerLayout() {
-        mDrawerAdapter = new DrawerAdapter(this);
+        mDrawerAdapter = new DrawerAdapter(this,R.layout.item_drawer);
         mDrawerAdapter.setOnModeChangeListener(new OnModeChangeListener() {
             @Override
             public void OnModeChange(boolean isNight) {
@@ -575,24 +573,24 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
     //更新界面
     @Override
-    public void UpdateUI(MP3Item mp3Item, boolean isplay) {
+    public void UpdateUI(Song song, boolean isplay) {
         if (!mIsRunning)
             return;
-        mBottomBar.UpdateBottomStatus(mp3Item, isplay);
+        mBottomBar.UpdateBottomStatus(song, isplay);
 //        if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
 //        mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ALLSONG_ADAPTER);
-        updateHeader(mp3Item,isplay);
+        updateHeader(song,isplay);
     }
 
     /**
      * 更新侧滑菜单
-     * @param mp3Item
+     * @param song
      */
-    private void updateHeader(MP3Item mp3Item,boolean isPlay) {
-        if(mp3Item == null)
+    private void updateHeader(Song song, boolean isPlay) {
+        if(song == null)
             return;
-        mHeadText.setText(getString(R.string.play_now,mp3Item.getTitle()));
-        new AsynLoadImage(mHeadImg).execute(mp3Item.getAlbumId(), Constants.URL_ALBUM);
+        mHeadText.setText(getString(R.string.play_now, song.getTitle()));
+        new AsynLoadImage(mHeadImg).execute(song.getAlbumId(), Constants.URL_ALBUM);
         mHeadImg.setBackgroundResource(isPlay && ThemeStore.isDay() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
     }
 

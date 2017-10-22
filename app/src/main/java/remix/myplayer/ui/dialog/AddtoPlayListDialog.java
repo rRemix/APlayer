@@ -29,7 +29,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.AddtoPlayListAdapter;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.model.mp3.PlayListSongInfo;
+import remix.myplayer.model.mp3.PlayListSong;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -74,7 +74,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
             @Override
             public void onItemClick(View view, int position) {
                 if(view != null ) {
-                    PlayListSongInfo info = new PlayListSongInfo(mAudioID,getPlayListId(position),getPlayListName(position));
+                    PlayListSong info = new PlayListSong(mAudioID,getPlayListId(position),getPlayListName(position));
                     ToastUtil.show(AddtoPlayListDialog.this,
                             PlayListUtil.addSong(info) > 0 ? getString(R.string.add_song_playlist_success, 1,getPlayListName(position)) : getString(R.string.add_song_playlist_error));
                 } else {
@@ -153,7 +153,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                                     }
                                     if(mAddAfterCreate){
                                         ToastUtil.show(AddtoPlayListDialog.this,
-                                                PlayListUtil.addSong(new PlayListSongInfo(mAudioID,newPlayListId,input.toString())) > 0 ? getString(R.string.add_song_playlist_success, 1,input.toString()) : getString(R.string.add_song_playlist_error),
+                                                PlayListUtil.addSong(new PlayListSong(mAudioID,newPlayListId,input.toString())) > 0 ? getString(R.string.add_song_playlist_success, 1,input.toString()) : getString(R.string.add_song_playlist_error),
                                                 Toast.LENGTH_SHORT);
                                     }
                                 }catch (Exception e){

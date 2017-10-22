@@ -26,8 +26,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.helper.MusicEventHelper;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
@@ -62,7 +62,7 @@ public class OptionDialog extends BaseDialogActivity {
     SimpleDraweeView mDraweeView;
 
     //当前正在播放的歌曲
-    private MP3Item mInfo = null;
+    private Song mInfo = null;
     //是否是删除播放列表中歌曲
     private boolean mIsDeletePlayList = false;
     //播放列表名字
@@ -74,7 +74,7 @@ public class OptionDialog extends BaseDialogActivity {
         setContentView(R.layout.dialog_option);
         ButterKnife.bind(this);
 
-        mInfo = (MP3Item)getIntent().getExtras().getSerializable("MP3Item");
+        mInfo = (Song)getIntent().getExtras().getSerializable("Song");
         if(mInfo == null)
             return;
         if(mIsDeletePlayList = getIntent().getExtras().getBoolean("IsDeletePlayList", false)){
@@ -139,7 +139,7 @@ public class OptionDialog extends BaseDialogActivity {
                 MobclickAgent.onEvent(this,"Share");
                 Intent intentShare = new Intent(OptionDialog.this,ShareDialog.class);
                 Bundle argShare = new Bundle();
-                argShare.putSerializable("MP3Item",mInfo);
+                argShare.putSerializable("Song",mInfo);
                 argShare.putInt("Type",Constants.SHARESONG);
                 intentShare.putExtras(argShare);
                 startActivity(intentShare);
@@ -161,9 +161,9 @@ public class OptionDialog extends BaseDialogActivity {
                                     boolean deleteSuccess = !mIsDeletePlayList ?
                                             MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0 :
                                             PlayListUtil.deleteSong(mInfo.getId(),mPlayListName);
-                                    if(deleteSuccess){
-                                        MusicEventHelper.onMediaStoreChanged();
-                                    }
+//                                    if(deleteSuccess){
+//                                        sendBroadcast(new Intent(MusicService.ACTION_MEDIA_CHANGE));
+//                                    }
                                     ToastUtil.show(OptionDialog.this,deleteSuccess ? R.string.delete_success : R.string.delete_error);
                                     finish();
                                 }

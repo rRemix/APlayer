@@ -24,7 +24,7 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import remix.myplayer.R;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;
@@ -65,7 +65,7 @@ public class NotifyReceiver extends BroadcastReceiver {
         if((MusicService.getCurrentMP3() != null)) {
             boolean isSystemColor = SPUtil.getValue(context,"Setting","IsSystemColor",true);
 
-            MP3Item temp = MusicService.getCurrentMP3();
+            Song temp = MusicService.getCurrentMP3();
             //设置歌手，歌曲名
             mRemoteBigView.setTextViewText(R.id.notify_song, temp.getTitle());
             mRemoteBigView.setTextViewText(R.id.notify_artist_album, temp.getArtist() + " - " + temp.getAlbum());

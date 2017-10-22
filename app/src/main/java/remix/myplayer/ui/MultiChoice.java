@@ -12,11 +12,10 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.ArrayList;
 
 import remix.myplayer.R;
-import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
-import remix.myplayer.model.mp3.MultiPosition;
-import remix.myplayer.model.mp3.PlayListInfo;
+import remix.myplayer.model.MultiPosition;
+import remix.myplayer.model.mp3.PlayList;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.FolderActivity;
@@ -133,7 +132,7 @@ public class MultiChoice implements OnMultiItemClickListener {
         }
 
         //获得所有播放列表的信息
-        final ArrayList<PlayListInfo> playListInfoList = PlayListUtil.getAllPlayListInfo();
+        final ArrayList<PlayList> playListInfoList = PlayListUtil.getAllPlayListInfo();
         final ArrayList<String> playlistNameList = new ArrayList<>();
         if(playListInfoList == null)
             return;
@@ -233,9 +232,9 @@ public class MultiChoice implements OnMultiItemClickListener {
                 break;
         }
         ToastUtil.show(mContext,mContext.getString(R.string.delete_multi_song,num));
-        if(num > 0){
-            MusicEventHelper.onMediaStoreChanged();
-        }
+//        if(num > 0){
+//            mContext.sendBroadcast(new Intent(MusicService.ACTION_MEDIA_CHANGE));
+//        }
         UpdateOptionMenu(false);
     }
 

@@ -8,9 +8,7 @@ import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,7 +19,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
-import remix.myplayer.model.mp3.MultiPosition;
+import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -34,12 +32,12 @@ import remix.myplayer.util.Global;
 /**
  * Created by taeja on 16-6-23.
  */
-public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
+public class FolderAdapter extends BaseAdapter<String,FolderAdapter.FolderHolder> {
     private MultiChoice mMultiChoice;
     private Drawable mDefaultDrawable;
     private Drawable mSelectDrawable;
-    public FolderAdapter(Context context,MultiChoice multiChoice) {
-        super(context);
+    public FolderAdapter(Context context,int layoutId,MultiChoice multiChoice) {
+        super(context,layoutId);
         this.mMultiChoice = multiChoice;
         int size = DensityUtil.dip2px(mContext,45);
         mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
@@ -47,28 +45,29 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
     }
 
     @Override
-    public FolderHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new FolderHolder(LayoutInflater.from(mContext).inflate(R.layout.item_folder_recycle,null,false));
+    protected String getItem(int position) {
+        if(Global.FolderMap == null || Global.FolderMap.size() < 0)
+            return "";
+        Iterator it = Global.FolderMap.keySet().iterator();
+        String name = "";
+        for(int i = 0 ; i <= position ; i++) {
+            if(it.hasNext())
+                name = (String) it.next();
+        }
+        return name;
     }
 
     @Override
-    public void onBindViewHolder(final FolderHolder holder, final int position) {
+    protected void convert(final FolderHolder holder, String folderName, int position) {
         if(Global.FolderMap == null || Global.FolderMap.size() < 0)
             return ;
-        //根据当前索引 获得对应的文件夹名字
-        Iterator it = Global.FolderMap.keySet().iterator();
-        String temp = "";
-        for(int i = 0 ; i <= position ; i++) {
-            if(it.hasNext())
-                temp = it.next().toString();
-        }
-        if(TextUtils.isEmpty(temp))
+        if(TextUtils.isEmpty(folderName))
             return;
         //设置文件夹名字 路径名 歌曲数量
-        holder.mName.setText(temp.substring(temp.lastIndexOf("/")+ 1,temp.length()));
-        holder.mPath.setText(temp);
-        if(Global.FolderMap.get(temp) != null)
-            holder.mCount.setText(Global.FolderMap.get(temp).size()+ "首");
+        holder.mName.setText(folderName.substring(folderName.lastIndexOf("/") + 1,folderName.length()));
+        holder.mPath.setText(folderName);
+        if(Global.FolderMap.get(folderName) != null)
+            holder.mCount.setText(Global.FolderMap.get(folderName).size()+ "首");
         //根据主题模式 设置图片
         if(holder.mImg != null) {
             holder.mImg.setImageDrawable(Theme.TintDrawable(mContext.getResources().getDrawable(R.drawable.icon_folder),ThemeStore.isDay() ? Color.BLACK : Color.WHITE));
@@ -79,7 +78,7 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
         holder.mContainer.setBackground(
                 Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 
-        final String full_path = temp;
+        final String full_path = folderName;
         if(holder.mButton != null) {
             int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
             Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
@@ -136,7 +135,7 @@ public class FolderAdapter extends BaseAdapter<FolderAdapter.FolderHolder> {
         return Global.FolderMap == null ? 0 : Global.FolderMap.size();
     }
 
-    public static class FolderHolder extends BaseViewHolder {
+    static class FolderHolder extends BaseViewHolder {
         public View mContainer;
         @BindView(R.id.folder_image)
         public ImageView mImg;

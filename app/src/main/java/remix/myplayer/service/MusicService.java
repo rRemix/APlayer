@@ -69,9 +69,9 @@ import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.lyric.LrcRow;
 import remix.myplayer.lyric.SearchLRC;
-import remix.myplayer.model.mp3.FloatLrcContent;
-import remix.myplayer.model.mp3.MP3Item;
-import remix.myplayer.model.mp3.PlayListSongInfo;
+import remix.myplayer.model.FloatLrcContent;
+import remix.myplayer.model.mp3.PlayListSong;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.observer.DBObserver;
 import remix.myplayer.observer.MediaStoreObserver;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
@@ -122,14 +122,14 @@ public class MusicService extends BaseService implements Playback {
     /** 当前正在播放的歌曲id */
     private static int mCurrentId = -1;
     /** 当前正在播放的mp3 */
-    private static MP3Item mCurrentInfo = null;
+    private static Song mCurrentInfo = null;
 
     /** 下一首歌曲的索引 */
     private static int mNextIndex = 0;
     /** 下一首播放歌曲的id */
     private static int mNextId = -1;
     /** 下一首播放的mp3 */
-    private static MP3Item mNextInfo = null;
+    private static Song mNextInfo = null;
 
     /** MediaExtractor 获得码率等信息 */
     private static MediaExtractor mMediaExtractor;
@@ -147,6 +147,9 @@ public class MusicService extends BaseService implements Playback {
 
     /** 播放控制的Receiver */
     private ControlReceiver mControlRecevier;
+
+    /** 事件*/
+    private MusicEventReceiver mMusicEventReceiver;
 
     /** 监测耳机拔出的Receiver*/
     private HeadsetPlugReceiver mHeadSetReceiver;
@@ -197,6 +200,11 @@ public class MusicService extends BaseService implements Playback {
     private DBObserver mPlayListObserver;
     private DBObserver mPlayListSongObserver;
     private static Context mContext;
+
+    public static final String APLAYER_PACKAGE_NAME = "remix.myplayer";
+    public static final String ACTION_MEDIA_CHANGE = APLAYER_PACKAGE_NAME + ".media.change";
+    public static final String ACTION_PERMISSION_CHANGE = APLAYER_PACKAGE_NAME + ".permission.change";
+    public static final String ACTION_PLAYLIST_CHANGE = APLAYER_PACKAGE_NAME + ".playlist.change";
 
     public MusicService(){}
     public MusicService(Context context) {
@@ -268,6 +276,12 @@ public class MusicService extends BaseService implements Playback {
         mWindowManager = (WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE);
 
         //初始化Receiver
+        mMusicEventReceiver = new MusicEventReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ACTION_MEDIA_CHANGE);
+        intentFilter.addAction(ACTION_PERMISSION_CHANGE);
+        intentFilter.addAction(ACTION_PLAYLIST_CHANGE);
+        registerReceiver(mMusicEventReceiver,intentFilter);
         mControlRecevier = new ControlReceiver();
         registerReceiver(mControlRecevier,new IntentFilter(Constants.CTL_ACTION));
         mHeadSetReceiver = new HeadsetPlugReceiver();
@@ -377,7 +391,7 @@ public class MusicService extends BaseService implements Playback {
      * @param item
      * @param pos
      */
-    public void initDataSource(MP3Item item,int pos){
+    public void initDataSource(Song item, int pos){
         if(item == null)
             return;
         //初始化当前播放歌曲
@@ -444,6 +458,7 @@ public class MusicService extends BaseService implements Playback {
         CommonUtil.unregisterReceiver(this,mControlRecevier);
         CommonUtil.unregisterReceiver(this,mHeadSetReceiver);
         CommonUtil.unregisterReceiver(this,mWidgetReceiver);
+        CommonUtil.unregisterReceiver(this,mMusicEventReceiver);
 
         releaseWakeLock();
         getContentResolver().unregisterContentObserver(mMediaStoreObserver);
@@ -568,6 +583,40 @@ public class MusicService extends BaseService implements Playback {
         }
     }
 
+    public class MusicEventReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            handleMusicEvent(intent);
+        }
+    }
+
+    private void handleMusicEvent(Intent intent) {
+        if(intent == null)
+            return;
+        String action = intent.getAction();
+        List<MusicEventHelper.MusicEventCallback> callbacks = MusicEventHelper.getCallbacks();
+        if(callbacks == null)
+            return;
+        switch (action){
+            case ACTION_MEDIA_CHANGE:
+                for(MusicEventHelper.MusicEventCallback callback : callbacks){
+                    callback.onMediaStoreChanged();
+                }
+                break;
+            case ACTION_PERMISSION_CHANGE:
+                for(MusicEventHelper.MusicEventCallback callback : callbacks){
+                    callback.onPermissionChanged(intent.getBooleanExtra("permission",false));
+                }
+                break;
+            case ACTION_PLAYLIST_CHANGE:
+                for(MusicEventHelper.MusicEventCallback callback : callbacks){
+                    callback.onPlayListChanged();
+                }
+                break;
+        }
+    }
+
     /**
      * 接受控制命令
      * 包括暂停、播放、上下首、播放模式
@@ -640,7 +689,7 @@ public class MusicService extends BaseService implements Playback {
                     if(exist == PlayListUtil.EXIST){
                         PlayListUtil.deleteSong(mCurrentId,Global.MyLoveID);
                     } else if (exist == PlayListUtil.NONEXIST){
-                        PlayListUtil.addSong(new PlayListSongInfo(mCurrentInfo.getId(), Global.MyLoveID,Constants.MYLOVE));
+                        PlayListUtil.addSong(new PlayListSong(mCurrentInfo.getId(), Global.MyLoveID,Constants.MYLOVE));
                     }
                     updateAppwidget();
                     break;
@@ -669,7 +718,7 @@ public class MusicService extends BaseService implements Playback {
                     break;
                 //临时播放一首歌曲
                 case Constants.PLAY_TEMP:
-                    MP3Item temp = (MP3Item) intent.getSerializableExtra("MP3Item");
+                    Song temp = (Song) intent.getSerializableExtra("Song");
                     if(temp != null){
                         mCurrentInfo = temp;
                         prepare(mCurrentInfo.getUrl());
@@ -840,7 +889,7 @@ public class MusicService extends BaseService implements Playback {
             //如果是点击下一首 播放预先设置好的下一首歌曲
             mCurrentId = mNextId;
             mCurrentIndex = mNextIndex;
-            mCurrentInfo = new MP3Item(mNextInfo);
+            mCurrentInfo = new Song(mNextInfo);
         } else {
             //如果点击上一首
             if ((--mCurrentIndex) < 0)
@@ -967,7 +1016,7 @@ public class MusicService extends BaseService implements Playback {
      * 返回当前播放歌曲
      * @return
      */
-    public static MP3Item getCurrentMP3() {
+    public static Song getCurrentMP3() {
         return mCurrentInfo;
     }
 
@@ -975,7 +1024,7 @@ public class MusicService extends BaseService implements Playback {
      * 返回下一首播放歌曲
      * @return
      */
-    public static MP3Item getNextMP3(){
+    public static Song getNextMP3(){
         return mNextInfo;
     }
 
@@ -1126,7 +1175,7 @@ public class MusicService extends BaseService implements Playback {
             }
         }
 
-        MP3Item item;
+        Song item;
         //上次退出时保存的正在播放的歌曲未失效
         if(isLastSongExist && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
             initDataSource(item,pos);
@@ -1343,7 +1392,7 @@ public class MusicService extends BaseService implements Playback {
             if((MusicService.getCurrentMP3() != null)) {
                 boolean isSystemColor = SPUtil.getValue(context,"Setting","IsSystemColor",true);
 
-                MP3Item temp = MusicService.getCurrentMP3();
+                Song temp = MusicService.getCurrentMP3();
                 //设置歌手，歌曲名
                 mRemoteBigView.setTextViewText(R.id.notify_song, temp.getTitle());
                 mRemoteBigView.setTextViewText(R.id.notify_artist_album, temp.getArtist() + " - " + temp.getAlbum());
@@ -1795,10 +1844,10 @@ public class MusicService extends BaseService implements Playback {
 //                    if (FolderActivity.getInstance() != null ) {
 //                        FolderActivity.getInstance().updateList();
 //                    }
-                    MusicEventHelper.onMediaStoreChanged();
+                    musicService.handleMusicEvent(new Intent(ACTION_MEDIA_CHANGE));
                     break;
-                case Constants.UPDATE_CHILDHOLDER_ADAPTER:
-                    MusicEventHelper.onMediaStoreChanged();
+                case Constants.UPDATE_PLAYLIST:
+                    musicService.handleMusicEvent(new Intent(ACTION_PLAYLIST_CHANGE));
                     break;
             }
         }

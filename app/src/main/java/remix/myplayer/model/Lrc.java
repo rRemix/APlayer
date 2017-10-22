@@ -1,4 +1,4 @@
-package remix.myplayer.model.mp3;
+package remix.myplayer.model;
 
 /**
  * Created by Remix on 2015/12/8.
@@ -7,19 +7,19 @@ package remix.myplayer.model.mp3;
 /**
  * 歌词信息
  */
-public class LrcInfo {
+public class Lrc {
     private String mSentence;
     private int mStartTime;
     private int mEndTime;
     private int mDuration;
 
-    public LrcInfo(String mSentence, int mStartTime, int mEndTime) {
+    public Lrc(String mSentence, int mStartTime, int mEndTime) {
         this.mSentence = mSentence;
         this.mStartTime = mStartTime;
         this.mEndTime = mEndTime;
     }
 
-    public LrcInfo(String mSentence, int mStartTime) {
+    public Lrc(String mSentence, int mStartTime) {
         this.mSentence = mSentence;
         this.mStartTime = mStartTime;
     }

@@ -17,7 +17,7 @@ import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.lyric.LrcRow;
 import remix.myplayer.lyric.LrcView;
 import remix.myplayer.lyric.SearchLRC;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -33,7 +33,7 @@ public class LrcFragment extends BaseFragment {
     private static int NO_NETWORK = 3;
     private static int SEARCHING = 4;
     private OnInflateFinishListener mOnFindListener;
-    private MP3Item mInfo;
+    private Song mInfo;
     @BindView(R.id.lrc_view)
     LrcView mLrcView;
     //歌词
@@ -78,7 +78,7 @@ public class LrcFragment extends BaseFragment {
         mUnBinder = ButterKnife.bind(this,rootView);
         if(mOnFindListener != null)
             mOnFindListener.onViewInflateFinish(mLrcView);
-        mInfo = (MP3Item)getArguments().getSerializable("MP3Item");
+        mInfo = (Song)getArguments().getSerializable("Song");
         if(mLrcList != null && mLrcList.size() > 0){
             mHandler.sendEmptyMessage(UPDATE_LRC);
         }
@@ -86,10 +86,10 @@ public class LrcFragment extends BaseFragment {
         return rootView;
     }
 
-    public void UpdateLrc(MP3Item mp3Item) {
-        if(mp3Item == null)
+    public void UpdateLrc(Song song) {
+        if(song == null)
             return;
-        mInfo = mp3Item;
+        mInfo = song;
 
         new DownloadThread().start();
     }

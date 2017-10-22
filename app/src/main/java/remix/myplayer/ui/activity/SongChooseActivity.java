@@ -1,30 +1,29 @@
 package remix.myplayer.ui.activity;
 
-import android.Manifest;
-import android.content.CursorLoader;
-import android.database.Cursor;
+import android.content.Context;
+import android.content.Loader;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tbruyelle.rxpermissions2.RxPermissions;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.functions.Consumer;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongChooseAdaper;
+import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.OnSongChooseListener;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
@@ -36,27 +35,16 @@ import remix.myplayer.util.ToastUtil;
  * @Date 2016/10/21 09:34
  */
 
-public class SongChooseActivity extends BaseActivity implements android.app.LoaderManager.LoaderCallbacks<Cursor>,
-                        MusicEventHelper.MusicEventCallback{
+public class SongChooseActivity extends PermissActivity<Song,SongChooseAdaper> {
     public static final String TAG = SongChooseActivity.class.getSimpleName();
 
-    private boolean mHasPermission = false;
     private int mPlayListID;
     private String mPlayListName;
-    Cursor mCursor = null;
-    //索引
-    public static int mArtistIdIndex = -1;
-    public static int mArtistIndex = -1;
-    public static int mAlbumIdIndex = -1;
-    public static int mTitleIndex = -1;
-    public static int mSongIdIndex = -1;
-    public static int mDisPlayNameIndex = -1;
     private static int LOADER_ID = 0;
     @BindView(R.id.confirm)
     TextView mConfirm;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
-    private SongChooseAdaper mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +62,7 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
         TextView cancel = findView(R.id.cancel);
         cancel.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
         mConfirm.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-        mAdapter = new SongChooseAdaper(this, new OnSongChooseListener() {
+        mAdapter = new SongChooseAdaper(this,R.layout.item_song_choose, new OnSongChooseListener() {
             @Override
             public void OnSongChoose(boolean isValid) {
                 mConfirm.setAlpha(isValid ? 1.0f : 0.6f);
@@ -87,7 +75,6 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mConfirm.setAlpha(0.6f);
 
-        MusicEventHelper.addCallback(this);
     }
 
     @OnClick({R.id.confirm,R.id.cancel})
@@ -108,65 +95,37 @@ public class SongChooseActivity extends BaseActivity implements android.app.Load
     }
 
     @Override
-    public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        //查询所有歌曲
-        return  new CursorLoader(this,
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.ARTIST,
-                        MediaStore.Audio.Media.ARTIST_ID, MediaStore.Audio.Media.TITLE,
-                        MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.DISPLAY_NAME,MediaStore.Audio.Media.ALBUM_ID},
-                MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),null,MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-    }
-
-    @Override
-    public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
-        if(data == null)
-            return;
-        //保存查询结果，并设置查询索引
-        mCursor = data;
-        mTitleIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE);
-        mArtistIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST);
-        mArtistIdIndex = data.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID);
-        mAlbumIdIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID);
-        mSongIdIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
-        mDisPlayNameIndex = data.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
-        mAdapter.setCursor(mCursor);
-    }
-
-    @Override
-    public void onLoaderReset(android.content.Loader<Cursor> loader) {
-        if(mAdapter != null)
-            mAdapter.setCursor(null);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        MusicEventHelper.removeCallback(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        new RxPermissions(this)
-                .request(Manifest.permission.READ_EXTERNAL_STORAGE)
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean aBoolean) throws Exception {
-                        if(aBoolean != mHasPermission){
-                            mHasPermission = aBoolean;
-                            if(aBoolean){
-                                MusicEventHelper.onMediaStoreChanged();
-                                mHasPermission = true;
-                            }
-                        }
-                    }
-                });
-    }
-
-    @Override
     public void onMediaStoreChanged() {
         if(mHasPermission)
             getLoaderManager().initLoader(++LOADER_ID, null, this);
+        else{
+            if(mAdapter != null)
+                mAdapter.setDatas(null);
+        }
     }
+
+    @Override
+    protected void setUpToolbar(Toolbar toolbar, String title) {
+    }
+
+    @Override
+    protected void setUpMultiChoice() {
+    }
+
+    @Override
+    protected Loader<List<Song>> getLoader() {
+        return new AsyncSongLoader(mContext);
+    }
+
+    private static class AsyncSongLoader extends AppWrappedAsyncTaskLoader<List<Song>> {
+        private AsyncSongLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        public List<Song> loadInBackground() {
+            return MediaStoreUtil.getAllSong();
+        }
+    }
+
 }

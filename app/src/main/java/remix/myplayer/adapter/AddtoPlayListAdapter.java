@@ -13,7 +13,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.model.mp3.PlayListInfo;
+import remix.myplayer.model.mp3.PlayList;
 import remix.myplayer.util.PlayListUtil;
 
 /**
@@ -49,7 +49,7 @@ public class AddtoPlayListAdapter extends RecyclerView.Adapter<AddtoPlayListAdap
     @Override
     public void onBindViewHolder(PlayListAddToHolder holder, final int position) {
         if(mCursor.moveToPosition(position)){
-            PlayListInfo info = PlayListUtil.getPlayListInfo(mCursor);
+            PlayList info = PlayListUtil.getPlayListInfo(mCursor);
             if(info == null) {
                 holder.mText.setText(R.string.load_playlist_error);
                 return;

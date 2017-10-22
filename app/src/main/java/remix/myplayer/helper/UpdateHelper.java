@@ -2,7 +2,7 @@ package remix.myplayer.helper;
 
 import java.util.ArrayList;
 
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
 
 /**
  * @ClassName
@@ -14,10 +14,10 @@ import remix.myplayer.model.mp3.MP3Item;
 public class UpdateHelper {
     private static ArrayList<Callback> mCallbacks = new ArrayList<>();
 
-    public static void update(MP3Item mp3Item, boolean isPlay) {
+    public static void update(Song song, boolean isPlay) {
         for(int i = 0 ; i < mCallbacks.size();i++){
             if(mCallbacks.get(i) != null)
-                mCallbacks.get(i).UpdateUI(mp3Item,isPlay);
+                mCallbacks.get(i).UpdateUI(song,isPlay);
         }
     }
 
@@ -33,6 +33,6 @@ public class UpdateHelper {
     }
 
     public interface Callback{
-        void UpdateUI(MP3Item MP3Item, boolean isplay);
+        void UpdateUI(Song Song, boolean isplay);
     }
 }

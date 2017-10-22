@@ -2,7 +2,6 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -18,7 +17,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import remix.myplayer.R;
@@ -26,8 +24,8 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.interfaces.SortChangeCallback;
-import remix.myplayer.model.mp3.MP3Item;
-import remix.myplayer.model.mp3.MultiPosition;
+import remix.myplayer.model.MultiPosition;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -42,7 +40,6 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -53,7 +50,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * Created by Remix on 2016/4/11.
  */
-public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIndexer{
+public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements FastScroller.SectionIndexer{
     //升序还是降序
     public static String ASCDESC = SPUtil.getValue(APlayerApplication.getContext(),"Setting","AscDesc"," asc");
     //按字母排序还是按添加时间排序
@@ -67,8 +64,8 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
     protected Drawable mSelectDrawable;
     protected SortChangeCallback mCallback;
 
-    public SongAdapter(Context context, Cursor cursor, MultiChoice multiChoice, int type) {
-        super(context,cursor,multiChoice);
+    public SongAdapter(Context context,int layoutId, MultiChoice multiChoice, int type) {
+        super(context,layoutId,multiChoice);
         this.mMultiChoice = multiChoice;
         this.mType = type;
         int size = DensityUtil.dip2px(mContext,60);
@@ -81,18 +78,18 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
     }
 
     @Override
-    public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
+    public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return viewType == TYPE_HEADER ?
                 new HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_1,parent,false)) :
                 new SongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_song_recycle,parent,false));
     }
 
     @Override
-    public void onBind(final BaseViewHolder baseHolder, final int position) {
+    protected void convert(BaseViewHolder baseHolder, final Song song, int position) {
         if(position == 0){
             final HeaderHolder headerHolder = (HeaderHolder) baseHolder;
             //没有歌曲时隐藏
-            if(mCursor == null || mCursor.getCount() == 0){
+            if(mDatas == null || mDatas.size() == 0){
                 headerHolder.mRoot.setVisibility(View.GONE);
                 return;
             }
@@ -118,19 +115,13 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
 
         if(!(baseHolder instanceof SongViewHolder))
             return;
-        if(mCursor == null || !mCursor.moveToPosition(position - 1)){
+        if(mDatas == null || position - 1 > mDatas.size()){
             return;
         }
         final SongViewHolder holder = (SongViewHolder) baseHolder;
-        final MP3Item temp = new MP3Item(mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media._ID)),
-                mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
-                mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)),
-                mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)),
-                mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
-                mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),0,"","",0,"","",0);
 
         //获得当前播放的歌曲
-//        final MP3Item currentMP3 = MusicService.getCurrentMP3();
+//        final Song currentMP3 = MusicService.getCurrentMP3();
         //判断该歌曲是否是正在播放的歌曲
         //如果是,高亮该歌曲，并显示动画
 //        if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
@@ -149,29 +140,24 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
 //            }
 //        }
 
-        try {
-            //是否为无损
-            String prefix = temp.getDisplayname().substring(temp.getDisplayname().lastIndexOf(".") + 1);
-            holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
+        //是否为无损
+        String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
+        holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
 
-            //设置歌曲名
-            String name = CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE);
-            holder.mName.setText(name);
+        //设置歌曲名
+        String name = CommonUtil.processInfo(song.getTitle(),CommonUtil.SONGTYPE);
+        holder.mName.setText(name);
 
-            //艺术家与专辑
-            String artist = CommonUtil.processInfo(temp.getArtist(),CommonUtil.ARTISTTYPE);
-            String album = CommonUtil.processInfo(temp.getAlbum(),CommonUtil.ALBUMTYPE);
-            holder.mOther.setText(artist + "-" + album);
+        //艺术家与专辑
+        String artist = CommonUtil.processInfo(song.getArtist(),CommonUtil.ARTISTTYPE);
+        String album = CommonUtil.processInfo(song.getAlbum(),CommonUtil.ALBUMTYPE);
+        holder.mOther.setText(artist + "-" + album);
 
-            //封面
-            new AsynLoadImage(holder.mImage).execute(temp.getAlbumId(),Constants.URL_ALBUM);
+        //封面
+        new AsynLoadImage(holder.mImage).execute(song.getAlbumId(),Constants.URL_ALBUM);
 
-            //背景点击效果
-            holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        //背景点击效果
+        holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 
         //选项Dialog
         if(holder.mButton != null) {
@@ -192,7 +178,7 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
                     if(mMultiChoice.isShow())
                         return;
                     Intent intent = new Intent(mContext, OptionDialog.class);
-                    intent.putExtra("MP3Item", temp);
+                    intent.putExtra("Song", song);
                     mContext.startActivity(intent);
                 }
             });
@@ -254,8 +240,11 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
                     }
                     Global.setPlayQueue(Global.AllSongList,mContext,intent);
                 } else {
-                    ArrayList<Integer> IdList = MediaStoreUtil.getSongIdListByCursor(mCursor);
-                    if(IdList == null || IdList.size() == 0){
+                    ArrayList<Integer> IdList = new ArrayList<>();
+                    for(int i = 0 ; i < mDatas.size();i++){
+                        IdList.add(mDatas.get(i).getId());
+                    }
+                    if(IdList.size() == 0){
                         ToastUtil.show(mContext,R.string.no_song);
                         return;
                     }
@@ -293,8 +282,8 @@ public class SongAdapter extends HeaderAdapter implements FastScroller.SectionIn
     public String getSectionText(int position) {
         if(position == 0)
             return "";
-        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position - 1)){
-            String title = mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+        if(mDatas != null && position - 1 < mDatas.size()){
+            String title = mDatas.get(position).getTitle();
             return !TextUtils.isEmpty(title) ? (Pinyin.toPinyin(title.charAt(0))).toUpperCase().substring(0,1)  : "";
         }
         return "";

@@ -1,13 +1,13 @@
 package remix.myplayer.ui.dialog;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,17 +19,24 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.functions.Consumer;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayQueueAdapter;
-import remix.myplayer.db.PlayListSongs;
+import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
+import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.model.mp3.PlayListSong;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.PlayListUtil;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -38,13 +45,12 @@ import remix.myplayer.util.Global;
 /**
  * 正在播放列表Dialog
  */
-public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager.LoaderCallbacks<Cursor>  {
+public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager.LoaderCallbacks<List<PlayListSong>>,MusicEventHelper.MusicEventCallback {
     @BindView(R.id.bottom_actionbar_play_list)
     RecyclerView mRecyclerView;
+    private boolean mHasPermission = false;
     private PlayQueueAdapter mAdapter;
-    Cursor mCursor = null;
     private SeekHandler mHandler;
-    public static int mAudioIdIndex;
     private static int LOADER_ID = 0;
     private boolean mMove = false;
     private int mPos = -1;
@@ -56,7 +62,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         ButterKnife.bind(this);
 
         mHandler = new SeekHandler(getMainLooper(),this);
-        mAdapter = new PlayQueueAdapter(this);
+        mAdapter = new PlayQueueAdapter(this,R.layout.item_playqueue);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -109,6 +115,8 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         lp.width = metrics.widthPixels;
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);
+
+        MusicEventHelper.addCallback(this);
     }
 
     public PlayQueueAdapter getAdapter(){
@@ -130,51 +138,89 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(mCursor != null)
-            mCursor.close();
+        MusicEventHelper.removeCallback(this);
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this,PlayListSongs.CONTENT_URI,new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
-                PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?",new String[]{Global.PlayQueueID + ""},null);
+    public Loader<List<PlayListSong>> onCreateLoader(int id, Bundle args) {
+        return new AsyncPlayQueueSongLoader(mContext);
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(Loader<List<PlayListSong>> loader, final List<PlayListSong> data) {
         if(data == null)
             return;
-        //查询完毕后保存结果，并设置查询索引
-        try {
-            mCursor = data;
-            mAudioIdIndex = data.getColumnIndex(PlayListSongs.PlayListSongColumns.AUDIO_ID);
-            final int curId = MusicService.getCurrentMP3() != null ? MusicService.getCurrentMP3().getId() : -1;
-            if(curId < 0)
-                return;
-            new Thread(){
-                @Override
-                public void run() {
-                    mCursor.moveToFirst();
-                    for(int i = 0 ; i < mCursor.getCount();i++){
-                        mCursor.moveToPosition(i);
-                        if(mCursor.getInt(mAudioIdIndex) == curId){
-                            mPos = i;
-                            Message msg = mHandler.obtainMessage(0);
-                            msg.sendToTarget();
-                        }
+        mAdapter.setDatas(data);
+        final int curId = MusicService.getCurrentMP3() != null ? MusicService.getCurrentMP3().getId() : -1;
+        if(curId < 0)
+            return;
+        new Thread(){
+            @Override
+            public void run() {
+                for(int i = 0 ; i < data.size();i++){
+                    if(data.get(i).AudioId == curId){
+                        mPos = i;
+                        Message msg = mHandler.obtainMessage(0);
+                        msg.sendToTarget();
                     }
                 }
-            }.start();
-            mAdapter.setCursor(data);
-        } catch (Exception e){
-            e.printStackTrace();
+            }
+        }.start();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<PlayListSong>> loader) {
+        if (mAdapter != null)
+            mAdapter.setDatas(null);
+    }
+
+    @Override
+    public void onMediaStoreChanged() {
+        if(mHasPermission){
+            getSupportLoaderManager().initLoader(LOADER_ID++,null,this);
+        } else {
+            if(mAdapter != null)
+                mAdapter.setDatas(null);
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        if (mAdapter != null)
-            mAdapter.setCursor(null);
+    public void onPermissionChanged(boolean has) {
+        onMediaStoreChanged();
+    }
+
+    @Override
+    public void onPlayListChanged() {
+        onMediaStoreChanged();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new RxPermissions(this)
+                .request(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if(aBoolean != mHasPermission){
+                            mHasPermission = aBoolean;
+                            Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
+                            intent.putExtra("permission",mHasPermission);
+                            sendBroadcast(intent);
+                        }
+                    }
+                });
+    }
+
+    private static class AsyncPlayQueueSongLoader extends WrappedAsyncTaskLoader<List<PlayListSong>> {
+        private AsyncPlayQueueSongLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        public List<PlayListSong> loadInBackground() {
+            return PlayListUtil.getPlayListSong(Global.PlayQueueID);
+        }
     }
 
     private static class SeekHandler extends Handler{
@@ -207,7 +253,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
                 //这里这个变量是用在RecyclerView滚动监听里面的
                 dialog.mMove = true;
             }
-            if(dialog != null && pos >= 0){
+            if(pos >= 0){
                 dialog.mRecyclerView.getLayoutManager().scrollToPosition(pos);
             }
         }

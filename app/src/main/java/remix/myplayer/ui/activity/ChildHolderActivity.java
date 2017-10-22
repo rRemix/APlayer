@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.squareup.haha.trove.TObjectFunction;
 import com.umeng.analytics.MobclickAgent;
 
 import java.lang.ref.WeakReference;
@@ -27,7 +28,7 @@ import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.SortChangeCallback;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -38,6 +39,7 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -46,7 +48,7 @@ import remix.myplayer.util.PlayListUtil;
 /**
  * 专辑、艺术家、文件夹、播放列表详情
  */
-public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHelper.Callback,MusicEventHelper.MusicEventCallback{
+public class ChildHolderActivity extends PermissActivity<Song,ChildHolderAdapter> implements UpdateHelper.Callback{
     public final static String TAG = ChildHolderActivity.class.getSimpleName();
     public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";
     private boolean mIsRunning = false;
@@ -54,7 +56,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
     public static int mId;
     private int mType;
     private String mArg;
-    private ArrayList<MP3Item> mInfoList;
+    private ArrayList<Song> mInfoList;
 
     //歌曲数目与标题
     @BindView(R.id.childholder_item_num)
@@ -67,7 +69,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
     private String Title;
     private BottomActionBarFragment mBottombar;
 
-    private ChildHolderAdapter mAdapter;
     private static WeakReference<ChildHolderActivity> mRef;
     private MaterialDialog mMDDialog;
 
@@ -89,7 +90,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         mType = getIntent().getIntExtra("Type", -1);
         mArg = getIntent().getStringExtra("Title");
 
-        mAdapter = new ChildHolderAdapter(this,mType,mArg,mMultiChoice);
+        mAdapter = new ChildHolderAdapter(this,R.layout.item_child_holder,mType,mArg,mMultiChoice);
         mAdapter.setCallback(new SortChangeCallback() {
             @Override
             public void SortChange() {
@@ -106,7 +107,7 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                     if (mInfoList != null && mInfoList.size() == 0)
                         return;
                     ArrayList<Integer> idList = new ArrayList<>();
-                    for (MP3Item info : mInfoList) {
+                    for (Song info : mInfoList) {
                         if(info != null && info.getId() > 0)
                             idList.add(info.getId());
                     }
@@ -168,14 +169,8 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
             return;
         mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.isPlay());
 
-        MusicEventHelper.addCallback(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        MusicEventHelper.removeCallback(this);
-    }
 
     @Override
     public void onBackPressed() {
@@ -191,7 +186,12 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         updateList();
     }
 
-    class GetSongList extends Thread{
+    @Override
+    public void onPlayListChanged() {
+        updateList();
+    }
+
+    private class GetSongList extends Thread{
         //是否需要重新查询歌曲列表
         private boolean mNeedReset = true;
         GetSongList(boolean needReset) {
@@ -214,9 +214,9 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
      * 根据条件排序
      */
     private void sortList(){
-        Collections.sort(mInfoList, new Comparator<MP3Item>() {
+        Collections.sort(mInfoList, new Comparator<Song>() {
             @Override
-            public int compare(MP3Item o1, MP3Item o2) {
+            public int compare(Song o1, Song o2) {
                 if(o1 == null || o2 == null)
                     return 0;
                 //当前是按名字排序
@@ -249,10 +249,9 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
      * 根据参数(专辑id 歌手id 文件夹名 播放列表名)获得对应的歌曲信息列表
      * @return 对应歌曲信息列表
      */
-    private ArrayList<MP3Item> getMP3List(){
+    private ArrayList<Song> getMP3List(){
         if(mId < 0)
             return  null;
-        mInfoList = new ArrayList<>();
         switch (mType) {
             //专辑id
             case Constants.ALBUM:
@@ -281,9 +280,9 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
 
     //更新界面
     @Override
-    public void UpdateUI(MP3Item MP3Item, boolean isplay) {
+    public void UpdateUI(Song Song, boolean isplay) {
         //底部状态兰
-        mBottombar.UpdateBottomStatus(MP3Item, isplay);
+        mBottombar.UpdateBottomStatus(Song, isplay);
         //更新高亮歌曲
 //        if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
 //        if(mAdapter != null)
@@ -304,7 +303,6 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
         MobclickAgent.onPageStart(ChildHolderActivity.class.getSimpleName());
         super.onResume();
         mIsRunning = true;
-
     }
 
     @Override
@@ -314,8 +312,15 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
     }
 
     public void updateList() {
-        if(mIsRunning)
-            new GetSongList().start();
+        if(mIsRunning){
+            if(mHasPermission)
+                new GetSongList().start();
+            else {
+                mInfoList = null;
+                mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+            }
+        }
+
     }
 
     public static ChildHolderActivity getInstance(){
@@ -335,9 +340,9 @@ public class ChildHolderActivity extends MultiChoiceActivity implements UpdateHe
                     multiChoice.clearSelectedViews();
                     break;
                 case Constants.UPDATE_ADAPTER:
-                    if(activity.mInfoList == null)
-                        return;
-                    activity.mAdapter.setList(activity.mInfoList);
+//                    if(activity.mInfoList == null)
+//                        return;
+                    activity.mAdapter.setDatas(activity.mInfoList);
                     activity.mNum.setText(activity.getString(R.string.song_count,activity.mInfoList.size()));
                     break;
                 case START:

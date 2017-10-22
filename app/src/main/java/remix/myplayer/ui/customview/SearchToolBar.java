@@ -42,7 +42,7 @@ public class SearchToolBar extends Toolbar {
 
     private void init(){
 
-        mEditText = (EditText)findViewById(R.id.search_input);
+        mEditText = findViewById(R.id.search_input);
         //设置EditText光标与下划线颜色
         mEditText.getBackground().setColorFilter(
                 ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white),
@@ -86,7 +86,7 @@ public class SearchToolBar extends Toolbar {
             }
         });
 
-        mButtonClear = (ImageButton)findViewById(R.id.search_clear);
+        mButtonClear = findViewById(R.id.search_clear);
         mButtonClear.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

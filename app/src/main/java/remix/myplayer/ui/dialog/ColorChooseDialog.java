@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.model.mp3.ColorChooseInfo;
+import remix.myplayer.model.mp3.ColorChoose;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 
@@ -42,7 +42,7 @@ public class ColorChooseDialog extends BaseDialogActivity {
     private final int[] mThemeColors = new int[]{ThemeStore.THEME_BLUE,ThemeStore.THEME_RED,ThemeStore.THEME_BROWN,ThemeStore.THEME_NAVY,
             ThemeStore.THEME_GREEN,ThemeStore.THEME_YELLOW,ThemeStore.THEME_PURPLE,ThemeStore.THEME_INDIGO,ThemeStore.THEME_PLUM,ThemeStore.THEME_WHITE};
 
-    private ArrayList<ColorChooseInfo> mColorInfoList = new ArrayList<>();
+    private ArrayList<ColorChoose> mColorInfoList = new ArrayList<>();
 
 
     @Override
@@ -75,7 +75,7 @@ public class ColorChooseDialog extends BaseDialogActivity {
 
         colorItem.setOnClickListener(new ColorLisener(themeColor));
         mColorContainer.addView(colorItem);
-        mColorInfoList.add(new ColorChooseInfo(themeColor,colorText,check));
+        mColorInfoList.add(new ColorChoose(themeColor,colorText,check));
     }
 
     /**

@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Set;
 
 import remix.myplayer.application.APlayerApplication;
-import remix.myplayer.model.mp3.LrcRequest;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.LrcRequest;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
@@ -42,13 +42,13 @@ public class SearchLRC {
     private static final String DEFAULT_LOCAL = "GB2312";
     private static final String LRC_REQUEST_ROOT = "http://s.geci.me/lrc/";
     private ILrcParser mLrcBuilder;
-    private MP3Item mInfo;
+    private Song mInfo;
     private String mTitle;
     private String mArtistName;
     private String mDisplayName;
     private String mManualPath;
 
-    public SearchLRC(MP3Item item) {
+    public SearchLRC(Song item) {
         mInfo = item;
         mTitle = mInfo.getTitle();
         mArtistName = mInfo.getArtist();
@@ -64,7 +64,7 @@ public class SearchLRC {
         mLrcBuilder = new DefaultLrcParser();
     }
 
-    public SearchLRC(MP3Item item,String manualPath){
+    public SearchLRC(Song item, String manualPath){
         this(item);
         mManualPath = manualPath;
     }

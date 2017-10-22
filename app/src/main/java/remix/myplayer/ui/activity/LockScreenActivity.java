@@ -29,7 +29,7 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.CtrlButtonListener;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.blur.StackBlurManager;
@@ -51,7 +51,7 @@ import remix.myplayer.util.ToastUtil;
 public class LockScreenActivity extends BaseActivity implements UpdateHelper.Callback{
     private final static String TAG = "LockScreenActivity";
     //当前播放的歌曲信息
-    private MP3Item mInfo;
+    private Song mInfo;
     //歌曲与艺术家
     @BindView(R.id.lockscreen_song)
     TextView mSong;
@@ -209,8 +209,8 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     }
 
     @Override
-    public void UpdateUI(MP3Item MP3Item, boolean isplay) {
-        mInfo = MP3Item;
+    public void UpdateUI(Song Song, boolean isplay) {
+        mInfo = Song;
         mIsPlay = isplay;
         if(!mIsRunning)
             return;

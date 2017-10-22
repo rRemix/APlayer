@@ -6,13 +6,14 @@ package remix.myplayer.model.mp3;
  * @Author Xiaoborui
  * @Date 2016/10/13 11:22
  */
-public class PlayListInfo {
+public class PlayList {
     public int _Id;
     public String Name;
     public int Count;
-    public PlayListInfo(){}
-    public PlayListInfo(String name, int count) {
+    public PlayList(){}
+    public PlayList(String name, int count) {
         Name = name;
         Count = count;
     }
+
 }

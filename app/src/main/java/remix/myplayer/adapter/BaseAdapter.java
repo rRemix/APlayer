@@ -1,8 +1,15 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.List;
 
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.interfaces.OnItemClickListener;
@@ -13,30 +20,76 @@ import remix.myplayer.interfaces.OnItemClickListener;
  * @Author Xiaoborui
  * @Date 2016/10/19 11:31
  */
-public abstract class BaseAdapter<T extends BaseViewHolder> extends RecyclerView.Adapter<T> {
+public abstract class BaseAdapter<D,T extends BaseViewHolder> extends RecyclerView.Adapter<T> {
     protected Context mContext;
     protected OnItemClickListener mOnItemClickLitener;
-    protected Cursor mCursor;
+    protected List<D> mDatas;
+    protected int mLayoutId;
+    protected Constructor mConstructor;
 
     public BaseAdapter(Context Context) {
         this.mContext = Context;
     }
 
-    public BaseAdapter(Context context,Cursor cursor){
+    public BaseAdapter(Context context,int layoutId){
         this.mContext = context;
-        this.mCursor = cursor;
+        this.mLayoutId = layoutId;
+        try {
+            this.mConstructor = getGenericClass().getDeclaredConstructor(View.class);
+            this.mConstructor.setAccessible(true);
+        }catch (Exception e){
+            throw new IllegalArgumentException(e.toString());
+        }
+    }
+
+    public void setDatas(List<D> datas){
+        mDatas = datas;
+        notifyDataSetChanged();
+    }
+
+    public List<D> getDatas(){
+        return mDatas;
+    }
+
+    @Override
+    public void onBindViewHolder(T holder, int position){
+        convert(holder,getItem(position),position);
+    }
+
+    protected D getItem(int position){
+        return mDatas.get(position);
+    }
+
+    protected abstract void convert(final T holder, D d, final int position);
+
+    @Override
+    public T onCreateViewHolder(ViewGroup parent, int viewType) {
+        try {
+            View itemView = LayoutInflater.from(mContext).inflate(mLayoutId, parent, false);
+            return (T)mConstructor.newInstance(itemView);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.toString());
+        }
     }
 
     public void setOnItemClickLitener(OnItemClickListener l) {
         this.mOnItemClickLitener = l;
     }
-    public void setCursor(Cursor cursor) {
-        mCursor = cursor;
-        notifyDataSetChanged();
-    }
 
     @Override
     public int getItemCount() {
-        return mCursor != null ? mCursor.getCount() : 0;
+        return mDatas != null ? mDatas.size() : 0;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected final Class<T> getGenericClass() {
+        Type genType = getClass().getGenericSuperclass();
+        Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+
+        if (params != null && params.length > 1 && params[1] instanceof Class<?>) {
+            return (Class<T>) params[1];
+        } else {
+            throw new IllegalArgumentException("泛型错误");
+        }
     }
 }

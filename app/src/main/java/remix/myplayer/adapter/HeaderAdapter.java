@@ -1,11 +1,9 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewGroup;
 
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
@@ -21,7 +19,7 @@ import remix.myplayer.util.Constants;
  * @Date 2017/1/17 16:36
  */
 
-public abstract class HeaderAdapter extends BaseAdapter<BaseViewHolder> {
+public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extends BaseAdapter<M,BaseViewHolder> {
     static final int TYPE_HEADER = 0;
     static final int TYPE_NORMAL = 1;
     protected MultiChoice mMultiChoice;
@@ -29,26 +27,13 @@ public abstract class HeaderAdapter extends BaseAdapter<BaseViewHolder> {
     //当前列表模式 1:列表 2:网格
     int ListModel = 2;
 
-    HeaderAdapter(Context context, Cursor cursor, MultiChoice multiChoice) {
-        super(context,cursor);
+    HeaderAdapter(Context context, int layoutId, MultiChoice multiChoice) {
+        super(context,layoutId);
         this.mMultiChoice = multiChoice;
     }
 
     public void setModeChangeCallback(ModeChangeCallback modeChangeCallback){
         mModeChangeCallback = modeChangeCallback;
-    }
-
-    public abstract BaseViewHolder onCreateHolder(ViewGroup parent, final int viewType);
-    public abstract void onBind(BaseViewHolder viewHolder, int position);
-
-    @Override
-    public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return onCreateHolder(parent,viewType);
-    }
-
-    @Override
-    public void onBindViewHolder(BaseViewHolder holder, int position) {
-        onBind(holder,position);
     }
 
     @Override
@@ -59,8 +44,13 @@ public abstract class HeaderAdapter extends BaseAdapter<BaseViewHolder> {
     }
 
     @Override
+    protected M getItem(int position) {
+        return mDatas != null ? position == 0 ? null : position - 1 < mDatas.size() ? mDatas.get(position - 1) : null : null;
+    }
+
+    @Override
     public int getItemCount() {
-        return mCursor != null && !mCursor.isClosed() && mCursor.getCount() > 0 ? super.getItemCount() + 1 : 0;
+        return mDatas != null ? super.getItemCount() + 1 : 0;
     }
 
     @Override

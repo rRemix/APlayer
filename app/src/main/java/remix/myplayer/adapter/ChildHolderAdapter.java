@@ -21,8 +21,8 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.interfaces.SortChangeCallback;
-import remix.myplayer.model.mp3.MP3Item;
-import remix.myplayer.model.mp3.MultiPosition;
+import remix.myplayer.model.MultiPosition;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -42,7 +42,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * Created by taeja on 16-6-24.
  */
-public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.SectionIndexer{
+public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> implements FastScroller.SectionIndexer{
     //升序
     public static final int ASC = 0;
     //降序
@@ -51,7 +51,6 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
     public static final int NAME = 0;
     //按添加时间排序
     public static final int ADDTIME = 1;
-    private ArrayList<MP3Item> mInfoList;
     private int mType;
     private String mArg;
     private MultiChoice mMultiChoice;
@@ -63,8 +62,8 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
     //当前是按字母排序还是添加时间 0:字母 1:时间
     public static int SORT = SPUtil.getValue(APlayerApplication.getContext(),"Setting","SubDirSort", NAME);
 
-    public ChildHolderAdapter(Context context, int type, String arg,MultiChoice multiChoice){
-        super(context,null,multiChoice);
+    public ChildHolderAdapter(Context context,int layoutId, int type, String arg,MultiChoice multiChoice){
+        super(context,layoutId,multiChoice);
         this.mContext = context;
         this.mType = type;
         this.mArg = arg;
@@ -78,24 +77,19 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
         mCallback = callback;
     }
 
-    public void setList(ArrayList<MP3Item> list){
-        mInfoList = list;
-        notifyDataSetChanged();
-    }
-
     @Override
-    public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
+    public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return viewType == TYPE_HEADER ?
                 new SongAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_1,parent,false)) :
                 new ChildHolderViewHoler(LayoutInflater.from(mContext).inflate(R.layout.item_child_holder,parent,false));
     }
 
     @Override
-    public void onBind(final BaseViewHolder baseHolder, int position) {
+    protected void convert(final BaseViewHolder baseHolder,final Song song, int position) {
         if(position == 0){
             final SongAdapter.HeaderHolder headerHolder = (SongAdapter.HeaderHolder) baseHolder;
             //没有歌曲时隐藏
-            if(mInfoList == null || mInfoList.size() == 0){
+            if(mDatas == null || mDatas.size() == 0){
                 headerHolder.mRoot.setVisibility(View.GONE);
                 return;
             }
@@ -114,11 +108,8 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
             return;
         }
 
-        if(mInfoList == null || position > mInfoList.size())
-            return;
         final ChildHolderViewHoler holder = (ChildHolderViewHoler) baseHolder;
-        final MP3Item temp = mInfoList.get(position - 1);
-        if(temp == null || temp.getId() < 0 || temp.Title.equals(mContext.getString(R.string.song_lose_effect))) {
+        if(song == null || song.getId() < 0 || song.Title.equals(mContext.getString(R.string.song_lose_effect))) {
             holder.mTitle.setText(R.string.song_lose_effect);
             holder.mColumnView.setVisibility(View.INVISIBLE);
             holder.mButton.setVisibility(View.INVISIBLE);
@@ -126,7 +117,7 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
             holder.mColumnView.setVisibility(View.VISIBLE);
             holder.mButton.setVisibility(View.VISIBLE);
             //获得正在播放的歌曲
-//            final MP3Item currentMP3 = MusicService.getCurrentMP3();
+//            final Song currentMP3 = MusicService.getCurrentMP3();
             //判断该歌曲是否是正在播放的歌曲
             //如果是,高亮该歌曲，并显示动画
 //            if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
@@ -147,15 +138,15 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
 //            }
 
             //是否无损
-            if(!TextUtils.isEmpty(temp.getDisplayname())){
-                String prefix = temp.getDisplayname().substring(temp.getDisplayname().lastIndexOf(".") + 1);
+            if(!TextUtils.isEmpty(song.getDisplayname())){
+                String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
                 holder.mSQ.setVisibility(!TextUtils.isEmpty(prefix) && (prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")) ? View.VISIBLE : View.GONE);
             } else {
                 holder.mSQ.setVisibility(View.GONE);
             }
 
             //设置标题
-            holder.mTitle.setText(CommonUtil.processInfo(temp.getTitle(),CommonUtil.SONGTYPE));
+            holder.mTitle.setText(CommonUtil.processInfo(song.getTitle(),CommonUtil.SONGTYPE));
 
             if(holder.mButton != null) {
                 //设置按钮着色
@@ -175,7 +166,7 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
                         if(mMultiChoice.isShow())
                             return;
                         Intent intent = new Intent(mContext, OptionDialog.class);
-                        intent.putExtra("MP3Item", temp);
+                        intent.putExtra("Song", song);
                         if (mType == Constants.PLAYLIST) {
                             intent.putExtra("IsDeletePlayList", true);
                             intent.putExtra("PlayListName", mArg);
@@ -221,11 +212,6 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
         }
     }
 
-    @Override
-    public int getItemCount() {
-        return mInfoList != null ? mInfoList.size() + 1 : 0;
-    }
-
     public void OnClick(SongAdapter.HeaderHolder headerHolder, View v){
         switch (v.getId()){
             case R.id.play_shuffle:
@@ -235,7 +221,7 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
                 intent.putExtra("shuffle",true);
                 //设置正在播放列表
                 ArrayList<Integer> IDList = new ArrayList<>();
-                for (MP3Item info : mInfoList)
+                for (Song info : mDatas)
                     IDList.add(info.getId());
                 if(IDList == null || IDList.size() == 0){
                     ToastUtil.show(mContext,R.string.no_song);
@@ -270,8 +256,8 @@ public class ChildHolderAdapter extends HeaderAdapter implements FastScroller.Se
     public String getSectionText(int position) {
         if(position == 0)
             return "";
-        if(mInfoList != null && mInfoList.size() > 0 && position < mInfoList.size() && mInfoList.get(position - 1) != null){
-            String title = mInfoList.get(position).getTitle();
+        if(mDatas != null && mDatas.size() > 0 && position < mDatas.size() && mDatas.get(position - 1) != null){
+            String title = mDatas.get(position).getTitle();
             return !TextUtils.isEmpty(title) ? (Pinyin.toPinyin(title.charAt(0))).toUpperCase().substring(0,1)  : "";
         }
         return "";

@@ -3,12 +3,12 @@ package remix.myplayer.model.mp3;
 import android.widget.ImageView;
 
 /**
- * @ClassName ColorChooseInfo
+ * @ClassName ColorChoose
  * @Description 颜色选择信息
  * @Author Xiaoborui
  * @Date 2016/8/26 14:43
  */
-public class ColorChooseInfo {
+public class ColorChoose {
     /** 主题颜色*/
     public int mThemeColor;
 
@@ -18,7 +18,7 @@ public class ColorChooseInfo {
     /** 是否选中 */
     public ImageView mCheck;
 
-    public ColorChooseInfo(int ThemeColor, String ColorText,ImageView Check) {
+    public ColorChoose(int ThemeColor, String ColorText, ImageView Check) {
         this.mThemeColor = ThemeColor;
         this.mColorText = ColorText;
         this.mCheck = Check;

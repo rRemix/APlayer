@@ -3,9 +3,7 @@ package remix.myplayer.adapter;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.SwitchCompat;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -15,6 +13,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.interfaces.OnModeChangeListener;
+import remix.myplayer.model.Drawer;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
@@ -26,25 +25,20 @@ import remix.myplayer.util.ColorUtil;
  * @Date 2016/10/26 11:05
  */
 
-public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
+public class DrawerAdapter extends BaseAdapter<Drawer,DrawerAdapter.DrawerHolder>{
     //当前选中项
-    public int mSelectIndex = 0;
+    private int mSelectIndex = 0;
     private int[] mImgs = new int[]{R.drawable.drawer_icon_musicbox,R.drawable.drawer_icon_recently,R.drawable.darwer_icon_folder,
                                     R.drawable.darwer_icon_night,R.drawable.darwer_icon_set};
     private int[] mTitles = new int[]{R.string.drawer_song,R.string.drawer_recently,
                                     R.string.drawer_folder,R.string.drawer_night,R.string.drawer_setting};
-    public DrawerAdapter(Context Context) {
-        super(Context);
+    public DrawerAdapter(Context Context,int layoutId) {
+        super(Context,layoutId);
     }
     private OnModeChangeListener mModeChangeListener;
 
     public void setOnModeChangeListener(OnModeChangeListener l){
         mModeChangeListener = l;
-    }
-
-    @Override
-    public DrawerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new DrawerHolder(LayoutInflater.from(mContext).inflate(R.layout.item_drawer,parent,false));
     }
 
     public void setSelectIndex(int index){
@@ -53,9 +47,14 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
     }
 
     @Override
-    public void onBindViewHolder(final DrawerHolder holder, final int position) {
-        Theme.TintDrawable(holder.mImg,mImgs[position],ThemeStore.getAccentColor());
-        holder.mText.setText(mTitles[position]);
+    protected Drawer getItem(int position) {
+        return new Drawer(mTitles[position],mImgs[position]);
+    }
+
+    @Override
+    protected void convert(final DrawerHolder holder, Drawer drawer, int position) {
+        Theme.TintDrawable(holder.mImg, drawer.getImageResID(),ThemeStore.getAccentColor());
+        holder.mText.setText(drawer.getTitleResId());
         holder.mText.setTextColor(ThemeStore.isDay() ? ColorUtil.getColor(R.color.gray_34353a) : ThemeStore.getTextColorPrimary());
         holder.mText.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_34353a : R.color.white_e5e5e5));
         if(position == 3){
@@ -77,10 +76,9 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
         });
         holder.mRoot.setSelected(mSelectIndex == position);
         holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(mContext,
-                        Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerEffectColor()),
-                        Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerDefaultColor()),
-                        ThemeStore.getDrawerEffectColor()));
-
+                Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerEffectColor()),
+                Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerDefaultColor()),
+                ThemeStore.getDrawerEffectColor()));
     }
 
     @Override
@@ -88,7 +86,7 @@ public class DrawerAdapter extends BaseAdapter<DrawerAdapter.DrawerHolder>{
         return mTitles != null ? mTitles.length : 0;
     }
 
-    class DrawerHolder extends BaseViewHolder{
+    static class DrawerHolder extends BaseViewHolder{
         @BindView(R.id.item_img)
         ImageView mImg;
         @BindView(R.id.item_text)

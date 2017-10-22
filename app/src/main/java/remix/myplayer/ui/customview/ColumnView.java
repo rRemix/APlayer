@@ -237,7 +237,7 @@ public class ColumnView extends View {
             public void run() {
                 Message msg = new Message();
                 msg.what = STARTANIM;
-//                msg.obj = (MP3Item) MusicService.getCurrentMP3();
+//                msg.obj = (Song) MusicService.getCurrentMP3();
                 mHandler.sendMessage(msg);
             }
         },50,300);
@@ -252,7 +252,7 @@ public class ColumnView extends View {
         }
         Message msg = new Message();
         msg.what = STOPANIM;
-//        msg.obj = (MP3Item) MusicService.getCurrentMP3();
+//        msg.obj = (Song) MusicService.getCurrentMP3();
         mHandler.sendMessage(msg);
     }
 

@@ -30,11 +30,10 @@ import remix.myplayer.util.Global;
  * @Author Xiaoborui
  * @Date 2016/10/8 09:46
  */
-public class FolderActivity extends MultiChoiceActivity implements MusicEventHelper.MusicEventCallback{
+public class FolderActivity extends PermissActivity<Object,FolderAdapter> {
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
 
-    private FolderAdapter mAdapter;
     private boolean mIsRunning = false;
     private static WeakReference<FolderActivity> mRef;
     public static final String TAG = FolderActivity.class.getSimpleName();
@@ -56,7 +55,7 @@ public class FolderActivity extends MultiChoiceActivity implements MusicEventHel
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mRefreshHandler = new RefreshHandler();
-        mAdapter = new FolderAdapter(this,mMultiChoice);
+        mAdapter = new FolderAdapter(this,R.layout.item_folder_recycle,mMultiChoice);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -81,14 +80,8 @@ public class FolderActivity extends MultiChoiceActivity implements MusicEventHel
         mRecyclerView.setAdapter(mAdapter);
 
         setUpToolbar(mToolBar,getString(R.string.folder));
-        MusicEventHelper.addCallback(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        MusicEventHelper.removeCallback(this);
-    }
 
     public void updateList() {
         if(mAdapter != null){

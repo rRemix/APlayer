@@ -28,7 +28,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.FloatColorAdapter;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.lyric.LrcRow;
-import remix.myplayer.model.mp3.FloatLrcContent;
+import remix.myplayer.model.FloatLrcContent;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
@@ -126,7 +126,8 @@ public class FloatLrcView extends RelativeLayout {
             @Override
             public boolean onPreDraw() {
                 mColorRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
-                mColorAdapter = new FloatColorAdapter(mContext,mColorRecyclerView.getMeasuredWidth());
+                mColorAdapter = new FloatColorAdapter(mContext,R.layout.item_float_lrc_color,mColorRecyclerView.getMeasuredWidth());
+                mColorAdapter.setDatas(ThemeStore.getAllThemeColor());
                 mColorAdapter.setOnItemClickLitener(new OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {

@@ -17,7 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.interfaces.OnInflateFinishListener;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -37,7 +37,7 @@ public class CoverFragment extends BaseFragment {
     SimpleDraweeView mShadow;
     @BindView(R.id.cover_container)
     View mCoverContainer;
-    private MP3Item mInfo;
+    private Song mInfo;
     private int mWidth;
     private Uri mUri = Uri.EMPTY;
     private OnInflateFinishListener mInflateFinishListener;
@@ -50,7 +50,7 @@ public class CoverFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mInfo = (MP3Item)getArguments().getSerializable("MP3Item");
+        mInfo = (Song)getArguments().getSerializable("Song");
         mWidth = getArguments().getInt("Width");
         View rootView = inflater.inflate(R.layout.fragment_cover,container,false);
         mUnBinder = ButterKnife.bind(this,rootView);
@@ -80,7 +80,7 @@ public class CoverFragment extends BaseFragment {
      * @param info 需要更新的歌曲
      * @param withAnim 是否需要动画
      */
-    public void UpdateCover(MP3Item info,Uri uri, boolean withAnim){
+    public void UpdateCover(Song info, Uri uri, boolean withAnim){
         if(!isAdded())
             return;
         if (mImage == null || (mInfo = info) == null)

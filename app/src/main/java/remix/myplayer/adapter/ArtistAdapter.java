@@ -1,12 +1,10 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -28,7 +26,8 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
-import remix.myplayer.model.mp3.MultiPosition;
+import remix.myplayer.model.mp3.Artist;
+import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -48,14 +47,14 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 艺术家界面的适配器
  */
-public class ArtistAdapter extends HeaderAdapter implements FastScroller.SectionIndexer{
-    public ArtistAdapter(Cursor cursor, Context context,MultiChoice multiChoice) {
-        super(context,cursor,multiChoice);
+public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> implements FastScroller.SectionIndexer{
+    public ArtistAdapter(Context context,int layoutId,MultiChoice multiChoice) {
+        super(context,layoutId,multiChoice);
         ListModel =  SPUtil.getValue(context,"Setting","ArtistModel",Constants.GRID_MODEL);
     }
 
     @Override
-    public BaseViewHolder onCreateHolder(ViewGroup parent, int viewType) {
+    public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if(viewType == TYPE_HEADER){
             return new AlbumAdater.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2,parent,false));
         }
@@ -65,10 +64,10 @@ public class ArtistAdapter extends HeaderAdapter implements FastScroller.Section
     }
 
     @Override
-    public void onBind(final BaseViewHolder baseHolder, final int position) {
+    protected void convert(BaseViewHolder baseHolder, Artist artist, final int position) {
         if(position == 0){
             final AlbumAdater.HeaderHolder headerHolder = (AlbumAdater.HeaderHolder) baseHolder;
-            if(mCursor == null || mCursor.getCount() == 0){
+            if(mDatas == null || mDatas.size() == 0){
                 headerHolder.mRoot.setVisibility(View.GONE);
                 return;
             }
@@ -95,83 +94,76 @@ public class ArtistAdapter extends HeaderAdapter implements FastScroller.Section
             return;
         }
         final ArtistHolder holder = (ArtistHolder) baseHolder;
-        if(mCursor.moveToPosition(position - 1)) {
-            try {
-                //设置歌手名
-                String artist = CommonUtil.processInfo(mCursor.getString(ArtistFragment.mArtistIndex),CommonUtil.ARTISTTYPE);
-                holder.mText1.setText(artist);
-                int artistId = mCursor.getInt(ArtistFragment.mArtistIdIndex);
-                if(holder instanceof ArtistListHolder){
-                    new AsynLoadSongNum(holder.mText2,Constants.ARTIST).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId);
-                }
-                //设置封面
-                new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId,Constants.URL_ARTIST);
+        //设置歌手名
+        final String artistName = CommonUtil.processInfo(artist.getArtist(),CommonUtil.ARTISTTYPE);
+        holder.mText1.setText(artistName);
+        final int artistId = artist.getArtistID();
+        if(holder instanceof ArtistListHolder){
+            new AsynLoadSongNum(holder.mText2,Constants.ARTIST).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId);
+        }
+        //设置封面
+        new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId,Constants.URL_ARTIST);
 
-                //item点击效果
-                holder.mContainer.setBackground(
-                        Theme.getPressAndSelectedStateListRippleDrawable(ListModel,mContext));
+        //item点击效果
+        holder.mContainer.setBackground(
+                Theme.getPressAndSelectedStateListRippleDrawable(ListModel,mContext));
 
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-
-            if(mOnItemClickLitener != null) {
-                holder.mContainer.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(holder.getAdapterPosition() - 1 < 0){
-                            ToastUtil.show(mContext,R.string.illegal_arg);
-                            return;
-                        }
-                        mOnItemClickLitener.onItemClick(holder.mContainer,position - 1);
+        if(mOnItemClickLitener != null) {
+            holder.mContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(holder.getAdapterPosition() - 1 < 0){
+                        ToastUtil.show(mContext,R.string.illegal_arg);
+                        return;
                     }
-                });
-                //多选菜单
-                holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        if(holder.getAdapterPosition() - 1 < 0){
-                            ToastUtil.show(mContext,R.string.illegal_arg);
-                            return true;
-                        }
-                        mOnItemClickLitener.onItemLongClick(holder.mContainer,position - 1);
+                    mOnItemClickLitener.onItemClick(holder.mContainer,position - 1);
+                }
+            });
+            //多选菜单
+            holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if(holder.getAdapterPosition() - 1 < 0){
+                        ToastUtil.show(mContext,R.string.illegal_arg);
                         return true;
                     }
-                });
-            }
-            //popupmenu
-            if(holder.mButton != null) {
-                int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
-                Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
+                    mOnItemClickLitener.onItemLongClick(holder.mContainer,position - 1);
+                    return true;
+                }
+            });
+        }
+        //popupmenu
+        if(holder.mButton != null) {
+            int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+            Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
 
-                //按钮点击效果
-                int size = DensityUtil.dip2px(mContext,45);
-                Drawable defaultDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-                Drawable selectDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
-                holder.mButton.setBackground(Theme.getPressDrawable(
-                        defaultDrawable,
-                        selectDrawable,
-                        ThemeStore.getRippleColor(),
-                        null,
-                        null));
+            //按钮点击效果
+            int size = DensityUtil.dip2px(mContext,45);
+            Drawable defaultDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+            Drawable selectDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
+            holder.mButton.setBackground(Theme.getPressDrawable(
+                    defaultDrawable,
+                    selectDrawable,
+                    ThemeStore.getRippleColor(),
+                    null,
+                    null));
 
-                holder.mButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(mMultiChoice.isShow() || !mCursor.moveToPosition(holder.getAdapterPosition() - 1))
-                            return;
-                        Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
-                        final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-                        popupMenu.getMenuInflater().inflate(R.menu.artist_menu, popupMenu.getMenu());
-                        popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
-                                mCursor.getInt(ArtistFragment.mArtistIdIndex),
-                                Constants.ARTIST,
-                                mCursor.getString(ArtistFragment.mArtistIndex)));
-                        popupMenu.setGravity(Gravity.END);
-                        popupMenu.show();
-                    }
-                });
-            }
+            holder.mButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mMultiChoice.isShow())
+                        return;
+                    Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
+                    final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
+                    popupMenu.getMenuInflater().inflate(R.menu.artist_menu, popupMenu.getMenu());
+                    popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
+                            artistId,
+                            Constants.ARTIST,
+                            artistName));
+                    popupMenu.setGravity(Gravity.END);
+                    popupMenu.show();
+                }
+            });
         }
 
         //是否处于选中状态
@@ -191,6 +183,7 @@ public class ArtistAdapter extends HeaderAdapter implements FastScroller.Section
             }
         }
     }
+
 
     @Override
     public void saveMode() {
@@ -213,14 +206,14 @@ public class ArtistAdapter extends HeaderAdapter implements FastScroller.Section
     public String getSectionText(int position) {
         if(position == 0)
             return "";
-        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position - 1)){
-            String artist = mCursor.getString(mCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+        if(mDatas != null && position - 1 < mDatas.size()){
+            String artist = mDatas.get(position).getArtist();
             return !TextUtils.isEmpty(artist) ? (Pinyin.toPinyin(artist.charAt(0))).toUpperCase().substring(0,1)  : "";
         }
         return "";
     }
 
-    public static class ArtistHolder extends BaseViewHolder {
+    static class ArtistHolder extends BaseViewHolder {
         @BindView(R.id.item_text1)
         public TextView mText1;
         @BindView(R.id.item_text2)

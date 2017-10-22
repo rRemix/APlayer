@@ -1,7 +1,6 @@
 package remix.myplayer.ui.activity;
 
-import android.Manifest;
-import android.app.LoaderManager;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -13,22 +12,22 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 
-import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.functions.Consumer;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
+import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -42,17 +41,12 @@ import remix.myplayer.util.MediaStoreUtil;
  * 最近添加歌曲的界面
  * 目前为最近7天添加
  */
-public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelper.Callback,
-        MusicEventHelper.MusicEventCallback,
-        LoaderManager.LoaderCallbacks<Cursor>{
+public class RecetenlyActivity extends PermissActivity<Song,SongAdapter> implements UpdateHelper.Callback{
     public static final String TAG = RecetenlyActivity.class.getSimpleName();
     private static int LOADER_ID = 0;
-    private boolean mHasPermission = false;
 
-    private SongAdapter mAdapter;
     @BindView(R.id.recyclerview)
     FastScrollRecyclerView mRecyclerView;
-    private Cursor mCursor;
     private ArrayList<Integer> mIdList = new ArrayList<>();
 
     private Handler mRefreshHandler = new Handler(){
@@ -77,7 +71,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
         setContentView(R.layout.activity_recently);
         ButterKnife.bind(this);
 
-        mAdapter = new SongAdapter(this, mCursor,mMultiChoice,SongAdapter.RECENTLY);
+        mAdapter = new SongAdapter(this, R.layout.item_song_recycle,mMultiChoice,SongAdapter.RECENTLY);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -88,7 +82,7 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    Global.setPlayQueue(mIdList,RecetenlyActivity.this,intent);
+                    Global.setPlayQueue(mIdList,mContext,intent);
                 }
             }
 
@@ -104,8 +98,6 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
 
-        MusicEventHelper.addCallback(this);
-
         setUpToolbar(mToolBar,getString(R.string.recently));
     }
 
@@ -116,8 +108,8 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
      */
     private int getSongId(int position){
         int id = -1;
-        if(mCursor != null && !mCursor.isClosed() && mCursor.moveToPosition(position)){
-            id = mCursor.getInt(mCursor.getColumnIndex(MediaStore.Audio.Media._ID));
+        if(mAdapter.getDatas() != null && mAdapter.getDatas().size() > position - 1){
+            id = mAdapter.getDatas().get(position).getId();
         }
         return id;
     }
@@ -132,61 +124,27 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
     }
 
     @Override
-    public void UpdateUI(MP3Item MP3Item, boolean isplay) {
+    public void UpdateUI(Song Song, boolean isplay) {
 //        mAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        //获得今天日期
-        Calendar today = Calendar.getInstance();
-        today.setTime(new Date());
-        //最近七天
-
-        return new android.content.CursorLoader(this,
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DISPLAY_NAME,MediaStore.Audio.Media.TITLE,
-                                MediaStore.Audio.Media.ALBUM,MediaStore.Audio.Media.ALBUM_ID,MediaStore.Audio.Media.ARTIST},
-                MediaStore.Audio.Media.DATE_ADDED + " >= " + (today.getTimeInMillis() / 1000 - (3600 * 24 * 7)) +
-                        " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
-                null,
-                MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-    }
 
     @Override
-    public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
-        if(loader.getId() != ++LOADER_ID || data == null)
-            return;
-        //查询完毕后保存结果，并设置查询索引
-        mCursor = data;
-        mIdList = MediaStoreUtil.getSongIdListByCursor(mCursor);
-        mAdapter.setCursor(mCursor);
-    }
+    public void onLoadFinished(android.content.Loader<List<Song>> loader, List<Song> data) {
+        super.onLoadFinished(loader, data);
+        if(data != null){
+            mIdList = new ArrayList<>();
+            for(Song song : data){
+                mIdList.add(song.getId());
+            }
+        }
 
-    @Override
-    public void onLoaderReset(android.content.Loader<Cursor> loader) {
-        if (mAdapter != null)
-            mAdapter.setCursor(null);
     }
 
     @Override
     protected void onResume() {
         MobclickAgent.onPageStart(RecetenlyActivity.class.getSimpleName());
         super.onResume();
-        new RxPermissions(this)
-                .request(Manifest.permission.READ_EXTERNAL_STORAGE)
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean aBoolean) throws Exception {
-                        if(aBoolean != mHasPermission){
-                            mHasPermission = aBoolean;
-                            if(aBoolean){
-                                MusicEventHelper.onMediaStoreChanged();
-                                mHasPermission = true;
-                            }
-                        }
-                    }
-                });
         if(mMultiChoice.isShow()){
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
@@ -202,18 +160,48 @@ public class RecetenlyActivity extends MultiChoiceActivity implements UpdateHelp
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(mCursor != null) {
-            mCursor.close();
-            mCursor = null;
-        }
-        MusicEventHelper.removeCallback(this);
-    }
-
-    @Override
     public void onMediaStoreChanged() {
         if(mHasPermission)
             getLoaderManager().initLoader(++LOADER_ID, null, this);
+        else{
+            if(mAdapter != null)
+                mAdapter.setDatas(null);
+        }
+    }
+
+    @Override
+    protected android.content.Loader<List<Song>> getLoader() {
+        return new AsyncRecentlySongLoader(this);
+    }
+
+    private static class AsyncRecentlySongLoader extends AppWrappedAsyncTaskLoader<List<Song>> {
+        private AsyncRecentlySongLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        public List<Song> loadInBackground() {
+            Cursor cursor = null;
+            List<Song> songs = new ArrayList<>();
+            try {
+                Calendar today = Calendar.getInstance();
+                today.setTime(new Date());
+                cursor = getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                        null,
+                        MediaStore.Audio.Media.DATE_ADDED + " >= " + (today.getTimeInMillis() / 1000 - (3600 * 24 * 7)) +
+                                " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
+                        null,
+                        MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+                if(cursor != null) {
+                    while (cursor.moveToNext()) {
+                        songs.add(MediaStoreUtil.getMP3Info(cursor));
+                    }
+                }
+            }finally {
+                if(cursor != null && !cursor.isClosed())
+                    cursor.close();
+            }
+            return songs;
+        }
     }
 }

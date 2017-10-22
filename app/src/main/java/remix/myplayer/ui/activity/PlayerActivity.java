@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
@@ -26,9 +27,7 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
-import android.view.TouchDelegate;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -46,6 +45,7 @@ import com.facebook.rebound.SpringSystem;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Set;
@@ -59,7 +59,7 @@ import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.lyric.LrcView;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -150,7 +150,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private ArrayList<ImageView> mDotList;
 
     //当前播放的歌曲
-    private MP3Item mInfo;
+    private Song mInfo;
     //当前播放时间
     private int mCurrentTime;
     //当前歌曲总时长
@@ -197,44 +197,18 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private float mEventY1;
     private float mEventY2;
 
-    /** 更新进度条的Handler */
-    private Handler mProgressHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            //如果当前正在播放，参数合法且用户没有在拖动进度条，更新进度条与时间
-            if(mHasPlay != null
-                    && mRemainPlay != null
-                    && mCurrentTime > 0
-                    && (mDuration - mCurrentTime) > 0){
-                mHasPlay.setText(CommonUtil.getTime(mCurrentTime));
-                mRemainPlay.setText(CommonUtil.getTime(mDuration - mCurrentTime));
-            }
-            if(msg.what == Constants.UPDATE_TIME_ALL && mSeekBar != null && !mIsDragSeekBar)
-                mSeekBar.setProgress(mCurrentTime);
-        }
-    };
+    /** 更新Handler */
+    private UIHandler mHandler;
+
     /** 更新封面与背景的Handler */
     private Uri mUri;
-    private final int UPDATE_COVER = 100;
-    private final int UPDATE_BG = 101;
+    private static final int UPDATE_COVER = 100;
+    private static final int UPDATE_BG = 101;
+    private static final int UPDATE_TIME_ONLY = 102;
+    private static final int UPDATE_TIME_ALL = 103;
     private Bitmap mRawBitMap;
 
     private Palette.Swatch mSwatch;
-    private Handler mCoverHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            if(msg.what == UPDATE_COVER){
-                ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,mUri,!mFistStart);
-                mFistStart = false;
-            }
-            if(msg.what == UPDATE_BG){
-                //修改背景颜色
-                int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
-                int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
-                mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
-            }
-        }
-    };
 
     @Override
     protected void setUpTheme() {
@@ -300,6 +274,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         setContentView(R.layout.activity_audio_holder);
         ButterKnife.bind(this);
 
+        mHandler = new UIHandler(getMainLooper(),this);
+
         //获是否正在播放和正在播放的歌曲
         mInfo = MusicService.getCurrentMP3();
         mIsPlay = MusicService.isPlay();
@@ -345,7 +321,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         if(SPUtil.getValue(this,"Setting","LrcHint",true)){
             SPUtil.putValue(this,"Setting","LrcHint",false);
             new MaterialDialog.Builder(mContext)
-                    .content(R.string.lc_operation_hint)
+                    .content(getString(R.string.lc_operation_hint))
                     .contentColorAttr(R.attr.text_color_primary)
                     .positiveColorAttr(R.attr.text_color_primary)
                     .backgroundColorAttr(R.attr.background_color_3)
@@ -594,7 +570,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 //                if(fromUser)
-                mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ONLY);
+                mHandler.sendEmptyMessage(UPDATE_TIME_ONLY);
                 if(mLrcView != null)
                     mLrcView.seekTo(progress,true,fromUser);
             }
@@ -614,32 +590,32 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         });
     }
 
-    public void setMP3Item(MP3Item mp3Item){
-        if(mp3Item != null)
-            mInfo = mp3Item;
+    public void setMP3Item(Song song){
+        if(song != null)
+            mInfo = song;
     }
 
     /**
      * 更新顶部歌曲信息
-     * @param mp3Item
+     * @param song
      */
-    public void UpdateTopStatus(MP3Item mp3Item) {
-        if(mp3Item == null)
+    public void UpdateTopStatus(Song song) {
+        if(song == null)
             return;
-        String title = mp3Item.getTitle() == null ? "" : mp3Item.getTitle();
-        String artist =  mp3Item.getArtist() == null ? "" : mp3Item.getArtist();
-        String album =  mp3Item.getAlbum() == null ? "" : mp3Item.getAlbum();
+        String title = song.getTitle() == null ? "" : song.getTitle();
+        String artist =  song.getArtist() == null ? "" : song.getArtist();
+        String album =  song.getAlbum() == null ? "" : song.getAlbum();
 
         if(title.equals(""))
             mTopTitle.setText(getString(R.string.unknow_song));
         else
             mTopTitle.setText(title);
         if(artist.equals(""))
-            mTopDetail.setText(mp3Item.getAlbum());
+            mTopDetail.setText(song.getAlbum());
         else if(album.equals(""))
-            mTopDetail.setText(mp3Item.getArtist());
+            mTopDetail.setText(song.getArtist());
         else
-            mTopDetail.setText(mp3Item.getArtist() + "-" + mp3Item.getAlbum());
+            mTopDetail.setText(song.getArtist() + "-" + song.getAlbum());
     }
 
     /**
@@ -664,7 +640,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mAdapter = new PagerAdapter(getSupportFragmentManager());
         Bundle bundle = new Bundle();
         bundle.putInt("Width", mWidth);
-        bundle.putSerializable("MP3Item", mInfo);
+        bundle.putSerializable("Song", mInfo);
         //初始化所有fragment
         final RecordFragment recordFragment = new RecordFragment();
         mAdapter.AddFragment(recordFragment);
@@ -809,7 +785,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                         if (progress > 0 && progress < MusicService.getDuration()) {
                             MusicService.setProgress(progress);
                             mCurrentTime = progress;
-                            mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
+                            mHandler.sendEmptyMessage(UPDATE_TIME_ALL);
                         }
                     }
                 });
@@ -871,8 +847,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     //更新界面
     @Override
-    public void UpdateUI(MP3Item mp3Item, boolean isplay){
-        mInfo = mp3Item;
+    public void UpdateUI(Song song, boolean isplay){
+        mInfo = song;
         mIsPlay = isplay;
         //两种情况下更新ui
         //一是activity在前台  二是activity暂停后有更新的动作，当activity重新回到前台后更新ui
@@ -917,7 +893,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 int progress = MusicService.getProgress();
                 if (progress > 0 && progress < mDuration) {
                     mCurrentTime = progress;
-                    mProgressHandler.sendEmptyMessage(Constants.UPDATE_TIME_ALL);
+                    mHandler.sendEmptyMessage(UPDATE_TIME_ALL);
                     try {
                         sleep(1000);
                     } catch (Exception e) {
@@ -997,8 +973,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 } else {
                     mSwatch = palette.getMutedSwatch();//柔和 暗色
                 }
-                mCoverHandler.removeMessages(UPDATE_BG);
-                mCoverHandler.sendEmptyMessage(UPDATE_BG);
+                mHandler.removeMessages(UPDATE_BG);
+                mHandler.sendEmptyMessage(UPDATE_BG);
             }
         });
     }
@@ -1018,8 +994,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
             }
         }
-        mCoverHandler.removeMessages(UPDATE_COVER);
-        mCoverHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+        mHandler.removeMessages(UPDATE_COVER);
+        mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
     }
 
     @Override
@@ -1050,5 +1026,58 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     @Override
     public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
+    }
+
+    private void updateProgressByHandler() {
+        if(mHasPlay != null
+                && mRemainPlay != null
+                && mCurrentTime > 0
+                && (mDuration - mCurrentTime) > 0){
+            mHasPlay.setText(CommonUtil.getTime(mCurrentTime));
+            mRemainPlay.setText(CommonUtil.getTime(mDuration - mCurrentTime));
+        }
+    }
+
+    private void updateSeekbarByHandler(){
+        mSeekBar.setProgress(mCurrentTime);
+    }
+
+    private void updateCoverByHandler(){
+        ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,mUri,!mFistStart);
+        mFistStart = false;
+    }
+
+    private void updateBgByHandler(){
+        int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
+        int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
+        mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
+    }
+
+    private static class UIHandler extends Handler{
+        private final WeakReference<PlayerActivity> mRef;
+        UIHandler(Looper looper, PlayerActivity playerActivity) {
+            super(looper);
+            mRef = new WeakReference<>(playerActivity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            if(mRef.get() == null)
+                return;
+            PlayerActivity activity = mRef.get();
+            if(msg.what == UPDATE_COVER){
+                activity.updateCoverByHandler();
+            }
+            if(msg.what == UPDATE_BG){
+               activity.updateBgByHandler();
+            }
+            if(msg.what == UPDATE_TIME_ONLY){
+                activity.updateProgressByHandler();
+            }
+            if(msg.what == UPDATE_TIME_ALL){
+                activity.updateProgressByHandler();
+                activity.updateSeekbarByHandler();
+            }
+        }
     }
 }

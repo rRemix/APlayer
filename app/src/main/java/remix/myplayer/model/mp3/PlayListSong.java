@@ -6,7 +6,7 @@ package remix.myplayer.model.mp3;
  * @Author Xiaoborui
  * @Date 2016/10/13 11:21
  */
-public class PlayListSongInfo {
+public class PlayListSong {
     public int _Id;
     public int AudioId;
 //    public int AlbumID;
@@ -16,8 +16,8 @@ public class PlayListSongInfo {
 //    public String Data;
     public int PlayListID;
     public String PlayListName;
-    public PlayListSongInfo(){}
-    public PlayListSongInfo(int audioId, int playListID,String playListName) {
+    public PlayListSong(){}
+    public PlayListSong(int audioId, int playListID, String playListName) {
         AudioId = audioId;
         PlayListID = playListID;
         PlayListName = playListName;

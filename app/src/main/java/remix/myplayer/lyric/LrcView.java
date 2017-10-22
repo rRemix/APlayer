@@ -308,15 +308,13 @@ public class LrcView extends View implements ILrcView{
                 } else {
                     handler.removeCallbacks(longPressRunnable);
                 }
-
                 break;
             case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
                 if(!canDrag){
                     if(longPressRunnable == null && onLrcClickListener != null){
                         onLrcClickListener.onClick();
                     }
-                    removeCallbacks(longPressRunnable);
+                    handler.removeCallbacks(longPressRunnable);
                     longPressRunnable = null;
                 }else{
                     if(onSeekToListener!= null && mCurRow != -1){
@@ -327,12 +325,15 @@ public class LrcView extends View implements ILrcView{
                     }else if(getScrollY() > mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding){
                         smoothScrollTo((int) (mLrcRows.size() * (mCurSizeForOtherLrc + mCurPadding) - mCurPadding),DURATION_FOR_ACTION_UP);
                     }
-
                     canDrag = false;
                     mIsDrawTimeLine = false;
                     invalidate();
                 }
-             break;
+                break;
+			case MotionEvent.ACTION_CANCEL:
+                handler.removeCallbacks(longPressRunnable);
+                longPressRunnable = null;
+				break;
         }
 		return true;
 	}

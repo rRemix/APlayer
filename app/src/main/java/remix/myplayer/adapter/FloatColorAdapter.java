@@ -10,8 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import java.util.List;
-
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
@@ -24,15 +22,13 @@ import remix.myplayer.util.SPUtil;
  * Created by Remix on 2017/8/15.
  */
 
-public class FloatColorAdapter extends BaseAdapter<FloatColorAdapter.FloatColorHolder> {
-    private List<Integer> mColorList;
+public class FloatColorAdapter extends BaseAdapter<Integer,FloatColorAdapter.FloatColorHolder> {
     //当前桌面歌词的字体颜色 默认为当前主题颜色
     private int mCurrentColor;
     private int mItemWidth;
-    public FloatColorAdapter(Context Context,int width) {
-        super(Context);
+    public FloatColorAdapter(Context Context,int layoutId,int width) {
+        super(Context,layoutId);
         mCurrentColor = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_COLOR,ThemeStore.getThemeColor());
-        mColorList = ThemeStore.getAllThemeColor();
         mItemWidth = width / ThemeStore.getAllThemeColor().size();
         //宽度太小
         if(mItemWidth < DensityUtil.dip2px(mContext,20))
@@ -53,10 +49,6 @@ public class FloatColorAdapter extends BaseAdapter<FloatColorAdapter.FloatColorH
         SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_COLOR,mCurrentColor);
     }
 
-    @Override
-    public int getItemCount() {
-        return mColorList != null ? mColorList.size() : 0;
-    }
 
     @Override
     public FloatColorHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -74,13 +66,12 @@ public class FloatColorAdapter extends BaseAdapter<FloatColorAdapter.FloatColorH
 
 
     @Override
-    public void onBindViewHolder(FloatColorHolder holder, final int position) {
-        final int themeColor = mColorList.get(position);
-        if(isColorChoose(themeColor)){
-            holder.mColor.setBackground(Theme.getShape(GradientDrawable.OVAL, ThemeStore.getThemeColorInt(themeColor),0, DensityUtil.dip2px(mContext,1),Color.BLACK,
+    protected void convert(FloatColorHolder holder, Integer integer, final int position) {
+        if(isColorChoose(integer)){
+            holder.mColor.setBackground(Theme.getShape(GradientDrawable.OVAL, ThemeStore.getThemeColorInt(integer),0, DensityUtil.dip2px(mContext,1),Color.BLACK,
                     DensityUtil.dip2px(mContext,18),DensityUtil.dip2px(mContext,18),1));
         } else {
-            holder.mColor.setBackground(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getThemeColorInt(themeColor),DensityUtil.dip2px(mContext,18),DensityUtil.dip2px(mContext,18)));
+            holder.mColor.setBackground(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getThemeColorInt(integer),DensityUtil.dip2px(mContext,18),DensityUtil.dip2px(mContext,18)));
         }
         holder.mRoot.setOnClickListener(new View.OnClickListener() {
             @Override

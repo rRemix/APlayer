@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import remix.myplayer.R;
-import remix.myplayer.model.mp3.MP3Item;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
@@ -40,7 +40,7 @@ public class AppWidgetSmall extends BaseAppwidget {
     }
 
     public void updateWidget(final Context context,final int[] appWidgetIds, boolean reloadCover){
-        MP3Item temp = MusicService.getCurrentMP3();
+        Song temp = MusicService.getCurrentMP3();
         if(temp == null || !hasInstances(context))
             return;
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_small);

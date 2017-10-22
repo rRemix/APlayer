@@ -1,6 +1,7 @@
 package remix.myplayer.helper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -10,10 +11,8 @@ import java.util.ArrayList;
 public class MusicEventHelper {
     private static ArrayList<MusicEventCallback> mMusicEventCallbacks = new ArrayList<>();
 
-    public static void onMediaStoreChanged() {
-        for(MusicEventCallback callback : mMusicEventCallbacks){
-            callback.onMediaStoreChanged();
-        }
+    public static List<MusicEventCallback> getCallbacks(){
+        return mMusicEventCallbacks;
     }
 
     public static void addCallback(MusicEventCallback musicEventCallback){
@@ -29,5 +28,7 @@ public class MusicEventHelper {
 
     public interface MusicEventCallback {
         void onMediaStoreChanged();
+        void onPermissionChanged(boolean has);
+        void onPlayListChanged();
     }
 }
