@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -271,7 +272,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mFromActivity =  getIntent().getBooleanExtra("FromActivity",false);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_audio_holder);
+        setContentView(R.layout.activity_player);
         ButterKnife.bind(this);
 
         mHandler = new UIHandler(getMainLooper(),this);
@@ -917,8 +918,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         (layerDrawable.getDrawable(1)).setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
         mSeekBar.setProgressDrawable(layerDrawable);
         //修改thumb颜色
-        mSeekBar.setThumb(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),accentColor));
-
+//        mSeekBar.setThumb(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,3),DensityUtil.dip2px(this,7)),accentColor));
+        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,accentColor,0,1,Color.WHITE,DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10),1));
         //修改控制按钮颜色
         Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,accentColor);
         Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,accentColor);
@@ -942,15 +943,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 DensityUtil.dip2px(this,2),0,0,DensityUtil.dip2px(this,288),DensityUtil.dip2px(this,38),1));
         mNextSong.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_a8a8a8 : R.color.white_e5e5e5));
     }
-//
-//    private CoverRunnalbe mCoverRunnable = new CoverRunnalbe();
-//    private class CoverRunnalbe implements Runnable{
-//        @Override
-//        public void run() {
-//            updateCover();
-//            updateBg();
-//        }
-//    }
+
 
     //更新背景
     private void updateBg() {
@@ -961,9 +954,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
         if(mRawBitMap == null)
             mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
-
-//            StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
-//            mNewBitMap = mStackBlurManager.process(40);
 
         Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
             @Override

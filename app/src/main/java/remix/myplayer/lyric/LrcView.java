@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -101,7 +100,6 @@ public class LrcView extends View implements ILrcView{
 
 	/**外部viewpager是否正在滑动*/
 	private boolean mIsViewPagerScroll = false;
-
 
     /** 错误提示文字 */
     private String mText = "正在搜索";
@@ -235,13 +233,7 @@ public class LrcView extends View implements ILrcView{
 	private long lastTime;
 	/** 长按runnable*/
 	private Runnable longPressRunnable = new LongPressRunnable();
-    private static class UIHandler extends Handler{
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-        }
-    }
-    private UIHandler handler = new UIHandler();
+    private Handler handler = new Handler();
 
     private class LongPressRunnable implements Runnable{
         @Override
@@ -569,4 +561,10 @@ public class LrcView extends View implements ILrcView{
             mPaintForTimeLine.setColor(color);
     }
 
+	@Override
+	protected void onDetachedFromWindow() {
+		super.onDetachedFromWindow();
+		if(handler != null)
+			handler.removeCallbacksAndMessages(null);
+	}
 }

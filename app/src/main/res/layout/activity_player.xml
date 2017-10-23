@@ -85,8 +85,8 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:id="@+id/guide_02"
-                        android:layout_marginLeft="@dimen/d2_size"
-                        android:layout_marginRight="@dimen/d2_size"/>
+                        android:layout_marginLeft="@dimen/d4_size"
+                        android:layout_marginRight="@dimen/d4_size"/>
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -143,14 +143,14 @@
                 android:layout_height="wrap_content"
                 android:minHeight="@dimen/d2_size"
                 android:maxHeight="@dimen/d2_size"
-                android:paddingStart="0dp"
-                android:paddingEnd="0dp"
+                android:paddingStart="@dimen/player_seekbar_padding"
+                android:paddingEnd="@dimen/player_seekbar_padding"
                 android:progressDrawable="@drawable/bg_progress"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@id/text_remain"
                 android:layout_toRightOf="@id/text_hasplay"
-                android:layout_marginStart="@dimen/d12_size"
-                android:layout_marginEnd="@dimen/d12_size"/>
+                android:layout_marginStart="@dimen/d10_size"
+                android:layout_marginEnd="@dimen/d10_size"/>
         </RelativeLayout>
 
         <!-- 三个播放控制按钮和两个控制播放模式 -->

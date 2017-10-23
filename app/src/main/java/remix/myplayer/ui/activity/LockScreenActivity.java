@@ -26,6 +26,20 @@ import java.lang.ref.WeakReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Emitter;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.SingleSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.R;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.CtrlButtonListener;
@@ -91,8 +105,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     private int mArtistColor = Color.WHITE;
     //是否正在播放
     private static boolean mIsPlay = false;
-    private Palette.Swatch mSwatch;
-    private BlurHandler mBlurHandler;
+    private Disposable mDisposable;
 
     @Override
     protected void setUpTheme() {
@@ -111,8 +124,6 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
 
         if((mInfo = MusicService.getCurrentMP3()) == null)
             return;
-
-        mBlurHandler = new BlurHandler(this);
 
         DisplayMetrics metric = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metric);
@@ -202,7 +213,8 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mBlurHandler.removeCallbacksAndMessages(null);
+        if(mDisposable != null)
+            mDisposable.dispose();
         if(mRawBitMap != null && !mRawBitMap.isRecycled())
             mRawBitMap.recycle();
         if(mNewBitMap != null && !mNewBitMap.isRecycled())
@@ -242,65 +254,51 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         if(mNextSong != null && MusicService.getNextMP3() != null)
             mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
 
-        new BlurThread().start();
-    }
-
-    private static class BlurHandler extends Handler{
-        private final WeakReference<LockScreenActivity> mRef;
-
-        BlurHandler(LockScreenActivity activity) {
-            this.mRef = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            if(mRef.get() == null)
-                return;
-            LockScreenActivity activity = mRef.get();
-            if(activity == null || activity.isFinishing())
-                return;
-            //设置背景
-            activity.mImageBackground.setImageBitmap(activity.mNewBitMap);
-            //变化字体颜色
-            if(activity.mSong != null && activity.mArtist != null ){
-                activity.mSong.setTextColor(activity.mSongColor);
-                activity.mArtist.setTextColor(activity.mArtistColor);
-                activity.mNextSong.setTextColor(activity.mSongColor);
-                activity.mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT,0,2,activity.mSongColor,0,0,1));
+        if(mInfo == null)
+            return;
+        Single.just(mInfo.getAlbumId())
+        .observeOn(Schedulers.io())
+        .doOnSubscribe(new Consumer<Disposable>() {
+            @Override
+            public void accept(Disposable disposable) throws Exception {
+                mDisposable = disposable;
             }
-        }
-    }
-
-    //高斯模糊线程
-    private class BlurThread extends Thread{
-        @Override
-        public void run() {
-            if (mInfo == null)
-                return;
-            try {
+        }).flatMap(new Function<Integer, SingleSource<Palette.Swatch>>() {
+            @Override
+            public SingleSource<Palette.Swatch> apply(@NonNull Integer integer) throws Exception {
                 mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
                 if(mRawBitMap == null)
                     mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
                 StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
 
                 mNewBitMap = mStackBlurManager.processNatively(40);
-
-                Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
+                return Single.create(new SingleOnSubscribe<Palette.Swatch>() {
                     @Override
-                    public void onGenerated(Palette palette) {
-                        if(palette == null)
-                            return;
-                        mSwatch = palette.getMutedSwatch();//柔和 暗色
-                        if(mSwatch == null)
-                            mSwatch = new Palette.Swatch(Color.GRAY,100);
-                        mSongColor = mSwatch.getBodyTextColor();
-                        mArtistColor = mSwatch.getTitleTextColor();
-                        mBlurHandler.sendEmptyMessage(Constants.UPDATE_BG);
+                    public void subscribe(@NonNull SingleEmitter<Palette.Swatch> e) throws Exception {
+                        Palette palette = Palette.from(mRawBitMap).generate();
+                        Palette.Swatch swatch = palette.getMutedSwatch();//柔和 暗色
+                        if(swatch == null)
+                            swatch = new Palette.Swatch(Color.GRAY,100);
+                        e.onSuccess(swatch);
                     }
                 });
-            } catch (Exception e){
-                e.printStackTrace();
             }
-        }
+        }).observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Consumer<Palette.Swatch>() {
+            @Override
+            public void accept(Palette.Swatch swatch) throws Exception {
+                if(swatch == null)
+                    return;
+                mSongColor = swatch.getBodyTextColor();
+                mArtistColor = swatch.getTitleTextColor();
+
+                mImageBackground.setImageBitmap(mNewBitMap);
+                mSong.setTextColor(mSongColor);
+                mArtist.setTextColor(mArtistColor);
+                mNextSong.setTextColor(mSongColor);
+                mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT,0,2,mSongColor,0,0,1));
+            }
+        });
     }
+
 }

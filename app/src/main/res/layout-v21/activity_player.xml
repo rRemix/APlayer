@@ -82,8 +82,8 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:id="@+id/guide_02"
-                        android:layout_marginLeft="@dimen/d2_size"
-                        android:layout_marginRight="@dimen/d2_size"/>
+                        android:layout_marginLeft="@dimen/d4_size"
+                        android:layout_marginRight="@dimen/d4_size"/>
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -141,98 +141,94 @@
                 android:minHeight="@dimen/d2_size"
                 android:maxHeight="@dimen/d2_size"
                 android:progressDrawable="@drawable/bg_progress"
-                android:paddingStart="0dp"
-                android:paddingEnd="0dp"
+                android:paddingStart="@dimen/player_seekbar_padding"
+                android:paddingEnd="@dimen/player_seekbar_padding"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@id/text_remain"
                 android:layout_toRightOf="@id/text_hasplay"
-                android:layout_marginStart="@dimen/d12_size"
-                android:layout_marginEnd="@dimen/d12_size"/>
+                android:layout_marginStart="@dimen/d10_size"
+                android:layout_marginEnd="@dimen/d10_size"/>
         </RelativeLayout>
 
         <!-- 三个播放控制按钮和两个控制播放模式 -->
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1.5">
+            android:layout_weight="1.5"
+            android:gravity="center_vertical"
+            android:background="@color/transparent"
+            android:baselineAligned="false">
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/d60_size"
-                android:layout_centerVertical="true"
-                android:gravity="center_vertical"
-                android:background="@color/transparent">
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:gravity="center">
-                    <ImageButton
-                        android:layout_width="@dimen/d50_size"
-                        android:layout_height="@dimen/d50_size"
-                        android:id="@+id/playbar_model"
-                        android:background="?android:attr/selectableItemBackgroundBorderless"
-                        android:src="@drawable/play_btn_loop" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:gravity="center">
-                    <ImageButton
-                        android:id="@+id/playbar_prev"
-                        android:layout_width="@dimen/d50_size"
-                        android:layout_height="@dimen/d50_size"
-                        android:src="@drawable/play_btn_pre"
-                        android:background="?android:attr/selectableItemBackgroundBorderless"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:gravity="center">
-                    <FrameLayout
-                        android:id="@+id/playbar_play_container"
-                        android:layout_width="@dimen/d50_size"
-                        android:layout_height="@dimen/d50_size"
-                        android:background="?android:attr/selectableItemBackgroundBorderless">
-                        <remix.myplayer.ui.customview.playpause.PlayPauseView
-                            android:id="@+id/playbar_play_pause"
-                            android:layout_width="@dimen/d50_size"
-                            android:layout_height="@dimen/d50_size"
-                            android:layout_gravity="center"
-                            android:visibility="visible"/>
-                    </FrameLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:gravity="center">
-                    <ImageButton
-                        android:id="@+id/playbar_next"
-                        android:layout_width="@dimen/d50_size"
-                        android:layout_height="@dimen/d50_size"
-                        android:src="@drawable/play_btn_next"
-                        android:background="?android:attr/selectableItemBackgroundBorderless"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:gravity="center">
-                    <ImageButton
-                        android:layout_width="@dimen/d50_size"
-                        android:layout_height="@dimen/d50_size"
-                        android:id="@+id/playbar_playinglist"
-                        android:src="@drawable/play_btn_normal_list"
-                        android:background="?android:attr/selectableItemBackgroundBorderless" />
-                </LinearLayout>
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center">
+                <ImageButton
+                    android:layout_width="@dimen/player_button_size"
+                    android:layout_height="@dimen/player_button_size"
+                    android:id="@+id/playbar_model"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/play_btn_loop" />
             </LinearLayout>
-        </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/playbar_prev"
+                    android:layout_width="@dimen/player_button_size"
+                    android:layout_height="@dimen/player_button_size"
+                    android:src="@drawable/play_btn_pre"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center">
+                <FrameLayout
+                    android:id="@+id/playbar_play_container"
+                    android:layout_width="@dimen/d50_size"
+                    android:layout_height="@dimen/d50_size"
+                    android:background="?android:attr/selectableItemBackgroundBorderless">
+                    <remix.myplayer.ui.customview.playpause.PlayPauseView
+                        android:id="@+id/playbar_play_pause"
+                        android:layout_width="@dimen/player_button_size"
+                        android:layout_height="@dimen/player_button_size"
+                        android:layout_gravity="center"
+                        android:visibility="visible"/>
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center">
+                <ImageButton
+                    android:id="@+id/playbar_next"
+                    android:layout_width="@dimen/player_button_size"
+                    android:layout_height="@dimen/player_button_size"
+                    android:src="@drawable/play_btn_next"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center">
+                <ImageButton
+                    android:layout_width="@dimen/player_button_size"
+                    android:layout_height="@dimen/player_button_size"
+                    android:id="@+id/playbar_playinglist"
+                    android:src="@drawable/play_btn_normal_list"
+                    android:background="?android:attr/selectableItemBackgroundBorderless" />
+            </LinearLayout>
+        </LinearLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
