@@ -18,7 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.FolderAdapter;
-import remix.myplayer.helper.MusicEventHelper;
+import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -34,7 +34,6 @@ public class FolderActivity extends PermissActivity<Object,FolderAdapter> {
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
 
-    private boolean mIsRunning = false;
     private static WeakReference<FolderActivity> mRef;
     public static final String TAG = FolderActivity.class.getSimpleName();
     private RefreshHandler mRefreshHandler;
@@ -83,7 +82,7 @@ public class FolderActivity extends PermissActivity<Object,FolderAdapter> {
     }
 
 
-    public void updateList() {
+    private void updateList() {
         if(mAdapter != null){
             mAdapter.notifyDataSetChanged();
         }
@@ -102,13 +101,11 @@ public class FolderActivity extends PermissActivity<Object,FolderAdapter> {
     protected void onResume() {
         MobclickAgent.onPageStart(FolderActivity.class.getSimpleName());
         super.onResume();
-        mIsRunning = true;
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mIsRunning = false;
     }
 
     protected void onPause() {
@@ -126,6 +123,11 @@ public class FolderActivity extends PermissActivity<Object,FolderAdapter> {
     @Override
     public void onMediaStoreChanged() {
         updateList();
+    }
+
+    @Override
+    protected int getLoaderId() {
+        return LoaderIds.FOLDER_ACTIVITY;
     }
 
     private static class RefreshHandler extends Handler{

@@ -17,6 +17,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
+import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.mp3.Song;
@@ -37,7 +38,6 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
     @BindView(R.id.recyclerview)
     FastScrollRecyclerView mRecyclerView;
 
-    private static int LOADER_ID = 10;
     public static final String TAG = SongFragment.class.getSimpleName();
 
     @Override
@@ -51,14 +51,13 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
         return R.layout.fragment_song;
     }
 
-
     @Override
     protected void initAdapter() {
-        mAdapter = new SongAdapter(getActivity(),R.layout.item_song_recycle,mMultiChoice, SongAdapter.ALLSONG);
+        mAdapter = new SongAdapter(getActivity(),R.layout.item_song_recycle,mMultiChoice, SongAdapter.ALLSONG,mRecyclerView);
         mAdapter.setChangeCallback(new SortChangeCallback() {
             @Override
             public void SortChange() {
-                getLoaderManager().restartLoader(LOADER_ID,null,SongFragment.this);
+                getLoaderManager().restartLoader(getLoaderId(),null,SongFragment.this);
             }
 
         });
@@ -66,6 +65,7 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
             @Override
             public void onItemClick(View view, int position) {
                 int id = getSongID(position);
+
                 if(id > 0 && !mMultiChoice.itemAddorRemoveWithClick(view,position,id,TAG)){
                     Intent intent = new Intent(Constants.CTL_ACTION);
                     Bundle arg = new Bundle();
@@ -121,6 +121,11 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
     }
 
     @Override
+    protected int getLoaderId() {
+        return LoaderIds.SONG_FRAGMENT;
+    }
+
+    @Override
     public void onLoadFinished(Loader<List<Song>> loader, List<Song> data) {
         super.onLoadFinished(loader, data);
         new Thread(){
@@ -131,20 +136,9 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
         }.start();
     }
 
-
     @Override
     public SongAdapter getAdapter(){
-        return  mAdapter;
-    }
-
-    @Override
-    public void onMediaStoreChanged() {
-        if(mHasPermission)
-            getLoaderManager().initLoader(++LOADER_ID, null, this);
-        else{
-            if(mAdapter != null)
-                mAdapter.setDatas(null);
-        }
+        return mAdapter;
     }
 
     private static class AsyncSongLoader extends WrappedAsyncTaskLoader<List<Song>> {

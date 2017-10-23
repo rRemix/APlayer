@@ -25,7 +25,6 @@
     <!--结尾处按钮-->
     <ImageButton
         android:layout_alignParentRight="true"
-        android:layout_marginRight="@dimen/d8_size"
         android:id="@+id/song_button"
         android:layout_width="@dimen/d60_size"
         android:layout_height="match_parent"
@@ -34,7 +33,7 @@
         android:background="@color/transparent"/>
 
     <remix.myplayer.ui.customview.ColumnView
-        android:visibility="invisible"
+        android:visibility="gone"
         android:layout_centerVertical="true"
         android:layout_width="@dimen/d18_size"
         android:layout_height="@dimen/d16_size"
@@ -54,7 +53,7 @@
         android:layout_toLeftOf="@id/song_columnview"
         android:orientation="vertical"
         android:gravity="center_vertical"
-        android:layout_marginRight="@dimen/d4_size">
+        android:layout_marginRight="@dimen/d8_size">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

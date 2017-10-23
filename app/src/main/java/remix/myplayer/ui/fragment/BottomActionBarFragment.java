@@ -76,7 +76,6 @@ public class BottomActionBarFragment extends BaseFragment{
                 R.drawable.commom_playercontrols_bg,
                 ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.day_background_color_3 : R.color.night_background_color_3));
 
-        mBottomActionBar = rootView.findViewById(R.id.bottom_action_bar);
         //点击打开播放界面
         mBottomActionBar.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -24,6 +24,7 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SearchResAdapter;
 import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
+import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.ui.customview.SearchToolBar;
@@ -40,7 +41,6 @@ import remix.myplayer.util.ToastUtil;
  * 搜索界面，根据关键字，搜索歌曲名，艺术家，专辑中的记录
  */
 public class SearchActivity extends PermissActivity<Song,SearchResAdapter> {
-    private static int LOADER_ID = 20000;
     //搜索的关键字
     private String mkey;
     //搜索结果的listview
@@ -53,7 +53,6 @@ public class SearchActivity extends PermissActivity<Song,SearchResAdapter> {
     TextView mSearchResBlank;
     @BindView(R.id.search_result_container)
     FrameLayout mSearchResContainer;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -122,13 +121,8 @@ public class SearchActivity extends PermissActivity<Song,SearchResAdapter> {
     }
 
     @Override
-    public void onMediaStoreChanged() {
-        if(mHasPermission)
-            getLoaderManager().initLoader(++LOADER_ID, null, this);
-        else{
-            if(mAdapter != null)
-                mAdapter.setDatas(null);
-        }
+    protected int getLoaderId() {
+        return LoaderIds.SEARCH_ACTIVITY;
     }
 
     @Override
@@ -145,7 +139,7 @@ public class SearchActivity extends PermissActivity<Song,SearchResAdapter> {
      */
     private void search(String key) {
         mkey = key;
-        getLoaderManager().initLoader(++LOADER_ID, null, this);
+        getLoaderManager().initLoader(LoaderIds.SEARCH_ACTIVITY, null, this);
     }
 
     private static class AsyncSearchLoader extends AppWrappedAsyncTaskLoader<List<Song>> {

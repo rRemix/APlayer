@@ -207,7 +207,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         if(position == 0)
             return "";
         if(mDatas != null && position - 1 < mDatas.size()){
-            String artist = mDatas.get(position).getArtist();
+            String artist = mDatas.get(position - 1).getArtist();
             return !TextUtils.isEmpty(artist) ? (Pinyin.toPinyin(artist.charAt(0))).toUpperCase().substring(0,1)  : "";
         }
         return "";

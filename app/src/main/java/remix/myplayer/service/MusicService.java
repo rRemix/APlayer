@@ -221,6 +221,7 @@ public class MusicService extends BaseService implements Playback {
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
         stopSelf();
+        System.exit(0);
     }
 
     @Override
@@ -240,7 +241,7 @@ public class MusicService extends BaseService implements Playback {
         if(intent != null && intent.getExtras() != null && intent.getExtras().getBoolean("FromWidget",false)){
             mControlRecevier.onReceive(mContext,intent);
         }
-        return super.onStartCommand(intent,flags,startId);
+        return START_NOT_STICKY;
     }
 
     @Override

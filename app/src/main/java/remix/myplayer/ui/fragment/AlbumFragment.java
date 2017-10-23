@@ -16,6 +16,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.AlbumAdater;
 import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
+import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.mp3.Album;
@@ -37,7 +38,6 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdater>{
     FastScrollRecyclerView mRecyclerView;
 
     public static final String TAG = AlbumFragment.class.getSimpleName();
-    private static int LOADER_ID = 100;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,7 +56,7 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdater>{
         mAdapter.setModeChangeCallback(new ModeChangeCallback() {
             @Override
             public void OnModeChange(final int mode) {
-                mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+                mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
                 mRecyclerView.setAdapter(mAdapter);
             }
         });
@@ -110,19 +110,15 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdater>{
         return mAdapter;
     }
 
-    @Override
-    public void onMediaStoreChanged() {
-        if(mHasPermission)
-            getLoaderManager().initLoader(++LOADER_ID, null, this);
-        else{
-            if(mAdapter != null)
-                mAdapter.setDatas(null);
-        }
-    }
 
     @Override
     protected Loader<List<Album>> getLoader() {
         return new AsyncAlbumLoader(mContext);
+    }
+
+    @Override
+    protected int getLoaderId() {
+        return LoaderIds.ALBUM_FRAGMENT;
     }
 
     private static class AsyncAlbumLoader extends WrappedAsyncTaskLoader<List<Album>> {

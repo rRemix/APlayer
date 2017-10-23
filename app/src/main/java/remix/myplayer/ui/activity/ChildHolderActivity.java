@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.squareup.haha.trove.TObjectFunction;
 import com.umeng.analytics.MobclickAgent;
 
 import java.lang.ref.WeakReference;
@@ -24,8 +23,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ChildHolderAdapter;
-import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.UpdateHelper;
+import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.mp3.Song;
@@ -39,7 +38,6 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -90,7 +88,7 @@ public class ChildHolderActivity extends PermissActivity<Song,ChildHolderAdapter
         mType = getIntent().getIntExtra("Type", -1);
         mArg = getIntent().getStringExtra("Title");
 
-        mAdapter = new ChildHolderAdapter(this,R.layout.item_child_holder,mType,mArg,mMultiChoice);
+        mAdapter = new ChildHolderAdapter(this,R.layout.item_child_holder,mType,mArg,mMultiChoice,mRecyclerView);
         mAdapter.setCallback(new SortChangeCallback() {
             @Override
             public void SortChange() {
@@ -169,6 +167,11 @@ public class ChildHolderActivity extends PermissActivity<Song,ChildHolderAdapter
             return;
         mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.isPlay());
 
+    }
+
+    @Override
+    protected int getLoaderId() {
+        return LoaderIds.CHILDHOLDER_ACTIVITY;
     }
 
 
@@ -284,9 +287,7 @@ public class ChildHolderActivity extends PermissActivity<Song,ChildHolderAdapter
         //底部状态兰
         mBottombar.UpdateBottomStatus(Song, isplay);
         //更新高亮歌曲
-//        if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
-//        if(mAdapter != null)
-//            mAdapter.notifyDataSetChanged();
+//        mAdapter.onUpdateHightLight();
     }
 
     @Override

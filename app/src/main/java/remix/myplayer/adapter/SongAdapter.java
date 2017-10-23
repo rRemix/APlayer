@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.provider.MediaStore;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.asynctask.AsynLoadImage;
+import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.Song;
@@ -50,24 +52,28 @@ import remix.myplayer.util.ToastUtil;
 /**
  * Created by Remix on 2016/4/11.
  */
-public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements FastScroller.SectionIndexer{
+public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements FastScroller.SectionIndexer,OnUpdateHighLightListener {
     //升序还是降序
     public static String ASCDESC = SPUtil.getValue(APlayerApplication.getContext(),"Setting","AscDesc"," asc");
     //按字母排序还是按添加时间排序
     public static String SORT = SPUtil.getValue(APlayerApplication.getContext(),"Setting","Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
 
     protected MultiChoice mMultiChoice;
-    protected int mType;
+    private int mType;
     public static final int ALLSONG = 0;
     public static final int RECENTLY = 1;
-    protected Drawable mDefaultDrawable;
-    protected Drawable mSelectDrawable;
-    protected SortChangeCallback mCallback;
+    private Drawable mDefaultDrawable;
+    private Drawable mSelectDrawable;
+    private SortChangeCallback mCallback;
 
-    public SongAdapter(Context context,int layoutId, MultiChoice multiChoice, int type) {
+    private RecyclerView mRecyclerView;
+    private int mLastIndex;
+
+    public SongAdapter(Context context,int layoutId, MultiChoice multiChoice, int type,RecyclerView recyclerView) {
         super(context,layoutId,multiChoice);
-        this.mMultiChoice = multiChoice;
-        this.mType = type;
+        mMultiChoice = multiChoice;
+        mType = type;
+        mRecyclerView = recyclerView;
         int size = DensityUtil.dip2px(mContext,60);
         mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
         mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getSelectColor(),size,size);
@@ -120,23 +126,26 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         }
         final SongViewHolder holder = (SongViewHolder) baseHolder;
 
-        //获得当前播放的歌曲
-//        final Song currentMP3 = MusicService.getCurrentMP3();
-        //判断该歌曲是否是正在播放的歌曲
-        //如果是,高亮该歌曲，并显示动画
-//        if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
-//        if(currentMP3 != null){
-//            boolean highlight = temp.getId() == MusicService.getCurrentMP3().getId();
-//            holder.mName.setTextColor(highlight ?
-//                    ThemeStore.getAccentColor():
-//                    ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-//            holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.INVISIBLE);
-//            //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
-//            if(MusicService.isPlay() && !holder.mColumnView.getStatus() && highlight){
-//                holder.mColumnView.startAnim();
-//            }
-//            else if(!MusicService.isPlay() && holder.mColumnView.getStatus()){
-//                holder.mColumnView.stopAnim();
+//        if(SPUtil.getValue(mContext,"Setting","ShowHighLight",true)){
+//            //获得当前播放的歌曲
+//            final Song currentMP3 = MusicService.getCurrentMP3();
+//            //判断该歌曲是否是正在播放的歌曲
+//            //如果是,高亮该歌曲，并显示动画
+//            if(currentMP3 != null){
+//                boolean highlight = song.getId() == MusicService.getCurrentMP3().getId();
+//                if(highlight)
+//                    mLastIndex = position;
+//                holder.mName.setTextColor(highlight ?
+//                        ThemeStore.getAccentColor():
+//                        ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+//                holder.mColumnView.setVisibility(highlight ? View.VISIBLE : View.GONE);
+//                //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
+//                if(MusicService.isPlay() && !holder.mColumnView.getStatus() && highlight){
+//                    holder.mColumnView.startAnim();
+//                }
+//                else if(!MusicService.isPlay() && holder.mColumnView.getStatus()){
+//                    holder.mColumnView.stopAnim();
+//                }
 //            }
 //        }
 
@@ -277,16 +286,57 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         }
     }
 
-
     @Override
     public String getSectionText(int position) {
         if(position == 0)
             return "";
         if(mDatas != null && position - 1 < mDatas.size()){
-            String title = mDatas.get(position).getTitle();
+            String title = mDatas.get(position - 1).getTitle();
             return !TextUtils.isEmpty(title) ? (Pinyin.toPinyin(title.charAt(0))).toUpperCase().substring(0,1)  : "";
         }
         return "";
+    }
+
+    /**
+     * 更新高亮歌曲
+     */
+    @Override
+    public void onUpdateHightLight() {
+        Song currentSong = MusicService.getCurrentMP3();
+        if(currentSong != null && mDatas != null && mDatas.indexOf(currentSong) >= 0){
+            int index = mDatas.indexOf(currentSong) + 1;
+
+            //播放的是同一首歌曲
+            if(index == mLastIndex){
+                return;
+            }
+            SongViewHolder newHolder = null;
+            if(mRecyclerView.findViewHolderForAdapterPosition(index) instanceof SongViewHolder){
+                newHolder = (SongViewHolder) mRecyclerView.findViewHolderForAdapterPosition(index);
+            }
+            SongViewHolder oldHolder = null;
+            if(mRecyclerView.findViewHolderForAdapterPosition(mLastIndex) instanceof SongViewHolder){
+                oldHolder = (SongViewHolder) mRecyclerView.findViewHolderForAdapterPosition(mLastIndex);
+            }
+
+            if(newHolder != null){
+                newHolder.mName.setTextColor(ThemeStore.getAccentColor());
+                newHolder.mColumnView.setVisibility(View.VISIBLE);
+                //根据当前播放状态以及动画是否在播放，开启或者暂停的高亮动画
+                if(MusicService.isPlay() && !newHolder.mColumnView.getStatus()){
+                    newHolder.mColumnView.startAnim();
+                }
+                else if(!MusicService.isPlay() && newHolder.mColumnView.getStatus()){
+                    newHolder.mColumnView.stopAnim();
+                }
+            }
+            if(oldHolder != null){
+                oldHolder.mName.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
+                oldHolder.mColumnView.stopAnim();
+                oldHolder.mColumnView.setVisibility(View.GONE);
+            }
+            mLastIndex = index;
+        }
     }
 
     static class SongViewHolder extends BaseViewHolder{

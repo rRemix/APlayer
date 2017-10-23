@@ -33,14 +33,15 @@ public abstract class LibraryFragment<D,A extends HeaderAdapter> extends BaseFra
     protected A mAdapter;
     protected boolean mHasPermission = false;
     protected MultiChoice mMultiChoice;
-    private String[] mPermissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private final String[] mPermissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         mHasPermission = hasPermissions();
-        if(mHasPermission)
-            onMediaStoreChanged();
+        if(mHasPermission){
+            getLoaderManager().initLoader(getLoaderId(), null, this);
+        }
     }
 
     @Override
@@ -107,7 +108,12 @@ public abstract class LibraryFragment<D,A extends HeaderAdapter> extends BaseFra
 
     @Override
     public void onMediaStoreChanged() {
-
+        if(mHasPermission)
+            getLoaderManager().restartLoader(getLoaderId(), null, this);
+        else{
+            if(mAdapter != null)
+                mAdapter.setDatas(null);
+        }
     }
 
     @Override
@@ -140,4 +146,5 @@ public abstract class LibraryFragment<D,A extends HeaderAdapter> extends BaseFra
     }
 
     protected abstract Loader<List<D>> getLoader();
+    protected abstract int getLoaderId();
 }

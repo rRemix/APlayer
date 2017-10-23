@@ -16,6 +16,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ArtistAdapter;
 import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
+import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.mp3.Artist;
@@ -37,12 +38,6 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
     FastScrollRecyclerView mRecyclerView;
 
     public static final String TAG = ArtistFragment.class.getSimpleName();
-    private static int LOADER_ID = 1000;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -114,21 +109,16 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
         return new AsyncArtistLoader(mContext);
     }
 
+    @Override
+    protected int getLoaderId() {
+        return LoaderIds.ARTIST_FRAGMENT;
+    }
 
     @Override
     public ArtistAdapter getAdapter(){
         return mAdapter;
     }
 
-    @Override
-    public void onMediaStoreChanged() {
-        if(mHasPermission)
-            getLoaderManager().initLoader(++LOADER_ID, null, this);
-        else{
-            if(mAdapter != null)
-                mAdapter.setDatas(null);
-        }
-    }
 
     private static class AsyncArtistLoader extends WrappedAsyncTaskLoader<List<Artist>> {
         private AsyncArtistLoader(Context context) {

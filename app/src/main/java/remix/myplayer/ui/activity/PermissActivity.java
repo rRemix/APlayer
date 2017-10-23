@@ -2,6 +2,8 @@ package remix.myplayer.ui.activity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -20,12 +22,18 @@ import remix.myplayer.service.MusicService;
 public abstract class PermissActivity<D,A extends BaseAdapter> extends MultiChoiceActivity implements MusicEventHelper.MusicEventCallback, android.app.LoaderManager.LoaderCallbacks<List<D>>{
     protected boolean mHasPermission = false;
     protected A mAdapter;
+    private final String[] mPermissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MusicEventHelper.addCallback(this);
+        if(mHasPermission == hasPermissions()){
+            getLoaderManager().initLoader(getLoaderId(), null, this);
+        }
     }
+
+    protected abstract int getLoaderId();
 
     @Override
     protected void onResume() {
@@ -44,6 +52,17 @@ public abstract class PermissActivity<D,A extends BaseAdapter> extends MultiChoi
                 });
     }
 
+    protected boolean hasPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && mPermissions != null) {
+            for (String permission : mPermissions) {
+                if (mContext.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -52,7 +71,12 @@ public abstract class PermissActivity<D,A extends BaseAdapter> extends MultiChoi
 
     @Override
     public void onMediaStoreChanged() {
-
+        if(mHasPermission)
+            getLoaderManager().restartLoader(getLoaderId(), null, this);
+        else{
+            if(mAdapter != null)
+                mAdapter.setDatas(null);
+        }
     }
 
     @Override

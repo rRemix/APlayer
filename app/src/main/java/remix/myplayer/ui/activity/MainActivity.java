@@ -45,10 +45,12 @@ import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
+import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnModeChangeListener;
+import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -577,8 +579,14 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if (!mIsRunning)
             return;
         mBottomBar.UpdateBottomStatus(song, isplay);
-//        if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
-//        mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ALLSONG_ADAPTER);
+//        for(Fragment temp : getSupportFragmentManager().getFragments()) {
+//            if (temp instanceof SongFragment) {
+//                SongFragment songFragment = (SongFragment) temp;
+//                if(songFragment.getAdapter() != null){
+//                    songFragment.getAdapter().onUpdateHightLight();
+//                }
+//            }
+//        }
         updateHeader(song,isplay);
     }
 

@@ -16,6 +16,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
+import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.mp3.PlayList;
@@ -36,7 +37,6 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
     public static final String TAG = PlayListFragment.class.getSimpleName();
     @BindView(R.id.playlist_recycleview)
     FastScrollRecyclerView mRecyclerView;
-    private static int LOADER_ID = 10000;
 
     @Override
     protected int getLayoutID() {
@@ -119,16 +119,6 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
     }
 
     @Override
-    public void onMediaStoreChanged() {
-        if(mHasPermission)
-            getLoaderManager().initLoader(++LOADER_ID, null, this);
-        else{
-            if(mAdapter != null)
-                mAdapter.setDatas(null);
-        }
-    }
-
-    @Override
     public void onPlayListChanged() {
         onMediaStoreChanged();
     }
@@ -136,6 +126,11 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
     @Override
     protected Loader<List<PlayList>> getLoader() {
         return new AsyncPlayListLoader(mContext);
+    }
+
+    @Override
+    protected int getLoaderId() {
+        return LoaderIds.PLAYLIST_FRAGMENT;
     }
 
     private static class AsyncPlayListLoader extends WrappedAsyncTaskLoader<List<PlayList>> {

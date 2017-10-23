@@ -256,6 +256,12 @@ public class ColumnView extends View {
         mHandler.sendMessage(msg);
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        stopAnim();
+    }
+
     //当前动画是否正在播放
     public boolean getStatus(){
         return mIsRun;

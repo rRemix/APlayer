@@ -20,6 +20,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.SongChooseAdaper;
 import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.helper.MusicEventHelper;
+import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnSongChooseListener;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.theme.ThemeStore;
@@ -40,7 +41,6 @@ public class SongChooseActivity extends PermissActivity<Song,SongChooseAdaper> {
 
     private int mPlayListID;
     private String mPlayListName;
-    private static int LOADER_ID = 0;
     @BindView(R.id.confirm)
     TextView mConfirm;
     @BindView(R.id.recyclerview)
@@ -95,13 +95,8 @@ public class SongChooseActivity extends PermissActivity<Song,SongChooseAdaper> {
     }
 
     @Override
-    public void onMediaStoreChanged() {
-        if(mHasPermission)
-            getLoaderManager().initLoader(++LOADER_ID, null, this);
-        else{
-            if(mAdapter != null)
-                mAdapter.setDatas(null);
-        }
+    protected int getLoaderId() {
+        return LoaderIds.SONGCHOOSE_ACTIVITY;
     }
 
     @Override

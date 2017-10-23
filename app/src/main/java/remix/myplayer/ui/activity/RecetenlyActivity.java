@@ -24,8 +24,8 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
-import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.UpdateHelper;
+import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
@@ -42,8 +42,7 @@ import remix.myplayer.util.MediaStoreUtil;
  * 目前为最近7天添加
  */
 public class RecetenlyActivity extends PermissActivity<Song,SongAdapter> implements UpdateHelper.Callback{
-    public static final String TAG = RecetenlyActivity.class.getSimpleName();
-    private static int LOADER_ID = 0;
+    public static final String TAG = RecetenlyActivity.class.getSimpleName();;
 
     @BindView(R.id.recyclerview)
     FastScrollRecyclerView mRecyclerView;
@@ -71,7 +70,7 @@ public class RecetenlyActivity extends PermissActivity<Song,SongAdapter> impleme
         setContentView(R.layout.activity_recently);
         ButterKnife.bind(this);
 
-        mAdapter = new SongAdapter(this, R.layout.item_song_recycle,mMultiChoice,SongAdapter.RECENTLY);
+        mAdapter = new SongAdapter(this, R.layout.item_song_recycle,mMultiChoice,SongAdapter.RECENTLY,mRecyclerView);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -125,9 +124,9 @@ public class RecetenlyActivity extends PermissActivity<Song,SongAdapter> impleme
 
     @Override
     public void UpdateUI(Song Song, boolean isplay) {
-//        mAdapter.notifyDataSetChanged();
+//        if(mAdapter != null)
+//            mAdapter.onUpdateHightLight();
     }
-
 
     @Override
     public void onLoadFinished(android.content.Loader<List<Song>> loader, List<Song> data) {
@@ -159,19 +158,15 @@ public class RecetenlyActivity extends PermissActivity<Song,SongAdapter> impleme
         }
     }
 
-    @Override
-    public void onMediaStoreChanged() {
-        if(mHasPermission)
-            getLoaderManager().initLoader(++LOADER_ID, null, this);
-        else{
-            if(mAdapter != null)
-                mAdapter.setDatas(null);
-        }
-    }
 
     @Override
     protected android.content.Loader<List<Song>> getLoader() {
         return new AsyncRecentlySongLoader(this);
+    }
+
+    @Override
+    protected int getLoaderId() {
+        return LoaderIds.RECENTLY_ACTIVITY;
     }
 
     private static class AsyncRecentlySongLoader extends AppWrappedAsyncTaskLoader<List<Song>> {

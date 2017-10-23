@@ -188,7 +188,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         if(position == 0)
             return "";
         if(mDatas != null && position - 1 < mDatas.size()){
-            String title = mDatas.get(position).Name;
+            String title = mDatas.get(position - 1).Name;
             return !TextUtils.isEmpty(title) ? (Pinyin.toPinyin(title.charAt(0))).toUpperCase().substring(0,1)  : "";
         }
         return "";

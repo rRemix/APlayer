@@ -202,6 +202,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mBlurHandler.removeCallbacksAndMessages(null);
         if(mRawBitMap != null && !mRawBitMap.isRecycled())
             mRawBitMap.recycle();
         if(mNewBitMap != null && !mNewBitMap.isRecycled())
@@ -247,7 +248,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     private static class BlurHandler extends Handler{
         private final WeakReference<LockScreenActivity> mRef;
 
-        public BlurHandler(LockScreenActivity activity) {
+        BlurHandler(LockScreenActivity activity) {
             this.mRef = new WeakReference<>(activity);
         }
 
@@ -256,6 +257,8 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
             if(mRef.get() == null)
                 return;
             LockScreenActivity activity = mRef.get();
+            if(activity == null || activity.isFinishing())
+                return;
             //设置背景
             activity.mImageBackground.setImageBitmap(activity.mNewBitMap);
             //变化字体颜色

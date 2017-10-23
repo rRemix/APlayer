@@ -205,7 +205,7 @@ public class AlbumAdater extends HeaderAdapter<Album, BaseViewHolder> implements
         if(position == 0)
             return "";
         if(mDatas != null && position - 1 < mDatas.size()){
-            String album = mDatas.get(position).getAlbum();
+            String album = mDatas.get(position - 1).getAlbum();
             return !TextUtils.isEmpty(album) ? (Pinyin.toPinyin(album.charAt(0))).toUpperCase().substring(0,1)  : "";
         }
         return "";
