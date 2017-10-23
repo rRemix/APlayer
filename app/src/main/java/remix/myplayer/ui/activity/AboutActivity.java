@@ -31,8 +31,8 @@ public class AboutActivity extends ToolbarActivity {
             PackageManager pm = APlayerApplication.getContext().getPackageManager();
             PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
             mVersion.setText("v" + pi.versionName);
-        }catch (Exception e){
-            e.printStackTrace();
+        }catch (Exception ignored){
+
         }
 
         setUpToolbar(mToolBar, getString(R.string.about));

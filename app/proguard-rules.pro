@@ -37,6 +37,17 @@
 #崩溃信息
 -keepattributes SourceFile,LineNumberTable
 
+#baseAdapter
+-keepclassmembers class remix.myplayer.adapter.holder.BaseViewHolder
+-keepclasseswithmembers class remix.myplayer.adapter.holder.BaseViewHolder {
+    <fields>;
+    <methods>;
+}
+-keepclasseswithmembers class * extends remix.myplayer.adapter.holder.BaseViewHolder{
+    <fields>;
+    <methods>;
+}
+
 #友盟推送
 -dontwarn com.taobao.**
 -dontwarn anet.channel.**

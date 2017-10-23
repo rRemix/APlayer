@@ -35,6 +35,7 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.mp3.PlayListSong;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
 
@@ -111,7 +112,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
         WindowManager.LayoutParams lp = getWindow().getAttributes();
-        lp.height = (int) (metrics.heightPixels * 0.55);
+        lp.height = DensityUtil.dip2px(mContext,354);
         lp.width = metrics.widthPixels;
         w.setAttributes(lp);
         w.setGravity(Gravity.BOTTOM);

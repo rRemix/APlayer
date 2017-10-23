@@ -78,6 +78,9 @@ public class BottomActionBarFragment extends BaseFragment{
         Theme.TintDrawable(rootView,
                 R.drawable.commom_playercontrols_bg,
                 ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.day_background_color_3 : R.color.night_background_color_3));
+        Theme.TintDrawable(mPlayNext,
+                R.drawable.bf_btn_next,
+                ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_323335 : R.color.white));
 
         //点击打开播放界面
         mBottomActionBar.setOnClickListener(new View.OnClickListener() {
@@ -135,16 +138,16 @@ public class BottomActionBarFragment extends BaseFragment{
         //设置按钮着色
         if(mPlayButton == null)
             return;
-        mPlayButton.setImageResource(isPlaying ? R.drawable.bf_btn_stop : R.drawable.bf_btn_play);
-//        if(isPlaying) {
-//            Theme.TintDrawable(mPlayButton,
-//                    R.drawable.bf_btn_stop,
-//                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
-//        } else{
-//            Theme.TintDrawable(mPlayButton,
-//                    R.drawable.bf_btn_play,
-//                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
-//        }
+//        mPlayButton.setImageResource(isPlaying ? R.drawable.bf_btn_stop : R.drawable.bf_btn_play);
+        if(isPlaying) {
+            Theme.TintDrawable(mPlayButton,
+                    R.drawable.bf_btn_stop,
+                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_323335 : R.color.white));
+        } else{
+            Theme.TintDrawable(mPlayButton,
+                    R.drawable.bf_btn_play,
+                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_323335 : R.color.white));
+        }
     }
 
     public static Rect getCoverRect(){
