@@ -27,16 +27,25 @@
             fresco:fadeDuration="0"
             android:layout_centerVertical="true"/>
 
-        <!-- 播放按钮 -->
-        <ImageButton
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="@dimen/d16_size"
+        <ImageView
+            android:id="@+id/playbar_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bf_btn_next"
             android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/d16_size"/>
+
+        <!-- 播放按钮 -->
+        <ImageView
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/playbar_next"
             android:id="@+id/playbar_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/transparent"
-            android:src="@drawable/bf_btn_play"/>
+            android:src="@drawable/bf_btn_play"
+            android:layout_marginRight="@dimen/d16_size"/>
 
         <!-- 歌曲名与歌手 -->
         <LinearLayout

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -19,7 +20,9 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import remix.myplayer.R;
+import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
@@ -28,6 +31,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 
 /**
@@ -40,7 +44,9 @@ import remix.myplayer.util.MediaStoreUtil;
 public class BottomActionBarFragment extends BaseFragment{
     //播放与下一首按钮
     @BindView(R.id.playbar_play)
-    ImageButton mPlayButton;
+    ImageView mPlayButton;
+    @BindView(R.id.playbar_next)
+    ImageView mPlayNext;
     //歌曲名艺术家
     @BindView(R.id.bottom_title)
     TextView mTitle;
@@ -61,10 +67,7 @@ public class BottomActionBarFragment extends BaseFragment{
         super.onCreate(savedInstanceState);
         mPageName = BottomActionBarFragment.class.getSimpleName();
     }
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
+
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,6 +101,7 @@ public class BottomActionBarFragment extends BaseFragment{
         //播放按钮
         CtrlButtonListener listener = new CtrlButtonListener(getContext());
         mPlayButton.setOnClickListener(listener);
+        mPlayNext.setOnClickListener(listener);
 
         //获取封面位置信息
         mCover.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -115,6 +119,7 @@ public class BottomActionBarFragment extends BaseFragment{
         });
         return rootView;
     }
+
     //更新界面
     public void UpdateBottomStatus(Song song, boolean isPlaying) {
         if(song == null)
@@ -126,19 +131,20 @@ public class BottomActionBarFragment extends BaseFragment{
             mArtist.setText(song.getArtist());
         //封面
         if(mCover != null)
-            MediaStoreUtil.setImageUrl(mCover, song.getAlbumId());
+            new AsynLoadImage(mCover).execute(song.getAlbumId(), Constants.URL_ALBUM);
         //设置按钮着色
         if(mPlayButton == null)
             return;
-        if(isPlaying) {
-            Theme.TintDrawable(mPlayButton,
-                    R.drawable.bf_btn_stop,
-                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
-        } else{
-            Theme.TintDrawable(mPlayButton,
-                    R.drawable.bf_btn_play,
-                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
-        }
+        mPlayButton.setImageResource(isPlaying ? R.drawable.bf_btn_stop : R.drawable.bf_btn_play);
+//        if(isPlaying) {
+//            Theme.TintDrawable(mPlayButton,
+//                    R.drawable.bf_btn_stop,
+//                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
+//        } else{
+//            Theme.TintDrawable(mPlayButton,
+//                    R.drawable.bf_btn_play,
+//                    ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_1c1b19 : R.color.white));
+//        }
     }
 
     public static Rect getCoverRect(){

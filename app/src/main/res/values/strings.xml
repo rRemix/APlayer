@@ -223,4 +223,5 @@
     <string name="plase_give_float_permission">请在设置中授予悬浮窗权限</string>
     <string name="jump_alipay_error">跳转失败\n已复制支付宝账户(*博睿)</string>
     <string name="please_give_access_external_storage_permission">请授予读写存储空间的权限</string>
+    <string name="show_recently">显示近一周导入的歌曲</string>
 </resources>

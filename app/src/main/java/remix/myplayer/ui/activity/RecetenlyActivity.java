@@ -44,6 +44,8 @@ import remix.myplayer.util.MediaStoreUtil;
 public class RecetenlyActivity extends PermissActivity<Song,SongAdapter> implements UpdateHelper.Callback{
     public static final String TAG = RecetenlyActivity.class.getSimpleName();;
 
+    @BindView(R.id.recently_placeholder)
+    View mPlaceHolder;
     @BindView(R.id.recyclerview)
     FastScrollRecyclerView mRecyclerView;
     private ArrayList<Integer> mIdList = new ArrayList<>();
@@ -136,8 +138,12 @@ public class RecetenlyActivity extends PermissActivity<Song,SongAdapter> impleme
             for(Song song : data){
                 mIdList.add(song.getId());
             }
+            mRecyclerView.setVisibility(data.size() > 0 ? View.VISIBLE : View.GONE);
+            mPlaceHolder.setVisibility(data.size() > 0 ? View.GONE : View.VISIBLE);
+        } else {
+            mRecyclerView.setVisibility(View.GONE);
+            mPlaceHolder.setVisibility(View.VISIBLE);
         }
-
     }
 
     @Override
@@ -157,7 +163,6 @@ public class RecetenlyActivity extends PermissActivity<Song,SongAdapter> impleme
             mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
         }
     }
-
 
     @Override
     protected android.content.Loader<List<Song>> getLoader() {

@@ -51,6 +51,7 @@
     <dimen name="d64_size">64dp</dimen>
     <dimen name="d70_size">70dp</dimen>
     <dimen name="d72_size">72dp</dimen>
+    <dimen name="d92_size">92dp</dimen>
     <dimen name="d120_size">120dp</dimen>
     <dimen name="d123_size">123dp</dimen>
     <dimen name="d124_size">124dp</dimen>
