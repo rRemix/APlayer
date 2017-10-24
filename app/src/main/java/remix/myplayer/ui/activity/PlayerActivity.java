@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -15,7 +16,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -29,10 +29,12 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -99,7 +101,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     //第一次启动的标志变量
     private boolean mFistStart = true;
     //是否正在拖动进度条
-    public static boolean mIsDragSeekBar = false;
+    public boolean mIsDragSeekBarFromUser = false;
 
     //入场动画封面
     SimpleDraweeView mAnimCover;
@@ -544,6 +546,19 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      * 初始化seekbar
      */
     private void setUpSeekBar() {
+//        RelativeLayout seekbarContainer = findViewById(R.id.seekbar_container);
+//        mSeekBar = new SeekBar(mContext);
+//        mSeekBar.setProgressDrawable(getResources().getDrawable(R.drawable.bg_progress));
+//        mSeekBar.setPadding(DensityUtil.dip2px(mContext,5),0,DensityUtil.dip2px(mContext,5),0);
+//        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
+//
+//        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, DensityUtil.dip2px(mContext,2));
+//        lp.setMargins(DensityUtil.dip2px(mContext,10),0,DensityUtil.dip2px(mContext,10),0);
+//
+//        lp.addRule(RelativeLayout.LEFT_OF,R.id.text_remain);
+//        lp.addRule(RelativeLayout.RIGHT_OF,R.id.text_hasplay);
+//        lp.addRule(RelativeLayout.CENTER_VERTICAL);
+//        seekbarContainer.addView(mSeekBar,lp);
         if(mInfo == null)
             return;
         //初始化已播放时间与剩余时间
@@ -570,14 +585,13 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                if(fromUser)
                 mHandler.sendEmptyMessage(UPDATE_TIME_ONLY);
                 if(mLrcView != null)
                     mLrcView.seekTo(progress,true,fromUser);
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                mIsDragSeekBar = true;
+                mIsDragSeekBarFromUser = true;
             }
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -586,7 +600,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //                    seekBar.setProgress(0);
 //                }
                 MusicService.setProgress(seekBar.getProgress());
-                mIsDragSeekBar = false;
+                mIsDragSeekBarFromUser = false;
             }
         });
     }
@@ -919,7 +933,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mSeekBar.setProgressDrawable(layerDrawable);
         //修改thumb颜色
 //        mSeekBar.setThumb(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,3),DensityUtil.dip2px(this,7)),accentColor));
-        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,accentColor,0,1,Color.WHITE,DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10),1));
+//        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,accentColor,0,1,Color.WHITE,DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10),1));
+        Drawable thumbDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10));
+        mSeekBar.setThumb(thumbDrawable);
+
         //修改控制按钮颜色
         Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,accentColor);
         Theme.TintDrawable(mPlayBarPrev,R.drawable.play_btn_pre,accentColor);
@@ -1061,10 +1078,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             if(msg.what == UPDATE_BG){
                activity.updateBgByHandler();
             }
-            if(msg.what == UPDATE_TIME_ONLY){
+            if(msg.what == UPDATE_TIME_ONLY && !activity.mIsDragSeekBarFromUser){
                 activity.updateProgressByHandler();
             }
-            if(msg.what == UPDATE_TIME_ALL){
+            if(msg.what == UPDATE_TIME_ALL && !activity.mIsDragSeekBarFromUser){
                 activity.updateProgressByHandler();
                 activity.updateSeekbarByHandler();
             }
