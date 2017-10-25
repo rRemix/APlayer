@@ -253,13 +253,13 @@ public class EQActivity extends ToolbarActivity {
 //        }
 
         mEqualizer.setEnabled(mEnable);
-        for(int i = 0 ; i < mEQSeekBars.size() ;i++){
+        for(short i = 0 ; i < mEQSeekBars.size() ;i++){
             mEQSeekBars.get(i).setEnabled(enable);
-            mEqualizer.setBandLevel((short)i,enable ? mBandFrequencys.get(i) : 0);
+            mEqualizer.setBandLevel(i,enable ? mBandFrequencys.get(i) : (short)0);
         }
     }
 
-    class EQSeekbarOnChangeListener implements EQSeekBar.OnSeekBarChangeListener{
+    private class EQSeekbarOnChangeListener implements EQSeekBar.OnSeekBarChangeListener{
         @Override
         public void onProgressChanged(EQSeekBar seekBar, int position, boolean fromUser) {
             if(!seekBar.canDrag())

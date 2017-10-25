@@ -19,13 +19,11 @@ import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
-import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -54,13 +52,7 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
     @Override
     protected void initAdapter() {
         mAdapter = new SongAdapter(getActivity(),R.layout.item_song_recycle,mMultiChoice, SongAdapter.ALLSONG,mRecyclerView);
-        mAdapter.setChangeCallback(new SortChangeCallback() {
-            @Override
-            public void SortChange() {
-                getLoaderManager().restartLoader(getLoaderId(),null,SongFragment.this);
-            }
-
-        });
+        mAdapter.setChangeCallback(() -> getLoaderManager().restartLoader(getLoaderId(),null,SongFragment.this));
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -102,9 +94,7 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
             Global.AllSongList = new ArrayList<>();
         else
             Global.AllSongList.clear();
-        for(Song song : mAdapter.getDatas()){
-            Global.AllSongList.add(song.getId());
-        }
+        mAdapter.getDatas().forEach(song -> Global.AllSongList.add(song.getId()));
     }
 
     private int getSongID(int position){

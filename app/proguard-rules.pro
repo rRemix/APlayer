@@ -204,6 +204,10 @@
 #rxpermission
 -keep class com.tbruyelle.rxpermissions.**{*;}
 
+#lambda
+-dontwarn java.lang.invoke.*
+-dontwarn **$$Lambda$*
+
 # 如果你需要兼容6.0系统，请不要混淆org.apache.http.legacy.jar
 -dontwarn android.net.compatibility.**
 -dontwarn android.net.http.**

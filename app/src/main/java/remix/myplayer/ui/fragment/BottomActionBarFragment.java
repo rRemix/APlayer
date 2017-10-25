@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -20,7 +19,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.listener.CtrlButtonListener;
@@ -32,7 +30,6 @@ import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -83,23 +80,20 @@ public class BottomActionBarFragment extends BaseFragment{
                 ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_323335 : R.color.white));
 
         //点击打开播放界面
-        mBottomActionBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(MusicService.getCurrentMP3() == null)
-                    return;
-                Intent intent = new Intent(v.getContext(), PlayerActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("Song",MusicService.getCurrentMP3());
-                intent.putExtras(bundle);
-                intent.putExtra("isPlay",MusicService.isPlay());
-                intent.putExtra("FromActivity",true);
-                intent.putExtra("Rect",mCoverRect);
+        mBottomActionBar.setOnClickListener(v -> {
+            if(MusicService.getCurrentMP3() == null)
+                return;
+            Intent intent = new Intent(v.getContext(), PlayerActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("Song",MusicService.getCurrentMP3());
+            intent.putExtras(bundle);
+            intent.putExtra("isPlay",MusicService.isPlay());
+            intent.putExtra("FromActivity",true);
+            intent.putExtra("Rect",mCoverRect);
 
-                ActivityOptionsCompat options = ActivityOptionsCompat
-                        .makeSceneTransitionAnimation(getActivity(), mCover, "image");
-                ActivityCompat.startActivity(getActivity(), intent, options.toBundle());
-            }
+            ActivityOptionsCompat options = ActivityOptionsCompat
+                    .makeSceneTransitionAnimation(getActivity(), mCover, "image");
+            ActivityCompat.startActivity(getActivity(), intent, options.toBundle());
         });
         //播放按钮
         CtrlButtonListener listener = new CtrlButtonListener(getContext());

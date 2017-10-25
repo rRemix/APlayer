@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -29,16 +28,13 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -59,7 +55,6 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.lyric.LrcView;
 import remix.myplayer.model.mp3.Song;
@@ -305,20 +300,17 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mOriginRect = savedInstanceState.getParcelable("Rect");
         }
 
-        getWindow().getDecorView().setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    mEventY1 = event.getY();
-                }
-                if(event.getAction() == MotionEvent.ACTION_UP){
-                    mEventY2 = event.getY();
-                    if(mEventY2 - mEventY1 > 100){
-                        onBackPressed();
-                    }
-                }
-                return false;
+        getWindow().getDecorView().setOnTouchListener((v,event) -> {
+            if(event.getAction() == MotionEvent.ACTION_DOWN){
+                mEventY1 = event.getY();
             }
+            if(event.getAction() == MotionEvent.ACTION_UP){
+                mEventY2 = event.getY();
+                if(mEventY2 - mEventY1 > 100){
+                    onBackPressed();
+                }
+            }
+            return false;
         });
 
         if(SPUtil.getValue(this,"Setting","LrcHint",true)){
@@ -530,9 +522,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      */
     private void setUpGuide() {
         mDotList = new ArrayList<>();
-        mDotList.add((ImageView) findView(R.id.guide_01));
-        mDotList.add((ImageView) findViewById(R.id.guide_02));
-        mDotList.add((ImageView) findViewById(R.id.guide_03));
+        mDotList.add( findView(R.id.guide_01));
+        mDotList.add( findViewById(R.id.guide_02));
+        mDotList.add( findViewById(R.id.guide_03));
         int width = DensityUtil.dip2px(this,5);
         int height = DensityUtil.dip2px(this,2);
         mHighLightIndicator = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getAccentColor(),width,height);
@@ -660,173 +652,155 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         final RecordFragment recordFragment = new RecordFragment();
         mAdapter.AddFragment(recordFragment);
         CoverFragment coverFragment = new CoverFragment();
-        coverFragment.setInflateFinishListener(new OnInflateFinishListener() {
-            @Override
-            public void onViewInflateFinish(View view) {
-                //从通知栏启动只设置位置信息并隐藏
-                //不用启动动画
-                if (mFromNotify) {
-                    if (mAdapter.getItem(1) instanceof CoverFragment)
-                        ((CoverFragment) mAdapter.getItem(1)).showImage();
-                    //隐藏动画用的封面并设置位置信息
-                    mAnimCover.setVisibility(View.GONE);
-                    return;
-                }
-
-                if(mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
-                    //获取传入的界面信息
-                    mOriginRect = getIntent().getParcelableExtra("Rect");
-                }
-
-                if(mOriginRect == null) {
-                    return;
-                }
-                // 获取上一个界面中，图片的宽度和高度
-                mOriginWidth = mOriginRect.width();
-                mOriginHeight = mOriginRect.height();
-
-                // 设置 view 的位置，使其和上一个界面中图片的位置重合
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mOriginWidth, mOriginHeight);
-                params.setMargins(mOriginRect.left, mOriginRect.top - StatusBarUtil.getStatusBarHeight(mContext), mOriginRect.right, mOriginRect.bottom);
-                mAnimCover.setLayoutParams(params);
-
-                //获得终点控件的位置信息
-                view.getGlobalVisibleRect(mDestRect);
-                // 计算图片缩放比例和位移距离
-                getMoveInfo(mDestRect);
-
-                mAnimCover.setPivotX(0);
-                mAnimCover.setPivotY(0);
-
-                final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
-                final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
-                final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
-                final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
-
-                final Spring spring = SpringSystem.create().createSpring();
-                spring.addListener(new SimpleSpringListener(){
-                    @Override
-                    public void onSpringUpdate(Spring spring) {
-                        if(mAnimCover == null)
-                            return;
-                        final double currentVal = spring.getCurrentValue();
-                        mAnimCover.setTranslationX((float) (transitionX * currentVal));
-                        mAnimCover.setTranslationY((float) (transitionY * currentVal));
-                        mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
-                        mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
-                    }
-                    @Override
-                    public void onSpringAtRest(Spring spring) {
-                        //入场动画结束时显示fragment中的封面
-                        if (mAdapter.getItem(1) instanceof CoverFragment) {
-                            ((CoverFragment) mAdapter.getItem(1)).showImage();
-                        }
-                        //隐藏动画用的封面
-                        mAnimCover.setVisibility(View.GONE);
-                    }
-                    @Override
-                    public void onSpringActivate(Spring spring) {
-                        overridePendingTransition(0, 0);
-                    }
-                });
-                spring.setOvershootClampingEnabled(true);
-                spring.setCurrentValue(0);
-                spring.setEndValue(1);
-
+        coverFragment.setInflateFinishListener(view -> {
+            //从通知栏启动只设置位置信息并隐藏
+            //不用启动动画
+            if (mFromNotify) {
+                if (mAdapter.getItem(1) instanceof CoverFragment)
+                    ((CoverFragment) mAdapter.getItem(1)).showImage();
+                //隐藏动画用的封面并设置位置信息
+                mAnimCover.setVisibility(View.GONE);
+                return;
             }
+
+            if(mOriginRect == null || mOriginRect.width() <= 0 || mOriginRect.height() <= 0) {
+                //获取传入的界面信息
+                mOriginRect = getIntent().getParcelableExtra("Rect");
+            }
+
+            if(mOriginRect == null) {
+                return;
+            }
+            // 获取上一个界面中，图片的宽度和高度
+            mOriginWidth = mOriginRect.width();
+            mOriginHeight = mOriginRect.height();
+
+            // 设置 view 的位置，使其和上一个界面中图片的位置重合
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mOriginWidth, mOriginHeight);
+            params.setMargins(mOriginRect.left, mOriginRect.top - StatusBarUtil.getStatusBarHeight(mContext), mOriginRect.right, mOriginRect.bottom);
+            mAnimCover.setLayoutParams(params);
+
+            //获得终点控件的位置信息
+            view.getGlobalVisibleRect(mDestRect);
+            // 计算图片缩放比例和位移距离
+            getMoveInfo(mDestRect);
+
+            mAnimCover.setPivotX(0);
+            mAnimCover.setPivotY(0);
+
+            final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
+            final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
+            final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
+            final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
+
+            final Spring spring = SpringSystem.create().createSpring();
+            spring.addListener(new SimpleSpringListener(){
+                @Override
+                public void onSpringUpdate(Spring spring) {
+                    if(mAnimCover == null)
+                        return;
+                    final double currentVal = spring.getCurrentValue();
+                    mAnimCover.setTranslationX((float) (transitionX * currentVal));
+                    mAnimCover.setTranslationY((float) (transitionY * currentVal));
+                    mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
+                    mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
+                }
+                @Override
+                public void onSpringAtRest(Spring spring) {
+                    //入场动画结束时显示fragment中的封面
+                    if (mAdapter.getItem(1) instanceof CoverFragment) {
+                        ((CoverFragment) mAdapter.getItem(1)).showImage();
+                    }
+                    //隐藏动画用的封面
+                    mAnimCover.setVisibility(View.GONE);
+                }
+                @Override
+                public void onSpringActivate(Spring spring) {
+                    overridePendingTransition(0, 0);
+                }
+            });
+            spring.setOvershootClampingEnabled(true);
+            spring.setCurrentValue(0);
+            spring.setEndValue(1);
+
         });
         coverFragment.setArguments(bundle);
 
         mAdapter.AddFragment(coverFragment);
         final LrcFragment lrcFragment = new LrcFragment();
-        lrcFragment.setOnInflateFinishListener(new OnInflateFinishListener() {
-            @Override
-            public void onViewInflateFinish(View view) {
-                if (!(view instanceof LrcView))
-                    return;
-                mLrcView = (LrcView) view;
-                mLrcView.setOnLrcClickListener(new LrcView.OnLrcClickListener() {
-                    @Override
-                    public void onClick() {
-                    }
-                    @Override
-                    public void onLongClick() {
-                        new MaterialDialog.Builder(mContext)
-                                .items(getString(R.string.ignore_lrc), getString(R.string.select_lrc))
-                                .itemsColorAttr(R.attr.text_color_primary)
-                                .backgroundColorAttr(R.attr.background_color_3)
-                                .itemsCallback(new MaterialDialog.ListCallback() {
-                                    @Override
-                                    public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
-                                        switch (position){
-                                            case 0:
-                                                //忽略这首歌的歌词
-                                                new MaterialDialog.Builder(mContext)
-                                                        .negativeText(R.string.cancel)
-                                                        .negativeColorAttr(R.attr.text_color_primary)
-                                                        .positiveText(R.string.confirm)
-                                                        .positiveColorAttr(R.attr.text_color_primary)
-                                                        .title(R.string.confirm_ignore_lrc)
-                                                        .titleColorAttr(R.attr.text_color_primary)
-                                                        .backgroundColorAttr(R.attr.background_color_3)
-                                                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                                            @Override
-                                                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                                Set<String> ignoreLrcID = SPUtil.getStringSet(mContext, "Setting", "IgnoreLrcID");
-                                                                if (mInfo != null && ignoreLrcID != null) {
-                                                                    ignoreLrcID.add(mInfo.getId() + "");
-                                                                    SPUtil.putStringSet(mContext, "Setting", "IgnoreLrcID", ignoreLrcID);
-                                                                    lrcFragment.UpdateLrc(mInfo);
-                                                                }
-                                                            }
-                                                        })
-                                                        .show();
-                                                break;
-                                            case 1:
-                                                //手动选择歌词
-                                                new FileChooserDialog.Builder(PlayerActivity.this)
-                                                        .extensionsFilter(".lrc")
-                                                        .show();
-                                                break;
-                                        }
-                                    }
-                                })
-                                .show();
-                    }
-                });
-                mLrcView.setOnSeekToListener(new LrcView.OnSeekToListener() {
-                    @Override
-                    public void onSeekTo(int progress) {
-                        if (progress > 0 && progress < MusicService.getDuration()) {
-                            MusicService.setProgress(progress);
-                            mCurrentTime = progress;
-                            mHandler.sendEmptyMessage(UPDATE_TIME_ALL);
-                        }
-                    }
-                });
-                mLrcView.setHighLightColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_highlight_day : R.color.lrc_highlight_night));
-                mLrcView.setOtherColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_highlight_day : R.color.lrc_highlight_night));
-                mLrcView.setTimeLineColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
-            }
+        lrcFragment.setOnInflateFinishListener(view -> {
+            if (!(view instanceof LrcView))
+                return;
+            mLrcView = (LrcView) view;
+            mLrcView.setOnLrcClickListener(new LrcView.OnLrcClickListener() {
+                @Override
+                public void onClick() {
+                }
+                @Override
+                public void onLongClick() {
+                    new MaterialDialog.Builder(mContext)
+                            .items(getString(R.string.ignore_lrc), getString(R.string.select_lrc))
+                            .itemsColorAttr(R.attr.text_color_primary)
+                            .backgroundColorAttr(R.attr.background_color_3)
+                            .itemsCallback((dialog, itemView, position, text) -> {
+                                switch (position){
+                                    case 0:
+                                        //忽略这首歌的歌词
+                                        new MaterialDialog.Builder(mContext)
+                                                .negativeText(R.string.cancel)
+                                                .negativeColorAttr(R.attr.text_color_primary)
+                                                .positiveText(R.string.confirm)
+                                                .positiveColorAttr(R.attr.text_color_primary)
+                                                .title(R.string.confirm_ignore_lrc)
+                                                .titleColorAttr(R.attr.text_color_primary)
+                                                .backgroundColorAttr(R.attr.background_color_3)
+                                                .onPositive((dialog1, which) -> {
+                                                    Set<String> ignoreLrcID = SPUtil.getStringSet(mContext, "Setting", "IgnoreLrcID");
+                                                    if (mInfo != null && ignoreLrcID != null) {
+                                                        ignoreLrcID.add(mInfo.getId() + "");
+                                                        SPUtil.putStringSet(mContext, "Setting", "IgnoreLrcID", ignoreLrcID);
+                                                        lrcFragment.UpdateLrc(mInfo);
+                                                    }
+                                                })
+                                                .show();
+                                        break;
+                                    case 1:
+                                        //手动选择歌词
+                                        new FileChooserDialog.Builder(PlayerActivity.this)
+                                                .extensionsFilter(".lrc")
+                                                .show();
+                                        break;
+                                }
+                            })
+                            .show();
+                }
+            });
+            mLrcView.setOnSeekToListener(progress -> {
+                if (progress > 0 && progress < MusicService.getDuration()) {
+                    MusicService.setProgress(progress);
+                    mCurrentTime = progress;
+                    mHandler.sendEmptyMessage(UPDATE_TIME_ALL);
+                }
+            });
+            mLrcView.setHighLightColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_highlight_day : R.color.lrc_highlight_night));
+            mLrcView.setOtherColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_highlight_day : R.color.lrc_highlight_night));
+            mLrcView.setTimeLineColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
         });
         lrcFragment.setArguments(bundle);
         mAdapter.AddFragment(lrcFragment);
 
         mPager.setAdapter(mAdapter);
         //下滑关闭
-        mPager.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN){
-                    mEventY1 = event.getY();
-                }
-                if(event.getAction() == MotionEvent.ACTION_UP){
-                    mEventY2 = event.getY();
-                    if(mEventY2 - mEventY1 > 200)
-                        onBackPressed();
-                }
-                return false;
+        mPager.setOnTouchListener((v, event) -> {
+            if(event.getAction() == MotionEvent.ACTION_DOWN){
+                mEventY1 = event.getY();
             }
+            if(event.getAction() == MotionEvent.ACTION_UP){
+                mEventY2 = event.getY();
+                if(mEventY2 - mEventY1 > 200)
+                    onBackPressed();
+            }
+            return false;
         });
         mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -972,17 +946,14 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         if(mRawBitMap == null)
             mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
 
-        Palette.from(mRawBitMap).generate(new Palette.PaletteAsyncListener() {
-            @Override
-            public void onGenerated(Palette palette) {
-                if(palette == null || palette.getMutedSwatch() == null){
-                    mSwatch = new Palette.Swatch(Color.GRAY,100);
-                } else {
-                    mSwatch = palette.getMutedSwatch();//柔和 暗色
-                }
-                mHandler.removeMessages(UPDATE_BG);
-                mHandler.sendEmptyMessage(UPDATE_BG);
+        Palette.from(mRawBitMap).generate(palette -> {
+            if(palette == null || palette.getMutedSwatch() == null){
+                mSwatch = new Palette.Swatch(Color.GRAY,100);
+            } else {
+                mSwatch = palette.getMutedSwatch();//柔和 暗色
             }
+            mHandler.removeMessages(UPDATE_BG);
+            mHandler.sendEmptyMessage(UPDATE_BG);
         });
     }
 

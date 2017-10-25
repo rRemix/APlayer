@@ -2,7 +2,6 @@ package remix.myplayer.ui.activity;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
 import remix.myplayer.R;
 import remix.myplayer.theme.Theme;
@@ -28,12 +27,7 @@ public class ToolbarActivity extends BaseActivity {
         toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.common_btn_back,themeColor));
         toolbar.setTitleTextColor(themeColor);
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickNavigation();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> onClickNavigation());
 //        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
 //            @Override
 //            public boolean onMenuItemClick(MenuItem item) {

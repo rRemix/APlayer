@@ -19,9 +19,7 @@ import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongChooseAdaper;
 import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
-import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.LoaderIds;
-import remix.myplayer.interfaces.OnSongChooseListener;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
@@ -62,12 +60,9 @@ public class SongChooseActivity extends PermissActivity<Song,SongChooseAdaper> {
         TextView cancel = findView(R.id.cancel);
         cancel.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
         mConfirm.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
-        mAdapter = new SongChooseAdaper(this,R.layout.item_song_choose, new OnSongChooseListener() {
-            @Override
-            public void OnSongChoose(boolean isValid) {
-                mConfirm.setAlpha(isValid ? 1.0f : 0.6f);
-                mConfirm.setClickable(isValid);
-            }
+        mAdapter = new SongChooseAdaper(this,R.layout.item_song_choose, isValid -> {
+            mConfirm.setAlpha(isValid ? 1.0f : 0.6f);
+            mConfirm.setClickable(isValid);
         });
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));

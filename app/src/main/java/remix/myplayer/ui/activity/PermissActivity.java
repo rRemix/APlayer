@@ -10,7 +10,6 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.List;
 
-import io.reactivex.functions.Consumer;
 import remix.myplayer.adapter.BaseAdapter;
 import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.service.MusicService;
@@ -40,14 +39,11 @@ public abstract class PermissActivity<D,A extends BaseAdapter> extends MultiChoi
         super.onResume();
         new RxPermissions(this)
                 .request(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean aBoolean) throws Exception {
-                        if(aBoolean != mHasPermission){
-                            Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
-                            intent.putExtra("permission",aBoolean);
-                            sendBroadcast(intent);
-                        }
+                .subscribe(aBoolean -> {
+                    if(aBoolean != mHasPermission){
+                        Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
+                        intent.putExtra("permission",aBoolean);
+                        sendBroadcast(intent);
                     }
                 });
     }

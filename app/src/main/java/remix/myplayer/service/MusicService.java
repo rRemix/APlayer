@@ -336,54 +336,44 @@ public class MusicService extends BaseService implements Playback {
      */
     private void setUpMediaPlayer() {
         mMediaPlayer = new MediaPlayer();
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
 
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                if(mCloseAfter){
-                    sendBroadcast(new Intent(Constants.EXIT));
+        mMediaPlayer.setOnCompletionListener(mp -> {
+            if(mCloseAfter){
+                sendBroadcast(new Intent(Constants.EXIT));
+            } else {
+                if(mPlayModel == Constants.PLAY_REPEATONE){
+                    prepare(mCurrentInfo.getUrl());
                 } else {
-                    if(mPlayModel == Constants.PLAY_REPEATONE){
-                        prepare(mCurrentInfo.getUrl());
-                    } else {
-                        playNextOrPrev(true);
-                    }
-                    Global.setOperation(Constants.NEXT);
-                    acquireWakeLock();
+                    playNextOrPrev(true);
                 }
+                Global.setOperation(Constants.NEXT);
+                acquireWakeLock();
             }
         });
-        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                if(mFirstFlag){
-                    mFirstFlag = false;
-                    return;
-                }
-                play();
+        mMediaPlayer.setOnPreparedListener(mp -> {
+            if(mFirstFlag){
+                mFirstFlag = false;
+                return;
             }
+            play();
         });
 
-        mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mp, int what, int extra) {
-                try {
-                    mIsInitialized = false;
-                    if(mMediaPlayer != null)
-                        mMediaPlayer.release();
-                    setUpMediaPlayer();
-                    if(mContext != null){
-                        ToastUtil.show(mContext,R.string.mediaplayer_error,what,extra);
-                    }
-                    return true;
-                } catch (Exception e){
-                    CommonUtil.uploadException("Error In OnError MusicEventCallback",e.toString());
-                } finally {
-                    CommonUtil.uploadException("MediaPlayerError","what:" + what + " extra:" + extra);
+        mMediaPlayer.setOnErrorListener((mp, what, extra) -> {
+            try {
+                mIsInitialized = false;
+                if(mMediaPlayer != null)
+                    mMediaPlayer.release();
+                setUpMediaPlayer();
+                if(mContext != null){
+                    ToastUtil.show(mContext,R.string.mediaplayer_error,what,extra);
                 }
-                return false;
+                return true;
+            } catch (Exception e){
+                CommonUtil.uploadException("Error In OnError MusicEventCallback",e.toString());
             }
+            return false;
         });
     }
 
@@ -401,7 +391,7 @@ public class MusicService extends BaseService implements Playback {
         mCurrentIndex = pos;
         try {
             if(mMediaPlayer == null) {
-                mMediaPlayer = new MediaPlayer();
+                setUpMediaPlayer();
             }
             prepare(mCurrentInfo.getUrl());
 //            mMediaPlayer.setDataSource(mCurrentInfo.getUrl());
@@ -844,13 +834,11 @@ public class MusicService extends BaseService implements Playback {
             mIsInitialized = false;
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(path);
-            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.prepareAsync();
 //            mIsplay = true;
             mIsInitialized = true;
         } catch (Exception e){
             ToastUtil.show(mContext,getString(R.string.play_failed) + e.toString());
-            CommonUtil.uploadException("prepare",e);
             mIsInitialized = false;
         }
     }

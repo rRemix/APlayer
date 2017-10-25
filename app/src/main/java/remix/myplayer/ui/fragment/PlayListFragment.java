@@ -17,7 +17,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.PlayListAdapter;
 import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.interfaces.LoaderIds;
-import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.mp3.PlayList;
 import remix.myplayer.ui.activity.ChildHolderActivity;
@@ -46,12 +45,9 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
     @Override
     protected void initAdapter() {
         mAdapter = new PlayListAdapter(mContext,R.layout.item_playlist_recycle_grid,mMultiChoice);
-        mAdapter.setModeChangeCallback(new ModeChangeCallback() {
-            @Override
-            public void OnModeChange(final int mode) {
-                mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
-                mRecyclerView.setAdapter(mAdapter);
-            }
+        mAdapter.setModeChangeCallback(mode -> {
+            mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
+            mRecyclerView.setAdapter(mAdapter);
         });
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override

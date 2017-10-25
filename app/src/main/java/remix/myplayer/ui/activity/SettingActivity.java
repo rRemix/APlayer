@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -29,9 +28,7 @@ import java.io.File;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import cn.bmob.v3.listener.BmobUpdateListener;
 import cn.bmob.v3.update.BmobUpdateAgent;
-import cn.bmob.v3.update.UpdateResponse;
 import cn.bmob.v3.update.UpdateStatus;
 import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
@@ -275,13 +272,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .items(new String[]{"0K","500K","1MB","2MB"})
                         .itemsColorAttr(R.attr.text_color_primary)
                         .backgroundColorAttr(R.attr.background_color_3)
-                        .itemsCallbackSingleChoice(position, new MaterialDialog.ListCallbackSingleChoice() {
-                            @Override
-                            public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                                SPUtil.putValue(SettingActivity.this, "Setting", "ScanSize", mScanSize[which]);
-                                Constants.SCAN_SIZE = mScanSize[which];
-                                return true;
-                            }
+                        .itemsCallbackSingleChoice(position, (dialog, itemView, which, text) -> {
+                            SPUtil.putValue(SettingActivity.this, "Setting", "ScanSize", mScanSize[which]);
+                            Constants.SCAN_SIZE = mScanSize[which];
+                            return true;
                         })
                         .theme(ThemeStore.getMDDialogTheme())
                         .positiveText(R.string.confirm)
@@ -320,15 +314,12 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     .buttonRippleColorAttr(R.attr.ripple_color)
                     .items(new String[]{getString(R.string.aplayer_lockscreen), getString(R.string.system_lockscreen), getString(R.string.close)})
                     .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"Setting","LockScreenOn",Constants.APLAYER_LOCKSCREEN) ,
-                            new MaterialDialog.ListCallbackSingleChoice() {
-                                @Override
-                                public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                    SPUtil.putValue(SettingActivity.this,"Setting","LockScreenOn",which);
-                                    Intent intent = new Intent(Constants.CTL_ACTION);
-                                    intent.putExtra("Control",Constants.TOGGLE_MEDIASESSION);
-                                    sendBroadcast(intent);
-                                    return true;
-                                }
+                            (dialog, view, which, text) -> {
+                                SPUtil.putValue(SettingActivity.this,"Setting","LockScreenOn",which);
+                                Intent intent = new Intent(Constants.CTL_ACTION);
+                                intent.putExtra("Control",Constants.TOGGLE_MEDIASESSION);
+                                sendBroadcast(intent);
+                                return true;
                             })
                     .backgroundColorAttr(R.attr.background_color_3)
                     .itemsColorAttr(R.attr.text_color_primary)
@@ -363,13 +354,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             .buttonRippleColorAttr(R.attr.ripple_color)
                             .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
                             .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"Setting","IsSystemColor",true) ? 0 : 1,
-                                    new MaterialDialog.ListCallbackSingleChoice() {
-                                        @Override
-                                        public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                            SPUtil.putValue(SettingActivity.this,"Setting","IsSystemColor",which == 0);
-                                            sendBroadcast(new Intent(Constants.NOTIFY));
-                                            return true;
-                                        }
+                                    (dialog, view, which, text) -> {
+                                        SPUtil.putValue(SettingActivity.this,"Setting","IsSystemColor",which == 0);
+                                        sendBroadcast(new Intent(Constants.NOTIFY));
+                                        return true;
                                     })
                             .backgroundColorAttr(R.attr.background_color_3)
                             .itemsColorAttr(R.attr.text_color_primary)
@@ -401,17 +389,14 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             //检查更新
             case R.id.setting_update_container:
                 MobclickAgent.onEvent(this,"CheckUpdate");
-                BmobUpdateAgent.setUpdateListener(new BmobUpdateListener() {
-                    @Override
-                    public void onUpdateReturned(int updateStatus, UpdateResponse updateInfo) {
-                        // TODO Auto-generated method stub
-                        if(updateStatus == UpdateStatus.No){
-                            ToastUtil.show(mContext,getString(R.string.no_update));
-                        }else if(updateStatus == UpdateStatus.IGNORED){
-                            ToastUtil.show(mContext,getString(R.string.update_ignore));
-                        }else if(updateStatus == UpdateStatus.TimeOut){
-                            ToastUtil.show(mContext,R.string.updat_error);
-                        }
+                BmobUpdateAgent.setUpdateListener((updateStatus, updateInfo) -> {
+                    // TODO Auto-generated method stub
+                    if(updateStatus == UpdateStatus.No){
+                        ToastUtil.show(mContext,getString(R.string.no_update));
+                    }else if(updateStatus == UpdateStatus.IGNORED){
+                        ToastUtil.show(mContext,getString(R.string.update_ignore));
+                    }else if(updateStatus == UpdateStatus.TimeOut){
+                        ToastUtil.show(mContext,R.string.updat_error);
                     }
                 });
                 BmobUpdateAgent.forceUpdate(this);
@@ -424,12 +409,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .positiveText(R.string.jump_alipay_account)
                         .negativeText(R.string.cancel)
                         .content(R.string.donate_tip)
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                AlipayUtil.startAlipayClient((Activity) mContext,"FKX01908X8ECOECIQZIL43");
-                            }
-                        })
+                        .onPositive((dialog, which) -> AlipayUtil.startAlipayClient((Activity) mContext,"FKX01908X8ECOECIQZIL43"))
                         .backgroundColorAttr(R.attr.background_color_3)
                         .positiveColorAttr(R.attr.text_color_primary)
                         .negativeColorAttr(R.attr.text_color_primary)
@@ -442,26 +422,21 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .content(R.string.confirm_clear_cache)
                         .positiveText(R.string.confirm)
                         .negativeText(R.string.cancel)
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        .onPositive((dialog, which) -> new Thread(){
                             @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                new Thread(){
-                                    @Override
-                                    public void run() {
-                                        //清除歌词，封面等缓存
-                                        //清除配置文件、数据库等缓存
-                                        CommonUtil.deleteFilesByDirectory(getCacheDir());
-                                        CommonUtil.deleteFilesByDirectory(getExternalCacheDir());
-                                        SPUtil.deleteFile(SettingActivity.this,"Setting");
-                                        deleteDatabase(DBOpenHelper.DBNAME);
-                                        //清除fresco缓存
-                                        Fresco.getImagePipeline().clearCaches();
-                                        mHandler.sendEmptyMessage(CLEARFINISH);
-                                        mNeedRefresh = true;
-                                    }
-                                }.start();
+                            public void run() {
+                                //清除歌词，封面等缓存
+                                //清除配置文件、数据库等缓存
+                                CommonUtil.deleteFilesByDirectory(getCacheDir());
+                                CommonUtil.deleteFilesByDirectory(getExternalCacheDir());
+                                SPUtil.deleteFile(SettingActivity.this,"Setting");
+                                deleteDatabase(DBOpenHelper.DBNAME);
+                                //清除fresco缓存
+                                Fresco.getImagePipeline().clearCaches();
+                                mHandler.sendEmptyMessage(CLEARFINISH);
+                                mNeedRefresh = true;
                             }
-                        })
+                        }.start())
                         .backgroundColorAttr(R.attr.background_color_3)
                         .positiveColorAttr(R.attr.text_color_primary)
                         .negativeColorAttr(R.attr.text_color_primary)

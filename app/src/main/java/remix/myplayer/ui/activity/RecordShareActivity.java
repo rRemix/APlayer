@@ -33,7 +33,6 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.functions.Consumer;
 import remix.myplayer.R;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
@@ -263,15 +262,12 @@ public class RecordShareActivity extends BaseActivity {
         super.onResume();
         new RxPermissions(this)
                 .request(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean aBoolean) throws Exception {
-                        if(aBoolean != mHasPermission){
-                            mHasPermission = aBoolean;
-                            Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
-                            intent.putExtra("permission",mHasPermission);
-                            sendBroadcast(intent);
-                        }
+                .subscribe(aBoolean -> {
+                    if(aBoolean != mHasPermission){
+                        mHasPermission = aBoolean;
+                        Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
+                        intent.putExtra("permission",mHasPermission);
+                        sendBroadcast(intent);
                     }
                 });
     }

@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -39,18 +38,12 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.Single;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
-import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.interfaces.OnModeChangeListener;
-import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -186,24 +179,21 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //延迟一点时间 等待初始化完成
-        mRefreshHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                initBottombar();
-                final Intent param = getIntent();
-                if(param != null && param.getData() != null){
-                    int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
-                    if(id < 0)
-                        return;
-                    Intent intent = new Intent(Constants.CTL_ACTION);
-                    Bundle arg = new Bundle();
-                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                    arg.putInt("Position", 0);
-                    intent.putExtras(arg);
-                    ArrayList<Integer> list = new ArrayList<>();
-                    list.add(id);
-                    Global.setPlayQueue(list,mContext,intent);
-                }
+        mRefreshHandler.postDelayed(() -> {
+            initBottombar();
+            final Intent param = getIntent();
+            if(param != null && param.getData() != null){
+                int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
+                if(id < 0)
+                    return;
+                Intent intent = new Intent(Constants.CTL_ACTION);
+                Bundle arg = new Bundle();
+                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                arg.putInt("Position", 0);
+                intent.putExtras(arg);
+                ArrayList<Integer> list = new ArrayList<>();
+                list.add(id);
+                Global.setPlayQueue(list,mContext,intent);
             }
         },600);
 
@@ -236,7 +226,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     @Override
     protected void setStatusBar() {
         StatusBarUtil.setColorNoTranslucentForDrawerLayout(this,
-                (DrawerLayout) findViewById(R.id.drawer_layout),
+                findViewById(R.id.drawer_layout),
                 ThemeStore.getMaterialPrimaryDarkColor());
     }
 
@@ -250,12 +240,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
         int themeColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white);
         toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.actionbar_menu,themeColor));
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDrawerLayout.openDrawer(mNavigationView);
-            }
-        });
+        mToolBar.setNavigationOnClickListener(v -> mDrawerLayout.openDrawer(mNavigationView));
     }
 
 
@@ -284,28 +269,25 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                         .backgroundColorAttr(R.attr.background_color_3)
                         .contentColorAttr(R.attr.text_color_primary)
                         .inputRange(1,15)
-                        .input("", getString(R.string.local_list) + Global.PlayList.size(), new MaterialDialog.InputCallback() {
-                            @Override
-                            public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                                int newPlayListId = -1;
-                                try {
-                                    if(!TextUtils.isEmpty(input)){
-                                        newPlayListId = PlayListUtil.addPlayList(input.toString());
-                                        ToastUtil.show(mContext, newPlayListId > 0 ?
-                                                        R.string.add_playlist_success :
-                                                        newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
-                                                Toast.LENGTH_SHORT);
-                                        if(newPlayListId > 0){
-                                            //跳转到添加歌曲界面
-                                            Intent intent = new Intent(mContext,SongChooseActivity.class);
-                                            intent.putExtra("PlayListID",newPlayListId);
-                                            intent.putExtra("PlayListName",input.toString());
-                                            startActivity(intent);
-                                        }
+                        .input("", getString(R.string.local_list) + Global.PlayList.size(), (dialog,input) ->{
+                            int newPlayListId = -1;
+                            try {
+                                if(!TextUtils.isEmpty(input)){
+                                    newPlayListId = PlayListUtil.addPlayList(input.toString());
+                                    ToastUtil.show(mContext, newPlayListId > 0 ?
+                                                    R.string.add_playlist_success :
+                                                    newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
+                                            Toast.LENGTH_SHORT);
+                                    if(newPlayListId > 0){
+                                        //跳转到添加歌曲界面
+                                        Intent intent = new Intent(mContext,SongChooseActivity.class);
+                                        intent.putExtra("PlayListID",newPlayListId);
+                                        intent.putExtra("PlayListName",input.toString());
+                                        startActivity(intent);
                                     }
-                                } catch (Exception e){
-                                    ToastUtil.show(mContext,"创建播放列表错误:" + e.toString());
                                 }
+                            } catch (Exception e){
+                                ToastUtil.show(mContext,"创建播放列表错误:" + e.toString());
                             }
                         })
                         .show();
@@ -402,12 +384,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
     private void setUpDrawerLayout() {
         mDrawerAdapter = new DrawerAdapter(this,R.layout.item_drawer);
-        mDrawerAdapter.setOnModeChangeListener(new OnModeChangeListener() {
-            @Override
-            public void OnModeChange(boolean isNight) {
-                setNightMode(isNight);
-            }
-        });
+        mDrawerAdapter.setOnModeChangeListener(this::setNightMode);
         mDrawerAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {

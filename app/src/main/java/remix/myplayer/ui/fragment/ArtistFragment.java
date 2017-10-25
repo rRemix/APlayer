@@ -17,7 +17,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.ArtistAdapter;
 import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.interfaces.LoaderIds;
-import remix.myplayer.interfaces.ModeChangeCallback;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.mp3.Artist;
 import remix.myplayer.ui.activity.ChildHolderActivity;
@@ -53,12 +52,9 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
     @Override
     protected void initAdapter() {
         mAdapter = new ArtistAdapter(mContext,R.layout.item_artist_recycle_grid,mMultiChoice);
-        mAdapter.setModeChangeCallback(new ModeChangeCallback() {
-            @Override
-            public void OnModeChange(final int mode) {
-                mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
-                mRecyclerView.setAdapter(mAdapter);
-            }
+        mAdapter.setModeChangeCallback(mode -> {
+            mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
+            mRecyclerView.setAdapter(mAdapter);
         });
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override

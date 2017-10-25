@@ -5,8 +5,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.ColorInt;
 import android.support.v7.graphics.Palette;
 import android.util.DisplayMetrics;
@@ -22,22 +20,13 @@ import android.widget.Toast;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.umeng.analytics.MobclickAgent;
 
-import java.lang.ref.WeakReference;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Emitter;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
-import io.reactivex.SingleOnSubscribe;
 import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.R;
@@ -47,7 +36,6 @@ import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.blur.StackBlurManager;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -258,12 +246,8 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
             return;
         Single.just(mInfo.getAlbumId())
         .observeOn(Schedulers.io())
-        .doOnSubscribe(new Consumer<Disposable>() {
-            @Override
-            public void accept(Disposable disposable) throws Exception {
-                mDisposable = disposable;
-            }
-        }).flatMap(new Function<Integer, SingleSource<Palette.Swatch>>() {
+        .doOnSubscribe(disposable -> mDisposable = disposable)
+        .flatMap(new Function<Integer, SingleSource<Palette.Swatch>>() {
             @Override
             public SingleSource<Palette.Swatch> apply(@NonNull Integer integer) throws Exception {
                 mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
@@ -272,32 +256,26 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                 StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
 
                 mNewBitMap = mStackBlurManager.processNatively(40);
-                return Single.create(new SingleOnSubscribe<Palette.Swatch>() {
-                    @Override
-                    public void subscribe(@NonNull SingleEmitter<Palette.Swatch> e) throws Exception {
-                        Palette palette = Palette.from(mRawBitMap).generate();
-                        Palette.Swatch swatch = palette.getMutedSwatch();//柔和 暗色
-                        if(swatch == null)
-                            swatch = new Palette.Swatch(Color.GRAY,100);
-                        e.onSuccess(swatch);
-                    }
+                return Single.create(e -> {
+                    Palette palette = Palette.from(mRawBitMap).generate();
+                    Palette.Swatch swatch = palette.getMutedSwatch();//柔和 暗色
+                    if(swatch == null)
+                        swatch = new Palette.Swatch(Color.GRAY,100);
+                    e.onSuccess(swatch);
                 });
             }
         }).observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Consumer<Palette.Swatch>() {
-            @Override
-            public void accept(Palette.Swatch swatch) throws Exception {
-                if(swatch == null)
-                    return;
-                mSongColor = swatch.getBodyTextColor();
-                mArtistColor = swatch.getTitleTextColor();
+        .subscribe(swatch -> {
+            if(swatch == null)
+                return;
+            mSongColor = swatch.getBodyTextColor();
+            mArtistColor = swatch.getTitleTextColor();
 
-                mImageBackground.setImageBitmap(mNewBitMap);
-                mSong.setTextColor(mSongColor);
-                mArtist.setTextColor(mArtistColor);
-                mNextSong.setTextColor(mSongColor);
-                mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT,0,2,mSongColor,0,0,1));
-            }
+            mImageBackground.setImageBitmap(mNewBitMap);
+            mSong.setTextColor(mSongColor);
+            mArtist.setTextColor(mArtistColor);
+            mNextSong.setTextColor(mSongColor);
+            mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT,0,2,mSongColor,0,0,1));
         });
     }
 

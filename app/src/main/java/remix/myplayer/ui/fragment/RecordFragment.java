@@ -58,20 +58,17 @@ public class RecordFragment extends BaseFragment{
             }
         });
         //启动分享心情的Activity
-        (rootView.findViewById(R.id.sharebtn)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mEdit.getText().toString().equals("")) {
-                    ToastUtil.show(getActivity(),R.string.plz_input_sharecontent);
-                    return;
-                }
-                Intent intent = new Intent(getActivity(), RecordShareActivity.class);
-                Bundle arg = new Bundle();
-                arg.putString("Content", mEdit.getText().toString());
-                arg.putSerializable("Song", MusicService.getCurrentMP3());
-                intent.putExtras(arg);
-                startActivity(intent);
+        (rootView.findViewById(R.id.sharebtn)).setOnClickListener(v -> {
+            if (mEdit.getText().toString().equals("")) {
+                ToastUtil.show(getActivity(),R.string.plz_input_sharecontent);
+                return;
             }
+            Intent intent = new Intent(getActivity(), RecordShareActivity.class);
+            Bundle arg = new Bundle();
+            arg.putString("Content", mEdit.getText().toString());
+            arg.putSerializable("Song", MusicService.getCurrentMP3());
+            intent.putExtras(arg);
+            startActivity(intent);
         });
 
         return rootView;

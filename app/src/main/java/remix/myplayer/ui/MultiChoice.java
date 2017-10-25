@@ -1,12 +1,10 @@
 package remix.myplayer.ui;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
@@ -86,10 +84,7 @@ public class MultiChoice implements OnMultiItemClickListener {
         switch (TYPE){
             case Constants.SONG:
             case Constants.PLAYLISTSONG:
-                for(Object arg : mSelectedArg){
-                    if (arg instanceof Integer)
-                        idList.add((Integer) arg);
-                }
+                mSelectedArg.stream().filter(arg -> arg instanceof Integer).forEach(id -> idList.add((Integer) id));
                 break;
             case Constants.ALBUM:
             case Constants.ARTIST:
@@ -114,10 +109,7 @@ public class MultiChoice implements OnMultiItemClickListener {
         switch (TYPE){
             case Constants.SONG:
             case Constants.PLAYLISTSONG:
-                for(Object arg : mSelectedArg){
-                    if (arg instanceof Integer)
-                        idList.add((Integer) arg);
-                }
+                mSelectedArg.stream().filter(arg -> arg instanceof Integer).forEach(id -> idList.add((Integer) id));
                 break;
             case Constants.ALBUM:
             case Constants.ARTIST:
@@ -146,53 +138,42 @@ public class MultiChoice implements OnMultiItemClickListener {
                 .theme(ThemeStore.getMDDialogTheme())
                 .items(playlistNameList)
                 .itemsColorAttr(R.attr.text_color_primary)
-                .itemsCallback(new MaterialDialog.ListCallback() {
-                    @Override
-                    public void onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                        final int num = PlayListUtil.addMultiSongs(idList,playListInfoList.get(which).Name,playListInfoList.get(which)._Id);
-                        ToastUtil.show(mContext,mContext.getString(R.string.add_song_playlist_success,num,playListInfoList.get(which).Name));
-                        UpdateOptionMenu(false);
-                    }
+                .itemsCallback((dialog, view, which, text) -> {
+                    final int num = PlayListUtil.addMultiSongs(idList,playListInfoList.get(which).Name,playListInfoList.get(which)._Id);
+                    ToastUtil.show(mContext,mContext.getString(R.string.add_song_playlist_success,num,playListInfoList.get(which).Name));
+                    UpdateOptionMenu(false);
                 })
                 .neutralText(R.string.create_playlist)
                 .neutralColorAttr(R.attr.text_color_primary)
-                .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        new MaterialDialog.Builder(mContext)
-                                .title(R.string.new_playlist)
-                                .titleColorAttr(R.attr.text_color_primary)
-                                .buttonRippleColorAttr(R.attr.ripple_color)
-                                .positiveText(R.string.create)
-                                .positiveColorAttr(R.attr.text_color_primary)
-                                .negativeText(R.string.cancel)
-                                .negativeColorAttr(R.attr.text_color_primary)
-                                .backgroundColorAttr(R.attr.background_color_3)
-                                .content(R.string.input_playlist_name)
-                                .contentColorAttr(R.attr.text_color_primary)
-                                .inputRange(1,15)
-                                .input("", mContext.getString(R.string.local_list) + Global.PlayList.size(), new MaterialDialog.InputCallback() {
-                                    @Override
-                                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                                        if(!TextUtils.isEmpty(input)){
-                                            final int num;
-                                            int newPlayListId = PlayListUtil.addPlayList(input.toString());
-                                            ToastUtil.show(mContext, newPlayListId > 0 ?
-                                                            R.string.add_playlist_success :
-                                                            newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
-                                                    Toast.LENGTH_SHORT);
-                                            if(newPlayListId < 0){
-                                                return;
-                                            }
-                                            num = PlayListUtil.addMultiSongs(idList,input.toString(),newPlayListId);
-                                            ToastUtil.show(mContext,mContext.getString(R.string.add_song_playlist_success,num,input.toString()));
-                                            UpdateOptionMenu(false);
-                                        }
-                                    }
-                                })
-                                .show();
-                    }
-                })
+                .onNeutral((dialog, which) -> new MaterialDialog.Builder(mContext)
+                        .title(R.string.new_playlist)
+                        .titleColorAttr(R.attr.text_color_primary)
+                        .buttonRippleColorAttr(R.attr.ripple_color)
+                        .positiveText(R.string.create)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .negativeText(R.string.cancel)
+                        .negativeColorAttr(R.attr.text_color_primary)
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .content(R.string.input_playlist_name)
+                        .contentColorAttr(R.attr.text_color_primary)
+                        .inputRange(1,15)
+                        .input("", mContext.getString(R.string.local_list) + Global.PlayList.size(), (dialog1, input) -> {
+                            if(!TextUtils.isEmpty(input)){
+                                final int num;
+                                int newPlayListId = PlayListUtil.addPlayList(input.toString());
+                                ToastUtil.show(mContext, newPlayListId > 0 ?
+                                                R.string.add_playlist_success :
+                                                newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
+                                        Toast.LENGTH_SHORT);
+                                if(newPlayListId < 0){
+                                    return;
+                                }
+                                num = PlayListUtil.addMultiSongs(idList,input.toString(),newPlayListId);
+                                ToastUtil.show(mContext,mContext.getString(R.string.add_song_playlist_success,num,input.toString()));
+                                UpdateOptionMenu(false);
+                            }
+                        })
+                        .show())
                 .backgroundColorAttr(R.attr.background_color_3).build().show();
     }
 
@@ -216,10 +197,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                 PlayListUtil.deleteMultiPlayList(idList);
                 break;
             case Constants.PLAYLISTSONG:
-                for(Object arg : mSelectedArg){
-                    if (arg instanceof Integer)
-                        idList.add((Integer) arg);
-                }
+                mSelectedArg.stream().filter(arg -> arg instanceof Integer).forEach(id -> idList.add((Integer) id));
                 num = PlayListUtil.deleteMultiSongs(idList,ChildHolderActivity.mId);
                 break;
             case Constants.SONG:
@@ -351,10 +329,7 @@ public class MultiChoice implements OnMultiItemClickListener {
      * 清除所有view的选中状态
      */
     public void clearSelectedViews(){
-        for(View view : mSelectedViews){
-            if(view != null)
-                setViewSelected(view,false);
-        }
+        mSelectedViews.stream().filter(view -> view != null).forEach(view -> setViewSelected(view, false));
         mSelectedViews.clear();
     }
 

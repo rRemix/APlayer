@@ -17,7 +17,6 @@ import com.umeng.analytics.MobclickAgent;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,7 +25,6 @@ import remix.myplayer.adapter.ChildHolderAdapter;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
@@ -89,12 +87,7 @@ public class ChildHolderActivity extends PermissActivity<Song,ChildHolderAdapter
         mArg = getIntent().getStringExtra("Title");
 
         mAdapter = new ChildHolderAdapter(this,R.layout.item_child_holder,mType,mArg,mMultiChoice,mRecyclerView);
-        mAdapter.setCallback(new SortChangeCallback() {
-            @Override
-            public void SortChange() {
-                new GetSongList(false).start();
-            }
-        });
+        mAdapter.setCallback(() -> new GetSongList(false).start());
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -217,33 +210,30 @@ public class ChildHolderActivity extends PermissActivity<Song,ChildHolderAdapter
      * 根据条件排序
      */
     private void sortList(){
-        Collections.sort(mInfoList, new Comparator<Song>() {
-            @Override
-            public int compare(Song o1, Song o2) {
-                if(o1 == null || o2 == null)
+        Collections.sort(mInfoList, (o1, o2) -> {
+            if(o1 == null || o2 == null)
+                return 0;
+            //当前是按名字排序
+            if(ChildHolderAdapter.SORT == ChildHolderAdapter.NAME){
+                if(TextUtils.isEmpty(o1.getTitleKey()) || TextUtils.isEmpty(o2.getTitleKey()))
                     return 0;
-                //当前是按名字排序
-                if(ChildHolderAdapter.SORT == ChildHolderAdapter.NAME){
-                    if(TextUtils.isEmpty(o1.getTitleKey()) || TextUtils.isEmpty(o2.getTitleKey()))
-                        return 0;
-                    if(ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC){
-                        return o1.getTitleKey().compareTo(o2.getTitleKey());
-                    } else {
-                        return o2.getTitleKey().compareTo(o1.getTitleKey());
-                    }
-                } else if(ChildHolderAdapter.SORT == ChildHolderAdapter.ADDTIME){
-                    //当前是按添加时间排序
-                    if(o1.getAddTime() == o2.getAddTime()){
-                        return 0;
-                    }
-                    if(ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC){
-                        return Long.valueOf(o1.getAddTime()).compareTo(o2.getAddTime());
-                    } else {
-                        return Long.valueOf(o2.getAddTime()).compareTo(o1.getAddTime());
-                    }
+                if(ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC){
+                    return o1.getTitleKey().compareTo(o2.getTitleKey());
                 } else {
+                    return o2.getTitleKey().compareTo(o1.getTitleKey());
+                }
+            } else if(ChildHolderAdapter.SORT == ChildHolderAdapter.ADDTIME){
+                //当前是按添加时间排序
+                if(o1.getAddTime() == o2.getAddTime()){
                     return 0;
                 }
+                if(ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC){
+                    return Long.valueOf(o1.getAddTime()).compareTo(o2.getAddTime());
+                } else {
+                    return Long.valueOf(o2.getAddTime()).compareTo(o1.getAddTime());
+                }
+            } else {
+                return 0;
             }
         });
     }
