@@ -38,6 +38,10 @@ public class HeadsetPlugReceiver extends BroadcastReceiver {
             ctlIntent.putExtra("Control",Constants.PAUSE);
             context.sendBroadcast(ctlIntent);
         }
-        abortBroadcast();
+        try {
+            abortBroadcast();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

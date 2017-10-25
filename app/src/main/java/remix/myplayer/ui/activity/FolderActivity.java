@@ -30,7 +30,7 @@ import remix.myplayer.util.Global;
  * @Author Xiaoborui
  * @Date 2016/10/8 09:46
  */
-public class FolderActivity extends PermissActivity<Object,FolderAdapter> {
+public class FolderActivity extends PermissionActivity<Object,FolderAdapter> {
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
 

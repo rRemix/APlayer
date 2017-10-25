@@ -3,6 +3,7 @@ package remix.myplayer.ui.activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -11,6 +12,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -905,11 +907,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_efeeed : R.color.gray_343438));
         (layerDrawable.getDrawable(1)).setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
         mSeekBar.setProgressDrawable(layerDrawable);
-        //修改thumb颜色
-//        mSeekBar.setThumb(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,3),DensityUtil.dip2px(this,7)),accentColor));
-//        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,accentColor,0,1,Color.WHITE,DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10),1));
-        Drawable thumbDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10));
-        mSeekBar.setThumb(thumbDrawable);
+        //修改thumb
+        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
+
+        Drawable seekbarBackground = mSeekBar.getBackground();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && seekbarBackground instanceof RippleDrawable) {
+            ((RippleDrawable)seekbarBackground).setColor(ColorStateList.valueOf( ColorUtil.adjustAlpha(ThemeStore.getAccentColor(),0.2f)));
+        } else {
+//            seekbarBackground.setColorFilter( ColorUtil.adjustAlpha(ThemeStore.getAccentColor(),0.2f), PorterDuff.Mode.SRC_ATOP);
+        }
+
 
         //修改控制按钮颜色
         Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,accentColor);
@@ -992,12 +999,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         //如果之前忽略过该歌曲的歌词，取消忽略
         Set<String> ignoreLrcId = SPUtil.getStringSet(this,"Setting","IgnoreLrcID");
         if(ignoreLrcId != null && ignoreLrcId.size() > 0){
-            for (String id : ignoreLrcId){
-                if((mInfo.getId() + "").equals(id)){
-                    ignoreLrcId.remove(mInfo.getId() + "");
-                    SPUtil.putStringSet(this,"Setting","IgnoreLrcID",ignoreLrcId);
-                }
-            }
+            ignoreLrcId.stream().filter(id -> (mInfo.getId() + "").equals(id)).forEach(id -> {
+                ignoreLrcId.remove(mInfo.getId() + "");
+                SPUtil.putStringSet(this,"Setting","IgnoreLrcID",ignoreLrcId);});
         }
         ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(file.getAbsolutePath());
     }

@@ -34,7 +34,7 @@ import remix.myplayer.util.ToastUtil;
  * @Date 2016/10/21 09:34
  */
 
-public class SongChooseActivity extends PermissActivity<Song,SongChooseAdaper> {
+public class SongChooseActivity extends PermissionActivity<Song,SongChooseAdaper> {
     public static final String TAG = SongChooseActivity.class.getSimpleName();
 
     private int mPlayListID;

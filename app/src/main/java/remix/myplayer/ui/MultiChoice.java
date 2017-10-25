@@ -84,7 +84,10 @@ public class MultiChoice implements OnMultiItemClickListener {
         switch (TYPE){
             case Constants.SONG:
             case Constants.PLAYLISTSONG:
-                mSelectedArg.stream().filter(arg -> arg instanceof Integer).forEach(id -> idList.add((Integer) id));
+                for(Object arg : mSelectedArg){
+                    if (arg instanceof Integer)
+                        idList.add((Integer) arg);
+                }
                 break;
             case Constants.ALBUM:
             case Constants.ARTIST:
@@ -109,7 +112,10 @@ public class MultiChoice implements OnMultiItemClickListener {
         switch (TYPE){
             case Constants.SONG:
             case Constants.PLAYLISTSONG:
-                mSelectedArg.stream().filter(arg -> arg instanceof Integer).forEach(id -> idList.add((Integer) id));
+                for(Object arg : mSelectedArg){
+                    if (arg instanceof Integer)
+                        idList.add((Integer) arg);
+                }
                 break;
             case Constants.ALBUM:
             case Constants.ARTIST:
@@ -197,7 +203,10 @@ public class MultiChoice implements OnMultiItemClickListener {
                 PlayListUtil.deleteMultiPlayList(idList);
                 break;
             case Constants.PLAYLISTSONG:
-                mSelectedArg.stream().filter(arg -> arg instanceof Integer).forEach(id -> idList.add((Integer) id));
+                for(Object arg : mSelectedArg){
+                    if (arg instanceof Integer)
+                        idList.add((Integer) arg);
+                }
                 num = PlayListUtil.deleteMultiSongs(idList,ChildHolderActivity.mId);
                 break;
             case Constants.SONG:
@@ -329,7 +338,10 @@ public class MultiChoice implements OnMultiItemClickListener {
      * 清除所有view的选中状态
      */
     public void clearSelectedViews(){
-        mSelectedViews.stream().filter(view -> view != null).forEach(view -> setViewSelected(view, false));
+        for(View view : mSelectedViews){
+            if(view != null)
+                setViewSelected(view,false);
+        }
         mSelectedViews.clear();
     }
 

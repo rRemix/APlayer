@@ -41,8 +41,8 @@ import remix.myplayer.util.MediaStoreUtil;
  * 最近添加歌曲的界面
  * 目前为最近7天添加
  */
-public class RecetenlyActivity extends PermissActivity<Song,SongAdapter> implements UpdateHelper.Callback{
-    public static final String TAG = RecetenlyActivity.class.getSimpleName();;
+public class RecetenlyActivity extends PermissionActivity<Song,SongAdapter> implements UpdateHelper.Callback{
+    public static final String TAG = RecetenlyActivity.class.getSimpleName();
 
     @BindView(R.id.recently_placeholder)
     View mPlaceHolder;

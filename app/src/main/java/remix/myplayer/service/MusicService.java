@@ -922,6 +922,9 @@ public class MusicService extends BaseService implements Playback {
 //        }
 
         if(mPlayModel == Constants.PLAY_SHUFFLE){
+            if(mRandomList.size() == 0){
+                makeShuffleList(mCurrentId);
+            }
             if ((++mNextIndex) > mRandomList.size() - 1)
                 mNextIndex = 0;
             mNextId = mRandomList.get(mNextIndex);
@@ -971,6 +974,8 @@ public class MusicService extends BaseService implements Playback {
      * @param current
      */
     public void makeShuffleList(final int current) {
+        if(mRandomList == null)
+            mRandomList = new ArrayList<>();
         mRandomList.clear();
         mRandomList.addAll(Global.PlayQueue);
         if (mRandomList.isEmpty())

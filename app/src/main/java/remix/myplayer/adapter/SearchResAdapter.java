@@ -14,7 +14,6 @@ import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * Created by Remix on 2016/1/23.

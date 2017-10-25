@@ -94,7 +94,9 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
             Global.AllSongList = new ArrayList<>();
         else
             Global.AllSongList.clear();
-        mAdapter.getDatas().forEach(song -> Global.AllSongList.add(song.getId()));
+        for(Song song : mAdapter.getDatas()){
+            Global.AllSongList.add(song.getId());
+        }
     }
 
     private int getSongID(int position){

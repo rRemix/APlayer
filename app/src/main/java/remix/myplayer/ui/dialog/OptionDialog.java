@@ -27,7 +27,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;

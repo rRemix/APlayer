@@ -18,7 +18,7 @@ import remix.myplayer.service.MusicService;
  * Created by Remix on 2017/10/20.
  */
 
-public abstract class PermissActivity<D,A extends BaseAdapter> extends MultiChoiceActivity implements MusicEventHelper.MusicEventCallback, android.app.LoaderManager.LoaderCallbacks<List<D>>{
+public abstract class PermissionActivity<D,A extends BaseAdapter> extends MultiChoiceActivity implements MusicEventHelper.MusicEventCallback, android.app.LoaderManager.LoaderCallbacks<List<D>>{
     protected boolean mHasPermission = false;
     protected A mAdapter;
     private final String[] mPermissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};

@@ -44,7 +44,7 @@ import remix.myplayer.util.PlayListUtil;
 /**
  * 专辑、艺术家、文件夹、播放列表详情
  */
-public class ChildHolderActivity extends PermissActivity<Song,ChildHolderAdapter> implements UpdateHelper.Callback{
+public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdapter> implements UpdateHelper.Callback{
     public final static String TAG = ChildHolderActivity.class.getSimpleName();
     public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";
     private boolean mIsRunning = false;
