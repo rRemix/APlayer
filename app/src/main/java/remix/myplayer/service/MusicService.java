@@ -589,22 +589,18 @@ public class MusicService extends BaseService implements Playback {
         List<MusicEventHelper.MusicEventCallback> callbacks = MusicEventHelper.getCallbacks();
         if(callbacks == null)
             return;
-        switch (action){
-            case ACTION_MEDIA_CHANGE:
-                for(MusicEventHelper.MusicEventCallback callback : callbacks){
-                    callback.onMediaStoreChanged();
-                }
-                break;
-            case ACTION_PERMISSION_CHANGE:
-                for(MusicEventHelper.MusicEventCallback callback : callbacks){
-                    callback.onPermissionChanged(intent.getBooleanExtra("permission",false));
-                }
-                break;
-            case ACTION_PLAYLIST_CHANGE:
-                for(MusicEventHelper.MusicEventCallback callback : callbacks){
-                    callback.onPlayListChanged();
-                }
-                break;
+        if(ACTION_MEDIA_CHANGE.equals(action)){
+            for(MusicEventHelper.MusicEventCallback callback : callbacks){
+                callback.onMediaStoreChanged();
+            }
+        } else if(ACTION_PERMISSION_CHANGE.equals(action)){
+            for(MusicEventHelper.MusicEventCallback callback : callbacks){
+                callback.onPermissionChanged(intent.getBooleanExtra("permission",false));
+            }
+        } else if(ACTION_PLAYLIST_CHANGE.equals(action)){
+            for(MusicEventHelper.MusicEventCallback callback : callbacks){
+                callback.onPlayListChanged();
+            }
         }
     }
 

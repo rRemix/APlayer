@@ -27,7 +27,7 @@ public abstract class PermissionActivity<D,A extends BaseAdapter> extends MultiC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MusicEventHelper.addCallback(this);
-        if(mHasPermission == hasPermissions()){
+        if(mHasPermission = hasPermissions()){
             getLoaderManager().initLoader(getLoaderId(), null, this);
         }
     }

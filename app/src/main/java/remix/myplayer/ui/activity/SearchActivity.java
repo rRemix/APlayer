@@ -10,6 +10,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -133,13 +135,18 @@ public class SearchActivity extends PermissionActivity<Song,SearchResAdapter> {
     protected void setUpClick() {
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return false;
+    }
+
     /**
      * 搜索歌曲名，专辑，艺术家中包含该关键的记录
      * @param key 搜索关键字
      */
     private void search(String key) {
         mkey = key;
-        getLoaderManager().initLoader(LoaderIds.SEARCH_ACTIVITY, null, this);
+        getLoaderManager().restartLoader(LoaderIds.SEARCH_ACTIVITY, null, this);
     }
 
     private static class AsyncSearchLoader extends AppWrappedAsyncTaskLoader<List<Song>> {

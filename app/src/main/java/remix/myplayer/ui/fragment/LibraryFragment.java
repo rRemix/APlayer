@@ -36,8 +36,7 @@ public abstract class LibraryFragment<D,A extends HeaderAdapter> extends BaseFra
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mHasPermission = hasPermissions();
-        if(mHasPermission){
+        if(mHasPermission = hasPermissions()){
             getLoaderManager().initLoader(getLoaderId(), null, this);
         }
     }

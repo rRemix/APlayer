@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 
@@ -12,6 +13,7 @@ import remix.myplayer.util.ColorUtil;
 /**
  * Created by taeja on 16-3-15.
  */
+@SuppressLint("Registered")
 public class ToolbarActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
