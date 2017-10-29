@@ -208,11 +208,6 @@
                 <action android:name="remix.music.EXIT" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receiver.EQReceiver">
-            <intent-filter>
-                <action android:name="remix.music.SOUNDEFFECT_ACTION" />
-            </intent-filter>
-        </receiver>
 
 
         <service android:name=".service.MusicService" />

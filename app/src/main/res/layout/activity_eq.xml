@@ -12,9 +12,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/material_color_primary">
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="?attr/background_color_3">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="@dimen/d10_size"
+                android:layout_marginBottom="@dimen/d10_size"
+                android:layout_marginLeft="@dimen/d16_size"
+                android:id="@+id/eq_anchor">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/use_eq"
+                    android:textColor="?attr/text_color"
+                    android:textSize="@dimen/s14_size"
+                    android:layout_marginBottom="@dimen/d6_size"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?attr/text_color"
+                    android:textSize="@dimen/s12_size"
+                    android:text="@string/need_earphone"/>
+            </LinearLayout>
             <android.support.v7.widget.SwitchCompat
-                android:visibility="gone"
                 android:background="@color/transparent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -22,16 +55,16 @@
                 android:textOff=""
                 android:id="@+id/eq_switch"
                 android:layout_gravity="right|center_vertical"
-                android:layout_marginRight="@dimen/d16_size"/>
-        </android.support.v7.widget.Toolbar>
-    </android.support.design.widget.AppBarLayout>
+                android:layout_marginRight="@dimen/d16_size"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/d1_size"
+                android:background="?attr/divider_color"
+                android:layout_below="@id/eq_anchor"/>
+        </RelativeLayout>
 
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="?attr/background_color_3">
         <LinearLayout
             android:id="@+id/eq_container"
             android:layout_width="match_parent"

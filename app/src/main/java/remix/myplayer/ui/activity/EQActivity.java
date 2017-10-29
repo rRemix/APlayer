@@ -1,23 +1,25 @@
 package remix.myplayer.ui.activity;
 
-import android.media.audiofx.BassBoost;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.audiofx.Equalizer;
-import android.media.audiofx.Virtualizer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,6 +30,7 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.EQSeekBar;
 import remix.myplayer.util.CommonUtil;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
@@ -40,12 +43,10 @@ import remix.myplayer.util.ToastUtil;
 public class EQActivity extends ToolbarActivity {
     private final static String TAG = "EQActivity";
     private static Equalizer mEqualizer;
-    public static EQActivity mInstance;
     private static short mBandNumber = -1;
     private static short mMaxEQLevel = -1;
     private static short mMinEQLevel = -1;
     private static ArrayList<Integer> mCenterFres = new ArrayList<>();
-    private static HashMap<String,Short> mPreSettings = new HashMap<>();
     private ArrayList<EQSeekBar> mEQSeekBars = new ArrayList<>();
     private static ArrayList<Short> mBandLevels = new ArrayList<>();
 
@@ -55,17 +56,14 @@ public class EQActivity extends ToolbarActivity {
     Toolbar mToolBar;
     @BindView(R.id.eq_reset)
     Button mReset;
+    @BindView(R.id.eq_container)
+    LinearLayout mEQContainer;
 
     private static ArrayList<Short> mBandFrequencys = new ArrayList<>();
     private static boolean mEnable = false;
-    private static boolean mInitialEnable = false;
-    private static BassBoost mBassBoost;
-    private static Virtualizer mVirtualizer;
-
-
-    private static short mBassBoostLevel;
-    private static short mVirtualizeLevel;
     private static boolean mHasInitial = false;
+
+    private EQReceiver mEQReceiver;
 
     public static void Init(){
         new Thread(){
@@ -80,7 +78,6 @@ public class EQActivity extends ToolbarActivity {
                     }
                     //是否启用音效设置
                     mEnable = SPUtil.getValue(APlayerApplication.getContext(),"Setting","EnableEQ",false) & Global.getHeadsetOn();
-                    mInitialEnable = SPUtil.getValue(APlayerApplication.getContext(),"Setting","InitialEnableEQ",false);
 
                     //EQ
                     mEqualizer = new Equalizer(0, AudioSessionId);
@@ -105,11 +102,6 @@ public class EQActivity extends ToolbarActivity {
                     for (short i = 0; i < mBandNumber; i++) {
                         //通过标签可以顺次的获得所有支持的频率的名字比如 60Hz 230Hz
                         mCenterFres.add(mEqualizer.getCenterFreq(i) / 1000);
-                    }
-
-                    //获得所有预设的音效
-                    for(short i = 0 ; i < mEqualizer.getNumberOfPresets() ; i++){
-                        mPreSettings.put(mEqualizer.getPresetName(i),i);
                     }
 
                     //获得所有频率值
@@ -138,6 +130,12 @@ public class EQActivity extends ToolbarActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        CommonUtil.unregisterReceiver(this,mEQReceiver);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         if(!mHasInitial){
             ToastUtil.show(this,R.string.eq_initial_failed);
@@ -148,69 +146,42 @@ public class EQActivity extends ToolbarActivity {
         setContentView(R.layout.activity_eq);
         ButterKnife.bind(this);
 
-        mInstance = this;
-
-        setUpToolbar(mToolBar,getString(R.string.use_eq));
-
-        //初始化switch
-        ContextThemeWrapper ctw = new ContextThemeWrapper(this,Theme.getTheme());
-        mSwitch = new SwitchCompat(ctw);
-        Toolbar.LayoutParams toolbarLp = new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        toolbarLp.rightMargin = DensityUtil.dip2px(this,16);
-        toolbarLp.gravity = Gravity.END;
-        mSwitch.setLayoutParams(toolbarLp);
-        mToolBar.addView(mSwitch);
+        setUpToolbar(mToolBar,getString(R.string.eq));
 
         mSwitch.setChecked(mEnable);
 //        Theme.TintDrawable(mLockScreenSwitch.getThumbDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
 //        Theme.TintDrawable(mLockScreenSwitch.getTrackDrawable(),ColorUtil.getColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColorRes() : R.color.purple_782899));
-        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked == mEnable)
-                    return;
+        mSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked == mEnable)
+                return;
 
-                if(!Global.getHeadsetOn()){
-                    ToastUtil.show(EQActivity.this,R.string.plz_earphone);
-                    mSwitch.setChecked(false);
-                    return;
-                }
-                mInitialEnable = isChecked;
-                SPUtil.putValue(EQActivity.this,"Setting","InitialEnableEQ",mInitialEnable);
-                mEnable = isChecked;
-                UpdateEnable(isChecked);
+            if(!Global.getHeadsetOn()){
+                ToastUtil.show(EQActivity.this,R.string.plz_earphone);
+                mSwitch.setChecked(false);
+                return;
             }
+            mEnable = isChecked;
+            updateEnable(isChecked);
         });
 
         //初始化重置按钮背景
         mReset.setBackground(Theme.getCorner(1.0f,5,0,ThemeStore.getAccentColor()));
 
         addEQSeekBar();
+//        for(int i = 0 ; i < mEQSeekBars.size() ;i++){
+//            int temp = mBandFrequencys.get(i);
+//            setSeekBarProgress(mEQSeekBars.get(i),temp);
+//            mEQSeekBars.get(i).setEnabled(mEnable);
+//        }
 
-        for(int i = 0 ; i < mEQSeekBars.size() ;i++){
-            int temp = mBandFrequencys.get(i);
-            setSeekBarProgress(mEQSeekBars.get(i),temp);
-            mEQSeekBars.get(i).setEnabled(mEnable);
-        }
-//        new Thread(){
-//            @Override
-//            public void run() {
-//                if(!(mEQSeekBars.size() > 0))
-//                    return;
-//                while (!mEQSeekBars.get(mEQSeekBars.size() - 1).isInit()){
-//                }
-//                Message msg = new Message();
-//                mHandler.sendMessage(msg);
-//            }
-//        }.startListen();
-
+        mEQReceiver = new EQReceiver();
+        registerReceiver(mEQReceiver,new IntentFilter(Constants.SOUNDEFFECT_ACTION));
     }
 
     /**
      * 根据BandNumber数量，添加EQSeekBar
      */
     private void addEQSeekBar() {
-        LinearLayout EQContainer = (LinearLayout)findViewById(R.id.eq_container);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams( DensityUtil.dip2px(this,30), ViewGroup.LayoutParams.MATCH_PARENT);
         lp.setMargins(DensityUtil.dip2px(this,20),0,DensityUtil.dip2px(this,20),0);
         for(int i = 0 ; i < mBandNumber ;i++){
@@ -225,15 +196,23 @@ public class EQActivity extends ToolbarActivity {
             eqSeekBar.setFreText(hz);
             int temp = mBandFrequencys.get(i);
             setSeekBarProgress(eqSeekBar,temp);
-            eqSeekBar.setEnabled(mEnable);
             mEQSeekBars.add(eqSeekBar);
-            EQContainer.addView(eqSeekBar);
-
+            mEQContainer.addView(eqSeekBar);
         }
+        mEQContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                mEQContainer.getViewTreeObserver().removeOnPreDrawListener(this);
+                for(EQSeekBar eqSeekBar : mEQSeekBars){
+                    eqSeekBar.setEnabled(mEnable);
+                }
+                return true;
+            }
+        });
     }
 
 
-    public void UpdateEnable(boolean enable) {
+    public void updateEnable(boolean enable) {
         mEnable = enable;
         SPUtil.putValue(EQActivity.this,"Setting","EnableEQ",enable);
 
@@ -307,9 +286,7 @@ public class EQActivity extends ToolbarActivity {
             ToastUtil.show(EQActivity.this,R.string.plz_earphone);
             return;
         }
-        mInitialEnable = true;
-        SPUtil.putValue(EQActivity.this,"Setting","InitialEnableEQ",mInitialEnable);
-        UpdateEnable(true);
+        updateEnable(true);
         if(mBandFrequencys != null)
             mBandFrequencys.clear();
         for(short i = 0 ; i < mEQSeekBars.size() ;i++){
@@ -324,12 +301,26 @@ public class EQActivity extends ToolbarActivity {
         }
     }
 
-    public static boolean getInitialEnable(){
-        return mInitialEnable;
-    }
 
     public static void setEnable(boolean enable){
         mEnable = enable;
+    }
+
+    /**
+     * Created by taeja on 16-4-18.
+     */
+    public class EQReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(Constants.SOUNDEFFECT_ACTION.equals(intent.getAction())){
+                //耳机拔出 关闭均衡器
+                boolean enable = Global.getHeadsetOn();
+                if(!enable){
+                    mEnable = false;
+                    updateEnable(false);
+                }
+            }
+        }
     }
 
 //    private void setPreset(View v) {
@@ -373,5 +364,4 @@ public class EQActivity extends ToolbarActivity {
 //    public void onBass(View v){
 //        setPreset(v);
 //    }
-
 }

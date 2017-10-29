@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -190,22 +191,12 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         final int arrowColor = ThemeStore.getAccentColor();
         ButterKnife.apply( new ImageView[]{findView(R.id.setting_eq_arrow),findView(R.id.setting_feedback_arrow),
                         findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow),findView(R.id.setting_donate_arrow)},
-                new ButterKnife.Action<ImageView>(){
-                    @Override
-                    public void apply(@NonNull ImageView view, int index) {
-                        Theme.TintDrawable(view,view.getBackground(),arrowColor);
-                    }
-                });
+                (ButterKnife.Action<ImageView>) (view, index) -> Theme.TintDrawable(view,view.getBackground(),arrowColor));
 
         //分根线颜色
         ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),
                 findView(R.id.setting_divider_3),findView(R.id.setting_divider_4)},
-                new ButterKnife.Action<View>() {
-                    @Override
-                    public void apply(@NonNull View view, int index) {
-                        view.setBackgroundColor(ThemeStore.getDividerColor());
-                    }
-                });
+                (ButterKnife.Action<View>) (view, index) -> view.setBackgroundColor(ThemeStore.getDividerColor()));
 
         //计算缓存大小
         new Thread(){
@@ -370,8 +361,14 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             //音效设置
             case R.id.setting_eq_container:
                 MobclickAgent.onEvent(this,"EQ");
+                final int sessionId = MusicService.getMediaPlayer().getAudioSessionId();
+                if (sessionId == AudioEffect.ERROR_BAD_VALUE) {
+                    Toast.makeText(mContext,getResources().getString(R.string.no_audio_ID), Toast.LENGTH_LONG).show();
+                    return;
+                }
                 Intent audioEffectIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
                 audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
+                audioEffectIntent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC);
                 if(CommonUtil.isIntentAvailable(this,audioEffectIntent)){
                     startActivityForResult(audioEffectIntent, 0);
                 } else {

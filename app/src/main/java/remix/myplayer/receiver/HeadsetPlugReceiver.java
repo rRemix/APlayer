@@ -30,9 +30,12 @@ public class HeadsetPlugReceiver extends BroadcastReceiver {
         if(intent.hasExtra("state")){
             headsetOn = intent.getIntExtra("state", -1) == 1;
         }
+
+        Global.setHeadsetOn(headsetOn);
         Intent eqintent = new Intent(Constants.SOUNDEFFECT_ACTION);
         eqintent.putExtra("IsHeadsetOn",Global.getHeadsetOn());
         context.sendBroadcast(eqintent);
+
         if(!headsetOn && MusicService.isPlay()){
             Intent ctlIntent = new Intent(Constants.CTL_ACTION);
             ctlIntent.putExtra("Control",Constants.PAUSE);

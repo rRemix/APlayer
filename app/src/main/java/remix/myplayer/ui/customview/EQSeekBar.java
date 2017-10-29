@@ -378,14 +378,15 @@ public class EQSeekBar extends View {
                 mDotPosition.add(mThumbWidth * 2 + mDotBetween * i);
             }
             mThumbCenterY = Math.round(mDotPosition.get(mPositon));
-            mInit = true;
             setProgress(mProgress);
+            mInit = true;
         }
     }
 
     public void setOnSeekBarChangeListener(OnSeekBarChangeListener l){
         mOnSeekBarChangeListener = l;
     }
+
 
     public void setMax(int max){
         mMax = max;
@@ -395,15 +396,14 @@ public class EQSeekBar extends View {
     }
 
     public void setProgress(int progress){
-        if(!mInit)
-            return;
         if(progress > mMax)
             progress = mMax;
         if(progress < 0)
             progress = 0;
         mProgress = progress;
         int eventY = (int)((1.0 * mProgress / mMax) * mTrackHeigh + mThumbHeight * 2);
-        seekTo(eventY,true);
+        if(mInit)
+            seekTo(eventY,true);
         //mThumbCenterY
 //        int temp = Integer.MAX_VALUE;
 //        for(int i = 0 ; i < mDotPosition.size() ;i++){

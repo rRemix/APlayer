@@ -440,6 +440,7 @@ public class MusicService extends BaseService implements Playback {
             mPlaybackThread.quit();
         }
 
+        closeAudioEffectSession();
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
         mMediaSession.setActive(false);
         mMediaSession.release();
@@ -455,8 +456,16 @@ public class MusicService extends BaseService implements Playback {
         getContentResolver().unregisterContentObserver(mMediaStoreObserver);
         getContentResolver().unregisterContentObserver(mPlayListObserver);
         getContentResolver().unregisterContentObserver(mPlayListSongObserver);
+
         ShakeDetector.getInstance(mContext).stopListen();
         LockScreenListener.getInstance(mContext).stopListen();
+    }
+
+    private void closeAudioEffectSession() {
+        final Intent audioEffectsIntent = new Intent(AudioEffect.ACTION_CLOSE_AUDIO_EFFECT_CONTROL_SESSION);
+        audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mMediaPlayer.getAudioSessionId());
+        audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
+        sendBroadcast(audioEffectsIntent);
     }
 
     /**
