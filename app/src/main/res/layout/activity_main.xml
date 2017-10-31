@@ -44,8 +44,8 @@
                 android:src="@drawable/icon_floatingbtn_day"
                 android:background="@color/transparent"
                 android:layout_gravity="bottom|right"
-                android:layout_marginRight="@dimen/d30_size"
-                android:layout_marginBottom="@dimen/d72_size"
+                android:layout_marginRight="@dimen/d38_size"
+                android:layout_marginBottom="@dimen/d80_size"
                 app:layout_behavior="remix.myplayer.ui.BottomBarBehavior"/>
 
             <!-- 底部自定义ationbar -->

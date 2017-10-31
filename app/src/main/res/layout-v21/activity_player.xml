@@ -120,7 +120,7 @@
                 android:layout_centerVertical="true"
                 android:textSize="@dimen/s12_size"
                 android:text="00:00"
-                android:layout_marginLeft="@dimen/d4_size"
+                android:layout_marginLeft="@dimen/d10_size"
                 android:layout_alignParentLeft="true"
                 android:textColor="@color/gray_cecece"/>
             <!--剩余播放时间-->
@@ -131,7 +131,7 @@
                 android:layout_centerVertical="true"
                 android:textSize="@dimen/s12_size"
                 android:text="00:00"
-                android:layout_marginRight="@dimen/d4_size"
+                android:layout_marginRight="@dimen/d10_size"
                 android:layout_alignParentRight="true"
                 android:textColor="@color/gray_cecece"/>
             <SeekBar
@@ -146,8 +146,8 @@
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@id/text_remain"
                 android:layout_toRightOf="@id/text_hasplay"
-                android:layout_marginStart="@dimen/d10_size"
-                android:layout_marginEnd="@dimen/d10_size"/>
+                android:layout_marginStart="@dimen/player_seekbar_margin"
+                android:layout_marginEnd="@dimen/player_seekbar_margin"/>
         </RelativeLayout>
 
         <!-- 三个播放控制按钮和两个控制播放模式 -->

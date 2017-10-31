@@ -13,7 +13,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
-import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -526,8 +525,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private void setUpGuide() {
         mDotList = new ArrayList<>();
         mDotList.add( findView(R.id.guide_01));
-        mDotList.add( findViewById(R.id.guide_02));
-        mDotList.add( findViewById(R.id.guide_03));
+        mDotList.add( findView(R.id.guide_02));
+        mDotList.add( findView(R.id.guide_03));
         int width = DensityUtil.dip2px(this,5);
         int height = DensityUtil.dip2px(this,2);
         mHighLightIndicator = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getAccentColor(),width,height);
@@ -849,7 +848,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             return;
         }
         //当操作不为播放或者暂停且正在运行时，更新所有控件
-        if((Global.getOperation() != Constants.TOGGLE || mFistStart) && mInfo != null ) {
+        if((Global.getOperation() != Constants.TOGGLE || mFistStart)) {
             //更新顶部信息
             UpdateTopStatus(mInfo);
             //更新歌词
@@ -917,22 +916,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             ((RippleDrawable)seekbarBackground).setColor(ColorStateList.valueOf( ColorUtil.adjustAlpha(ThemeStore.getAccentColor(),0.2f)));
 //            ((RippleDrawable)seekbarBackground).setColor(ColorStateList.valueOf(Color.rgb(0xff,0xe2,0xe2)));
         }
-//        mSeekBar.setBackground(null);
-//        StateListDrawable thumbDrawable = new StateListDrawable();
-//        int[] thumbNormal = new int[]{};
-//        int[] thumbPressed = new int[]{android.R.attr.state_pressed};
-//
-//        thumbDrawable.addState(thumbNormal,Theme.getShape(GradientDrawable.OVAL,
-//                Color.rgb(0xff,0x1b,0x1b),
-//                0,
-//                5,
-//                Color.WHITE,
-//                DensityUtil.dip2px(mContext,10),
-//                DensityUtil.dip2px(mContext,10),
-//                1));
-//        thumbDrawable.addState(thumbPressed,Theme.getDrawable(mContext,R.drawable.icon_thumb_selected));
-//        thumbDrawable.setBounds(0,DensityUtil.dip2px(mContext,28),DensityUtil.dip2px(mContext,28),0);
-//        mSeekBar.setThumb(Theme.getDrawable(mContext,R.drawable.icon_thumb_selected));
 
         //修改控制按钮颜色
         Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,accentColor);
