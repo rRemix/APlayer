@@ -2,11 +2,10 @@ package remix.myplayer.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,8 +14,6 @@ import android.view.View;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -181,27 +178,12 @@ public class RecetenlyActivity extends PermissionActivity<Song,SongAdapter> impl
 
         @Override
         public List<Song> loadInBackground() {
-            Cursor cursor = null;
-            List<Song> songs = new ArrayList<>();
-            try {
-                Calendar today = Calendar.getInstance();
-                today.setTime(new Date());
-                cursor = getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        null,
-                        MediaStore.Audio.Media.DATE_ADDED + " >= " + (today.getTimeInMillis() / 1000 - (3600 * 24 * 7)) +
-                                " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
-                        null,
-                        MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-                if(cursor != null) {
-                    while (cursor.moveToNext()) {
-                        songs.add(MediaStoreUtil.getMP3Info(cursor));
-                    }
-                }
-            }finally {
-                if(cursor != null && !cursor.isClosed())
-                    cursor.close();
-            }
-            return songs;
+            return getLastAddedSongs();
+        }
+
+        @NonNull
+        private List<Song> getLastAddedSongs() {
+           return MediaStoreUtil.getLastAddedSong();
         }
     }
 }

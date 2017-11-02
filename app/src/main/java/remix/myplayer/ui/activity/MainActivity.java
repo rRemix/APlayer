@@ -164,7 +164,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

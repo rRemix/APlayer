@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -124,6 +126,30 @@ public class MediaStoreUtil {
                 cursor.close();
         }
 
+        return songs;
+    }
+
+    public static List<Song> getLastAddedSong(){
+        Cursor cursor = null;
+        List<Song> songs = new ArrayList<>();
+        try {
+            Calendar today = Calendar.getInstance();
+            today.setTime(new Date());
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    null,
+                    MediaStore.Audio.Media.DATE_ADDED + " >= " + (today.getTimeInMillis() / 1000 - (3600 * 24 * 7)) +
+                            " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
+                    null,
+                    MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+            if(cursor != null) {
+                while (cursor.moveToNext()) {
+                    songs.add(MediaStoreUtil.getMP3Info(cursor));
+                }
+            }
+        }finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
+        }
         return songs;
     }
 

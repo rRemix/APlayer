@@ -17,6 +17,7 @@ import android.media.audiofx.AudioEffect;
 import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -111,6 +112,9 @@ public class MusicService extends BaseService implements Playback {
     /** 是否正在设置mediapplayer的datasource */
     private static boolean mIsInitialized = false;
 
+    /** 数据是否加载完成*/
+    private boolean mLoadFinished = false;
+
     /** 播放模式 */
     private static int mPlayModel = Constants.PLAY_LOOP;
 
@@ -199,12 +203,16 @@ public class MusicService extends BaseService implements Playback {
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
     private DBObserver mPlayListSongObserver;
-    private static Context mContext;
+    private Context mContext;
 
     public static final String APLAYER_PACKAGE_NAME = "remix.myplayer";
     public static final String ACTION_MEDIA_CHANGE = APLAYER_PACKAGE_NAME + ".media.change";
     public static final String ACTION_PERMISSION_CHANGE = APLAYER_PACKAGE_NAME + ".permission.change";
     public static final String ACTION_PLAYLIST_CHANGE = APLAYER_PACKAGE_NAME + ".playlist.change";
+    public static final String ACTION_APPWIDGET_OPERATE = APLAYER_PACKAGE_NAME + "appwidget.operate";
+    public static final String ACTION_SHORTCUT_SHUFFLE = APLAYER_PACKAGE_NAME + ".shortcut.shuffle";
+    public static final String ACTION_SHORTCUT_MYLOVE = APLAYER_PACKAGE_NAME + ".shortcut.my_love";
+    public static final String ACTION_SHORTCUT_LASTADDED = APLAYER_PACKAGE_NAME + "shortcut.last_added";
 
     public MusicService(){}
     public MusicService(Context context) {
@@ -220,6 +228,7 @@ public class MusicService extends BaseService implements Playback {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
+        unInit();
         stopSelf();
         System.exit(0);
     }
@@ -232,24 +241,47 @@ public class MusicService extends BaseService implements Playback {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        mIsServiceStop = false;
-        if(mControlRecevier == null){
-            mControlRecevier = new ControlReceiver();
-            registerReceiver(mControlRecevier,new IntentFilter(Constants.CTL_ACTION));
-        }
-        if(intent != null && intent.getExtras() != null && intent.getExtras().getBoolean("FromWidget",false)){
-            mControlRecevier.onReceive(mContext,intent);
-        }
-        return START_NOT_STICKY;
-    }
-
-    @Override
     public void onCreate() {
         super.onCreate();
         mContext = this;
         mInstance = this;
         init();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        mIsServiceStop = false;
+        if(intent == null)
+            return START_NOT_STICKY;
+
+        String action = intent.getAction() != null ? intent.getAction() : "";
+        switch (action){
+            case ACTION_APPWIDGET_OPERATE:
+                //没有加载完成延迟操作
+                mUpdateUIHandler.postDelayed(() -> mControlRecevier.onReceive(mContext,intent),!mLoadFinished ? 500 : 0);
+                break;
+            case ACTION_SHORTCUT_SHUFFLE:
+                break;
+            case ACTION_SHORTCUT_MYLOVE:
+                break;
+            case ACTION_SHORTCUT_LASTADDED:
+                List<Song> songs = MediaStoreUtil.getLastAddedSong();
+                List<Integer> ids = new ArrayList<>();
+                if(songs == null)
+                    break;
+                for(Song song : songs){
+                    ids.add(song.getId());
+                }
+
+                Intent lastedIntent = new Intent(Constants.CTL_ACTION);
+                Bundle arg = new Bundle();
+                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                arg.putInt("Position", 0);
+                intent.putExtras(arg);
+                Global.setPlayQueue(ids,mContext,lastedIntent);
+                break;
+        }
+        return START_NOT_STICKY;
     }
 
     private void init() {
@@ -425,6 +457,10 @@ public class MusicService extends BaseService implements Playback {
         if(mMediaPlayer != null) {
             if(isPlay())
                 pause(false);
+            mNotify.cancel();
+            closeAudioEffectSession();
+            removeFloatLrc();
+            updateAppwidget();
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
@@ -440,12 +476,9 @@ public class MusicService extends BaseService implements Playback {
             mPlaybackThread.quit();
         }
 
-        closeAudioEffectSession();
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
         mMediaSession.setActive(false);
         mMediaSession.release();
-        mNotify.cancel();
-        removeFloatLrc();
 
         CommonUtil.unregisterReceiver(this,mControlRecevier);
         CommonUtil.unregisterReceiver(this,mHeadSetReceiver);
@@ -1145,6 +1178,7 @@ public class MusicService extends BaseService implements Playback {
                     LockScreenListener.getInstance(mContext).beginListen();
                 }
                 initLastSong();
+                mLoadFinished = true;
             }
         }.start();
 

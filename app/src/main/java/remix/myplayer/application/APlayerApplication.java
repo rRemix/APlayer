@@ -78,6 +78,9 @@ public class APlayerApplication extends android.app.Application {
         crashHandler.init(this);
         //检测内存泄漏
         mRefWatcher = LeakCanary.install(this);
+        //AppShortcut
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
+//            new DynamicShortcutManager(this).setUpShortcut();
         try {
             if(SPUtil.getValue(this,"Setting","LockScreenTemp",true)){
                 SPUtil.putValue(this,"Setting","LockScreenTemp",false);

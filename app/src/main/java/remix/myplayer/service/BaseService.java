@@ -10,7 +10,7 @@ import remix.myplayer.manager.ServiceManager;
 /**
  * Created by Remix on 2016/3/26.
  */
-public class BaseService extends Service {
+public abstract class BaseService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {

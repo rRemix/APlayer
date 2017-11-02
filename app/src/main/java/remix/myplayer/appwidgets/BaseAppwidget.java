@@ -38,9 +38,8 @@ public class BaseAppwidget extends AppWidgetProvider {
     protected Bitmap mBitmap;
 
     protected PendingIntent buildPendingIntent(Context context,ComponentName componentName,int operation) {
-        Intent intent = new Intent(Constants.CTL_ACTION);
+        Intent intent = new Intent(MusicService.ACTION_APPWIDGET_OPERATE);
         intent.putExtra("Control",operation);
-        intent.putExtra("FromWidget",true);
         intent.setComponent(componentName);
         return PendingIntent.getService(context,operation,intent,PendingIntent.FLAG_UPDATE_CURRENT);
     }

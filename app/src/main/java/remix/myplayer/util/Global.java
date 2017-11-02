@@ -10,6 +10,7 @@ import android.content.Intent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -102,7 +103,7 @@ public class Global {
      * @param newQueueIdList
      * @return
      */
-    public synchronized static void setPlayQueue(final ArrayList<Integer> newQueueIdList) {
+    public synchronized static void setPlayQueue(final List<Integer> newQueueIdList) {
         new Thread(){
             @Override
             public void run() {
@@ -135,7 +136,7 @@ public class Global {
      * @param newQueueIdList
      * @return
      */
-    public synchronized static void setPlayQueue(final ArrayList<Integer> newQueueIdList, final Context context, final Intent intent) {
+    public synchronized static void setPlayQueue(final List<Integer> newQueueIdList, final Context context, final Intent intent) {
         new Thread(){
             @Override
             public void run() {

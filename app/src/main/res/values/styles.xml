@@ -146,6 +146,14 @@
         <item name="android:windowBackground">@color/night_background_color_3</item>
     </style>
 
+    <style name="AppShortcut" parent="ActivityStyle">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 
     <style name="DayTheme" parent="@style/ActivityStyle">
         <item name="background_color_main">@color/day_background_color_main</item>
