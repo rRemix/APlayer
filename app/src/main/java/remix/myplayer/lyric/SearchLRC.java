@@ -20,6 +20,12 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Set;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.LrcRequest;
 import remix.myplayer.model.mp3.Song;
@@ -73,25 +79,6 @@ public class SearchLRC {
         return mInfo.getId();
     }
 
-    /**
-     * 根据歌手与歌手名,获得歌词id
-     * @return 歌词id
-     */
-    public String getLrcUrl(){
-        try {
-            JSONObject lrcid = CommonUtil.getSongJsonObject(
-                    URLEncoder.encode(mInfo.getTitle(), "utf-8"),
-                    URLEncoder.encode(mInfo.getArtist(), "utf-8"),mInfo.getDuration());
-            //歌词迷
-            if(lrcid != null && lrcid.getInt("count") > 0 && lrcid.getInt("code") == 0){
-                return lrcid.getJSONArray("result").getJSONObject(0).getString("lrc");
-            }
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return "";
-    }
 
     /**
      * 获取酷狗歌词接口的参数
@@ -113,6 +100,58 @@ public class SearchLRC {
             e.printStackTrace();
         }
         return new LrcRequest();
+    }
+
+
+    public Observable<List<LrcRow>> getObservable(String lrcPath){
+        Observable<BufferedReader> onlone = Observable.create((ObservableOnSubscribe<BufferedReader>) e -> {
+            final BufferedReader br = new BufferedReader(
+                    new InputStreamReader(new ByteArrayInputStream(Base64.decode(getOnlineLrcContent(), Base64.DEFAULT))));
+//            e.onNext(new DefaultLrcParser().getLrcRows(br,false,mDisplayName,mArtistName));
+            e.onNext(br);
+        });
+        Observable<BufferedReader> local = Observable.create(new ObservableOnSubscribe<BufferedReader>() {
+            @Override
+            public void subscribe(ObservableEmitter<BufferedReader> e) {
+                e.onNext(new BufferedReader(null));
+            }
+        });
+
+        boolean online = false;
+//        Single<BufferedReader> concat = online ? Observable.concat(onlone,local).first(null) : Observable.concat(onlone,local).lastElement();
+
+        Observable.just(lrcPath)
+                .filter(new Predicate<String>() {
+                    @Override
+                    public boolean test(String s)  {
+                        Set<String> ignoreLrcId = SPUtil.getStringSet(APlayerApplication.getContext(),"Setting","IgnoreLrcID");
+                        if(ignoreLrcId != null && ignoreLrcId.size() > 0){
+                            for (String id : ignoreLrcId){
+                                if((mInfo.getId() + "").equals(id)){
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                })
+                .map((Function<String, BufferedReader>) s -> {
+
+                    return new BufferedReader(null);
+                })
+                .flatMap(new Function<BufferedReader, ObservableSource<List<LrcRow>>>() {
+                    @Override
+                    public ObservableSource<List<LrcRow>> apply(BufferedReader bufferedReader) throws Exception {
+                        return null;
+                    }
+                }).onErrorReturn(new Function<Throwable, List<LrcRow>>() {
+            @Override
+            public List<LrcRow> apply(Throwable throwable) throws Exception {
+                return null;
+            }
+        });
+
+        return null;
     }
 
     /**

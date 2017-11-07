@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import remix.myplayer.service.MusicService;
-import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2017/11/1.
@@ -23,7 +22,6 @@ public class AppShortcutActivity extends BaseActivity {
 
         int type = getIntent() != null ? getIntent().getIntExtra(KEY_SHORTCUT_TYPE,-1) : -1;
         startService(type);
-        ToastUtil.show(mContext,"进入AppShortcutActivity:" + type);
         finish();
     }
 
@@ -32,6 +30,12 @@ public class AppShortcutActivity extends BaseActivity {
         switch (type){
             case SHORTCUT_TYPE_LAST_ADDED:
                 intent.setAction(MusicService.ACTION_SHORTCUT_LASTADDED);
+                break;
+            case SHORTCUT_TYPE_SHUFFLE_ALL:
+                intent.setAction(MusicService.ACTION_SHORTCUT_SHUFFLE);
+                break;
+            case SHORTCUT_TYPE_MY_LOVE:
+                intent.setAction(MusicService.ACTION_SHORTCUT_MYLOVE);
                 break;
         }
         startService(intent);

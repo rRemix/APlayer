@@ -151,7 +151,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
     public void onLoadFinished(Loader<List<PlayListSong>> loader, final List<PlayListSong> data) {
         if(data == null)
             return;
-        mAdapter.setDatas(data);
+        mAdapter.setData(data);
         final int curId = MusicService.getCurrentMP3() != null ? MusicService.getCurrentMP3().getId() : -1;
         if(curId < 0)
             return;
@@ -172,7 +172,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
     @Override
     public void onLoaderReset(Loader<List<PlayListSong>> loader) {
         if (mAdapter != null)
-            mAdapter.setDatas(null);
+            mAdapter.setData(null);
     }
 
     @Override
@@ -181,7 +181,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
             getSupportLoaderManager().initLoader(LOADER_ID++,null,this);
         } else {
             if(mAdapter != null)
-                mAdapter.setDatas(null);
+                mAdapter.setData(null);
         }
     }
 

@@ -152,7 +152,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                     mInfo.setArtist(artist);
                                     mInfo.setTitle(title);
                                     mInfo.setYear(year);
-                                    ((PlayerActivity)mContext).UpdateTopStatus(mInfo);
+                                    ((PlayerActivity)mContext).updateTopStatus(mInfo);
                                     ((PlayerActivity)mContext).setMP3Item(mInfo);
                                 } else {
                                     ToastUtil.show(mContext,R.string.save_error);

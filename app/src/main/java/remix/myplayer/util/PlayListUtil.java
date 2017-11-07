@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import remix.myplayer.R;
@@ -65,7 +66,7 @@ public class PlayListUtil {
      * @param IdList
      * @return
      */
-    public static int deleteMultiPlayList(ArrayList<Integer> IdList){
+    public static int deleteMultiPlayList(List<Integer> IdList){
         if(IdList == null || IdList.size() == 0)
             return 0;
         String where = "";
@@ -102,11 +103,11 @@ public class PlayListUtil {
      * @param infos
      * @return
      */
-    public static int addMultiSongs(ArrayList<PlayListSong> infos){
+    public static int addMultiSongs(List<PlayListSong> infos){
         if(infos == null || infos.size() == 0 )
             return 0;
         //不重复添加
-        ArrayList<Integer> rawIDList = getIDList(infos.get(0).PlayListID);
+        List<Integer> rawIDList = getIDList(infos.get(0).PlayListID);
         for(int i = 0 ; i < rawIDList.size() ;i++){
             for(int j = infos.size() - 1; j >= 0; j--){
                 if(rawIDList.get(i) == infos.get(j).AudioId)
@@ -131,7 +132,7 @@ public class PlayListUtil {
      * @param IDList
      * @return
      */
-    public static int addMultiSongs(ArrayList<Integer> IDList,String playListName){
+    public static int addMultiSongs(List<Integer> IDList,String playListName){
         return addMultiSongs(IDList,playListName,getPlayListID(playListName));
     }
 
@@ -140,11 +141,11 @@ public class PlayListUtil {
      * @param IDList
      * @return
      */
-    public static int addMultiSongs(ArrayList<Integer> IDList,String playListName,int playListId){
+    public static int addMultiSongs(List<Integer> IDList,String playListName,int playListId){
         if(IDList == null || IDList.size() == 0 )
             return 0;
         //不重复添加
-        ArrayList<Integer> rawIDList = getIDList(playListName);
+        List<Integer> rawIDList = getIDList(playListName);
         for(int i = 0 ; i < rawIDList.size() ;i++){
             for(int j = IDList.size() - 1; j >= 0; j--){
                 if(rawIDList.get(i).equals(IDList.get(j)))
@@ -201,7 +202,7 @@ public class PlayListUtil {
      * @param playlistId
      * @return
      */
-    public static int deleteMultiSongs(ArrayList<Integer> IdList,int playlistId){
+    public static int deleteMultiSongs(List<Integer> IdList,int playlistId){
         try {
             if(IdList == null || IdList.size() == 0)
                 return 0;
@@ -270,7 +271,7 @@ public class PlayListUtil {
      * 返回系统中除播放队列所有播放列表
      * @return
      */
-    public static ArrayList<PlayList> getAllPlayListInfo(){
+    public static List<PlayList> getAllPlayListInfo(){
         ArrayList<PlayList> playList = new ArrayList<>();
         Cursor cursor = null;
         try {
@@ -294,8 +295,8 @@ public class PlayListUtil {
         return playList;
     }
 
-    public static ArrayList<PlayListSong> getPlayListSong(int playlistId){
-        ArrayList<PlayListSong> playListSongs = new ArrayList<>();
+    public static List<PlayListSong> getPlayListSong(int playlistId){
+        List<PlayListSong> playListSongs = new ArrayList<>();
         Cursor cursor = null;
         try {
             cursor = mContext.getContentResolver().query(PlayListSongs.CONTENT_URI,new String[]{PlayListSongs.PlayListSongColumns.AUDIO_ID},
@@ -320,7 +321,7 @@ public class PlayListUtil {
      * @param playlistName
      * @return
      */
-    public static ArrayList<Integer> getIDList(String playlistName){
+    public static List<Integer> getIDList(String playlistName){
         ArrayList<Integer> IDList = new ArrayList<>();
         Cursor cursor = null;
         try {
@@ -346,7 +347,7 @@ public class PlayListUtil {
      * @param playlistId
      * @return
      */
-    public static ArrayList<Integer> getIDList(int playlistId){
+    public static List<Integer> getIDList(int playlistId){
         ArrayList<Integer> IDList = new ArrayList<>();
         Cursor cursor = null;
         try {
@@ -389,7 +390,7 @@ public class PlayListUtil {
      * @param idList 歌曲id列表
      * @return 对应所有歌曲信息列表
      */
-    public static ArrayList<Song> getMP3ListByIds(ArrayList<Integer> idList) {
+    public static List<Song> getMP3ListByIds(List<Integer> idList) {
         if(idList == null || idList.size() == 0)
             return new ArrayList<>();
 

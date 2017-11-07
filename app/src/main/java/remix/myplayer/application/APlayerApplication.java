@@ -3,8 +3,8 @@ package remix.myplayer.application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 
-import com.facebook.common.internal.Supplier;
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
@@ -19,6 +19,7 @@ import com.umeng.socialize.UMShareAPI;
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import remix.myplayer.BuildConfig;
+import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.service.MusicService;
@@ -30,7 +31,6 @@ import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.cache.DiskCache;
 
 /**
@@ -46,7 +46,6 @@ public class APlayerApplication extends android.app.Application {
 
     public static RefWatcher getRefWatcher(Context context) {
         APlayerApplication application = (APlayerApplication) context.getApplicationContext();
-
         return application.mRefWatcher;
     }
 
@@ -79,16 +78,8 @@ public class APlayerApplication extends android.app.Application {
         //检测内存泄漏
         mRefWatcher = LeakCanary.install(this);
         //AppShortcut
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
-//            new DynamicShortcutManager(this).setUpShortcut();
-        try {
-            if(SPUtil.getValue(this,"Setting","LockScreenTemp",true)){
-                SPUtil.putValue(this,"Setting","LockScreenTemp",false);
-                SPUtil.deleteValue(this,"Setting","LockScreenOn");
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
+            new DynamicShortcutManager(this).setUpShortcut();
 
     }
 
@@ -104,12 +95,7 @@ public class APlayerApplication extends android.app.Application {
         PlayListUtil.setContext(mContext);
         final int cacheSize = (int)(Runtime.getRuntime().maxMemory() / 8);
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
-                .setBitmapMemoryCacheParamsSupplier(new Supplier<MemoryCacheParams>() {
-                    @Override
-                    public MemoryCacheParams get() {
-                        return new MemoryCacheParams(cacheSize, Integer.MAX_VALUE,cacheSize,Integer.MAX_VALUE, 5 * ByteConstants.MB);
-                    }
-                })
+                .setBitmapMemoryCacheParamsSupplier(() -> new MemoryCacheParams(cacheSize, Integer.MAX_VALUE,cacheSize,Integer.MAX_VALUE, 5 * ByteConstants.MB))
                 .setBitmapsConfig(Bitmap.Config.RGB_565)
                 .build();
         Fresco.initialize(this,config);

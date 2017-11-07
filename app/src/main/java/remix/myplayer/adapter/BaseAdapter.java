@@ -42,7 +42,7 @@ public abstract class BaseAdapter<D,T extends BaseViewHolder> extends RecyclerVi
         }
     }
 
-    public void setDatas(List<D> datas){
+    public void setData(List<D> datas){
         mDatas = datas;
         notifyDataSetChanged();
     }

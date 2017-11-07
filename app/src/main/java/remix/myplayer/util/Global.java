@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import remix.myplayer.model.mp3.PlayList;
 import remix.myplayer.model.mp3.PlayListSong;
 import remix.myplayer.service.MusicService;
 
@@ -43,11 +44,11 @@ public class Global {
     /**
      * 所有歌曲id
      */
-    public static ArrayList<Integer> AllSongList = new ArrayList<>();
+    public static List<Integer> AllSongList = new ArrayList<>();
     /**
      * 正在播放歌曲id
      */
-    public static ArrayList<Integer> PlayQueue = new ArrayList<>();
+    public static List<Integer> PlayQueue = new ArrayList<>();
     /**
      * 文件夹名与对应的所有歌曲id
      */
@@ -60,7 +61,7 @@ public class Global {
     /**
      * 播放列表
      */
-    public static ArrayList<remix.myplayer.model.mp3.PlayList> PlayList = new ArrayList<>();
+    public static List<PlayList> PlayList = new ArrayList<>();
 
     public static void setOperation(int operation){
         Operation = operation;
@@ -141,14 +142,12 @@ public class Global {
             @Override
             public void run() {
                 if(newQueueIdList == null || newQueueIdList.size() == 0){
-                    CommonUtil.uploadException("SetEmptyQueue","");
                     return;
                 }
                 if (newQueueIdList.equals(PlayQueue)) {
                     context.sendBroadcast(intent);
                     return;
                 }
-
                 PlayQueue.clear();
                 PlayQueue.addAll(newQueueIdList);
                 if(intent.getBooleanExtra("shuffle",false)){
@@ -171,7 +170,7 @@ public class Global {
         }.start();
     }
 
-    public static synchronized ArrayList<Integer> getPlayQueue(){
+    public static synchronized List<Integer> getPlayQueue(){
         return PlayQueue;
     }
 
@@ -180,8 +179,8 @@ public class Global {
      * @param rawAddList
      * @return
      */
-    public static int AddSongToPlayQueue(final ArrayList<Integer> rawAddList) {
-        ArrayList<PlayListSong> infos = new ArrayList<>();
+    public static int AddSongToPlayQueue(final List<Integer> rawAddList) {
+        List<PlayListSong> infos = new ArrayList<>();
         for(Integer id : rawAddList){
             infos.add(new PlayListSong(id, PlayQueueID,Constants.PLAY_QUEUE));
         }

@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -74,7 +73,7 @@ public class SearchActivity extends PermissionActivity<Song,SearchResAdapter> {
             @Override
             public void onClear() {
                 //清空搜索结果，并更新界面
-                mAdapter.setDatas(null);
+                mAdapter.setData(null);
                 mkey = "";
                 UpdateUI();
             }

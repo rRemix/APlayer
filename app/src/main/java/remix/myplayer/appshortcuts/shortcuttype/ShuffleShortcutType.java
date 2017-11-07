@@ -23,7 +23,7 @@ public class ShuffleShortcutType extends BaseShortcutType {
         return new ShortcutInfo.Builder(mContext,ID_PREFIX + "shuffle")
                 .setShortLabel(mContext.getString(R.string.model_random))
                 .setLongLabel(mContext.getString(R.string.model_random))
-                .setIcon(Icon.createWithResource(mContext, R.mipmap.ic_launcher))
+                .setIcon(Icon.createWithResource(mContext, R.drawable.icon_appshortcut_shuffle))
                 .setIntent(getIntent(AppShortcutActivity.SHORTCUT_TYPE_SHUFFLE_ALL))
                 .build();
     }

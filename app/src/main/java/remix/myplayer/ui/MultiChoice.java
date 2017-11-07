@@ -8,6 +8,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import remix.myplayer.R;
 import remix.myplayer.interfaces.OnMultiItemClickListener;
@@ -94,7 +95,7 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.FOLDER:
             case Constants.PLAYLIST:
                 for(Object arg : mSelectedArg){
-                    ArrayList<Integer> tempList = MediaStoreUtil.getSongIdList(arg,TYPE);
+                    List<Integer> tempList = MediaStoreUtil.getSongIdList(arg,TYPE);
                     if(tempList != null && tempList.size() > 0)
                         idList.addAll(MediaStoreUtil.getSongIdList(arg,TYPE));
                 }
@@ -122,7 +123,7 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.FOLDER:
             case Constants.PLAYLIST:
                 for(Object arg : mSelectedArg){
-                    ArrayList<Integer> tempList = MediaStoreUtil.getSongIdList(arg,TYPE);
+                    List<Integer> tempList = MediaStoreUtil.getSongIdList(arg,TYPE);
                     if(tempList != null && tempList.size() > 0)
                         idList.addAll(MediaStoreUtil.getSongIdList(arg,TYPE));
                 }
@@ -130,7 +131,7 @@ public class MultiChoice implements OnMultiItemClickListener {
         }
 
         //获得所有播放列表的信息
-        final ArrayList<PlayList> playListInfoList = PlayListUtil.getAllPlayListInfo();
+        final List<PlayList> playListInfoList = PlayListUtil.getAllPlayListInfo();
         final ArrayList<String> playlistNameList = new ArrayList<>();
         if(playListInfoList == null)
             return;
@@ -195,7 +196,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                             continue;
                         idList.add((Integer) arg);
                         //保存删除前，选中的播放列表下一共有多少歌曲
-                        ArrayList<Integer> selectIDList = PlayListUtil.getIDList((Integer) arg);
+                        List<Integer> selectIDList = PlayListUtil.getIDList((Integer) arg);
                         if(selectIDList != null)
                             num += selectIDList.size();
                     }

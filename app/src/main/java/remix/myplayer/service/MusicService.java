@@ -54,7 +54,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -198,7 +197,7 @@ public class MusicService extends BaseService implements Playback {
     private boolean mIsServiceStop = false;
     /** handlerThread*/
     private HandlerThread mPlaybackThread;
-    private LrcHandler mPlaybackHandler;
+    private PlaybackHandler mPlaybackHandler;
 
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
@@ -249,36 +248,70 @@ public class MusicService extends BaseService implements Playback {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent commandIntent, int flags, int startId) {
         mIsServiceStop = false;
-        if(intent == null)
+        if(commandIntent == null)
             return START_NOT_STICKY;
+        String action = commandIntent.getAction() != null ? commandIntent.getAction() : "";
 
-        String action = intent.getAction() != null ? intent.getAction() : "";
         switch (action){
             case ACTION_APPWIDGET_OPERATE:
-                //没有加载完成延迟操作
-                mUpdateUIHandler.postDelayed(() -> mControlRecevier.onReceive(mContext,intent),!mLoadFinished ? 500 : 0);
+                mPlaybackHandler.post(() -> {
+                    while (!mLoadFinished);
+                    Intent appwidgetIntent = new Intent(Constants.CTL_ACTION);
+                    appwidgetIntent.putExtra("Control",commandIntent.getIntExtra("Control",-1));
+                    sendBroadcast(appwidgetIntent);
+                });
                 break;
             case ACTION_SHORTCUT_SHUFFLE:
+                mPlaybackHandler.post(() -> {
+                    while (!mLoadFinished);
+                    if(mPlayModel != Constants.PLAY_SHUFFLE){
+                        setPlayModel(Constants.PLAY_SHUFFLE);
+                    }
+                    Intent shuffleIntent = new Intent(Constants.CTL_ACTION);
+                    shuffleIntent.putExtra("Control", Constants.NEXT);
+                    mFirstFlag = false;
+                    sendBroadcast(shuffleIntent);
+                });
                 break;
             case ACTION_SHORTCUT_MYLOVE:
+                mPlaybackHandler.post(() -> {
+                    while (!mLoadFinished);
+                    List<Integer> ids = PlayListUtil.getIDList(Global.MyLoveID);
+                    if(ids == null || ids.size() == 0) {
+                        ToastUtil.show(mContext,R.string.list_is_empty);
+                        return;
+                    }
+                    Intent myloveIntent = new Intent(Constants.CTL_ACTION);
+                    Bundle arg = new Bundle();
+                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                    arg.putInt("Position", 0);
+                    myloveIntent.putExtras(arg);
+                    mFirstFlag = false;
+                    Global.setPlayQueue(ids,mContext,myloveIntent);
+                });
+
                 break;
             case ACTION_SHORTCUT_LASTADDED:
-                List<Song> songs = MediaStoreUtil.getLastAddedSong();
-                List<Integer> ids = new ArrayList<>();
-                if(songs == null)
-                    break;
-                for(Song song : songs){
-                    ids.add(song.getId());
-                }
-
-                Intent lastedIntent = new Intent(Constants.CTL_ACTION);
-                Bundle arg = new Bundle();
-                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                arg.putInt("Position", 0);
-                intent.putExtras(arg);
-                Global.setPlayQueue(ids,mContext,lastedIntent);
+                mPlaybackHandler.post(() -> {
+                    List<Song> songs = MediaStoreUtil.getLastAddedSong();
+                    List<Integer> ids = new ArrayList<>();
+                    if(songs == null || songs.size() == 0) {
+                        ToastUtil.show(mContext,R.string.list_is_empty);
+                        return;
+                    }
+                    for(Song song : songs){
+                        ids.add(song.getId());
+                    }
+                    Intent lastedIntent = new Intent(Constants.CTL_ACTION);
+                    Bundle arg = new Bundle();
+                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                    arg.putInt("Position", 0);
+                    lastedIntent.putExtras(arg);
+                    mFirstFlag = false;
+                    Global.setPlayQueue(ids,mContext,lastedIntent);
+                });
                 break;
         }
         return START_NOT_STICKY;
@@ -290,7 +323,7 @@ public class MusicService extends BaseService implements Playback {
 
         mPlaybackThread = new HandlerThread("IO");
         mPlaybackThread.start();
-        mPlaybackHandler = new LrcHandler(this, mPlaybackThread.getLooper());
+        mPlaybackHandler = new PlaybackHandler(this, mPlaybackThread.getLooper());
 
         mUpdateUIHandler = new UpdateUIHandler(this);
 
@@ -574,7 +607,6 @@ public class MusicService extends BaseService implements Playback {
     @Override
     public void playSelectSong(int position){
         if((mCurrentIndex = position) == -1 || (mCurrentIndex > Global.PlayQueue.size() - 1)) {
-            CommonUtil.uploadException("playSelectSong","position:" + position + (" playQueueSize:" + Global.PlayQueue != null ? Global.PlayQueue.size() : "null"));
             ToastUtil.show(mContext,R.string.illegal_arg);
             return;
         }
@@ -860,7 +892,7 @@ public class MusicService extends BaseService implements Playback {
                 ToastUtil.show(mContext,getString(R.string.path_empty));
                 return;
             }
-            mAudioFouus =  mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
+            mAudioFouus = mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
                     AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
             if(!mAudioFouus) {
                 ToastUtil.show(mContext,getString(R.string.cant_request_audio_focus));
@@ -879,28 +911,6 @@ public class MusicService extends BaseService implements Playback {
             ToastUtil.show(mContext,getString(R.string.play_failed) + e.toString());
             mIsInitialized = false;
         }
-    }
-
-    /**
-     * 得到一个随机数
-     * @return
-     */
-    private int getShuffle(){
-        if(!mRandomList.contains(mCurrentId))
-            mRandomList.add(mCurrentId);
-        //先判断是否已经随机循环完播放队列并且将当前播放的歌曲添加到RandomList
-        if (mRandomList.size() == Global.PlayQueue.size() || mRandomList.size() == 0) {
-            mRandomList.clear();
-        }
-        //从未用到过的歌曲id中取出一个
-        //并将取出的索引添加到mRandomList 标志这首歌曲已经被随机播放过
-        int nextId = 0;
-        List<Integer> tempList = (List<Integer>) Global.PlayQueue.clone();
-        if (tempList != null && tempList.size() > 0) {
-            tempList.removeAll(mRandomList);
-            nextId = tempList.get(new Random().nextInt(tempList.size()));
-        }
-        return nextId;
     }
 
     /**
@@ -1163,13 +1173,14 @@ public class MusicService extends BaseService implements Playback {
                         CommonUtil.uploadException("新建列表错误",e);
                     }
                 }else {
+                    //播放模式
+                    mPlayModel = SPUtil.getValue(mContext,"Setting", "PlayModel",Constants.PLAY_LOOP);
                     Global.PlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
                     Global.MyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);
                     Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
                     Global.PlayList = PlayListUtil.getAllPlayListInfo();
                     mShowFloatLrc = SPUtil.getValue(mContext,"Setting","FloatLrc",false);
-                    //播放模式
-                    mPlayModel = SPUtil.getValue(mContext,"Setting", "PlayModel",Constants.PLAY_LOOP);
+
                     //摇一摇
                     if(SPUtil.getValue(mContext,"Setting","Shake",false)){
                         ShakeDetector.getInstance(mContext).beginListen();
@@ -1309,23 +1320,20 @@ public class MusicService extends BaseService implements Playback {
      * 更新桌面歌词
      */
     private void updateFloatLrc() {
-        mPlaybackHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (MusicService.class){
-                    Log.d(TAG,"thread:" + Thread.currentThread().toString());
-                    if (checkPermission())
-                        return;
-                    if(!mShowFloatLrc)
-                        return;
-                    //根据操作判断是否需要更新歌词
-                    int control = Global.Operation;
-                    if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcList == null)
-                        mLrcList = new SearchLRC(mCurrentInfo).getLrc("");
-                    if(mUpdateFloatLrcThread == null) {
-                        mUpdateFloatLrcThread = new UpdateFloatLrcThread();
-                        mUpdateFloatLrcThread.start();
-                    }
+        mPlaybackHandler.post(() -> {
+            synchronized (MusicService.class){
+                Log.d(TAG,"thread:" + Thread.currentThread().toString());
+                if (checkPermission())
+                    return;
+                if(!mShowFloatLrc)
+                    return;
+                //根据操作判断是否需要更新歌词
+                int control = Global.Operation;
+                if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcList == null)
+                    mLrcList = new SearchLRC(mCurrentInfo).getLrc("");
+                if(mUpdateFloatLrcThread == null) {
+                    mUpdateFloatLrcThread = new UpdateFloatLrcThread();
+                    mUpdateFloatLrcThread.start();
                 }
             }
         });
@@ -1832,9 +1840,9 @@ public class MusicService extends BaseService implements Playback {
         }
     }
 
-    private static class LrcHandler extends Handler{
+    private static class PlaybackHandler extends Handler{
         private final WeakReference<MusicService> mRef;
-        LrcHandler(MusicService service, Looper looper){
+        PlaybackHandler(MusicService service, Looper looper){
             super(looper);
             mRef = new WeakReference<>(service);
         }

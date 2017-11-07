@@ -23,7 +23,7 @@ public class MyLoveShortcutType extends BaseShortcutType {
         return new ShortcutInfo.Builder(mContext,ID_PREFIX + "my_love")
                 .setShortLabel(mContext.getString(R.string.my_favorite))
                 .setLongLabel(mContext.getString(R.string.my_favorite))
-                .setIcon(Icon.createWithResource(mContext, R.mipmap.ic_launcher))
+                .setIcon(Icon.createWithResource(mContext, R.drawable.icon_appshortcut_my_love))
                 .setIntent(getIntent(AppShortcutActivity.SHORTCUT_TYPE_MY_LOVE))
                 .build();
     }

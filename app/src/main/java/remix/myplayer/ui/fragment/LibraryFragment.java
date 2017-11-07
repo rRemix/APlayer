@@ -96,7 +96,7 @@ public abstract class LibraryFragment<D,A extends HeaderAdapter> extends BaseFra
         super.onDestroy();
         MusicEventHelper.removeCallback(this);
         if(mAdapter != null){
-            mAdapter.setDatas(null);
+            mAdapter.setData(null);
         }
     }
 
@@ -106,7 +106,7 @@ public abstract class LibraryFragment<D,A extends HeaderAdapter> extends BaseFra
             getLoaderManager().restartLoader(getLoaderId(), null, this);
         else{
             if(mAdapter != null)
-                mAdapter.setDatas(null);
+                mAdapter.setData(null);
         }
     }
 
@@ -130,13 +130,13 @@ public abstract class LibraryFragment<D,A extends HeaderAdapter> extends BaseFra
 
     @Override
     public void onLoadFinished(Loader<List<D>> loader, List<D> data) {
-        mAdapter.setDatas(data);
+        mAdapter.setData(data);
     }
 
     @Override
     public void onLoaderReset(Loader<List<D>> loader) {
         if(mAdapter != null)
-            mAdapter.setDatas(null);
+            mAdapter.setData(null);
     }
 
     protected abstract Loader<List<D>> getLoader();

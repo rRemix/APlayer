@@ -86,7 +86,7 @@ public class LrcFragment extends BaseFragment {
         return rootView;
     }
 
-    public void UpdateLrc(Song song) {
+    public void updateLrc(Song song) {
         if(song == null)
             return;
         mInfo = song;
@@ -94,13 +94,13 @@ public class LrcFragment extends BaseFragment {
         new DownloadThread().start();
     }
 
-    public void UpdateLrc(String lrcPath){
+    public void updateLrc(String lrcPath){
         new DownloadThread(lrcPath).start();
     }
 
 
     private class DownloadThread extends Thread {
-        public String mManualPath;
+        String mManualPath;
         DownloadThread(String manualPath){
             mManualPath = manualPath;
         }

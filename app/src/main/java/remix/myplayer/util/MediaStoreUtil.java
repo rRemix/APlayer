@@ -125,7 +125,6 @@ public class MediaStoreUtil {
             if(cursor != null && !cursor.isClosed())
                 cursor.close();
         }
-
         return songs;
     }
 
@@ -330,7 +329,7 @@ public class MediaStoreUtil {
             }
             //没有设置过封面，对于播放列表类型的查找播放列表下所有歌曲，直到有一首歌曲存在封面
             if(type == Constants.URL_PLAYLIST){
-                ArrayList<Integer> songIdList = PlayListUtil.getIDList(arg);
+                List<Integer> songIdList = PlayListUtil.getIDList(arg);
                 for (Integer songId : songIdList){
                     Song item = MediaStoreUtil.getMP3InfoById(songId);
                     if(item == null)
@@ -796,10 +795,10 @@ public class MediaStoreUtil {
      * @param type
      * @return
      */
-    public static ArrayList<Integer> getSongIdList(Object arg , int type){
+    public static List<Integer> getSongIdList(Object arg , int type){
         Cursor cursor = null;
         ContentResolver resolver = mContext.getContentResolver();
-        ArrayList<Integer> ids = new ArrayList<>();
+        List<Integer> ids = new ArrayList<>();
         //专辑或者艺术家
         if(type == Constants.ALBUM || type == Constants.ARTIST){
             try {

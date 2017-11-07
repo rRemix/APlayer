@@ -71,7 +71,7 @@ public abstract class PermissionActivity<D,A extends BaseAdapter> extends MultiC
             getLoaderManager().restartLoader(getLoaderId(), null, this);
         else{
             if(mAdapter != null)
-                mAdapter.setDatas(null);
+                mAdapter.setData(null);
         }
     }
 
@@ -96,13 +96,13 @@ public abstract class PermissionActivity<D,A extends BaseAdapter> extends MultiC
     @Override
     public void onLoadFinished(android.content.Loader<List<D>> loader, List<D> data) {
         if(mAdapter != null)
-            mAdapter.setDatas(data);
+            mAdapter.setData(data);
     }
 
     @Override
     public void onLoaderReset(android.content.Loader<List<D>> loader) {
         if(mAdapter != null)
-            mAdapter.setDatas(null);
+            mAdapter.setData(null);
     }
 
     protected android.content.Loader<List<D>> getLoader(){

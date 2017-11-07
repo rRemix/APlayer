@@ -259,20 +259,19 @@ public class CircleSeekBar extends AbsSeekBar {
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
         mCenterX = getWidth() /  2;
         mCenterY = getHeight() / 2;
         mRadius = mCenterX > mCenterY ? mCenterY : mCenterX - mThumbWidth / 2;
 
         if(mRadius > 0) {
             mRectF = new RectF( mCenterX - mRadius,
-                                mCenterY - mRadius,
-                                mCenterX + mRadius,
-                                mCenterY + mRadius);
+                    mCenterY - mRadius,
+                    mCenterX + mRadius,
+                    mCenterY + mRadius);
             mOffsetX = (float) Math.sin(mRad) * mRadius;
             mOffsetY = -(float) Math.cos(mRad) * mRadius;
-
             invalidate();
         }
     }

@@ -55,7 +55,7 @@ public class DBObserver extends ContentObserver {
         if(!selfChange){
             mMatch = DBContentProvider.mUriMatcher.match(uri);
             mHandler.removeCallbacks(mRunnable);
-            mHandler.postDelayed(mRunnable,400);
+            mHandler.postDelayed(mRunnable,500);
         }
     }
 

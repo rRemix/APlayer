@@ -691,7 +691,7 @@ public class CommonUtil {
                 return true;
             }
         } catch (Exception e) {
-            CommonUtil.uploadException("isRightLrc",e);
+
         } finally {
             try {
                 if(br != null){

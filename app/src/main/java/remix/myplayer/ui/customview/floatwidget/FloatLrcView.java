@@ -127,7 +127,7 @@ public class FloatLrcView extends RelativeLayout {
             public boolean onPreDraw() {
                 mColorRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
                 mColorAdapter = new FloatColorAdapter(mContext,R.layout.item_float_lrc_color,mColorRecyclerView.getMeasuredWidth());
-                mColorAdapter.setDatas(ThemeStore.getAllThemeColor());
+                mColorAdapter.setData(ThemeStore.getAllThemeColor());
                 mColorAdapter.setOnItemClickLitener(new OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {

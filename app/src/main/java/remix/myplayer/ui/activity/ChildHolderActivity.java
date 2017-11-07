@@ -17,6 +17,7 @@ import com.umeng.analytics.MobclickAgent;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -52,7 +53,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     public static int mId;
     private int mType;
     private String mArg;
-    private ArrayList<Song> mInfoList;
+    private List<Song> mInfoList;
 
     //歌曲数目与标题
     @BindView(R.id.childholder_item_num)
@@ -242,7 +243,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
      * 根据参数(专辑id 歌手id 文件夹名 播放列表名)获得对应的歌曲信息列表
      * @return 对应歌曲信息列表
      */
-    private ArrayList<Song> getMP3List(){
+    private List<Song> getMP3List(){
         if(mId < 0)
             return  null;
         switch (mType) {
@@ -262,7 +263,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
             //播放列表名
             case Constants.PLAYLIST:
                 /* 播放列表歌曲id列表 */
-                ArrayList<Integer> playListSongIDList = PlayListUtil.getIDList(mId);
+                List<Integer> playListSongIDList = PlayListUtil.getIDList(mId);
                 if(playListSongIDList == null)
                     return mInfoList;
                 mInfoList = PlayListUtil.getMP3ListByIds(playListSongIDList);
@@ -333,7 +334,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
                 case Constants.UPDATE_ADAPTER:
 //                    if(activity.mInfoList == null)
 //                        return;
-                    activity.mAdapter.setDatas(activity.mInfoList);
+                    activity.mAdapter.setData(activity.mInfoList);
                     activity.mNum.setText(activity.getString(R.string.song_count,activity.mInfoList.size()));
                     break;
                 case START:

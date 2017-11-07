@@ -608,7 +608,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      * 更新顶部歌曲信息
      * @param song
      */
-    public void UpdateTopStatus(Song song) {
+    public void updateTopStatus(Song song) {
         if(song == null)
             return;
         String title = song.getTitle() == null ? "" : song.getTitle();
@@ -631,7 +631,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      * 更新播放、暂停按钮
      * @param isPlay
      */
-    public void UpdatePlayButton(final boolean isPlay) {
+    public void updatePlayButton(final boolean isPlay) {
         mPlayPauseView.updateState(isPlay,true);
     }
 
@@ -639,7 +639,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      * 初始化顶部信息
      */
     private void setUpTop() {
-        UpdateTopStatus(mInfo);
+        updateTopStatus(mInfo);
     }
 
     /**
@@ -761,7 +761,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                                                     if (mInfo != null && ignoreLrcID != null) {
                                                         ignoreLrcID.add(mInfo.getId() + "");
                                                         SPUtil.putStringSet(mContext, "Setting", "IgnoreLrcID", ignoreLrcID);
-                                                        lrcFragment.UpdateLrc(mInfo);
+                                                        lrcFragment.updateLrc(mInfo);
                                                     }
                                                 })
                                                 .show();
@@ -850,9 +850,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         //当操作不为播放或者暂停且正在运行时，更新所有控件
         if((Global.getOperation() != Constants.TOGGLE || mFistStart)) {
             //更新顶部信息
-            UpdateTopStatus(mInfo);
+            updateTopStatus(mInfo);
             //更新歌词
-            ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(mInfo);
+            ((LrcFragment) mAdapter.getItem(2)).updateLrc(mInfo);
             //更新进度条
             int temp = MusicService.getProgress();
             mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
@@ -871,7 +871,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             }.start();
         }
         //更新按钮状态
-        UpdatePlayButton(isplay);
+        updatePlayButton(isplay);
     }
 
     //更新进度条线程
@@ -1005,7 +1005,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 }
             }
         }
-        ((LrcFragment) mAdapter.getItem(2)).UpdateLrc(file.getAbsolutePath());
+        ((LrcFragment) mAdapter.getItem(2)).updateLrc(file.getAbsolutePath());
     }
 
     @Override

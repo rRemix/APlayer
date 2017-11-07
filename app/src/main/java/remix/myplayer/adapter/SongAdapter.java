@@ -90,6 +90,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
                 new SongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_song_recycle,parent,false));
     }
 
+
     @Override
     protected void convert(BaseViewHolder baseHolder, final Song song, int position) {
         if(position == 0){
@@ -107,12 +108,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
             //显示当前排序方式
             headerHolder.mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? R.string.sort_as_add_time : R.string.sort_as_letter);
             headerHolder.mAscDesc.setText(!ASCDESC.equals(" asc") ? R.string.sort_as_desc : R.string.sort_as_asc);
-            View.OnClickListener listener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    OnClick(headerHolder,v);
-                }
-            };
+            View.OnClickListener listener = v -> OnClick(headerHolder,v);
             headerHolder.mSort.setOnClickListener(listener);
             headerHolder.mAscDesc.setOnClickListener(listener);
             headerHolder.mShuffle.setOnClickListener(listener);
@@ -121,9 +117,6 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 
         if(!(baseHolder instanceof SongViewHolder))
             return;
-        if(mDatas == null || position - 1 > mDatas.size()){
-            return;
-        }
         final SongViewHolder holder = (SongViewHolder) baseHolder;
 
 //        if(SPUtil.getValue(mContext,"Setting","ShowHighLight",true)){
@@ -148,10 +141,11 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 //                }
 //            }
 //        }
-
         //是否为无损
-        String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
-        holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
+        if(!TextUtils.isEmpty(song.getDisplayname())){
+            String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
+            holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
+        }
 
         //设置歌曲名
         String name = CommonUtil.processInfo(song.getTitle(),CommonUtil.SONGTYPE);

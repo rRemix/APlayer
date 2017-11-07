@@ -13,7 +13,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.soundcloud.android.crop.Crop;
 import com.umeng.analytics.MobclickAgent;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import remix.myplayer.R;
 import remix.myplayer.theme.ThemeStore;
@@ -42,9 +42,8 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
     }
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        ArrayList<Integer> idList = new ArrayList<>();
+        List<Integer> idList = MediaStoreUtil.getSongIdList(mId,mType);
         //根据不同参数获得歌曲id列表
-        idList = MediaStoreUtil.getSongIdList(mId,mType);
         switch (item.getItemId()) {
             //播放
             case R.id.menu_play:
@@ -74,18 +73,15 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                         .buttonRippleColor(ThemeStore.getRippleColor())
                         .positiveText(R.string.confirm)
                         .negativeText(R.string.cancel)
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                MobclickAgent.onEvent(mContext,"Delete");
-                                if(mId == Global.MyLoveID && mType == Constants.PLAYLIST){
-                                    ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delelte));
-                                }
-                                if(mType != Constants.PLAYLIST){
-                                    ToastUtil.show(mContext,MediaStoreUtil.delete(mId , mType) > 0 ? R.string.delete_success : R.string.delete_error);
-                                } else {
-                                    ToastUtil.show(mContext,PlayListUtil.deletePlayList(mId) ? R.string.delete_success : R.string.delete_error);
-                                }
+                        .onPositive((dialog, which) -> {
+                            MobclickAgent.onEvent(mContext,"Delete");
+                            if(mId == Global.MyLoveID && mType == Constants.PLAYLIST){
+                                ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delelte));
+                            }
+                            if(mType != Constants.PLAYLIST){
+                                ToastUtil.show(mContext,MediaStoreUtil.delete(mId , mType) > 0 ? R.string.delete_success : R.string.delete_error);
+                            } else {
+                                ToastUtil.show(mContext,PlayListUtil.deletePlayList(mId) ? R.string.delete_success : R.string.delete_error);
                             }
                         })
                         .onNegative(new MaterialDialog.SingleButtonCallback() {
