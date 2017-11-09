@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:id="@+id/audio_holder_container"
+    android:background="?attr/background_color_main">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="8">
+            <!-- 顶部自定义actionbar、-->
+            <include layout="@layout/layout_player_topbar"/>
+
+            <RelativeLayout
+                android:layout_below="@id/top_actionbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <!--三个导航图标-->
+                <RelativeLayout
+                    android:id="@+id/holder_indicator"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:paddingTop="@dimen/d2_size">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:id="@+id/guide_02"
+                        android:layout_marginLeft="@dimen/d4_size"
+                        android:layout_marginRight="@dimen/d4_size"/>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toLeftOf="@id/guide_02"
+                        android:layout_alignTop="@id/guide_02"
+                        android:id="@+id/guide_01"
+                        android:layout_centerVertical="true"/>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/guide_02"
+                        android:layout_alignTop="@id/guide_02"
+                        android:id="@+id/guide_03"
+                        android:layout_centerVertical="true"/>
+                </RelativeLayout>
+                <!-- 中间三个页面 -->
+                <remix.myplayer.ui.customview.AudioViewPager
+                    android:id="@+id/holder_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_above="@id/holder_indicator"/>
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            <!--已播放时间-->
+            <TextView
+                android:id="@+id/text_hasplay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textSize="@dimen/s12_size"
+                android:text="00:00"
+                android:layout_marginLeft="@dimen/d20_size"
+                android:layout_alignParentLeft="true"
+                android:textColor="@color/gray_cecece"/>
+            <!--剩余播放时间-->
+            <TextView
+                android:id="@+id/text_remain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textSize="@dimen/s12_size"
+                android:text="00:00"
+                android:layout_marginRight="@dimen/d20_size"
+                android:layout_alignParentRight="true"
+                android:textColor="@color/gray_cecece"/>
+            <SeekBar
+                android:id="@+id/seekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/d2_size"
+                android:maxHeight="@dimen/d2_size"
+                android:progressDrawable="@drawable/bg_progress"
+                android:paddingStart="@dimen/player_seekbar_padding"
+                android:paddingEnd="@dimen/player_seekbar_padding"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/text_remain"
+                android:layout_toRightOf="@id/text_hasplay"
+                android:layout_marginStart="@dimen/player_seekbar_margin"
+                android:layout_marginEnd="@dimen/player_seekbar_margin"/>
+        </RelativeLayout>
+
+        <!-- 三个播放控制按钮和两个控制播放模式 -->
+        <include layout="@layout/layout_player_control"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.5">
+            <TextView
+                android:layout_centerInParent="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/d36_size"
+                android:layout_marginRight="@dimen/d36_size"
+                android:paddingTop="@dimen/d12_size"
+                android:paddingBottom="@dimen/d12_size"
+                android:paddingStart="@dimen/d8_size"
+                android:paddingEnd="@dimen/d8_size"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textSize="@dimen/s14_size"
+                android:textColor="@color/gray_a8a8a8"
+                android:id="@+id/next_song"/>
+        </RelativeLayout>
+    </LinearLayout>
+</FrameLayout>

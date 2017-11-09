@@ -1,41 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:visibility="invisible"
+    android:id="@+id/cover_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <FrameLayout
-        android:visibility="invisible"
-        android:id="@+id/cover_container"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="@dimen/d25_size"
+    android:layout_marginRight="@dimen/d25_size"
+    android:paddingTop="@dimen/d6_size"
+    android:layout_centerHorizontal="true">
+    <ImageView
+        android:id="@+id/cover_shadow"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:background="@drawable/bg_cover_shadow" />
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/cover_image"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginLeft="@dimen/d24_size"
-        android:layout_marginRight="@dimen/d24_size"
-        android:layout_marginTop="@dimen/d6_size"
-        android:layout_centerHorizontal="true">
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/cover_shadow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|center_horizontal"
-            android:visibility="gone"
-            android:layout_marginTop="@dimen/d8_size"
-            fresco:actualImageScaleType="centerCrop"
-            fresco:fadeDuration="0"
-            fresco:viewAspectRatio="1"/>
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/cover_image"
-            android:visibility="invisible"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_margin="@dimen/d8_size"
-            fresco:failureImage="@drawable/album_empty_bg_day"
-            fresco:failureImageScaleType="centerCrop"
-            fresco:actualImageScaleType="centerCrop"
-            fresco:fadeDuration="0"
-            fresco:roundedCornerRadius="@dimen/d2_size"
-            fresco:viewAspectRatio="1"/>
-    </FrameLayout>
-</RelativeLayout>
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="@dimen/d30_size"
+        fresco:failureImage="@drawable/album_empty_bg_day"
+        fresco:failureImageScaleType="centerCrop"
+        fresco:actualImageScaleType="centerCrop"
+        fresco:fadeDuration="0"
+        fresco:viewAspectRatio="1"
+        fresco:roundingBorderWidth="@dimen/d2_size"
+        fresco:roundingBorderColor="@color/cover_border_color"/>
+</FrameLayout>

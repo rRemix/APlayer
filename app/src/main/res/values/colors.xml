@@ -134,6 +134,8 @@
     <color name="night_enable_track_color">@color/white</color>
     <color name="night_enable_text_color">@color/white</color>
 
+    <color name="cover_border_color">#f1f1f1</color>
+
     <color name="float_text_color">#d4d4d4</color>
     <color name="float_control_color">#9f000000</color>
     <color name="float_divider_color">#d4d4d4</color>
@@ -170,4 +172,5 @@
 
     <color name="md_white_primary">#fefefe</color>
     <color name="md_white_primary_dark">#e5e5e5</color>
+
 </resources>

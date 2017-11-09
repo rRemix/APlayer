@@ -271,7 +271,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mFromActivity =  getIntent().getBooleanExtra("FromActivity",false);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_player);
+        setContentView(R.layout.activity_player_new);
         ButterKnife.bind(this);
 
         mHandler = new UIHandler(getMainLooper(),this);

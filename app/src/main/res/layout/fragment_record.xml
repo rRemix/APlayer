@@ -1,38 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/d6_size">
 
     <FrameLayout
-        android:layout_width="@dimen/d264_size"
-        android:layout_height="@dimen/d264_size"
-        android:layout_marginTop="@dimen/d28_size"
-        android:background="@drawable/note_bg"
-        android:layout_centerHorizontal="true">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/d25_size"
+        android:layout_marginRight="@dimen/d25_size"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/record_container"
+        android:background="@drawable/note_bg">
         <remix.myplayer.ui.customview.PagerEditText
             android:layout_width="match_parent"
-            android:layout_height="@dimen/d200_size"
+            android:layout_height="wrap_content"
             android:id="@+id/edit_record"
             android:maxLength="200"
+            android:maxHeight="@dimen/d240_size"
             android:gravity="left"
-            android:textColor="#50452f"
+            android:textColor="#e2d6c1"
             android:textSize="@dimen/s14_size"
             android:hint="@string/write_something"
-            android:padding="@dimen/d15_size"
+            android:padding="@dimen/d10_size"
             android:textCursorDrawable="@null"
             android:background="@null"/>
 
         <remix.myplayer.ui.customview.PagerButton
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/d32_size"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
-            android:layout_marginRight="@dimen/d16_size"
-            android:layout_marginBottom="@dimen/d8_size"
+            android:layout_marginRight="@dimen/d12_size"
             android:background="@color/transparent"
             android:id="@+id/sharebtn"
             android:text="@string/record_share"
-            android:textColor="@color/gray_e6dccb"
-            android:textSize="@dimen/s16_size"/>
+            android:textColor="#b8a179"
+            android:textSize="@dimen/s14_size"/>
     </FrameLayout>
 
 

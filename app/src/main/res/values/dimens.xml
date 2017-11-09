@@ -34,6 +34,7 @@
     <dimen name="d22_size">22dp</dimen>
     <dimen name="d23_size">23dp</dimen>
     <dimen name="d24_size">24dp</dimen>
+    <dimen name="d25_size">25dp</dimen>
     <dimen name="d28_size">28dp</dimen>
     <dimen name="d30_size">30dp</dimen>
     <dimen name="d32_size">32dp</dimen>
@@ -112,6 +113,7 @@
     <dimen name="float_container_margin_top">80dp</dimen>
 
     <dimen name="player_button_size">50dp</dimen>
-    <dimen name="player_seekbar_padding">4dp</dimen>
+    <dimen name="player_seekbar_padding">6dp</dimen>
     <dimen name="player_seekbar_margin">8dp</dimen>
+    <dimen name="cover_margin">11dp</dimen>
 </resources>

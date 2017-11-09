@@ -8,6 +8,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 
 import butterknife.BindView;
@@ -15,6 +16,7 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.RecordShareActivity;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -27,7 +29,8 @@ import remix.myplayer.util.ToastUtil;
 public class RecordFragment extends BaseFragment{
     @BindView(R.id.edit_record)
     EditText mEdit;
-    private static String mRecord = "";
+    @BindView(R.id.record_container)
+    View mRecordContainer;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,12 +41,9 @@ public class RecordFragment extends BaseFragment{
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_record,null);
+        View rootView = inflater.inflate(R.layout.fragment_record,container,false);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-//        if(mRecord != null && !mRecord.equals("")){
-//            mEdit.setText(mRecord);
-//        }
         mEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -69,6 +69,21 @@ public class RecordFragment extends BaseFragment{
             arg.putSerializable("Song", MusicService.getCurrentMP3());
             intent.putExtras(arg);
             startActivity(intent);
+        });
+
+        mRecordContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                mRecordContainer.getViewTreeObserver().removeOnPreDrawListener(this);
+
+                //左右各11dp的间距
+                int coverSize = Math.min(mRecordContainer.getWidth(),mRecordContainer.getHeight()) - DensityUtil.dip2px(mContext,11) * 2;
+                ViewGroup.LayoutParams lp = mRecordContainer.getLayoutParams();
+                lp.width = lp.height = coverSize;
+                mRecordContainer.setLayoutParams(lp);
+
+                return true;
+            }
         });
 
         return rootView;

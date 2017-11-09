@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
@@ -20,6 +22,7 @@ import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 
 /**
@@ -34,7 +37,7 @@ public class CoverFragment extends BaseFragment {
     @BindView(R.id.cover_image)
     SimpleDraweeView mImage;
     @BindView(R.id.cover_shadow)
-    SimpleDraweeView mShadow;
+    ImageView mShadow;
     @BindView(R.id.cover_container)
     View mCoverContainer;
     private Song mInfo;
@@ -62,7 +65,13 @@ public class CoverFragment extends BaseFragment {
                 mImage.getViewTreeObserver().removeOnPreDrawListener(this);
                 if(mInflateFinishListener != null)
                     mInflateFinishListener.onViewInflateFinish(mImage);
-                mShadow.setImageURI(Uri.parse("res://remix.myplayer/" + R.drawable.player_cover_shadow));
+
+                //左右各11dp的间距
+                int coverSize = Math.min(mCoverContainer.getWidth(),mCoverContainer.getHeight()) - DensityUtil.dip2px(mContext,11) * 2;
+                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mImage.getLayoutParams();
+                lp.width = lp.height = coverSize;
+                mImage.setLayoutParams(lp);
+
                 return true;
             }
         });
@@ -111,6 +120,9 @@ public class CoverFragment extends BaseFragment {
                         return;
                     mCoverContainer.setTranslationX((float) startValue);
                     mImage.setImageURI(mUri);
+
+                    float endVal = 1;
+                    float thresHold = endVal * 0.9f;
                     final Spring inAnim = SpringSystem.create().createSpring();
                     inAnim.addListener(new SimpleSpringListener(){
                         @Override
@@ -119,10 +131,27 @@ public class CoverFragment extends BaseFragment {
                                 return;
                             mCoverContainer.setScaleX((float) spring.getCurrentValue());
                             mCoverContainer.setScaleY((float) spring.getCurrentValue());
+
+                            //动画即将结束时重新显示阴影
+                            if(endVal - spring.getCurrentValue() < thresHold && mShadow.getVisibility() != View.VISIBLE){
+                                mShadow.setVisibility(View.VISIBLE);
+                            }
                         }
+
+                        @Override
+                        public void onSpringActivate(Spring spring) {
+                            super.onSpringActivate(spring);
+                            mShadow.setVisibility(View.INVISIBLE);
+                        }
+
+//                        @Override
+//                        public void onSpringAtRest(Spring spring) {
+//                            super.onSpringAtRest(spring);
+//                            mShadow.setVisibility(View.VISIBLE);
+//                        }
                     });
                     inAnim.setCurrentValue(0.85);
-                    inAnim.setEndValue(1);
+                    inAnim.setEndValue(endVal);
                 }
             });
             outAnim.setOvershootClampingEnabled(true);
@@ -130,7 +159,7 @@ public class CoverFragment extends BaseFragment {
             outAnim.setEndValue(endValue);
         } else {
             mImage.setImageURI(mUri);
-//            mShadow.setVisibility(ThemeStore.isDay() ? View.VISIBLE : View.INVISIBLE);
+            mShadow.setVisibility(View.VISIBLE);
         }
     }
 
