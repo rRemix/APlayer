@@ -11,7 +11,6 @@ import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
 import android.util.Property;
-import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.view.animation.DecelerateInterpolator;
@@ -65,9 +64,9 @@ public class PlayPauseView extends FrameLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        float pixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics());
-        int size= Math.round(pixels);
-        setMeasuredDimension(size,size);
+//        float pixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics());
+//        int size= Math.round(pixels);
+//        setMeasuredDimension(size,size);
     }
 
     @Override

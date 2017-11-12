@@ -20,11 +20,14 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Set;
 
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Function3;
 import io.reactivex.functions.Predicate;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.LrcRequest;
@@ -104,6 +107,8 @@ public class SearchLRC {
 
 
     public Observable<List<LrcRow>> getObservable(String lrcPath){
+        boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting","OnlineLrc",false);
+
         Observable<BufferedReader> onlone = Observable.create((ObservableOnSubscribe<BufferedReader>) e -> {
             final BufferedReader br = new BufferedReader(
                     new InputStreamReader(new ByteArrayInputStream(Base64.decode(getOnlineLrcContent(), Base64.DEFAULT))));
@@ -112,13 +117,53 @@ public class SearchLRC {
         });
         Observable<BufferedReader> local = Observable.create(new ObservableOnSubscribe<BufferedReader>() {
             @Override
-            public void subscribe(ObservableEmitter<BufferedReader> e) {
-                e.onNext(new BufferedReader(null));
+            public void subscribe(ObservableEmitter<BufferedReader> e) throws Exception {
+                String localLrcPath = getlocalLrcPath();
+                e.onNext(new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath))));
             }
         });
 
-        boolean online = false;
-//        Single<BufferedReader> concat = online ? Observable.concat(onlone,local).first(null) : Observable.concat(onlone,local).lastElement();
+        Observable<BufferedReader> priority = onlineFirst ? onlone : local;
+        Observable<BufferedReader> alternative = onlineFirst ? local : onlone;
+        Observable.combineLatest(priority, alternative, priority, new Function3<BufferedReader, BufferedReader, BufferedReader, String>() {
+            @Override
+            public String apply(BufferedReader bufferedReader, BufferedReader bufferedReader2, BufferedReader bufferedReader3) throws Exception {
+                return null;
+            }
+        });
+
+        Observable<List<LrcRow>> onlineLrc = Observable.create(new ObservableOnSubscribe<List<LrcRow>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<LrcRow>> e) throws Exception {
+                String onlineLrcContent = getOnlineLrcContent();
+                if(!TextUtils.isEmpty(onlineLrcContent)){
+                    final BufferedReader br = new BufferedReader(
+                            new InputStreamReader(new ByteArrayInputStream(Base64.decode(onlineLrcContent, Base64.DEFAULT))));
+                    e.onNext(mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName));
+                }
+            }
+        });
+
+
+        Observable<List<LrcRow>> localLrc = Observable.create(new ObservableOnSubscribe<List<LrcRow>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<LrcRow>> e) throws Exception {
+                String localLrcPath = getlocalLrcPath();
+                final BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath)));
+                e.onNext(mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName));
+            }
+        });
+
+        onlineLrc.switchIfEmpty(onlineLrc);
+
+
+        Maybe<BufferedReader> concat = onlineFirst ? Observable.concat(onlone,local).firstElement() : Observable.concat(onlone,local).lastElement();
+        concat.subscribe(new Consumer<BufferedReader>() {
+            @Override
+            public void accept(BufferedReader bufferedReader) throws Exception {
+
+            }
+        });
 
         Observable.just(lrcPath)
                 .filter(new Predicate<String>() {

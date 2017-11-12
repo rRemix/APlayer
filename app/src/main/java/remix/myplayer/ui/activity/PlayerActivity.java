@@ -3,7 +3,6 @@ package remix.myplayer.ui.activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -11,8 +10,8 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
-import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -271,7 +270,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mFromActivity =  getIntent().getBooleanExtra("FromActivity",false);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_player_new);
+        setContentView(R.layout.activity_player);
         ButterKnife.bind(this);
 
         mHandler = new UIHandler(getMainLooper(),this);
@@ -524,10 +523,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      */
     private void setUpGuide() {
         mDotList = new ArrayList<>();
-        mDotList.add( findView(R.id.guide_01));
-        mDotList.add( findView(R.id.guide_02));
-        mDotList.add( findView(R.id.guide_03));
-        int width = DensityUtil.dip2px(this,5);
+        mDotList.add(findView(R.id.guide_01));
+        mDotList.add(findView(R.id.guide_02));
+        mDotList.add(findView(R.id.guide_03));
+        int width = DensityUtil.dip2px(this,8);
         int height = DensityUtil.dip2px(this,2);
         mHighLightIndicator = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getAccentColor(),width,height);
         mNormalIndicator = Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.adjustAlpha(ThemeStore.getAccentColor(),0.3f),width,height);
@@ -902,20 +901,22 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         int accentColor = ThemeStore.getAccentColor();
         int tintColor = ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b);
 
-        LayerDrawable layerDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
+        LayerDrawable progressDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
         //修改progress颜色
-        ((GradientDrawable)layerDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_efeeed : R.color.gray_343438));
-        (layerDrawable.getDrawable(1)).setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
-        mSeekBar.setProgressDrawable(layerDrawable);
+        ((GradientDrawable)progressDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_efeeed : R.color.gray_343438));
+        (progressDrawable.getDrawable(1)).setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+        mSeekBar.setProgressDrawable(progressDrawable);
 
         //修改thumb
-        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
-//        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,Color.rgb(0xff,0x1b,0x1b),0,1,Color.WHITE,DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10),1));
-        Drawable seekbarBackground = mSeekBar.getBackground();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && seekbarBackground instanceof RippleDrawable) {
-            ((RippleDrawable)seekbarBackground).setColor(ColorStateList.valueOf( ColorUtil.adjustAlpha(ThemeStore.getAccentColor(),0.2f)));
-//            ((RippleDrawable)seekbarBackground).setColor(ColorStateList.valueOf(Color.rgb(0xff,0xe2,0xe2)));
-        }
+        int inset = DensityUtil.dip2px(mContext,6);
+        mSeekBar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),accentColor),
+                inset,inset,inset,inset));
+
+//        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
+//        Drawable seekbarBackground = mSeekBar.getBackground();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && seekbarBackground instanceof RippleDrawable) {
+//            ((RippleDrawable)seekbarBackground).setColor(ColorStateList.valueOf( ColorUtil.adjustAlpha(ThemeStore.getAccentColor(),0.2f)));
+//        }
 
         //修改控制按钮颜色
         Theme.TintDrawable(mPlayBarNext,R.drawable.play_btn_next,accentColor);

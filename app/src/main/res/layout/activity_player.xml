@@ -16,7 +16,8 @@
             android:layout_height="0dp"
             android:layout_weight="8">
             <!-- 顶部自定义actionbar、-->
-            <include layout="@layout/layout_player_topbar"/>
+            <include layout="@layout/layout_player_topbar"
+                android:id="@+id/top_actionbar"/>
 
             <RelativeLayout
                 android:layout_below="@id/top_actionbar"
@@ -111,7 +112,7 @@
             android:layout_height="0dp"
             android:layout_weight="1.5">
             <TextView
-                android:layout_centerInParent="true"
+                android:layout_marginTop="@dimen/d8_size"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/d36_size"

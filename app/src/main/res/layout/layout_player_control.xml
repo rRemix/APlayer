@@ -36,12 +36,12 @@
         android:gravity="center">
         <FrameLayout
             android:id="@+id/playbar_play_container"
-            android:layout_width="@dimen/d50_size"
-            android:layout_height="@dimen/d50_size">
+            android:layout_width="@dimen/d56_size"
+            android:layout_height="@dimen/d56_size">
             <remix.myplayer.ui.customview.playpause.PlayPauseView
                 android:id="@+id/playbar_play_pause"
-                android:layout_width="@dimen/d50_size"
-                android:layout_height="@dimen/d50_size"
+                android:layout_width="@dimen/player_button_size"
+                android:layout_height="@dimen/player_button_size"
                 android:layout_gravity="center"
                 android:visibility="visible"/>
         </FrameLayout>
