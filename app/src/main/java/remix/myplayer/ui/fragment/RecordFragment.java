@@ -16,7 +16,6 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.RecordShareActivity;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -76,10 +75,13 @@ public class RecordFragment extends BaseFragment{
             public boolean onPreDraw() {
                 mRecordContainer.getViewTreeObserver().removeOnPreDrawListener(this);
 
-                //左右各11dp的间距
-                int coverSize = Math.min(mRecordContainer.getWidth(),mRecordContainer.getHeight()) - DensityUtil.dip2px(mContext,11) * 2;
+//                //左右各11dp的间距
+//                int coverSize = Math.min(mRecordContainer.getWidth(),mRecordContainer.getHeight()) - DensityUtil.dip2px(mContext,11) * 2;
+//                ViewGroup.LayoutParams lp = mRecordContainer.getLayoutParams();
+//                lp.width = lp.height = coverSize;
+//                mRecordContainer.setLayoutParams(lp);
                 ViewGroup.LayoutParams lp = mRecordContainer.getLayoutParams();
-                lp.width = lp.height = coverSize;
+                lp.width = lp.height;
                 mRecordContainer.setLayoutParams(lp);
 
                 return true;
