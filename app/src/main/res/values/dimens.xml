@@ -115,5 +115,7 @@
     <dimen name="player_button_size">56dp</dimen>
     <dimen name="player_seekbar_padding">6dp</dimen>
     <dimen name="player_seekbar_margin">8dp</dimen>
-    <dimen name="cover_margin">11dp</dimen>
+    <dimen name="cover_margin">34dp</dimen>
+
+
 </resources>

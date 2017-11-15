@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -59,19 +58,32 @@ public class CoverFragment extends BaseFragment {
         mUnBinder = ButterKnife.bind(this,rootView);
 
         mImage.getHierarchy().setFailureImage(ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night);
-        mImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+        mCoverContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
-                mImage.getViewTreeObserver().removeOnPreDrawListener(this);
-                if(mInflateFinishListener != null)
-                    mInflateFinishListener.onViewInflateFinish(mImage);
+                mCoverContainer.getViewTreeObserver().removeOnPreDrawListener(this);
 
-                //左右各11dp的间距
-                int coverSize = Math.min(mCoverContainer.getWidth(),mCoverContainer.getHeight()) - DensityUtil.dip2px(mContext,11) * 2;
-                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mImage.getLayoutParams();
-                lp.width = lp.height = coverSize;
-                mImage.setLayoutParams(lp);
+                int containerWidth = mCoverContainer.getWidth();
+                int containerHeight = mCoverContainer.getHeight();
 
+                int coverSize = Math.min(mCoverContainer.getWidth(),mCoverContainer.getHeight()) - DensityUtil.dip2px(mContext,36) * 2;
+//                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mImage.getLayoutParams();
+//                lp.width = lp.height = coverSize;
+//                mImage.setLayoutParams(lp);
+
+                mImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                    @Override
+                    public boolean onPreDraw() {
+                        mImage.getViewTreeObserver().removeOnPreDrawListener(this);
+
+                        int imageWidth = mImage.getWidth();
+                        int imageHeigh = mImage.getHeight();
+
+                        if(mInflateFinishListener != null)
+                            mInflateFinishListener.onViewInflateFinish(mImage);
+                        return true;
+                    }
+                });
                 return true;
             }
         });
