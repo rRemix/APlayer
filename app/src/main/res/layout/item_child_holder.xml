@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:scaleType="center"
-        android:src="@drawable/list_icn_more"
+        android:src="@drawable/icon_player_more"
         android:background="@color/transparent"/>
 
     <remix.myplayer.ui.customview.ColumnView

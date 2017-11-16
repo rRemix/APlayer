@@ -52,7 +52,7 @@
         android:layout_width="@dimen/d45_size"
         android:layout_height="@dimen/d45_size"
         android:layout_centerVertical="true"
-        android:src="@drawable/list_icn_more"
+        android:src="@drawable/icon_player_more"
         android:background="@color/transparent"/>
 
     <View

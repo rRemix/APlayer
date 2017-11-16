@@ -2,7 +2,6 @@ package remix.myplayer.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.umeng.analytics.MobclickAgent;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,10 +24,11 @@ import remix.myplayer.adapter.ChildHolderAdapter;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.misc.handler.MsgHandler;
+import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.util.ColorUtil;
@@ -66,13 +65,13 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     private String Title;
     private BottomActionBarFragment mBottombar;
 
-    private static WeakReference<ChildHolderActivity> mRef;
     private MaterialDialog mMDDialog;
 
     //更新
     private static final int START = 0;
     private static final int END = 1;
-    private RefreshHandler mRefreshHandler;
+    private MsgHandler mRefreshHandler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +79,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         setContentView(R.layout.activity_child_holder);
         ButterKnife.bind(this);
 
-        mRef = new WeakReference<>(this);
-        mRefreshHandler = new RefreshHandler();
+        mRefreshHandler = new MsgHandler(this,ChildHolderActivity.class);
         //参数id，类型，标题
         mId = getIntent().getIntExtra("Id", -1);
         mType = getIntent().getIntExtra("Type", -1);
@@ -159,7 +157,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         mBottombar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
             return;
-        mBottombar.UpdateBottomStatus(MusicService.getCurrentMP3(), MusicService.isPlay());
+        mBottombar.updateBottomStatus(MusicService.getCurrentMP3(), MusicService.isPlay());
 
     }
 
@@ -276,7 +274,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     @Override
     public void UpdateUI(Song Song, boolean isplay) {
         //底部状态兰
-        mBottombar.UpdateBottomStatus(Song, isplay);
+        mBottombar.updateBottomStatus(Song, isplay);
         //更新高亮歌曲
 //        mAdapter.onUpdateHightLight();
     }
@@ -315,39 +313,32 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
     }
 
-    public static ChildHolderActivity getInstance(){
-        return mRef != null ? mRef.get() : null;
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mRefreshHandler.removeCallbacksAndMessages(null);
     }
 
-    private static class RefreshHandler extends Handler{
-        @Override
-        public void handleMessage(Message msg) {
-            final ChildHolderActivity activity = mRef.get();
-            if(activity == null)
-                return;
-            final MultiChoice multiChoice = activity.mMultiChoice;
-            final MaterialDialog dialog = activity.mMDDialog;
-            switch (msg.what){
-                case Constants.CLEAR_MULTI:
-                    multiChoice.clearSelectedViews();
-                    break;
-                case Constants.UPDATE_ADAPTER:
-//                    if(activity.mInfoList == null)
-//                        return;
-                    activity.mAdapter.setData(activity.mInfoList);
-                    activity.mNum.setText(activity.getString(R.string.song_count,activity.mInfoList.size()));
-                    break;
-                case START:
-                    if(dialog != null && !dialog.isShowing()){
-                        dialog.show();
-                    }
-                    break;
-                case END:
-                    if(dialog != null && dialog.isShowing()){
-                        dialog.dismiss();
-                    }
-                    break;
-            }
+    @OnHandleMessage
+    public void handleInternal(Message msg){
+        switch (msg.what){
+            case Constants.CLEAR_MULTI:
+                mMultiChoice.clearSelectedViews();
+                break;
+            case Constants.UPDATE_ADAPTER:
+                mAdapter.setData(mInfoList);
+                mNum.setText(getString(R.string.song_count,mInfoList.size()));
+                break;
+            case START:
+                if(mMDDialog != null && !mMDDialog.isShowing()){
+                    mMDDialog.show();
+                }
+                break;
+            case END:
+                if(mMDDialog != null && mMDDialog.isShowing()){
+                    mMDDialog.dismiss();
+                }
+                break;
         }
     }
 

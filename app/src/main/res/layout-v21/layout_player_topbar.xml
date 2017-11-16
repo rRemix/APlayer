@@ -9,7 +9,7 @@
         android:layout_marginLeft="@dimen/d16_size"
         android:layout_centerVertical="true"
         android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/play_btn_back"
+        android:src="@drawable/icon_player_back"
         android:id="@+id/top_hide"
         android:layout_alignParentLeft="true"/>
     <ImageButton
@@ -18,7 +18,7 @@
         android:layout_marginRight="@dimen/d16_size"
         android:layout_centerVertical="true"
         android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/list_icn_more"
+        android:src="@drawable/icon_player_more"
         android:id="@+id/top_more"
         android:layout_alignParentRight="true"/>
     <LinearLayout

@@ -40,7 +40,7 @@
             android:layout_width="@dimen/d48_size"
             android:layout_height="match_parent"
             android:id="@+id/item_button"
-            android:src="@drawable/list_icn_more"
+            android:src="@drawable/icon_player_more"
             android:background="@color/transparent"
             android:layout_alignParentRight="true"
             android:layout_below="@id/divider"/>

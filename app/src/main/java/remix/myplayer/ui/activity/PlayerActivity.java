@@ -15,8 +15,6 @@ import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
@@ -45,7 +43,6 @@ import com.facebook.rebound.SpringSystem;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Set;
@@ -58,6 +55,8 @@ import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.lyric.LrcView;
+import remix.myplayer.misc.handler.MsgHandler;
+import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -197,7 +196,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private float mEventY2;
 
     /** 更新Handler */
-    private UIHandler mHandler;
+    private MsgHandler mHandler;
 
     /** 更新封面与背景的Handler */
     private Uri mUri;
@@ -273,7 +272,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         setContentView(R.layout.activity_player);
         ButterKnife.bind(this);
 
-        mHandler = new UIHandler(getMainLooper(),this);
+        mHandler = new MsgHandler(this,PlayerActivity.class);
 
         //获是否正在播放和正在播放的歌曲
         mInfo = MusicService.getCurrentMP3();
@@ -927,8 +926,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mTopTitle.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.black_333333 : R.color.white_e5e5e5));
 
         //修改顶部按钮颜色
-        Theme.TintDrawable(mTopHide,R.drawable.play_btn_back,tintColor);
-        Theme.TintDrawable(mTopMore,R.drawable.list_icn_more,tintColor);
+        Theme.TintDrawable(mTopHide,R.drawable.icon_player_back,tintColor);
+        Theme.TintDrawable(mTopMore,R.drawable.icon_player_more,tintColor);
         //播放模式与播放队列
         int playmodel = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
         Theme.TintDrawable(mPlayModel,playmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
@@ -1039,31 +1038,21 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
     }
 
-    private static class UIHandler extends Handler{
-        private final WeakReference<PlayerActivity> mRef;
-        UIHandler(Looper looper, PlayerActivity playerActivity) {
-            super(looper);
-            mRef = new WeakReference<>(playerActivity);
+    @OnHandleMessage
+    public void handleInternal(Message msg){
+        if(msg.what == UPDATE_COVER){
+            updateCoverByHandler();
         }
-
-        @Override
-        public void handleMessage(Message msg) {
-            if(mRef.get() == null)
-                return;
-            PlayerActivity activity = mRef.get();
-            if(msg.what == UPDATE_COVER){
-                activity.updateCoverByHandler();
-            }
-            if(msg.what == UPDATE_BG){
-               activity.updateBgByHandler();
-            }
-            if(msg.what == UPDATE_TIME_ONLY && !activity.mIsDragSeekBarFromUser){
-                activity.updateProgressByHandler();
-            }
-            if(msg.what == UPDATE_TIME_ALL && !activity.mIsDragSeekBarFromUser){
-                activity.updateProgressByHandler();
-                activity.updateSeekbarByHandler();
-            }
+        if(msg.what == UPDATE_BG){
+           updateBgByHandler();
+        }
+        if(msg.what == UPDATE_TIME_ONLY && !mIsDragSeekBarFromUser){
+            updateProgressByHandler();
+        }
+        if(msg.what == UPDATE_TIME_ALL && !mIsDragSeekBarFromUser){
+            updateProgressByHandler();
+            updateSeekbarByHandler();
         }
     }
+
 }

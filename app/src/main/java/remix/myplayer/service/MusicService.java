@@ -1221,6 +1221,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     LockScreenListener.getInstance(mContext).beginListen();
                 }
                 initLastSong();
+
                 mLoadFinished = true;
             }
         }.start();

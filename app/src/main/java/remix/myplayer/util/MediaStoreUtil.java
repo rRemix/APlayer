@@ -205,7 +205,7 @@ public class MediaStoreUtil {
         try{
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    null,
+                    new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA},
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
                     null,
                     SPUtil.getValue(mContext,"Setting","Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER)
@@ -238,7 +238,7 @@ public class MediaStoreUtil {
     public static void SortWithFolder(int id,String fullpath) {
         String dirPath = fullpath.substring(0, fullpath.lastIndexOf("/"));
         if (!Global.FolderMap.containsKey(dirPath)) {
-            ArrayList<Integer> list = new ArrayList<>();
+            List<Integer> list = new ArrayList<>();
             list.add(id);
             Global.FolderMap.put(dirPath, list);
         } else {

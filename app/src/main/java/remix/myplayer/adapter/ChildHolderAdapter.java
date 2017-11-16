@@ -157,7 +157,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
             if(holder.mButton != null) {
                 //设置按钮着色
                 int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
-                Theme.TintDrawable(holder.mButton,R.drawable.list_icn_more,tintColor);
+                Theme.TintDrawable(holder.mButton,R.drawable.icon_player_more,tintColor);
 
                 //item点击效果
                 holder.mButton.setBackground(Theme.getPressDrawable(

@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -44,6 +43,8 @@ import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.misc.handler.MsgHandler;
+import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -95,54 +96,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     //是否正在运行
     private static boolean mIsRunning = false;
 
+    private MsgHandler mRefreshHandler;
     //设置界面
     private final int SETTING = 1;
-    private Handler mRefreshHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            if(msg.what == -100){
-                ToastUtil.show(mContext,msg.obj.toString());
-            }
-            if(msg.what == Constants.RECREATE_ACTIVITY) {
-                recreate();
-            }
-            else if(msg.what == Constants.CLEAR_MULTI){
-                mMultiChoice.clearSelectedViews();
-            }
-            else if (msg.what == Constants.UPDATE_ADAPTER || msg.what == Constants.UPDATE_ALLSONG_ADAPTER){
-                boolean isAllSongOnly = msg.what == Constants.UPDATE_ALLSONG_ADAPTER;
-                //刷新适配器
-                for(Fragment temp : getSupportFragmentManager().getFragments()){
-                    if(temp instanceof SongFragment){
-                        SongFragment songFragment = (SongFragment)temp;
-                        if(songFragment.getAdapter() != null){
-                            songFragment.getAdapter().notifyDataSetChanged();
-                        }
-                        if(isAllSongOnly)
-                            return;
-                    }
-                    if(temp instanceof AlbumFragment){
-                        AlbumFragment albumFragment = (AlbumFragment)temp;
-                        if(albumFragment.getAdapter() != null){
-                            albumFragment.getAdapter().notifyDataSetChanged();
-                        }
-                    }
-                    if(temp instanceof ArtistFragment){
-                        ArtistFragment artistFragment = (ArtistFragment)temp;
-                        if(artistFragment.getAdapter() != null){
-                            artistFragment.getAdapter().notifyDataSetChanged();
-                        }
-                    }
-                    if(temp instanceof PlayListFragment){
-                        PlayListFragment playListFragment = (PlayListFragment) temp;
-                        if(playListFragment.getAdapter() != null){
-                            playListFragment.getAdapter().notifyDataSetChanged();
-                        }
-                    }
-                }
-            }
-        }
-    };
 
     @Override
     protected void onResume() {
@@ -175,6 +131,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         //初始化测滑菜单
         setUpDrawerLayout();
         setUpViewColor();
+        //handler
+        mRefreshHandler = new MsgHandler(this,MainActivity.class);
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //延迟一点时间 等待初始化完成
@@ -204,7 +162,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         int lastId = SPUtil.getValue(mContext,"Setting","LastSongId",-1);
         Song item;
         if(lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
-            mBottomBar.UpdateBottomStatus(item,  MusicService.isPlay());
+            mBottomBar.updateBottomStatus(item,  MusicService.isPlay());
         } else {
             if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
                 return ;
@@ -216,7 +174,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             }
             item = MediaStoreUtil.getMP3InfoById(id);
             if(item != null){
-                mBottomBar.UpdateBottomStatus(item,  MusicService.isPlay());
+                mBottomBar.updateBottomStatus(item,  MusicService.isPlay());
             }
         }
     }
@@ -554,7 +512,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     public void UpdateUI(Song song, boolean isplay) {
         if (!mIsRunning)
             return;
-        mBottomBar.UpdateBottomStatus(song, isplay);
+        mBottomBar.updateBottomStatus(song, isplay);
 //        for(Fragment temp : getSupportFragmentManager().getFragments()) {
 //            if (temp instanceof SongFragment) {
 //                SongFragment songFragment = (SongFragment) temp;
@@ -577,6 +535,52 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         new AsynLoadImage(mHeadImg).execute(song.getAlbumId(), Constants.URL_ALBUM);
         mHeadImg.setBackgroundResource(isPlay && ThemeStore.isDay() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
     }
+
+    @OnHandleMessage
+    void handleInternal(Message msg){
+        if(msg.what == -100){
+            ToastUtil.show(mContext,msg.obj.toString());
+        }
+        if(msg.what == Constants.RECREATE_ACTIVITY) {
+            recreate();
+        }
+        else if(msg.what == Constants.CLEAR_MULTI){
+            mMultiChoice.clearSelectedViews();
+        }
+        else if (msg.what == Constants.UPDATE_ADAPTER || msg.what == Constants.UPDATE_ALLSONG_ADAPTER){
+            boolean isAllSongOnly = msg.what == Constants.UPDATE_ALLSONG_ADAPTER;
+            //刷新适配器
+            for(Fragment temp : getSupportFragmentManager().getFragments()){
+                if(temp instanceof SongFragment){
+                    SongFragment songFragment = (SongFragment)temp;
+                    if(songFragment.getAdapter() != null){
+                        songFragment.getAdapter().notifyDataSetChanged();
+                    }
+                    if(isAllSongOnly)
+                        return;
+                }
+                if(temp instanceof AlbumFragment){
+                    AlbumFragment albumFragment = (AlbumFragment)temp;
+                    if(albumFragment.getAdapter() != null){
+                        albumFragment.getAdapter().notifyDataSetChanged();
+                    }
+                }
+                if(temp instanceof ArtistFragment){
+                    ArtistFragment artistFragment = (ArtistFragment)temp;
+                    if(artistFragment.getAdapter() != null){
+                        artistFragment.getAdapter().notifyDataSetChanged();
+                    }
+                }
+                if(temp instanceof PlayListFragment){
+                    PlayListFragment playListFragment = (PlayListFragment) temp;
+                    if(playListFragment.getAdapter() != null){
+                        playListFragment.getAdapter().notifyDataSetChanged();
+                    }
+                }
+            }
+        }
+    }
+
 
 }
 

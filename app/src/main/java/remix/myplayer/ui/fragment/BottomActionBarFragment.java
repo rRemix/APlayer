@@ -118,7 +118,7 @@ public class BottomActionBarFragment extends BaseFragment{
     }
 
     //更新界面
-    public void UpdateBottomStatus(Song song, boolean isPlaying) {
+    public void updateBottomStatus(Song song, boolean isPlaying) {
         if(song == null)
             return;
         //歌曲名 艺术家
