@@ -1,13 +1,16 @@
 package remix.myplayer.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 import butterknife.BindView;
@@ -38,30 +41,15 @@ public class LrcFragment extends BaseFragment {
     LrcView mLrcView;
     //歌词
     private List<LrcRow> mLrcList;
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if(mLrcView == null)
-                return;
-            //是否正在搜索
-            if(msg.what == SEARCHING){
-                mLrcView.setText(getString(R.string.searching));
-
-            } else if(msg.what == UPDATE_LRC) {
-                //更新歌词
-                mLrcView.setLrcRows(mLrcList);
-            } else if (msg.what == NO_LRC) {
-                //没有找到歌词
-                mLrcView.setText(getString(R.string.no_lrc));
-            } else if (msg.what == NO_NETWORK) {
-                //没用网络
-                mLrcView.setText(getString(R.string.check_network));
-            }
-        }
-    };
+    private LrcHandler mHandler;
 
     public void setOnInflateFinishListener(OnInflateFinishListener l){
         mOnFindListener = l;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
     }
 
     @Override
@@ -76,6 +64,8 @@ public class LrcFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_lrc,container,false);
 
         mUnBinder = ButterKnife.bind(this,rootView);
+        if(mHandler == null)
+            mHandler = new LrcHandler(Looper.getMainLooper(),this);
         if(mOnFindListener != null)
             mOnFindListener.onViewInflateFinish(mLrcView);
         mInfo = (Song)getArguments().getSerializable("Song");
@@ -86,9 +76,17 @@ public class LrcFragment extends BaseFragment {
         return rootView;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mHandler.removeCallbacksAndMessages(null);
+    }
+
     public void updateLrc(Song song) {
         if(song == null)
             return;
+        if(mHandler == null)
+            mHandler = new LrcHandler(Looper.getMainLooper(),this);
         mInfo = song;
 
         new DownloadThread().start();
@@ -96,6 +94,25 @@ public class LrcFragment extends BaseFragment {
 
     public void updateLrc(String lrcPath){
         new DownloadThread(lrcPath).start();
+    }
+
+    private void handleInternal(int what){
+        if(mLrcView == null)
+            return;
+        //是否正在搜索
+        if(what == SEARCHING){
+            mLrcView.setText(getString(R.string.searching));
+
+        } else if(what == UPDATE_LRC) {
+            //更新歌词
+            mLrcView.setLrcRows(mLrcList);
+        } else if (what == NO_LRC) {
+            //没有找到歌词
+            mLrcView.setText(getString(R.string.no_lrc));
+        } else if (what == NO_NETWORK) {
+            //没用网络
+            mLrcView.setText(getString(R.string.check_network));
+        }
     }
 
 
@@ -119,6 +136,21 @@ public class LrcFragment extends BaseFragment {
                 }
                 mHandler.sendEmptyMessage(UPDATE_LRC);
             }
+        }
+    }
+
+    private static class LrcHandler extends Handler{
+        final WeakReference<LrcFragment> mRef;
+        LrcHandler(Looper looper,LrcFragment fragment){
+            super(looper);
+            mRef = new WeakReference<>(fragment);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            if(mRef.get() == null)
+                return;
+            mRef.get().handleInternal(msg.what);
         }
     }
 

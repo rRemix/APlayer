@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.audiofx.AudioEffect;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.PopupMenu;
@@ -17,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.common.util.ByteConstants;
 import com.umeng.analytics.MobclickAgent;
@@ -113,50 +111,47 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         .positiveText(R.string.confirm)
                         .positiveColorAttr(R.attr.text_color_primary)
                         .backgroundColorAttr(R.attr.background_color_3)
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                String title = "",artist = "",album = "",genre = "",year = "";
-                                title = mSongLayout.getEditText() != null ? mSongLayout.getEditText().getText().toString() : mInfo.getTitle();
-                                if(TextUtils.isEmpty(title)){
-                                    ToastUtil.show(mContext,R.string.song_not_empty);
-                                    return;
-                                }
-                                artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString() : mContext.getString(R.string.unknow_artist);
-                                album = mAlbumLayout.getEditText() != null ? mAlbumLayout.getEditText().getText().toString() : mContext.getString(R.string.unknow_album);
-                                year = mYearLayout.getEditText() != null ? mYearLayout.getEditText().getText().toString() : " ";
-                                genre = mGenreLayout.getEditText() != null ? mGenreLayout.getEditText().getText().toString() : "";
+                        .onPositive((dialog, which) -> {
+                            String title = "",artist = "",album = "",genre = "",year = "";
+                            title = mSongLayout.getEditText() != null ? mSongLayout.getEditText().getText().toString() : mInfo.getTitle();
+                            if(TextUtils.isEmpty(title)){
+                                ToastUtil.show(mContext,R.string.song_not_empty);
+                                return;
+                            }
+                            artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString() : mContext.getString(R.string.unknow_artist);
+                            album = mAlbumLayout.getEditText() != null ? mAlbumLayout.getEditText().getText().toString() : mContext.getString(R.string.unknow_album);
+                            year = mYearLayout.getEditText() != null ? mYearLayout.getEditText().getText().toString() : " ";
+                            genre = mGenreLayout.getEditText() != null ? mGenreLayout.getEditText().getText().toString() : "";
 
-                                int updateRow = -1;
-                                int updateGenreRow = -1;
-                                try {
-                                    //更新歌曲等信息
-                                    updateRow = MediaStoreUtil.updateMP3Info(mInfo.getId(),title,artist,album,year);
-                                    //更新流派信息
-                                    //先判断是否存在该流派，如果不存在先新建该流派，再建立歌曲与流派的映射
-                                    if(mGenreInfo.GenreID > 0){
-                                        updateGenreRow = MediaStoreUtil.updateGenre(mGenreInfo.GenreID,genre);
-                                    }
-                                    else {
-                                        long genreId = MediaStoreUtil.insertGenre(genre);
-                                        if(genreId != -1){
-                                            updateGenreRow = MediaStoreUtil.insertGenreMap(mInfo.getId(),(int)genreId) ? 1 : -1;
-                                        }
-                                    }
-                                }catch (Exception e){
-                                    e.printStackTrace();
+                            int updateRow = -1;
+                            int updateGenreRow = -1;
+                            try {
+                                //更新歌曲等信息
+                                updateRow = MediaStoreUtil.updateMP3Info(mInfo.getId(),title,artist,album,year);
+                                //更新流派信息
+                                //先判断是否存在该流派，如果不存在先新建该流派，再建立歌曲与流派的映射
+                                if(mGenreInfo.GenreID > 0){
+                                    updateGenreRow = MediaStoreUtil.updateGenre(mGenreInfo.GenreID,genre);
                                 }
-                                if(updateGenreRow > 0 && updateRow > 0){
-                                    ToastUtil.show(mContext,R.string.save_success);
-                                    mInfo.setAlbum(album);
-                                    mInfo.setArtist(artist);
-                                    mInfo.setTitle(title);
-                                    mInfo.setYear(year);
-                                    ((PlayerActivity)mContext).updateTopStatus(mInfo);
-                                    ((PlayerActivity)mContext).setMP3Item(mInfo);
-                                } else {
-                                    ToastUtil.show(mContext,R.string.save_error);
+                                else {
+                                    long genreId = MediaStoreUtil.insertGenre(genre);
+                                    if(genreId != -1){
+                                        updateGenreRow = MediaStoreUtil.insertGenreMap(mInfo.getId(),(int)genreId) ? 1 : -1;
+                                    }
                                 }
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                            if(updateGenreRow > 0 && updateRow > 0){
+                                ToastUtil.show(mContext,R.string.save_success);
+                                mInfo.setAlbum(album);
+                                mInfo.setArtist(artist);
+                                mInfo.setTitle(title);
+                                mInfo.setYear(year);
+                                ((PlayerActivity)mContext).updateTopStatus(mInfo);
+                                ((PlayerActivity)mContext).setMP3Item(mInfo);
+                            } else {
+                                ToastUtil.show(mContext,R.string.save_error);
                             }
                         }).build();
                 editDialog.show();
@@ -189,7 +184,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         if(!ThemeStore.isDay()){
                             mYearLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
                         }
-                        mYearLayout.getEditText().setText(mInfo.getYear() + "");
+                        mYearLayout.getEditText().setText(mInfo.getYear());
                     }
                     mGenreInfo = MediaStoreUtil.getGenre(mInfo.getId());
                     if(mGenreLayout.getEditText() != null){
@@ -273,24 +268,21 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                             .content(R.string.confirm_delete_from_library)
                             .positiveText(R.string.confirm)
                             .negativeText(R.string.cancel)
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0){
-                                        if(PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)){
-                                            ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
-                                            //移除的是正在播放的歌曲
-                                            if(MusicService.getCurrentMP3() == null)
-                                                return;
-                                            if(mInfo.getId() == MusicService.getCurrentMP3().getId() && Global.PlayQueue.size() >= 2){
-                                                Intent intent = new Intent(Constants.CTL_ACTION);
-                                                intent.putExtra("Control", Constants.NEXT);
-                                                mContext.sendBroadcast(intent);
-                                            }
+                            .onPositive((dialog, which) -> {
+                                if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0){
+                                    if(PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)){
+                                        ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
+                                        //移除的是正在播放的歌曲
+                                        if(MusicService.getCurrentMP3() == null)
+                                            return;
+                                        if(mInfo.getId() == MusicService.getCurrentMP3().getId() && Global.PlayQueue.size() >= 2){
+                                            Intent intent = new Intent(Constants.CTL_ACTION);
+                                            intent.putExtra("Control", Constants.NEXT);
+                                            mContext.sendBroadcast(intent);
                                         }
-                                    } else {
-                                        ToastUtil.show(mContext, mContext.getString(R.string.delete_error));
                                     }
+                                } else {
+                                    ToastUtil.show(mContext, mContext.getString(R.string.delete_error));
                                 }
                             })
                             .backgroundColorAttr(R.attr.background_color_3)

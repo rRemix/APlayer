@@ -791,6 +791,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mAdapter.AddFragment(lrcFragment);
 
         mPager.setAdapter(mAdapter);
+        mPager.setOffscreenPageLimit(mAdapter.getCount() - 1);
         //下滑关闭
         mPager.setOnTouchListener((v, event) -> {
             if(event.getAction() == MotionEvent.ACTION_DOWN){

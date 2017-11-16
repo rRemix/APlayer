@@ -2,8 +2,6 @@ package remix.myplayer.ui.activity;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -13,6 +11,7 @@ import java.util.List;
 import remix.myplayer.adapter.BaseAdapter;
 import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.util.CommonUtil;
 
 /**
  * Created by Remix on 2017/10/20.
@@ -27,7 +26,7 @@ public abstract class PermissionActivity<D,A extends BaseAdapter> extends MultiC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MusicEventHelper.addCallback(this);
-        if(mHasPermission = hasPermissions()){
+        if(mHasPermission = CommonUtil.hasPermissions(mPermissions)){
             getLoaderManager().initLoader(getLoaderId(), null, this);
         }
     }
@@ -46,17 +45,6 @@ public abstract class PermissionActivity<D,A extends BaseAdapter> extends MultiC
                         sendBroadcast(intent);
                     }
                 });
-    }
-
-    protected boolean hasPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && mPermissions != null) {
-            for (String permission : mPermissions) {
-                if (mContext.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     @Override

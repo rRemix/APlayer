@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import java.util.Arrays;
 import java.util.List;
 
+import remix.myplayer.appshortcuts.shortcuttype.ContinuePlayShortcutType;
 import remix.myplayer.appshortcuts.shortcuttype.LastAddedShortcutType;
 import remix.myplayer.appshortcuts.shortcuttype.MyLoveShortcutType;
 import remix.myplayer.appshortcuts.shortcuttype.ShuffleShortcutType;
@@ -37,9 +38,10 @@ public class DynamicShortcutManager extends ContextWrapper {
 
     @NonNull
     private List<ShortcutInfo> getDefaultShortcut() {
-        return Arrays.asList(new ShuffleShortcutType(mContext).getShortcutInfo(),
+        return Arrays.asList(new ContinuePlayShortcutType(mContext).getShortcutInfo(),
+                new LastAddedShortcutType(mContext).getShortcutInfo(),
                 new MyLoveShortcutType(mContext).getShortcutInfo(),
-                new LastAddedShortcutType(mContext).getShortcutInfo());
+                new ShuffleShortcutType(mContext).getShortcutInfo());
     }
 
 }

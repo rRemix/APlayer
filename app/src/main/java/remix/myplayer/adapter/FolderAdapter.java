@@ -67,7 +67,7 @@ public class FolderAdapter extends BaseAdapter<String,FolderAdapter.FolderHolder
         holder.mName.setText(folderName.substring(folderName.lastIndexOf("/") + 1,folderName.length()));
         holder.mPath.setText(folderName);
         if(Global.FolderMap.get(folderName) != null)
-            holder.mCount.setText(Global.FolderMap.get(folderName).size()+ "首");
+            holder.mCount.setText(String.format("%d首", Global.FolderMap.get(folderName).size()));
         //根据主题模式 设置图片
         if(holder.mImg != null) {
             holder.mImg.setImageDrawable(Theme.TintDrawable(mContext.getResources().getDrawable(R.drawable.icon_folder),ThemeStore.isDay() ? Color.BLACK : Color.WHITE));

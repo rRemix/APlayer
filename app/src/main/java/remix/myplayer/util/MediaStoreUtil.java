@@ -236,13 +236,13 @@ public class MediaStoreUtil {
      * @param fullpath 歌曲完整路径
      */
     public static void SortWithFolder(int id,String fullpath) {
-        String dirpath = fullpath.substring(0, fullpath.lastIndexOf("/"));
-        if (!Global.FolderMap.containsKey(dirpath)) {
+        String dirPath = fullpath.substring(0, fullpath.lastIndexOf("/"));
+        if (!Global.FolderMap.containsKey(dirPath)) {
             ArrayList<Integer> list = new ArrayList<>();
             list.add(id);
-            Global.FolderMap.put(dirpath, list);
+            Global.FolderMap.put(dirPath, list);
         } else {
-            ArrayList<Integer> list = Global.FolderMap.get(dirpath);
+            List<Integer> list = Global.FolderMap.get(dirPath);
             list.add(id);
         }
     }
@@ -524,7 +524,7 @@ public class MediaStoreUtil {
         try {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
-                    MediaStore.Audio.Media.DATA + " like ?",
+                    MediaStore.Audio.Media.DATA + " like ? " + MediaStoreUtil.getBaseSelection(),
                     new String[]{folderName + "%"},null,null);
             if(cursor != null && cursor.getCount() > 0){
                 while (cursor.moveToNext()){
@@ -861,15 +861,19 @@ public class MediaStoreUtil {
     public static String getBaseSelection(){
         Set<String> deleteId = SPUtil.getStringSet(mContext,"Setting","DeleteID");
         if(deleteId == null || deleteId.size() == 0)
-            return "";
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(" and ");
+            return BASE_SELECTION;
+        StringBuilder blacklist = new StringBuilder();
+        blacklist.append(" and ");
         int i = 0;
-        for (String id : deleteId) {
-            stringBuilder.append(MediaStore.Audio.Media._ID + " != ").append(id).append(i != deleteId.size() - 1 ?  " and " : " ");
+        for(String id : deleteId){
+            if(i == 0){
+                blacklist.append(MediaStore.Audio.Media._ID).append(" not in (");
+            }
+            blacklist.append(id);
+            blacklist.append(i != deleteId.size() - 1 ? "," : ")");
             i++;
         }
-        return stringBuilder.toString() + BASE_SELECTION;
+        return blacklist.append(BASE_SELECTION).toString();
     }
 
     /**

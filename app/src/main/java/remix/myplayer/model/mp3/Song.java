@@ -20,7 +20,7 @@ public class Song implements Serializable,Cloneable {
     public String ReailTime;
     public String Url;
     public long Size;
-    public String Year;
+    public String Year = "";
     public String TitleKey;
     public long AddTime;
     public Song(){}

@@ -2,8 +2,6 @@ package remix.myplayer.ui.fragment;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -22,6 +20,7 @@ import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
+import remix.myplayer.util.CommonUtil;
 
 /**
  * Created by Remix on 2016/12/23.
@@ -36,7 +35,7 @@ public abstract class LibraryFragment<D,A extends HeaderAdapter> extends BaseFra
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if(mHasPermission = hasPermissions()){
+        if(mHasPermission = CommonUtil.hasPermissions(mPermissions)){
             getLoaderManager().initLoader(getLoaderId(), null, this);
         }
     }
@@ -78,17 +77,6 @@ public abstract class LibraryFragment<D,A extends HeaderAdapter> extends BaseFra
                         mContext.sendBroadcast(intent);
                     }
                 });
-    }
-
-    protected boolean hasPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && mPermissions != null) {
-            for (String permission : mPermissions) {
-                if (mContext.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     @Override

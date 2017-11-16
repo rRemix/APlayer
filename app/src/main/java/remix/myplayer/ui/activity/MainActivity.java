@@ -195,7 +195,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 Global.setPlayQueue(list,mContext,intent);
             }
         },600);
-
     }
 
     /**
@@ -316,6 +315,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
         mAddButton.setImageResource(ThemeStore.isDay() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
         mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
         mViewPager.setCurrentItem(0);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override

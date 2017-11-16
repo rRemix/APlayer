@@ -32,6 +32,7 @@
     <string name="list_is_empty">列表为空</string>
     <string name="folder">文件夹</string>
     <string name="recently">最近添加</string>
+    <string name="continue_play">继续播放</string>
     <string name="no_song">暂无歌曲</string>
     <string name="share_error">分享失败</string>
     <string name="share_success">分享成功</string>
@@ -226,4 +227,5 @@
     <string name="show_recently">显示近一周导入的歌曲</string>
     <string name="no_audio_ID">请在播放歌曲后再次尝试此操作</string>
     <string name="need_earphone">使用此功能需要插入耳机</string>
+    <string name="load_overtime">加载数据超时</string>
 </resources>

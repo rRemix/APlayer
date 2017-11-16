@@ -214,6 +214,8 @@
         <item name="colorControlHighlight">@color/day_ripple_color</item>
     </style>
 
+    <style name="EditTextStyle" parent="Widget.AppCompat.EditText"/>
+
     <style name="DayTheme.Red" parent="@style/DayTheme">
         <item name="material_color_primary">@color/md_red_primary</item>
         <item name="material_color_secondry">@color/md_red_primary</item>

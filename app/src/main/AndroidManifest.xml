@@ -126,7 +126,8 @@
             android:theme="@style/LockScreenActivity" />
         <activity android:name=".ui.activity.AppShortcutActivity"
             android:theme="@style/AppShortcut"
-            android:excludeFromRecents="true"/>
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"/>
         <activity
             android:name=".ui.dialog.AddtoPlayListDialog"
             android:theme="@style/BaseDialogTheme" />

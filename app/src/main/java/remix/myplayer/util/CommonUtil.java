@@ -33,7 +33,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -305,7 +304,7 @@ public class CommonUtil {
      * @param position
      * @return
      */
-    public static  <T extends Object> String getMapkeyByPosition(Map<String,ArrayList<T>> map, int position){
+    public static  <T extends Object> String getMapkeyByPosition(Map<String,List<T>> map, int position){
         if(map == null || map.size() == 0 || position < 0)
             return "";
         Iterator it = map.keySet().iterator();
@@ -784,5 +783,20 @@ public class CommonUtil {
         else
             return -1;
         return min * 60000 + sec * 1000 + mill;
+    }
+
+    /**
+     * 判断是否有权限
+     * @return
+     */
+    public static boolean hasPermissions(String[] permissions) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && permissions != null) {
+            for (String permission : permissions) {
+                if (mContext.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

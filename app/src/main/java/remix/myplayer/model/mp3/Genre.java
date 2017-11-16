@@ -8,7 +8,7 @@ package remix.myplayer.model.mp3;
  */
 public class Genre {
     public int GenreID;
-    public String GenreName;
+    public String GenreName = "";
     public Genre(int id,String name){
         GenreID = id;
         GenreName = name;

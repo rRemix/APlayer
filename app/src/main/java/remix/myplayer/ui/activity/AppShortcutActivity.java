@@ -13,6 +13,7 @@ public class AppShortcutActivity extends BaseActivity {
     public static final int SHORTCUT_TYPE_SHUFFLE_ALL = 0;
     public static final int SHORTCUT_TYPE_MY_LOVE = 1;
     public static final int SHORTCUT_TYPE_LAST_ADDED = 2;
+    public static final int SHORTCUT_TYPE_CONTINUE_PLAY = 3;
 
     public static final String KEY_SHORTCUT_TYPE = "com.remix.myplayer.appshortcuts.ShortcutType";
 
@@ -36,6 +37,9 @@ public class AppShortcutActivity extends BaseActivity {
                 break;
             case SHORTCUT_TYPE_MY_LOVE:
                 intent.setAction(MusicService.ACTION_SHORTCUT_MYLOVE);
+                break;
+            case SHORTCUT_TYPE_CONTINUE_PLAY:
+                intent.setAction(MusicService.ACTION_SHORTCUT_CONTINUE_PLAY);
                 break;
         }
         startService(intent);

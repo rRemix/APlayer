@@ -1,5 +1,6 @@
 package remix.myplayer.service;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -17,7 +18,6 @@ import android.media.audiofx.AudioEffect;
 import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -102,7 +102,7 @@ import remix.myplayer.util.floatpermission.FloatWindowManager;
  * 回调相关activity的界面更新
  * 通知栏的控制
  */
-public class MusicService extends BaseService implements Playback {
+public class MusicService extends BaseService implements Playback,MusicEventHelper.MusicEventCallback{
     private final static String TAG = "MusicService";
     private static MusicService mInstance;
     /** 是否第一次启动*/
@@ -204,6 +204,8 @@ public class MusicService extends BaseService implements Playback {
     private DBObserver mPlayListSongObserver;
     private Context mContext;
 
+    protected boolean mHasPermission = false;
+
     public static final String APLAYER_PACKAGE_NAME = "remix.myplayer";
     public static final String ACTION_MEDIA_CHANGE = APLAYER_PACKAGE_NAME + ".media.change";
     public static final String ACTION_PERMISSION_CHANGE = APLAYER_PACKAGE_NAME + ".permission.change";
@@ -212,6 +214,7 @@ public class MusicService extends BaseService implements Playback {
     public static final String ACTION_SHORTCUT_SHUFFLE = APLAYER_PACKAGE_NAME + ".shortcut.shuffle";
     public static final String ACTION_SHORTCUT_MYLOVE = APLAYER_PACKAGE_NAME + ".shortcut.my_love";
     public static final String ACTION_SHORTCUT_LASTADDED = APLAYER_PACKAGE_NAME + "shortcut.last_added";
+    public static final String ACTION_SHORTCUT_CONTINUE_PLAY = APLAYER_PACKAGE_NAME + "shortcut.continue_play";
 
     public MusicService(){}
     public MusicService(Context context) {
@@ -253,71 +256,78 @@ public class MusicService extends BaseService implements Playback {
         if(commandIntent == null)
             return START_NOT_STICKY;
         String action = commandIntent.getAction() != null ? commandIntent.getAction() : "";
+        if(TextUtils.isEmpty(action))
+            return START_NOT_STICKY;
 
-        switch (action){
-            case ACTION_APPWIDGET_OPERATE:
-                mPlaybackHandler.post(() -> {
-                    while (!mLoadFinished);
+        mPlaybackHandler.post(() -> {
+            final long start = System.currentTimeMillis();
+            final int MAX_WAIT = 8000;
+            //等待加载完成 最多加载8秒
+            while (!mLoadFinished){
+                if(System.currentTimeMillis() - start > MAX_WAIT){
+                    ToastUtil.show(mContext,getString(R.string.load_overtime));
+                    return;
+                }
+            }
+            switch (action){
+                case ACTION_APPWIDGET_OPERATE:
                     Intent appwidgetIntent = new Intent(Constants.CTL_ACTION);
                     appwidgetIntent.putExtra("Control",commandIntent.getIntExtra("Control",-1));
                     sendBroadcast(appwidgetIntent);
-                });
-                break;
-            case ACTION_SHORTCUT_SHUFFLE:
-                mPlaybackHandler.post(() -> {
-                    while (!mLoadFinished);
+                    break;
+                case ACTION_SHORTCUT_CONTINUE_PLAY:
+                    if(mIsplay)
+                        break;
+                    Intent continueIntent = new Intent(Constants.CTL_ACTION);
+                    continueIntent.putExtra("Control",Constants.TOGGLE);
+                    sendBroadcast(continueIntent);
+                    break;
+                case ACTION_SHORTCUT_SHUFFLE:
                     if(mPlayModel != Constants.PLAY_SHUFFLE){
                         setPlayModel(Constants.PLAY_SHUFFLE);
                     }
                     Intent shuffleIntent = new Intent(Constants.CTL_ACTION);
                     shuffleIntent.putExtra("Control", Constants.NEXT);
-                    mFirstFlag = false;
+
                     sendBroadcast(shuffleIntent);
-                });
-                break;
-            case ACTION_SHORTCUT_MYLOVE:
-                mPlaybackHandler.post(() -> {
-                    while (!mLoadFinished);
-                    List<Integer> ids = PlayListUtil.getIDList(Global.MyLoveID);
-                    if(ids == null || ids.size() == 0) {
+                    break;
+                case ACTION_SHORTCUT_MYLOVE:
+                    List<Integer> myLoveIds = PlayListUtil.getIDList(Global.MyLoveID);
+                    if(myLoveIds == null || myLoveIds.size() == 0) {
                         ToastUtil.show(mContext,R.string.list_is_empty);
                         return;
                     }
                     Intent myloveIntent = new Intent(Constants.CTL_ACTION);
-                    Bundle arg = new Bundle();
-                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                    arg.putInt("Position", 0);
-                    myloveIntent.putExtras(arg);
-                    mFirstFlag = false;
-                    Global.setPlayQueue(ids,mContext,myloveIntent);
-                });
+                    myloveIntent.putExtra("Control",Constants.PLAYSELECTEDSONG);
+                    myloveIntent.putExtra("Position",0);
 
-                break;
-            case ACTION_SHORTCUT_LASTADDED:
-                mPlaybackHandler.post(() -> {
+                    Global.setPlayQueue(myLoveIds,mContext,myloveIntent);
+                    break;
+                case ACTION_SHORTCUT_LASTADDED:
                     List<Song> songs = MediaStoreUtil.getLastAddedSong();
-                    List<Integer> ids = new ArrayList<>();
+                    List<Integer> lastAddIds = new ArrayList<>();
                     if(songs == null || songs.size() == 0) {
                         ToastUtil.show(mContext,R.string.list_is_empty);
                         return;
                     }
                     for(Song song : songs){
-                        ids.add(song.getId());
+                        lastAddIds.add(song.getId());
                     }
                     Intent lastedIntent = new Intent(Constants.CTL_ACTION);
-                    Bundle arg = new Bundle();
-                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                    arg.putInt("Position", 0);
-                    lastedIntent.putExtras(arg);
-                    mFirstFlag = false;
-                    Global.setPlayQueue(ids,mContext,lastedIntent);
-                });
-                break;
-        }
+                    lastedIntent.putExtra("Control", Constants.PLAYSELECTEDSONG);
+                    lastedIntent.putExtra("Position",0);
+
+                    Global.setPlayQueue(lastAddIds,mContext,lastedIntent);
+                    break;
+            }
+        });
         return START_NOT_STICKY;
     }
 
     private void init() {
+
+        MusicEventHelper.addCallback(this);
+
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
         Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
 
@@ -378,8 +388,12 @@ public class MusicService extends BaseService implements Playback {
         if(!CommonUtil.isIntentAvailable(this,i)){
             EQActivity.Init();
         }
+
         //读取数据
-        loadData();
+        mHasPermission = CommonUtil.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE});
+        if(mHasPermission){
+            loadData();
+        }
     }
 
     /**
@@ -418,6 +432,7 @@ public class MusicService extends BaseService implements Playback {
             }
         });
         mMediaPlayer.setOnPreparedListener(mp -> {
+            LogUtil.d("initDataSource","onPrepared:" + mFirstFlag);
             if(mFirstFlag){
                 mFirstFlag = false;
                 return;
@@ -431,9 +446,7 @@ public class MusicService extends BaseService implements Playback {
                 if(mMediaPlayer != null)
                     mMediaPlayer.release();
                 setUpMediaPlayer();
-                if(mContext != null){
-                    ToastUtil.show(mContext,R.string.mediaplayer_error,what,extra);
-                }
+                ToastUtil.show(mContext,R.string.mediaplayer_error,what,extra);
                 return true;
             } catch (Exception e){
                 CommonUtil.uploadException("Error In OnError MusicEventCallback",e.toString());
@@ -462,7 +475,6 @@ public class MusicService extends BaseService implements Playback {
 //            mMediaPlayer.setDataSource(mCurrentInfo.getUrl());
 //            mMediaPlayer.prepareAsync();
         } catch (Exception e) {
-            CommonUtil.uploadException("initDataSource",e);
         }
         //桌面歌词
         updateFloatLrc();
@@ -487,6 +499,8 @@ public class MusicService extends BaseService implements Playback {
     }
 
     private void unInit(){
+        MusicEventHelper.removeCallback(this);
+
         if(mMediaPlayer != null) {
             if(isPlay())
                 pause(false);
@@ -624,6 +638,23 @@ public class MusicService extends BaseService implements Playback {
 //        mIsplay = true;
         prepare(mCurrentInfo.getUrl());
         updateNextSong();
+    }
+
+    @Override
+    public void onMediaStoreChanged() {
+
+    }
+
+    @Override
+    public void onPermissionChanged(boolean has) {
+        if(has != mHasPermission && has){
+            mHasPermission = true;
+            loadData();
+        }
+    }
+
+    @Override
+    public void onPlayListChanged() {
     }
 
     public class WidgetReceiver extends BroadcastReceiver {
@@ -889,18 +920,19 @@ public class MusicService extends BaseService implements Playback {
     private void prepare(final String path) {
         try {
             if(TextUtils.isEmpty(path)){
-                ToastUtil.show(mContext,getString(R.string.path_empty));
+                mUpdateUIHandler.post(() -> ToastUtil.show(mContext,getString(R.string.path_empty)));
                 return;
             }
             mAudioFouus = mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
                     AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
             if(!mAudioFouus) {
-                ToastUtil.show(mContext,getString(R.string.cant_request_audio_focus));
+                mUpdateUIHandler.post(() -> ToastUtil.show(mContext,getString(R.string.cant_request_audio_focus)));
                 return;
             }
             if(isPlay()){
                 pause(true);
             }
+            LogUtil.d("initDataSource","prepare");
             mIsInitialized = false;
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(path);
@@ -908,7 +940,7 @@ public class MusicService extends BaseService implements Playback {
 //            mIsplay = true;
             mIsInitialized = true;
         } catch (Exception e){
-            ToastUtil.show(mContext,getString(R.string.play_failed) + e.toString());
+            mUpdateUIHandler.post(() -> ToastUtil.show(mContext,getString(R.string.play_failed) + e.toString()));
             mIsInitialized = false;
         }
     }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 
+import com.facebook.cache.disk.DiskCacheConfig;
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.cache.MemoryCacheParams;
@@ -95,8 +96,9 @@ public class APlayerApplication extends android.app.Application {
         PlayListUtil.setContext(mContext);
         final int cacheSize = (int)(Runtime.getRuntime().maxMemory() / 8);
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
-                .setBitmapMemoryCacheParamsSupplier(() -> new MemoryCacheParams(cacheSize, Integer.MAX_VALUE,cacheSize,Integer.MAX_VALUE, 5 * ByteConstants.MB))
+                .setBitmapMemoryCacheParamsSupplier(() -> new MemoryCacheParams(cacheSize, Integer.MAX_VALUE,cacheSize,Integer.MAX_VALUE, 2 * ByteConstants.MB))
                 .setBitmapsConfig(Bitmap.Config.RGB_565)
+                .setMainDiskCacheConfig(DiskCacheConfig.newBuilder(mContext).setMaxCacheSize(0).build())
                 .build();
         Fresco.initialize(this,config);
     }

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
@@ -21,7 +22,6 @@ import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 
 /**
@@ -58,32 +58,22 @@ public class CoverFragment extends BaseFragment {
         mUnBinder = ButterKnife.bind(this,rootView);
 
         mImage.getHierarchy().setFailureImage(ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night);
-        mCoverContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+        mImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
-                mCoverContainer.getViewTreeObserver().removeOnPreDrawListener(this);
+                mImage.getViewTreeObserver().removeOnPreDrawListener(this);
 
-                int containerWidth = mCoverContainer.getWidth();
-                int containerHeight = mCoverContainer.getHeight();
+                int imageWidth = mImage.getWidth();
+                int imageHeigh = mImage.getHeight();
+                //如果封面宽度大于高度 需要处理下
+                if(imageWidth > imageHeigh){
+                    RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mImage.getLayoutParams();
+                    lp.width = lp.height = imageHeigh;
+                    mImage.setLayoutParams(lp);
+                }
 
-                int coverSize = Math.min(mCoverContainer.getWidth(),mCoverContainer.getHeight()) - DensityUtil.dip2px(mContext,36) * 2;
-//                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mImage.getLayoutParams();
-//                lp.width = lp.height = coverSize;
-//                mImage.setLayoutParams(lp);
-
-                mImage.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                    @Override
-                    public boolean onPreDraw() {
-                        mImage.getViewTreeObserver().removeOnPreDrawListener(this);
-
-                        int imageWidth = mImage.getWidth();
-                        int imageHeigh = mImage.getHeight();
-
-                        if(mInflateFinishListener != null)
-                            mInflateFinishListener.onViewInflateFinish(mImage);
-                        return true;
-                    }
-                });
+                if(mInflateFinishListener != null)
+                    mInflateFinishListener.onViewInflateFinish(mImage);
                 return true;
             }
         });
@@ -125,6 +115,13 @@ public class CoverFragment extends BaseFragment {
                         return;
                     mCoverContainer.setTranslationX((float) spring.getCurrentValue());
                 }
+
+                @Override
+                public void onSpringActivate(Spring spring) {
+                    super.onSpringActivate(spring);
+                    mShadow.setVisibility(View.INVISIBLE);
+                }
+
                 @Override
                 public void onSpringAtRest(Spring spring) {
                     //显示封面的动画
@@ -153,14 +150,9 @@ public class CoverFragment extends BaseFragment {
                         @Override
                         public void onSpringActivate(Spring spring) {
                             super.onSpringActivate(spring);
-                            mShadow.setVisibility(View.INVISIBLE);
+
                         }
 
-//                        @Override
-//                        public void onSpringAtRest(Spring spring) {
-//                            super.onSpringAtRest(spring);
-//                            mShadow.setVisibility(View.VISIBLE);
-//                        }
                     });
                     inAnim.setCurrentValue(0.85);
                     inAnim.setEndValue(endVal);

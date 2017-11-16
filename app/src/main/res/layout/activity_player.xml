@@ -58,7 +58,8 @@
                     android:id="@+id/holder_pager"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_above="@id/holder_indicator"/>
+                    android:layout_above="@id/holder_indicator"
+                    android:overScrollMode="never"/>
             </RelativeLayout>
         </RelativeLayout>
 
