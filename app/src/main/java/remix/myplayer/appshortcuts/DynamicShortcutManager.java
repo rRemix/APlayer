@@ -44,4 +44,7 @@ public class DynamicShortcutManager extends ContextWrapper {
                 new ShuffleShortcutType(mContext).getShortcutInfo());
     }
 
+    public void updateContinueShortcut(){
+        mShortcutManger.updateShortcuts(Arrays.asList(new ContinuePlayShortcutType(mContext).getShortcutInfo()));
+    }
 }

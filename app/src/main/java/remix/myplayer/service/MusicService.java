@@ -58,6 +58,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import remix.myplayer.R;
+import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.appwidgets.AppWidgetBig;
 import remix.myplayer.appwidgets.AppWidgetMedium;
 import remix.myplayer.appwidgets.AppWidgetSmall;
@@ -199,6 +200,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private HandlerThread mPlaybackThread;
     private PlaybackHandler mPlaybackHandler;
 
+    /** shortcut*/
+    private DynamicShortcutManager mShortcutManager;
+
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
     private DBObserver mPlayListSongObserver;
@@ -215,6 +219,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     public static final String ACTION_SHORTCUT_MYLOVE = APLAYER_PACKAGE_NAME + ".shortcut.my_love";
     public static final String ACTION_SHORTCUT_LASTADDED = APLAYER_PACKAGE_NAME + "shortcut.last_added";
     public static final String ACTION_SHORTCUT_CONTINUE_PLAY = APLAYER_PACKAGE_NAME + "shortcut.continue_play";
+    public static final String ACTION_LOAD_FINISH = APLAYER_PACKAGE_NAME + "load.finish";
 
     public MusicService(){}
     public MusicService(Context context) {
@@ -327,6 +332,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private void init() {
 
         MusicEventHelper.addCallback(this);
+
+        mShortcutManager = new DynamicShortcutManager(mContext);
 
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
         Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
@@ -504,6 +511,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         if(mMediaPlayer != null) {
             if(isPlay())
                 pause(false);
+            mShortcutManager.updateContinueShortcut();
             mNotify.cancel();
             closeAudioEffectSession();
             removeFloatLrc();
@@ -847,6 +855,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(mFloatLrcView != null)
                 mFloatLrcView.setPlayIcon(MusicService.isPlay());
             updateMediaSession(control);
+            mShortcutManager.updateContinueShortcut();
         }
     }
 
@@ -1223,6 +1232,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 initLastSong();
 
                 mLoadFinished = true;
+                sendBroadcast(new Intent(ACTION_LOAD_FINISH));
             }
         }.start();
 

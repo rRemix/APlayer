@@ -8,7 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="@dimen/d25_size"
-        android:layout_marginRight="@dimen/d25_size">
+        android:layout_marginRight="@dimen/d25_size"
+        android:visibility="invisible">
         <ImageView
             android:id="@+id/cover_shadow"
             android:layout_width="match_parent"
@@ -22,7 +23,8 @@
             android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="@dimen/d12_size"
             android:layout_marginLeft="@dimen/cover_margin"
             android:layout_marginRight="@dimen/cover_margin"
             fresco:failureImage="@drawable/album_empty_bg_day"

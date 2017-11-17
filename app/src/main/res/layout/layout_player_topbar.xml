@@ -6,7 +6,7 @@
     <ImageButton
         android:layout_width="@dimen/d40_size"
         android:layout_height="@dimen/d40_size"
-        android:layout_marginLeft="@dimen/d16_size"
+        android:layout_marginLeft="@dimen/d8_size"
         android:layout_centerVertical="true"
         android:background="@color/transparent"
         android:src="@drawable/icon_player_back"
@@ -16,7 +16,7 @@
     <ImageButton
         android:layout_width="@dimen/d40_size"
         android:layout_height="@dimen/d40_size"
-        android:layout_marginRight="@dimen/d16_size"
+        android:layout_marginRight="@dimen/d8_size"
         android:layout_centerVertical="true"
         android:background="@color/transparent"
         android:src="@drawable/icon_player_more"

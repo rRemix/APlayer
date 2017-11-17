@@ -34,6 +34,7 @@
 #保护注解
 -keepattributes *Annotation*
 -keepattributes Signature
+-keepattributes EnclosingMethod
 #崩溃信息
 -keepattributes SourceFile,LineNumberTable
 
@@ -47,6 +48,21 @@
     <fields>;
     <methods>;
 }
+
+-keep class **.R$* {*;}
+-keepclasseswithmembers class * extends android.app.Activity{
+    <methods>;
+}
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Application
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+-keep public class * extends android.app.backup.BackupAgentHelper
+-keep public class * extends android.preference.Preference
+-keep public class com.android.vending.licensing.ILicensingService
+-keep public class * extends java.lang.annotation.Annotation
+-keep public class * extends android.os.Handler
 
 #友盟推送
 -dontwarn com.taobao.**

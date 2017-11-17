@@ -272,7 +272,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         setContentView(R.layout.activity_player);
         ButterKnife.bind(this);
 
-        mHandler = new MsgHandler(this,PlayerActivity.class);
+        mHandler = new MsgHandler(this);
 
         //获是否正在播放和正在播放的歌曲
         mInfo = MusicService.getCurrentMP3();
@@ -987,6 +987,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     protected void onDestroy() {
         super.onDestroy();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        mHandler.remove();
     }
 
     /**
@@ -1027,24 +1028,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mSeekBar.setProgress(mCurrentTime);
     }
 
-    private void updateCoverByHandler(){
-        ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,mUri,!mFistStart);
-        mFistStart = false;
-    }
-
-    private void updateBgByHandler(){
-        int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
-        int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
-        mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
-    }
-
     @OnHandleMessage
     public void handleInternal(Message msg){
         if(msg.what == UPDATE_COVER){
-            updateCoverByHandler();
+            ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,mUri,!mFistStart);
+            mFistStart = false;
         }
         if(msg.what == UPDATE_BG){
-           updateBgByHandler();
+            int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
+            int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
+            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
         }
         if(msg.what == UPDATE_TIME_ONLY && !mIsDragSeekBarFromUser){
             updateProgressByHandler();

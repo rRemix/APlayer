@@ -79,7 +79,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         setContentView(R.layout.activity_child_holder);
         ButterKnife.bind(this);
 
-        mRefreshHandler = new MsgHandler(this,ChildHolderActivity.class);
+        mRefreshHandler = new MsgHandler(this);
         //参数id，类型，标题
         mId = getIntent().getIntExtra("Id", -1);
         mType = getIntent().getIntExtra("Type", -1);
@@ -316,7 +316,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mRefreshHandler.removeCallbacksAndMessages(null);
+        mRefreshHandler.remove();
     }
 
     @OnHandleMessage

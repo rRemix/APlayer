@@ -39,7 +39,7 @@ public class CoverFragment extends BaseFragment {
     ImageView mShadow;
     @BindView(R.id.cover_container)
     View mCoverContainer;
-    private Song mInfo;
+
     private int mWidth;
     private Uri mUri = Uri.EMPTY;
     private OnInflateFinishListener mInflateFinishListener;
@@ -52,7 +52,7 @@ public class CoverFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mInfo = (Song)getArguments().getSerializable("Song");
+
         mWidth = getArguments().getInt("Width");
         View rootView = inflater.inflate(R.layout.fragment_cover,container,false);
         mUnBinder = ButterKnife.bind(this,rootView);
@@ -94,7 +94,7 @@ public class CoverFragment extends BaseFragment {
     public void UpdateCover(Song info, Uri uri, boolean withAnim){
         if(!isAdded())
             return;
-        if (mImage == null || (mInfo = info) == null)
+        if (mImage == null || info == null)
             return;
 
         mUri = uri;
@@ -117,12 +117,6 @@ public class CoverFragment extends BaseFragment {
                 }
 
                 @Override
-                public void onSpringActivate(Spring spring) {
-                    super.onSpringActivate(spring);
-                    mShadow.setVisibility(View.INVISIBLE);
-                }
-
-                @Override
                 public void onSpringAtRest(Spring spring) {
                     //显示封面的动画
                     if(mImage == null || spring == null)
@@ -131,7 +125,6 @@ public class CoverFragment extends BaseFragment {
                     mImage.setImageURI(mUri);
 
                     float endVal = 1;
-                    float thresHold = endVal * 0.9f;
                     final Spring inAnim = SpringSystem.create().createSpring();
                     inAnim.addListener(new SimpleSpringListener(){
                         @Override
@@ -142,15 +135,14 @@ public class CoverFragment extends BaseFragment {
                             mCoverContainer.setScaleY((float) spring.getCurrentValue());
 
                             //动画即将结束时重新显示阴影
-                            if(endVal - spring.getCurrentValue() < thresHold && mShadow.getVisibility() != View.VISIBLE){
-                                mShadow.setVisibility(View.VISIBLE);
-                            }
+//                            if(spring.getCurrentValue() > endVal && mShadow.getVisibility() != View.VISIBLE){
+//                                mShadow.setVisibility(View.VISIBLE);
+//                            }
                         }
 
                         @Override
                         public void onSpringActivate(Spring spring) {
-                            super.onSpringActivate(spring);
-
+//                            mShadow.setVisibility(View.INVISIBLE);
                         }
 
                     });

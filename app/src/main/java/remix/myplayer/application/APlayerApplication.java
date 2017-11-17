@@ -58,7 +58,7 @@ public class APlayerApplication extends android.app.Application {
 
         initUtil();
         initTheme();
-        startService(new Intent(this, MusicService.class));
+
         //友盟异常捕获
         MobclickAgent.setCatchUncaughtExceptions(true);
         MobclickAgent.setDebugMode(BuildConfig.DEBUG);
@@ -81,7 +81,7 @@ public class APlayerApplication extends android.app.Application {
         //AppShortcut
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
             new DynamicShortcutManager(this).setUpShortcut();
-
+        startService(new Intent(this, MusicService.class));
     }
 
     private void initUtil() {

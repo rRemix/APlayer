@@ -12,12 +12,11 @@
         android:gravity="center_vertical"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="@dimen/d16_size"
         android:id="@+id/play_shuffle">
         <ImageView
             android:id="@+id/play_shuffle_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/d44_size"
+            android:layout_height="@dimen/d44_size"
             android:src="@drawable/btn_shuffle"
             android:background="@color/transparent" />
         <TextView
@@ -25,7 +24,7 @@
             android:layout_height="wrap_content"
             android:text="@string/play_random"
             android:textColor="@color/default_textview_color"
-            android:layout_marginLeft="@dimen/d16_size" />
+            android:layout_marginLeft="@dimen/d8_size" />
     </LinearLayout>
 
     <ImageView

@@ -1,8 +1,11 @@
 package remix.myplayer.ui.activity;
 
 
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -66,6 +69,8 @@ import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.cache.DiskCache;
 
+import static remix.myplayer.service.MusicService.ACTION_LOAD_FINISH;
+
 /**
  *
  */
@@ -99,6 +104,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private MsgHandler mRefreshHandler;
     //设置界面
     private final int SETTING = 1;
+    private BroadcastReceiver mLoadReceiver;
 
     @Override
     protected void onResume() {
@@ -125,6 +131,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        //初始化底部状态栏
+        mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
+        //receiver
+        mLoadReceiver = new BottomBarReceiver();
+        registerReceiver(mLoadReceiver,new IntentFilter(MusicService.ACTION_LOAD_FINISH));
+        //初始化控件
         setUpToolbar(mToolBar);
         setUpPager();
         setUpTab();
@@ -132,27 +144,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         setUpDrawerLayout();
         setUpViewColor();
         //handler
-        mRefreshHandler = new MsgHandler(this,MainActivity.class);
-        //初始化底部状态栏
-        mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        //延迟一点时间 等待初始化完成
-        mRefreshHandler.postDelayed(() -> {
-            initBottombar();
-            final Intent param = getIntent();
-            if(param != null && param.getData() != null){
-                int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
-                if(id < 0)
-                    return;
-                Intent intent = new Intent(Constants.CTL_ACTION);
-                Bundle arg = new Bundle();
-                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                arg.putInt("Position", 0);
-                intent.putExtras(arg);
-                ArrayList<Integer> list = new ArrayList<>();
-                list.add(id);
-                Global.setPlayQueue(list,mContext,intent);
-            }
-        },600);
+        mRefreshHandler = new MsgHandler(this);
     }
 
     /**
@@ -537,7 +529,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     }
 
     @OnHandleMessage
-    void handleInternal(Message msg){
+    public void handleInternal(Message msg){
         if(msg.what == -100){
             ToastUtil.show(mContext,msg.obj.toString());
         }
@@ -581,6 +573,30 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
+    public class BottomBarReceiver extends BroadcastReceiver {
 
+        @Override
+        public void onReceive(Context context, Intent receive) {
+            String action = receive != null ? receive.getAction() : "";
+            if(ACTION_LOAD_FINISH.equals(action)){
+                initBottombar();
+                final Intent param = getIntent();
+                if(param != null && param.getData() != null){
+                    int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
+                    if(id < 0)
+                        return;
+                    Intent intent = new Intent(Constants.CTL_ACTION);
+                    Bundle arg = new Bundle();
+                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                    arg.putInt("Position", 0);
+                    intent.putExtras(arg);
+                    ArrayList<Integer> list = new ArrayList<>();
+                    list.add(id);
+                    Global.setPlayQueue(list,mContext,intent);
+                }
+            }
+            unregisterReceiver(mLoadReceiver);
+        }
+    }
 }
 

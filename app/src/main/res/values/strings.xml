@@ -33,6 +33,7 @@
     <string name="folder">文件夹</string>
     <string name="recently">最近添加</string>
     <string name="continue_play">继续播放</string>
+    <string name="pause_play">暂停播放</string>
     <string name="no_song">暂无歌曲</string>
     <string name="share_error">分享失败</string>
     <string name="share_success">分享成功</string>

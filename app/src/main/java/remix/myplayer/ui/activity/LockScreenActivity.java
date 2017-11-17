@@ -25,7 +25,6 @@ import butterknife.ButterKnife;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -247,23 +246,20 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         Single.just(mInfo.getAlbumId())
         .observeOn(Schedulers.io())
         .doOnSubscribe(disposable -> mDisposable = disposable)
-        .flatMap(new Function<Integer, SingleSource<Palette.Swatch>>() {
-            @Override
-            public SingleSource<Palette.Swatch> apply(@NonNull Integer integer) throws Exception {
-                mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
-                if(mRawBitMap == null)
-                    mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
-                StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
+        .flatMap((Function<Integer, SingleSource<Palette.Swatch>>) integer -> {
+            mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
+            if(mRawBitMap == null)
+                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
+            StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
 
-                mNewBitMap = mStackBlurManager.processNatively(40);
-                return Single.create(e -> {
-                    Palette palette = Palette.from(mRawBitMap).generate();
-                    Palette.Swatch swatch = palette.getMutedSwatch();//柔和 暗色
-                    if(swatch == null)
-                        swatch = new Palette.Swatch(Color.GRAY,100);
-                    e.onSuccess(swatch);
-                });
-            }
+            mNewBitMap = mStackBlurManager.processNatively(40);
+            return Single.create(e -> {
+                Palette palette = Palette.from(mRawBitMap).generate();
+                Palette.Swatch swatch = palette.getMutedSwatch();//柔和 暗色
+                if(swatch == null)
+                    swatch = new Palette.Swatch(Color.GRAY,100);
+                e.onSuccess(swatch);
+            });
         }).observeOn(AndroidSchedulers.mainThread())
         .subscribe(swatch -> {
             if(swatch == null)

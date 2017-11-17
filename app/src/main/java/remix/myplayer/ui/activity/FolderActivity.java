@@ -3,7 +3,6 @@ package remix.myplayer.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,8 +10,6 @@ import android.text.TextUtils;
 import android.view.View;
 
 import com.umeng.analytics.MobclickAgent;
-
-import java.lang.ref.WeakReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,15 +31,13 @@ public class FolderActivity extends PermissionActivity<Object,FolderAdapter> {
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
 
-    private static WeakReference<FolderActivity> mRef;
     public static final String TAG = FolderActivity.class.getSimpleName();
-    private RefreshHandler mRefreshHandler;
+    private Handler mRefreshHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         MobclickAgent.onEvent(this,"Folder");
         super.onCreate(savedInstanceState);
-        mRef = new WeakReference<>(this);
         initViews();
     }
 
@@ -53,7 +48,7 @@ public class FolderActivity extends PermissionActivity<Object,FolderAdapter> {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mRefreshHandler = new RefreshHandler();
+        mRefreshHandler = new Handler();
         mAdapter = new FolderAdapter(this,R.layout.item_folder_recycle,mMultiChoice);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
@@ -104,39 +99,29 @@ public class FolderActivity extends PermissionActivity<Object,FolderAdapter> {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
+        mRefreshHandler.removeCallbacksAndMessages(null);
     }
 
     protected void onPause() {
         MobclickAgent.onPageEnd(FolderActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
-            mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
+            mRefreshHandler.postDelayed(() -> mMultiChoice.clearSelectedViews(),500);
         }
     }
 
-    public static FolderActivity getInstance() {
-        return mRef != null ? mRef.get() : null;
-    }
 
     @Override
     public void onMediaStoreChanged() {
         updateList();
     }
 
+
     @Override
     protected int getLoaderId() {
         return LoaderIds.FOLDER_ACTIVITY;
     }
 
-    private static class RefreshHandler extends Handler{
-        @Override
-        public void handleMessage(Message msg) {
-            final FolderActivity activity = mRef.get();
-            if(msg.what == Constants.CLEAR_MULTI && activity != null){
-                activity.mMultiChoice.clearSelectedViews();
-            }
-        }
-    }
 }
