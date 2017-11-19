@@ -27,7 +27,8 @@ public class DynamicShortcutManager extends ContextWrapper {
     public DynamicShortcutManager(Context base) {
         super(base);
         mContext = base;
-        mShortcutManger = getSystemService(ShortcutManager.class);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
+            mShortcutManger = getSystemService(ShortcutManager.class);
     }
 
     public void setUpShortcut(){
@@ -45,6 +46,7 @@ public class DynamicShortcutManager extends ContextWrapper {
     }
 
     public void updateContinueShortcut(){
-        mShortcutManger.updateShortcuts(Arrays.asList(new ContinuePlayShortcutType(mContext).getShortcutInfo()));
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
+            mShortcutManger.updateShortcuts(Arrays.asList(new ContinuePlayShortcutType(mContext).getShortcutInfo()));
     }
 }

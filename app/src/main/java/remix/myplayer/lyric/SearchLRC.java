@@ -5,6 +5,8 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,7 +19,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import io.reactivex.Maybe;
@@ -29,9 +33,15 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Function3;
 import io.reactivex.functions.Predicate;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.LrcRequest;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.model.netease.SearchData;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
@@ -105,6 +115,48 @@ public class SearchLRC {
         return new LrcRequest();
     }
 
+    public void test(){
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    Map<String,String> params = new HashMap<>();
+                    params.put("s","Seemann");
+                    params.put("offset","0");
+                    params.put("limit","0");
+                    params.put("type","1");
+                    StringBuilder paramStr = new StringBuilder();
+
+                    int pos = 0;
+                    for(String key : params.keySet()){
+                        if(pos > 0)
+                            paramStr.append("&");
+                        paramStr.append(String.format("%s=%s", key, URLEncoder.encode(params.get(key), "utf-8")));
+                        pos++;
+                    }
+
+
+                    final String url = "http://music.163.com/api/search/pc?s=Seemann&offset=0&limit=10&type=1006";
+                    OkHttpClient client = new OkHttpClient.Builder().build();
+                    RequestBody requestBody = RequestBody.create(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"),"");
+
+                    Request request = new Request.Builder()
+                            .url(url)
+                            .post(requestBody)
+                            .addHeader("Cookie","appver=1.5.0.75771")
+                            .build();
+                    Response response = client.newCall(request).execute();
+                    String responseString = response.body().string();
+                    SearchData searchData = new Gson().fromJson(responseString,SearchData.class);
+                    LogUtil.d("SearchData",searchData + "");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }.start();
+
+    }
 
     public Observable<List<LrcRow>> getObservable(String lrcPath){
         boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting","OnlineLrc",false);

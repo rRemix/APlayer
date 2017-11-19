@@ -117,7 +117,7 @@ dependencies {
 
     compile 'com.facebook.fresco:fresco:1.5.0'
     compile 'com.facebook.rebound:rebound:0.3.8'
-    compile 'com.umeng.analytics:analytics:latest.integration'
+    compile 'com.umeng.analytics:analytics:6.1.2'
     compile 'com.afollestad.material-dialogs:core:0.9.4.7'
     compile 'com.soundcloud.android:android-crop:1.0.1@aar'
     compile 'cn.bmob.android:bmob-sdk:3.5.0'

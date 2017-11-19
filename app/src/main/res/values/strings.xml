@@ -205,7 +205,7 @@
     <string name="please_input_artist">请输入艺术家</string>
     <string name="please_input_year">请输入年代</string>
     <string name="please_input_genre">请输入流派</string>
-    <string name="write_something">写点什么吧</string>
+    <string name="write_something">每当想起这首歌的时候</string>
     <string name="song_sheet">歌单</string>
     <string name="play_failed">播放失败:</string>
     <string name="cant_request_audio_focus">无法获得音频焦点</string>

@@ -281,8 +281,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     sendBroadcast(appwidgetIntent);
                     break;
                 case ACTION_SHORTCUT_CONTINUE_PLAY:
-                    if(mIsplay)
-                        break;
                     Intent continueIntent = new Intent(Constants.CTL_ACTION);
                     continueIntent.putExtra("Control",Constants.TOGGLE);
                     sendBroadcast(continueIntent);
@@ -293,7 +291,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     }
                     Intent shuffleIntent = new Intent(Constants.CTL_ACTION);
                     shuffleIntent.putExtra("Control", Constants.NEXT);
-
                     sendBroadcast(shuffleIntent);
                     break;
                 case ACTION_SHORTCUT_MYLOVE:
