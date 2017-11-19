@@ -46,7 +46,6 @@ import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.lyric.SearchLRC;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.model.mp3.Song;
@@ -146,8 +145,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         setUpViewColor();
         //handler
         mRefreshHandler = new MsgHandler(this);
-
-        new SearchLRC(new Song(),"123").test();
     }
 
     /**
