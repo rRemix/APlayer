@@ -229,4 +229,9 @@
     <string name="no_audio_ID">请在播放歌曲后再次尝试此操作</string>
     <string name="need_earphone">使用此功能需要插入耳机</string>
     <string name="load_overtime">加载数据超时</string>
+    <string name="scan_failed">扫描失败:%s</string>
+    <string name="scanning">正在扫描</string>
+    <string name="scanned_count">共扫描%d首歌曲</string>
+    <string name="scan_getfile_count">正在获取所有文件</string>
+    <string name="no_audio_file">无音频文件</string>
 </resources>

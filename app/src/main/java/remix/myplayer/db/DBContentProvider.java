@@ -24,7 +24,11 @@ public class DBContentProvider extends ContentProvider {
     public static final int PLAY_LIST_SINGLE = 2;
     public static final int PLAY_LIST_SONG_MULTIPLE = 3;
     public static final int PLAY_LIST_SONG_SINGLE = 4;
-    public static UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    private static UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+
+    public static UriMatcher getUriMatcher(){
+        return mUriMatcher;
+    }
 
     static {
         mUriMatcher.addURI(AUTHORITY,PlayLists.TABLE_NAME, PLAY_LIST_MULTIPLE);

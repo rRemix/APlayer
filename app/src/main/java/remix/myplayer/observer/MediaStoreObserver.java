@@ -1,11 +1,8 @@
 package remix.myplayer.observer;
 
-import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Handler;
 
-import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -13,8 +10,7 @@ import remix.myplayer.util.MediaStoreUtil;
 /**
  * Created by taeja on 16-3-30.
  */
-public class MediaStoreObserver extends ContentObserver {
-    private Handler mHandler;
+public class MediaStoreObserver extends BaseObserver {
     /**
      * Creates a content observer.
      *
@@ -22,36 +18,16 @@ public class MediaStoreObserver extends ContentObserver {
      */
     public MediaStoreObserver(Handler handler) {
         super(handler);
-        mHandler = handler;
-    }
-
-    private Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            Single.just(1)
-                    .observeOn(Schedulers.io())
-                    .subscribe(integer -> {
-                        Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
-                        mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-                    });
-        }
-    };
-
-    @Override
-    public void onChange(boolean selfChange, Uri uri) {
-        if(!selfChange && uri != null && uri.toString().contains("content://media/external")){
-            mHandler.removeCallbacks(mRunnable);
-            mHandler.postDelayed(mRunnable,500);
-        }
     }
 
     @Override
-    public void onChange(boolean selfChange) {
-       super.onChange(selfChange);
+    void onAccept(Uri uri) {
+        Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
+        mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
     }
 
     @Override
-    public boolean deliverSelfNotifications() {
-        return true;
+    boolean onFilter(Uri uri) {
+        return uri != null && uri.toString().contains("content://media/");
     }
 }
