@@ -101,10 +101,43 @@
                 </RelativeLayout>
 
                 <RelativeLayout
-                    android:id="@+id/setting_navigation_container"
+                    android:id="@+id/setting_scan_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/setting_lockscreen_container"
+                    android:paddingTop="@dimen/d10_size"
+                    android:paddingBottom="@dimen/d10_size"
+                    android:background="?attr/background_common">
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_vertical"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="@dimen/d16_size">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/manual_scan"
+                            android:textColor="?attr/text_color_primary"
+                            android:textSize="@dimen/s16_size"
+                            android:layout_marginBottom="@dimen/d2_size"/>
+                        <TextView
+                            android:id="@+id/setting_scan_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/manual_scan_tip"
+                            android:textColor="?attr/text_color"
+                            android:textSize="@dimen/s14_size"/>
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/setting_navigation_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/setting_scan_container"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
                     android:background="?attr/background_common">

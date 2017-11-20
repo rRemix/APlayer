@@ -1,14 +1,12 @@
 package remix.myplayer.ui.activity;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.SwitchCompat;
@@ -35,6 +33,9 @@ import remix.myplayer.R;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.ShakeDetector;
+import remix.myplayer.misc.MediaScanner;
+import remix.myplayer.misc.handler.MsgHandler;
+import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -89,21 +90,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     private final int RECREATE = 100;
     private final int CACHESIZE = 101;
     private final int CLEARFINISH = 102;
-    private Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            if(msg.what == RECREATE)
-                recreate();
-            if(msg.what == CACHESIZE){
-                mCache.setText(getString(R.string.cache_szie,mCacheSize / 1024f / 1024));
-            }
-            if(msg.what == CLEARFINISH){
-                ToastUtil.show(SettingActivity.this,getString(R.string.clear_success));
-                mCache.setText("0MB");
-                mLrcPath.setText(R.string.default_lrc_path);
-            }
-        }
-    };
+    private MsgHandler mHandler;
     private final int[] mScanSize = new int[]{0,500 * ByteConstants.KB,ByteConstants.MB, 2 * ByteConstants.MB};
 
     @Override
@@ -113,6 +100,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
         setUpToolbar(mToolbar,getString(R.string.setting));
+        mHandler = new MsgHandler(this);
 
         //读取重启aitivity之前的数据
         if(savedInstanceState != null){
@@ -235,9 +223,18 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     @Override
     public void onFolderSelection(@NonNull FolderChooserDialog dialog, @NonNull File folder) {
-        boolean success = SPUtil.putValue(this,"Setting","LrcSearchPath",folder.getAbsolutePath());
-        ToastUtil.show(this, success ? R.string.setting_success : R.string.setting_error, Toast.LENGTH_SHORT);
-        mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcPath","")));
+        String tag = dialog.getTag();
+        switch (tag){
+            case "Lrc":
+                boolean success = SPUtil.putValue(this,"Setting","LrcSearchPath",folder.getAbsolutePath());
+                ToastUtil.show(this, success ? R.string.setting_success : R.string.setting_error, Toast.LENGTH_SHORT);
+                mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,"Setting","LrcPath","")));
+                break;
+            case "Scan":
+                new MediaScanner(mContext).scanFiles(folder,"audio/*");
+                break;
+        }
+
     }
 
     @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_container,
@@ -245,7 +242,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_lockscreen_container,R.id.setting_lrc_priority_container,R.id.setting_lrc_float_container,
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
             R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container,
-            R.id.setting_screen_container})
+            R.id.setting_screen_container,R.id.setting_scan_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -285,6 +282,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 new FolderChooserDialog.Builder(this)
                         .chooseButton(R.string.choose_folder)
                         .allowNewFolder(false,R.string.new_folder)
+                        .tag("Lrc")
                         .show();
                 break;
             //歌词搜索优先级
@@ -294,6 +292,14 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             //屏幕常亮
             case R.id.setting_screen_container:
                 mScreenSwitch.setChecked(!mScreenSwitch.isChecked());
+                break;
+            //手动扫描
+            case R.id.setting_scan_container:
+                new FolderChooserDialog.Builder(this)
+                        .chooseButton(R.string.choose_folder)
+                        .tag("Scan")
+                        .allowNewFolder(false,R.string.new_folder)
+                        .show();
                 break;
             //锁屏显示
             case R.id.setting_lockscreen_container:
@@ -443,6 +449,20 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
     }
 
+    @OnHandleMessage
+    public void handleInternal(Message msg){
+        if(msg.what == RECREATE)
+            recreate();
+        if(msg.what == CACHESIZE){
+            mCache.setText(getString(R.string.cache_szie,mCacheSize / 1024f / 1024));
+        }
+        if(msg.what == CLEARFINISH){
+            ToastUtil.show(SettingActivity.this,getString(R.string.clear_success));
+            mCache.setText("0MB");
+            mLrcPath.setText(R.string.default_lrc_path);
+        }
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -451,6 +471,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         outState.putBoolean("needRefresh",mNeedRefresh);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mHandler.remove();
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

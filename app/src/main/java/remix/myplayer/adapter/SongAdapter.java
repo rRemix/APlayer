@@ -99,6 +99,8 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
             if(mDatas == null || mDatas.size() == 0){
                 headerHolder.mRoot.setVisibility(View.GONE);
                 return;
+            } else {
+                headerHolder.mRoot.setVisibility(View.VISIBLE);
             }
 
             if(mType == RECENTLY){

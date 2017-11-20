@@ -33,12 +33,7 @@ public class MediaScanner {
     private File mFile;
     private String mMimeType;
     private MaterialDialog mProgressDialog;
-    private MaterialDialog mLoadingDialog = new MaterialDialog.Builder(mContext)
-            .cancelable(false)
-            .title(R.string.please_wait)
-            .content(R.string.scan_getfile_count)
-            .progress(true,100)
-            .build();
+    private MaterialDialog mLoadingDialog;
     private MsgHandler mHandler;
 
     private ObservableEmitter<String> mScanEmitter;
@@ -47,8 +42,21 @@ public class MediaScanner {
         mContext = context;
         mHandler = new MsgHandler(this);
 
+        mLoadingDialog = new MaterialDialog.Builder(mContext)
+                .cancelable(false)
+                .title(R.string.please_wait)
+                .content(R.string.scan_getting_files)
+                .backgroundColorRes(R.color.day_background_color_3)
+                .contentColorRes(R.color.day_textcolor_primary)
+                .titleColorRes(R.color.day_textcolor_primary)
+                .progress(true,100)
+                .build();
+
         mProgressDialog = new MaterialDialog.Builder(mContext)
                 .cancelable(false)
+                .backgroundColorRes(R.color.day_background_color_3)
+                .contentColorRes(R.color.day_textcolor_primary)
+                .titleColorRes(R.color.day_textcolor_primary)
                 .progress(false, mToScanCount,true)
                 .dismissListener(dialog -> {
                     mConnection.disconnect();
