@@ -33,6 +33,8 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Function3;
 import io.reactivex.functions.Predicate;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -41,7 +43,7 @@ import okhttp3.Response;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.LrcRequest;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.model.netease.SearchData;
+import remix.myplayer.model.netease.SearchResponse;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
@@ -135,7 +137,6 @@ public class SearchLRC {
                         pos++;
                     }
 
-
                     final String url = "http://music.163.com/api/search/pc?s=Seemann&offset=0&limit=10&type=1006";
                     OkHttpClient client = new OkHttpClient.Builder().build();
                     RequestBody requestBody = RequestBody.create(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"),"");
@@ -145,10 +146,24 @@ public class SearchLRC {
                             .post(requestBody)
                             .addHeader("Cookie","appver=1.5.0.75771")
                             .build();
-                    Response response = client.newCall(request).execute();
-                    String responseString = response.body().string();
-                    SearchData searchData = new Gson().fromJson(responseString,SearchData.class);
-                    LogUtil.d("SearchData",searchData + "");
+
+                    client.newCall(request).enqueue(new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+
+                        }
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            String responseString = response.body().string();
+                            SearchResponse searchResponse = new Gson().fromJson(responseString,SearchResponse.class);
+                            LogUtil.d("SearchResponse", searchResponse + "");
+                        }
+                    });
+
+//                    Response response = client.newCall(request).execute();
+
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

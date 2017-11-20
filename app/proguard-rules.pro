@@ -194,6 +194,7 @@
 -keep class cn.bmob.push.** {*;}
 
 # keep okhttp3、okio
+-dontwarn javax.annotation.**
 -dontwarn okhttp3.**
 -keep class okhttp3.** { *;}
 -keep interface okhttp3.** { *; }
@@ -202,6 +203,9 @@
 # keep rx
 -dontwarn sun.misc.**
 -keep class io.reactivex.**{*;}
+
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
 
 -keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
  long producerIndex;

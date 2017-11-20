@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.support.multidex.MultiDexApplication;
 
 import com.facebook.cache.disk.DiskCacheConfig;
 import com.facebook.common.util.ByteConstants;
@@ -41,7 +42,7 @@ import remix.myplayer.util.cache.DiskCache;
 /**
  * 错误收集与上报
  */
-public class APlayerApplication extends android.app.Application {
+public class APlayerApplication extends MultiDexApplication{
     private static Context mContext;
     private RefWatcher mRefWatcher;
 
@@ -49,7 +50,6 @@ public class APlayerApplication extends android.app.Application {
         APlayerApplication application = (APlayerApplication) context.getApplicationContext();
         return application.mRefWatcher;
     }
-
 
     @Override
     public void onCreate() {
