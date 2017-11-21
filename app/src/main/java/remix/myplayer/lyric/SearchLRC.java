@@ -43,7 +43,7 @@ import okhttp3.Response;
 import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.model.LrcRequest;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.model.netease.SearchResponse;
+import remix.myplayer.model.netease.NSearchResponse;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
@@ -122,6 +122,8 @@ public class SearchLRC {
             @Override
             public void run() {
                 try {
+
+
                     Map<String,String> params = new HashMap<>();
                     params.put("s","Seemann");
                     params.put("offset","0");
@@ -156,8 +158,8 @@ public class SearchLRC {
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
                             String responseString = response.body().string();
-                            SearchResponse searchResponse = new Gson().fromJson(responseString,SearchResponse.class);
-                            LogUtil.d("SearchResponse", searchResponse + "");
+                            NSearchResponse searchResponse = new Gson().fromJson(responseString,NSearchResponse.class);
+                            LogUtil.d("NSearchResponse", searchResponse + "");
                         }
                     });
 

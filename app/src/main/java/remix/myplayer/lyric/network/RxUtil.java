@@ -1,4 +1,4 @@
-package remix.myplayer.model.network;
+package remix.myplayer.lyric.network;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -12,7 +12,7 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class RxUtil {
-    private static final String TAG = "GvgNetwork";
+    private static final String TAG = "APlayerNetwork";
     private RxUtil(){}
 
     public static <T> ObservableTransformer<T,T> applyScheduler(){

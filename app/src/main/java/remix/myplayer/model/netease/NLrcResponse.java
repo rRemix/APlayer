@@ -6,11 +6,14 @@ import remix.myplayer.model.BaseData;
  * Created by Remix on 2017/11/19.
  */
 
-public class LrcResponse extends BaseData {
+public class NLrcResponse extends BaseData {
     public boolean sgc;
     public boolean sfy;
     public boolean qfy;
     public int code;
+    public LrcData lrc;
+    public LrcData klyric;
+    public LrcData tlyric;
     public TransUserData transUser;
 
     public static class LrcData extends BaseData{

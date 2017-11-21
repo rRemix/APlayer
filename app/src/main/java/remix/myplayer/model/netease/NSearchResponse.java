@@ -8,7 +8,7 @@ import remix.myplayer.model.BaseData;
  * Created by Remix on 2017/11/19.
  */
 
-public class SearchResponse extends BaseData {
+public class NSearchResponse extends BaseData {
     public int code;
     public SeachActualData result;
 

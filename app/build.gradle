@@ -98,6 +98,7 @@ android {
 
     configurations {
         all*.exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+        all*.exclude group: 'com.google.code.gson', module: 'gson'
     }
 
     configurations.all {

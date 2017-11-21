@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -21,17 +19,17 @@ import android.view.WindowManager;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.functions.Consumer;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PlayQueueAdapter;
 import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.misc.handler.MsgHandler;
+import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.model.mp3.PlayListSong;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
@@ -51,18 +49,18 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
     RecyclerView mRecyclerView;
     private boolean mHasPermission = false;
     private PlayQueueAdapter mAdapter;
-    private SeekHandler mHandler;
     private static int LOADER_ID = 0;
     private boolean mMove = false;
     private int mPos = -1;
 
+    private MsgHandler mHandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_playqueue);
         ButterKnife.bind(this);
 
-        mHandler = new SeekHandler(getMainLooper(),this);
+        mHandler = new MsgHandler(this);
         mAdapter = new PlayQueueAdapter(this,R.layout.item_playqueue);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
@@ -74,6 +72,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
                 intent.putExtras(arg);
                 sendBroadcast(intent);
 
+                mHandler.postDelayed(() -> mAdapter.notifyDataSetChanged(),50);
             }
             @Override
             public void onItemLongClick(View view, int position) {
@@ -103,10 +102,9 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
 
         //初始化LoaderManager
         getSupportLoaderManager().initLoader(LOADER_ID++,null,this);
-
         //改变播放列表高度，并置于底部
         Window w = getWindow();
-        w.setWindowAnimations(R.style.AnimBottom);
+//        w.setWindowAnimations(R.style.AnimBottom);
         WindowManager wm = getWindowManager();
         Display display = wm.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
@@ -135,11 +133,12 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         super.finish();
         overridePendingTransition(0, R.anim.slide_bottom_out);
     }
-
+//
     @Override
     protected void onDestroy() {
         super.onDestroy();
         MusicEventHelper.removeCallback(this);
+        mHandler.remove();
     }
 
     @Override
@@ -152,14 +151,22 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         if(data == null)
             return;
         mAdapter.setData(data);
-        final int curId = MusicService.getCurrentMP3() != null ? MusicService.getCurrentMP3().getId() : -1;
-        if(curId < 0)
+        final int currentId = MusicService.getCurrentMP3() != null ? MusicService.getCurrentMP3().getId() : -1;
+        if(currentId < 0)
             return;
+        smoothScrollTo(data,currentId);
+    }
+
+    /**
+     * 滚动到指定位置
+     * @param data
+     */
+    private void smoothScrollTo(List<PlayListSong> data,int currentId) {
         new Thread(){
             @Override
             public void run() {
                 for(int i = 0 ; i < data.size();i++){
-                    if(data.get(i).AudioId == curId){
+                    if(data.get(i).AudioId == currentId){
                         mPos = i;
                         Message msg = mHandler.obtainMessage(0);
                         msg.sendToTarget();
@@ -200,15 +207,12 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         super.onResume();
         new RxPermissions(this)
                 .request(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean aBoolean) throws Exception {
-                        if(aBoolean != mHasPermission){
-                            mHasPermission = aBoolean;
-                            Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
-                            intent.putExtra("permission",mHasPermission);
-                            sendBroadcast(intent);
-                        }
+                .subscribe(aBoolean -> {
+                    if(aBoolean != mHasPermission){
+                        mHasPermission = aBoolean;
+                        Intent intent = new Intent(MusicService.ACTION_PERMISSION_CHANGE);
+                        intent.putExtra("permission",mHasPermission);
+                        sendBroadcast(intent);
                     }
                 });
     }
@@ -224,39 +228,27 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         }
     }
 
-    private static class SeekHandler extends Handler{
-        private final WeakReference<PlayQueueDialog> mRef;
-
-        SeekHandler(Looper looper, PlayQueueDialog dialog) {
-            super(looper);
-            mRef = new WeakReference<>(dialog);
+    @OnHandleMessage
+    public void handleInternal(Message msg){
+        final LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+        int firstItem = layoutManager.findFirstVisibleItemPosition();
+        int lastItem = layoutManager.findLastVisibleItemPosition();
+        //然后区分情况
+        if (mPos <= firstItem ){
+            //当要置顶的项在当前显示的第一个项的前面时
+            mRecyclerView.scrollToPosition(mPos);
+        }else if (mPos <= lastItem ){
+            //当要置顶的项已经在屏幕上显示时
+            int top = mRecyclerView.getChildAt(mPos - firstItem).getTop();
+            mRecyclerView.scrollBy(0, top);
+        }else{
+            //当要置顶的项在当前显示的最后一项的后面时
+            mRecyclerView.scrollToPosition(mPos);
+            //这里这个变量是用在RecyclerView滚动监听里面的
+            mMove = true;
         }
-
-        @Override
-        public void handleMessage(Message msg) {
-            final PlayQueueDialog dialog = mRef.get();
-            final int pos = dialog.mPos;
-            final RecyclerView recyclerView = dialog.mRecyclerView;
-            final LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-            int firstItem = layoutManager.findFirstVisibleItemPosition();
-            int lastItem = layoutManager.findLastVisibleItemPosition();
-            //然后区分情况
-            if (pos <= firstItem ){
-                //当要置顶的项在当前显示的第一个项的前面时
-                recyclerView.scrollToPosition(pos);
-            }else if (pos <= lastItem ){
-                //当要置顶的项已经在屏幕上显示时
-                int top = recyclerView.getChildAt(pos - firstItem).getTop();
-                recyclerView.scrollBy(0, top);
-            }else{
-                //当要置顶的项在当前显示的最后一项的后面时
-                recyclerView.scrollToPosition(pos);
-                //这里这个变量是用在RecyclerView滚动监听里面的
-                dialog.mMove = true;
-            }
-            if(pos >= 0){
-                dialog.mRecyclerView.getLayoutManager().scrollToPosition(pos);
-            }
+        if(mPos >= 0){
+            mRecyclerView.getLayoutManager().scrollToPosition(mPos);
         }
     }
 }

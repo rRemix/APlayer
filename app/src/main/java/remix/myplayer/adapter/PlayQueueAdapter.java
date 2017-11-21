@@ -2,7 +2,6 @@ package remix.myplayer.adapter;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.Message;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -13,6 +12,8 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.model.mp3.PlayListSong;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -27,12 +28,6 @@ import remix.myplayer.util.PlayListUtil;
  * 正在播放列表的适配器
  */
 public class PlayQueueAdapter extends BaseAdapter<PlayListSong,PlayQueueAdapter.PlayQueueHolder> {
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            notifyDataSetChanged();
-        }
-    };
     public PlayQueueAdapter(Context context,int layoutId) {
         super(context,layoutId);
     }
@@ -51,36 +46,26 @@ public class PlayQueueAdapter extends BaseAdapter<PlayListSong,PlayQueueAdapter.
             holder.mArtist.setText(CommonUtil.processInfo(item.getArtist(),CommonUtil.ARTISTTYPE));
             holder.mArtist.setVisibility(View.VISIBLE);
 //                //高亮
-//                if(MusicService.getCurrentMP3() != null && MusicService.getCurrentMP3().getId() == item.getId()){
-//                    holder.mHighLight.setVisibility(View.VISIBLE);
-//                    holder.mSong.setTextColor(ThemeStore.getAccentColor());
-//                } else {
-//                    holder.mHighLight.setVisibility(View.GONE);
-//                    holder.mSong.setTextColor(ThemeStore.getTextColorPrimary());
-//                }
+            if(MusicService.getCurrentMP3() != null && MusicService.getCurrentMP3().getId() == item.getId()){
+                holder.mSong.setTextColor(ThemeStore.getAccentColor());
+            } else {
+//                holder.mSong.setTextColor(Color.parseColor(ThemeStore.isDay() ? "#323335" : "#ffffff"));
+                holder.mSong.setTextColor(ThemeStore.getTextColorPrimary());
+            }
         }
 
         //删除按钮
-        holder.mDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PlayListUtil.deleteSong(audioId,Global.PlayQueueID);
-//                    if(mCursor.getInt(0) == MusicService.getCurrentMP3().getId()) {
-//                        Intent intent = new Intent(Constants.CTL_ACTION);
-//                        intent.putExtra("Control", Constants.NEXT);
-//                        mContext.sendBroadcast(intent);
-//                    }
-                //更新界面
-                mHandler.sendEmptyMessage(Constants.NOTIFYDATACHANGED);
+        holder.mDelete.setOnClickListener(v -> {
+            if(PlayListUtil.deleteSong(audioId,Global.PlayQueueID)){
+//                if(MusicService.getCurrentMP3() != null && MusicService.getCurrentMP3().getId() == audioId){
+//                    mContext.sendBroadcast(new Intent(Constants.CTL_ACTION).putExtra("Control", Constants.NEXT));
+//                }
             }
+            //更新界面
+           new Handler().sendEmptyMessage(Constants.NOTIFYDATACHANGED);
         });
         if(mOnItemClickLitener != null){
-            holder.mContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition());
-                }
-            });
+            holder.mContainer.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition()));
         }
     }
 
@@ -91,8 +76,6 @@ public class PlayQueueAdapter extends BaseAdapter<PlayListSong,PlayQueueAdapter.
         TextView mArtist;
         @BindView(R.id.playqueue_delete)
         ImageView mDelete;
-        @BindView(R.id.item_highlight)
-        ImageView mHighLight;
         @BindView(R.id.item_root)
         RelativeLayout mContainer;
         public PlayQueueHolder(View v) {

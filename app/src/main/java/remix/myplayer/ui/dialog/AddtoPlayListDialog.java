@@ -95,7 +95,6 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
 
         //改变高度，并置于底部
         Window w = getWindow();
-        w.setWindowAnimations(R.style.AnimBottom);
         WindowManager wm = getWindowManager();
         Display display = wm.getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
