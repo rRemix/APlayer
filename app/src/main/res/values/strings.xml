@@ -236,4 +236,6 @@
     <string name="scan_getting_files">正在获取目录下所有文件</string>
     <string name="no_audio_file">无音频文件</string>
     <string name="manual_scan_tip">扫描指定目录下所有歌曲文件</string>
+    <string name="playing_notification">正在播放通知</string>
+    <string name="playing_notification_description">正在播放通知提供了播放/暂停等便捷操作</string>
 </resources>
