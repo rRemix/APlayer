@@ -86,12 +86,7 @@ public class FloatLrcView extends RelativeLayout {
             mLrcSettingContainer.setVisibility(GONE);
         }
     };
-    private Runnable mLongClickRunnable = new Runnable() {
-        @Override
-        public void run() {
-            saveCanMove(true);
-        }
-    };
+    private Runnable mLongClickRunnable = () -> saveCanMove(true);
 
     public FloatLrcView(Context context) {
         super(context);

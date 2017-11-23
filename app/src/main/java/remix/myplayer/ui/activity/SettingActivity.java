@@ -64,8 +64,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     TextView mLrcPath;
     @BindView(R.id.setting_clear_text)
     TextView mCache;
-    @BindView(R.id.setting_lockscreen_text)
-    TextView mLockScreenText;
     @BindView(R.id.setting_navaigation_switch)
     SwitchCompat mNaviSwitch;
     @BindView(R.id.setting_shake_switch)
@@ -78,6 +76,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     TextView mFloatLrcTip;
     @BindView(R.id.setting_screen_switch)
     SwitchCompat mScreenSwitch;
+    @BindView(R.id.setting_notify_switch)
+    SwitchCompat mNotifyStyleSwitch;
+    @BindView(R.id.setting_notify_color_container)
+    View mNotifyColorContainer;
 
     //是否需要重建activity
     private boolean mNeedRecreate = false;
@@ -110,8 +112,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
 
         //导航栏是否变色 是否启用摇一摇切歌
-        final String[] keyWord = new String[]{"ColorNavigation","Shake","OnlineLrc","FloatLrc", SPUtil.SPKEY.SCREEN_ALWAYS_ON};
-        ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch,mFloatLrcSwitch,mScreenSwitch}, new ButterKnife.Action<SwitchCompat>() {
+        final String[] keyWord = new String[]{"ColorNavigation","Shake",
+                "OnlineLrc","FloatLrc", SPUtil.SPKEY.SCREEN_ALWAYS_ON,SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,};
+        ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch
+                ,mFloatLrcSwitch,mScreenSwitch, mNotifyStyleSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
                 view.setChecked(SPUtil.getValue(mContext,"Setting",keyWord[index],false));
@@ -156,7 +160,13 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //屏幕常亮
                             case 4:
-                                SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.SCREEN_ALWAYS_ON,isChecked);
+//                                SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.SCREEN_ALWAYS_ON,isChecked);
+                                break;
+                            //通知栏样式
+                            case 5:
+                                sendBroadcast(new Intent(Constants.CTL_ACTION)
+                                        .putExtra("Control",Constants.TOGGLE_NOTIFY)
+                                        .putExtra(SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,isChecked));
                                 break;
                         }
                         SPUtil.putValue(SettingActivity.this,"Setting",keyWord[index],isChecked);
@@ -183,7 +193,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         //分根线颜色
         ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),
-                findView(R.id.setting_divider_3),findView(R.id.setting_divider_4)},
+                findView(R.id.setting_divider_3),findView(R.id.setting_divider_4),findView(R.id.setting_divider_5)},
                 (ButterKnife.Action<View>) (view, index) -> view.setBackgroundColor(ThemeStore.getDividerColor()));
 
         //计算缓存大小
@@ -237,12 +247,12 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     }
 
-    @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_container,
+    @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_color_container,
             R.id.setting_feedback_container,R.id.setting_about_container, R.id.setting_update_container,
             R.id.setting_lockscreen_container,R.id.setting_lrc_priority_container,R.id.setting_lrc_float_container,
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
             R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container,
-            R.id.setting_screen_container,R.id.setting_scan_container})
+            R.id.setting_screen_container,R.id.setting_scan_container,R.id.setting_classic_notify_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -340,29 +350,31 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 startActivityForResult(new Intent(this, ColorChooseDialog.class),0);
                 break;
             //通知栏底色
-            case R.id.setting_notify_container:
-                try {
-                    MobclickAgent.onEvent(this,"NotifyColor");
-                    new MaterialDialog.Builder(this)
-                            .title(R.string.notify_bg_color)
-                            .titleColorAttr(R.attr.text_color_primary)
-                            .positiveText(R.string.choose)
-                            .positiveColorAttr(R.attr.text_color_primary)
-                            .buttonRippleColorAttr(R.attr.ripple_color)
-                            .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
-                            .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"Setting","IsSystemColor",true) ? 0 : 1,
-                                    (dialog, view, which, text) -> {
-                                        SPUtil.putValue(SettingActivity.this,"Setting","IsSystemColor",which == 0);
-                                        sendBroadcast(new Intent(Constants.NOTIFY));
-                                        return true;
-                                    })
-                            .backgroundColorAttr(R.attr.background_color_3)
-                            .itemsColorAttr(R.attr.text_color_primary)
-                            .theme(ThemeStore.getMDDialogTheme())
-                            .show();
-                } catch (Exception e){
-                    e.printStackTrace();
+            case R.id.setting_notify_color_container:
+                if(!SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,false)){
+                    ToastUtil.show(mContext,R.string.notify_bg_color_warnning);
+                    return;
                 }
+                MobclickAgent.onEvent(this,"NotifyColor");
+                new MaterialDialog.Builder(this)
+                        .title(R.string.notify_bg_color)
+                        .titleColorAttr(R.attr.text_color_primary)
+                        .positiveText(R.string.choose)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .buttonRippleColorAttr(R.attr.ripple_color)
+                        .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
+                        .itemsCallbackSingleChoice(SPUtil.getValue(mContext,"Setting","IsSystemColor",true) ? 0 : 1,
+                                (dialog, view, which, text) -> {
+                                    SPUtil.putValue(mContext,"Setting","IsSystemColor",which == 0);
+                                    sendBroadcast(new Intent(Constants.CTL_ACTION)
+                                            .putExtra("Control",Constants.TOGGLE_NOTIFY)
+                                            .putExtra(SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,mNotifyStyleSwitch.isChecked()));
+                                    return true;
+                                })
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .itemsColorAttr(R.attr.text_color_primary)
+                        .theme(ThemeStore.getMDDialogTheme())
+                        .show();
                 break;
             //音效设置
             case R.id.setting_eq_container:
@@ -445,6 +457,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .negativeColorAttr(R.attr.text_color_primary)
                         .contentColorAttr(R.attr.text_color_primary)
                         .show();
+                break;
+            case R.id.setting_classic_notify_container:
+                mNotifyStyleSwitch.setChecked(!mNotifyStyleSwitch.isChecked());
                 break;
         }
     }

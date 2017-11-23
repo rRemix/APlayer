@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -24,7 +23,6 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import remix.myplayer.R;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -49,7 +47,7 @@ public class NotifyImpl extends Notify {
 
     @Override
     public void update() {
-        mRemoteBigView = new RemoteViews(mService.getPackageName(),  R.layout.notification_big);
+        mRemoteBigView = new RemoteViews(mService.getPackageName(),R.layout.notification_big);
         mRemoteView = new RemoteViews(mService.getPackageName(),R.layout.notification);
         boolean isPlay = MusicService.isPlay();
 
@@ -89,7 +87,7 @@ public class NotifyImpl extends Notify {
                 mRemoteView.setImageViewResource(R.id.notify_play, R.drawable.notify_pause);
             }
             //设置封面
-            final int size = DensityUtil.dip2px(mService,120);
+            final int size = DensityUtil.dip2px(mService,128);
             final String uri = MediaStoreUtil.getImageUrl(temp.getAlbumId(),Constants.URL_ALBUM);
             ImageRequest imageRequest =
                     ImageRequestBuilder.newBuilderWithSource(!TextUtils.isEmpty(uri) ? Uri.parse(uri) : Uri.EMPTY)
@@ -112,7 +110,6 @@ public class NotifyImpl extends Notify {
                     } catch (Exception e){
                         CommonUtil.uploadException("PushNotify Error",e);
                     } finally {
-
                         pushNotify();
                     }
                 }
@@ -128,40 +125,21 @@ public class NotifyImpl extends Notify {
     }
 
     private void buildNotification(Context context) {
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context,NOTIFICATION_CHANNEL_ID);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context,NOTIFICATION_CHANNEL_ID);
         if(mNotification == null){
-            mBuilder.setContent(mRemoteView)
+            builder.setContent(mRemoteView)
                     .setCustomBigContentView(mRemoteBigView)
                     .setContentText("")
                     .setContentTitle("")
-                    .setWhen(System.currentTimeMillis())
+                    .setShowWhen(false)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
                     .setOngoing(MusicService.isPlay())
+                    .setContentIntent(getContentIntent())
                     .setSmallIcon(R.drawable.notifbar_icon);
-            mBuilder.setCustomBigContentView(mRemoteBigView);
-            mBuilder.setCustomContentView(mRemoteView);
-            //点击通知栏打开播放界面
-            //后退回到主界面
-            Intent result = new Intent(context,PlayerActivity.class);
+            builder.setCustomBigContentView(mRemoteBigView);
+            builder.setCustomContentView(mRemoteView);
 
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-            stackBuilder.addParentStack(PlayerActivity.class);
-            stackBuilder.addNextIntent(result);
-
-            stackBuilder.editIntentAt(1).putExtra("Notify", true);
-            stackBuilder.editIntentAt(0).putExtra("Notify", true);
-            PendingIntent resultPendingIntent =
-                    stackBuilder.getPendingIntent(
-                            0,
-                            PendingIntent.FLAG_UPDATE_CURRENT
-                    );
-
-//                Intent notifyIntent = new Intent(context,PlayerActivity.class);
-//                notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                PendingIntent pendingIntent = PendingIntent.getActivity(context,0,notifyIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-
-            mBuilder.setContentIntent(resultPendingIntent);
-            mNotification = mBuilder.build();
+            mNotification = builder.build();
         } else {
             mNotification.bigContentView = mRemoteBigView;
             mNotification.contentView = mRemoteView;
@@ -174,22 +152,22 @@ public class NotifyImpl extends Notify {
         actionIntent.putExtra("FromNotify", true);
         //播放或者暂停
         actionIntent.putExtra("Control", Constants.TOGGLE);
-        PendingIntent playIntent = PendingIntent.getBroadcast(context, 1, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent playIntent = PendingIntent.getBroadcast(context, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_play, playIntent);
         mRemoteView.setOnClickPendingIntent(R.id.notify_play,playIntent);
         //下一首
         actionIntent.putExtra("Control", Constants.NEXT);
-        PendingIntent nextIntent = PendingIntent.getBroadcast(context,2,actionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent nextIntent = PendingIntent.getBroadcast(context,1,actionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_next, nextIntent);
         mRemoteView.setOnClickPendingIntent(R.id.notify_next, nextIntent);
         //上一首
         actionIntent.putExtra("Control", Constants.PREV);
-        PendingIntent prevIntent = PendingIntent.getBroadcast(context, 3, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent prevIntent = PendingIntent.getBroadcast(context, 2, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_prev,prevIntent);
 
         //关闭通知栏
         actionIntent.putExtra("Close", true);
-        PendingIntent closeIntent = PendingIntent.getBroadcast(context, 4, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent closeIntent = PendingIntent.getBroadcast(context, 3, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_close, closeIntent);
         mRemoteView.setOnClickPendingIntent(R.id.notify_close,closeIntent);
     }

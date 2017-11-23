@@ -70,6 +70,7 @@ import remix.myplayer.observer.MediaStoreObserver;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
 import remix.myplayer.service.notification.Notify;
 import remix.myplayer.service.notification.NotifyImpl;
+import remix.myplayer.service.notification.NotifyImpl24;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.customview.floatwidget.FloatLrcView;
@@ -336,7 +337,12 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mWakeLock = ((PowerManager)getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,getClass().getSimpleName());
         mWakeLock.setReferenceCounted(false);
         //通知栏
-        mNotify = new NotifyImpl(this);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N & !SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,false)){
+            mNotify = new NotifyImpl24(this);
+        } else {
+            mNotify = new NotifyImpl(this);
+        }
+
         //监听audiofocus
         mAudioFocusListener = new AudioFocusChangeListener();
 
@@ -811,6 +817,18 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                         prepare(mCurrentInfo.getUrl());
                     }
                     break;
+                //切换通知栏样式
+                case Constants.TOGGLE_NOTIFY:
+                    mNotify.cancel();
+                    boolean classic = intent.getBooleanExtra(SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,false);
+                    if(classic){
+                        mNotify = new NotifyImpl(MusicService.this);
+                    } else {
+                        mNotify = new NotifyImpl24(MusicService.this);
+                    }
+                    if(Global.isNotifyShowing())
+                        mNotify.update();
+                    break;
                 default:break;
             }
         }
@@ -844,6 +862,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             updateMediaSession(control);
             mShortcutManager.updateContinueShortcut();
         }
+    }
+
+    public MediaSessionCompat getMediaSession(){
+        return mMediaSession;
     }
 
     /**

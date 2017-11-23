@@ -238,4 +238,11 @@
     <string name="manual_scan_tip">扫描指定目录下所有歌曲文件</string>
     <string name="playing_notification">正在播放通知</string>
     <string name="playing_notification_description">正在播放通知提供了播放/暂停等便捷操作</string>
+    <string name="previous">上一首</string>
+    <string name="next">下一首</string>
+    <string name="play_pause">播放/暂停</string>
+    <string name="notify">通知栏</string>
+    <string name="notify_style">经典通知栏样式</string>
+    <string name="notify_style_tip">使用经典通知栏样式</string>
+    <string name="notify_bg_color_warnning">请先打开经典通知栏</string>
 </resources>

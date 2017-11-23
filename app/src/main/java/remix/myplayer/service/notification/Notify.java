@@ -3,12 +3,16 @@ package remix.myplayer.service.notification;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.TaskStackBuilder;
 
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.Global;
 
 /**
@@ -17,11 +21,11 @@ import remix.myplayer.util.Global;
 
 public abstract class Notify {
     protected MusicService mService;
-    protected NotificationManager mNotificationManager;
+    private NotificationManager mNotificationManager;
 
     private static final int IDLE_DELAY = 5 * 60 * 1000;
-    protected long mLastPlayedTime;
-    protected int mNotifyMode = NOTIFY_MODE_NONE;
+    private long mLastPlayedTime;
+    private int mNotifyMode = NOTIFY_MODE_NONE;
     protected long mNotificationPostTime = 0;
     private static final int NOTIFY_MODE_NONE = 0;
     private static final int NOTIFY_MODE_FOREGROUND = 1;
@@ -32,7 +36,7 @@ public abstract class Notify {
 
     protected Notification mNotification;
 
-    public Notify(MusicService context){
+    Notify(MusicService context){
         mService = context;
         init();
     }
@@ -102,5 +106,18 @@ public abstract class Notify {
         return MusicService.isPlay() || System.currentTimeMillis() - mLastPlayedTime < IDLE_DELAY;
     }
 
+    protected PendingIntent getContentIntent(){
+        Intent result = new Intent(mService,PlayerActivity.class);
 
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(mService);
+        stackBuilder.addParentStack(PlayerActivity.class);
+        stackBuilder.addNextIntent(result);
+
+        stackBuilder.editIntentAt(1).putExtra("Notify", true);
+        stackBuilder.editIntentAt(0).putExtra("Notify", true);
+        return stackBuilder.getPendingIntent(
+                0,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+    }
 }
