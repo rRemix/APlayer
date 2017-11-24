@@ -1529,8 +1529,12 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             return;
         mIsFloatLrcInitializing = true;
         final WindowManager.LayoutParams param = new WindowManager.LayoutParams();
-        param.type = WindowManager.LayoutParams.TYPE_PHONE;
-//        param.type = WindowManager.LayoutParams.TYPE_PHONE;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            param.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            param.type = WindowManager.LayoutParams.TYPE_PHONE;
+        }
         param.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         param.format = PixelFormat.RGBA_8888;
         param.gravity = Gravity.TOP;

@@ -72,7 +72,7 @@ public class SPUtil {
 
     public static class SPKEY{
         //桌面歌词是否可移动
-        public static final String CAN_MOVE = "can_move";
+        public static final String FLOAT_LRC_LOCK = "float_lrc_lock";
         //桌面歌词字体大小
         public static final String FLOAT_TEXT_SIZE = "float_text_size";
         //桌面歌词y坐标

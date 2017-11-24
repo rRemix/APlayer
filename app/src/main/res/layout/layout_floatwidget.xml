@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingLeft="@dimen/d15_size"
-    android:paddingRight="@dimen/d15_size">
+    android:paddingRight="@dimen/d15_size"
+    android:id="@+id/widget_root">
 
     <RelativeLayout
         android:id="@+id/widget_pannel"
@@ -120,9 +120,16 @@
                     android:layout_height="@dimen/d30_size"
                     android:layout_toLeftOf="@id/widget_lrc_bigger" />
             </RelativeLayout>
-
         </RelativeLayout>
     </RelativeLayout>
+
+    <ImageButton
+        android:layout_width="@dimen/float_button_size"
+        android:layout_height="@dimen/float_button_size"
+        android:background="@drawable/bg_common_borderless_ripple"
+        android:src="@drawable/widget_lrc_unlock"
+        android:id="@+id/widget_unlock"
+        android:visibility="invisible"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -143,7 +150,6 @@
             android:maxLines="1"
             android:id="@+id/widget_line1"
             android:gravity="center"
-            android:ellipsize="none"
             tools:text="哈哈哈哈哈哈哈哈"/>
 
         <TextView
@@ -153,7 +159,6 @@
             android:textSize="@dimen/s16_size"
             android:maxLines="1"
             android:layout_marginTop="@dimen/d6_size"
-
             android:id="@+id/widget_line2"
             android:gravity="center"
             android:ellipsize="end"
