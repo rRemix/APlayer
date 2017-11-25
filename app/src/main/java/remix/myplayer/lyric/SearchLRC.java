@@ -41,6 +41,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.misc.cache.DiskCache;
+import remix.myplayer.misc.cache.DiskLruCache;
 import remix.myplayer.model.LrcRequest;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.model.netease.NSearchResponse;
@@ -48,8 +50,6 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
-import remix.myplayer.util.cache.DiskCache;
-import remix.myplayer.util.cache.DiskLruCache;
 
 /**
  * Created by Remix on 2015/12/7.

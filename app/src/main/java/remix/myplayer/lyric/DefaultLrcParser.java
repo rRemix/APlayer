@@ -8,9 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
+import remix.myplayer.misc.cache.DiskCache;
+import remix.myplayer.misc.cache.DiskLruCache;
 import remix.myplayer.util.CommonUtil;
-import remix.myplayer.util.cache.DiskCache;
-import remix.myplayer.util.cache.DiskLruCache;
 
 /**
  * @ClassName

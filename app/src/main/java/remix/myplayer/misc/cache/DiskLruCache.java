@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package remix.myplayer.util.cache;
+package remix.myplayer.misc.cache;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;

@@ -46,6 +46,7 @@ import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.model.mp3.Song;
@@ -67,7 +68,6 @@ import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
-import remix.myplayer.util.cache.DiskCache;
 
 import static remix.myplayer.service.MusicService.ACTION_LOAD_FINISH;
 

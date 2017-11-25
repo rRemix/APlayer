@@ -29,11 +29,11 @@ import java.util.Set;
 
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
+import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Artist;
 import remix.myplayer.model.mp3.Genre;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.util.cache.DiskCache;
 
 /**
  * Created by taeja on 16-2-17.

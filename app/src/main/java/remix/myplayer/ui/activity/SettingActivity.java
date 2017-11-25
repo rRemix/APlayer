@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.media.audiofx.AudioEffect;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -34,6 +36,7 @@ import remix.myplayer.application.APlayerApplication;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;
+import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.service.MusicService;
@@ -47,7 +50,6 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
-import remix.myplayer.util.floatpermission.FloatWindowManager;
 
 /**
  * @ClassName SettingActivity
@@ -146,10 +148,16 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             //桌面歌词
                             case 3:
                                 if(isChecked && !FloatWindowManager.getInstance().checkPermission(mContext)){
-                                    ToastUtil.show(mContext,R.string.plase_give_float_permission);
                                     mFloatLrcSwitch.setOnCheckedChangeListener(null);
                                     mFloatLrcSwitch.setChecked(false);
                                     mFloatLrcSwitch.setOnCheckedChangeListener(this);
+                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                                        intent.setData(Uri.parse("package:" + getPackageName()));
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(intent);
+                                    }
+                                    ToastUtil.show(mContext,R.string.plase_give_float_permission);
                                     return;
                                 }
                                 mFloatLrcTip.setText(isChecked ? R.string.opened_float_lrc : R.string.closed_float_lrc);

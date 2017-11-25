@@ -62,6 +62,7 @@ import remix.myplayer.listener.LockScreenListener;
 import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.lyric.LrcRow;
 import remix.myplayer.lyric.SearchLRC;
+import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.model.FloatLrcContent;
 import remix.myplayer.model.mp3.PlayListSong;
 import remix.myplayer.model.mp3.Song;
@@ -82,7 +83,6 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
-import remix.myplayer.util.floatpermission.FloatWindowManager;
 
 
 /**
@@ -173,7 +173,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /**电源锁*/
     private PowerManager.WakeLock mWakeLock;
     /** 通知栏*/
-    private Notify mNotify;
+    private Notify mPlayingNotify;
     /** 当前控制命令*/
     private int mControl;
     /** WindowManager 控制悬浮窗*/
@@ -338,9 +338,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mWakeLock.setReferenceCounted(false);
         //通知栏
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N & !SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,false)){
-            mNotify = new NotifyImpl24(this);
+            mPlayingNotify = new NotifyImpl24(this);
         } else {
-            mNotify = new NotifyImpl(this);
+            mPlayingNotify = new NotifyImpl(this);
         }
 
         //监听audiofocus
@@ -506,7 +506,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(isPlay())
                 pause(false);
             mShortcutManager.updateContinueShortcut();
-            mNotify.cancel();
+            mPlayingNotify.cancel();
             closeAudioEffectSession();
             removeFloatLrc();
             updateAppwidget();
@@ -681,7 +681,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     }
 
     public class MusicEventReceiver extends BroadcastReceiver{
-
         @Override
         public void onReceive(Context context, Intent intent) {
             handleMusicEvent(intent);
@@ -727,7 +726,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(intent.getExtras().getBoolean("Close")){
                 Global.setNotifyShowing(false);
                 pause(false);
-                mNotify.cancel();
+                mPlayingNotify.cancel();
+                if(mFloatLrcView != null)
+                    mFloatLrcView.cancelNotify();
                 return;
             }
 
@@ -819,15 +820,20 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     break;
                 //切换通知栏样式
                 case Constants.TOGGLE_NOTIFY:
-                    mNotify.cancel();
+                    mPlayingNotify.cancel();
                     boolean classic = intent.getBooleanExtra(SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,false);
                     if(classic){
-                        mNotify = new NotifyImpl(MusicService.this);
+                        mPlayingNotify = new NotifyImpl(MusicService.this);
                     } else {
-                        mNotify = new NotifyImpl24(MusicService.this);
+                        mPlayingNotify = new NotifyImpl24(MusicService.this);
                     }
                     if(Global.isNotifyShowing())
-                        mNotify.update();
+                        mPlayingNotify.update();
+                    break;
+                //解锁通知栏
+                case Constants.UNLOCK_DESTOP_LYRIC:
+                    if(mFloatLrcView != null)
+                        mFloatLrcView.saveLock(false, true);
                     break;
                 default:break;
             }
@@ -855,7 +861,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             //更新ui
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
             //更新通知栏
-            mNotify.update();
+            mPlayingNotify.update();
             //更新桌面歌词播放按钮
             if(mFloatLrcView != null)
                 mFloatLrcView.setPlayIcon(MusicService.isPlay());
@@ -1522,6 +1528,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      */
     private boolean mIsFloatLrcInitializing = false;
     private void createFloatLrc(){
+        if(mFloatLrcView != null){
+            ToastUtil.show(mContext,"桌面歌词已经存在");
+            return;
+        }
         if (checkPermission())
             return;
 
@@ -1535,17 +1545,26 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         } else {
             param.type = WindowManager.LayoutParams.TYPE_PHONE;
         }
-        param.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+//        if(SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LRC_LOCK,false)){
+//            param.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+//                    | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+//        }
+//        param.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+//        param.format = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LRC_LOCK,false) ?
+//                PixelFormat.TRANSLUCENT :
+//                PixelFormat.RGBA_8888;
         param.format = PixelFormat.RGBA_8888;
         param.gravity = Gravity.TOP;
         param.width = mContext.getResources().getDisplayMetrics().widthPixels;
         param.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         param.x = 0;
         param.y = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_Y,0);
-        if(mFloatLrcView != null){
-            mWindowManager.removeView(mFloatLrcView);
-            mFloatLrcView = null;
-        }
+
+//        if(mFloatLrcView != null){
+//            mWindowManager.removeView(mFloatLrcView);
+//            mFloatLrcView = null;
+//        }
+
         mFloatLrcView = new FloatLrcView(mContext);
         mWindowManager.addView(mFloatLrcView,param);
         mIsFloatLrcInitializing = false;
@@ -1557,6 +1576,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      */
     private void removeFloatLrc(){
         if(mFloatLrcView != null){
+            mFloatLrcView.cancelNotify();
             mWindowManager.removeView(mFloatLrcView);
             mFloatLrcView = null;
         }

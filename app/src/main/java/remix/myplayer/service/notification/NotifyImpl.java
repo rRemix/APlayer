@@ -125,7 +125,7 @@ public class NotifyImpl extends Notify {
     }
 
     private void buildNotification(Context context) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context,NOTIFICATION_CHANNEL_ID);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, PLAYING_NOTIFICATION_CHANNEL_ID);
         if(mNotification == null){
             builder.setContent(mRemoteView)
                     .setCustomBigContentView(mRemoteBigView)

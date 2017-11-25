@@ -53,7 +53,8 @@ public class Constants {
     public final static int LOVE = 7;
     public final static int TOGGLE_MEDIASESSION = 8;
     public final static int PLAY_TEMP = 9;
-    public static final int TOGGLE_NOTIFY = 10;
+    public final static int TOGGLE_NOTIFY = 10;
+    public final static int UNLOCK_DESTOP_LYRIC = 11;
     //播放模式
     public final static int PLAY_LOOP = 50;
     public final static int PLAY_SHUFFLE = 51;

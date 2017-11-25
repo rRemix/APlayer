@@ -1,4 +1,4 @@
-package remix.myplayer.util.cache;
+package remix.myplayer.misc.cache;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;

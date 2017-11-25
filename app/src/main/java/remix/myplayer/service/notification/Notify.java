@@ -31,8 +31,8 @@ public abstract class Notify {
     private static final int NOTIFY_MODE_FOREGROUND = 1;
     private static final int NOTIFY_MODE_BACKGROUND = 2;
 
-    static final String NOTIFICATION_CHANNEL_ID = "playing_notification";
-    static final int NOTIFICATION_ID = 1;
+    static final String PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification";
+    static final int PLAYING_NOTIFICATION_ID = 1;
 
     protected Notification mNotification;
 
@@ -50,7 +50,7 @@ public abstract class Notify {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void createNotificationChannel(){
-        NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,mService.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW);
+        NotificationChannel notificationChannel = new NotificationChannel(PLAYING_NOTIFICATION_CHANNEL_ID,mService.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW);
         notificationChannel.setShowBadge(false);
         notificationChannel.enableLights(false);
         notificationChannel.enableVibration(false);
@@ -70,18 +70,18 @@ public abstract class Notify {
             newNotifyMode = NOTIFY_MODE_NONE;
         }
 
-        mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+        mNotificationManager.notify(PLAYING_NOTIFICATION_ID, mNotification);
         if (mNotifyMode != newNotifyMode) {
             if (mNotifyMode == NOTIFY_MODE_FOREGROUND) {
                 mService.stopForeground(newNotifyMode == NOTIFY_MODE_NONE);
             } else if (newNotifyMode == NOTIFY_MODE_NONE) {
-                mNotificationManager.cancel(NOTIFICATION_ID);
+                mNotificationManager.cancel(PLAYING_NOTIFICATION_ID);
             }
         }
         if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
-            mService.startForeground(NOTIFICATION_ID, mNotification);
+            mService.startForeground(PLAYING_NOTIFICATION_ID, mNotification);
         } else if (newNotifyMode == NOTIFY_MODE_BACKGROUND) {
-            mNotificationManager.notify(NOTIFICATION_ID, mNotification);
+            mNotificationManager.notify(PLAYING_NOTIFICATION_ID, mNotification);
         }
 
         //记录最后一次播放的时间
@@ -95,7 +95,7 @@ public abstract class Notify {
      */
     public void cancel(){
         mService.stopForeground(true);
-        mNotificationManager.cancel(NOTIFICATION_ID);
+        mNotificationManager.cancel(PLAYING_NOTIFICATION_ID);
         mNotifyMode = NOTIFY_MODE_NONE;
     }
 
@@ -106,7 +106,7 @@ public abstract class Notify {
         return MusicService.isPlay() || System.currentTimeMillis() - mLastPlayedTime < IDLE_DELAY;
     }
 
-    protected PendingIntent getContentIntent(){
+    PendingIntent getContentIntent(){
         Intent result = new Intent(mService,PlayerActivity.class);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(mService);

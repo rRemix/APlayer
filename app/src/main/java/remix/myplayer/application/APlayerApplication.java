@@ -24,6 +24,7 @@ import remix.myplayer.BuildConfig;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
+import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
@@ -33,7 +34,6 @@ import remix.myplayer.util.ErrUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.cache.DiskCache;
 
 /**
  * Created by taeja on 16-3-16.

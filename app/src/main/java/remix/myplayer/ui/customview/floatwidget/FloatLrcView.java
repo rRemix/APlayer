@@ -1,11 +1,17 @@
 package remix.myplayer.ui.customview.floatwidget;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PointF;
+import android.os.Build;
 import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -20,8 +26,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.lang.ref.WeakReference;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -34,6 +38,7 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * @ClassName
@@ -48,7 +53,7 @@ public class FloatLrcView extends RelativeLayout {
     private PointF mLastPoint = new PointF();
     private boolean mIsLock = false;
     private FloatLrcContent mLrcContent;
-    private UIHandler mUIHandler;
+    private Handler mUIHandler = new Handler();
     @BindView(R.id.widget_line1)
     FloatTextView mLine1;
     @BindView(R.id.widget_line2)
@@ -78,6 +83,8 @@ public class FloatLrcView extends RelativeLayout {
 
     private FloatColorAdapter mColorAdapter;
 
+    private UnLockNotify mNotify;
+
     //当前字体大小
     private static final int SMALL = 1;
     private static final int MEDIUM = 2;
@@ -101,8 +108,6 @@ public class FloatLrcView extends RelativeLayout {
         }
     };
 
-    private Runnable mLongClickRunnable = () -> saveLock(false);
-
     public FloatLrcView(Context context) {
         super(context);
         init(context);
@@ -121,9 +126,8 @@ public class FloatLrcView extends RelativeLayout {
 
     private void init(Context context) {
         mContext = context;
-
+        mNotify = new UnLockNotify();
         mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        mUIHandler = new UIHandler(this);
 
         View root = LayoutInflater.from(mContext).inflate(R.layout.layout_floatwidget, null);
         ButterKnife.bind(this, root);
@@ -172,22 +176,21 @@ public class FloatLrcView extends RelativeLayout {
         mLine1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
         mLine2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
         mIsLock = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LRC_LOCK,false);
+        saveLock(mIsLock,false);
 
         mLock.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
                 mLock.getViewTreeObserver().removeOnPreDrawListener(this);
-                int[] location = new int[2];
-                mLock.getLocationOnScreen(location);
-                mLock.getLocationInWindow(location);
-                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mUnLock.getLayoutParams();
-                lp.setMargins(location[0] ,location[1],0,0);
-                mUnLock.setLayoutParams(lp);
-//                mUnLock.setLeft(location[0]);
-//                mUnLock.setTop(location[1]);
-                if(mIsLock){
-                    mUnLock.setVisibility(VISIBLE);
-                }
+//                int[] location = new int[2];
+//                mLock.getLocationOnScreen(location);
+//                mLock.getLocationInWindow(location);
+//                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mUnLock.getLayoutParams();
+//                lp.setMargins(location[0] ,location[1],0,0);
+//                mUnLock.setLayoutParams(lp);
+//                if(mIsLock){
+//                    mUnLock.setVisibility(VISIBLE);
+//                }
                 return true;
             }
         });
@@ -214,21 +217,9 @@ public class FloatLrcView extends RelativeLayout {
     /** 当前是否正在拖动*/
     private boolean mIsDragging = false;
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-//        if(mIsLock){
-//            getParent().requestDisallowInterceptTouchEvent(true);
-//            return false;
-//        }
-        return super.dispatchTouchEvent(ev);
-    }
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-//        if(mIsLock){
-//            return false;
-//        }
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if(!mIsLock){
@@ -242,19 +233,13 @@ public class FloatLrcView extends RelativeLayout {
             case MotionEvent.ACTION_MOVE:
                 if(!mIsLock){
                     WindowManager.LayoutParams params = (WindowManager.LayoutParams) getLayoutParams();
+
                     if (Math.abs(event.getRawY() - mLastPoint.y) > DISTANCE_THRESHOLD ) {
                         params.y += (int) (event.getRawY() - mLastPoint.y);
                         mWindowManager.updateViewLayout(this, params);
                         mIsDragging = true;
                     }
                     mLastPoint.set(event.getRawX(), event.getRawY());
-                    //保存y坐标
-//                    params = (WindowManager.LayoutParams) getLayoutParams();
-//                    if (params != null){
-//                        mCurrentY = params.y;
-//                        mSaveHandler.obtainMessage(SAVE_Y).sendToTarget();
-//                    }
-//                        SPUtil.putValue(mContext, "Setting", SPUtil.SPKEY.FLOAT_Y, params.y);
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -279,7 +264,7 @@ public class FloatLrcView extends RelativeLayout {
                     WindowManager.LayoutParams params = (WindowManager.LayoutParams) getLayoutParams();
                     SPUtil.putValue(mContext, "Setting", SPUtil.SPKEY.FLOAT_Y, params.y);
                 } else {
-                    mUIHandler.removeCallbacks(mLongClickRunnable);
+//                    mUIHandler.removeCallbacks(mLongClickRunnable);
                 }
                 break;
         }
@@ -304,13 +289,13 @@ public class FloatLrcView extends RelativeLayout {
                 break;
             //锁定
             case R.id.widget_lock:
-                saveLock(true);
+                saveLock(true, true);
                 mUIHandler.postDelayed(mHideRunnable, 0);
-                mUnLock.setVisibility(VISIBLE);
+//                mUnLock.setVisibility(VISIBLE);
                 break;
             //解除锁定
             case R.id.widget_unlock:
-                saveLock(false);
+                saveLock(false, false);
                 mUnLock.setVisibility(GONE);
                 mPanel.setVisibility(VISIBLE);
                 break;
@@ -360,10 +345,34 @@ public class FloatLrcView extends RelativeLayout {
         }
     }
 
-    private void saveLock(boolean canMove){
-        mIsLock = canMove;
-//        ToastUtil.show(mContext, mIsLock ? R.string.float_unlock : R.string.float_lock);
+    public void saveLock(boolean lock, boolean toast){
+        mIsLock = lock;
         SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LRC_LOCK, mIsLock);
+        if(toast){
+            ToastUtil.show(mContext, !mIsLock ? R.string.float_unlock : R.string.float_lock);
+        }
+
+        WindowManager.LayoutParams params = (WindowManager.LayoutParams) getLayoutParams();
+        if(params != null){
+            if(lock){
+                //锁定后点击通知栏解锁
+                mNotify.notifyToUnlock();
+                params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+            } else {
+                mNotify.cancel();
+                params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+            }
+            mWindowManager.updateViewLayout(this,params);
+        }
+    }
+
+    /**
+     * 应用退出后清除通知
+     */
+    public void cancelNotify(){
+        if(mNotify != null)
+            mNotify.cancel();
     }
 
     /**
@@ -374,30 +383,52 @@ public class FloatLrcView extends RelativeLayout {
         mUIHandler.postDelayed(mHideRunnable,DISMISS_THRESHOLD);
     }
 
-
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mUIHandler.removeCallbacksAndMessages(null);
     }
 
-    private static final int SAVE_Y = 10;
-    private static final class UIHandler extends Handler{
-        private final WeakReference<FloatLrcView> mLrcView;
-        UIHandler(final FloatLrcView lrcView){
-            super();
-            mLrcView = new WeakReference<>(lrcView);
-        }
+    private class UnLockNotify {
+        private static final String UNLOCK_NOTIFICATION_CHANNEL_ID = "unlock_notification";
+        private static final int UNLOCK_NOTIFICATION_ID = 2;
 
-        @Override
-        public void handleMessage(Message msg) {
-            final FloatLrcView floatLrcView = mLrcView.get();
-            if(floatLrcView == null)
-                return;
-            switch (msg.what){
-                default:break;
+        private NotificationManager mNotificationManager;
+        UnLockNotify(){
+            mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                initNotificationChanel();
             }
         }
-    }
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        private void initNotificationChanel() {
+            NotificationChannel notificationChannel = new NotificationChannel(UNLOCK_NOTIFICATION_CHANNEL_ID,mContext.getString(R.string.unlock_notification), NotificationManager.IMPORTANCE_LOW);
+            notificationChannel.setShowBadge(false);
+            notificationChannel.enableLights(false);
+            notificationChannel.enableVibration(false);
+            notificationChannel.setDescription(mContext.getString(R.string.unlock_notification_description));
+            mNotificationManager.createNotificationChannel(notificationChannel);
+        }
+
+        void notifyToUnlock(){
+            Notification notification = new NotificationCompat.Builder(mContext, UNLOCK_NOTIFICATION_CHANNEL_ID)
+                    .setContentText(mContext.getString(R.string.float_lock))
+                    .setContentTitle(mContext.getString(R.string.click_to_unlock))
+                    .setShowWhen(false)
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setOngoing(true)
+                    .setContentIntent(PendingIntent.getBroadcast(mContext,
+                            10,
+                            new Intent(Constants.CTL_ACTION).putExtra("Control",Constants.UNLOCK_DESTOP_LYRIC),
+                            PendingIntent.FLAG_UPDATE_CURRENT))
+                    .setSmallIcon(R.drawable.notifbar_icon)
+                    .build();
+            mNotificationManager.notify(UNLOCK_NOTIFICATION_ID,notification);
+        }
+
+        void cancel(){
+            mNotificationManager.cancel(UNLOCK_NOTIFICATION_ID);
+        }
+    }
 }
