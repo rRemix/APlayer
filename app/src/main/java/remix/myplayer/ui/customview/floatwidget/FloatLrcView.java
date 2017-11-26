@@ -133,12 +133,6 @@ public class FloatLrcView extends RelativeLayout {
         ButterKnife.bind(this, root);
         addView(root);
         setUpView();
-//        setOnTouchListener(new OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                return false;
-//            }
-//        });
     }
 
     private void setUpColor() {
@@ -176,7 +170,7 @@ public class FloatLrcView extends RelativeLayout {
         mLine1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
         mLine2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
         mIsLock = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LRC_LOCK,false);
-        saveLock(mIsLock,false);
+
 
         mLock.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
@@ -196,6 +190,21 @@ public class FloatLrcView extends RelativeLayout {
         });
         mTextSizeType = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_SIZE,MEDIUM);
         setPlayIcon(MusicService.isPlay());
+
+        getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                getViewTreeObserver().removeOnPreDrawListener(this);
+                saveLock(mIsLock,false);
+                return true;
+            }
+        });
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        Object o = getLayoutParams();
     }
 
     public void setText(LrcRow lrc1, LrcRow lrc2) {
@@ -216,8 +225,6 @@ public class FloatLrcView extends RelativeLayout {
     private static final int LONGCLICK_THRESHOLD = 1000;
     /** 当前是否正在拖动*/
     private boolean mIsDragging = false;
-
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
@@ -351,7 +358,6 @@ public class FloatLrcView extends RelativeLayout {
         if(toast){
             ToastUtil.show(mContext, !mIsLock ? R.string.float_unlock : R.string.float_lock);
         }
-
         WindowManager.LayoutParams params = (WindowManager.LayoutParams) getLayoutParams();
         if(params != null){
             if(lock){

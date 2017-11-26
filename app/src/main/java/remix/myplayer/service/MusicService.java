@@ -1489,7 +1489,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 //                    if(!isPlay())
 //                        continue;
                     if(!isFloatLrcShowing()) {
-                        mUpdateUIHandler.sendEmptyMessage(Constants.CREATE_FLOAT_LRC);
+                        mUpdateUIHandler.removeMessages(Constants.CREATE_FLOAT_LRC);
+                        mUpdateUIHandler.sendEmptyMessageDelayed(Constants.CREATE_FLOAT_LRC,LRC_THRESHOLD);
                     } else {
                         Message target = mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT);
                         if(mLrcList == null || mLrcList.size() == 0 || mFloatLrcView == null) {
@@ -1519,6 +1520,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                         }
                     }
                 }
+
             }
         }
     }
@@ -1528,18 +1530,13 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      */
     private boolean mIsFloatLrcInitializing = false;
     private void createFloatLrc(){
-        if(mFloatLrcView != null){
-            ToastUtil.show(mContext,"桌面歌词已经存在");
-            return;
-        }
         if (checkPermission())
             return;
-
         if(mIsFloatLrcInitializing)
             return;
         mIsFloatLrcInitializing = true;
-        final WindowManager.LayoutParams param = new WindowManager.LayoutParams();
 
+        final WindowManager.LayoutParams param = new WindowManager.LayoutParams();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             param.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         } else {
@@ -1548,11 +1545,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 //        if(SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LRC_LOCK,false)){
 //            param.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
 //                    | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+//        } else {
+//            param.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 //        }
-//        param.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-//        param.format = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LRC_LOCK,false) ?
-//                PixelFormat.TRANSLUCENT :
-//                PixelFormat.RGBA_8888;
         param.format = PixelFormat.RGBA_8888;
         param.gravity = Gravity.TOP;
         param.width = mContext.getResources().getDisplayMetrics().widthPixels;
@@ -1560,10 +1555,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         param.x = 0;
         param.y = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_Y,0);
 
-//        if(mFloatLrcView != null){
-//            mWindowManager.removeView(mFloatLrcView);
-//            mFloatLrcView = null;
-//        }
+        if(mFloatLrcView != null){
+            mWindowManager.removeView(mFloatLrcView);
+            mFloatLrcView = null;
+        }
 
         mFloatLrcView = new FloatLrcView(mContext);
         mWindowManager.addView(mFloatLrcView,param);

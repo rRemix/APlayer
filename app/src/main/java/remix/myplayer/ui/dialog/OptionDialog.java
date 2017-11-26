@@ -5,9 +5,10 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -17,7 +18,6 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.umeng.analytics.MobclickAgent;
@@ -106,12 +106,7 @@ public class OptionDialog extends BaseDialogActivity {
 
         ButterKnife.apply( new TextView[]{findView(R.id.popup_add_text),findView(R.id.popup_ring_text),
                         findView(R.id.popup_share_text),findView(R.id.popup_delete_text)},
-                new ButterKnife.Action<TextView>(){
-                    @Override
-                    public void apply(@NonNull TextView textView, int index) {
-                        textView.setTextColor(tintColor);
-                    }
-                });
+                (ButterKnife.Action<TextView>) (textView, index) -> textView.setTextColor(tintColor));
     }
 
     @OnClick({R.id.popup_add,R.id.popup_share,R.id.popup_delete,R.id.popup_ring})
@@ -154,23 +149,17 @@ public class OptionDialog extends BaseDialogActivity {
                             .buttonRippleColor(ThemeStore.getRippleColor())
                             .positiveText(R.string.confirm)
                             .negativeText(R.string.cancel)
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    boolean deleteSuccess = !mIsDeletePlayList ?
-                                            MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0 :
-                                            PlayListUtil.deleteSong(mInfo.getId(),mPlayListName);
+                            .onPositive((dialog, which) -> {
+                                boolean deleteSuccess = !mIsDeletePlayList ?
+                                        MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0 :
+                                        PlayListUtil.deleteSong(mInfo.getId(),mPlayListName);
 //                                    if(deleteSuccess){
 //                                        sendBroadcast(new Intent(MusicService.ACTION_MEDIA_CHANGE));
 //                                    }
-                                    ToastUtil.show(OptionDialog.this,deleteSuccess ? R.string.delete_success : R.string.delete_error);
-                                    finish();
-                                }
+                                ToastUtil.show(OptionDialog.this,deleteSuccess ? R.string.delete_success : R.string.delete_error);
+                                finish();
                             })
-                            .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                }
+                            .onNegative((dialog, which) -> {
                             })
                             .backgroundColorAttr(R.attr.background_color_3)
                             .positiveColorAttr(R.attr.text_color_primary)
@@ -191,19 +180,36 @@ public class OptionDialog extends BaseDialogActivity {
      * @param audioId
      */
     private void setRing(int audioId) {
-        ContentValues cv = new ContentValues();
-        cv.put(MediaStore.Audio.Media.IS_RINGTONE, true);
-        cv.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);
-        cv.put(MediaStore.Audio.Media.IS_ALARM, false);
-        cv.put(MediaStore.Audio.Media.IS_MUSIC, false);
-        // 把需要设为铃声的歌曲更新铃声库
-        if(getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cv, MediaStore.MediaColumns._ID + "=?", new String[]{audioId + ""}) > 0) {
-            Uri newUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, audioId);
-            RingtoneManager.setActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE, newUri);
-            ToastUtil.show(this,R.string.set_ringtone_success);
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put(MediaStore.Audio.Media.IS_RINGTONE, true);
+            cv.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);
+            cv.put(MediaStore.Audio.Media.IS_ALARM, false);
+            cv.put(MediaStore.Audio.Media.IS_MUSIC, true);
+            // 把需要设为铃声的歌曲更新铃声库
+            if(getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cv, MediaStore.MediaColumns._ID + "=?", new String[]{audioId + ""}) > 0) {
+                Uri newUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, audioId);
+                RingtoneManager.setActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE, newUri);
+                ToastUtil.show(this,R.string.set_ringtone_success);
+            }
+            else
+                ToastUtil.show(this,R.string.set_ringtone_error);
+        }catch (Exception e){
+            //没有权限
+            if(e instanceof SecurityException){
+                ToastUtil.show(mContext,R.string.please_give_write_settings_permission);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (!Settings.System.canWrite(mContext)) {
+                        Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                        intent.setData(Uri.parse("package:" + mContext.getPackageName()));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                    }
+                }
+            }
+
         }
-        else
-            ToastUtil.show(this,R.string.set_ringtone_error);
+
     }
 
     @Override

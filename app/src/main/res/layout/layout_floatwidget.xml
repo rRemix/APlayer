@@ -129,7 +129,7 @@
         android:background="@drawable/bg_common_borderless_ripple"
         android:src="@drawable/widget_lrc_unlock"
         android:id="@+id/widget_unlock"
-        android:visibility="invisible"/>
+        android:visibility="gone"/>
 
     <LinearLayout
         android:layout_width="match_parent"

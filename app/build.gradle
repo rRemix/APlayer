@@ -25,8 +25,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 32
-        versionName "1.1.9.2"
+        versionCode 33
+        versionName "1.2.0"
         vectorDrawables.useSupportLibrary = true
         ndk {
             abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86','x86_64'

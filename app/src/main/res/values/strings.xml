@@ -248,4 +248,5 @@
     <string name="notify_bg_color_warnning">请先打开经典通知栏</string>
     <string name="unlock_notification">解锁桌面歌词通知</string>
     <string name="click_to_unlock">点击解除锁定</string>
+    <string name="please_give_write_settings_permission">请授予修改系统设置权限</string>
 </resources>
