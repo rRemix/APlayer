@@ -51,7 +51,7 @@ public class BottomActionBarFragment extends BaseFragment{
     TextView mArtist;
     @BindView(R.id.bottom_action_bar)
     RelativeLayout mBottomActionBar;
-    @BindView(R.id.bottom_actionbar_container)
+    @BindView(R.id.bottom_actionbar_root)
     LinearLayout mRootView;
     @BindView(R.id.bottom_action_bar_cover)
     SimpleDraweeView mCover;
@@ -68,7 +68,7 @@ public class BottomActionBarFragment extends BaseFragment{
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.bottom_actionbar,container);
+        View rootView = inflater.inflate(R.layout.bottom_actionbar,container,false);
         mUnBinder = ButterKnife.bind(this,rootView);
 
         //设置整个背景着色

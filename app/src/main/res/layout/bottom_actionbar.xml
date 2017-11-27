@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/item_height"
     android:background="@drawable/commom_playercontrols_bg"
-    android:id="@+id/bottom_actionbar_container">
+    android:id="@+id/bottom_actionbar_root">
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="1px"

@@ -49,11 +49,12 @@
                 app:layout_behavior="remix.myplayer.ui.BottomBarBehavior"/>
 
             <!-- 底部自定义ationbar -->
-            <fragment android:name="remix.myplayer.ui.fragment.BottomActionBarFragment"
-                android:id="@+id/bottom_actionbar_new"
+            <FrameLayout
+                android:id="@+id/bottom_actionbar_container"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/item_height"
                 android:layout_gravity="bottom"
+                android:visibility="gone"
                 app:layout_behavior="remix.myplayer.ui.BottomBarBehavior"/>
         </android.support.design.widget.CoordinatorLayout>
 

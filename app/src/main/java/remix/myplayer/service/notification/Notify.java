@@ -31,10 +31,11 @@ public abstract class Notify {
     private static final int NOTIFY_MODE_FOREGROUND = 1;
     private static final int NOTIFY_MODE_BACKGROUND = 2;
 
-    static final String PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification";
-    static final int PLAYING_NOTIFICATION_ID = 1;
+    public static final String PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification";
+    public static final int PLAYING_NOTIFICATION_ID = 1;
 
     protected Notification mNotification;
+    protected boolean mIsStop;
 
     Notify(MusicService context){
         mService = context;
@@ -96,6 +97,7 @@ public abstract class Notify {
     public void cancel(){
         mService.stopForeground(true);
         mNotificationManager.cancel(PLAYING_NOTIFICATION_ID);
+        mIsStop = true;
         mNotifyMode = NOTIFY_MODE_NONE;
     }
 

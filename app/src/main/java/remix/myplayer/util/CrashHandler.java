@@ -141,7 +141,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         pw.println("App Version: " + pi.versionName);
 
         pw.println("App Version code: " + pi.versionCode);
-        pw.println(pi.versionCode);
         //android版本号
         pw.println("Android release version: " + Build.VERSION.RELEASE);
         pw.println("Android Sdk version: " + Build.VERSION.SDK_INT);
@@ -161,7 +160,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
      */
     private void uploadExceptionToServer(Throwable ex) {
         //TODO Upload Exception Message To Your Web Server
-        MobclickAgent.reportError(mContext,ex);
+//        MobclickAgent.reportError(mContext,ex);
     }
 
 }

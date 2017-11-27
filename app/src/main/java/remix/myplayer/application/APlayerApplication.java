@@ -1,7 +1,6 @@
 package remix.myplayer.application;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.multidex.MultiDexApplication;
@@ -25,7 +24,6 @@ import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.misc.cache.DiskCache;
-import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -81,7 +79,12 @@ public class APlayerApplication extends MultiDexApplication{
         //AppShortcut
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
             new DynamicShortcutManager(this).setUpShortcut();
-        startService(new Intent(this, MusicService.class));
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            startForegroundService(new Intent(this, MusicService.class));
+//        } else {
+//            startService(new Intent(this, MusicService.class));
+//        }
+
     }
 
     private void initUtil() {

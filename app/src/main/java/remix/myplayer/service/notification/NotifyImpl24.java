@@ -44,7 +44,7 @@ public class NotifyImpl24 extends Notify{
     public void update() {
         boolean isPlay = MusicService.isPlay();
 
-        if(!Global.isNotifyShowing() && !isPlay)
+        if(!Global.isNotifyShowing())
             return;
         Song song = MusicService.getCurrentMP3();
         if(song == null)
@@ -103,7 +103,8 @@ public class NotifyImpl24 extends Notify{
                         .setShowActionsInCompactView(0,1,2)
                         .setMediaSession(mService.getMediaSession().getSessionToken()))
                 .build();
-
+        if(mIsStop)
+            return;
         pushNotify();
     }
 

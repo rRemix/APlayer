@@ -51,7 +51,7 @@ public class NotifyImpl extends Notify {
         mRemoteView = new RemoteViews(mService.getPackageName(),R.layout.notification);
         boolean isPlay = MusicService.isPlay();
 
-        if(!Global.isNotifyShowing() && !isPlay)
+        if(!Global.isNotifyShowing())
             return;
 
         buildAction(mService);

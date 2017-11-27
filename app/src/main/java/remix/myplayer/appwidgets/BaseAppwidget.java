@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.text.TextUtils;
 import android.widget.RemoteViews;
 
@@ -41,7 +42,12 @@ public class BaseAppwidget extends AppWidgetProvider {
         Intent intent = new Intent(MusicService.ACTION_APPWIDGET_OPERATE);
         intent.putExtra("Control",operation);
         intent.setComponent(componentName);
-        return PendingIntent.getService(context,operation,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return PendingIntent.getForegroundService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        } else {
+            return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
+//        return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     protected boolean hasInstances(Context context) {
@@ -55,7 +61,7 @@ public class BaseAppwidget extends AppWidgetProvider {
             if(mBitmap != null && !mBitmap.isRecycled()) {
                 remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
             } else {
-                remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
+                remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_night);
             }
             pushUpdate(context,appWidgetIds,remoteViews);
         } else {
