@@ -27,7 +27,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 
@@ -50,9 +49,6 @@ public class NotifyImpl extends Notify {
         mRemoteBigView = new RemoteViews(mService.getPackageName(),R.layout.notification_big);
         mRemoteView = new RemoteViews(mService.getPackageName(),R.layout.notification);
         boolean isPlay = MusicService.isPlay();
-
-        if(!Global.isNotifyShowing())
-            return;
 
         buildAction(mService);
         buildNotification(mService);

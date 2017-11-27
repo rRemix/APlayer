@@ -1,7 +1,6 @@
 package remix.myplayer.service;
 
 import android.Manifest;
-import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +22,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.MediaStore;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -100,6 +98,8 @@ import remix.myplayer.util.ToastUtil;
 public class MusicService extends BaseService implements Playback,MusicEventHelper.MusicEventCallback{
     private final static String TAG = "MusicService";
     private static MusicService mInstance;
+    /** 是否第一次启动*/
+    private static boolean mFirstFlag = true;
 
     /** 是否正在设置mediapplayer的datasource */
     private static boolean mIsInitialized = false;
@@ -250,77 +250,18 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     @Override
     public int onStartCommand(Intent commandIntent, int flags, int startId) {
         mIsServiceStop = false;
+        final long start = System.currentTimeMillis();
+        if(!mLoadFinished && (mHasPermission = CommonUtil.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}))) {
+            //读取数据
+            loadDataActual();
+            LogUtil.d(TAG,"读取耗时:" + (System.currentTimeMillis() - start));
+        }
+
         String action = commandIntent.getAction();
-        ToastUtil.show(mContext,"ServiceAction:" + action);
         if(TextUtils.isEmpty(action)) {
             return START_NOT_STICKY;
         }
-        Notification notification = new NotificationCompat.Builder(this, Notify.PLAYING_NOTIFICATION_CHANNEL_ID)
-                .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setSmallIcon(R.drawable.notifbar_icon)
-                .setContentTitle("前台服务")
-                .setContentText("临时处理")
-                .build();
-        startForeground(100,notification);
-        mPlaybackHandler.post(() -> {
-            final long start = System.currentTimeMillis();
-            final int MAX_WAIT = 4000;
-            //等待加载完成 最多加载4秒
-            while (!mLoadFinished){
-                if(System.currentTimeMillis() - start > MAX_WAIT){
-                    mUpdateUIHandler.post(() -> ToastUtil.show(mContext,getString(R.string.load_overtime)));
-                    return;
-                }
-            }
-            switch (action){
-                case ACTION_APPWIDGET_OPERATE:
-                    Intent appwidgetIntent = new Intent(Constants.CTL_ACTION);
-                    appwidgetIntent.putExtra("Control",commandIntent.getIntExtra("Control",-1));
-                    sendBroadcast(appwidgetIntent);
-                    break;
-                case ACTION_SHORTCUT_CONTINUE_PLAY:
-                    Intent continueIntent = new Intent(Constants.CTL_ACTION);
-                    continueIntent.putExtra("Control",Constants.TOGGLE);
-                    sendBroadcast(continueIntent);
-                    break;
-                case ACTION_SHORTCUT_SHUFFLE:
-                    if(mPlayModel != Constants.PLAY_SHUFFLE){
-                        setPlayModel(Constants.PLAY_SHUFFLE);
-                    }
-                    Intent shuffleIntent = new Intent(Constants.CTL_ACTION);
-                    shuffleIntent.putExtra("Control", Constants.NEXT);
-                    sendBroadcast(shuffleIntent);
-                    break;
-                case ACTION_SHORTCUT_MYLOVE:
-                    List<Integer> myLoveIds = PlayListUtil.getIDList(Global.MyLoveID);
-                    if(myLoveIds == null || myLoveIds.size() == 0) {
-                        ToastUtil.show(mContext,R.string.list_is_empty);
-                        return;
-                    }
-                    Intent myloveIntent = new Intent(Constants.CTL_ACTION);
-                    myloveIntent.putExtra("Control",Constants.PLAYSELECTEDSONG);
-                    myloveIntent.putExtra("Position",0);
-
-                    Global.setPlayQueue(myLoveIds,mContext,myloveIntent);
-                    break;
-                case ACTION_SHORTCUT_LASTADDED:
-                    List<Song> songs = MediaStoreUtil.getLastAddedSong();
-                    List<Integer> lastAddIds = new ArrayList<>();
-                    if(songs == null || songs.size() == 0) {
-                        ToastUtil.show(mContext,R.string.list_is_empty);
-                        return;
-                    }
-                    for(Song song : songs){
-                        lastAddIds.add(song.getId());
-                    }
-                    Intent lastedIntent = new Intent(Constants.CTL_ACTION);
-                    lastedIntent.putExtra("Control", Constants.PLAYSELECTEDSONG);
-                    lastedIntent.putExtra("Position",0);
-
-                    Global.setPlayQueue(lastAddIds,mContext,lastedIntent);
-                    break;
-            }
-        });
+        mPlaybackHandler.post(() -> handleStartCommandIntent(commandIntent, action));
         return START_NOT_STICKY;
     }
 
@@ -395,11 +336,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             EQActivity.Init();
         }
 
-        //读取数据
-        mHasPermission = CommonUtil.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE});
-        if(mHasPermission){
-            loadData();
-        }
+
     }
 
     /**
@@ -438,6 +375,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             }
         });
         mMediaPlayer.setOnPreparedListener(mp -> {
+            if(mFirstFlag){
+                mFirstFlag = false;
+                return;
+            }
             play();
         });
 
@@ -462,7 +403,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * @param pos
      */
     public void initDataSource(Song item, int pos){
-        mUpdateUIHandler.post(() -> ToastUtil.show(mContext,"初始化InitDataSource"));
         if(item == null)
             return;
         //初始化当前播放歌曲
@@ -473,8 +413,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(mMediaPlayer == null) {
                 setUpMediaPlayer();
             }
-
-//            prepare(mCurrentInfo.getUrl());
+            prepare(mCurrentInfo.getUrl());
 //            mMediaPlayer.setDataSource(mCurrentInfo.getUrl());
 //            mMediaPlayer.prepareAsync();
         } catch (Exception e) {
@@ -689,6 +628,58 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             handleMusicEvent(intent);
         }
     }
+
+    private void handleStartCommandIntent(Intent commandIntent, String action) {
+        switch (action){
+            case ACTION_APPWIDGET_OPERATE:
+                Intent appwidgetIntent = new Intent(Constants.CTL_ACTION);
+                appwidgetIntent.putExtra("Control",commandIntent.getIntExtra("Control",-1));
+                sendBroadcast(appwidgetIntent);
+                break;
+            case ACTION_SHORTCUT_CONTINUE_PLAY:
+                Intent continueIntent = new Intent(Constants.CTL_ACTION);
+                continueIntent.putExtra("Control",Constants.TOGGLE);
+                sendBroadcast(continueIntent);
+                break;
+            case ACTION_SHORTCUT_SHUFFLE:
+                if(mPlayModel != Constants.PLAY_SHUFFLE){
+                    setPlayModel(Constants.PLAY_SHUFFLE);
+                }
+                Intent shuffleIntent = new Intent(Constants.CTL_ACTION);
+                shuffleIntent.putExtra("Control", Constants.NEXT);
+                sendBroadcast(shuffleIntent);
+                break;
+            case ACTION_SHORTCUT_MYLOVE:
+                List<Integer> myLoveIds = PlayListUtil.getIDList(Global.MyLoveID);
+                if(myLoveIds == null || myLoveIds.size() == 0) {
+                    ToastUtil.show(mContext, R.string.list_is_empty);
+                    return;
+                }
+                Intent myloveIntent = new Intent(Constants.CTL_ACTION);
+                myloveIntent.putExtra("Control",Constants.PLAYSELECTEDSONG);
+                myloveIntent.putExtra("Position",0);
+
+                Global.setPlayQueue(myLoveIds,mContext,myloveIntent);
+                break;
+            case ACTION_SHORTCUT_LASTADDED:
+                List<Song> songs = MediaStoreUtil.getLastAddedSong();
+                List<Integer> lastAddIds = new ArrayList<>();
+                if(songs == null || songs.size() == 0) {
+                    ToastUtil.show(mContext,R.string.list_is_empty);
+                    return;
+                }
+                for(Song song : songs){
+                    lastAddIds.add(song.getId());
+                }
+                Intent lastedIntent = new Intent(Constants.CTL_ACTION);
+                lastedIntent.putExtra("Control", Constants.PLAYSELECTEDSONG);
+                lastedIntent.putExtra("Position",0);
+
+                Global.setPlayQueue(lastAddIds,mContext,lastedIntent);
+                break;
+        }
+    }
+
 
     private void handleMusicEvent(Intent intent) {
         if(intent == null)
@@ -1211,49 +1202,53 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         new Thread(){
             @Override
             public void run() {
-                final boolean isFirst = SPUtil.getValue(mContext, "Setting", "First", true);
-                SPUtil.putValue(mContext,"Setting","First",false);
-                //读取sd卡歌曲id
-
-                Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
-                //第一次启动软件
-                if(isFirst){
-                    try {
-                        //默认全部歌曲为播放队列
-                        Global.PlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
-                        Global.setPlayQueue(Global.AllSongList);
-                        SPUtil.putValue(mContext,"Setting","PlayQueueID",Global.PlayQueueID);
-                        //添加我的收藏列表
-                        Global.MyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
-                        SPUtil.putValue(mContext,"Setting","MyLoveID",Global.MyLoveID);
-                        //保存默认主题设置
-                        SPUtil.putValue(mContext,"Setting","ThemeMode", ThemeStore.DAY);
-                        SPUtil.putValue(mContext,"Setting","ThemeColor",ThemeStore.THEME_BLUE);
-                    } catch (Exception e){
-                        CommonUtil.uploadException("新建列表错误",e);
-                    }
-                }else {
-                    //播放模式
-                    mPlayModel = SPUtil.getValue(mContext,"Setting", "PlayModel",Constants.PLAY_LOOP);
-                    Global.PlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
-                    Global.MyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);
-                    Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
-                    Global.PlayList = PlayListUtil.getAllPlayListInfo();
-                    mShowFloatLrc = SPUtil.getValue(mContext,"Setting","FloatLrc",false);
-
-                    //摇一摇
-                    if(SPUtil.getValue(mContext,"Setting","Shake",false)){
-                        ShakeDetector.getInstance(mContext).beginListen();
-                    }
-                    //锁屏
-                    LockScreenListener.getInstance(mContext).beginListen();
-                }
-                initLastSong();
-                mLoadFinished = true;
-                sendBroadcast(new Intent(ACTION_LOAD_FINISH));
+                loadDataActual();
             }
         }.start();
 
+    }
+
+    private void loadDataActual(){
+        final boolean isFirst = SPUtil.getValue(mContext, "Setting", "First", true);
+        SPUtil.putValue(mContext,"Setting","First",false);
+        //读取sd卡歌曲id
+
+        Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
+        //第一次启动软件
+        if(isFirst){
+            try {
+                //默认全部歌曲为播放队列
+                Global.PlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
+                Global.setPlayQueue(Global.AllSongList);
+                SPUtil.putValue(mContext,"Setting","PlayQueueID",Global.PlayQueueID);
+                //添加我的收藏列表
+                Global.MyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
+                SPUtil.putValue(mContext,"Setting","MyLoveID",Global.MyLoveID);
+                //保存默认主题设置
+                SPUtil.putValue(mContext,"Setting","ThemeMode", ThemeStore.DAY);
+                SPUtil.putValue(mContext,"Setting","ThemeColor",ThemeStore.THEME_BLUE);
+            } catch (Exception e){
+                CommonUtil.uploadException("新建列表错误",e);
+            }
+        }else {
+            //播放模式
+            mPlayModel = SPUtil.getValue(mContext,"Setting", "PlayModel",Constants.PLAY_LOOP);
+            Global.PlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
+            Global.MyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);
+            Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
+            Global.PlayList = PlayListUtil.getAllPlayListInfo();
+            mShowFloatLrc = SPUtil.getValue(mContext,"Setting","FloatLrc",false);
+
+            //摇一摇
+            if(SPUtil.getValue(mContext,"Setting","Shake",false)){
+                ShakeDetector.getInstance(mContext).beginListen();
+            }
+            //锁屏
+            LockScreenListener.getInstance(mContext).beginListen();
+        }
+        initLastSong();
+        mLoadFinished = true;
+        sendBroadcast(new Intent(ACTION_LOAD_FINISH));
     }
 
     /**

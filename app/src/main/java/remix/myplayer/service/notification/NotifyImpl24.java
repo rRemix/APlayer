@@ -26,7 +26,6 @@ import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 
 import static remix.myplayer.service.MusicService.copy;
@@ -44,8 +43,6 @@ public class NotifyImpl24 extends Notify{
     public void update() {
         boolean isPlay = MusicService.isPlay();
 
-        if(!Global.isNotifyShowing())
-            return;
         Song song = MusicService.getCurrentMP3();
         if(song == null)
             return;
@@ -113,8 +110,4 @@ public class NotifyImpl24 extends Notify{
                 .putExtra("Control",control);
     }
 
-    @Override
-    void pushNotify() {
-        super.pushNotify();
-    }
 }

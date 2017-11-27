@@ -21,7 +21,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,6 +65,7 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -93,10 +93,10 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     View mHeadRoot;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
-    @BindView(R.id.bottom_actionbar_container)
-    FrameLayout mBottomBarCotainer;
+//    @BindView(R.id.bottom_actionbar_container)
+//    FrameLayout mBottomBarCotainer;
 
-    private BottomActionBarFragment mBottomFragment;
+    private BottomActionBarFragment mBottomBar;
     private final static String TAG = "MainActivity";
     private DrawerAdapter mDrawerAdapter;
     private PagerAdapter mPagerAdapter;
@@ -134,9 +134,10 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
+        //初始化底部状态栏
+        mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //receiver
-        mLoadReceiver = new BottomBarReceiver();
+        mLoadReceiver = new LoadFinishReceiver();
         registerReceiver(mLoadReceiver,new IntentFilter(MusicService.ACTION_LOAD_FINISH));
         //初始化控件
         setUpToolbar(mToolBar);
@@ -154,30 +155,25 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      */
     private void initBottombar() {
         //初始化底部状态栏
-        mBottomFragment = new BottomActionBarFragment();
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.bottom_actionbar_container,mBottomFragment,"bottomFragment")
-                .commit();
-        mBottomBarCotainer.setVisibility(View.VISIBLE);
-//        mBottomFragment = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-//        int lastId = SPUtil.getValue(mContext,"Setting","LastSongId",-1);
-//        Song item;
-//        if(lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
-//            mBottomFragment.updateBottomStatus(item,  MusicService.isPlay());
-//        } else {
-//            if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
-//                return ;
-//            int id =  Global.PlayQueue.get(0);
-//            for(int i = 0; i < Global.PlayQueue.size() ; i++){
-//                id = Global.PlayQueue.get(i);
-//                if (id != lastId)
-//                    break;
-//            }
-//            item = MediaStoreUtil.getMP3InfoById(id);
-//            if(item != null){
-//                mBottomFragment.updateBottomStatus(item,  MusicService.isPlay());
-//            }
-//        }
+        mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
+        int lastId = SPUtil.getValue(mContext,"Setting","LastSongId",-1);
+        Song item;
+        if(lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
+            mBottomBar.updateBottomStatus(item,  MusicService.isPlay());
+        } else {
+            if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
+                return ;
+            int id =  Global.PlayQueue.get(0);
+            for(int i = 0; i < Global.PlayQueue.size() ; i++){
+                id = Global.PlayQueue.get(i);
+                if (id != lastId)
+                    break;
+            }
+            item = MediaStoreUtil.getMP3InfoById(id);
+            if(item != null){
+                mBottomBar.updateBottomStatus(item,  MusicService.isPlay());
+            }
+        }
     }
 
     @Override
@@ -215,7 +211,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             case R.id.add:
                 if(mMultiChoice.isShow())
                     return;
-                new MaterialDialog.Builder(MainActivity.this)
+                new MaterialDialog.Builder(mContext)
                         .title(R.string.new_playlist)
                         .titleColorAttr(R.attr.text_color_primary)
                         .positiveText(R.string.create)
@@ -227,7 +223,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                         .contentColorAttr(R.attr.text_color_primary)
                         .inputRange(1,15)
                         .input("", getString(R.string.local_list) + Global.PlayList.size(), (dialog,input) ->{
-                            int newPlayListId = -1;
+                            int newPlayListId;
                             try {
                                 if(!TextUtils.isEmpty(input)){
                                     newPlayListId = PlayListUtil.addPlayList(input.toString());
@@ -323,7 +319,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
 //        AppBarLayout appBarLayout = findView(R.id.appbar);
 //        appBarLayout.addView(mTablayout);
-
     }
 
     /**
@@ -513,9 +508,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     public void UpdateUI(Song song, boolean isplay) {
         if (!mIsRunning)
             return;
-        if(mBottomFragment == null)
-            initBottombar();
-        mBottomFragment.updateBottomStatus(song, isplay);
+        mBottomBar.updateBottomStatus(song, isplay);
 //        for(Fragment temp : getSupportFragmentManager().getFragments()) {
 //            if (temp instanceof SongFragment) {
 //                SongFragment songFragment = (SongFragment) temp;
@@ -584,7 +577,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-    public class BottomBarReceiver extends BroadcastReceiver {
+    private class LoadFinishReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent receive) {
             String action = receive != null ? receive.getAction() : "";
