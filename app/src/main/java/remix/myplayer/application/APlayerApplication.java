@@ -84,7 +84,6 @@ public class APlayerApplication extends MultiDexApplication{
 //        } else {
 //            startService(new Intent(this, MusicService.class));
 //        }
-
     }
 
     private void initUtil() {

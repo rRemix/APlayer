@@ -24,7 +24,6 @@ public abstract class BaseObserver extends ContentObserver {
      *
      * @param handler The handler to run {@link #onChange} on, or null if none.
      */
-    private  int mCount;
     public BaseObserver(Handler handler) {
         super(handler);
         mHandler = handler;

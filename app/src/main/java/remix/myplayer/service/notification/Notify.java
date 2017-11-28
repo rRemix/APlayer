@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 import remix.myplayer.R;
@@ -20,7 +21,7 @@ import remix.myplayer.util.Global;
  */
 
 public abstract class Notify {
-    protected MusicService mService;
+    MusicService mService;
     private NotificationManager mNotificationManager;
 
     private static final int IDLE_DELAY = 5 * 60 * 1000;
@@ -31,11 +32,14 @@ public abstract class Notify {
     private static final int NOTIFY_MODE_FOREGROUND = 1;
     private static final int NOTIFY_MODE_BACKGROUND = 2;
 
-    public static final String PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification";
-    public static final int PLAYING_NOTIFICATION_ID = 1;
+    static final String PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification";
+    private static final int PLAYING_NOTIFICATION_ID = 1;
 
-    protected Notification mNotification;
-    protected boolean mIsStop;
+    private static final String LOADING_NOTIFICATION_CHANNEL_ID = "processing_notification";
+    private static final int LOADING_NOTIFICATION_ID = 2;
+
+    Notification mNotification;
+    boolean mIsStop;
 
     Notify(MusicService context){
         mService = context;
@@ -51,15 +55,35 @@ public abstract class Notify {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void createNotificationChannel(){
-        NotificationChannel notificationChannel = new NotificationChannel(PLAYING_NOTIFICATION_CHANNEL_ID,mService.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW);
-        notificationChannel.setShowBadge(false);
-        notificationChannel.enableLights(false);
-        notificationChannel.enableVibration(false);
-        notificationChannel.setDescription(mService.getString(R.string.playing_notification_description));
-        mNotificationManager.createNotificationChannel(notificationChannel);
+        NotificationChannel playingNotificationChannel = new NotificationChannel(PLAYING_NOTIFICATION_CHANNEL_ID,mService.getString(R.string.playing_notification), NotificationManager.IMPORTANCE_LOW);
+        playingNotificationChannel.setShowBadge(false);
+        playingNotificationChannel.enableLights(false);
+        playingNotificationChannel.enableVibration(false);
+        playingNotificationChannel.setDescription(mService.getString(R.string.playing_notification_description));
+        mNotificationManager.createNotificationChannel(playingNotificationChannel);
+
+
+        NotificationChannel processingNotificationChannel = new NotificationChannel(LOADING_NOTIFICATION_CHANNEL_ID,mService.getString(R.string.loading_notification), NotificationManager.IMPORTANCE_LOW);
+        processingNotificationChannel.setShowBadge(false);
+        processingNotificationChannel.enableLights(false);
+        processingNotificationChannel.enableVibration(false);
+        processingNotificationChannel.setDescription(mService.getString(R.string.loading_notification_description));
+        mNotificationManager.createNotificationChannel(processingNotificationChannel);
     }
 
-    public abstract void update();
+    public abstract void updateForPlaying();
+
+    public void updateForLoading(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            mService.startForeground(LOADING_NOTIFICATION_ID, new NotificationCompat.Builder(mService, LOADING_NOTIFICATION_CHANNEL_ID)
+                    .setContentTitle(mService.getString(R.string.loading))
+                    .setShowWhen(false)
+                    .setOngoing(false)
+                    .setSmallIcon(R.drawable.notifbar_icon)
+                    .build());
+        }
+
+    }
 
     void pushNotify() {
         final int newNotifyMode;
@@ -94,11 +118,18 @@ public abstract class Notify {
     /**
      * 取消通知栏
      */
-    public void cancel(){
+    public void cancelPlayingNotify(){
         mService.stopForeground(true);
         mNotificationManager.cancel(PLAYING_NOTIFICATION_ID);
         mIsStop = true;
         mNotifyMode = NOTIFY_MODE_NONE;
+    }
+
+    public void cancelLoadingNotify(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            mService.stopForeground(true);
+            mNotificationManager.cancel(LOADING_NOTIFICATION_ID);
+        }
     }
 
     /**

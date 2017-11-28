@@ -45,7 +45,7 @@ public class NotifyImpl extends Notify {
     }
 
     @Override
-    public void update() {
+    public void updateForPlaying() {
         mRemoteBigView = new RemoteViews(mService.getPackageName(),R.layout.notification_big);
         mRemoteView = new RemoteViews(mService.getPackageName(),R.layout.notification);
         boolean isPlay = MusicService.isPlay();

@@ -40,7 +40,7 @@ public class NotifyImpl24 extends Notify{
     }
 
     @Override
-    public void update() {
+    public void updateForPlaying() {
         boolean isPlay = MusicService.isPlay();
 
         Song song = MusicService.getCurrentMP3();
@@ -70,8 +70,8 @@ public class NotifyImpl24 extends Notify{
                 updateWithBitmap(BitmapFactory.decodeResource(mService.getResources(),R.drawable.album_empty_bg_night),song);
             }
         }, CallerThreadExecutor.getInstance());
-
     }
+
 
     private void updateWithBitmap(Bitmap bitmap,Song song){
         int playPauseIcon = MusicService.isPlay() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp;
@@ -84,11 +84,11 @@ public class NotifyImpl24 extends Notify{
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.notifbar_icon)
                 .addAction(R.drawable.ic_skip_previous_black_24dp, mService.getString(R.string.previous),
-                        PendingIntent.getBroadcast(mService,0, getControlIntent(Constants.PREV), PendingIntent.FLAG_UPDATE_CURRENT)) // #0
+                        PendingIntent.getBroadcast(mService,0, getControlIntent(Constants.PREV), PendingIntent.FLAG_UPDATE_CURRENT))
                 .addAction(playPauseIcon, mService.getString(R.string.play_pause),
-                        PendingIntent.getBroadcast(mService,1, getControlIntent(Constants.TOGGLE), PendingIntent.FLAG_UPDATE_CURRENT))  // #1
+                        PendingIntent.getBroadcast(mService,1, getControlIntent(Constants.TOGGLE), PendingIntent.FLAG_UPDATE_CURRENT))
                 .addAction(R.drawable.ic_skip_next_black_24dp, mService.getString(R.string.next),
-                        PendingIntent.getBroadcast(mService,2, getControlIntent(Constants.NEXT), PendingIntent.FLAG_UPDATE_CURRENT))     // #2
+                        PendingIntent.getBroadcast(mService,2, getControlIntent(Constants.NEXT), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setDeleteIntent(PendingIntent.getBroadcast(mService,3,deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContentIntent(getContentIntent())
                 .setContentTitle(song.getTitle())
