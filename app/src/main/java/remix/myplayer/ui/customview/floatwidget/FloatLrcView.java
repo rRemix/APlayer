@@ -422,7 +422,7 @@ public class FloatLrcView extends RelativeLayout {
                     .setContentText(mContext.getString(R.string.float_lock))
                     .setContentTitle(mContext.getString(R.string.click_to_unlock))
                     .setShowWhen(false)
-                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setOngoing(true)
                     .setContentIntent(PendingIntent.getBroadcast(mContext,
                             10,

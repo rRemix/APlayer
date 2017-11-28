@@ -10,6 +10,7 @@ import remix.myplayer.ui.activity.LockScreenActivity;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by taeja on 16-3-11.
@@ -17,7 +18,7 @@ import remix.myplayer.util.SPUtil;
 public class LockScreenListener {
     private Context mContext;
     private static LockScreenListener mInstance;
-    private static ScreenReceiver mReceiver;
+    private ScreenReceiver mReceiver;
     private LockScreenListener(Context context){
         mContext = context;
         mInstance = this;
@@ -35,25 +36,26 @@ public class LockScreenListener {
         filter.addAction(Intent.ACTION_SCREEN_ON);
         mContext.registerReceiver(mReceiver,filter);
     }
+
     public void stopListen(){
         CommonUtil.unregisterReceiver(mContext,mReceiver);
     }
+
     class ScreenReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(SPUtil.getValue(context,"Setting","LockScreenOn", Constants.APLAYER_LOCKSCREEN) != Constants.APLAYER_LOCKSCREEN){
-                return;
-            }
-            String action = intent.getAction();
-            if (Intent.ACTION_SCREEN_ON.equals(action) && MusicService.isPlay()) {
-                try {
-                    Intent intent1 = new Intent(context, LockScreenActivity.class);
-                    intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(intent1);
-                } catch (Exception e) {
-                    e.printStackTrace();
+            try {
+                if(SPUtil.getValue(context,"Setting","LockScreenOn", Constants.APLAYER_LOCKSCREEN) != Constants.APLAYER_LOCKSCREEN){
+                    return;
                 }
+                String action = intent.getAction();
+                if (Intent.ACTION_SCREEN_ON.equals(action) && MusicService.isPlay()) {
+                    context.startActivity(new Intent(context, LockScreenActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                }
+            }catch (Exception e){
+                ToastUtil.show(mContext,"LockScreen:" + e.toString());
             }
+
         }
     }
 }

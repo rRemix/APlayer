@@ -27,7 +27,7 @@ public class DefaultLrcParser implements ILrcParser {
         //解析歌词
         TreeMap<Integer,String> lrcMap = new TreeMap<>();
         lrcMap.clear();
-        String s = "";
+        String s;
         DiskLruCache.Editor editor = null;
         OutputStream lrcCacheStream = null;
 

@@ -359,7 +359,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mNeedUpdateUI = false;
         }
         //更新进度条
-        new ProgeressThread().start();
+        new ProgressThread().start();
     }
 
     @Override
@@ -874,7 +874,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     }
 
     //更新进度条线程
-    private class ProgeressThread extends Thread {
+    private class ProgressThread extends Thread {
         @Override
         public void run() {
             while (mIsRunning) {

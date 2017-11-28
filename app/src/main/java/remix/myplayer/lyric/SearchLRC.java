@@ -24,15 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.reactivex.Maybe;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.functions.Function3;
-import io.reactivex.functions.Predicate;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -173,99 +164,6 @@ public class SearchLRC {
             }
         }.start();
 
-    }
-
-    public Observable<List<LrcRow>> getObservable(String lrcPath){
-        boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting","OnlineLrc",false);
-
-        Observable<BufferedReader> onlone = Observable.create((ObservableOnSubscribe<BufferedReader>) e -> {
-            final BufferedReader br = new BufferedReader(
-                    new InputStreamReader(new ByteArrayInputStream(Base64.decode(getOnlineLrcContent(), Base64.DEFAULT))));
-//            e.onNext(new DefaultLrcParser().getLrcRows(br,false,mDisplayName,mArtistName));
-            e.onNext(br);
-        });
-        Observable<BufferedReader> local = Observable.create(new ObservableOnSubscribe<BufferedReader>() {
-            @Override
-            public void subscribe(ObservableEmitter<BufferedReader> e) throws Exception {
-                String localLrcPath = getlocalLrcPath();
-                e.onNext(new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath))));
-            }
-        });
-
-        Observable<BufferedReader> priority = onlineFirst ? onlone : local;
-        Observable<BufferedReader> alternative = onlineFirst ? local : onlone;
-        Observable.combineLatest(priority, alternative, priority, new Function3<BufferedReader, BufferedReader, BufferedReader, String>() {
-            @Override
-            public String apply(BufferedReader bufferedReader, BufferedReader bufferedReader2, BufferedReader bufferedReader3) throws Exception {
-                return null;
-            }
-        });
-
-        Observable<List<LrcRow>> onlineLrc = Observable.create(new ObservableOnSubscribe<List<LrcRow>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<LrcRow>> e) throws Exception {
-                String onlineLrcContent = getOnlineLrcContent();
-                if(!TextUtils.isEmpty(onlineLrcContent)){
-                    final BufferedReader br = new BufferedReader(
-                            new InputStreamReader(new ByteArrayInputStream(Base64.decode(onlineLrcContent, Base64.DEFAULT))));
-                    e.onNext(mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName));
-                }
-            }
-        });
-
-
-        Observable<List<LrcRow>> localLrc = Observable.create(new ObservableOnSubscribe<List<LrcRow>>() {
-            @Override
-            public void subscribe(ObservableEmitter<List<LrcRow>> e) throws Exception {
-                String localLrcPath = getlocalLrcPath();
-                final BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath)));
-                e.onNext(mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName));
-            }
-        });
-
-        onlineLrc.switchIfEmpty(onlineLrc);
-
-
-        Maybe<BufferedReader> concat = onlineFirst ? Observable.concat(onlone,local).firstElement() : Observable.concat(onlone,local).lastElement();
-        concat.subscribe(new Consumer<BufferedReader>() {
-            @Override
-            public void accept(BufferedReader bufferedReader) throws Exception {
-
-            }
-        });
-
-        Observable.just(lrcPath)
-                .filter(new Predicate<String>() {
-                    @Override
-                    public boolean test(String s)  {
-                        Set<String> ignoreLrcId = SPUtil.getStringSet(APlayerApplication.getContext(),"Setting","IgnoreLrcID");
-                        if(ignoreLrcId != null && ignoreLrcId.size() > 0){
-                            for (String id : ignoreLrcId){
-                                if((mInfo.getId() + "").equals(id)){
-                                    return false;
-                                }
-                            }
-                        }
-                        return true;
-                    }
-                })
-                .map((Function<String, BufferedReader>) s -> {
-
-                    return new BufferedReader(null);
-                })
-                .flatMap(new Function<BufferedReader, ObservableSource<List<LrcRow>>>() {
-                    @Override
-                    public ObservableSource<List<LrcRow>> apply(BufferedReader bufferedReader) throws Exception {
-                        return null;
-                    }
-                }).onErrorReturn(new Function<Throwable, List<LrcRow>>() {
-            @Override
-            public List<LrcRow> apply(Throwable throwable) throws Exception {
-                return null;
-            }
-        });
-
-        return null;
     }
 
     /**
