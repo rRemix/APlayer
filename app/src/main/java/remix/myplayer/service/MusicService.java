@@ -182,7 +182,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /** 桌面歌词控件*/
     private FloatLrcView mFloatLrcView;
     /** 当前歌词*/
-    private List<LrcRow> mLrcList = null;
+    private List<LrcRow> mLrcRows = null;
     /** 已经生成过的随机数 用于随机播放模式*/
     private List<Integer> mRandomList = new ArrayList<>();
     /** service是否停止运行*/
@@ -1404,8 +1404,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     return;
                 //根据操作判断是否需要更新歌词
                 int control = Global.Operation;
-                if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcList == null)
-                    mLrcList = new SearchLRC(mCurrentInfo).getLrc("");
+                if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcRows == null)
+                    mLrcRows = new SearchLRC(mCurrentInfo).getLrc("");
                 if(mUpdateFloatLrcThread == null) {
                     mUpdateFloatLrcThread = new UpdateFloatLrcThread();
                     mUpdateFloatLrcThread.start();
@@ -1491,7 +1491,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         private boolean mWantToQuit;
         void quit(){
             mWantToQuit = true;
-            interrupt();
         }
 
         void quitImmediately(){
@@ -1503,9 +1502,12 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         public void run() {
             while (mShowFloatLrc){
                 try {
+//                    int interval = getInterval();
+//                    LogUtil.d("DesktopLrc","间隔:" + interval);
+//                    LogUtil.d("DesktopLrc","当前歌词:" + (mCurrentLrc != null ? mCurrentLrc.Line1 : null));
                     Thread.sleep(LRC_INTERVAL);
                 } catch (InterruptedException e) {
-                    LogUtil.d("DesktopLrc","捕获异常,程序退出" + e);
+                    LogUtil.d("DesktopLrc","捕获异常,线程退出");
                     break;
                 }
                 if(mWantToQuit){
@@ -1530,33 +1532,50 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                         mUpdateUIHandler.removeMessages(Constants.CREATE_FLOAT_LRC);
                         mUpdateUIHandler.sendEmptyMessageDelayed(Constants.CREATE_FLOAT_LRC,50);
                     } else {
-                        if(mLrcList == null || mLrcList.size() == 0 || mFloatLrcView == null) {
+                        if(mLrcRows == null || mLrcRows.size() == 0) {
                             mCurrentLrc.Line1 = new LrcRow("",0,getResources().getString(R.string.no_lrc));
                             mCurrentLrc.Line2 = EMPTY_ROW;
                             mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
                             continue;
                         }
-                        int progress = getProgress();
-                        for(int i = 0 ; i < mLrcList.size();i++){
-                            LrcRow lrcRow = mLrcList.get(i);
-                            int temp = progress - lrcRow.getTime();
-                            if(i == 0 && temp < 0){
-                                if(mCurrentInfo == null)
-                                    break;
-                                mCurrentLrc.Line1 = new LrcRow("",0,mCurrentInfo.getTitle());
-                                mCurrentLrc.Line2 = new LrcRow("",0,mCurrentInfo.getArtist() + " - " + mCurrentInfo.getAlbum());
-                                mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
-                            } else if(Math.abs(temp) < LRC_THRESHOLD){
-                                mCurrentLrc.Line1 = mLrcList.get(i);
-                                mCurrentLrc.Line2 = (i + 1 < mLrcList.size() ? mLrcList.get(i + 1) : EMPTY_ROW);
-                                mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
-                                break;
-                            }
-                        }
+                        findCurrentLyric();
                     }
                 }
 
             }
+        }
+
+        private void findCurrentLyric() {
+            int progress = getProgress();
+            for(int i = 0; i < mLrcRows.size(); i++){
+                LrcRow lrcRow = mLrcRows.get(i);
+                int interval = progress - lrcRow.getTime();
+                if(i == 0 && interval < 0){
+                    //未开始歌唱前显示歌曲信息
+                    mCurrentLrc.Line1 = new LrcRow("",0,mCurrentInfo.getTitle());
+                    mCurrentLrc.Line2 = new LrcRow("",0,mCurrentInfo.getArtist() + " - " + mCurrentInfo.getAlbum());
+                    mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
+                    break;
+                } else if(Math.abs(interval) < LRC_THRESHOLD){
+                    mCurrentLrc.Line1 = mLrcRows.get(i);
+                    mCurrentLrc.Line2 = (i + 1 < mLrcRows.size() ? mLrcRows.get(i + 1) : EMPTY_ROW);
+                    mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
+                    break;
+                } else if(interval > 0 && i == mLrcRows.size() - 1){
+                    //最后一句歌词
+                    mCurrentLrc.Line1 = mLrcRows.get(i);
+                    mCurrentLrc.Line2 = EMPTY_ROW;
+                    mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
+                }
+            }
+        }
+
+        /**
+         * 根据当前歌词获得间隔时间
+         * @return
+         */
+        private int getInterval(){
+            return mCurrentLrc != null && mCurrentLrc.Line1 != null && mCurrentLrc.Line1.getTotalTime() > 0 ? (int) mCurrentLrc.Line1.getTotalTime() : LRC_INTERVAL;
         }
     }
 
@@ -1623,8 +1642,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         SPUtil.putValue(mContext,"Setting","FloatLrc",false);
         mShowFloatLrc = false;
         mUpdateFloatLrcThread = null;
-        if(mLrcList != null)
-            mLrcList.clear();
+        if(mLrcRows != null)
+            mLrcRows.clear();
         mUpdateUIHandler.removeMessages(Constants.CREATE_FLOAT_LRC);
         mUpdateUIHandler.sendEmptyMessageDelayed(Constants.REMOVE_FLOAT_LRC,LRC_INTERVAL);
     }
@@ -1649,7 +1668,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         private boolean mNeedContinue = false;
         @Override
         public void onAudioFocusChange(int focusChange) {
-            //获得audiofocus
+            //获得AudioFocus
             if(focusChange == AudioManager.AUDIOFOCUS_GAIN){
                 mAudioFocus = true;
                 if(mMediaPlayer == null)
@@ -1773,12 +1792,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     musicService.createFloatLrc();
                     break;
                 case Constants.UPDATE_ADAPTER:
-//                    if(ChildHolderActivity.getInstance() != null ){
-//                        ChildHolderActivity.getInstance().updateList();
-//                    }
-//                    if (FolderActivity.getInstance() != null ) {
-//                        FolderActivity.getInstance().updateList();
-//                    }
                     musicService.handleMusicEvent(new Intent(ACTION_MEDIA_CHANGE));
                     break;
                 case Constants.UPDATE_PLAYLIST:
@@ -1791,26 +1804,31 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private class ScreenReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if(Intent.ACTION_SCREEN_ON.equals(action)){
-                //显示锁屏
-                if(MusicService.isPlay() && SPUtil.getValue(context,"Setting","LockScreenOn", Constants.APLAYER_LOCKSCREEN) == Constants.APLAYER_LOCKSCREEN)
-                    context.startActivity(new Intent(context, LockScreenActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                //重新显示桌面歌词
-                if(mShowFloatLrc && !isFloatLrcShowing()){
-                    if(mUpdateFloatLrcThread == null) {
-                        mUpdateFloatLrcThread = new UpdateFloatLrcThread();
-                        mUpdateFloatLrcThread.start();
+            try {
+                String action = intent.getAction();
+                if(Intent.ACTION_SCREEN_ON.equals(action)){
+                    //显示锁屏
+                    if(MusicService.isPlay() && SPUtil.getValue(context,"Setting","LockScreenOn", Constants.APLAYER_LOCKSCREEN) == Constants.APLAYER_LOCKSCREEN)
+                        context.startActivity(new Intent(context, LockScreenActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                    //重新显示桌面歌词
+                    if(mShowFloatLrc && !isFloatLrcShowing()){
+                        if(mUpdateFloatLrcThread == null) {
+                            mUpdateFloatLrcThread = new UpdateFloatLrcThread();
+                            mUpdateFloatLrcThread.start();
+                        }
+                    }
+                } else {
+                    //屏幕熄灭 关闭桌面歌词
+                    if(mShowFloatLrc && isFloatLrcShowing() && mUpdateFloatLrcThread != null) {
+                        mUpdateFloatLrcThread.quit();
+                        mUpdateFloatLrcThread = null;
                     }
                 }
-            } else {
-                //屏幕熄灭 关闭桌面歌词
-                if(mShowFloatLrc && isFloatLrcShowing()) {
-                    mUpdateFloatLrcThread.quit();
-                    mUpdateFloatLrcThread = null;
-//                    removeFloatLrc();
-                }
+            }catch (Exception e){
+                LogUtil.d("DesktopLrc","Error:" + e);
+                e.printStackTrace();
             }
+
         }
     }
 }

@@ -76,19 +76,19 @@
     <dimen name="app_widget_big_min_height">250dp</dimen>
     <dimen name="app_widget_big_min_width">250dp</dimen>
     <dimen name="app_widget_big_hieght">340dp</dimen>
-    <dimen name="app_widget_big_button_height">64dp</dimen>
+    <dimen name="app_widget_big_button_size">38dp</dimen>
     <dimen name="app_widget_big_image_size">272dp</dimen>
 
     <dimen name="app_widget_medium_min_height">110dp</dimen>
     <dimen name="app_widget_medium_min_width">250dp</dimen>
     <dimen name="app_widget_medium_image_size">72dp</dimen>
     <dimen name="app_widget_medium_height">136dp</dimen>
-    <dimen name="app_widget_medium_button_height">64dp</dimen>
+    <dimen name="app_widget_medium_button_size">34dp</dimen>
 
     <dimen name="app_widget_small_min_height">40dp</dimen>
     <dimen name="app_widget_small_min_width">250dp</dimen>
     <dimen name="app_widget_small_image_size">64dp</dimen>
-    <dimen name="app_widget_small_button_height">48dp</dimen>
+    <dimen name="app_widget_small_button_size">34dp</dimen>
     <dimen name="app_widget_small_height">72dp</dimen>
 
     <dimen name="fastscroll_bubble_radius">44dp</dimen>

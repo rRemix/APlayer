@@ -172,23 +172,6 @@ public class FloatLrcView extends RelativeLayout {
         mLine2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
         mIsLock = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LRC_LOCK,false);
 
-
-        mLock.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                mLock.getViewTreeObserver().removeOnPreDrawListener(this);
-//                int[] location = new int[2];
-//                mLock.getLocationOnScreen(location);
-//                mLock.getLocationInWindow(location);
-//                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mUnLock.getLayoutParams();
-//                lp.setMargins(location[0] ,location[1],0,0);
-//                mUnLock.setLayoutParams(lp);
-//                if(mIsLock){
-//                    mUnLock.setVisibility(VISIBLE);
-//                }
-                return true;
-            }
-        });
         mTextSizeType = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_SIZE,MEDIUM);
         setPlayIcon(MusicService.isPlay());
 
@@ -196,27 +179,22 @@ public class FloatLrcView extends RelativeLayout {
             @Override
             public boolean onPreDraw() {
                 getViewTreeObserver().removeOnPreDrawListener(this);
-                saveLock(mIsLock,false);
+                saveLock(mIsLock,true);
                 return true;
             }
         });
     }
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        Object o = getLayoutParams();
-    }
 
     public void setText(LrcRow lrc1, LrcRow lrc2) {
         if(lrc1 != null) {
             if(TextUtils.isEmpty(lrc1.getContent()))
-                lrc1.setContent("...");
+                lrc1.setContent("......");
             mLine1.setLrcRow(lrc1);
         }
         if(lrc2 != null) {
             if(TextUtils.isEmpty(lrc2.getContent()))
-                lrc2.setContent("...");
+                lrc2.setContent(".....");
             mLine2.setText(lrc2.getContent());
         }
     }
@@ -426,6 +404,7 @@ public class FloatLrcView extends RelativeLayout {
                     .setShowWhen(false)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setOngoing(true)
+                    .setTicker(mContext.getString(R.string.float_lock_ticker))
                     .setContentIntent(PendingIntent.getBroadcast(mContext,
                             10,
                             new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.UNLOCK_DESTOP_LYRIC),

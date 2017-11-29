@@ -1,9 +1,5 @@
 package remix.myplayer.lyric.network;
 
-import android.content.Context;
-
-import java.util.Map;
-
 import io.reactivex.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -53,10 +49,6 @@ public class HttpClient implements HttpHelper {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build().create(ApiService.class);
-    }
-
-    private <T> void addRequest(Context context,Map<String,String> params){
-
     }
 
     @Override
