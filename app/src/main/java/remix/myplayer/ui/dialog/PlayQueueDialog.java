@@ -65,7 +65,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Intent intent = new Intent(Constants.CTL_ACTION);
+                Intent intent = new Intent(MusicService.ACTION_CMD);
                 Bundle arg = new Bundle();
                 arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                 arg.putInt("Position", position);

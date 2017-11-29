@@ -26,7 +26,7 @@ public class AppWidgetBig extends BaseAppwidget {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         defaultAppWidget(context,appWidgetIds);
-        Intent intent = new Intent(Constants.WIDGET_UPDATE);
+        Intent intent = new Intent(MusicService.ACTION_WIDGET_UPDATE);
         intent.putExtra("WidgetName","BigWidget");
         intent.putExtra("WidgetIds",appWidgetIds);
         intent.setFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);

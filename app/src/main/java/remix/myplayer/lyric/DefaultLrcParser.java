@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TreeMap;
 
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.cache.DiskLruCache;
@@ -25,8 +24,6 @@ public class DefaultLrcParser implements ILrcParser {
         if(bufferedReader == null)
             return null;
         //解析歌词
-        TreeMap<Integer,String> lrcMap = new TreeMap<>();
-        lrcMap.clear();
         String s;
         DiskLruCache.Editor editor = null;
         OutputStream lrcCacheStream = null;

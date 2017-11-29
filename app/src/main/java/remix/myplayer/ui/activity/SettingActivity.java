@@ -161,7 +161,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     return;
                                 }
                                 mFloatLrcTip.setText(isChecked ? R.string.opened_float_lrc : R.string.closed_float_lrc);
-                                Intent intent = new Intent(Constants.CTL_ACTION);
+                                Intent intent = new Intent(MusicService.ACTION_CMD);
                                 intent.putExtra("FloatLrc",mFloatLrcSwitch.isChecked());
                                 intent.putExtra("Control",Constants.TOGGLE_FLOAT_LRC);
                                 sendBroadcast(intent);
@@ -172,7 +172,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //通知栏样式
                             case 5:
-                                sendBroadcast(new Intent(Constants.CTL_ACTION)
+                                sendBroadcast(new Intent(MusicService.ACTION_CMD)
                                         .putExtra("Control",Constants.TOGGLE_NOTIFY)
                                         .putExtra(SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,isChecked));
                                 break;
@@ -331,7 +331,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"Setting","LockScreenOn",Constants.APLAYER_LOCKSCREEN) ,
                             (dialog, view, which, text) -> {
                                 SPUtil.putValue(SettingActivity.this,"Setting","LockScreenOn",which);
-                                Intent intent = new Intent(Constants.CTL_ACTION);
+                                Intent intent = new Intent(MusicService.ACTION_CMD);
                                 intent.putExtra("Control",Constants.TOGGLE_MEDIASESSION);
                                 sendBroadcast(intent);
                                 return true;
@@ -374,7 +374,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .itemsCallbackSingleChoice(SPUtil.getValue(mContext,"Setting","IsSystemColor",true) ? 0 : 1,
                                 (dialog, view, which, text) -> {
                                     SPUtil.putValue(mContext,"Setting","IsSystemColor",which == 0);
-                                    sendBroadcast(new Intent(Constants.CTL_ACTION)
+                                    sendBroadcast(new Intent(MusicService.ACTION_CMD)
                                             .putExtra("Control",Constants.TOGGLE_NOTIFY)
                                             .putExtra(SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,mNotifyStyleSwitch.isChecked()));
                                     return true;

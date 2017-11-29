@@ -588,7 +588,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                     int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
                     if(id < 0)
                         return;
-                    Intent intent = new Intent(Constants.CTL_ACTION);
+                    Intent intent = new Intent(MusicService.ACTION_CMD);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", 0);

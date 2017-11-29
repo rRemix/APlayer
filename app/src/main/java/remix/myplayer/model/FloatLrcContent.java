@@ -13,5 +13,5 @@ import remix.myplayer.lyric.LrcRow;
 
 public class FloatLrcContent implements Serializable {
     public LrcRow Line1 = new LrcRow();
-    public LrcRow Line2;
+    public LrcRow Line2 = new LrcRow();
 }

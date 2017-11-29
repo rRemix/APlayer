@@ -132,6 +132,11 @@ public abstract class Notify {
         }
     }
 
+    public void cancelAll(){
+        cancelPlayingNotify();
+        mNotificationManager.cancelAll();
+    }
+
     /**
      * @return 最近是否在播放
      */

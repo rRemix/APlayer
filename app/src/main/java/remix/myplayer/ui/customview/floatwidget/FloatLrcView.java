@@ -37,6 +37,7 @@ import remix.myplayer.model.FloatLrcContent;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -289,7 +290,7 @@ public class FloatLrcView extends RelativeLayout {
             //关闭桌面歌词
             case R.id.widget_close:
                 SPUtil.putValue(mContext,"Setting","FloatLrc",false);
-                Intent closeIntent = new Intent(Constants.CTL_ACTION);
+                Intent closeIntent = new Intent(MusicService.ACTION_CMD);
                 closeIntent.putExtra("FloatLrc",false);
                 closeIntent.putExtra("Control",Constants.TOGGLE_FLOAT_LRC);
                 mContext.sendBroadcast(closeIntent);
@@ -316,7 +317,7 @@ public class FloatLrcView extends RelativeLayout {
             case R.id.widget_next:
             case R.id.widget_play:
             case R.id.widget_prev:
-                Intent ctlIntent = new Intent(Constants.CTL_ACTION);
+                Intent ctlIntent = new Intent(MusicService.ACTION_CMD);
                 ctlIntent.putExtra("Control",view.getId() == R.id.widget_next ? Constants.NEXT : view.getId() == R.id.widget_prev ? Constants.PREV : Constants.TOGGLE);
                 mContext.sendBroadcast(ctlIntent);
                 mUIHandler.postDelayed(() -> mPlay.setImageResource(MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal),100);
@@ -377,6 +378,7 @@ public class FloatLrcView extends RelativeLayout {
      * 应用退出后清除通知
      */
     public void cancelNotify(){
+        LogUtil.d("DesktopLrc","取消解锁通知");
         if(mNotify != null)
             mNotify.cancel();
     }
@@ -426,7 +428,7 @@ public class FloatLrcView extends RelativeLayout {
                     .setOngoing(true)
                     .setContentIntent(PendingIntent.getBroadcast(mContext,
                             10,
-                            new Intent(Constants.CTL_ACTION).putExtra("Control",Constants.UNLOCK_DESTOP_LYRIC),
+                            new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.UNLOCK_DESTOP_LYRIC),
                             PendingIntent.FLAG_UPDATE_CURRENT))
                     .setSmallIcon(R.drawable.notifbar_icon)
                     .build();

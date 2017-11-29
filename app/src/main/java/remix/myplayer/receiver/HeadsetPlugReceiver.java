@@ -37,7 +37,7 @@ public class HeadsetPlugReceiver extends BroadcastReceiver {
         context.sendBroadcast(eqintent);
 
         if(!headsetOn && MusicService.isPlay()){
-            Intent ctlIntent = new Intent(Constants.CTL_ACTION);
+            Intent ctlIntent = new Intent(MusicService.ACTION_CMD);
             ctlIntent.putExtra("Control",Constants.PAUSE);
             context.sendBroadcast(ctlIntent);
         }

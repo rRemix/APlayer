@@ -109,7 +109,7 @@ public class LrcRow implements Comparable<LrcRow>{
 	}
 	@Override
 	public String toString() {
-		return "LrcRow [timeStr=" + timeStr + ", time=" + time + ", content="
+		return "LrcRow [timeStr=" + timeStr + ", time=" + time + ", totalTime=" + totalTime +", content="
 				+ content + "]";
 	} 
 

@@ -443,7 +443,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      */
     @OnClick({R.id.playbar_next,R.id.playbar_prev,R.id.playbar_play_container})
     public void onCtrlClick(View v){
-        Intent intent = new Intent(Constants.CTL_ACTION);
+        Intent intent = new Intent(MusicService.ACTION_CMD);
         switch (v.getId()) {
             case R.id.playbar_prev:
                 intent.putExtra("Control", Constants.PREV);

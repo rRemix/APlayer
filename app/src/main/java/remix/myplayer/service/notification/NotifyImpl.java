@@ -144,7 +144,7 @@ public class NotifyImpl extends Notify {
 
     private void buildAction(Context context) {
         //添加Action
-        Intent actionIntent = new Intent(Constants.CTL_ACTION);
+        Intent actionIntent = new Intent(MusicService.ACTION_CMD);
         actionIntent.putExtra("FromNotify", true);
         //播放或者暂停
         actionIntent.putExtra("Control", Constants.TOGGLE);

@@ -8,6 +8,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 
+import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 
 /**
@@ -34,7 +35,7 @@ public class ShakeDetector implements SensorEventListener{
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            Intent intent = new Intent(Constants.CTL_ACTION);
+            Intent intent = new Intent(MusicService.ACTION_CMD);
             intent.putExtra("Control", Constants.NEXT);
             mContext.sendBroadcast(intent);
         }

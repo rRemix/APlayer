@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.View;
 
 import remix.myplayer.R;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 
 /**
@@ -21,7 +22,7 @@ public class CtrlButtonListener implements View.OnClickListener {
     }
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(Constants.CTL_ACTION);
+        Intent intent = new Intent(MusicService.ACTION_CMD);
         switch (v.getId()) {
             case R.id.lockscreen_prev:
             case R.id.playbar_prev:

@@ -25,6 +25,7 @@ import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -75,7 +76,7 @@ public class RecetenlyActivity extends PermissionActivity<Song,SongAdapter> impl
             public void onItemClick(View view, int position) {
                 int id = getSongId(position);
                 if(id > 0 && !mMultiChoice.itemAddorRemoveWithClick(view,position,id,TAG)){
-                    Intent intent = new Intent(Constants.CTL_ACTION);
+                    Intent intent = new Intent(MusicService.ACTION_CMD);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);

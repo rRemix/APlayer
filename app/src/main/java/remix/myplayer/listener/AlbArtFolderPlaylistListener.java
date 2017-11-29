@@ -16,6 +16,7 @@ import com.umeng.analytics.MobclickAgent;
 import java.util.List;
 
 import remix.myplayer.R;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -51,7 +52,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                     ToastUtil.show(mContext,R.string.list_is_empty);
                     return true;
                 }
-                Intent intent = new Intent(Constants.CTL_ACTION);
+                Intent intent = new Intent(MusicService.ACTION_CMD);
                 Bundle arg = new Bundle();
                 arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                 arg.putInt("Position", 0);

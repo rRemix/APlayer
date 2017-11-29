@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.KeyEvent;
 
+import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
 
@@ -37,7 +38,7 @@ public class MediaButtonReceiver extends BroadcastReceiver {
                 keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ||
                 keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
             LogUtil.d(TAG,"receive remote ctrl");
-            intent_ctl = new Intent(Constants.CTL_ACTION);
+            intent_ctl = new Intent(MusicService.ACTION_CMD);
             int arg = keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.TOGGLE :
                     keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Constants.NEXT : Constants.PREV;
             intent_ctl.putExtra("Control", arg);
@@ -55,7 +56,7 @@ public class MediaButtonReceiver extends BroadcastReceiver {
                         sleep(800);
                         int arg = mCount == 1 ? Constants.TOGGLE : mCount == 2 ? Constants.NEXT : Constants.PREV;
                         mCount = 0;
-                        Intent intent = new Intent(Constants.CTL_ACTION);
+                        Intent intent = new Intent(MusicService.ACTION_CMD);
                         intent.putExtra("Control", arg);
                         context.sendBroadcast(intent);
                     } catch (InterruptedException e) {

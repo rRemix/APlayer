@@ -235,7 +235,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         switch (v.getId()){
             case R.id.play_shuffle:
                 MusicService.getInstance().setPlayModel(Constants.PLAY_SHUFFLE);
-                Intent intent = new Intent(Constants.CTL_ACTION);
+                Intent intent = new Intent(MusicService.ACTION_CMD);
                 intent.putExtra("Control", Constants.NEXT);
                 intent.putExtra("shuffle",true);
                 if(mType == ALLSONG){

@@ -102,7 +102,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
                             idList.add(info.getId());
                     }
                     //设置正在播放列表
-                    Intent intent = new Intent(Constants.CTL_ACTION);
+                    Intent intent = new Intent(MusicService.ACTION_CMD);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);

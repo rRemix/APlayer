@@ -76,7 +76,7 @@ public class NotifyImpl24 extends Notify{
     private void updateWithBitmap(Bitmap bitmap,Song song){
         int playPauseIcon = MusicService.isPlay() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp;
 
-        Intent deleteIntent = new Intent(Constants.CTL_ACTION);
+        Intent deleteIntent = new Intent(MusicService.ACTION_CMD);
         deleteIntent.putExtra("FromNotify", true);
         deleteIntent.putExtra("Close", true);
 
@@ -106,7 +106,7 @@ public class NotifyImpl24 extends Notify{
     }
 
     private Intent getControlIntent(int control){
-        return new Intent(Constants.CTL_ACTION).putExtra("FromNotify", true)
+        return new Intent(MusicService.ACTION_CMD).putExtra("FromNotify", true)
                 .putExtra("Control",control);
     }
 

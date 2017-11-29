@@ -276,7 +276,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                         if(MusicService.getCurrentMP3() == null)
                                             return;
                                         if(mInfo.getId() == MusicService.getCurrentMP3().getId() && Global.PlayQueue.size() >= 2){
-                                            Intent intent = new Intent(Constants.CTL_ACTION);
+                                            Intent intent = new Intent(MusicService.ACTION_CMD);
                                             intent.putExtra("Control", Constants.NEXT);
                                             mContext.sendBroadcast(intent);
                                         }

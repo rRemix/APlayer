@@ -32,15 +32,8 @@ public class Constants {
     public final static int PLAYLIST = 4;
     public final static int PLAYLISTSONG = 5;
 
-    public final static String THEME_ACTION = "remix.music.THEME_ACTION";
-    public final static String CTL_ACTION = "remix.music.CTL_ACTION";
-    public final static String EVENT_ACTION = "remix.music.EVENT_ACTION";
-    public final static String UPDATE_ACTION = "remix.music.UPDATE_ACTION";
-    public final static String CONTROL_TIMER = "remix.music.CONTROL_TIMER";
-    public final static String NOTIFY = "remix.music.NOTIFY";
     public final static String EXIT = "remix.music.EXIT";
     public final static String SOUNDEFFECT_ACTION = "remix.music.SOUNDEFFECT_ACTION";
-    public final static String WIDGET_UPDATE = "remix.music.WIDGET_UPDATE";
 
     //控制命令
     public final static int PLAYSELECTEDSONG = 0;
