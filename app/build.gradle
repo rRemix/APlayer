@@ -56,7 +56,7 @@ android {
         }
         release {
             //混淆代码
-            minifyEnabled true
+            minifyEnabled false
             debuggable false
             zipAlignEnabled true
             shrinkResources false

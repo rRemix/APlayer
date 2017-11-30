@@ -5,7 +5,7 @@ package remix.myplayer.util;
  */
 
 import remix.myplayer.R;
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 
 /**
  * 常量值

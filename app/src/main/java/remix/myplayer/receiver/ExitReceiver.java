@@ -9,8 +9,8 @@ import com.umeng.analytics.MobclickAgent;
 
 import remix.myplayer.db.DBManager;
 import remix.myplayer.listener.ShakeDetector;
-import remix.myplayer.manager.ActivityManager;
-import remix.myplayer.manager.ServiceManager;
+import remix.myplayer.misc.manager.ActivityManager;
+import remix.myplayer.misc.manager.ServiceManager;
 
 /**
  * Created by taeja on 16-2-16.

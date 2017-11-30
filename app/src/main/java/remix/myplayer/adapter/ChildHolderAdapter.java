@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.MultiPosition;

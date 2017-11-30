@@ -1,4 +1,4 @@
-package remix.myplayer.application;
+package remix.myplayer;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -19,7 +19,6 @@ import com.umeng.socialize.UMShareAPI;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.update.BmobUpdateAgent;
-import remix.myplayer.BuildConfig;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.db.DBManager;
 import remix.myplayer.db.DBOpenHelper;
@@ -28,7 +27,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.CrashHandler;
-import remix.myplayer.util.ErrUtil;
+import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -92,7 +91,7 @@ public class APlayerApplication extends MultiDexApplication{
         PermissionUtil.setContext(mContext);
         MediaStoreUtil.setContext(mContext);
         CommonUtil.setContext(mContext);
-        ErrUtil.setContext(mContext);
+        ImageUriUtil.setContext(mContext);
         DiskCache.init(mContext);
         ColorUtil.setContext(mContext);
         PlayListUtil.setContext(mContext);
@@ -100,7 +99,7 @@ public class APlayerApplication extends MultiDexApplication{
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
                 .setBitmapMemoryCacheParamsSupplier(() -> new MemoryCacheParams(cacheSize, Integer.MAX_VALUE,cacheSize,Integer.MAX_VALUE, 2 * ByteConstants.MB))
                 .setBitmapsConfig(Bitmap.Config.RGB_565)
-                .setMainDiskCacheConfig(DiskCacheConfig.newBuilder(mContext).setMaxCacheSize(0).build())
+//                .setMainDiskCacheConfig(DiskCacheConfig.newBuilder(mContext).setMaxCacheSize(0).build())
                 .build();
         Fresco.initialize(this,config);
     }

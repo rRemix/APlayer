@@ -11,7 +11,7 @@ import com.umeng.analytics.MobclickAgent;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 
 /**
  * Created by Remix on 2016/3/26.

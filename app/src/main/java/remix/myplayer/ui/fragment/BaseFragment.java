@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import com.umeng.analytics.MobclickAgent;
 
 import butterknife.Unbinder;
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 
 /**
  * @ClassName

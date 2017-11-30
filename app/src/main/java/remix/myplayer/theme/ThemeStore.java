@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import remix.myplayer.R;
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SPUtil;
 

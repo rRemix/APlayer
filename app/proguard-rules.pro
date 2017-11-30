@@ -38,6 +38,9 @@
 #崩溃信息
 -keepattributes SourceFile,LineNumberTable
 
+#basedata
+-keep public class * extends remix.myplayer.model.BaseData
+
 #baseAdapter
 -keepclassmembers class remix.myplayer.adapter.holder.BaseViewHolder
 -keepclasseswithmembers class remix.myplayer.adapter.holder.BaseViewHolder {

@@ -3,9 +3,8 @@ package remix.myplayer.lyric.network;
 import io.reactivex.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
-import remix.myplayer.lyric.ApiService;
 import remix.myplayer.lyric.HttpHelper;
-import remix.myplayer.model.netease.NSearchResponse;
+import remix.myplayer.model.netease.NSongSearchResponse;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -72,7 +71,7 @@ public class HttpClient implements HttpHelper {
     }
 
     @Override
-    public Observable<NSearchResponse> getNeteaseSearch2(String key, int offset, int limit, int type) {
+    public Observable<NSongSearchResponse> getNeteaseSearch2(String key, int offset, int limit, int type) {
         return mNeteaseApi.getNeteaseSearch2(key,offset,limit,type);
     }
 

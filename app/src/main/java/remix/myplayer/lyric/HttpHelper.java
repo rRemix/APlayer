@@ -2,14 +2,14 @@ package remix.myplayer.lyric;
 
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
-import remix.myplayer.model.netease.NSearchResponse;
+import remix.myplayer.model.netease.NSongSearchResponse;
 
 /**
  * Created by Remix on 2017/11/21.
  */
 
 public interface HttpHelper {
-    Observable<NSearchResponse> getNeteaseSearch2(String key,int offset, int limit,int type);
+    Observable<NSongSearchResponse> getNeteaseSearch2(String key, int offset, int limit, int type);
 
     Observable<ResponseBody> getNeteaseSearch(String key,int offset,int limit,int type);
 

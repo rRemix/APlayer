@@ -6,7 +6,7 @@ import android.os.Message;
 
 import java.lang.reflect.Method;
 
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.util.ToastUtil;
 
 /**

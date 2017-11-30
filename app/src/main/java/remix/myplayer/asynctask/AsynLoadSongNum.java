@@ -7,7 +7,7 @@ import android.provider.MediaStore;
 import android.widget.TextView;
 
 import remix.myplayer.R;
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 

@@ -31,12 +31,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.cache.DiskLruCache;
 import remix.myplayer.model.LrcRequest;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.model.netease.NSearchResponse;
+import remix.myplayer.model.netease.NSongSearchResponse;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
@@ -149,8 +149,8 @@ public class SearchLRC {
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
                             String responseString = response.body().string();
-                            NSearchResponse searchResponse = new Gson().fromJson(responseString,NSearchResponse.class);
-                            LogUtil.d("NSearchResponse", searchResponse + "");
+                            NSongSearchResponse searchResponse = new Gson().fromJson(responseString,NSongSearchResponse.class);
+                            LogUtil.d("NSongSearchResponse", searchResponse + "");
                         }
                     });
 

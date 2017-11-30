@@ -32,7 +32,7 @@ import butterknife.OnClick;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import cn.bmob.v3.update.UpdateStatus;
 import remix.myplayer.R;
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;

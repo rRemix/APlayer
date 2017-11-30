@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 
 /**
  * @ClassName

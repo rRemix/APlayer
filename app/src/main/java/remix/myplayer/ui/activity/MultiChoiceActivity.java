@@ -14,7 +14,7 @@ import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
 import remix.myplayer.R;
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;

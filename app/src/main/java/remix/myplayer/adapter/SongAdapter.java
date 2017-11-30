@@ -22,11 +22,12 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.application.APlayerApplication;
-import remix.myplayer.asynctask.AsynLoadImage;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.interfaces.SortChangeCallback;
+import remix.myplayer.misc.imae.AlbumUriRequest;
 import remix.myplayer.model.MultiPosition;
+import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -143,6 +144,9 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 //                }
 //            }
 //        }
+        //封面
+//        new AsynLoadImage(holder.mImage).execute(song.getAlbumId(),Constants.URL_ALBUM);
+        new AlbumUriRequest(position,holder,holder.mImage,new Album(song.getAlbumId(),song.getAlbum(),0)).load();
         //是否为无损
         if(!TextUtils.isEmpty(song.getDisplayname())){
             String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
@@ -158,8 +162,6 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         String album = CommonUtil.processInfo(song.getAlbum(),CommonUtil.ALBUMTYPE);
         holder.mOther.setText(artist + "-" + album);
 
-        //封面
-        new AsynLoadImage(holder.mImage).execute(song.getAlbumId(),Constants.URL_ALBUM);
 
         //背景点击效果
         holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
@@ -177,39 +179,30 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
                     ThemeStore.getRippleColor(),
                     null,null));
 
-            holder.mButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(mMultiChoice.isShow())
-                        return;
-                    Intent intent = new Intent(mContext, OptionDialog.class);
-                    intent.putExtra("Song", song);
-                    mContext.startActivity(intent);
-                }
+            holder.mButton.setOnClickListener(v -> {
+                if(mMultiChoice.isShow())
+                    return;
+                Intent intent = new Intent(mContext, OptionDialog.class);
+                intent.putExtra("Song", song);
+                mContext.startActivity(intent);
             });
         }
 
         if(mOnItemClickLitener != null && holder.mContainer != null) {
-            holder.mContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(holder.getAdapterPosition() - 1 < 0){
-                        ToastUtil.show(mContext,R.string.illegal_arg);
-                        return;
-                    }
-                    mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition() - 1);
+            holder.mContainer.setOnClickListener(v -> {
+                if(holder.getAdapterPosition() - 1 < 0){
+                    ToastUtil.show(mContext,R.string.illegal_arg);
+                    return;
                 }
+                mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition() - 1);
             });
-            holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if(holder.getAdapterPosition() - 1 < 0){
-                        ToastUtil.show(mContext,R.string.illegal_arg);
-                        return true;
-                    }
-                    mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition() - 1);
+            holder.mContainer.setOnLongClickListener(v -> {
+                if(holder.getAdapterPosition() - 1 < 0){
+                    ToastUtil.show(mContext,R.string.illegal_arg);
                     return true;
                 }
+                mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition() - 1);
+                return true;
             });
         }
 

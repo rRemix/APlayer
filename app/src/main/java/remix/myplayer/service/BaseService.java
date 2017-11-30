@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import remix.myplayer.manager.ServiceManager;
+import remix.myplayer.misc.manager.ServiceManager;
 
 /**
  * Created by Remix on 2016/3/26.

@@ -25,9 +25,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -40,9 +38,8 @@ import java.util.Map;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
 import remix.myplayer.R;
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.model.bmob.Error;
-import remix.myplayer.util.thumb.SearchCover;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -467,89 +464,6 @@ public class CommonUtil {
         return null;
     }
 
-    /**
-     * 判断某个专辑在本地数据库是否有封面
-     * @param uri
-     * @return
-     */
-    public static boolean isAlbumThumbExistInDB(Uri uri){
-        boolean exist = false;
-        InputStream stream = null;
-        try {
-            stream = mContext.getContentResolver().openInputStream(uri);
-            exist = true;
-        } catch (Exception e) {
-            exist = false;
-        } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return exist;
-    }
-
-    /**
-     * 下载专辑封面并根据专辑id保存
-     * @param songname
-     * @param artist
-     * @param albumid
-     */
-    public static String downAlbumCover(String songname,String artist,long albumid){
-        String urlstr = new SearchCover(songname,artist,SearchCover.COVER).getImgUrl();
-        URL url = null;
-        BufferedReader br = null;
-        StringBuffer strBuffer = new StringBuffer();
-        FileOutputStream fos = null;
-        InputStream in = null;
-        String s;
-        File img = null;
-        try {
-            url = new URL(urlstr);
-            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.connect();
-            in = httpURLConnection.getInputStream();
-
-            if(in == null || !Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
-                return "";
-
-            File dir = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/cache/cover");
-            if(!dir.exists())
-                dir.mkdirs();
-            img = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/cache/cover/" + albumid  + ".jpg");
-            fos = new FileOutputStream(img);
-
-            byte[] bs = new byte[1024];
-            int len = 0;
-            // 开始读取
-            while ((len = in.read(bs)) != -1) {
-                fos.write(bs);
-            }
-            if(fos != null)
-                fos.flush();
-
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            try {
-                if(fos != null)
-                    fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                if(in != null)
-                    in.close();
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-        }
-        return img == null ? "" : img.getAbsolutePath();
-    }
 
     public static String getCoverInCache(long albumId){
         File coverCacheDir = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/cache/cover");

@@ -40,6 +40,12 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
+import io.reactivex.functions.Consumer;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
@@ -63,6 +69,8 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.ImageUriUtil;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
@@ -148,6 +156,35 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         setUpViewColor();
         //handler
         mRefreshHandler = new MsgHandler(this);
+
+        long start = System.currentTimeMillis();
+
+//        File customImage = ImageUriUtil.getCustomCoverIfExist(34, Constants.URL_ALBUM);
+//        if(cus)
+//        LogUtil.e("switchIfEmpty","查找自定义封面耗时:" + (System.currentTimeMillis() - start));
+
+        Observable.create(new ObservableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(ObservableEmitter<Integer> e) throws Exception {
+                if(true)
+                    e.onComplete();
+            }
+        }).switchIfEmpty(new ObservableSource<Integer>() {
+            @Override
+            public void subscribe(Observer<? super Integer> observer) {
+                observer.onNext(1);
+            }
+        }).switchIfEmpty(new ObservableSource<Integer>() {
+            @Override
+            public void subscribe(Observer<? super Integer> observer) {
+                observer.onNext(2);
+            }
+        }).subscribe(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                LogUtil.e("switchIfEmpty","Rx耗时:" + (System.currentTimeMillis() - start));
+            }
+        });
     }
 
     /**

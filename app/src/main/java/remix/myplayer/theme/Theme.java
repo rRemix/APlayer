@@ -24,7 +24,7 @@ import android.widget.TextView;
 import java.lang.reflect.Field;
 
 import remix.myplayer.R;
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;

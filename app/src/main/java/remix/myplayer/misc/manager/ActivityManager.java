@@ -1,4 +1,4 @@
-package remix.myplayer.manager;
+package remix.myplayer.misc.manager;
 
 import android.app.Activity;
 

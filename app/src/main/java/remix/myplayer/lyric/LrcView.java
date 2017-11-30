@@ -18,7 +18,7 @@ import android.widget.Scroller;
 
 import java.util.List;
 
-import remix.myplayer.application.APlayerApplication;
+import remix.myplayer.APlayerApplication;
 
 /***
  * 

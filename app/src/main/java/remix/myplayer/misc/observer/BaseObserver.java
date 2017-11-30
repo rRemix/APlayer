@@ -1,4 +1,4 @@
-package remix.myplayer.observer;
+package remix.myplayer.misc.observer;
 
 import android.database.ContentObserver;
 import android.net.Uri;
