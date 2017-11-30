@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -40,6 +41,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
+import com.google.gson.Gson;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
@@ -50,14 +52,22 @@ import java.util.Set;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.lyric.LrcView;
+import remix.myplayer.lyric.network.HttpClient;
+import remix.myplayer.lyric.network.RxUtil;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.imae.AlbumUriRequest;
+import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.model.netease.NAlbumSearchResponse;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -73,6 +83,7 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -263,6 +274,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mFromNotify = getIntent().getBooleanExtra("Notify",false);
@@ -293,7 +305,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
         //设置封面
         if(mInfo != null)
-            MediaStoreUtil.setImageUrl(mAnimCover,mInfo.getAlbumId());
+            new AlbumUriRequest(mAnimCover,new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0)).load();
 
         //恢复位置信息
         if(savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null){
@@ -861,13 +873,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             if(MusicService.getNextMP3() != null){
                 mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
             }
-            new Thread(){
-                @Override
-                public void run() {
-                    updateBg();
-                    updateCover();
-                }
-            }.start();
+            updateBg();
+            updateCover();
         }
         //更新按钮状态
         updatePlayButton(isplay);
@@ -947,21 +954,26 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private void updateBg() {
         if(!mDiscolour)
             return;
-        //更新背景
-
-        mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
-        if(mRawBitMap == null)
-            mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
-
-        Palette.from(mRawBitMap).generate(palette -> {
-            if(palette == null || palette.getMutedSwatch() == null){
-                mSwatch = new Palette.Swatch(Color.GRAY,100);
-            } else {
-                mSwatch = palette.getMutedSwatch();//柔和 暗色
-            }
-            mHandler.removeMessages(UPDATE_BG);
-            mHandler.sendEmptyMessage(UPDATE_BG);
+        Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
+            mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
+            if(mRawBitMap == null)
+                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
+            Palette.from(mRawBitMap).generate(palette -> {
+                if(palette == null || palette.getMutedSwatch() == null){
+                    mSwatch = new Palette.Swatch(Color.GRAY,100);
+                } else {
+                    mSwatch = palette.getMutedSwatch();//柔和 暗色
+                }
+                e.onNext(mSwatch);
+            });
+        })
+        .compose(RxUtil.applyScheduler())
+        .subscribe(swatch -> {
+            int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
+            int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
+            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
         });
+
     }
 
     /**
@@ -971,16 +983,44 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         //更新封面
         if(mInfo == null || (mInfo = MusicService.getCurrentMP3()) == null){
             mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
+            mHandler.removeMessages(UPDATE_COVER);
+            mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
         } else {
-            File imgFile = MediaStoreUtil.getImageUrlInCache(mInfo.getAlbumId(), Constants.URL_ALBUM);
-            if(imgFile.exists()) {
-                mUri = Uri.parse("file:///" +  imgFile);
-            } else {
-                mUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
-            }
+            Observable.create((ObservableOnSubscribe<String>) e -> {
+                File customImage = ImageUriUtil.getCustomCoverIfExist(mInfo.getAlbumId(), Constants.URL_ALBUM);
+                if(customImage != null && customImage.exists()){
+                    e.onNext("file://" + customImage.getAbsolutePath());
+                } else {
+                    e.onComplete();
+                }
+            }).switchIfEmpty(new Observable<String>() {
+                @Override
+                protected void subscribeActual(Observer<? super String> observer) {
+                    Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
+                    if(ImageUriUtil.isAlbumThumbExistInMediaCache(uri)){
+                        observer.onNext(uri.toString());
+                    }else {
+                        observer.onComplete();
+                    }
+                }
+            }).switchIfEmpty(HttpClient.getNeteaseApiservice()
+                    .getNeteaseSearch(mInfo.getAlbum(),0,1,10)
+                    .map(body -> {
+                        NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);
+                        return response.result.albums.get(0).picUrl;
+                    }))
+                    .compose(RxUtil.applySchedulerToIO())
+                    .subscribe(s -> {
+                        mUri = Uri.parse(s);
+                        mHandler.removeMessages(UPDATE_COVER);
+                        mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+                    }, throwable ->{
+                        mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
+                        mHandler.removeMessages(UPDATE_COVER);
+                        mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+                    });
         }
-        mHandler.removeMessages(UPDATE_COVER);
-        mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+
     }
 
     @Override
@@ -1031,7 +1071,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     @OnHandleMessage
     public void handleInternal(Message msg){
         if(msg.what == UPDATE_COVER){
-            ((CoverFragment) mAdapter.getItem(1)).UpdateCover(mInfo,mUri,!mFistStart);
+            ((CoverFragment) mAdapter.getItem(1)).updateCover(mInfo,mUri,!mFistStart);
             mFistStart = false;
         }
         if(msg.what == UPDATE_BG){

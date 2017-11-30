@@ -16,4 +16,28 @@ public class PlayList {
         Count = count;
     }
 
+
+    public int getId() {
+        return _Id;
+    }
+
+    public void setId(int _Id) {
+        this._Id = _Id;
+    }
+
+    public String getName() {
+        return Name;
+    }
+
+    public void setName(String name) {
+        Name = name;
+    }
+
+    public int getCount() {
+        return Count;
+    }
+
+    public void setCount(int count) {
+        Count = count;
+    }
 }

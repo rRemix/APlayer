@@ -23,9 +23,9 @@ import com.github.promeg.pinyinhelper.Pinyin;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
+import remix.myplayer.misc.imae.ArtistUriRequest;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.Artist;
 import remix.myplayer.theme.Theme;
@@ -75,18 +75,8 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
             headerHolder.mDivider.setVisibility(ListModel == Constants.LIST_MODEL ? View.VISIBLE : View.GONE);
             headerHolder.mListModelBtn.setColorFilter(ListModel == Constants.LIST_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
             headerHolder.mGridModelBtn.setColorFilter(ListModel == Constants.GRID_MODEL ? ColorUtil.getColor(R.color.select_model_button_color) : ColorUtil.getColor(R.color.default_model_button_color));
-            headerHolder.mGridModelBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    switchMode(headerHolder,v);
-                }
-            });
-            headerHolder.mListModelBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    switchMode(headerHolder,v);
-                }
-            });
+            headerHolder.mGridModelBtn.setOnClickListener(v -> switchMode(headerHolder,v));
+            headerHolder.mListModelBtn.setOnClickListener(v -> switchMode(headerHolder,v));
             return;
         }
 
@@ -102,34 +92,29 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
             new AsynLoadSongNum(holder.mText2,Constants.ARTIST).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId);
         }
         //设置封面
-        new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId,Constants.URL_ARTIST);
+        new ArtistUriRequest(holder.mImage,artist).load();
+//        new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId,Constants.URL_ARTIST);
 
         //item点击效果
         holder.mContainer.setBackground(
                 Theme.getPressAndSelectedStateListRippleDrawable(ListModel,mContext));
 
         if(mOnItemClickLitener != null) {
-            holder.mContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(holder.getAdapterPosition() - 1 < 0){
-                        ToastUtil.show(mContext,R.string.illegal_arg);
-                        return;
-                    }
-                    mOnItemClickLitener.onItemClick(holder.mContainer,position - 1);
+            holder.mContainer.setOnClickListener(v -> {
+                if(holder.getAdapterPosition() - 1 < 0){
+                    ToastUtil.show(mContext,R.string.illegal_arg);
+                    return;
                 }
+                mOnItemClickLitener.onItemClick(holder.mContainer,position - 1);
             });
             //多选菜单
-            holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if(holder.getAdapterPosition() - 1 < 0){
-                        ToastUtil.show(mContext,R.string.illegal_arg);
-                        return true;
-                    }
-                    mOnItemClickLitener.onItemLongClick(holder.mContainer,position - 1);
+            holder.mContainer.setOnLongClickListener(v -> {
+                if(holder.getAdapterPosition() - 1 < 0){
+                    ToastUtil.show(mContext,R.string.illegal_arg);
                     return true;
                 }
+                mOnItemClickLitener.onItemLongClick(holder.mContainer,position - 1);
+                return true;
             });
         }
         //popupmenu
@@ -148,21 +133,18 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
                     null,
                     null));
 
-            holder.mButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(mMultiChoice.isShow())
-                        return;
-                    Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
-                    final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-                    popupMenu.getMenuInflater().inflate(R.menu.artist_menu, popupMenu.getMenu());
-                    popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
-                            artistId,
-                            Constants.ARTIST,
-                            artistName));
-                    popupMenu.setGravity(Gravity.END);
-                    popupMenu.show();
-                }
+            holder.mButton.setOnClickListener(v -> {
+                if(mMultiChoice.isShow())
+                    return;
+                Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
+                final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
+                popupMenu.getMenuInflater().inflate(R.menu.artist_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
+                        artistId,
+                        Constants.ARTIST,
+                        artistName));
+                popupMenu.setGravity(Gravity.END);
+                popupMenu.show();
             });
         }
 
@@ -215,20 +197,20 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
     static class ArtistHolder extends BaseViewHolder {
         @BindView(R.id.item_text1)
-        public TextView mText1;
+        TextView mText1;
         @BindView(R.id.item_text2)
         @Nullable
-        public TextView mText2;
+        TextView mText2;
         @BindView(R.id.item_simpleiview)
-        public SimpleDraweeView mImage;
+        SimpleDraweeView mImage;
         @BindView(R.id.item_button)
-        public ImageButton mButton;
+        ImageButton mButton;
         @BindView(R.id.item_container)
-        public RelativeLayout mContainer;
+        RelativeLayout mContainer;
         @BindView(R.id.item_root)
         @Nullable
-        public View mRoot;
-        public ArtistHolder(View v) {
+        View mRoot;
+        ArtistHolder(View v) {
             super(v);
         }
     }

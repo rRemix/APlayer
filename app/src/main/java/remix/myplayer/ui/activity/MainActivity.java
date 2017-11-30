@@ -49,12 +49,13 @@ import io.reactivex.functions.Consumer;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
-import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.imae.AlbumUriRequest;
+import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -69,7 +70,6 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -565,7 +565,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if(song == null)
             return;
         mHeadText.setText(getString(R.string.play_now, song.getTitle()));
-        new AsynLoadImage(mHeadImg).execute(song.getAlbumId(), Constants.URL_ALBUM);
+//        new AsynLoadImage(mHeadImg).execute(song.getAlbumId(), Constants.URL_ALBUM);
+        new AlbumUriRequest(mHeadImg,new Album(song.getAlbumId(),song.getAlbum(),0)).load();
         mHeadImg.setBackgroundResource(isPlay && ThemeStore.isDay() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
     }
 

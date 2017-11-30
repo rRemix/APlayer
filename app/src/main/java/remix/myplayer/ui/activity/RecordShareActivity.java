@@ -35,6 +35,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.misc.cache.DiskCache;
+import remix.myplayer.misc.imae.AlbumUriRequest;
+import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -42,7 +44,6 @@ import remix.myplayer.ui.dialog.ShareDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -145,8 +146,7 @@ public class RecordShareActivity extends BaseActivity {
         if(mInfo == null)
             return;
 
-
-        MediaStoreUtil.setImageUrl(mImage,mInfo.getAlbumId());
+        new AlbumUriRequest(mImage,new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0)).load();
 
         //设置歌曲名与分享内容
         mContent.setText(getIntent().getExtras().getString("Content"));

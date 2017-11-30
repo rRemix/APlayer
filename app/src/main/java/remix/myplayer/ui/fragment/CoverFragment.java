@@ -91,7 +91,7 @@ public class CoverFragment extends BaseFragment {
      * @param info 需要更新的歌曲
      * @param withAnim 是否需要动画
      */
-    public void UpdateCover(Song info, Uri uri, boolean withAnim){
+    public void updateCover(Song info, Uri uri, boolean withAnim){
         if(!isAdded())
             return;
         if (mImage == null || info == null)

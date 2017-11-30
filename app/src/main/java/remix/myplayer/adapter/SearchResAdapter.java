@@ -10,10 +10,10 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.asynctask.AsynLoadImage;
+import remix.myplayer.misc.imae.AlbumUriRequest;
+import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.util.CommonUtil;
-import remix.myplayer.util.Constants;
 
 /**
  * Created by Remix on 2016/1/23.
@@ -31,16 +31,12 @@ public class SearchResAdapter extends BaseAdapter<Song,SearchResAdapter.SearchRe
     @Override
     protected void convert(final SearchResHolder holder, Song song, int position) {
         holder.mName.setText(CommonUtil.processInfo(song.getTitle(),CommonUtil.SONGTYPE));
-        holder.mOther.setText(song.getArtist() + "-" + song.getAlbum());
+        holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
         //封面
-        new AsynLoadImage(holder.mImage).execute(song.getAlbumId(), Constants.URL_ALBUM);
+//        new AsynLoadImage(holder.mImage).execute(song.getAlbumId(), Constants.URL_ALBUM);
+        new AlbumUriRequest(holder.mImage,new Album(song.getAlbumId(),song.getAlbum(),0)).load();
         if(mOnItemClickLitener != null && holder.mRooView != null){
-            holder.mRooView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition());
-                }
-            });
+            holder.mRooView.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition()));
         }
     }
 

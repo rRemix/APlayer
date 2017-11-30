@@ -1,15 +1,15 @@
 package remix.myplayer.util;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
+import android.provider.MediaStore;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
 import remix.myplayer.misc.cache.DiskCache;
-import remix.myplayer.util.CommonUtil;
-import remix.myplayer.util.Constants;
 
 /**
  * Created by Remix on 2017/11/30.
@@ -24,7 +24,27 @@ public class ImageUriUtil {
     }
 
     /**
-     * 判断某个专辑在本地数据库是否有封面
+     * 获得某歌手在本地数据库的封面
+     */
+    public static File getArtistThumbInMediaCache(int artistId){
+        Cursor cursor = null;
+        try {
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,new String[]{MediaStore.Audio.Albums.ALBUM_ART},
+                    MediaStore.Audio.Media.ARTIST_ID + "=?",new String[]{artistId + ""},null);
+            if(cursor != null && cursor.moveToFirst()) {
+                return new File(cursor.getString(0));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
+        }
+        return null;
+    }
+
+    /**
+     * 判断某专辑在本地数据库是否有封面
      * @param uri
      * @return
      */

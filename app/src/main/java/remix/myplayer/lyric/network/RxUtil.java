@@ -4,7 +4,6 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -18,6 +17,11 @@ public class RxUtil {
     public static <T> ObservableTransformer<T,T> applyScheduler(){
         return upstream -> upstream.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public static <T> ObservableTransformer<T,T> applySchedulerToIO(){
+        return upstream -> upstream.subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io());
     }
 //
 //    public static <T> ObservableTransformer<CommonBean<T>,T> handleResult(){

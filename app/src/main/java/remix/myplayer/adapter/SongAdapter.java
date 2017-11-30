@@ -20,9 +20,9 @@ import com.github.promeg.pinyinhelper.Pinyin;
 import java.util.ArrayList;
 
 import butterknife.BindView;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.APlayerApplication;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.misc.imae.AlbumUriRequest;
@@ -146,7 +146,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 //        }
         //封面
 //        new AsynLoadImage(holder.mImage).execute(song.getAlbumId(),Constants.URL_ALBUM);
-        new AlbumUriRequest(position,holder,holder.mImage,new Album(song.getAlbumId(),song.getAlbum(),0)).load();
+        new AlbumUriRequest(holder.mImage,new Album(song.getAlbumId(),song.getAlbum(),0)).load();
         //是否为无损
         if(!TextUtils.isEmpty(song.getDisplayname())){
             String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);

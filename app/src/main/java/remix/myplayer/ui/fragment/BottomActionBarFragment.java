@@ -20,8 +20,9 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.asynctask.AsynLoadImage;
 import remix.myplayer.listener.CtrlButtonListener;
+import remix.myplayer.misc.imae.AlbumUriRequest;
+import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -29,7 +30,6 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
-import remix.myplayer.util.Constants;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -128,7 +128,8 @@ public class BottomActionBarFragment extends BaseFragment{
             mArtist.setText(song.getArtist());
         //封面
         if(mCover != null)
-            new AsynLoadImage(mCover).execute(song.getAlbumId(), Constants.URL_ALBUM);
+            new AlbumUriRequest(mCover,new Album(song.getAlbumId(),song.getAlbum(),0)).load();
+//            new AsynLoadImage(mCover).execute(song.getAlbumId(), Constants.URL_ALBUM);
         //设置按钮着色
         if(mPlayButton == null)
             return;

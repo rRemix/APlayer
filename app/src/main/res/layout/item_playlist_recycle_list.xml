@@ -11,9 +11,9 @@
         android:layout_width="@dimen/d42_size"
         android:layout_height="@dimen/d42_size"
         android:id="@+id/item_simpleiview"
+        fresco:fadeDuration="500"
         fresco:actualImageScaleType="centerCrop"
-        fresco:placeholderImageScaleType="centerCrop"
-        fresco:placeholderImage="?attr/default_album"
+        fresco:failureImage="?attr/default_album"
         fresco:failureImageScaleType="centerCrop"
         android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/d8_size"/>

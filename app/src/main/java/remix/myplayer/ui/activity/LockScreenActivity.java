@@ -31,6 +31,8 @@ import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.R;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.CtrlButtonListener;
+import remix.myplayer.misc.imae.AlbumUriRequest;
+import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -235,7 +237,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         }
         //封面
         if(mSimpleImage != null) {
-            MediaStoreUtil.setImageUrl(mSimpleImage,mInfo.getAlbumId());
+            new AlbumUriRequest(mSimpleImage,new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0)).load();
         }
         //下一首
         if(mNextSong != null && MusicService.getNextMP3() != null)
