@@ -10,9 +10,9 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.misc.imae.AlbumUriRequest;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.request.AlbumUriRequest;
 
 /**
  * Created by Remix on 2016/1/23.

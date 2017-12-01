@@ -64,10 +64,10 @@ import remix.myplayer.lyric.network.HttpClient;
 import remix.myplayer.lyric.network.RxUtil;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
-import remix.myplayer.misc.imae.AlbumUriRequest;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.model.netease.NAlbumSearchResponse;
+import remix.myplayer.request.AlbumUriRequest;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -987,7 +987,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
         } else {
             Observable.create((ObservableOnSubscribe<String>) e -> {
-                File customImage = ImageUriUtil.getCustomCoverIfExist(mInfo.getAlbumId(), Constants.URL_ALBUM);
+                File customImage = ImageUriUtil.getCustomThumbIfExist(mInfo.getAlbumId(), Constants.URL_ALBUM);
                 if(customImage != null && customImage.exists()){
                     e.onNext("file://" + customImage.getAbsolutePath());
                 } else {

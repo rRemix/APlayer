@@ -1,4 +1,4 @@
-package remix.myplayer.misc.imae;
+package remix.myplayer.request;
 
 import android.content.ContentUris;
 import android.net.Uri;
@@ -43,7 +43,7 @@ public class AlbumUriRequest extends ImageUriRequest {
 //        new Thread(){
 //            @Override
 //            public void run() {
-//                File customImage = ImageUriUtil.getCustomCoverIfExist(mAlbum.getAlbumID(), Constants.URL_ALBUM);
+//                File customImage = ImageUriUtil.getCustomThumbIfExist(mAlbum.getAlbumID(), Constants.URL_ALBUM);
 //                if(customImage != null && customImage.exists()){
 //                    handler.post(() -> onSuccess("file://" + customImage.getAbsolutePath()));
 //                    return;
@@ -82,7 +82,7 @@ public class AlbumUriRequest extends ImageUriRequest {
 
     static Observable<String> getAlbumThumbObservable(Album album){
         return Observable.create((ObservableOnSubscribe<String>) e -> {
-            File customImage = ImageUriUtil.getCustomCoverIfExist(album.getAlbumID(), Constants.URL_ALBUM);
+            File customImage = ImageUriUtil.getCustomThumbIfExist(album.getAlbumID(), Constants.URL_ALBUM);
             if(customImage != null && customImage.exists()){
                 e.onNext("file://" + customImage.getAbsolutePath());
             }
@@ -96,17 +96,19 @@ public class AlbumUriRequest extends ImageUriRequest {
 //                        observer.onNext("file://" + thumbUrl);
 //                    }
 //                }
+
                 Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), album.getAlbumID());
                 if(ImageUriUtil.isAlbumThumbExistInMediaCache(uri)){
                     observer.onNext(uri.toString());
                 }
+
                 observer.onComplete();
             }
         }).switchIfEmpty(HttpClient.getNeteaseApiservice()
                 .getNeteaseSearch(album.getAlbum(),0,1,10)
                 .doOnSubscribe(disposable -> {
                     //延迟 避免接口请求频繁
-                    Thread.sleep(24);
+//                    Thread.sleep(24);
                 })
                 .map(body -> {
                     NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);

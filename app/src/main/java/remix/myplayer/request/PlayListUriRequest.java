@@ -1,4 +1,4 @@
-package remix.myplayer.misc.imae;
+package remix.myplayer.request;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -32,7 +32,7 @@ public class PlayListUriRequest extends ImageUriRequest {
     @Override
     public void load() {
         Observable.create((ObservableOnSubscribe<String>) e -> {
-            File customImage = ImageUriUtil.getCustomCoverIfExist(mPlayList.getId(), Constants.URL_PLAYLIST);
+            File customImage = ImageUriUtil.getCustomThumbIfExist(mPlayList.getId(), Constants.URL_PLAYLIST);
             if(customImage != null && customImage.exists()){
                 e.onNext("file://" + customImage.getAbsolutePath());
             }

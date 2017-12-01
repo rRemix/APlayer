@@ -179,7 +179,11 @@ public class FloatLrcView extends RelativeLayout {
             @Override
             public boolean onPreDraw() {
                 getViewTreeObserver().removeOnPreDrawListener(this);
-                saveLock(mIsLock,true);
+//                Song song = MusicService.getCurrentMP3();
+//                if(song != null){
+//                    setText(new LrcRow("",0,song.getTitle()),new LrcRow("",0,song.getArtist() + " - " + song.getAlbum()));
+//                }
+                saveLock(mIsLock,false);
                 return true;
             }
         });

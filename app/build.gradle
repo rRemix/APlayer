@@ -59,7 +59,7 @@ android {
             minifyEnabled false
             debuggable false
             zipAlignEnabled true
-            shrinkResources false
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

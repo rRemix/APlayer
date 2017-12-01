@@ -15,9 +15,9 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.interfaces.OnSongChooseListener;
-import remix.myplayer.misc.imae.AlbumUriRequest;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.request.AlbumUriRequest;
 
 /**
  * @ClassName

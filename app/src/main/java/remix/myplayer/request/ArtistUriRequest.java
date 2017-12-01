@@ -1,4 +1,4 @@
-package remix.myplayer.misc.imae;
+package remix.myplayer.request;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.gson.Gson;
@@ -29,7 +29,7 @@ public class ArtistUriRequest extends ImageUriRequest {
     @Override
     public void load() {
         Observable.create((ObservableOnSubscribe<String>) e -> {
-            File customImage = ImageUriUtil.getCustomCoverIfExist(mArtist.getArtistID(), Constants.URL_ARTIST);
+            File customImage = ImageUriUtil.getCustomThumbIfExist(mArtist.getArtistID(), Constants.URL_ARTIST);
             if(customImage != null && customImage.exists()){
                 e.onNext("file://" + customImage.getAbsolutePath());
             }

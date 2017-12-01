@@ -1,4 +1,4 @@
-package remix.myplayer.misc.imae;
+package remix.myplayer.request;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
