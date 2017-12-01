@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -39,10 +40,10 @@ import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -91,6 +92,13 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
                 new SongViewHolder(LayoutInflater.from(mContext).inflate(R.layout.item_song_recycle,parent,false));
     }
 
+    @Override
+    public void onViewRecycled(BaseViewHolder holder) {
+        super.onViewRecycled(holder);
+        if(holder instanceof SongViewHolder){
+            ((SongViewHolder) holder).mImage.setImageURI(Uri.EMPTY);
+        }
+    }
 
     @Override
     protected void convert(BaseViewHolder baseHolder, final Song song, int position) {
@@ -117,6 +125,8 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
             headerHolder.mShuffle.setOnClickListener(listener);
             return;
         }
+
+        long start = System.currentTimeMillis();
 
         if(!(baseHolder instanceof SongViewHolder))
             return;
@@ -145,8 +155,9 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 //            }
 //        }
         //封面
-//        new AsynLoadImage(holder.mImage).execute(song.getAlbumId(),Constants.URL_ALBUM);
-        new AlbumUriRequest(holder.mImage,new Album(song.getAlbumId(),song.getAlbum(),0)).load();
+
+        new AlbumUriRequest(holder.mImage,new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist())).load();
+
         //是否为无损
         if(!TextUtils.isEmpty(song.getDisplayname())){
             String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
@@ -154,13 +165,10 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         }
 
         //设置歌曲名
-        String name = CommonUtil.processInfo(song.getTitle(),CommonUtil.SONGTYPE);
-        holder.mName.setText(name);
+        holder.mName.setText(song.getTitle());
 
         //艺术家与专辑
-        String artist = CommonUtil.processInfo(song.getArtist(),CommonUtil.ARTISTTYPE);
-        String album = CommonUtil.processInfo(song.getAlbum(),CommonUtil.ALBUMTYPE);
-        holder.mOther.setText(artist + "-" + album);
+        holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
 
 
         //背景点击效果
@@ -222,6 +230,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
             }
         }
 
+        LogUtil.d("SongAdapter","耗时:" + (System.currentTimeMillis() - start));
     }
 
     protected void OnClick(HeaderHolder headerHolder, View v){

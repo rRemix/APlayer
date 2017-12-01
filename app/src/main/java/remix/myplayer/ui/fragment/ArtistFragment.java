@@ -89,6 +89,7 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
         mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setHasFixedSize(true);
     }
 
 

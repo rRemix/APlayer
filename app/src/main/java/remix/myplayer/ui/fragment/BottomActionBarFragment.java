@@ -29,7 +29,6 @@ import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.CommonUtil;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -123,12 +122,12 @@ public class BottomActionBarFragment extends BaseFragment{
             return;
         //歌曲名 艺术家
         if(mTitle != null)
-            mTitle.setText(CommonUtil.processInfo(song.getTitle(),CommonUtil.SONGTYPE));
+            mTitle.setText(song.getTitle());
         if(mArtist != null)
             mArtist.setText(song.getArtist());
         //封面
         if(mCover != null)
-            new AlbumUriRequest(mCover,new Album(song.getAlbumId(),song.getAlbum(),0)).load();
+            new AlbumUriRequest(mCover,new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist())).load();
 //            new AsynLoadImage(mCover).execute(song.getAlbumId(), Constants.URL_ALBUM);
         //设置按钮着色
         if(mPlayButton == null)

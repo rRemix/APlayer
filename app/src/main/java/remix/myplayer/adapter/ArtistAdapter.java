@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
@@ -34,7 +35,6 @@ import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
@@ -64,6 +64,14 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     }
 
     @Override
+    public void onViewRecycled(BaseViewHolder holder) {
+        super.onViewRecycled(holder);
+        if(holder instanceof ArtistHolder){
+            ((ArtistHolder) holder).mImage.setImageURI(Uri.EMPTY);
+        }
+    }
+
+    @Override
     protected void convert(BaseViewHolder baseHolder, Artist artist, final int position) {
         if(position == 0){
             final AlbumAdater.HeaderHolder headerHolder = (AlbumAdater.HeaderHolder) baseHolder;
@@ -85,15 +93,13 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         }
         final ArtistHolder holder = (ArtistHolder) baseHolder;
         //设置歌手名
-        final String artistName = CommonUtil.processInfo(artist.getArtist(),CommonUtil.ARTISTTYPE);
-        holder.mText1.setText(artistName);
+        holder.mText1.setText(artist.getArtist());
         final int artistId = artist.getArtistID();
         if(holder instanceof ArtistListHolder){
             new AsynLoadSongNum(holder.mText2,Constants.ARTIST).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId);
         }
         //设置封面
         new ArtistUriRequest(holder.mImage,artist).load();
-//        new AsynLoadImage(holder.mImage).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId,Constants.URL_ARTIST);
 
         //item点击效果
         holder.mContainer.setBackground(
@@ -142,7 +148,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
                 popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
                         artistId,
                         Constants.ARTIST,
-                        artistName));
+                        artist.getArtist()));
                 popupMenu.setGravity(Gravity.END);
                 popupMenu.show();
             });

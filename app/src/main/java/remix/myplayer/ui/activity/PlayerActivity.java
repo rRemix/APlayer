@@ -305,7 +305,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
         //设置封面
         if(mInfo != null)
-            new AlbumUriRequest(mAnimCover,new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0)).load();
+            new AlbumUriRequest(mAnimCover,new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist())).load();
 
         //恢复位置信息
         if(savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null){

@@ -90,6 +90,7 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdater>{
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(model == Constants.LIST_MODEL ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setHasFixedSize(true);
     }
 
     private int getAlbumID(int position){
@@ -105,7 +106,6 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdater>{
     public AlbumAdater getAdapter(){
         return mAdapter;
     }
-
 
     @Override
     protected Loader<List<Album>> getLoader() {

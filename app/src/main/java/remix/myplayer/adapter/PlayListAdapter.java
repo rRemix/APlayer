@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -63,6 +64,14 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
     }
 
     @Override
+    public void onViewRecycled(BaseViewHolder holder) {
+        super.onViewRecycled(holder);
+        if(holder instanceof PlayListHolder){
+            ((PlayListHolder) holder).mImage.setImageURI(Uri.EMPTY);
+        }
+    }
+
+    @Override
     public int getItemCount() {
         return super.getItemCount();
     }
@@ -93,7 +102,6 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         holder.mName.setText(info.Name);
         holder.mOther.setText(mContext.getString(R.string.song_count,info.Count));
         //设置专辑封面
-//        new AsynLoadImage(holder.mImage).execute(info._Id,Constants.URL_PLAYLIST);
         new PlayListUriRequest(holder.mImage,info).load();
 
         if(mOnItemClickLitener != null) {

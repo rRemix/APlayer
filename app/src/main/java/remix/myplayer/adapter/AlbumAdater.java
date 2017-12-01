@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
@@ -35,7 +36,6 @@ import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
@@ -66,6 +66,14 @@ public class AlbumAdater extends HeaderAdapter<Album, BaseViewHolder> implements
     }
 
     @Override
+    public void onViewRecycled(BaseViewHolder holder) {
+        super.onViewRecycled(holder);
+        if(holder instanceof AlbumHolder){
+            ((AlbumHolder) holder).mImage.setImageURI(Uri.EMPTY);
+        }
+    }
+
+    @Override
     protected void convert(BaseViewHolder baseHolder, Album album, int position) {
         if(position == 0){
             final HeaderHolder headerHolder = (HeaderHolder) baseHolder;
@@ -87,11 +95,9 @@ public class AlbumAdater extends HeaderAdapter<Album, BaseViewHolder> implements
         }
         final AlbumHolder holder = (AlbumHolder) baseHolder;
         //获得并设置专辑与艺术家
-        String artist = CommonUtil.processInfo(album.getAlbum(),CommonUtil.ARTISTTYPE);
-        final String albumName = CommonUtil.processInfo(album.getAlbum(),CommonUtil.ALBUMTYPE);
+        holder.mText1.setText(album.getAlbum());
+        holder.mText2.setText(album.getArtist());
 
-        holder.mText1.setText(albumName);
-        holder.mText2.setText(artist);
         //设置封面
         final int albumid = album.getAlbumID();
         new AlbumUriRequest(holder.mImage,album).load();
@@ -147,7 +153,7 @@ public class AlbumAdater extends HeaderAdapter<Album, BaseViewHolder> implements
                 popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
                         albumid,
                         Constants.ALBUM,
-                        albumName));
+                        album.getAlbum()));
                 popupMenu.show();
             });
         }

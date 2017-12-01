@@ -14,7 +14,6 @@ import remix.myplayer.model.mp3.PlayListSong;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -42,8 +41,8 @@ public class PlayQueueAdapter extends BaseAdapter<PlayListSong,PlayQueueAdapter.
             holder.mArtist.setVisibility(View.GONE);
         } else {
             //设置歌曲与艺术家
-            holder.mSong.setText(CommonUtil.processInfo(item.getTitle(),CommonUtil.SONGTYPE));
-            holder.mArtist.setText(CommonUtil.processInfo(item.getArtist(),CommonUtil.ARTISTTYPE));
+            holder.mSong.setText(item.getTitle());
+            holder.mArtist.setText(item.getArtist());
             holder.mArtist.setVisibility(View.VISIBLE);
 //                //高亮
             if(MusicService.getCurrentMP3() != null && MusicService.getCurrentMP3().getId() == item.getId()){

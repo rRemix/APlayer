@@ -18,7 +18,6 @@ import remix.myplayer.interfaces.OnSongChooseListener;
 import remix.myplayer.misc.imae.AlbumUriRequest;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.util.CommonUtil;
 
 /**
  * @ClassName
@@ -43,16 +42,14 @@ public class SongChooseAdaper extends BaseAdapter<Song,SongChooseAdaper.SongChoo
     @Override
     protected void convert(final SongChooseHolder holder, Song song, int position) {
         //歌曲名
-        String name = CommonUtil.processInfo(song.getTitle(),CommonUtil.SONGTYPE);
-        holder.mSong.setText(name);
+        holder.mSong.setText(song.getTitle());
         //艺术家
-        String artist = CommonUtil.processInfo(song.getArtist(),CommonUtil.ARTISTTYPE);
-        holder.mArtist.setText(artist);
+        holder.mArtist.setText(song.getArtist());
         //封面
         holder.mImage.setImageURI(Uri.EMPTY);
 
 //        new AsynLoadImage(holder.mImage).execute(song.getAlbumId(), Constants.URL_ALBUM);
-        new AlbumUriRequest(holder.mImage,new Album(song.getAlbumId(),song.getAlbum(),0)).load();
+        new AlbumUriRequest(holder.mImage,new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist())).load();
         //选中歌曲
         holder.mRoot.setOnClickListener(v -> {
             holder.mCheck.setChecked(!holder.mCheck.isChecked());

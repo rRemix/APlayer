@@ -146,11 +146,11 @@ public class RecordShareActivity extends BaseActivity {
         if(mInfo == null)
             return;
 
-        new AlbumUriRequest(mImage,new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0)).load();
+        new AlbumUriRequest(mImage,new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist())).load();
 
         //设置歌曲名与分享内容
         mContent.setText(getIntent().getExtras().getString("Content"));
-        mSong.setText("《" + mInfo.getTitle() + "》");
+        mSong.setText(String.format("《%s》", mInfo.getTitle()));
         //背景
         mBackground1.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0, DensityUtil.dip2px(this,2), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));
         mBackground2.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0,DensityUtil.dip2px(this,1), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));
@@ -209,8 +209,7 @@ public class RecordShareActivity extends BaseActivity {
                 if(!shareDir.exists()){
                     shareDir.mkdirs();
                 }
-                mFile = new File(DiskCache.getDiskCacheDir(RecordShareActivity.this,"share") + "/" +
-                        new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())) + ".png");
+                mFile = new File(String.format("%s/%s.png", DiskCache.getDiskCacheDir(RecordShareActivity.this, "share"), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()))));
                 if (!mFile.exists()) {
                     mFile.createNewFile();
                 }

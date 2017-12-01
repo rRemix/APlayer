@@ -82,13 +82,17 @@ public class MediaStoreUtil {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,
                             MediaStore.Audio.Media.ALBUM,
+                            MediaStore.Audio.Media.ARTIST_ID,
                             MediaStore.Audio.Media.ARTIST},
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
                     null,
                     MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
             if(cursor != null) {
                 while (cursor.moveToNext()) {
-                    albums.add(new Album(cursor.getInt(0),cursor.getString(1),cursor.getInt(2)));
+                    albums.add(new Album(cursor.getInt(0),
+                            CommonUtil.processInfo(cursor.getString(1), CommonUtil.ALBUMTYPE),
+                            cursor.getInt(2),
+                            CommonUtil.processInfo(cursor.getString(3),CommonUtil.ARTISTTYPE)));
                 }
             }
         }finally {
@@ -501,7 +505,7 @@ public class MediaStoreUtil {
         return new Song(
                 cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)),
                 cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
-                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)),
+                CommonUtil.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)),CommonUtil.SONGTYPE),
                 CommonUtil.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)),CommonUtil.ALBUMTYPE),
                 cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
                 CommonUtil.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),CommonUtil.ARTISTTYPE),

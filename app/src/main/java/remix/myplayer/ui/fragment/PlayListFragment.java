@@ -82,7 +82,7 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
         mRecyclerView.setAdapter(mAdapter);
-
+        mRecyclerView.setHasFixedSize(true);
     }
 
     private int getPlayListId(int position){

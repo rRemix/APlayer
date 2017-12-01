@@ -13,7 +13,6 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.misc.imae.AlbumUriRequest;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.util.CommonUtil;
 
 /**
  * Created by Remix on 2016/1/23.
@@ -30,11 +29,10 @@ public class SearchResAdapter extends BaseAdapter<Song,SearchResAdapter.SearchRe
 
     @Override
     protected void convert(final SearchResHolder holder, Song song, int position) {
-        holder.mName.setText(CommonUtil.processInfo(song.getTitle(),CommonUtil.SONGTYPE));
+        holder.mName.setText(song.getTitle());
         holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
         //封面
-//        new AsynLoadImage(holder.mImage).execute(song.getAlbumId(), Constants.URL_ALBUM);
-        new AlbumUriRequest(holder.mImage,new Album(song.getAlbumId(),song.getAlbum(),0)).load();
+        new AlbumUriRequest(holder.mImage,new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist())).load();
         if(mOnItemClickLitener != null && holder.mRooView != null){
             holder.mRooView.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition()));
         }

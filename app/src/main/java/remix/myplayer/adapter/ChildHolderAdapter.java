@@ -18,9 +18,9 @@ import com.github.promeg.pinyinhelper.Pinyin;
 import java.util.ArrayList;
 
 import butterknife.BindView;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.APlayerApplication;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.MultiPosition;
@@ -34,7 +34,6 @@ import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
@@ -101,12 +100,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
             //显示当前排序方式
             headerHolder.mAscDesc.setText(ASC_DESC != ASC ? R.string.sort_as_desc : R.string.sort_as_asc);
             headerHolder.mSort.setText(SORT != NAME ?  R.string.sort_as_add_time : R.string.sort_as_letter);
-            View.OnClickListener listener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    OnClick(headerHolder,v);
-                }
-            };
+            View.OnClickListener listener = v -> OnClick(headerHolder,v);
             headerHolder.mSort.setOnClickListener(listener);
             headerHolder.mAscDesc.setOnClickListener(listener);
             headerHolder.mShuffle.setOnClickListener(listener);
@@ -152,7 +146,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
             }
 
             //设置标题
-            holder.mTitle.setText(CommonUtil.processInfo(song.getTitle(),CommonUtil.SONGTYPE));
+            holder.mTitle.setText(song.getTitle());
 
             if(holder.mButton != null) {
                 //设置按钮着色
@@ -166,19 +160,16 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
                         ThemeStore.getRippleColor(),
                         null,null));
 
-                holder.mButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(mMultiChoice.isShow())
-                            return;
-                        Intent intent = new Intent(mContext, OptionDialog.class);
-                        intent.putExtra("Song", song);
-                        if (mType == Constants.PLAYLIST) {
-                            intent.putExtra("IsDeletePlayList", true);
-                            intent.putExtra("PlayListName", mArg);
-                        }
-                        mContext.startActivity(intent);
+                holder.mButton.setOnClickListener(v -> {
+                    if(mMultiChoice.isShow())
+                        return;
+                    Intent intent = new Intent(mContext, OptionDialog.class);
+                    intent.putExtra("Song", song);
+                    if (mType == Constants.PLAYLIST) {
+                        intent.putExtra("IsDeletePlayList", true);
+                        intent.putExtra("PlayListName", mArg);
                     }
+                    mContext.startActivity(intent);
                 });
             }
         }
@@ -187,26 +178,20 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
         holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 
         if(holder.mContainer != null && mOnItemClickLitener != null){
-            holder.mContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(holder.getAdapterPosition() - 1 < 0){
-                        ToastUtil.show(mContext,R.string.illegal_arg);
-                        return;
-                    }
-                    mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition() - 1);
+            holder.mContainer.setOnClickListener(v -> {
+                if(holder.getAdapterPosition() - 1 < 0){
+                    ToastUtil.show(mContext,R.string.illegal_arg);
+                    return;
                 }
+                mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition() - 1);
             });
-            holder.mContainer.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if(holder.getAdapterPosition() - 1 < 0){
-                        ToastUtil.show(mContext,R.string.illegal_arg);
-                        return true;
-                    }
-                    mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition() - 1);
+            holder.mContainer.setOnLongClickListener(v -> {
+                if(holder.getAdapterPosition() - 1 < 0){
+                    ToastUtil.show(mContext,R.string.illegal_arg);
                     return true;
                 }
+                mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition() - 1);
+                return true;
             });
         }
 

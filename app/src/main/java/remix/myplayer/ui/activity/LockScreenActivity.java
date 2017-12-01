@@ -237,7 +237,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         }
         //封面
         if(mSimpleImage != null) {
-            new AlbumUriRequest(mSimpleImage,new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0)).load();
+            new AlbumUriRequest(mSimpleImage,new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist())).load();
         }
         //下一首
         if(mNextSong != null && MusicService.getNextMP3() != null)

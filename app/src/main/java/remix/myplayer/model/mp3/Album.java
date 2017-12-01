@@ -8,11 +8,13 @@ public class Album {
     private int AlbumID;
     private String Album;
     private int ArtistID;
+    private String Artist;
 
-    public Album(int albumID, String album, int artistID) {
+    public Album(int albumID, String album, int artistId,String artist) {
         AlbumID = albumID;
         Album = album;
-        ArtistID = artistID;
+        ArtistID = artistId;
+        Artist = artist;
     }
 
     public int getAlbumID() {
@@ -37,5 +39,13 @@ public class Album {
 
     public void setArtistID(int artistID) {
         ArtistID = artistID;
+    }
+
+    public String getArtist() {
+        return Artist;
+    }
+
+    public void setArtist(String artist) {
+        Artist = artist;
     }
 }
