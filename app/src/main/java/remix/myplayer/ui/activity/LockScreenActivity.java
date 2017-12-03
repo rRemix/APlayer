@@ -28,15 +28,18 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.request.AlbumUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.blur.StackBlurManager;
+import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -52,7 +55,8 @@ import remix.myplayer.util.ToastUtil;
  */
 
 public class LockScreenActivity extends BaseActivity implements UpdateHelper.Callback{
-    private final static String TAG = "LockScreenActivity";
+    private static final String TAG = "LockScreenActivity";
+    private static final int IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),210);
     //当前播放的歌曲信息
     private Song mInfo;
     //歌曲与艺术家
@@ -237,7 +241,9 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         }
         //封面
         if(mSimpleImage != null) {
-            new AlbumUriRequest(mSimpleImage,new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist())).load();
+            new AlbumUriRequest(mSimpleImage,
+                    new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist()),
+                    new RequestConfig.Builder(IMAGE_SIZE,IMAGE_SIZE).build()).load();
         }
         //下一首
         if(mNextSong != null && MusicService.getNextMP3() != null)

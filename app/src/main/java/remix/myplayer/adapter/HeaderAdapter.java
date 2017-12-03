@@ -20,10 +20,11 @@ import remix.myplayer.util.Constants;
  */
 
 public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extends BaseAdapter<M,BaseViewHolder> {
+
     static final int TYPE_HEADER = 0;
     static final int TYPE_NORMAL = 1;
     protected MultiChoice mMultiChoice;
-    ModeChangeCallback mModeChangeCallback;
+    private ModeChangeCallback mModeChangeCallback;
     //当前列表模式 1:列表 2:网格
     int ListModel = 2;
 
@@ -73,7 +74,7 @@ public abstract class HeaderAdapter<M, B extends RecyclerView.ViewHolder> extend
      * @param headerHolder
      * @param v
      */
-    void switchMode(AlbumAdater.HeaderHolder headerHolder, View v){
+    void switchMode(AlbumAdapter.HeaderHolder headerHolder, View v){
         int newModel = v.getId() == R.id.list_model ? Constants.LIST_MODEL : Constants.GRID_MODEL;
         if(newModel == ListModel)
             return;

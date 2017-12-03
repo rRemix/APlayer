@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.PagerAdapter;
@@ -51,6 +52,7 @@ import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.request.AlbumUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -525,12 +527,14 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      * 更新侧滑菜单
      * @param song
      */
+    private static final int IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),108);
     private void updateHeader(Song song, boolean isPlay) {
         if(song == null)
             return;
         mHeadText.setText(getString(R.string.play_now, song.getTitle()));
-//        new AsynLoadImage(mHeadImg).execute(song.getAlbumId(), Constants.URL_ALBUM);
-        new AlbumUriRequest(mHeadImg,new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist())).load();
+        new AlbumUriRequest(mHeadImg,
+                new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist()),
+                new RequestConfig.Builder(IMAGE_SIZE,IMAGE_SIZE).build()).load();
         mHeadImg.setBackgroundResource(isPlay && ThemeStore.isDay() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
     }
 

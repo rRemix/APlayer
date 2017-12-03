@@ -30,6 +30,7 @@ import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.request.AlbumUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -46,6 +47,8 @@ import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+
+import static remix.myplayer.request.ImageUriRequest.LIST_IMAGE_SIZE;
 
 /**
  * 全部歌曲和最近添加页面所用adapter
@@ -156,7 +159,10 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 //        }
         //封面
 
-        new AlbumUriRequest(holder.mImage,new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist())).load();
+        new AlbumUriRequest(
+                holder.mImage,
+                new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist()),
+                new RequestConfig.Builder(LIST_IMAGE_SIZE,LIST_IMAGE_SIZE).build()).load();
 
         //是否为无损
         if(!TextUtils.isEmpty(song.getDisplayname())){

@@ -1,7 +1,6 @@
 package remix.myplayer.ui.activity;
 
 import android.annotation.SuppressLint;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -41,7 +40,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
-import com.google.gson.Gson;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
@@ -54,20 +52,18 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.lyric.LrcView;
-import remix.myplayer.lyric.network.HttpClient;
 import remix.myplayer.lyric.network.RxUtil;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.model.netease.NAlbumSearchResponse;
 import remix.myplayer.request.AlbumUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -83,11 +79,12 @@ import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
+
+import static remix.myplayer.request.ImageUriRequest.LIST_IMAGE_SIZE;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -305,7 +302,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
         //设置封面
         if(mInfo != null)
-            new AlbumUriRequest(mAnimCover,new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist())).load();
+            new AlbumUriRequest(mAnimCover,
+                    new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist()),
+                    new RequestConfig.Builder(LIST_IMAGE_SIZE,LIST_IMAGE_SIZE).build()).load();
 
         //恢复位置信息
         if(savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null){
@@ -986,29 +985,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mHandler.removeMessages(UPDATE_COVER);
             mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
         } else {
-            Observable.create((ObservableOnSubscribe<String>) e -> {
-                File customImage = ImageUriUtil.getCustomThumbIfExist(mInfo.getAlbumId(), Constants.URL_ALBUM);
-                if(customImage != null && customImage.exists()){
-                    e.onNext("file://" + customImage.getAbsolutePath());
-                } else {
-                    e.onComplete();
-                }
-            }).switchIfEmpty(new Observable<String>() {
-                @Override
-                protected void subscribeActual(Observer<? super String> observer) {
-                    Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId());
-                    if(ImageUriUtil.isAlbumThumbExistInMediaCache(uri)){
-                        observer.onNext(uri.toString());
-                    }else {
-                        observer.onComplete();
-                    }
-                }
-            }).switchIfEmpty(HttpClient.getNeteaseApiservice()
-                    .getNeteaseSearch(mInfo.getAlbum(),0,1,10)
-                    .map(body -> {
-                        NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);
-                        return response.result.albums.get(0).picUrl;
-                    }))
+            AlbumUriRequest.getAlbumThumbObservable(new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist()))
                     .compose(RxUtil.applySchedulerToIO())
                     .subscribe(s -> {
                         mUri = Uri.parse(s);
@@ -1019,6 +996,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                         mHandler.removeMessages(UPDATE_COVER);
                         mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
                     });
+
         }
 
     }

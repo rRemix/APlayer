@@ -24,6 +24,11 @@ import remix.myplayer.util.ImageUriUtil;
 
 public class AlbumUriRequest extends ImageUriRequest {
     private Album mAlbum;
+    public AlbumUriRequest(SimpleDraweeView simpleDraweeView, Album album,RequestConfig config) {
+        super(simpleDraweeView,config);
+        mAlbum = album;
+    }
+
     public AlbumUriRequest(SimpleDraweeView simpleDraweeView, Album album) {
         super(simpleDraweeView);
         mAlbum = album;
@@ -31,56 +36,42 @@ public class AlbumUriRequest extends ImageUriRequest {
 
     @Override
     public void load() {
-        getAlbumThumbObservable(mAlbum)
+        Observable.create((ObservableOnSubscribe<String>) e -> {
+            File customImage = ImageUriUtil.getCustomThumbIfExist(mAlbum.getAlbumID(), Constants.URL_ALBUM);
+            if(customImage != null && customImage.exists()){
+                e.onNext("file://" + customImage.getAbsolutePath());
+            }
+            e.onComplete();
+        }).switchIfEmpty(new Observable<String>() {
+            @Override
+            protected void subscribeActual(Observer<? super String> observer) {
+                Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mAlbum.getAlbumID());
+                if(ImageUriUtil.isAlbumThumbExistInMediaCache(uri)){
+                    observer.onNext(uri.toString());
+                } else {
+                    if(mConfig.isForceDownload()){
+                        observer.onComplete();
+                    } else{
+                        observer.onError(new Throwable(""));
+                    }
+                }
+            }
+        }).switchIfEmpty(HttpClient.getNeteaseApiservice()
+                .getNeteaseSearch(mAlbum.getAlbum(),0,1,10)
+                .doOnSubscribe(disposable -> {
+                    //延迟 避免接口请求频繁
+//                    Thread.sleep(24);
+                })
+                .map(body -> {
+                    NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);
+                    return response.result.albums.get(0).picUrl;
+                }))
         .compose(RxUtil.applyScheduler())
         .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
-        if(true)
-            return;
 
-        //是否有自定义封面
-//        long start = System.currentTimeMillis();
-//        Handler handler = new Handler(Looper.getMainLooper());
-//        new Thread(){
-//            @Override
-//            public void run() {
-//                File customImage = ImageUriUtil.getCustomThumbIfExist(mAlbum.getAlbumID(), Constants.URL_ALBUM);
-//                if(customImage != null && customImage.exists()){
-//                    handler.post(() -> onSuccess("file://" + customImage.getAbsolutePath()));
-//                    return;
-//                }
-//                LogUtil.e("ImageUriRequest","查找自定义封面耗时:" + (System.currentTimeMillis() - start));
-//
-//                long start1 = System.currentTimeMillis();
-//                //是否存在于数据库
-//                Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mAlbum.getAlbumID());
-//                boolean existInMediaStore = ImageUriUtil.isAlbumThumbExistInMediaCache(uri);
-//                LogUtil.e("ImageUriRequest","查找内嵌封面耗时:" + (System.currentTimeMillis() - start1));
-//                if(existInMediaStore){
-//                    handler.post(() -> onSuccess(uri.toString()));
-//                } else {
-//                    //获得网易的封面
-//                    HttpClient.getNeteaseApiservice()
-//                            .getNeteaseSearch(mAlbum.getAlbum(),0,1,10)
-//                            .compose(RxUtil.applyScheduler())
-//                            .subscribe(new Consumer<ResponseBody>() {
-//                                @Override
-//                                public void accept(ResponseBody body) throws Exception {
-//                                    NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);
-//                                    if(response != null && response.result.albums != null && response.result.albums.size() > 0)
-//                                        handler.post(() -> onSuccess(response.result.albums.get(0).picUrl));
-//                                }
-//                            }, new Consumer<Throwable>() {
-//                                @Override
-//                                public void accept(Throwable throwable) throws Exception {
-//                                    ToastUtil.show(APlayerApplication.getContext(),"onError:" + throwable);
-//                                }
-//                            });
-//                }
-//            }
-//        }.start();
     }
 
-    static Observable<String> getAlbumThumbObservable(Album album){
+    public static Observable<String> getAlbumThumbObservable(Album album){
         return Observable.create((ObservableOnSubscribe<String>) e -> {
             File customImage = ImageUriUtil.getCustomThumbIfExist(album.getAlbumID(), Constants.URL_ALBUM);
             if(customImage != null && customImage.exists()){
@@ -101,7 +92,6 @@ public class AlbumUriRequest extends ImageUriRequest {
                 if(ImageUriUtil.isAlbumThumbExistInMediaCache(uri)){
                     observer.onNext(uri.toString());
                 }
-
                 observer.onComplete();
             }
         }).switchIfEmpty(HttpClient.getNeteaseApiservice()

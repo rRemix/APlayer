@@ -25,6 +25,10 @@ public class ArtistUriRequest extends ImageUriRequest {
         mArtist = artist;
     }
 
+    public ArtistUriRequest(SimpleDraweeView image, Artist artist,RequestConfig config) {
+        super(image,config);
+        mArtist = artist;
+    }
 
     @Override
     public void load() {
@@ -39,8 +43,11 @@ public class ArtistUriRequest extends ImageUriRequest {
             File artistThumb = ImageUriUtil.getArtistThumbInMediaCache(mArtist.getArtistID());
             if(artistThumb != null && artistThumb.exists()){
                 observer.onNext("file://" + artistThumb.getAbsolutePath());
+            } if(mConfig.isForceDownload()){
+                observer.onComplete();
+            } else{
+                observer.onError(new Throwable(""));
             }
-            observer.onComplete();
         }).switchIfEmpty(HttpClient.getNeteaseApiservice()
                 .getNeteaseSearch(mArtist.getArtist(),0,1,100)
                 .doOnSubscribe(disposable -> {

@@ -30,6 +30,7 @@ import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.request.AlbumUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -41,6 +42,9 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
+import static remix.myplayer.request.ImageUriRequest.GRID_IMAGE_SIZE;
+import static remix.myplayer.request.ImageUriRequest.LIST_IMAGE_SIZE;
+
 
 /**
  * Created by Remix on 2015/12/20.
@@ -49,8 +53,9 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 专辑界面的适配器
  */
-public class AlbumAdater extends HeaderAdapter<Album, BaseViewHolder> implements FastScroller.SectionIndexer {
-    public AlbumAdater(Context context,int layoutId,MultiChoice multiChoice) {
+public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implements FastScroller.SectionIndexer {
+
+    public AlbumAdapter(Context context, int layoutId, MultiChoice multiChoice) {
         super(context,layoutId,multiChoice);
         ListModel =  SPUtil.getValue(context,"Setting","AlbumModel",Constants.GRID_MODEL);
     }
@@ -100,7 +105,9 @@ public class AlbumAdater extends HeaderAdapter<Album, BaseViewHolder> implements
 
         //设置封面
         final int albumid = album.getAlbumID();
-        new AlbumUriRequest(holder.mImage,album).load();
+
+        final int imageSize = ListModel == 1 ? LIST_IMAGE_SIZE : GRID_IMAGE_SIZE;
+        new AlbumUriRequest(holder.mImage,album,new RequestConfig.Builder(imageSize,imageSize).build()).load();
         if(holder instanceof AlbumListHolder){
             new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);
         }

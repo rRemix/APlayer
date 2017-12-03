@@ -1,6 +1,10 @@
 package remix.myplayer.request;
 
+import android.content.ContentUris;
+import android.net.Uri;
+
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.util.List;
@@ -10,10 +14,12 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
+import remix.myplayer.lyric.network.HttpClient;
 import remix.myplayer.lyric.network.RxUtil;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.PlayList;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.model.netease.NAlbumSearchResponse;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -26,6 +32,11 @@ public class PlayListUriRequest extends ImageUriRequest {
     private PlayList mPlayList;
     public PlayListUriRequest(SimpleDraweeView image, PlayList playList) {
         super(image);
+        mPlayList = playList;
+    }
+
+    public PlayListUriRequest(SimpleDraweeView image, PlayList playList,RequestConfig config) {
+        super(image,config);
         mPlayList = playList;
     }
 
@@ -48,7 +59,35 @@ public class PlayListUriRequest extends ImageUriRequest {
                 }
 
                 Observable.fromIterable(songs)
-                        .flatMap(song -> AlbumUriRequest.getAlbumThumbObservable(new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist())))
+                        .flatMap(song -> {
+                            Album album = new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist());
+                            return  Observable.create((ObservableOnSubscribe<String>) e -> {
+                                File customImage = ImageUriUtil.getCustomThumbIfExist(album.getAlbumID(), Constants.URL_ALBUM);
+                                if(customImage != null && customImage.exists()){
+                                    e.onNext("file://" + customImage.getAbsolutePath());
+                                }
+                                e.onComplete();
+                                }).switchIfEmpty(new Observable<String>() {
+                                    @Override
+                                    protected void subscribeActual(Observer<? super String> observer1) {
+                                        Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), album.getAlbumID());
+                                        if(ImageUriUtil.isAlbumThumbExistInMediaCache(uri)){
+                                            observer1.onNext(uri.toString());
+                                        } else {
+                                            if(mConfig.isForceDownload()){
+                                                observer1.onComplete();
+                                            } else{
+                                                observer1.onError(new Throwable(""));
+                                            }
+                                        }
+                                    }
+                                }).switchIfEmpty(HttpClient.getNeteaseApiservice()
+                                    .getNeteaseSearch(album.getAlbum(),0,1,10)
+                                    .map(body -> {
+                                        NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);
+                                        return response.result.albums.get(0).picUrl;
+                                    }));
+                        })
                         .subscribe(s -> {
                             observer.onNext(s);
                             observer.onComplete();

@@ -33,11 +33,13 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.request.AlbumUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.dialog.ShareDialog;
@@ -55,6 +57,7 @@ import remix.myplayer.util.ToastUtil;
  * 将分享内容与专辑封面进行处理用于分享
  */
 public class RecordShareActivity extends BaseActivity {
+    private static final int IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),268);
     @BindView(R.id.recordshare_image)
     SimpleDraweeView mImage;
     //歌曲名与分享内容
@@ -146,7 +149,9 @@ public class RecordShareActivity extends BaseActivity {
         if(mInfo == null)
             return;
 
-        new AlbumUriRequest(mImage,new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist())).load();
+        new AlbumUriRequest(mImage,
+                new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist()),
+                new RequestConfig.Builder(IMAGE_SIZE,IMAGE_SIZE).build()).load();
 
         //设置歌曲名与分享内容
         mContent.setText(getIntent().getExtras().getString("Content"));

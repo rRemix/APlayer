@@ -14,7 +14,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import remix.myplayer.R;
-import remix.myplayer.adapter.AlbumAdater;
+import remix.myplayer.adapter.AlbumAdapter;
 import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
@@ -32,7 +32,7 @@ import remix.myplayer.util.SPUtil;
 /**
  * 专辑Fragment
  */
-public class AlbumFragment extends LibraryFragment<Album,AlbumAdater>{
+public class AlbumFragment extends LibraryFragment<Album,AlbumAdapter>{
     @BindView(R.id.album_recycleview)
     FastScrollRecyclerView mRecyclerView;
 
@@ -51,7 +51,7 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdater>{
 
     @Override
     protected void initAdapter() {
-        mAdapter = new AlbumAdater(mContext,R.layout.item_album_recycle_grid,mMultiChoice);
+        mAdapter = new AlbumAdapter(mContext,R.layout.item_album_recycle_grid,mMultiChoice);
         mAdapter.setModeChangeCallback(mode -> {
             mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
             mRecyclerView.setAdapter(mAdapter);
@@ -103,7 +103,7 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdater>{
 
 
     @Override
-    public AlbumAdater getAdapter(){
+    public AlbumAdapter getAdapter(){
         return mAdapter;
     }
 

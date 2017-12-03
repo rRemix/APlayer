@@ -29,6 +29,7 @@ import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.Artist;
 import remix.myplayer.request.ArtistUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -39,6 +40,9 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+
+import static remix.myplayer.request.ImageUriRequest.GRID_IMAGE_SIZE;
+import static remix.myplayer.request.ImageUriRequest.LIST_IMAGE_SIZE;
 
 /**
  * Created by Remix on 2015/12/22.
@@ -56,7 +60,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if(viewType == TYPE_HEADER){
-            return new AlbumAdater.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2,parent,false));
+            return new AlbumAdapter.HeaderHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_topbar_2,parent,false));
         }
         return viewType == Constants.LIST_MODEL ?
                 new ArtistAdapter.ArtistListHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_artist_recycle_list,parent,false)) :
@@ -74,7 +78,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     @Override
     protected void convert(BaseViewHolder baseHolder, Artist artist, final int position) {
         if(position == 0){
-            final AlbumAdater.HeaderHolder headerHolder = (AlbumAdater.HeaderHolder) baseHolder;
+            final AlbumAdapter.HeaderHolder headerHolder = (AlbumAdapter.HeaderHolder) baseHolder;
             if(mDatas == null || mDatas.size() == 0){
                 headerHolder.mRoot.setVisibility(View.GONE);
                 return;
@@ -99,7 +103,8 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
             new AsynLoadSongNum(holder.mText2,Constants.ARTIST).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId);
         }
         //设置封面
-        new ArtistUriRequest(holder.mImage,artist).load();
+        final int imageSize = ListModel == 1 ? LIST_IMAGE_SIZE : GRID_IMAGE_SIZE;
+        new ArtistUriRequest(holder.mImage,artist,new RequestConfig.Builder(imageSize,imageSize).build()).load();
 
         //item点击效果
         holder.mContainer.setBackground(
