@@ -60,10 +60,7 @@ import remix.myplayer.lyric.LrcView;
 import remix.myplayer.lyric.network.RxUtil;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
-import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.request.AlbumUriRequest;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -74,6 +71,9 @@ import remix.myplayer.ui.dialog.PlayQueueDialog;
 import remix.myplayer.ui.fragment.CoverFragment;
 import remix.myplayer.ui.fragment.LrcFragment;
 import remix.myplayer.ui.fragment.RecordFragment;
+import remix.myplayer.uri.ImageUriRequest;
+import remix.myplayer.uri.LibraryUriRequest;
+import remix.myplayer.uri.RequestConfig;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -84,7 +84,8 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 
-import static remix.myplayer.request.ImageUriRequest.LIST_IMAGE_SIZE;
+import static remix.myplayer.uri.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -302,9 +303,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
         //设置封面
         if(mInfo != null)
-            new AlbumUriRequest(mAnimCover,
-                    new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist()),
-                    new RequestConfig.Builder(LIST_IMAGE_SIZE,LIST_IMAGE_SIZE).build()).load();
+            new LibraryUriRequest(mAnimCover,
+                    getSearchRequestWithAlbumType(mInfo),
+                    new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
 
         //恢复位置信息
         if(savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null){
@@ -985,18 +986,28 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mHandler.removeMessages(UPDATE_COVER);
             mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
         } else {
-            AlbumUriRequest.getAlbumThumbObservable(new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist()))
-                    .compose(RxUtil.applySchedulerToIO())
-                    .subscribe(s -> {
-                        mUri = Uri.parse(s);
-                        mHandler.removeMessages(UPDATE_COVER);
-                        mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
-                    }, throwable ->{
-                        mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
-                        mHandler.removeMessages(UPDATE_COVER);
-                        mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
-                    });
+            new ImageUriRequest(){
+                @Override
+                public void onError(String errMsg) {
+                    mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
+                    mHandler.removeMessages(UPDATE_COVER);
+                    mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+                }
 
+                @Override
+                public void onSuccess(String url) {
+                    mUri = Uri.parse(url);
+                    mHandler.removeMessages(UPDATE_COVER);
+                    mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+                }
+
+                @Override
+                public void load() {
+                    getThumbObservable(getSearchRequestWithAlbumType(mInfo))
+                            .compose(RxUtil.applySchedulerToIO())
+                            .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
+                }
+            }.load();
         }
 
     }

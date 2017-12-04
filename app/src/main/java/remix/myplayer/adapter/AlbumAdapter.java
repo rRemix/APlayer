@@ -29,21 +29,23 @@ import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.Album;
-import remix.myplayer.request.AlbumUriRequest;
-import remix.myplayer.request.RequestConfig;
+import remix.myplayer.model.mp3.Song;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.ui.fragment.AlbumFragment;
+import remix.myplayer.uri.LibraryUriRequest;
+import remix.myplayer.uri.RequestConfig;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
-import static remix.myplayer.request.ImageUriRequest.GRID_IMAGE_SIZE;
-import static remix.myplayer.request.ImageUriRequest.LIST_IMAGE_SIZE;
+import static remix.myplayer.uri.ImageUriRequest.BIG_IMAGE_SIZE;
+import static remix.myplayer.uri.ImageUriRequest.SMALL_IMAGE_SIZE;
 
 
 /**
@@ -106,8 +108,12 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         //设置封面
         final int albumid = album.getAlbumID();
 
-        final int imageSize = ListModel == 1 ? LIST_IMAGE_SIZE : GRID_IMAGE_SIZE;
-        new AlbumUriRequest(holder.mImage,album,new RequestConfig.Builder(imageSize,imageSize).build()).load();
+        final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
+        Song song = new Song();
+        song.setArtist(album.getArtist());
+        song.setAlbum(album.getAlbum());
+        song.setAlbumId(albumid);
+        new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequestWithAlbumType(song),new RequestConfig.Builder(imageSize,imageSize).build()).load();
         if(holder instanceof AlbumListHolder){
             new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);
         }

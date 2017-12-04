@@ -8,42 +8,19 @@ import android.os.Environment;
 import java.io.File;
 import java.io.IOException;
 
-import remix.myplayer.R;
-import remix.myplayer.util.ToastUtil;
-
 /**
  * Created by Remix on 2016/6/14.
  */
 public class DiskCache {
     private static DiskLruCache mLrcCache;
-    private static DiskLruCache mAlbumCache;
-    private static DiskLruCache mArtistCache;
-    private static Context mContext;
+
 
     public static void init(Context context){
-        mContext = context;
         try {
-            File lrcCacheDir = getDiskCacheDir(mContext, "lrc");
+            File lrcCacheDir = getDiskCacheDir(context, "lyric");
             if (!lrcCacheDir.exists())
                 lrcCacheDir.mkdir();
-            mLrcCache = DiskLruCache.open(lrcCacheDir, getAppVersion(mContext), 1, 2 * 1024 * 1024);
-
-            File thumbnailCacheDir = getDiskCacheDir(mContext,"thumbnail");
-            if(!thumbnailCacheDir.exists()){
-                if(!thumbnailCacheDir.mkdir()){
-                    ToastUtil.show(mContext, R.string.create_dir_error);
-                }
-            }
-
-//            File album_cacheDir = getDiskCacheDir(mContext,"thumbnail/album");
-//            if(!album_cacheDir.exists())
-//                album_cacheDir.mkdir();
-//            mAlbumCache = DiskLruCache.open(album_cacheDir,getAppVersion(mContext),1,10 * 1024 * 1024);
-//
-//            File artist_cacheDir = getDiskCacheDir(mContext,"thumbnail/artist");
-//            if(!artist_cacheDir.exists())
-//                artist_cacheDir.mkdir();
-//            mAlbumCache = DiskLruCache.open(album_cacheDir,getAppVersion(mContext),1,10 * 1024 * 1024);
+            mLrcCache = DiskLruCache.open(lrcCacheDir, getAppVersion(context), 1, 2 * 1024 * 1024);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -53,10 +30,6 @@ public class DiskCache {
     public static DiskLruCache getLrcDiskCache(){
         return mLrcCache;
     }
-
-    public static DiskLruCache getAlbumDiskCache(){return mAlbumCache;}
-
-    public static DiskLruCache getArtistCache(){return mArtistCache;}
 
     public static File getDiskCacheDir(Context context, String uniqueName) {
         String cachePath = "";

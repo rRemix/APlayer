@@ -32,18 +32,19 @@ import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.CtrlButtonListener;
-import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.request.AlbumUriRequest;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.blur.StackBlurManager;
+import remix.myplayer.uri.LibraryUriRequest;
+import remix.myplayer.uri.RequestConfig;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
+
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
  * Created by Remix on 2016/3/9.
@@ -241,8 +242,8 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         }
         //封面
         if(mSimpleImage != null) {
-            new AlbumUriRequest(mSimpleImage,
-                    new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist()),
+            new LibraryUriRequest(mSimpleImage,
+                    getSearchRequestWithAlbumType(mInfo),
                     new RequestConfig.Builder(IMAGE_SIZE,IMAGE_SIZE).build()).load();
         }
         //下一首

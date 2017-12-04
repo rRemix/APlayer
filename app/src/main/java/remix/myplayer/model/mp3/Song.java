@@ -16,8 +16,9 @@ public class Song implements Serializable,Cloneable {
     public String Album;
     public int AlbumId;
     public String Artist;
+    public int ArtistId;
     public long Duration;
-    public String ReailTime;
+    public String RealTime;
     public String Url;
     public long Size;
     public String Year = "";
@@ -26,7 +27,7 @@ public class Song implements Serializable,Cloneable {
     public Song(){}
 
     public Song(int id, String displayname, String title, String album,
-                int albumid, String artist, long duration, String realTime,
+                int albumid, String artist, int artistId,long duration, String realTime,
                 String url, long size, String year, String titleKey, long addTime){
         Id = id;
         Title = title;
@@ -34,8 +35,9 @@ public class Song implements Serializable,Cloneable {
         Album = album;
         AlbumId = albumid;
         Artist = artist;
+        ArtistId = artistId;
         Duration = duration;
-        ReailTime = realTime;
+        RealTime = realTime;
         Url = url;
         Size = size;
         Year = year;
@@ -53,7 +55,7 @@ public class Song implements Serializable,Cloneable {
         this.AlbumId = info.getAlbumId();
         this.Artist = info.getArtist();
         this.Duration = info.getDuration();
-        this.ReailTime = info.getReailTime();
+        this.RealTime = info.getRealTime();
         this.Url = info.getUrl();
         this.Size = info.getSize();
         this.Year = info.getYear();
@@ -82,7 +84,7 @@ public class Song implements Serializable,Cloneable {
                 ", AlbumId=" + AlbumId +
                 ", Artist='" + Artist + '\'' +
                 ", Duration=" + Duration +
-                ", ReailTime='" + ReailTime + '\'' +
+                ", RealTime='" + RealTime + '\'' +
                 ", Url='" + Url + '\'' +
                 ", Size=" + Size +
                 ", Year=" + Year +
@@ -130,13 +132,20 @@ public class Song implements Serializable,Cloneable {
 
     public void setAlbumId(int albumId){AlbumId = albumId;}
 
-
-    public String getReailTime() {
-        return ReailTime;
+    public int getArtistId() {
+        return ArtistId;
     }
 
-    public void setReailTime(String reailTime) {
-        ReailTime = reailTime;
+    public void setArtistId(int artistId) {
+        ArtistId = artistId;
+    }
+
+    public String getRealTime() {
+        return RealTime;
+    }
+
+    public void setRealTime(String realTime) {
+        RealTime = realTime;
     }
 
     public int getId() {

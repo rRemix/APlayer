@@ -4,12 +4,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import remix.myplayer.R;
 import remix.myplayer.misc.cache.DiskCache;
+import remix.myplayer.model.mp3.Song;
+import remix.myplayer.model.netease.NSearchRequest;
 
 /**
  * Created by Remix on 2017/11/30.
@@ -83,4 +87,42 @@ public class ImageUriUtil {
         }
         return null;
     }
+
+    /**
+     * 根据歌曲信息构建请求参数
+     * @param song
+     * @return
+     */
+    public static NSearchRequest getSearchRequest(Song song,int localType){
+        if(song == null)
+            return NSearchRequest.DEFAULT_REQUEST;
+        boolean isTitlelegal = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(mContext.getString(R.string.unknow_song));
+        boolean isAlbumlegal = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(mContext.getString(R.string.unknow_album));
+        boolean isArtistlegal = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(mContext.getString(R.string.unknow_artist));
+
+        //歌曲名合法
+        if(isTitlelegal){
+            //艺术家合法
+            if(isArtistlegal){
+                return new NSearchRequest(song.getAlbumId(),song.getTitle() + "-" + song.getArtist(),1,localType);
+            }
+            //专辑名合法
+            if(isAlbumlegal){
+                return new NSearchRequest(song.getAlbumId(),song.getTitle() + "-" + song.getAlbum(),1,localType);
+            }
+        }
+        //根据专辑名字查询
+        if(isAlbumlegal){
+            if(isArtistlegal)
+                return new NSearchRequest(song.getAlbumId(),song.getArtist() + "-" + song.getAlbum(),1,localType);
+            else
+                return new NSearchRequest(song.getAlbumId(),song.getArtist(),10,localType);
+        }
+        return NSearchRequest.DEFAULT_REQUEST;
+    }
+
+    public static NSearchRequest getSearchRequestWithAlbumType(Song song){
+        return getSearchRequest(song,Constants.URL_ALBUM);
+    }
+
 }

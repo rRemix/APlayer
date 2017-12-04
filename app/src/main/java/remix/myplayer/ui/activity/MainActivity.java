@@ -49,10 +49,7 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
-import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.request.AlbumUriRequest;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -61,6 +58,8 @@ import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
+import remix.myplayer.uri.LibraryUriRequest;
+import remix.myplayer.uri.RequestConfig;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -73,6 +72,7 @@ import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 
 import static remix.myplayer.service.MusicService.ACTION_LOAD_FINISH;
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
  *
@@ -468,7 +468,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
                     final String path = Crop.getOutput(data).getEncodedPath();
                     if(TextUtils.isEmpty(path) || id == -1){
-                        ToastUtil.show(MainActivity.this,errorTxt);
+                        ToastUtil.show(mContext,errorTxt);
                         return;
                     }
                     //清除fresco的缓存
@@ -532,8 +532,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if(song == null)
             return;
         mHeadText.setText(getString(R.string.play_now, song.getTitle()));
-        new AlbumUriRequest(mHeadImg,
-                new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist()),
+        new LibraryUriRequest(mHeadImg,
+                getSearchRequestWithAlbumType(song),
                 new RequestConfig.Builder(IMAGE_SIZE,IMAGE_SIZE).build()).load();
         mHeadImg.setBackgroundResource(isPlay && ThemeStore.isDay() ? R.drawable.drawer_bg_album_shadow : R.color.transparent);
     }

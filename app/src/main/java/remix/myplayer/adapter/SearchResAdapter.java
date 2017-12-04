@@ -10,12 +10,12 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.request.AlbumUriRequest;
-import remix.myplayer.request.RequestConfig;
+import remix.myplayer.uri.LibraryUriRequest;
+import remix.myplayer.uri.RequestConfig;
 
-import static remix.myplayer.request.ImageUriRequest.LIST_IMAGE_SIZE;
+import static remix.myplayer.uri.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
  * Created by Remix on 2016/1/23.
@@ -29,15 +29,14 @@ public class SearchResAdapter extends BaseAdapter<Song,SearchResAdapter.SearchRe
         super(context,layoutId);
     }
 
-
     @Override
     protected void convert(final SearchResHolder holder, Song song, int position) {
         holder.mName.setText(song.getTitle());
         holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
         //封面
-        new AlbumUriRequest(holder.mImage,
-                new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist()),
-                new RequestConfig.Builder(LIST_IMAGE_SIZE,LIST_IMAGE_SIZE).build()).load();
+        new LibraryUriRequest(holder.mImage,
+                getSearchRequestWithAlbumType(song),
+                new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
         if(mOnItemClickLitener != null && holder.mRooView != null){
             holder.mRooView.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition()));
         }

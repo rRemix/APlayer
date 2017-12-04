@@ -20,8 +20,8 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import remix.myplayer.R;
 import remix.myplayer.APlayerApplication;
+import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;

@@ -21,17 +21,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.listener.CtrlButtonListener;
-import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.request.AlbumUriRequest;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.PlayerActivity;
+import remix.myplayer.uri.LibraryUriRequest;
+import remix.myplayer.uri.RequestConfig;
 import remix.myplayer.util.ColorUtil;
 
-import static remix.myplayer.request.ImageUriRequest.LIST_IMAGE_SIZE;
+import static remix.myplayer.uri.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
  * Created by Remix on 2015/12/1.
@@ -130,9 +130,9 @@ public class BottomActionBarFragment extends BaseFragment{
             mArtist.setText(song.getArtist());
         //封面
         if(mCover != null)
-            new AlbumUriRequest(mCover,
-                    new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist()),
-                    new RequestConfig.Builder(LIST_IMAGE_SIZE,LIST_IMAGE_SIZE).build()).load();
+            new LibraryUriRequest(mCover,
+                    getSearchRequestWithAlbumType(song),
+                    new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
         //设置按钮着色
         if(mPlayButton == null)
             return;

@@ -15,12 +15,12 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.interfaces.OnSongChooseListener;
-import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.request.AlbumUriRequest;
-import remix.myplayer.request.RequestConfig;
+import remix.myplayer.uri.LibraryUriRequest;
+import remix.myplayer.uri.RequestConfig;
 
-import static remix.myplayer.request.ImageUriRequest.LIST_IMAGE_SIZE;
+import static remix.myplayer.uri.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
  * @ClassName
@@ -51,10 +51,9 @@ public class SongChooseAdaper extends BaseAdapter<Song,SongChooseAdaper.SongChoo
         //封面
         holder.mImage.setImageURI(Uri.EMPTY);
 
-//        new AsynLoadImage(holder.mImage).execute(song.getAlbumId(), Constants.URL_ALBUM);
-        new AlbumUriRequest(holder.mImage,
-                new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist()),
-                new RequestConfig.Builder(LIST_IMAGE_SIZE,LIST_IMAGE_SIZE).build()).load();
+        new LibraryUriRequest(holder.mImage,
+                getSearchRequestWithAlbumType(song),
+                new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
         //选中歌曲
         holder.mRoot.setOnClickListener(v -> {
             holder.mCheck.setChecked(!holder.mCheck.isChecked());

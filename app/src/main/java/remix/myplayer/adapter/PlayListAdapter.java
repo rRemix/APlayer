@@ -25,21 +25,22 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.PlayList;
-import remix.myplayer.request.PlayListUriRequest;
-import remix.myplayer.request.RequestConfig;
+import remix.myplayer.model.netease.NSearchRequest;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.ui.fragment.PlayListFragment;
+import remix.myplayer.uri.PlayListUriRequest;
+import remix.myplayer.uri.RequestConfig;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
-import static remix.myplayer.request.ImageUriRequest.GRID_IMAGE_SIZE;
-import static remix.myplayer.request.ImageUriRequest.LIST_IMAGE_SIZE;
+import static remix.myplayer.uri.ImageUriRequest.BIG_IMAGE_SIZE;
+import static remix.myplayer.uri.ImageUriRequest.SMALL_IMAGE_SIZE;
 
 /**
  * Created by taeja on 16-1-15.
@@ -106,8 +107,8 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         holder.mName.setText(info.Name);
         holder.mOther.setText(mContext.getString(R.string.song_count,info.Count));
         //设置专辑封面
-        final int imageSize = ListModel == 1 ? LIST_IMAGE_SIZE : GRID_IMAGE_SIZE;
-        new PlayListUriRequest(holder.mImage,info,new RequestConfig.Builder(imageSize,imageSize).build()).load();
+        final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
+        new PlayListUriRequest(holder.mImage, new NSearchRequest(info.getId(),info.getName(),1,Constants.URL_PLAYLIST),new RequestConfig.Builder(imageSize,imageSize).build()).load();
 
         holder.mContainer.setOnClickListener(v -> {
             if(holder.getAdapterPosition() - 1 < 0){

@@ -27,10 +27,7 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.MultiPosition;
-import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.request.AlbumUriRequest;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -40,15 +37,17 @@ import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.ui.fragment.SongFragment;
+import remix.myplayer.uri.LibraryUriRequest;
+import remix.myplayer.uri.RequestConfig;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
-import static remix.myplayer.request.ImageUriRequest.LIST_IMAGE_SIZE;
+import static remix.myplayer.uri.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
  * 全部歌曲和最近添加页面所用adapter
@@ -129,8 +128,6 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
             return;
         }
 
-        long start = System.currentTimeMillis();
-
         if(!(baseHolder instanceof SongViewHolder))
             return;
         final SongViewHolder holder = (SongViewHolder) baseHolder;
@@ -159,10 +156,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 //        }
         //封面
 
-        new AlbumUriRequest(
-                holder.mImage,
-                new Album(song.getAlbumId(),song.getAlbum(),0,song.getArtist()),
-                new RequestConfig.Builder(LIST_IMAGE_SIZE,LIST_IMAGE_SIZE).build()).load();
+        new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
 
         //是否为无损
         if(!TextUtils.isEmpty(song.getDisplayname())){
@@ -175,7 +169,6 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 
         //艺术家与专辑
         holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
-
 
         //背景点击效果
         holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
@@ -235,8 +228,6 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
                 holder.mContainer.setSelected(false);
             }
         }
-
-        LogUtil.d("SongAdapter","耗时:" + (System.currentTimeMillis() - start));
     }
 
     protected void OnClick(HeaderHolder headerHolder, View v){

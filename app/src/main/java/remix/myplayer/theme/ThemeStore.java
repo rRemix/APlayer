@@ -7,8 +7,8 @@ import android.support.annotation.ColorRes;
 import java.util.ArrayList;
 import java.util.List;
 
-import remix.myplayer.R;
 import remix.myplayer.APlayerApplication;
+import remix.myplayer.R;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SPUtil;
 

@@ -36,18 +36,19 @@ import butterknife.OnClick;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.misc.cache.DiskCache;
-import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.request.AlbumUriRequest;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.dialog.ShareDialog;
+import remix.myplayer.uri.LibraryUriRequest;
+import remix.myplayer.uri.RequestConfig;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
+
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
  * Created by taeja on 16-3-14.
@@ -149,8 +150,8 @@ public class RecordShareActivity extends BaseActivity {
         if(mInfo == null)
             return;
 
-        new AlbumUriRequest(mImage,
-                new Album(mInfo.getAlbumId(),mInfo.getAlbum(),0,mInfo.getArtist()),
+        new LibraryUriRequest(mImage,
+                getSearchRequestWithAlbumType(mInfo),
                 new RequestConfig.Builder(IMAGE_SIZE,IMAGE_SIZE).build()).load();
 
         //设置歌曲名与分享内容

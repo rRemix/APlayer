@@ -4,8 +4,8 @@ package remix.myplayer.util;
  * Created by taeja on 16-2-17.
  */
 
-import remix.myplayer.R;
 import remix.myplayer.APlayerApplication;
+import remix.myplayer.R;
 
 /**
  * 常量值
@@ -75,9 +75,10 @@ public class Constants {
     //有盟appkey
     public final static String UMENG_APPKEY = "56d6563367e58e6aa70005af";
     //获得专辑封面类型
-    public final static int URL_ALBUM = 0;
-    public final static int URL_ARTIST = 1;
-    public final static int URL_PLAYLIST = 4;
+    public final static int URL_SONG = 1;
+    public final static int URL_ALBUM = 10;
+    public final static int URL_ARTIST = 100;
+    public final static int URL_PLAYLIST = 1000;
     public final static String ACTION_BUTTON = "ACTION_BUTTON";
     public final static int NOTIFY_PREV = 0;
     public final static int NOTIFY_PLAY = 1;

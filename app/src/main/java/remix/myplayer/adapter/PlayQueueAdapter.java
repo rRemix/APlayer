@@ -27,8 +27,13 @@ import remix.myplayer.util.PlayListUtil;
  * 正在播放列表的适配器
  */
 public class PlayQueueAdapter extends BaseAdapter<PlayListSong,PlayQueueAdapter.PlayQueueHolder> {
+    private int mAccentColor;
+    private int mTextColor;
+
     public PlayQueueAdapter(Context context,int layoutId) {
         super(context,layoutId);
+        mAccentColor = ThemeStore.getAccentColor();
+        mTextColor = ThemeStore.getTextColorPrimary();
     }
 
     @Override
@@ -46,10 +51,10 @@ public class PlayQueueAdapter extends BaseAdapter<PlayListSong,PlayQueueAdapter.
             holder.mArtist.setVisibility(View.VISIBLE);
 //                //高亮
             if(MusicService.getCurrentMP3() != null && MusicService.getCurrentMP3().getId() == item.getId()){
-                holder.mSong.setTextColor(ThemeStore.getAccentColor());
+                holder.mSong.setTextColor(mAccentColor);
             } else {
 //                holder.mSong.setTextColor(Color.parseColor(ThemeStore.isDay() ? "#323335" : "#ffffff"));
-                holder.mSong.setTextColor(ThemeStore.getTextColorPrimary());
+                holder.mSong.setTextColor(mTextColor);
             }
         }
 
