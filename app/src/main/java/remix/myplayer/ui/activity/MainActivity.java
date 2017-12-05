@@ -96,8 +96,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     View mHeadRoot;
     @BindView(R.id.recyclerview)
     RecyclerView mRecyclerView;
-//    @BindView(R.id.bottom_actionbar_container)
-//    FrameLayout mBottomBarCotainer;
 
     private BottomActionBarFragment mBottomBar;
     private final static String TAG = "MainActivity";

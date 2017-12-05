@@ -82,6 +82,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     SwitchCompat mNotifyStyleSwitch;
     @BindView(R.id.setting_notify_color_container)
     View mNotifyColorContainer;
+    @BindView(R.id.setting_album_cover_text)
+    TextView mAlbumCoverText;
+    @BindView(R.id.setting_artist_cover_text)
+    TextView mArtistCoverText;
 
     //是否需要重建activity
     private boolean mNeedRecreate = false;
@@ -200,9 +204,13 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 (ButterKnife.Action<ImageView>) (view, index) -> Theme.TintDrawable(view,view.getBackground(),arrowColor));
 
         //分根线颜色
-        ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),
+        ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),findView(R.id.setting_divider_6),
                 findView(R.id.setting_divider_3),findView(R.id.setting_divider_4),findView(R.id.setting_divider_5)},
                 (ButterKnife.Action<View>) (view, index) -> view.setBackgroundColor(ThemeStore.getDividerColor()));
+
+        //封面
+        mAlbumCoverText.setText(SPUtil.getValue(mContext,"Setting",SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only)));
+        mArtistCoverText.setText(SPUtil.getValue(mContext,"Setting",SPUtil.SPKEY.AUTO_DOWNLOAD_ARTIST_COVER,mContext.getString(R.string.wifi_only)));
 
         //计算缓存大小
         new Thread(){
@@ -260,7 +268,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_lockscreen_container,R.id.setting_lrc_priority_container,R.id.setting_lrc_float_container,
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
             R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container,
-            R.id.setting_screen_container,R.id.setting_scan_container,R.id.setting_classic_notify_container})
+            R.id.setting_screen_container,R.id.setting_scan_container,R.id.setting_classic_notify_container,
+            R.id.setting_album_cover_container,R.id.setting_artist_cover_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -468,6 +477,36 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             case R.id.setting_classic_notify_container:
                 mNotifyStyleSwitch.setChecked(!mNotifyStyleSwitch.isChecked());
+                break;
+            //专辑与艺术家封面自动下载
+            case R.id.setting_album_cover_container:
+            case R.id.setting_artist_cover_container:
+                final boolean isAlbum = v.getId() == R.id.setting_album_cover_container;
+                final String choice = isAlbum ? SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only)) :
+                        SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.AUTO_DOWNLOAD_ARTIST_COVER,mContext.getString(R.string.wifi_only));
+                int selected = mContext.getString(R.string.wifi_only).equals(choice) ? 1 : mContext.getString(R.string.always).equals(choice) ? 0 : 2;
+                new MaterialDialog.Builder(this)
+                        .title(isAlbum ? R.string.auto_download_album_cover : R.string.auto_download_artist_cover)
+                        .titleColorAttr(R.attr.text_color_primary)
+                        .positiveText(R.string.choose)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .buttonRippleColorAttr(R.attr.ripple_color)
+                        .items(new String[]{getString(R.string.always),getString(R.string.wifi_only),getString(R.string.never)})
+                        .itemsCallbackSingleChoice(selected,
+                                (dialog, view, which, text) -> {
+                                    if(isAlbum)
+                                        mAlbumCoverText.setText(text);
+                                    else
+                                        mArtistCoverText.setText(text);
+                                    SPUtil.putValue(mContext,"Setting",
+                                            isAlbum ? SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER : SPUtil.SPKEY.AUTO_DOWNLOAD_ARTIST_COVER,
+                                            text.toString());
+                                    return true;
+                                })
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .itemsColorAttr(R.attr.text_color_primary)
+                        .theme(ThemeStore.getMDDialogTheme())
+                        .show();
                 break;
         }
     }

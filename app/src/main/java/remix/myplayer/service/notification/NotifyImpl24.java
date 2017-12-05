@@ -78,8 +78,8 @@ public class NotifyImpl24 extends Notify{
         int playPauseIcon = MusicService.isPlay() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp;
 
         Intent deleteIntent = new Intent(MusicService.ACTION_CMD);
-        deleteIntent.putExtra("FromNotify", true);
         deleteIntent.putExtra("Close", true);
+        deleteIntent.putExtra("FromImpl24",true);
 
         mNotification = new NotificationCompat.Builder(mService, PLAYING_NOTIFICATION_CHANNEL_ID)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)

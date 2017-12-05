@@ -748,9 +748,13 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(intent.getExtras().getBoolean("Close")){
                 Global.setNotifyShowing(false);
                 pause(false);
-                mNotify.cancelPlayingNotify();
-                if(mFloatLrcView != null)
-                    mFloatLrcView.cancelNotify();
+                //AndroidN仅从通知栏移除 不做其他处理
+                if(!intent.getExtras().getBoolean("FromImpl24")){
+                    mNotify.cancelPlayingNotify();
+                    if(mUpdateFloatLrcThread != null) {
+                        mUpdateFloatLrcThread.quitDelay();
+                    }
+                }
                 return;
             }
 
@@ -1408,7 +1412,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 int control = Global.Operation;
                 if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcRows == null)
                     mLrcRows = new SearchLRC(mCurrentInfo).getLrc("");
-                if(mUpdateFloatLrcThread == null) {
+                if(mShowFloatLrc && !isFloatLrcShowing()){
                     mUpdateFloatLrcThread = new UpdateFloatLrcThread();
                     mUpdateFloatLrcThread.start();
                 }
@@ -1490,9 +1494,16 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private FloatLrcContent mCurrentLrc = new FloatLrcContent();
     private LrcRow EMPTY_ROW = new LrcRow("",0,"");
     private class UpdateFloatLrcThread extends Thread{
+        UpdateFloatLrcThread(){
+            LogUtil.d("DesktopLrc","创建线程");
+        }
+
         void quitImmediately(){
-//            mShowFloatLrc = false;
             interrupt();
+        }
+
+        void quitDelay(){
+            mPlaybackHandler.postDelayed(this::quitImmediately,LRC_INTERVAL);
         }
 
         @Override
@@ -1501,7 +1512,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 try {
 //                    int interval = getInterval();
 //                    LogUtil.d("DesktopLrc","间隔:" + interval);
-//                    LogUtil.d("DesktopLrc","当前歌词:" + (mCurrentLrc != null ? mCurrentLrc.Line1 : null));
+                    LogUtil.d("DesktopLrc","Thread:" + Thread.currentThread());
                     Thread.sleep(LRC_INTERVAL);
                 } catch (InterruptedException e) {
                     LogUtil.d("DesktopLrc","捕获异常,线程退出");
@@ -1522,6 +1533,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 } else{
                     if(!isFloatLrcShowing()) {
                         mUpdateUIHandler.removeMessages(Constants.CREATE_FLOAT_LRC);
+                        LogUtil.d("DesktopLrc","请求创建桌面歌词");
                         mUpdateUIHandler.sendEmptyMessageDelayed(Constants.CREATE_FLOAT_LRC,50);
                     } else {
                         if(mLrcRows == null || mLrcRows.size() == 0) {
@@ -1829,7 +1841,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 //屏幕熄灭 关闭桌面歌词
                 if(mShowFloatLrc && isFloatLrcShowing()) {
                     mUpdateFloatLrcThread.quitImmediately();
-                    mUpdateFloatLrcThread = null;
                 }
             }
         }

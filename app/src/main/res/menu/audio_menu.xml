@@ -7,8 +7,8 @@
             android:id="@+id/menu_edit"/>
         <item android:title="@string/song_detail"
             android:id="@+id/menu_detail"/>
-        <item android:title="@string/choose_lyric_source"
-            android:id="@+id/menu_lyric"/>
+        <!--<item android:title="@string/choose_lyric_source"-->
+            <!--android:id="@+id/menu_lyric"/>-->
         <item android:title="@string/sleep_timer"
             android:id="@+id/menu_timer"/>
         <item android:title="@string/eq"

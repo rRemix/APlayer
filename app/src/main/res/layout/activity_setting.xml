@@ -20,7 +20,7 @@
         android:background="?attr/background_color_3">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -35,103 +35,91 @@
                     android:layout_margin="@dimen/d14_size"
                     android:textSize="@dimen/s16_size"
                     android:textColor="?attr/colorAccent" />
-                <RelativeLayout
+                <LinearLayout
                     android:id="@+id/setting_filter_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
                     android:layout_below="@id/setting_common_title"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
+                    android:paddingLeft="@dimen/d16_size"
                     android:background="?attr/background_common">
-                    <LinearLayout
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center_vertical"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="@dimen/d16_size">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/music_filter"
-                            android:textColor="?attr/text_color_primary"
-                            android:textSize="@dimen/s16_size"
-                            android:layout_marginBottom="@dimen/d2_size"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/set_filter_size"
-                            android:textColor="?attr/text_color"
-                            android:textSize="@dimen/s14_size"/>
-                    </LinearLayout>
-                </RelativeLayout>
+                        android:text="@string/music_filter"
+                        android:textColor="?attr/text_color_primary"
+                        android:textSize="@dimen/s16_size"
+                        android:layout_marginBottom="@dimen/d2_size"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/set_filter_size"
+                        android:textColor="?attr/text_color"
+                        android:textSize="@dimen/s14_size"/>
+                </LinearLayout>
 
-                <RelativeLayout
+                <LinearLayout
                     android:id="@+id/setting_lockscreen_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/setting_filter_container"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:paddingLeft="@dimen/d16_size"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
                     android:background="?attr/background_common">
-                    <LinearLayout
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center_vertical"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="@dimen/d16_size">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/lockscreen_show"
-                            android:textColor="?attr/text_color_primary"
-                            android:textSize="@dimen/s16_size"
-                            android:layout_marginBottom="@dimen/d2_size"/>
-                        <TextView
-                            android:id="@+id/setting_lockscreen_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/choose_or_close_lockscreen"
-                            android:textColor="?attr/text_color"
-                            android:textSize="@dimen/s14_size"/>
-                    </LinearLayout>
-                </RelativeLayout>
+                        android:text="@string/lockscreen_show"
+                        android:textColor="?attr/text_color_primary"
+                        android:textSize="@dimen/s16_size"
+                        android:layout_marginBottom="@dimen/d2_size"/>
+                    <TextView
+                        android:id="@+id/setting_lockscreen_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/choose_or_close_lockscreen"
+                        android:textColor="?attr/text_color"
+                        android:textSize="@dimen/s14_size"/>
+                </LinearLayout>
 
-                <RelativeLayout
+                <LinearLayout
                     android:id="@+id/setting_scan_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/setting_lockscreen_container"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
-                    android:background="?attr/background_common">
-                    <LinearLayout
+                    android:paddingLeft="@dimen/d16_size"
+                    android:background="?attr/background_common"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true">
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center_vertical"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="@dimen/d16_size">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/manual_scan"
-                            android:textColor="?attr/text_color_primary"
-                            android:textSize="@dimen/s16_size"
-                            android:layout_marginBottom="@dimen/d2_size"/>
-                        <TextView
-                            android:id="@+id/setting_scan_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/manual_scan_tip"
-                            android:textColor="?attr/text_color"
-                            android:textSize="@dimen/s14_size"/>
-                    </LinearLayout>
-                </RelativeLayout>
+                        android:text="@string/manual_scan"
+                        android:textColor="?attr/text_color_primary"
+                        android:textSize="@dimen/s16_size"
+                        android:layout_marginBottom="@dimen/d2_size"/>
+                    <TextView
+                        android:id="@+id/setting_scan_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/manual_scan_tip"
+                        android:textColor="?attr/text_color"
+                        android:textSize="@dimen/s14_size"/>
+                </LinearLayout>
 
                 <RelativeLayout
                     android:id="@+id/setting_shake_container"
@@ -178,6 +166,83 @@
                 <View
                     android:id="@+id/setting_divider_1"
                     android:layout_below="@id/setting_shake_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="1px" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/setting_cover_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cover"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="@dimen/d14_size"
+                    android:textSize="@dimen/s16_size"
+                    android:textColor="?attr/colorAccent"/>
+                <LinearLayout
+                    android:id="@+id/setting_album_cover_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/setting_cover_title"
+                    android:paddingTop="@dimen/d10_size"
+                    android:paddingBottom="@dimen/d10_size"
+                    android:paddingLeft="@dimen/d16_size"
+                    android:background="?attr/background_common">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/auto_download_album_cover"
+                        android:textColor="?attr/text_color_primary"
+                        android:textSize="@dimen/s16_size"
+                        android:layout_marginBottom="@dimen/d2_size"/>
+                    <TextView
+                        android:id="@+id/setting_album_cover_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/always"
+                        android:textColor="?attr/text_color"
+                        android:textSize="@dimen/s14_size"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/setting_artist_cover_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/setting_album_cover_container"
+                    android:paddingTop="@dimen/d10_size"
+                    android:paddingBottom="@dimen/d10_size"
+                    android:paddingLeft="@dimen/d16_size"
+                    android:background="?attr/background_common">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/auto_download_artist_cover"
+                        android:textColor="?attr/text_color_primary"
+                        android:textSize="@dimen/s16_size"
+                        android:layout_marginBottom="@dimen/d2_size"/>
+                    <TextView
+                        android:id="@+id/setting_artist_cover_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/always"
+                        android:textColor="?attr/text_color"
+                        android:textSize="@dimen/s14_size"/>
+                </LinearLayout>
+                <View
+                    android:id="@+id/setting_divider_2"
+                    android:layout_below="@id/setting_artist_cover_container"
                     android:layout_width="match_parent"
                     android:layout_height="1px" />
             </RelativeLayout>
@@ -280,39 +345,35 @@
                         android:layout_marginRight="@dimen/d14_size"/>
                 </RelativeLayout>
 
-                <RelativeLayout
+                <LinearLayout
                     android:id="@+id/setting_lrc_path_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/setting_lrc_priority_container"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
-                    android:background="?attr/background_common">
-                    <LinearLayout
+                    android:background="?attr/background_common"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:paddingStart="@dimen/d16_size"
+                    android:paddingEnd="@dimen/d16_size">
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center_vertical"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="@dimen/d16_size"
-                        android:layout_marginRight="@dimen/d16_size">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/lrc_scan"
-                            android:textColor="?attr/text_color_primary"
-                            android:textSize="@dimen/s16_size"
-                            android:layout_marginBottom="@dimen/d2_size"/>
-                        <TextView
-                            android:id="@+id/setting_lrc_path"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/default_lrc_path"
-                            android:textColor="?attr/text_color"
-                            android:textSize="@dimen/s14_size"/>
-                    </LinearLayout>
-                </RelativeLayout>
+                        android:text="@string/lrc_scan"
+                        android:textColor="?attr/text_color_primary"
+                        android:textSize="@dimen/s16_size"
+                        android:layout_marginBottom="@dimen/d2_size"/>
+                    <TextView
+                        android:id="@+id/setting_lrc_path"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/default_lrc_path"
+                        android:textColor="?attr/text_color"
+                        android:textSize="@dimen/s14_size"/>
+                </LinearLayout>
 
                 <RelativeLayout
                     android:id="@+id/setting_screen_container"
@@ -357,7 +418,7 @@
                 </RelativeLayout>
 
                 <View
-                    android:id="@+id/setting_divider_2"
+                    android:id="@+id/setting_divider_3"
                     android:layout_below="@id/setting_screen_container"
                     android:layout_width="match_parent"
                     android:layout_height="1px" />
@@ -418,40 +479,36 @@
                         android:layout_marginRight="@dimen/d14_size"/>
                 </RelativeLayout>
 
-                <RelativeLayout
+                <LinearLayout
                     android:id="@+id/setting_notify_color_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/setting_classic_notify_container"
                     android:paddingTop="@dimen/d10_size"
                     android:paddingBottom="@dimen/d10_size"
-                    android:background="?attr/background_common">
-                    <LinearLayout
+                    android:background="?attr/background_common"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:paddingLeft="@dimen/d16_size">
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center_vertical"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="@dimen/d16_size">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/notify_bg_color"
-                            android:textColor="?attr/text_color_primary"
-                            android:textSize="@dimen/s16_size"
-                            android:layout_marginBottom="@dimen/d2_size"/>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/notify_bg_color_info"
-                            android:textColor="?attr/text_color"
-                            android:textSize="@dimen/s14_size"/>
-                    </LinearLayout>
-                </RelativeLayout>
+                        android:text="@string/notify_bg_color"
+                        android:textColor="?attr/text_color_primary"
+                        android:textSize="@dimen/s16_size"
+                        android:layout_marginBottom="@dimen/d2_size"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/notify_bg_color_info"
+                        android:textColor="?attr/text_color"
+                        android:textSize="@dimen/s14_size"/>
+                </LinearLayout>
 
                 <View
-                    android:id="@+id/setting_divider_3"
+                    android:id="@+id/setting_divider_4"
                     android:layout_below="@id/setting_notify_color_container"
                     android:layout_width="match_parent"
                     android:layout_height="1px" />
@@ -553,7 +610,7 @@
                 </RelativeLayout>
 
                 <View
-                    android:id="@+id/setting_divider_4"
+                    android:id="@+id/setting_divider_5"
                     android:layout_below="@id/setting_navigation_container"
                     android:layout_width="match_parent"
                     android:layout_height="1px" />
@@ -738,7 +795,7 @@
                 </RelativeLayout>
 
                 <View
-                    android:id="@+id/setting_divider_5"
+                    android:id="@+id/setting_divider_6"
                     android:layout_below="@id/setting_clear_container"
                     android:layout_width="match_parent"
                     android:layout_height="1px" />
