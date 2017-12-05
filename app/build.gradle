@@ -25,7 +25,7 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 34
+        versionCode 35
         versionName "1.2.1"
         vectorDrawables.useSupportLibrary = true
         ndk {
@@ -56,10 +56,10 @@ android {
         }
         release {
             //混淆代码
-            minifyEnabled false
+            minifyEnabled true
             debuggable false
             zipAlignEnabled true
-            shrinkResources true
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

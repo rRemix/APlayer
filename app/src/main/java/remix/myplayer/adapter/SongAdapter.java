@@ -28,6 +28,8 @@ import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.interfaces.SortChangeCallback;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.request.LibraryUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -37,8 +39,6 @@ import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.ui.fragment.SongFragment;
-import remix.myplayer.uri.LibraryUriRequest;
-import remix.myplayer.uri.RequestConfig;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -46,7 +46,7 @@ import remix.myplayer.util.Global;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
-import static remix.myplayer.uri.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
@@ -154,8 +154,8 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 //                }
 //            }
 //        }
-        //封面
 
+        //封面
         new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
 
         //是否为无损

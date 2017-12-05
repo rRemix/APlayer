@@ -22,6 +22,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import remix.myplayer.R;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
@@ -84,7 +85,7 @@ public class NotifyImpl extends Notify {
             }
             //设置封面
             final int size = DensityUtil.dip2px(mService,128);
-            final String uri = MediaStoreUtil.getImageUrl(temp.getAlbumId(),Constants.URL_ALBUM);
+            final String uri = MediaStoreUtil.getImageUrl(temp.getAlbumId(), ImageUriRequest.URL_ALBUM);
             ImageRequest imageRequest =
                     ImageRequestBuilder.newBuilderWithSource(!TextUtils.isEmpty(uri) ? Uri.parse(uri) : Uri.EMPTY)
                             .setResizeOptions(new ResizeOptions(size,size))

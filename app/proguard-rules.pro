@@ -39,7 +39,10 @@
 -keepattributes SourceFile,LineNumberTable
 
 #basedata
--keep public class * extends remix.myplayer.model.BaseData
+-keepclasseswithmembers class * extends remix.myplayer.model.BaseData{
+    <fields>;
+    <methods>;
+}
 
 #baseAdapter
 -keepclassmembers class remix.myplayer.adapter.holder.BaseViewHolder

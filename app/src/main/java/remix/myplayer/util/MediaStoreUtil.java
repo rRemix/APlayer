@@ -34,6 +34,7 @@ import remix.myplayer.model.mp3.Album;
 import remix.myplayer.model.mp3.Artist;
 import remix.myplayer.model.mp3.Genre;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.request.ImageUriRequest;
 
 /**
  * Created by taeja on 16-2-17.
@@ -294,8 +295,8 @@ public class MediaStoreUtil {
      */
     public static File getImageUrlInCache(int id,int type){
         //如果是专辑或者艺术家，先查找本地缓存
-        return type == Constants.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(id * 255 + "")) :
-               type == Constants.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + "")) :
+        return type == ImageUriRequest.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(id * 255 + "")) :
+               type == ImageUriRequest.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + "")) :
                new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + ""));
     }
 
@@ -306,7 +307,7 @@ public class MediaStoreUtil {
      */
     public static void setImageUrl(SimpleDraweeView simpleDraweeView,int albumId){
         //先判断是否设置过封面
-        File imgFile = MediaStoreUtil.getImageUrlInCache(albumId,Constants.URL_ALBUM);
+        File imgFile = MediaStoreUtil.getImageUrlInCache(albumId, ImageUriRequest.URL_ALBUM);
         if(imgFile != null && imgFile.exists()) {
             simpleDraweeView.setImageURI(Uri.parse("file://" + imgFile));
         } else {
@@ -324,15 +325,15 @@ public class MediaStoreUtil {
         if(arg <= 0)
             return null;
         //先查找本地缓存
-        if(type == Constants.URL_ARTIST || type == Constants.URL_ALBUM || type == Constants.URL_PLAYLIST ){
-            File img = type == Constants.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(arg * 255 + ""))
-                    : type == Constants.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(arg* 255 + ""))
+        if(type == ImageUriRequest.URL_ARTIST || type == ImageUriRequest.URL_ALBUM || type == ImageUriRequest.URL_PLAYLIST ){
+            File img = type == ImageUriRequest.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(arg * 255 + ""))
+                    : type == ImageUriRequest.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(arg* 255 + ""))
                     : new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(arg * 255 + ""));
             if(img.exists()){
                 return "file://" + img.getAbsolutePath();
             }
             //没有设置过封面，对于播放列表类型的查找播放列表下所有歌曲，直到有一首歌曲存在封面
-            if(type == Constants.URL_PLAYLIST){
+            if(type == ImageUriRequest.URL_PLAYLIST){
                 List<Integer> songIdList = PlayListUtil.getIDList(arg);
                 for (Integer songId : songIdList){
                     Song item = MediaStoreUtil.getMP3InfoById(songId);
@@ -356,11 +357,11 @@ public class MediaStoreUtil {
         String[] selectionArg = null;
 
         switch (type) {
-            case Constants.URL_ARTIST:
+            case ImageUriRequest.URL_ARTIST:
                 selection = MediaStore.Audio.Media.ARTIST_ID + "=?";
                 selectionArg = new String[]{arg + ""};
                 break;
-            case Constants.URL_ALBUM:
+            case ImageUriRequest.URL_ALBUM:
 //                selection = MediaStore.Audio.Albums._ID + "=?";
 //                selectionArg = new String[]{arg + ""};
                 return "content://media/external/audio/albumart/" + arg;
@@ -420,7 +421,7 @@ public class MediaStoreUtil {
         ParcelFileDescriptor pfd = null;
         try {
             Bitmap bm = null;
-            File imgFile = getImageUrlInCache(albumId,Constants.URL_ALBUM);
+            File imgFile = getImageUrlInCache(albumId, ImageUriRequest.URL_ALBUM);
             if(imgFile.exists()){
                 bm = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
             } else {
@@ -463,7 +464,7 @@ public class MediaStoreUtil {
         ParcelFileDescriptor pfd = null;
         FileDescriptor fd = null;
         try {
-            File imgFile = getImageUrlInCache(albumId,Constants.URL_ALBUM);
+            File imgFile = getImageUrlInCache(albumId, ImageUriRequest.URL_ALBUM);
             BitmapFactory.Options options = new BitmapFactory.Options();
             if(imgFile.exists()){
                 options.inJustDecodeBounds = true;

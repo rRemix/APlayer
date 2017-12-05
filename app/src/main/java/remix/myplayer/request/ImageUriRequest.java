@@ -1,4 +1,4 @@
-package remix.myplayer.uri;
+package remix.myplayer.request;
 
 import android.content.ContentUris;
 import android.net.Uri;
@@ -11,12 +11,11 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import remix.myplayer.APlayerApplication;
-import remix.myplayer.lyric.network.HttpClient;
 import remix.myplayer.model.netease.NAlbumSearchResponse;
 import remix.myplayer.model.netease.NArtistSearchResponse;
 import remix.myplayer.model.netease.NSearchRequest;
 import remix.myplayer.model.netease.NSongSearchResponse;
-import remix.myplayer.util.Constants;
+import remix.myplayer.request.network.HttpClient;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
 
@@ -27,6 +26,9 @@ import remix.myplayer.util.ImageUriUtil;
 public abstract class ImageUriRequest {
     public static final int BIG_IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),125);
     public static final int SMALL_IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),45);
+    public static final int URL_PLAYLIST = 1000;
+    public static final int URL_ALBUM = 10;
+    public static final int URL_ARTIST = 100;
 
     RequestConfig mConfig = DEFAULT_CONFIG;
 
@@ -56,7 +58,7 @@ public abstract class ImageUriRequest {
         }).switchIfEmpty(new Observable<String>() {
             @Override
             protected void subscribeActual(Observer<? super String> observer) {
-                if(request.getLType() == Constants.URL_ALBUM){
+                if(request.getLType() == URL_ALBUM){
                     Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), request.getID());
                     if(ImageUriUtil.isAlbumThumbExistInMediaCache(uri)){
                         observer.onNext(uri.toString());

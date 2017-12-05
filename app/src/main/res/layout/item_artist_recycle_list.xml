@@ -12,7 +12,7 @@
         android:id="@+id/item_simpleiview"
         fresco:fadeDuration="500"
         fresco:actualImageScaleType="centerCrop"
-        fresco:failureImage="?attr/default_album"
+        fresco:failureImage="?attr/default_artist"
         fresco:failureImageScaleType="centerCrop"
         android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/d8_size"/>

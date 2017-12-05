@@ -11,10 +11,10 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.uri.LibraryUriRequest;
-import remix.myplayer.uri.RequestConfig;
+import remix.myplayer.request.LibraryUriRequest;
+import remix.myplayer.request.RequestConfig;
 
-import static remix.myplayer.uri.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**

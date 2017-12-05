@@ -1,4 +1,4 @@
-package remix.myplayer.lyric.network;
+package remix.myplayer.request.network;
 
 import io.reactivex.Observable;
 import okhttp3.OkHttpClient;

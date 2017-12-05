@@ -57,10 +57,13 @@ import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.lyric.LrcView;
-import remix.myplayer.lyric.network.RxUtil;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.request.ImageUriRequest;
+import remix.myplayer.request.LibraryUriRequest;
+import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -71,9 +74,6 @@ import remix.myplayer.ui.dialog.PlayQueueDialog;
 import remix.myplayer.ui.fragment.CoverFragment;
 import remix.myplayer.ui.fragment.LrcFragment;
 import remix.myplayer.ui.fragment.RecordFragment;
-import remix.myplayer.uri.ImageUriRequest;
-import remix.myplayer.uri.LibraryUriRequest;
-import remix.myplayer.uri.RequestConfig;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
@@ -84,7 +84,7 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 
-import static remix.myplayer.uri.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**

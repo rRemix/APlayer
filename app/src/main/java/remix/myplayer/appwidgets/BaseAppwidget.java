@@ -23,8 +23,8 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import remix.myplayer.R;
+import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.MediaStoreUtil;
 
@@ -66,7 +66,7 @@ public class BaseAppwidget extends AppWidgetProvider {
             pushUpdate(context,appWidgetIds,remoteViews);
         } else {
             final int size = DensityUtil.dip2px(context,72);
-            final String uri = MediaStoreUtil.getImageUrl(albumId,Constants.URL_ALBUM);
+            final String uri = MediaStoreUtil.getImageUrl(albumId, ImageUriRequest.URL_ALBUM);
             ImageRequest imageRequest =
                     ImageRequestBuilder.newBuilderWithSource(!TextUtils.isEmpty(uri) ? Uri.parse(uri) : Uri.EMPTY)
                             .setResizeOptions(new ResizeOptions(size,size))

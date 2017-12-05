@@ -14,6 +14,7 @@ import remix.myplayer.R;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.model.netease.NSearchRequest;
+import remix.myplayer.request.ImageUriRequest;
 
 /**
  * Created by Remix on 2017/11/30.
@@ -79,8 +80,8 @@ public class ImageUriUtil {
      * @return
      */
     public static File getCustomThumbIfExist(int arg, int type){
-        File img = type == Constants.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(arg * 255 + ""))
-                : type == Constants.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(arg* 255 + ""))
+        File img = type == ImageUriRequest.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(arg * 255 + ""))
+                : type == ImageUriRequest.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(arg* 255 + ""))
                 : new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(arg * 255 + ""));
         if(img.exists()){
             return img;
@@ -122,7 +123,7 @@ public class ImageUriUtil {
     }
 
     public static NSearchRequest getSearchRequestWithAlbumType(Song song){
-        return getSearchRequest(song,Constants.URL_ALBUM);
+        return getSearchRequest(song, ImageUriRequest.URL_ALBUM);
     }
 
 }

@@ -22,15 +22,15 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.request.LibraryUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.PlayerActivity;
-import remix.myplayer.uri.LibraryUriRequest;
-import remix.myplayer.uri.RequestConfig;
 import remix.myplayer.util.ColorUtil;
 
-import static remix.myplayer.uri.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**

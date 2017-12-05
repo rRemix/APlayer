@@ -74,11 +74,6 @@ public class Constants {
     public final static String WECHAT_APIID = "wx10775467a6664fbb";
     //有盟appkey
     public final static String UMENG_APPKEY = "56d6563367e58e6aa70005af";
-    //获得专辑封面类型
-    public final static int URL_SONG = 1;
-    public final static int URL_ALBUM = 10;
-    public final static int URL_ARTIST = 100;
-    public final static int URL_PLAYLIST = 1000;
     public final static String ACTION_BUTTON = "ACTION_BUTTON";
     public final static int NOTIFY_PREV = 0;
     public final static int NOTIFY_PLAY = 1;

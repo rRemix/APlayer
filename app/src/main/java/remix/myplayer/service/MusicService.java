@@ -67,6 +67,7 @@ import remix.myplayer.model.FloatLrcContent;
 import remix.myplayer.model.mp3.PlayListSong;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
+import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.service.notification.Notify;
 import remix.myplayer.service.notification.NotifyImpl;
 import remix.myplayer.service.notification.NotifyImpl24;
@@ -918,7 +919,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                             PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).build());
 
 
-            final String uri = MediaStoreUtil.getImageUrl(mCurrentInfo.getAlbumId(),Constants.URL_ALBUM);
+            final String uri = MediaStoreUtil.getImageUrl(mCurrentInfo.getAlbumId(), ImageUriRequest.URL_ALBUM);
             ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(!TextUtils.isEmpty(uri) ? Uri.parse(uri) : Uri.EMPTY)
                         .build();
             DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);

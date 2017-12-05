@@ -29,21 +29,22 @@ import remix.myplayer.listener.AlbArtFolderPlaylistListener;
 import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.Artist;
 import remix.myplayer.model.netease.NSearchRequest;
+import remix.myplayer.request.ImageUriRequest;
+import remix.myplayer.request.LibraryUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.ui.fragment.ArtistFragment;
-import remix.myplayer.uri.LibraryUriRequest;
-import remix.myplayer.uri.RequestConfig;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
-import static remix.myplayer.uri.ImageUriRequest.BIG_IMAGE_SIZE;
-import static remix.myplayer.uri.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.request.ImageUriRequest.BIG_IMAGE_SIZE;
+import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 
 /**
  * Created by Remix on 2015/12/22.
@@ -105,7 +106,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         }
         //设置封面
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
-        new LibraryUriRequest(holder.mImage, new NSearchRequest(artistId,artist.getArtist(),100,Constants.URL_ARTIST),new RequestConfig.Builder(imageSize,imageSize).build()).load();
+        new LibraryUriRequest(holder.mImage, new NSearchRequest(artistId,artist.getArtist(),100, ImageUriRequest.URL_ARTIST),new RequestConfig.Builder(imageSize,imageSize).build()).load();
 
         //item点击效果
         holder.mContainer.setBackground(

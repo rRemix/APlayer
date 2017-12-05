@@ -1,4 +1,4 @@
-package remix.myplayer.uri;
+package remix.myplayer.request;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -10,10 +10,9 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
-import remix.myplayer.lyric.network.RxUtil;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.model.netease.NSearchRequest;
-import remix.myplayer.util.Constants;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.PlayListUtil;
 
@@ -32,7 +31,7 @@ public class PlayListUriRequest extends LibraryUriRequest {
     @Override
     public void load() {
         Observable.create((ObservableOnSubscribe<String>) e -> {
-            File customImage = ImageUriUtil.getCustomThumbIfExist(mRequest.getID(), Constants.URL_PLAYLIST);
+            File customImage = ImageUriUtil.getCustomThumbIfExist(mRequest.getID(), ImageUriRequest.URL_PLAYLIST);
             if(customImage != null && customImage.exists()){
                 e.onNext("file://" + customImage.getAbsolutePath());
             }

@@ -1,4 +1,4 @@
-package remix.myplayer.uri;
+package remix.myplayer.request;
 
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
@@ -11,11 +11,8 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
-import remix.myplayer.R;
-import remix.myplayer.lyric.network.RxUtil;
 import remix.myplayer.model.netease.NSearchRequest;
-import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.Constants;
+import remix.myplayer.request.network.RxUtil;
 
 /**
  * Created by Remix on 2017/12/4.
@@ -31,10 +28,10 @@ public class LibraryUriRequest extends ImageUriRequest {
     }
 
     public void onError(String errMsg){
-        String url = "res://remix.myplayer/" + (mRequest.getLType() == Constants.URL_ARTIST ?
-                (ThemeStore.isDay() ? R.drawable.artist_empty_bg_day : R.drawable.artist_empty_bg_night) :
-                ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night );
-        mImage.setImageURI(url);
+//        String url = "res://remix.myplayer/" + (mRequest.getLType() == ImageUriRequest.URL_ARTIST ?
+//                (ThemeStore.isDay() ? R.drawable.artist_empty_bg_day : R.drawable.artist_empty_bg_night) :
+//                ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night );
+        mImage.setImageURI(Uri.EMPTY);
     }
 
     public void onSuccess(String url) {

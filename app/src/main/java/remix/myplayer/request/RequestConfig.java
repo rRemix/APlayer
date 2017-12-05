@@ -1,4 +1,4 @@
-package remix.myplayer.uri;
+package remix.myplayer.request;
 
 import android.support.annotation.IntRange;
 
