@@ -276,7 +276,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         //底部状态兰
         mBottombar.updateBottomStatus(Song, isplay);
         //更新高亮歌曲
-//        mAdapter.onUpdateHightLight();
+//        mAdapter.onUpdateHighLight();
     }
 
     @Override

@@ -173,45 +173,40 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         //背景点击效果
         holder.mContainer.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(Constants.LIST_MODEL,mContext));
 
-        //选项Dialog
-        if(holder.mButton != null) {
-            //设置按钮着色
-            int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
-            Theme.TintDrawable(holder.mButton,R.drawable.icon_player_more,tintColor);
+        //设置按钮着色
+        int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+        Theme.TintDrawable(holder.mButton,R.drawable.icon_player_more,tintColor);
 
-            //按钮点击效果
-            holder.mButton.setBackground(Theme.getPressDrawable(
-                    mDefaultDrawable,
-                    mSelectDrawable,
-                    ThemeStore.getRippleColor(),
-                    null,null));
+        //按钮点击效果
+        holder.mButton.setBackground(Theme.getPressDrawable(
+                mDefaultDrawable,
+                mSelectDrawable,
+                ThemeStore.getRippleColor(),
+                null,null));
 
-            holder.mButton.setOnClickListener(v -> {
-                if(mMultiChoice.isShow())
-                    return;
-                Intent intent = new Intent(mContext, OptionDialog.class);
-                intent.putExtra("Song", song);
-                mContext.startActivity(intent);
-            });
-        }
+        holder.mButton.setOnClickListener(v -> {
+            if(mMultiChoice.isShow())
+                return;
+            Intent intent = new Intent(mContext, OptionDialog.class);
+            intent.putExtra("Song", song);
+            mContext.startActivity(intent);
+        });
 
-        if(mOnItemClickLitener != null && holder.mContainer != null) {
-            holder.mContainer.setOnClickListener(v -> {
-                if(holder.getAdapterPosition() - 1 < 0){
-                    ToastUtil.show(mContext,R.string.illegal_arg);
-                    return;
-                }
-                mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition() - 1);
-            });
-            holder.mContainer.setOnLongClickListener(v -> {
-                if(holder.getAdapterPosition() - 1 < 0){
-                    ToastUtil.show(mContext,R.string.illegal_arg);
-                    return true;
-                }
-                mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition() - 1);
+        holder.mContainer.setOnClickListener(v -> {
+            if(holder.getAdapterPosition() - 1 < 0){
+                ToastUtil.show(mContext,R.string.illegal_arg);
+                return;
+            }
+            mOnItemClickLitener.onItemClick(v, holder.getAdapterPosition() - 1);
+        });
+        holder.mContainer.setOnLongClickListener(v -> {
+            if(holder.getAdapterPosition() - 1 < 0){
+                ToastUtil.show(mContext,R.string.illegal_arg);
                 return true;
-            });
-        }
+            }
+            mOnItemClickLitener.onItemLongClick(v,holder.getAdapterPosition() - 1);
+            return true;
+        });
 
         if(mType == ALLSONG){
             if(MultiChoice.TAG.equals(SongFragment.TAG) &&
@@ -296,7 +291,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
      * 更新高亮歌曲
      */
     @Override
-    public void onUpdateHightLight() {
+    public void onUpdateHighLight() {
         Song currentSong = MusicService.getCurrentMP3();
         if(currentSong != null && mDatas != null && mDatas.indexOf(currentSong) >= 0){
             int index = mDatas.indexOf(currentSong) + 1;

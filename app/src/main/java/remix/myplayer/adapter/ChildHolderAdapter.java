@@ -255,7 +255,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
     }
 
     @Override
-    public void onUpdateHightLight() {
+    public void onUpdateHighLight() {
         Song currentSong = MusicService.getCurrentMP3();
         if(currentSong != null && mDatas != null && mDatas.indexOf(currentSong) >= 0){
             int index = mDatas.indexOf(currentSong) + 1;

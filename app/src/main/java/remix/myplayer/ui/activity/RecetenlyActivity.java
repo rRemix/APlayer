@@ -125,7 +125,7 @@ public class RecetenlyActivity extends PermissionActivity<Song,SongAdapter> impl
     @Override
     public void UpdateUI(Song Song, boolean isplay) {
 //        if(mAdapter != null)
-//            mAdapter.onUpdateHightLight();
+//            mAdapter.onUpdateHighLight();
     }
 
     @Override

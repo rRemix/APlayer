@@ -516,7 +516,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 //            if (temp instanceof SongFragment) {
 //                SongFragment songFragment = (SongFragment) temp;
 //                if(songFragment.getAdapter() != null){
-//                    songFragment.getAdapter().onUpdateHightLight();
+//                    songFragment.getAdapter().onUpdateHighLight();
 //                }
 //            }
 //        }

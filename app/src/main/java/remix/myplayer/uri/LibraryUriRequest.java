@@ -15,6 +15,7 @@ import remix.myplayer.R;
 import remix.myplayer.lyric.network.RxUtil;
 import remix.myplayer.model.netease.NSearchRequest;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.util.Constants;
 
 /**
  * Created by Remix on 2017/12/4.
@@ -30,14 +31,13 @@ public class LibraryUriRequest extends ImageUriRequest {
     }
 
     public void onError(String errMsg){
-        onSuccess("res://remix.myplayer/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
+        String url = "res://remix.myplayer/" + (mRequest.getLType() == Constants.URL_ARTIST ?
+                (ThemeStore.isDay() ? R.drawable.artist_empty_bg_day : R.drawable.artist_empty_bg_night) :
+                ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night );
+        mImage.setImageURI(url);
     }
 
     public void onSuccess(String url) {
-//        if(mImage.getTag() != null && mImage.getTag().equals(url)){
-//            return;
-//        }
-//        mImage.setImageURI(Uri.EMPTY);
 
         ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(Uri.parse(url));
         if(mConfig.isResize()){

@@ -111,54 +111,51 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         holder.mContainer.setBackground(
                 Theme.getPressAndSelectedStateListRippleDrawable(ListModel,mContext));
 
-        if(mOnItemClickLitener != null) {
-            holder.mContainer.setOnClickListener(v -> {
-                if(holder.getAdapterPosition() - 1 < 0){
-                    ToastUtil.show(mContext,R.string.illegal_arg);
-                    return;
-                }
-                mOnItemClickLitener.onItemClick(holder.mContainer,position - 1);
-            });
-            //多选菜单
-            holder.mContainer.setOnLongClickListener(v -> {
-                if(holder.getAdapterPosition() - 1 < 0){
-                    ToastUtil.show(mContext,R.string.illegal_arg);
-                    return true;
-                }
-                mOnItemClickLitener.onItemLongClick(holder.mContainer,position - 1);
+        holder.mContainer.setOnClickListener(v -> {
+            if(holder.getAdapterPosition() - 1 < 0){
+                ToastUtil.show(mContext,R.string.illegal_arg);
+                return;
+            }
+            mOnItemClickLitener.onItemClick(holder.mContainer,position - 1);
+        });
+        //多选菜单
+        holder.mContainer.setOnLongClickListener(v -> {
+            if(holder.getAdapterPosition() - 1 < 0){
+                ToastUtil.show(mContext,R.string.illegal_arg);
                 return true;
-            });
-        }
+            }
+            mOnItemClickLitener.onItemLongClick(holder.mContainer,position - 1);
+            return true;
+        });
+
         //popupmenu
-        if(holder.mButton != null) {
-            int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
-            Theme.TintDrawable(holder.mButton,R.drawable.icon_player_more,tintColor);
+        int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+        Theme.TintDrawable(holder.mButton,R.drawable.icon_player_more,tintColor);
 
-            //按钮点击效果
-            int size = DensityUtil.dip2px(mContext,45);
-            Drawable defaultDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
-            Drawable selectDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
-            holder.mButton.setBackground(Theme.getPressDrawable(
-                    defaultDrawable,
-                    selectDrawable,
-                    ThemeStore.getRippleColor(),
-                    null,
-                    null));
+        //按钮点击效果
+        int size = DensityUtil.dip2px(mContext,45);
+        Drawable defaultDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, Color.TRANSPARENT, size, size);
+        Drawable selectDrawable = Theme.getShape(ListModel == Constants.LIST_MODEL ? GradientDrawable.OVAL : GradientDrawable.RECTANGLE, ThemeStore.getSelectColor(), size, size);
+        holder.mButton.setBackground(Theme.getPressDrawable(
+                defaultDrawable,
+                selectDrawable,
+                ThemeStore.getRippleColor(),
+                null,
+                null));
 
-            holder.mButton.setOnClickListener(v -> {
-                if(mMultiChoice.isShow())
-                    return;
-                Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
-                final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-                popupMenu.getMenuInflater().inflate(R.menu.artist_menu, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
-                        artistId,
-                        Constants.ARTIST,
-                        artist.getArtist()));
-                popupMenu.setGravity(Gravity.END);
-                popupMenu.show();
-            });
-        }
+        holder.mButton.setOnClickListener(v -> {
+            if(mMultiChoice.isShow())
+                return;
+            Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
+            final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
+            popupMenu.getMenuInflater().inflate(R.menu.artist_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
+                    artistId,
+                    Constants.ARTIST,
+                    artist.getArtist()));
+            popupMenu.setGravity(Gravity.END);
+            popupMenu.show();
+        });
 
         //是否处于选中状态
         if(MultiChoice.TAG.equals(ArtistFragment.TAG) &&
