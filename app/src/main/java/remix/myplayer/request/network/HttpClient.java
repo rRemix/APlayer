@@ -4,7 +4,6 @@ import io.reactivex.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import remix.myplayer.lyric.HttpHelper;
-import remix.myplayer.model.netease.NSongSearchResponse;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -70,10 +69,6 @@ public class HttpClient implements HttpHelper {
         return mKuGouApi.getKuGouLyric(1,"pc","lrc","utf8",id,accessKey);
     }
 
-    @Override
-    public Observable<NSongSearchResponse> getNeteaseSearch2(String key, int offset, int limit, int type) {
-        return mNeteaseApi.getNeteaseSearch2(key,offset,limit,type);
-    }
 
     private static class SingletonHolder{
         static HttpClient mInstance = new HttpClient();

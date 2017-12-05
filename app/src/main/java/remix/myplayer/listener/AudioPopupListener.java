@@ -18,14 +18,30 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.common.util.ByteConstants;
+import com.google.gson.Gson;
 import com.umeng.analytics.MobclickAgent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import okhttp3.ResponseBody;
 import remix.myplayer.R;
+import remix.myplayer.model.kugou.KLrcResponse;
+import remix.myplayer.model.kugou.KSearchResponse;
 import remix.myplayer.model.mp3.Genre;
 import remix.myplayer.model.mp3.PlayListSong;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.model.netease.NLrcResponse;
+import remix.myplayer.model.netease.NSongSearchResponse;
+import remix.myplayer.request.network.HttpClient;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.EQActivity;
@@ -34,6 +50,7 @@ import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
@@ -263,37 +280,111 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         PlayListUtil.addSong(info) > 0 ? mContext.getString(R.string.add_song_playlist_success, 1,Constants.MYLOVE) : mContext.getString(R.string.add_song_playlist_error));
                 break;
             case R.id.menu_delete:
-                try {
-                    new MaterialDialog.Builder(mContext)
-                            .content(R.string.confirm_delete_from_library)
-                            .positiveText(R.string.confirm)
-                            .negativeText(R.string.cancel)
-                            .onPositive((dialog, which) -> {
-                                if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0){
-                                    if(PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)){
-                                        ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
-                                        //移除的是正在播放的歌曲
-                                        if(MusicService.getCurrentMP3() == null)
-                                            return;
-                                        if(mInfo.getId() == MusicService.getCurrentMP3().getId() && Global.PlayQueue.size() >= 2){
-                                            Intent intent = new Intent(MusicService.ACTION_CMD);
-                                            intent.putExtra("Control", Constants.NEXT);
-                                            mContext.sendBroadcast(intent);
-                                        }
+                new MaterialDialog.Builder(mContext)
+                        .content(R.string.confirm_delete_from_library)
+                        .positiveText(R.string.confirm)
+                        .negativeText(R.string.cancel)
+                        .onPositive((dialog, which) -> {
+                            if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0){
+                                if(PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)){
+                                    ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
+                                    //移除的是正在播放的歌曲
+                                    if(MusicService.getCurrentMP3() == null)
+                                        return;
+                                    if(mInfo.getId() == MusicService.getCurrentMP3().getId() && Global.PlayQueue.size() >= 2){
+                                        Intent intent = new Intent(MusicService.ACTION_CMD);
+                                        intent.putExtra("Control", Constants.NEXT);
+                                        mContext.sendBroadcast(intent);
                                     }
-                                } else {
-                                    ToastUtil.show(mContext, mContext.getString(R.string.delete_error));
                                 }
-                            })
-                            .backgroundColorAttr(R.attr.background_color_3)
-                            .positiveColorAttr(R.attr.text_color_primary)
-                            .negativeColorAttr(R.attr.text_color_primary)
-                            .contentColorAttr(R.attr.text_color_primary)
-                            .show();
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
+                            } else {
+                                ToastUtil.show(mContext, mContext.getString(R.string.delete_error));
+                            }
+                        })
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .negativeColorAttr(R.attr.text_color_primary)
+                        .contentColorAttr(R.attr.text_color_primary)
+                        .show();
                 break;
+            case R.id.menu_lyric:
+                String key = ImageUriUtil.getLyricSearchKey(mInfo);
+                Observable.zip(HttpClient.getKuGouApiservice().getKuGouSearch(1, "yes", "pc", key, (int) mInfo.getDuration(), "")
+                        .flatMap(new Function<ResponseBody, ObservableSource<KLrcResponse>>() {
+                            @Override
+                            public ObservableSource<KLrcResponse> apply(ResponseBody body) throws Exception {
+                                KSearchResponse response = new Gson().fromJson(body.string(), KSearchResponse.class);
+                                return HttpClient.getKuGouApiservice()
+                                        .getKuGouLyric(1, "pc", "lrc", "utf8", response.candidates.get(0).id, response.candidates.get(0).accesskey)
+                                        .map(new Function<ResponseBody, KLrcResponse>() {
+                                            @Override
+                                            public KLrcResponse apply(ResponseBody body) throws Exception {
+                                                return new Gson().fromJson(body.string(), KLrcResponse.class);
+                                            }
+                                        });
+                            }
+                        }), HttpClient.getNeteaseApiservice().getNeteaseSearch(key, 0, 1, 1)
+                        .flatMap(new Function<ResponseBody, ObservableSource<NLrcResponse>>() {
+                            @Override
+                            public ObservableSource<NLrcResponse> apply(ResponseBody body) throws Exception {
+                                NSongSearchResponse response = new Gson().fromJson(body.string(), NSongSearchResponse.class);
+                                return HttpClient.getNeteaseApiservice()
+                                        .getNeteaseLyric("pc", response.result.songs.get(0).id, -1, -1, -1)
+                                        .map(new Function<ResponseBody, NLrcResponse>() {
+                                            @Override
+                                            public NLrcResponse apply(ResponseBody body) throws Exception {
+                                                return new Gson().fromJson(body.string(), NLrcResponse.class);
+                                            }
+                                        });
+                            }
+                        }), new BiFunction<KLrcResponse, NLrcResponse, String>() {
+                    @Override
+                    public String apply(KLrcResponse kLrcResponse, NLrcResponse nLrcResponse) throws Exception {
+                        if(kLrcResponse != null && nLrcResponse != null){
+                            return "KN";
+                        }
+                        if(kLrcResponse != null)
+                            return "K";
+                        if(nLrcResponse != null)
+                            return "N";
+                        return "";
+                    }
+                }).compose(RxUtil.applyScheduler())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        List<String> sources = new ArrayList<>();
+                        if (s.contains("K"))
+                            sources.add("酷狗");
+                        if (s.contains("N"))
+                            sources.add("网易");
+                        sources.add("手动选择");
+                        sources.add("忽略歌词");
+
+                        MaterialDialog lyricDialog = new MaterialDialog.Builder(mContext)
+                                .title("选择歌词源")
+                                .titleColorAttr(R.attr.text_color_primary)
+                                .items(sources)
+                                .itemsCallback(new MaterialDialog.ListCallback() {
+                                    @Override
+                                    public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
+                                        ToastUtil.show(mContext, text);
+                                    }
+                                })
+                                .positiveText(R.string.confirm)
+                                .positiveColorAttr(R.attr.text_color_primary)
+                                .backgroundColorAttr(R.attr.background_color_3)
+                                .build();
+                        lyricDialog.show();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        ToastUtil.show(mContext, throwable.toString());
+                    }
+                });
+                break;
+
 //            case R.id.menu_vol:
 //                AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
 //                if(audioManager != null){

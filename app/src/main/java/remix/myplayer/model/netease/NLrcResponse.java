@@ -11,16 +11,10 @@ public class NLrcResponse extends BaseData {
     public boolean sfy;
     public boolean qfy;
     public int code;
-    public LrcData lrc;
-    public LrcData klyric;
-    public LrcData tlyric;
+    public LrcActualData lrc;
+    public LrcActualData klyric;
+    public LrcActualData tlyric;
     public TransUserData transUser;
-
-    public static class LrcData extends BaseData{
-        public LrcActualData lrc;
-        public LrcActualData klyric;
-        public LrcActualData tlyric;
-    }
 
     public static class TransUserData extends BaseData{
         public int id;

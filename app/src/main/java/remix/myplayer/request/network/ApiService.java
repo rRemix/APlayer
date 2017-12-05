@@ -2,7 +2,6 @@ package remix.myplayer.request.network;
 
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
-import remix.myplayer.model.netease.NSongSearchResponse;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
@@ -13,11 +12,6 @@ import retrofit2.http.Query;
  */
 
 public interface ApiService {
-    @POST("search/pc")
-    @Headers("Cookie: appver=1.5.0.75771")
-    Observable<NSongSearchResponse> getNeteaseSearch2(@Query("s") String key, @Query("offset") int offset,
-                                                      @Query("limit") int limit, @Query("type") int type);
-
     @POST("search/pc")
     @Headers("Cookie: appver=1.5.0.75771")
     Observable<ResponseBody> getNeteaseSearch(@Query("s") String key, @Query("offset") int offset,

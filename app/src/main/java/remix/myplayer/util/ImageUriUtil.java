@@ -122,6 +122,33 @@ public class ImageUriUtil {
         return NSearchRequest.DEFAULT_REQUEST;
     }
 
+    /**
+     * 获得搜索歌词的关键字
+     * @param song
+     * @return
+     */
+    public static String getLyricSearchKey(Song song){
+        if(song == null)
+            return "";
+        boolean isTitlelegal = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(mContext.getString(R.string.unknow_song));
+        boolean isAlbumlegal = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(mContext.getString(R.string.unknow_album));
+        boolean isArtistlegal = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(mContext.getString(R.string.unknow_artist));
+
+        //歌曲名合法
+        if(isTitlelegal){
+            //艺术家合法
+            if(isArtistlegal){
+                return song.getTitle() + "-" + song.getArtist();
+            } else if(isAlbumlegal){
+                //专辑名合法
+                return song.getTitle() + "-" + song.getAlbum();
+            } else {
+                return song.getTitle();
+            }
+        }
+        return "";
+    }
+
     public static NSearchRequest getSearchRequestWithAlbumType(Song song){
         return getSearchRequest(song, ImageUriRequest.URL_ALBUM);
     }

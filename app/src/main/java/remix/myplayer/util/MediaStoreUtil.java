@@ -48,7 +48,8 @@ public class MediaStoreUtil {
     private static final String TAG = "MediaStoreUtil";
     private static Context mContext;
     private MediaStoreUtil(){}
-    public static String BASE_SELECTION = " and is_music = 1 ";
+//    public static String BASE_SELECTION = " and is_music = 1 ";
+    public static String BASE_SELECTION = " ";
     public static void setContext(Context context){
         mContext = context;
     }
@@ -116,7 +117,7 @@ public class MediaStoreUtil {
         try {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
-                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
+                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + getBaseSelection(),
                     null,
                     SongAdapter.SORT + SongAdapter.ASCDESC);
             if(cursor != null) {
@@ -865,32 +866,33 @@ public class MediaStoreUtil {
      * @return
      */
     public static String getBaseSelection(){
-        Set<String> deleteId = SPUtil.getStringSet(mContext,"Setting","DeleteID");
-        if(deleteId == null || deleteId.size() == 0)
-            return BASE_SELECTION;
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(" and ");
-        int i = 0;
-        for (String id : deleteId) {
-            stringBuilder.append(MediaStore.Audio.Media._ID + " != ").append(id).append(i != deleteId.size() - 1 ?  " and " : " ");
-            i++;
-        }
-        return stringBuilder.toString();
 //        Set<String> deleteId = SPUtil.getStringSet(mContext,"Setting","DeleteID");
 //        if(deleteId == null || deleteId.size() == 0)
 //            return BASE_SELECTION;
-//        StringBuilder blacklist = new StringBuilder();
-//        blacklist.append(" and ");
+//        StringBuilder stringBuilder = new StringBuilder();
+//        stringBuilder.append(" and ");
 //        int i = 0;
-//        for(String id : deleteId){
-//            if(i == 0){
-//                blacklist.append(MediaStore.Audio.Media._ID).append(" not in (");
-//            }
-//            blacklist.append(id);
-//            blacklist.append(i != deleteId.size() - 1 ? "," : ")");
+//        for (String id : deleteId) {
+//            stringBuilder.append(MediaStore.Audio.Media._ID + " != ").append(id).append(i != deleteId.size() - 1 ?  " and " : " ");
 //            i++;
 //        }
-//        return blacklist.append(BASE_SELECTION).toString();
+//        return stringBuilder.toString();
+
+        Set<String> deleteId = SPUtil.getStringSet(mContext,"Setting","DeleteID");
+        if(deleteId == null || deleteId.size() == 0)
+            return BASE_SELECTION;
+        StringBuilder blacklist = new StringBuilder();
+        blacklist.append(" and ");
+        int i = 0;
+        for(String id : deleteId){
+            if(i == 0){
+                blacklist.append(MediaStore.Audio.Media._ID).append(" not in (");
+            }
+            blacklist.append(id);
+            blacklist.append(i != deleteId.size() - 1 ? "," : ")");
+            i++;
+        }
+        return blacklist.append(BASE_SELECTION).toString();
     }
 
     /**
