@@ -12,7 +12,7 @@ public interface HttpHelper {
 
     Observable<ResponseBody> getNeteaseLyric(int id);
 
-    Observable<ResponseBody> getKuGouSearch(String keyword, int duration, String hash);
+    Observable<ResponseBody> getKuGouSearch(String keyword, long duration, String hash);
 
     Observable<ResponseBody> getKuGouLyric(int id,String accessKey);
 }

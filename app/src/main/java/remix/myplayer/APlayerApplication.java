@@ -24,12 +24,12 @@ import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.CrashHandler;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by taeja on 16-3-16.
@@ -59,7 +59,7 @@ public class APlayerApplication extends MultiDexApplication{
         MobclickAgent.setCatchUncaughtExceptions(true);
         MobclickAgent.setDebugMode(BuildConfig.DEBUG);
         //字体
-        CommonUtil.setFontSize(this);
+        Util.setFontSize(this);
         //友盟分享
         UMShareAPI.get(this);
         Config.DEBUG = BuildConfig.DEBUG;
@@ -89,7 +89,7 @@ public class APlayerApplication extends MultiDexApplication{
         DBManager.initialInstance(new DBOpenHelper(mContext));
         PermissionUtil.setContext(mContext);
         MediaStoreUtil.setContext(mContext);
-        CommonUtil.setContext(mContext);
+        Util.setContext(mContext);
         ImageUriUtil.setContext(mContext);
         DiskCache.init(mContext);
         ColorUtil.setContext(mContext);

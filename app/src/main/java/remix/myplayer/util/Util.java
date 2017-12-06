@@ -48,7 +48,7 @@ import remix.myplayer.model.bmob.Error;
 /**
  * 通用工具类
  */
-public class CommonUtil {
+public class Util {
     private static Context mContext;
 
     public static void setContext(Context context) {
@@ -570,7 +570,7 @@ public class CommonUtil {
      */
     public static void uploadException(String title,String description){
         try {
-            if(!CommonUtil.isNetWorkConnected()){
+            if(!Util.isNetWorkConnected()){
                 return;
             }
             PackageManager pm = APlayerApplication.getContext().getPackageManager();
@@ -599,7 +599,7 @@ public class CommonUtil {
      */
     public static void uploadException(String title,Exception exception){
         try {
-            if(!CommonUtil.isNetWorkConnected()){
+            if(!Util.isNetWorkConnected()){
                 return;
             }
             PackageManager pm = APlayerApplication.getContext().getPackageManager();
@@ -661,4 +661,14 @@ public class CommonUtil {
         }
         return true;
     }
+
+    /**
+     * 判断wifi是否打开
+     * @return
+     */
+    public static boolean isWifi(Context context) {
+        NetworkInfo activeNetInfo = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        return activeNetInfo != null && activeNetInfo.getType() == ConnectivityManager.TYPE_WIFI;
+    }
+
 }

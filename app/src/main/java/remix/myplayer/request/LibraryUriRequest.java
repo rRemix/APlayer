@@ -35,8 +35,9 @@ public class LibraryUriRequest extends ImageUriRequest {
     }
 
     public void onSuccess(String url) {
-
         ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(Uri.parse(url));
+//        imageRequestBuilder.setLowestPermittedRequestLevel(isAutoDownloadCover() ? ImageRequest.RequestLevel.DISK_CACHE : ImageRequest.RequestLevel.FULL_FETCH);
+
         if(mConfig.isResize()){
             imageRequestBuilder.setResizeOptions(ResizeOptions.forDimensions(mConfig.getWidth(),mConfig.getHeight()));
         }

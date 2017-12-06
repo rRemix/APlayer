@@ -37,10 +37,10 @@ import remix.myplayer.misc.cache.DiskLruCache;
 import remix.myplayer.model.LrcRequest;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.model.netease.NSongSearchResponse;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2015/12/7.
@@ -70,7 +70,7 @@ public class SearchLRC {
                 mDisplayName = temp.indexOf('.') > 0 ? temp.substring(0,temp.lastIndexOf('.')) : temp;
             }
         } catch (Exception e){
-            CommonUtil.uploadException("SearchLrc Init Error","DisPlayName:" + item.getDisplayname() + " Title:" + item.getTitle());
+            Util.uploadException("SearchLrc Init Error","DisPlayName:" + item.getDisplayname() + " Title:" + item.getTitle());
             mDisplayName = mTitle;
         }
         mLrcBuilder = new DefaultLrcParser();
@@ -93,7 +93,7 @@ public class SearchLRC {
     public LrcRequest getLrcParam(){
         //酷狗
         try {
-            JSONObject response = CommonUtil.getSongJsonObject(URLEncoder.encode(mInfo.getTitle(), "utf-8"),
+            JSONObject response = Util.getSongJsonObject(URLEncoder.encode(mInfo.getTitle(), "utf-8"),
                             URLEncoder.encode(mInfo.getArtist(), "utf-8"),mInfo.getDuration());
             if(response != null && response.length() > 0){
                 if(response.getJSONArray("candidates").length() > 0){
@@ -200,7 +200,7 @@ public class SearchLRC {
 
         //搜索时判断该歌曲是否有缓存
         try {
-            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(CommonUtil.hashKeyForDisk(mTitle + "/" + mArtistName));
+            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(Util.hashKeyForDisk(mTitle + "/" + mArtistName));
              if(snapShot != null && (br = new BufferedReader(new InputStreamReader(snapShot.getInputStream(0)))) != null ){
                 return mLrcBuilder.getLrcRows(br,false, mTitle,mArtistName);
             }
@@ -248,7 +248,7 @@ public class SearchLRC {
             }
         }catch (Exception e){
 //            LogUtil.e(TAG,e.toString());
-            CommonUtil.uploadException("Search Error",e);
+            Util.uploadException("Search Error",e);
         } finally {
             if (br != null)
                 try {
@@ -310,7 +310,7 @@ public class SearchLRC {
             return "";
         if(!TextUtils.isEmpty(searchPath)){
             //已设置歌词路径
-            CommonUtil.searchFile(mDisplayName,mTitle,mArtistName, new File(searchPath));
+            Util.searchFile(mDisplayName,mTitle,mArtistName, new File(searchPath));
             if(!TextUtils.isEmpty(Global.CurrentLrcPath)){
                 return Global.CurrentLrcPath;
             }
@@ -332,7 +332,7 @@ public class SearchLRC {
                 while (allLrcFiles.moveToNext()){
                     File file = new File(allLrcFiles.getString(allLrcFiles.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
                     if (file.exists() && file.canRead()) {
-                        if(CommonUtil.isRightLrc(file, mDisplayName,mTitle,mArtistName)){
+                        if(Util.isRightLrc(file, mDisplayName,mTitle,mArtistName)){
                             return file.getAbsolutePath();
                         }
                     }

@@ -73,6 +73,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
     private RecyclerView mRecyclerView;
     private int mLastIndex;
 
+
     public SongAdapter(Context context,int layoutId, MultiChoice multiChoice, int type,RecyclerView recyclerView) {
         super(context,layoutId,multiChoice);
         mMultiChoice = multiChoice;

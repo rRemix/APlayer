@@ -109,7 +109,9 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         holder.mOther.setText(mContext.getString(R.string.song_count,info.Count));
         //设置专辑封面
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
-        new PlayListUriRequest(holder.mImage, new NSearchRequest(info.getId(),info.getName(),1, ImageUriRequest.URL_PLAYLIST),new RequestConfig.Builder(imageSize,imageSize).build()).load();
+        new PlayListUriRequest(holder.mImage,
+                new NSearchRequest(info.getId(), info.getName(), 1, ImageUriRequest.URL_PLAYLIST),
+                new RequestConfig.Builder(imageSize,imageSize).build()).load();
 
         holder.mContainer.setOnClickListener(v -> {
             if(holder.getAdapterPosition() - 1 < 0){
@@ -236,7 +238,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 //            int playListId = params[0];
 //            ArrayList<Integer> list = PlayListUtil.getIDList(playListId);
 //            String url = null;
-//            File imgFile =  new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(Integer.valueOf(playListId) * 255 + ""));
+//            File imgFile =  new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + Util.hashKeyForDisk(Integer.valueOf(playListId) * 255 + ""));
 //            if(imgFile != null && imgFile.exists())
 //                return imgFile.getAbsolutePath();
 //

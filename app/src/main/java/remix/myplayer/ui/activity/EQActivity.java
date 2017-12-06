@@ -26,13 +26,13 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.EQSeekBar;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by taeja on 16-4-13.
@@ -70,7 +70,7 @@ public class EQActivity extends ToolbarActivity {
                     int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
                     LogUtil.d(TAG,"AudioSessionId:" + AudioSessionId);
                     if(AudioSessionId  == 0) {
-                        CommonUtil.uploadException("AudioSessionId","is zero");
+                        Util.uploadException("AudioSessionId","is zero");
                         return;
                     }
                     //是否启用音效设置
@@ -109,7 +109,7 @@ public class EQActivity extends ToolbarActivity {
                     //初始化完成
                     mHasInitial = true;
                 }catch (Exception e){
-                    CommonUtil.uploadException("均衡器初始化失败",e);
+                    Util.uploadException("均衡器初始化失败",e);
                 }
             }
 
@@ -129,7 +129,7 @@ public class EQActivity extends ToolbarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        CommonUtil.unregisterReceiver(this,mEQReceiver);
+        Util.unregisterReceiver(this,mEQReceiver);
     }
 
     @Override

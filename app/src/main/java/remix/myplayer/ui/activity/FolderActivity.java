@@ -17,9 +17,9 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.FolderAdapter;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.Util;
 
 /**
  * @ClassName FolderActivity
@@ -53,7 +53,7 @@ public class FolderActivity extends PermissionActivity<Object,FolderAdapter> {
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                String path = CommonUtil.getMapkeyByPosition(Global.FolderMap,position);
+                String path = Util.getMapkeyByPosition(Global.FolderMap,position);
                 if(!TextUtils.isEmpty(path) &&
                         !mMultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
                     Intent intent = new Intent(FolderActivity.this, ChildHolderActivity.class);
@@ -66,7 +66,7 @@ public class FolderActivity extends PermissionActivity<Object,FolderAdapter> {
 
             @Override
             public void onItemLongClick(View view, int position) {
-                String path = CommonUtil.getMapkeyByPosition(Global.FolderMap,position);
+                String path = Util.getMapkeyByPosition(Global.FolderMap,position);
                 if(!TextUtils.isEmpty(path))
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG,Constants.FOLDER);
             }

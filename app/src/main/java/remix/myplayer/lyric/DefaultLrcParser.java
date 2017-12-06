@@ -9,7 +9,7 @@ import java.util.List;
 
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.cache.DiskLruCache;
-import remix.myplayer.util.CommonUtil;
+import remix.myplayer.util.Util;
 
 /**
  * @ClassName
@@ -33,7 +33,7 @@ public class DefaultLrcParser implements ILrcParser {
             if (needCache) {
                 DiskLruCache lrcDiskCache = DiskCache.getLrcDiskCache();
                 if(lrcDiskCache != null)
-                    editor = lrcDiskCache.edit(CommonUtil.hashKeyForDisk(songName + "/" + artistName));
+                    editor = lrcDiskCache.edit(Util.hashKeyForDisk(songName + "/" + artistName));
                 if(editor != null)
                     lrcCacheStream = editor.newOutputStream(0);
             }

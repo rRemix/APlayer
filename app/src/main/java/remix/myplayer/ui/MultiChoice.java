@@ -22,12 +22,12 @@ import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 /**
  * @ClassName MultiChoice
@@ -259,7 +259,7 @@ public class MultiChoice implements OnMultiItemClickListener {
     public void itemAddorRemoveWithLongClick(View view,int position,Object arg,String newTag,int type){
         //当前没有处于多选状态
         if(!mIsShow && TAG.equals("")){
-            CommonUtil.Vibrate(mContext,150);
+            Util.Vibrate(mContext,150);
             TAG = newTag;
             TYPE = type;
             mIsShow = true;

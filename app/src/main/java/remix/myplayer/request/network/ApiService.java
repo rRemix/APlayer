@@ -22,7 +22,7 @@ public interface ApiService {
 
     @GET("search")
     Observable<ResponseBody> getKuGouSearch(@Query("ver") int ver,@Query("man") String man,@Query("client") String client,
-                                            @Query("keyword") String keyword,@Query("duration") int duration,@Query("hash") String hash);
+                                            @Query("keyword") String keyword,@Query("duration") long duration,@Query("hash") String hash);
 
     @GET("download")
     Observable<ResponseBody> getKuGouLyric(@Query("ver") int ver,@Query("client") String client,@Query("fmt") String fmt,@Query("charset") String charSet,

@@ -103,7 +103,7 @@ public class Global {
             @Override
             public void run() {
                 if(newQueueIdList == null || newQueueIdList.size() == 0){
-                    CommonUtil.uploadException("SetEmptyQueue","");
+                    Util.uploadException("SetEmptyQueue","");
                     return;
                 }
                 if (newQueueIdList.equals(PlayQueue))
@@ -116,10 +116,10 @@ public class Global {
                     deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
                     addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
                 } catch (Exception e){
-                    CommonUtil.uploadException("setPlayQueue Error",e);
+                    Util.uploadException("setPlayQueue Error",e);
                 } finally {
                     if(addRow == 0)
-                        CommonUtil.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
+                        Util.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
                 }
 
             }
@@ -154,10 +154,10 @@ public class Global {
                     deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
                     addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
                 } catch (Exception e){
-                    CommonUtil.uploadException("setPlayQueue Error",e);
+                    Util.uploadException("setPlayQueue Error",e);
                 } finally {
                     if(addRow == 0)
-                        CommonUtil.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
+                        Util.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
                 }
 
             }

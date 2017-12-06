@@ -11,9 +11,9 @@ import remix.myplayer.R;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.MainActivity;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2016/12/20.
@@ -65,7 +65,7 @@ public class AppWidgetMedium extends BaseAppwidget {
         long currentTime = MusicService.getProgress();
         long remainTime = temp.getDuration() - MusicService.getProgress();
         if(currentTime > 0 && remainTime > 0){
-            remoteViews.setTextViewText(R.id.appwidget_progress, CommonUtil.getTime(currentTime) + "/" + CommonUtil.getTime(remainTime));
+            remoteViews.setTextViewText(R.id.appwidget_progress, Util.getTime(currentTime) + "/" + Util.getTime(remainTime));
         }
         //进度
         remoteViews.setProgressBar(R.id.appwidget_seekbar,(int)temp.getDuration(),(int)currentTime,false);

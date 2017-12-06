@@ -92,9 +92,9 @@ public class MediaStoreUtil {
             if(cursor != null) {
                 while (cursor.moveToNext()) {
                     albums.add(new Album(cursor.getInt(0),
-                            CommonUtil.processInfo(cursor.getString(1), CommonUtil.ALBUMTYPE),
+                            Util.processInfo(cursor.getString(1), Util.ALBUMTYPE),
                             cursor.getInt(2),
-                            CommonUtil.processInfo(cursor.getString(3),CommonUtil.ARTISTTYPE)));
+                            Util.processInfo(cursor.getString(3), Util.ARTISTTYPE)));
                 }
             }
         }finally {
@@ -296,9 +296,9 @@ public class MediaStoreUtil {
      */
     public static File getImageUrlInCache(int id,int type){
         //如果是专辑或者艺术家，先查找本地缓存
-        return type == ImageUriRequest.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(id * 255 + "")) :
-               type == ImageUriRequest.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + "")) :
-               new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(id * 255 + ""));
+        return type == ImageUriRequest.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + Util.hashKeyForDisk(id * 255 + "")) :
+               type == ImageUriRequest.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + Util.hashKeyForDisk(id * 255 + "")) :
+               new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + Util.hashKeyForDisk(id * 255 + ""));
     }
 
     /**
@@ -327,9 +327,9 @@ public class MediaStoreUtil {
             return null;
         //先查找本地缓存
         if(type == ImageUriRequest.URL_ARTIST || type == ImageUriRequest.URL_ALBUM || type == ImageUriRequest.URL_PLAYLIST ){
-            File img = type == ImageUriRequest.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + CommonUtil.hashKeyForDisk(arg * 255 + ""))
-                    : type == ImageUriRequest.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + CommonUtil.hashKeyForDisk(arg* 255 + ""))
-                    : new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + CommonUtil.hashKeyForDisk(arg * 255 + ""));
+            File img = type == ImageUriRequest.URL_ALBUM ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/album") + "/" + Util.hashKeyForDisk(arg * 255 + ""))
+                    : type == ImageUriRequest.URL_ARTIST ? new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/artist") + "/" + Util.hashKeyForDisk(arg* 255 + ""))
+                    : new File(DiskCache.getDiskCacheDir(mContext,"thumbnail/playlist") + "/" + Util.hashKeyForDisk(arg * 255 + ""));
             if(img.exists()){
                 return "file://" + img.getAbsolutePath();
             }
@@ -507,13 +507,13 @@ public class MediaStoreUtil {
         return new Song(
                 cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)),
                 cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
-                CommonUtil.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)),CommonUtil.SONGTYPE),
-                CommonUtil.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)),CommonUtil.ALBUMTYPE),
+                Util.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)), Util.SONGTYPE),
+                Util.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)), Util.ALBUMTYPE),
                 cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
-                CommonUtil.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),CommonUtil.ARTISTTYPE),
+                Util.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)), Util.ARTISTTYPE),
                 cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID)),
                 duration,
-                CommonUtil.getTime(duration),
+                Util.getTime(duration),
                 cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)),
                 cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE)),
                 cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.YEAR)),
@@ -777,7 +777,7 @@ public class MediaStoreUtil {
                 break;
             case Constants.FOLDER:
                 try {
-                    folderName = CommonUtil.getMapkeyByPosition(Global.FolderMap,data);
+                    folderName = Util.getMapkeyByPosition(Global.FolderMap,data);
                     if(Global.FolderMap.get(folderName) != null){
                         for(Integer id : Global.FolderMap.get(folderName)){
                             oriID.add(id + "");

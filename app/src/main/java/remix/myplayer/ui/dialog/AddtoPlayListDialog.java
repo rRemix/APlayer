@@ -31,11 +31,11 @@ import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.model.mp3.PlayListSong;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by taeja on 16-2-1.
@@ -156,7 +156,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                                                 Toast.LENGTH_SHORT);
                                     }
                                 }catch (Exception e){
-                                    CommonUtil.uploadException("新建" + input + "错误:" + newPlayListId,e);
+                                    Util.uploadException("新建" + input + "错误:" + newPlayListId,e);
                                 }
                             }
                         }

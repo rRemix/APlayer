@@ -20,10 +20,10 @@ import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2015/12/5.
@@ -57,7 +57,7 @@ public class FolderFragment extends BaseFragment {
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                String path = CommonUtil.getMapkeyByPosition(Global.FolderMap,position);
+                String path = Util.getMapkeyByPosition(Global.FolderMap,position);
                 if(getUserVisibleHint() && !TextUtils.isEmpty(path) &&
                         !mMultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
                     Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
@@ -71,7 +71,7 @@ public class FolderFragment extends BaseFragment {
 
             @Override
             public void onItemLongClick(View view, int position) {
-                String path = CommonUtil.getMapkeyByPosition(Global.FolderMap,position);
+                String path = Util.getMapkeyByPosition(Global.FolderMap,position);
                 if(getUserVisibleHint() && !TextUtils.isEmpty(path))
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG,Constants.FOLDER);
             }

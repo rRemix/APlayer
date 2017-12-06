@@ -75,7 +75,6 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.LockScreenActivity;
 import remix.myplayer.ui.customview.floatwidget.FloatLrcView;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
@@ -83,6 +82,7 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 
 /**
@@ -257,7 +257,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         LogUtil.d("ServiceLifeCycle","onStartCommand");
         mIsServiceStop = false;
 
-        if(!mLoadFinished && (mHasPermission = CommonUtil.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}))) {
+        if(!mLoadFinished && (mHasPermission = Util.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}))) {
             //读取数据
 //            mNotify.updateForLoading();
             loadDataSync();
@@ -348,7 +348,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         //初始化音效设置
         Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mMediaPlayer.getAudioSessionId());
-        if(!CommonUtil.isIntentAvailable(this,i)){
+        if(!Util.isIntentAvailable(this,i)){
             EQActivity.Init();
         }
 
@@ -497,11 +497,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mMediaSession.setActive(false);
         mMediaSession.release();
 
-        CommonUtil.unregisterReceiver(this,mControlRecevier);
-        CommonUtil.unregisterReceiver(this,mHeadSetReceiver);
-        CommonUtil.unregisterReceiver(this,mWidgetReceiver);
-        CommonUtil.unregisterReceiver(this,mMusicEventReceiver);
-        CommonUtil.unregisterReceiver(this,mScreenReceiver);
+        Util.unregisterReceiver(this,mControlRecevier);
+        Util.unregisterReceiver(this,mHeadSetReceiver);
+        Util.unregisterReceiver(this,mWidgetReceiver);
+        Util.unregisterReceiver(this,mMusicEventReceiver);
+        Util.unregisterReceiver(this,mScreenReceiver);
 
         releaseWakeLock();
         getContentResolver().unregisterContentObserver(mMediaStoreObserver);
@@ -767,7 +767,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     Global.PlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
                     Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
                 }
-//                if(CommonUtil.isFastDoubleClick()) {
+//                if(Util.isFastDoubleClick()) {
 //                    return;
 //                }
             }
@@ -1262,7 +1262,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 SPUtil.putValue(mContext,"Setting","ThemeMode", ThemeStore.DAY);
                 SPUtil.putValue(mContext,"Setting","ThemeColor",ThemeStore.THEME_BLUE);
             } catch (Exception e){
-                CommonUtil.uploadException("新建列表错误",e);
+                Util.uploadException("新建列表错误",e);
             }
         }else {
             //播放模式
@@ -1527,7 +1527,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     return;
                 }
                 //当前应用在前台
-                if(CommonUtil.isAppOnForeground(mContext)){
+                if(Util.isAppOnForeground(mContext)){
                     if(isFloatLrcShowing())
                         mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
                 } else{

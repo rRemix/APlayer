@@ -6,7 +6,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -110,7 +109,7 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
     }
 
     @Override
-    public RecyclerView.Adapter getAdapter() {
+    public PlayListAdapter getAdapter() {
         return mAdapter;
     }
 

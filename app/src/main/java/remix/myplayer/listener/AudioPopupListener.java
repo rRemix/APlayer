@@ -31,12 +31,12 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.ui.dialog.TimerDialog;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 /**
  * @ClassName AudioPopupListener
@@ -227,14 +227,14 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                             if(path.lastIndexOf('.') > -1 && path.lastIndexOf('.') < path.length() - 1){
                                 extension = mInfo.getUrl().substring(mInfo.getUrl().lastIndexOf('.') + 1 ,mInfo.getUrl().length());
                             } else {
-                                extension = CommonUtil.getType(MusicService.getRateInfo(Constants.MIME));
+                                extension = Util.getType(MusicService.getRateInfo(Constants.MIME));
                             }
                             mDetailMime.setText(extension);
                         }
                     }
                     //歌曲时长
                     if(mDetailDuration != null)
-                        mDetailDuration.setText(CommonUtil.getTime(mInfo.getDuration()));
+                        mDetailDuration.setText(Util.getTime(mInfo.getDuration()));
                     //歌曲码率
                     if(mDetailBitRate != null)
                         mDetailBitRate.setText(MusicService.getRateInfo(Constants.BIT_RATE) + " kb/s");
@@ -251,7 +251,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 MobclickAgent.onEvent(mContext,"EQ");
                 Intent audioEffectIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
                 audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
-                if(CommonUtil.isIntentAvailable(mContext,audioEffectIntent)){
+                if(Util.isIntentAvailable(mContext,audioEffectIntent)){
                     ((Activity)mContext).startActivityForResult(audioEffectIntent, 0);
                 } else {
                     mContext.startActivity(new Intent(mContext,EQActivity.class));

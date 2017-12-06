@@ -75,7 +75,6 @@ import remix.myplayer.ui.fragment.CoverFragment;
 import remix.myplayer.ui.fragment.LrcFragment;
 import remix.myplayer.ui.fragment.RecordFragment;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
@@ -83,6 +82,7 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
@@ -243,7 +243,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                         miuiVersion = Integer.valueOf(miui.substring(1,miui.length()));
                     }
                 }catch (Exception e){
-                    CommonUtil.uploadException("miui版本解析错误",e);
+                    Util.uploadException("miui版本解析错误",e);
                 }
             }
             if(Build.MANUFACTURER.equals("Meizu")){
@@ -571,8 +571,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
 
         if(mDuration > 0 && mCurrentTime >= 0 && (mDuration - mCurrentTime) > 0){
-            mHasPlay.setText(CommonUtil.getTime(mCurrentTime));
-            mRemainPlay.setText(CommonUtil.getTime(mDuration - mCurrentTime));
+            mHasPlay.setText(Util.getTime(mCurrentTime));
+            mRemainPlay.setText(Util.getTime(mDuration - mCurrentTime));
         }
 
         //初始化seekbar
@@ -1048,8 +1048,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 && mRemainPlay != null
                 && mCurrentTime > 0
                 && (mDuration - mCurrentTime) > 0){
-            mHasPlay.setText(CommonUtil.getTime(mCurrentTime));
-            mRemainPlay.setText(CommonUtil.getTime(mDuration - mCurrentTime));
+            mHasPlay.setText(Util.getTime(mCurrentTime));
+            mRemainPlay.setText(Util.getTime(mDuration - mCurrentTime));
         }
     }
 

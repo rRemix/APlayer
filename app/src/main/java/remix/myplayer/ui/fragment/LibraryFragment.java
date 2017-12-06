@@ -20,7 +20,7 @@ import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
-import remix.myplayer.util.CommonUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2016/12/23.
@@ -35,7 +35,7 @@ public abstract class LibraryFragment<D,A extends HeaderAdapter> extends BaseFra
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if(mHasPermission = CommonUtil.hasPermissions(mPermissions)){
+        if(mHasPermission = Util.hasPermissions(mPermissions)){
             getLoaderManager().initLoader(getLoaderId(), null, this);
         }
     }

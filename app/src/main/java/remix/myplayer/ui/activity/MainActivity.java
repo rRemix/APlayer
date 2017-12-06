@@ -43,6 +43,7 @@ import butterknife.OnClick;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
+import remix.myplayer.adapter.HeaderAdapter;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
@@ -58,10 +59,10 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.fragment.BottomActionBarFragment;
+import remix.myplayer.ui.fragment.LibraryFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
@@ -70,6 +71,7 @@ import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 import static remix.myplayer.service.MusicService.ACTION_LOAD_FINISH;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
@@ -106,7 +108,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
     private MsgHandler mRefreshHandler;
     //设置界面
-    private final int SETTING = 1;
+    private final int REQUEST_SETTING = 1;
     private BroadcastReceiver mLoadReceiver;
 
     @Override
@@ -117,6 +119,10 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
         mIsRunning = true;
         //更新UI
+//        if(mFromSettingFlag){
+//            mFromSettingFlag = false;
+//            return;
+//        }
         UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
     }
 
@@ -361,7 +367,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                         break;
                     //设置
                     case 4:
-                        startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), SETTING);
+                        startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), REQUEST_SETTING);
                         break;
                 }
                 mDrawerAdapter.setSelectIndex(position);
@@ -434,12 +440,13 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             final int id = Global.SetCoverID; //专辑、艺术家、播放列表封面
             switch (requestCode){
                 //设置主题后重启activity或者清除缓存后刷新adapter
-                case SETTING:
+                case REQUEST_SETTING:
                     if(data.getBooleanExtra("needRecreate",false)) {
                         mRefreshHandler.sendEmptyMessage(Constants.RECREATE_ACTIVITY);
                     }else if(data.getBooleanExtra("needRefresh",false)){
                         mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                     }
+
                     break;
                 //图片选择
                 case Crop.REQUEST_PICK:
@@ -452,7 +459,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                                 return;
                             }
                         }
-                        Uri destination = Uri.fromFile(new File(cacheDir, CommonUtil.hashKeyForDisk((id * 255 ) + "")));
+                        Uri destination = Uri.fromFile(new File(cacheDir, Util.hashKeyForDisk((id * 255 ) + "")));
                         Crop.of(data.getData(), destination).asSquare().start(this);
                     } else {
                         ToastUtil.show(this,errorTxt);
@@ -509,6 +516,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     public void UpdateUI(Song song, boolean isplay) {
         if (!mIsRunning)
             return;
+
+
         mBottomBar.updateBottomStatus(song, isplay);
 //        for(Fragment temp : getSupportFragmentManager().getFragments()) {
 //            if (temp instanceof SongFragment) {
@@ -538,43 +547,17 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
     @OnHandleMessage
     public void handleInternal(Message msg){
-        if(msg.what == -100){
-            ToastUtil.show(mContext,msg.obj.toString());
-        }
         if(msg.what == Constants.RECREATE_ACTIVITY) {
             recreate();
-        }
-        else if(msg.what == Constants.CLEAR_MULTI){
+        } else if(msg.what == Constants.CLEAR_MULTI){
             mMultiChoice.clearSelectedViews();
-        }
-        else if (msg.what == Constants.UPDATE_ADAPTER || msg.what == Constants.UPDATE_ALLSONG_ADAPTER){
-            boolean isAllSongOnly = msg.what == Constants.UPDATE_ALLSONG_ADAPTER;
+        } else if (msg.what == Constants.UPDATE_ADAPTER){
             //刷新适配器
             for(Fragment temp : getSupportFragmentManager().getFragments()){
-                if(temp instanceof SongFragment){
-                    SongFragment songFragment = (SongFragment)temp;
-                    if(songFragment.getAdapter() != null){
-                        songFragment.getAdapter().notifyDataSetChanged();
-                    }
-                    if(isAllSongOnly)
-                        return;
-                }
-                if(temp instanceof AlbumFragment){
-                    AlbumFragment albumFragment = (AlbumFragment)temp;
-                    if(albumFragment.getAdapter() != null){
-                        albumFragment.getAdapter().notifyDataSetChanged();
-                    }
-                }
-                if(temp instanceof ArtistFragment){
-                    ArtistFragment artistFragment = (ArtistFragment)temp;
-                    if(artistFragment.getAdapter() != null){
-                        artistFragment.getAdapter().notifyDataSetChanged();
-                    }
-                }
-                if(temp instanceof PlayListFragment){
-                    PlayListFragment playListFragment = (PlayListFragment) temp;
-                    if(playListFragment.getAdapter() != null){
-                        playListFragment.getAdapter().notifyDataSetChanged();
+                if(temp instanceof LibraryFragment){
+                    HeaderAdapter headerAdapter = (HeaderAdapter) ((LibraryFragment)temp).getAdapter();
+                    if(headerAdapter != null){
+                        headerAdapter.notifyDataSetChanged();
                     }
                 }
             }

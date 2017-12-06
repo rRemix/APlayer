@@ -39,6 +39,7 @@ import remix.myplayer.misc.MediaScanner;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -46,10 +47,10 @@ import remix.myplayer.ui.dialog.ColorChooseDialog;
 import remix.myplayer.ui.dialog.FolderChooserDialog;
 import remix.myplayer.util.AlipayUtil;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.CommonUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 /**
  * @ClassName SettingActivity
@@ -84,8 +85,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     View mNotifyColorContainer;
     @BindView(R.id.setting_album_cover_text)
     TextView mAlbumCoverText;
-    @BindView(R.id.setting_artist_cover_text)
-    TextView mArtistCoverText;
+
 
     //是否需要重建activity
     private boolean mNeedRecreate = false;
@@ -100,6 +100,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     private final int CLEARFINISH = 102;
     private MsgHandler mHandler;
     private final int[] mScanSize = new int[]{0,500 * ByteConstants.KB,ByteConstants.MB, 2 * ByteConstants.MB};
+    private String mOriginalAlbumChoice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -209,16 +210,16 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 (ButterKnife.Action<View>) (view, index) -> view.setBackgroundColor(ThemeStore.getDividerColor()));
 
         //封面
-        mAlbumCoverText.setText(SPUtil.getValue(mContext,"Setting",SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only)));
-        mArtistCoverText.setText(SPUtil.getValue(mContext,"Setting",SPUtil.SPKEY.AUTO_DOWNLOAD_ARTIST_COVER,mContext.getString(R.string.wifi_only)));
+        mOriginalAlbumChoice = SPUtil.getValue(mContext,"Setting",SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only));
+        mAlbumCoverText.setText(mOriginalAlbumChoice);
 
         //计算缓存大小
         new Thread(){
             @Override
             public void run() {
                 mCacheSize = 0;
-                mCacheSize += CommonUtil.getFolderSize(getExternalCacheDir());
-                mCacheSize += CommonUtil.getFolderSize(getCacheDir());
+                mCacheSize += Util.getFolderSize(getExternalCacheDir());
+                mCacheSize += Util.getFolderSize(getCacheDir());
                 mHandler.sendEmptyMessage(CACHESIZE);
             }
         }.start();
@@ -269,7 +270,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
             R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container,
             R.id.setting_screen_container,R.id.setting_scan_container,R.id.setting_classic_notify_container,
-            R.id.setting_album_cover_container,R.id.setting_artist_cover_container})
+            R.id.setting_album_cover_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -404,7 +405,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 Intent audioEffectIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
                 audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
                 audioEffectIntent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC);
-                if(CommonUtil.isIntentAvailable(this,audioEffectIntent)){
+                if(Util.isIntentAvailable(this,audioEffectIntent)){
                     startActivityForResult(audioEffectIntent, 0);
                 } else {
                     startActivity(new Intent(this,EQActivity.class));
@@ -459,8 +460,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             public void run() {
                                 //清除歌词，封面等缓存
                                 //清除配置文件、数据库等缓存
-                                CommonUtil.deleteFilesByDirectory(getCacheDir());
-                                CommonUtil.deleteFilesByDirectory(getExternalCacheDir());
+                                Util.deleteFilesByDirectory(getCacheDir());
+                                Util.deleteFilesByDirectory(getExternalCacheDir());
                                 SPUtil.deleteFile(SettingActivity.this,"Setting");
                                 deleteDatabase(DBOpenHelper.DBNAME);
                                 //清除fresco缓存
@@ -480,13 +481,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //专辑与艺术家封面自动下载
             case R.id.setting_album_cover_container:
-            case R.id.setting_artist_cover_container:
-                final boolean isAlbum = v.getId() == R.id.setting_album_cover_container;
-                final String choice = isAlbum ? SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only)) :
-                        SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.AUTO_DOWNLOAD_ARTIST_COVER,mContext.getString(R.string.wifi_only));
-                int selected = mContext.getString(R.string.wifi_only).equals(choice) ? 1 : mContext.getString(R.string.always).equals(choice) ? 0 : 2;
+                final String choice =  SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only));
+                final int selected = mContext.getString(R.string.wifi_only).equals(choice) ? 1 : mContext.getString(R.string.always).equals(choice) ? 0 : 2;
                 new MaterialDialog.Builder(this)
-                        .title(isAlbum ? R.string.auto_download_album_cover : R.string.auto_download_artist_cover)
+                        .title(R.string.auto_download_album_cover)
                         .titleColorAttr(R.attr.text_color_primary)
                         .positiveText(R.string.choose)
                         .positiveColorAttr(R.attr.text_color_primary)
@@ -494,12 +492,12 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .items(new String[]{getString(R.string.always),getString(R.string.wifi_only),getString(R.string.never)})
                         .itemsCallbackSingleChoice(selected,
                                 (dialog, view, which, text) -> {
-                                    if(isAlbum)
-                                        mAlbumCoverText.setText(text);
-                                    else
-                                        mArtistCoverText.setText(text);
+                                    mAlbumCoverText.setText(text);
+                                    //仅从从不改变到仅在wifi下或者总是的情况下，才刷新Adapter
+                                    mNeedRefresh |= (mContext.getString(R.string.wifi_only).equals(text) & !mOriginalAlbumChoice.equals(text));
+                                    ImageUriRequest.AUTO_DOWNLOAD_ALBUM = text.toString();
                                     SPUtil.putValue(mContext,"Setting",
-                                            isAlbum ? SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER : SPUtil.SPKEY.AUTO_DOWNLOAD_ARTIST_COVER,
+                                            SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,
                                             text.toString());
                                     return true;
                                 })
@@ -520,7 +518,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
         if(msg.what == CLEARFINISH){
             ToastUtil.show(SettingActivity.this,getString(R.string.clear_success));
-            mCache.setText("0MB");
+            mCache.setText(R.string.zero_size);
             mLrcPath.setText(R.string.default_lrc_path);
         }
     }

@@ -106,7 +106,9 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         }
         //设置封面
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
-        new LibraryUriRequest(holder.mImage, new NSearchRequest(artistId,artist.getArtist(),100, ImageUriRequest.URL_ARTIST),new RequestConfig.Builder(imageSize,imageSize).build()).load();
+        new LibraryUriRequest(holder.mImage, new NSearchRequest(artistId,artist.getArtist(),
+                100, ImageUriRequest.URL_ARTIST),
+                new RequestConfig.Builder(imageSize,imageSize).build()).load();
 
         //item点击效果
         holder.mContainer.setBackground(

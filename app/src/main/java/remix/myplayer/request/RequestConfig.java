@@ -55,7 +55,7 @@ public class RequestConfig {
         private int mWidth;
         private int mHeight;
         private boolean mResize;
-        private boolean mForceDownload = true;
+        private boolean mForceDownload;
 
         public Builder(){
             mResize = false;
