@@ -5,6 +5,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 
+import com.facebook.common.util.ByteConstants;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -13,14 +15,19 @@ import java.io.IOException;
  */
 public class DiskCache {
     private static DiskLruCache mLrcCache;
-
+    private static DiskLruCache mHttpCache;
 
     public static void init(Context context){
         try {
             File lrcCacheDir = getDiskCacheDir(context, "lyric");
             if (!lrcCacheDir.exists())
                 lrcCacheDir.mkdir();
-            mLrcCache = DiskLruCache.open(lrcCacheDir, getAppVersion(context), 1, 2 * 1024 * 1024);
+            mLrcCache = DiskLruCache.open(lrcCacheDir, getAppVersion(context), 1, 10 * ByteConstants.MB);
+
+            File httpCacheDir = getDiskCacheDir(context,"http");
+            if(!httpCacheDir.exists())
+                httpCacheDir.mkdir();
+            mHttpCache = DiskLruCache.open(httpCacheDir,getAppVersion(context),1,10 * ByteConstants.MB);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -29,6 +36,10 @@ public class DiskCache {
 
     public static DiskLruCache getLrcDiskCache(){
         return mLrcCache;
+    }
+
+    public static DiskLruCache getHttpDiskCache(){
+        return mHttpCache;
     }
 
     public static File getDiskCacheDir(Context context, String uniqueName) {
