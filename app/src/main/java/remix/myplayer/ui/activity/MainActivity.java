@@ -155,6 +155,35 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         setUpViewColor();
         //handler
         mRefreshHandler = new MsgHandler(this);
+
+//        HttpClient.getInstance().getNeteaseSearch("七里香-周杰伦",0,1,1)
+//                .compose(RxUtil.applyScheduler())
+//                .subscribe(new Consumer<ResponseBody>() {
+//                    @Override
+//                    public void accept(ResponseBody body) throws Exception {
+//                        NSongSearchResponse response = new Gson().fromJson(body.string(), NSongSearchResponse.class);
+//                    }
+//                }, new Consumer<Throwable>() {
+//                    @Override
+//                    public void accept(Throwable throwable) throws Exception {
+//
+//                    }
+//                });
+//
+//        HttpClient.getInstance().getNeteaseLyric(186001)
+//                .compose(RxUtil.applyScheduler())
+//                .subscribe(new Consumer<ResponseBody>() {
+//                    @Override
+//                    public void accept(ResponseBody body) throws Exception {
+//                        NLrcResponse response = new Gson().fromJson(body.string(), NLrcResponse.class);
+//                    }
+//                }, new Consumer<Throwable>() {
+//                    @Override
+//                    public void accept(Throwable throwable) throws Exception {
+//
+//                    }
+//                });
+
     }
 
     /**
@@ -516,7 +545,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     public void UpdateUI(Song song, boolean isplay) {
         if (!mIsRunning)
             return;
-
 
         mBottomBar.updateBottomStatus(song, isplay);
 //        for(Fragment temp : getSupportFragmentManager().getFragments()) {

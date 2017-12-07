@@ -16,8 +16,6 @@ import java.io.File;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
-import io.reactivex.functions.Consumer;
-import okhttp3.ResponseBody;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.model.netease.NAlbumSearchResponse;
@@ -25,7 +23,6 @@ import remix.myplayer.model.netease.NArtistSearchResponse;
 import remix.myplayer.model.netease.NSearchRequest;
 import remix.myplayer.model.netease.NSongSearchResponse;
 import remix.myplayer.request.network.HttpClient;
-import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.SPUtil;
@@ -65,7 +62,7 @@ public abstract class ImageUriRequest {
 
     protected Observable<String> getThumbObservable(NSearchRequest request){
         return Observable.create((ObservableOnSubscribe<String>) e -> {
-            //是否设置过自定义饭呢米娜
+            //是否设置过自定义封面
             File customImage = ImageUriUtil.getCustomThumbIfExist(request.getID(),request.getLType());
             if(customImage != null && customImage.exists()){
                 e.onNext("file://" + customImage.getAbsolutePath());
@@ -105,14 +102,6 @@ public abstract class ImageUriRequest {
                     if(request.getNType() == 1){
                         //搜索的是歌曲
                         NSongSearchResponse response = new Gson().fromJson(body.string(),NSongSearchResponse.class);
-                        HttpClient.getInstance().getNeteaseLyric(response.result.songs.get(0).id)
-                                .compose(RxUtil.applyScheduler())
-                                .subscribe(new Consumer<ResponseBody>() {
-                                    @Override
-                                    public void accept(ResponseBody body) throws Exception {
-
-                                    }
-                                });
                         return response.result.songs.get(0).album.picUrl;
                     } else if (request.getNType() == 10){
                         //搜索的是专辑
@@ -141,6 +130,7 @@ public abstract class ImageUriRequest {
                     }
                 });
     }
+
 
     /**
      * 是否下载封面

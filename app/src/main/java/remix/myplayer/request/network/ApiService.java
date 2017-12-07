@@ -3,7 +3,6 @@ package remix.myplayer.request.network;
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
@@ -13,11 +12,11 @@ import retrofit2.http.Query;
 
 public interface ApiService {
     @POST("search/pc")
-    @Headers("Cookie: appver=1.5.0.75771")
+//    @Headers("Cookie: appver=1.5.0.75771")
     Observable<ResponseBody> getNeteaseSearch(@Query("s") String key, @Query("offset") int offset,
                                               @Query("limit") int limit, @Query("type") int type);
     @GET("song/lyric")
-    @Headers("Cookie: appver=1.5.0.75771")
+//    @Headers("Cookie: appver=1.5.0.75771")
     Observable<ResponseBody> getNeteaseLyric(@Query("os") String os,@Query("id") int id,@Query("lv") int lv,@Query("kv") int kv,@Query("tv") int tv);
 
     @GET("search")

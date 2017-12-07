@@ -11,10 +11,12 @@ import okhttp3.Cache;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 import okhttp3.ResponseBody;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.lyric.HttpHelper;
 import remix.myplayer.misc.cache.DiskCache;
+import remix.myplayer.util.Util;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -50,7 +52,8 @@ public class HttpClient implements HttpHelper {
                 .baseUrl(NETEASE_BASE_URL)
                 .client(new OkHttpClient.Builder()
                         .cache(createDefaultCache(APlayerApplication.getContext()))
-                        .addInterceptor(createCacheControlInterceptor())
+                        .addNetworkInterceptor(REWRITE_RESPONSE_INTERCEPTOR)
+                        .addInterceptor(REWRITE_RESPONSE_INTERCEPTOR)
                         .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
                         .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
                         .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
@@ -63,7 +66,8 @@ public class HttpClient implements HttpHelper {
                 .baseUrl(KUGOU_BASE_URL)
                 .client(new OkHttpClient.Builder()
                         .cache(createDefaultCache(APlayerApplication.getContext()))
-                        .addInterceptor(createCacheControlInterceptor())
+                        .addNetworkInterceptor(REWRITE_RESPONSE_INTERCEPTOR)
+                        .addInterceptor(REWRITE_RESPONSE_INTERCEPTOR)
                         .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
                         .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
                         .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
@@ -82,21 +86,34 @@ public class HttpClient implements HttpHelper {
         return null;
     }
 
-    private Interceptor createCacheControlInterceptor() {
-        return chain -> {
-            Request modifiedRequest = chain.request().newBuilder()
-//                    .cacheControl(new CacheControl.Builder()
-//                            .maxAge(31536000, TimeUnit.SECONDS)
-//                            .maxStale(31536000,TimeUnit.SECONDS)
-//                            .build())
-                    .removeHeader("pragma")
+    private Interceptor REWRITE_RESPONSE_INTERCEPTOR = chain -> {
+        Request request = chain.request();//获取请求
+        String cacheHeaderValue = Util.isNetWorkConnected()
+                ? "public, max-age=31536000"
+                : "public, only-if-cached, max-stale=31536000" ;
+        request = request.newBuilder()
+                .removeHeader("Cache-Control")
+                .header("Cache-Control", cacheHeaderValue)
+                .build();
+        Response originalResponse = chain.proceed(request);
+
+        if(Util.isNetWorkConnected()){
+            return originalResponse.newBuilder()
                     .removeHeader("Cache-Control")
-                    .addHeader("Cache-Control", "max-age=" + 31536000)
-                    .addHeader("Cache-Control","max-stale=" + 31536000)
+                    .removeHeader("Pragrma")
+                    .header("Cache-Control", "public, max-age=31536000")
+                    .header("Cache-Control", "public, max-stale=31536000")
                     .build();
-            return chain.proceed(modifiedRequest);
-        };
-    }
+        }else{
+            return originalResponse.newBuilder()
+                    //这里的设置的是我们的没有网络的缓存时间，想设置多少就是多少。
+                    .removeHeader("Cache-Control")
+                    .removeHeader("Pragrma")
+                    .header("Cache-Control", "public, only-if-cached, max-stale=" + 31536000)
+                    .build();
+        }
+    };
+
 
     @Override
     public Observable<ResponseBody> getNeteaseSearch(String key, int offset, int limit, int type) {
