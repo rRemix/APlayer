@@ -4,4 +4,5 @@
     <integer name="DialogAnimDuration">350</integer>
     <integer name="PlayerActivityAnimDuration">200</integer>
     <integer name="AutoHideDelay">600</integer>
+    <integer name="FadeDuration">300</integer>
 </resources>

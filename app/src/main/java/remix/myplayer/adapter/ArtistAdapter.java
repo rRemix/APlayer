@@ -1,5 +1,6 @@
 package remix.myplayer.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -77,6 +78,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     protected void convert(BaseViewHolder baseHolder, Artist artist, final int position) {
         if(position == 0){

@@ -1,5 +1,6 @@
 package remix.myplayer.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -103,6 +104,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     protected void convert(BaseViewHolder baseHolder, final Song song, int position) {
         if(position == 0){

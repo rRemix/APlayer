@@ -37,12 +37,14 @@ public class ImageUriUtil {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,new String[]{MediaStore.Audio.Albums.ALBUM_ART},
                     MediaStore.Audio.Media.ARTIST_ID + "=?",new String[]{artistId + ""},null);
             if(cursor != null && cursor.moveToFirst()) {
-                return new File(cursor.getString(0));
+                String imagePath = cursor.getString(0);
+                if(!TextUtils.isEmpty(imagePath))
+                    return new File(imagePath);
             }
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            if(cursor != null && !cursor.isClosed())
+            if(cursor != null )
                 cursor.close();
         }
         return null;

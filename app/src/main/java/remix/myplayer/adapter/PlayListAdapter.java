@@ -1,5 +1,6 @@
 package remix.myplayer.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -77,11 +78,8 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         }
     }
 
-    @Override
-    public int getItemCount() {
-        return super.getItemCount();
-    }
 
+    @SuppressLint("RestrictedApi")
     @Override
     protected void convert(BaseViewHolder baseHolder, final PlayList info, int position) {
         if(position == 0){

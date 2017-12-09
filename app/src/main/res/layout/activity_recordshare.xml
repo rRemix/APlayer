@@ -45,6 +45,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         fresco:actualImageScaleType="centerCrop"
+                        fresco:placeholderImage="?attr/default_album"
+                        fresco:placeholderImageScaleType="centerCrop"
                         fresco:failureImageScaleType="centerCrop"
                         fresco:failureImage="@drawable/album_empty_bg_day"
                         fresco:paddingStart="@dimen/d22_size"

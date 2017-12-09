@@ -15,7 +15,6 @@ import java.io.IOException;
  */
 public class DiskCache {
     private static DiskLruCache mLrcCache;
-    private static DiskLruCache mHttpCache;
 
     public static void init(Context context){
         try {
@@ -24,10 +23,6 @@ public class DiskCache {
                 lrcCacheDir.mkdir();
             mLrcCache = DiskLruCache.open(lrcCacheDir, getAppVersion(context), 1, 10 * ByteConstants.MB);
 
-            File httpCacheDir = getDiskCacheDir(context,"http");
-            if(!httpCacheDir.exists())
-                httpCacheDir.mkdir();
-            mHttpCache = DiskLruCache.open(httpCacheDir,getAppVersion(context),1,10 * ByteConstants.MB);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -36,10 +31,6 @@ public class DiskCache {
 
     public static DiskLruCache getLrcDiskCache(){
         return mLrcCache;
-    }
-
-    public static DiskLruCache getHttpDiskCache(){
-        return mHttpCache;
     }
 
     public static File getDiskCacheDir(Context context, String uniqueName) {

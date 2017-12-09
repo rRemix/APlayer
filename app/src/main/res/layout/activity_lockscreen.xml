@@ -25,6 +25,7 @@
             android:layout_width="@dimen/d210_size"
             android:layout_height="@dimen/d210_size"
             android:id="@+id/lockscreen_image"
+
             fresco:placeholderImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/album_empty_bg_night"
             fresco:actualImageScaleType="centerCrop"

@@ -494,7 +494,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 (dialog, view, which, text) -> {
                                     mAlbumCoverText.setText(text);
                                     //仅从从不改变到仅在wifi下或者总是的情况下，才刷新Adapter
-                                    mNeedRefresh |= (mContext.getString(R.string.wifi_only).equals(text) & !mOriginalAlbumChoice.equals(text));
+                                    mNeedRefresh |= ((mContext.getString(R.string.wifi_only).equals(text) | mContext.getString(R.string.always).equals(text))
+                                            & !mOriginalAlbumChoice.equals(text));
                                     ImageUriRequest.AUTO_DOWNLOAD_ALBUM = text.toString();
                                     SPUtil.putValue(mContext,"Setting",
                                             SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,
