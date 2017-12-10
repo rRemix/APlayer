@@ -7,26 +7,17 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Build;
-import android.text.TextUtils;
 import android.widget.RemoteViews;
 
-import com.facebook.common.executors.CallerThreadExecutor;
-import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.DataSource;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.common.ResizeOptions;
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
-
 import remix.myplayer.R;
-import remix.myplayer.request.ImageUriRequest;
+import remix.myplayer.model.mp3.Song;
+import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.network.RemoteUriRequest;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.MediaStoreUtil;
+
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
  * @ClassName
@@ -55,7 +46,10 @@ public class BaseAppwidget extends AppWidgetProvider {
         return appIds != null && appIds.length > 0;
     }
 
-    protected void updateCover(final Context context, final RemoteViews remoteViews,final int[] appWidgetIds,int albumId, boolean reloadCover){
+    protected void updateCover(final Context context, final RemoteViews remoteViews,final int[] appWidgetIds, boolean reloadCover){
+        Song song = MusicService.getCurrentMP3();
+        if(song == null)
+            return;
         //设置封面
         if(!reloadCover){
             if(mBitmap != null && !mBitmap.isRecycled()) {
@@ -66,16 +60,20 @@ public class BaseAppwidget extends AppWidgetProvider {
             pushUpdate(context,appWidgetIds,remoteViews);
         } else {
             final int size = DensityUtil.dip2px(context,72);
-            final String uri = MediaStoreUtil.getImageUrl(albumId, ImageUriRequest.URL_ALBUM);
-            ImageRequest imageRequest =
-                    ImageRequestBuilder.newBuilderWithSource(!TextUtils.isEmpty(uri) ? Uri.parse(uri) : Uri.EMPTY)
-                            .setResizeOptions(new ResizeOptions(size,size))
-                            .build();
-            DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);
 
-            dataSource.subscribe(new BaseBitmapDataSubscriber() {
+            new RemoteUriRequest(getSearchRequestWithAlbumType(song),new RequestConfig.Builder(size,size).build()){
                 @Override
-                protected void onNewResultImpl(Bitmap bitmap) {
+                public void onError(String errMsg) {
+                    if(mBitmap != null && !mBitmap.isRecycled()){
+                        mBitmap.recycle();
+                    }
+                    mBitmap = null;
+                    remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
+                    pushUpdate(context,appWidgetIds,remoteViews);
+                }
+
+                @Override
+                public void onSuccess(Bitmap bitmap) {
                     try {
                         if(mBitmap != null && !mBitmap.isRecycled()){
                             mBitmap.recycle();
@@ -87,21 +85,14 @@ public class BaseAppwidget extends AppWidgetProvider {
                         } else {
                             remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
                         }
-                        pushUpdate(context,appWidgetIds,remoteViews);
+
                     } catch (Exception e){
                         e.printStackTrace();
+                    } finally {
+                        pushUpdate(context,appWidgetIds,remoteViews);
                     }
                 }
-                @Override
-                protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-                    if(mBitmap != null && !mBitmap.isRecycled()){
-                        mBitmap.recycle();
-                    }
-                    mBitmap = null;
-                    remoteViews.setImageViewResource(R.id.appwidget_image, R.drawable.album_empty_bg_day);
-                    pushUpdate(context,appWidgetIds,remoteViews);
-                }
-            }, CallerThreadExecutor.getInstance());
+            }.load();
         }
     }
 

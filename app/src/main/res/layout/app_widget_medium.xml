@@ -60,6 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/d2_size"
         android:layout_marginLeft="@dimen/d8_size"
+        android:layout_marginRight="@dimen/d8_size"
         android:layout_marginTop="@dimen/d4_size"/>
 
     <RelativeLayout

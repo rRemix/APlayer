@@ -32,7 +32,7 @@ import static remix.myplayer.util.Util.isWifi;
  * Created by Remix on 2017/11/30.
  */
 
-public abstract class ImageUriRequest {
+public abstract class ImageUriRequest<T> {
     public static final int BIG_IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),125);
     public static final int SMALL_IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),45);
     public static final int URL_PLAYLIST = 1000;
@@ -41,7 +41,7 @@ public abstract class ImageUriRequest {
 
     public static String AUTO_DOWNLOAD_ALBUM = SPUtil.getValue(APlayerApplication.getContext(),"Setting", SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,APlayerApplication.getContext().getString(R.string.wifi_only));
 
-    RequestConfig mConfig = DEFAULT_CONFIG;
+    protected RequestConfig mConfig = DEFAULT_CONFIG;
 
     private static final RequestConfig DEFAULT_CONFIG = new RequestConfig.Builder()
             .forceDownload(true).build();
@@ -55,7 +55,7 @@ public abstract class ImageUriRequest {
 
     public abstract void onError(String errMsg);
 
-    public abstract void onSuccess(String url);
+    public abstract void onSuccess(T url);
 
     public abstract void load();
 
@@ -64,70 +64,6 @@ public abstract class ImageUriRequest {
        return Observable.concat(getCustomThumbObservable(request),getContentThumbObservable(request),getNetworkThumbObservable(request))
                .firstOrError()
                .toObservable();
-//        return Observable.create((ObservableOnSubscribe<String>) e -> {
-//            //是否设置过自定义封面
-//            File customImage = ImageUriUtil.getCustomThumbIfExist(request.getID(),request.getLType());
-//            if(customImage != null && customImage.exists()){
-//                e.onNext("file://" + customImage.getAbsolutePath());
-//            }
-//            e.onComplete();
-//        }).switchIfEmpty(new Observable<String>() {
-//            //查询本地数据库
-//            @Override
-//            protected void subscribeActual(Observer<? super String> observer) {
-//                if(request.getLType() == URL_ALBUM){
-//                    //专辑封面
-//                    Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), request.getID());
-//                    if(ImageUriUtil.isAlbumThumbExistInMediaCache(uri)){
-//                        observer.onNext(uri.toString());
-//                    } else {
-//                        observer.onComplete();
-//                    }
-//                } else {
-//                    //艺术家封面
-//                    File artistThumb = ImageUriUtil.getArtistThumbInMediaCache(request.getID());
-//                    if(artistThumb != null && artistThumb.exists()){
-//                        observer.onNext("file://" + artistThumb.getAbsolutePath());
-//                    } if(isAutoDownloadCover()){
-//                        observer.onComplete();
-//                    } else{
-//                        observer.onError(new Throwable(""));
-//                    }
-//                }
-//            }
-//        }).switchIfEmpty(HttpClient.getNeteaseApiservice()
-//                .getNeteaseSearch(request.getKey(),0,1,request.getNType())
-//                .map(body -> {
-//                    if(request.getNType() == 1){
-//                        //搜索的是歌曲
-//                        NSongSearchResponse response = new Gson().fromJson(body.string(),NSongSearchResponse.class);
-//                        return response.result.songs.get(0).album.picUrl;
-//                    } else if (request.getNType() == 10){
-//                        //搜索的是专辑
-//                        NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);
-//                        return response.result.albums.get(0).picUrl;
-//                    } else if (request.getNType() == 100){
-//                        //搜索的是艺术家
-//                        NArtistSearchResponse response = new Gson().fromJson(body.string(),NArtistSearchResponse.class);
-//                        return response.getResult().getArtists().get(0).getPicUrl();
-//                    } else
-//                        return "";
-//                }))
-//                .map(s -> {
-//                    //对于网络请求 需要根据用户设置判断是否加载
-//                    if(UriUtil.isNetworkUri(Uri.parse(s)) && !isAutoDownloadCover()){
-//                        ImageRequest imageRequest = ImageRequest.fromUri(s);
-//                        CacheKey cacheKey = DefaultCacheKeyFactory.getInstance().getEncodedCacheKey(imageRequest,null);
-//                        if(ImagePipelineFactory.getInstance().getMainBufferedDiskCache().containsSync(cacheKey) ||
-//                                ImagePipelineFactory.getInstance().getImagePipeline().isInDiskCacheSync(imageRequest.getSourceUri())){
-//                            return s;
-//                        } else {
-//                            return "";
-//                        }
-//                    } else {
-//                        return s;
-//                    }
-//                });
     }
 
     private Observable<String> getCustomThumbObservable(NSearchRequest request){

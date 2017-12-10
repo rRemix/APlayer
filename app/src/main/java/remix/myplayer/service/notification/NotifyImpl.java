@@ -4,34 +4,23 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import com.facebook.common.executors.CallerThreadExecutor;
-import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.DataSource;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.common.ResizeOptions;
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
-
 import remix.myplayer.R;
 import remix.myplayer.model.mp3.Song;
-import remix.myplayer.request.ImageUriRequest;
+import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.network.RemoteUriRequest;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
 
 import static remix.myplayer.service.MusicService.copy;
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
  * Created by Remix on 2017/11/22.
@@ -57,13 +46,13 @@ public class NotifyImpl extends Notify {
         if((MusicService.getCurrentMP3() != null)) {
             boolean isSystemColor = SPUtil.getValue(mService,"Setting","IsSystemColor",true);
 
-            Song temp = MusicService.getCurrentMP3();
+            Song song = MusicService.getCurrentMP3();
             //设置歌手，歌曲名
-            mRemoteBigView.setTextViewText(R.id.notify_song, temp.getTitle());
-            mRemoteBigView.setTextViewText(R.id.notify_artist_album, temp.getArtist() + " - " + temp.getAlbum());
+            mRemoteBigView.setTextViewText(R.id.notify_song, song.getTitle());
+            mRemoteBigView.setTextViewText(R.id.notify_artist_album, song.getArtist() + " - " + song.getAlbum());
 
-            mRemoteView.setTextViewText(R.id.notify_song,temp.getTitle());
-            mRemoteView.setTextViewText(R.id.notify_artist_album,temp.getArtist() + " - " + temp.getAlbum());
+            mRemoteView.setTextViewText(R.id.notify_song,song.getTitle());
+            mRemoteView.setTextViewText(R.id.notify_artist_album,song.getArtist() + " - " + song.getAlbum());
 
             //设置了黑色背景
             if(!isSystemColor){
@@ -85,16 +74,17 @@ public class NotifyImpl extends Notify {
             }
             //设置封面
             final int size = DensityUtil.dip2px(mService,128);
-            final String uri = MediaStoreUtil.getImageUrl(temp.getAlbumId(), ImageUriRequest.URL_ALBUM);
-            ImageRequest imageRequest =
-                    ImageRequestBuilder.newBuilderWithSource(!TextUtils.isEmpty(uri) ? Uri.parse(uri) : Uri.EMPTY)
-                            .setResizeOptions(new ResizeOptions(size,size))
-                            .build();
-            DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);
 
-            dataSource.subscribe(new BaseBitmapDataSubscriber() {
+            new RemoteUriRequest(getSearchRequestWithAlbumType(song),new RequestConfig.Builder(size,size).build()){
                 @Override
-                protected void onNewResultImpl(Bitmap bitmap) {
+                public void onError(String errMsg) {
+                    mRemoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
+                    mRemoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
+                    pushNotify();
+                }
+
+                @Override
+                public void onSuccess(Bitmap bitmap) {
                     try {
                         Bitmap result = copy(bitmap);
                         if(result != null) {
@@ -111,13 +101,7 @@ public class NotifyImpl extends Notify {
                     }
                 }
 
-                @Override
-                protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-                    mRemoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
-                    mRemoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
-                    pushNotify();
-                }
-            }, CallerThreadExecutor.getInstance());
+            }.load();
         }
     }
 

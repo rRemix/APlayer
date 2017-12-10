@@ -35,7 +35,8 @@
                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:progressDrawable="@drawable/bg_appwidget_progress"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/d2_size" />
+                android:layout_height="@dimen/d2_size"
+                android:layout_marginRight="@dimen/d4_size"/>
         </LinearLayout>
     </RelativeLayout>
 

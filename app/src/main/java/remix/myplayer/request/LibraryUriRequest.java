@@ -1,6 +1,7 @@
 package remix.myplayer.request;
 
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -15,10 +16,10 @@ import remix.myplayer.request.network.RxUtil;
  * Created by Remix on 2017/12/4.
  */
 
-public class LibraryUriRequest extends ImageUriRequest {
+public class LibraryUriRequest extends ImageUriRequest<String> {
     protected SimpleDraweeView mImage;
     NSearchRequest mRequest;
-    public LibraryUriRequest(SimpleDraweeView image,NSearchRequest request,RequestConfig config) {
+    public LibraryUriRequest(@NonNull SimpleDraweeView image, @NonNull NSearchRequest request, RequestConfig config) {
         super(config);
         mImage = image;
         mRequest = request;

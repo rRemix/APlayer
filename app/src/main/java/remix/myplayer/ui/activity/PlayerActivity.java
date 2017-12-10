@@ -986,7 +986,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mHandler.removeMessages(UPDATE_COVER);
             mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
         } else {
-            new ImageUriRequest(){
+            new ImageUriRequest<String>(){
                 @Override
                 public void onError(String errMsg) {
                     mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));

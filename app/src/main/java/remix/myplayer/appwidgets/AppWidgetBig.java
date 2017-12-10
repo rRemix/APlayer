@@ -68,7 +68,7 @@ public class AppWidgetBig extends BaseAppwidget {
         //进度
         remoteViews.setProgressBar(R.id.appwidget_seekbar,(int)temp.getDuration(),(int)currentTime,false);
         //设置封面
-        updateCover(context,remoteViews,appWidgetIds,temp.getAlbumId(),reloadCover);
+        updateCover(context,remoteViews,appWidgetIds,reloadCover);
     }
 
     private void buildAction(Context context, RemoteViews views) {
