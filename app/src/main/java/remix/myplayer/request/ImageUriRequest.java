@@ -60,17 +60,15 @@ public abstract class ImageUriRequest<T> {
     public abstract void load();
 
     protected Observable<String> getThumbObservable(NSearchRequest request){
-
        return Observable.concat(getCustomThumbObservable(request),getContentThumbObservable(request),getNetworkThumbObservable(request))
                .firstOrError()
                .toObservable();
     }
 
-    private Observable<String> getCustomThumbObservable(NSearchRequest request){
+    protected Observable<String> getCustomThumbObservable(NSearchRequest request){
         return new Observable<String>() {
             @Override
             protected void subscribeActual(Observer<? super String> observer) {
-
                 //是否设置过自定义封面
                 File customImage = ImageUriUtil.getCustomThumbIfExist(request.getID(),request.getLType());
                 if(customImage != null && customImage.exists()){
