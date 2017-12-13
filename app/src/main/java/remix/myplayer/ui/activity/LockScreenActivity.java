@@ -22,25 +22,26 @@ import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Single;
-import io.reactivex.SingleSource;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.CtrlButtonListener;
 import remix.myplayer.model.mp3.Song;
+import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.blur.StackBlurManager;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.LogUtil;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -101,6 +102,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     private static boolean mIsPlay = false;
     private Disposable mDisposable;
 
+
     @Override
     protected void setUpTheme() {
     }
@@ -141,6 +143,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         mView.setBackgroundColor(Color.TRANSPARENT);
 
         findView(R.id.lockscreen_arrow_container).startAnimation(AnimationUtils.loadAnimation(this,R.anim.arrow_left_to_right));
+
     }
 
     //前后两次触摸的X
@@ -176,6 +179,12 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                 break;
         }
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        overridePendingTransition(0,0);
     }
 
     @Override
@@ -252,36 +261,59 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
 
         if(mInfo == null)
             return;
-        Single.just(mInfo.getAlbumId())
-        .observeOn(Schedulers.io())
-        .doOnSubscribe(disposable -> mDisposable = disposable)
-        .flatMap((Function<Integer, SingleSource<Palette.Swatch>>) integer -> {
-            mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
-            if(mRawBitMap == null)
-                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
-            StackBlurManager mStackBlurManager = new StackBlurManager(mRawBitMap);
 
-            mNewBitMap = mStackBlurManager.processNatively(40);
-            return Single.create(e -> {
+        final int size = DensityUtil.dip2px(mContext,100);
+        new ImageUriRequest<Palette.Swatch>(new RequestConfig.Builder(size,size).build()){
+            @Override
+            public void onError(String errMsg) {
+//                ToastUtil.show(mContext,errMsg);
+            }
+
+            @Override
+            public void onSuccess(Palette.Swatch result) {
+                if(result == null)
+                    return;
+                mSongColor = result.getBodyTextColor();
+                mArtistColor = result.getTitleTextColor();
+
+                mImageBackground.setImageBitmap(mNewBitMap);
+                mSong.setTextColor(mSongColor);
+                mArtist.setTextColor(mArtistColor);
+                mNextSong.setTextColor(mSongColor);
+                mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT,0,2,mSongColor,0,0,1));
+            }
+
+            @Override
+            public void load() {
+                getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(mInfo))
+                        .compose(RxUtil.applySchedulerToIO())
+                        .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
+                            mRawBitMap = bitmap;
+                            if(mRawBitMap == null)
+                                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
+                            processBitmap(e);
+                        }))
+                        .onErrorResumeNext(Observable.create(e -> {
+                            mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
+                            processBitmap(e);
+                        }))
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe(disposable -> mDisposable = disposable)
+                        .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
+            }
+
+            private void processBitmap(ObservableEmitter<Palette.Swatch> e) {
+                StackBlurManager stackBlurManager = new StackBlurManager(mRawBitMap);
+                mNewBitMap = stackBlurManager.processNatively(40);
                 Palette palette = Palette.from(mRawBitMap).generate();
                 Palette.Swatch swatch = palette.getMutedSwatch();//柔和 暗色
                 if(swatch == null)
                     swatch = new Palette.Swatch(Color.GRAY,100);
-                e.onSuccess(swatch);
-            });
-        }).observeOn(AndroidSchedulers.mainThread())
-        .subscribe(swatch -> {
-            if(swatch == null)
-                return;
-            mSongColor = swatch.getBodyTextColor();
-            mArtistColor = swatch.getTitleTextColor();
+                e.onNext(swatch);
+                e.onComplete();
+            }
+        }.load();
 
-            mImageBackground.setImageBitmap(mNewBitMap);
-            mSong.setTextColor(mSongColor);
-            mArtist.setTextColor(mArtistColor);
-            mNextSong.setTextColor(mSongColor);
-            mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT,0,2,mSongColor,0,0,1));
-        });
     }
 
 }

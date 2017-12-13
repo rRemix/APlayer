@@ -29,8 +29,8 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
         mImage.setImageURI(Uri.EMPTY);
     }
 
-    public void onSuccess(String url) {
-        ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(Uri.parse(url));
+    public void onSuccess(String result) {
+        ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(Uri.parse(result));
         if(mConfig.isResize()){
             imageRequestBuilder.setResizeOptions(ResizeOptions.forDimensions(mConfig.getWidth(),mConfig.getHeight()));
         }

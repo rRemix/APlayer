@@ -995,8 +995,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 }
 
                 @Override
-                public void onSuccess(String url) {
-                    mUri = Uri.parse(url);
+                public void onSuccess(String result) {
+                    mUri = Uri.parse(result);
                     mHandler.removeMessages(UPDATE_COVER);
                     mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
                 }

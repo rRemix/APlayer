@@ -5,14 +5,12 @@ import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.umeng.analytics.MobclickAgent;
 
@@ -62,18 +60,18 @@ public class ColorChooseDialog extends BaseDialogActivity {
      */
     private void addColor(@ColorRes int mdColor, String colorText,int themeColor) {
         View colorItem = LayoutInflater.from(this).inflate(R.layout.item_color_choose,null);
-        ImageView src = (ImageView) colorItem.findViewById(R.id.color_choose_item_src);
+        ImageView src = colorItem.findViewById(R.id.color_choose_item_src);
         GradientDrawable drawable = (GradientDrawable) src.getDrawable();
         drawable.setColor(ColorUtil.getColor(mdColor));
 
-        ImageView check = (ImageView) colorItem.findViewById(R.id.color_choose_item_check);
+        ImageView check = colorItem.findViewById(R.id.color_choose_item_check);
         check.setVisibility(isColorChoose(themeColor) ? View.VISIBLE : View.GONE);
 
-        TextView colorTextView = (TextView) colorItem.findViewById(R.id.color_choose_item_text);
+        TextView colorTextView = colorItem.findViewById(R.id.color_choose_item_text);
         colorTextView.setText(colorText);
         colorTextView.setTextColor(ThemeStore.getTextColorPrimary());
 
-        colorItem.setOnClickListener(new ColorLisener(themeColor));
+        colorItem.setOnClickListener(new ColorListener(themeColor));
         mColorContainer.addView(colorItem);
         mColorInfoList.add(new ColorChoose(themeColor,colorText,check));
     }
@@ -88,9 +86,9 @@ public class ColorChooseDialog extends BaseDialogActivity {
     }
 
 
-    class ColorLisener implements View.OnClickListener{
+    class ColorListener implements View.OnClickListener{
         private int mThemeColor;
-        public ColorLisener(int themeColor){
+        public ColorListener(int themeColor){
             mThemeColor = themeColor;
         }
         @Override
@@ -106,17 +104,9 @@ public class ColorChooseDialog extends BaseDialogActivity {
                         .contentColorAttr(R.attr.text_color_primary)
                         .positiveText("是")
                         .negativeText("否")
-                        .onPositive(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                changeThemeColor(true);
-                            }
-                        })
-                        .onNegative(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        .onPositive((dialog, which) -> changeThemeColor(true))
+                        .onNegative((dialog, which) -> {
 
-                            }
                         }).
                         show();
             } else {
@@ -124,10 +114,10 @@ public class ColorChooseDialog extends BaseDialogActivity {
             }
         }
 
-        private void changeThemeColor(boolean isfromNight) {
+        private void changeThemeColor(boolean isFromNight) {
             Intent intent = new Intent();
             intent.putExtra("needRecreate",true);
-            intent.putExtra("fromColorChoose",isfromNight);
+            intent.putExtra("fromColorChoose",isFromNight);
             setResult(Activity.RESULT_OK,intent);
             ThemeStore.THEME_MODE = ThemeStore.DAY;
             ThemeStore.THEME_COLOR = mThemeColor;

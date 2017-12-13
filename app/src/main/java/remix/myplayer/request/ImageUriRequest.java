@@ -2,18 +2,33 @@ package remix.myplayer.request;
 
 import android.content.ContentUris;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.facebook.common.executors.CallerThreadExecutor;
+import com.facebook.common.references.CloseableReference;
 import com.facebook.common.util.UriUtil;
+import com.facebook.datasource.DataSource;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.common.ResizeOptions;
+import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
+import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
+import io.reactivex.functions.Function;
 import okhttp3.ResponseBody;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
@@ -26,6 +41,7 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.SPUtil;
 
+import static remix.myplayer.service.MusicService.copy;
 import static remix.myplayer.util.Util.isWifi;
 
 /**
@@ -55,7 +71,7 @@ public abstract class ImageUriRequest<T> {
 
     public abstract void onError(String errMsg);
 
-    public abstract void onSuccess(T url);
+    public abstract void onSuccess(T result);
 
     public abstract void load();
 
@@ -148,6 +164,42 @@ public abstract class ImageUriRequest<T> {
             SPUtil.putValue(APlayerApplication.getContext(),"HttpCache",request.getKey(),imageUrl);
         }
         return imageUrl;
+    }
+
+    protected Observable<Bitmap> getThumbBitmapObservable(NSearchRequest request) {
+        return getThumbObservable(request)
+                .flatMap(new Function<String, ObservableSource<Bitmap>>() {
+                    @Override
+                    public ObservableSource<Bitmap> apply(String url) throws Exception {
+                        return Observable.create(new ObservableOnSubscribe<Bitmap>() {
+                            @Override
+                            public void subscribe(ObservableEmitter<Bitmap> e) throws Exception {
+                                Uri imageUri = !TextUtils.isEmpty(url) ? Uri.parse(url) : Uri.EMPTY;
+                                ImageRequest imageRequest =
+                                        ImageRequestBuilder.newBuilderWithSource(imageUri)
+                                                .setResizeOptions(new ResizeOptions(mConfig.getWidth(),mConfig.getHeight()))
+                                                .build();
+                                DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);
+                                dataSource.subscribe(new BaseBitmapDataSubscriber() {
+                                    @Override
+                                    protected void onNewResultImpl(Bitmap bitmap) {
+                                        Bitmap result = copy(bitmap);
+                                        if(result == null) {
+                                            result = BitmapFactory.decodeResource(APlayerApplication.getContext().getResources(), R.drawable.album_empty_bg_day);
+                                        }
+                                        e.onNext(result);
+                                        e.onComplete();
+                                    }
+
+                                    @Override
+                                    protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+                                        e.onError(dataSource.getFailureCause());
+                                    }
+                                }, CallerThreadExecutor.getInstance());
+                            }
+                        });
+                    }
+                });
     }
 
     /**

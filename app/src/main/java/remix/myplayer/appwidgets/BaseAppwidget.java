@@ -73,13 +73,13 @@ public class BaseAppwidget extends AppWidgetProvider {
                 }
 
                 @Override
-                public void onSuccess(Bitmap bitmap) {
+                public void onSuccess(Bitmap result) {
                     try {
                         if(mBitmap != null && !mBitmap.isRecycled()){
                             mBitmap.recycle();
                             mBitmap = null;
                         }
-                        mBitmap = MusicService.copy(bitmap);
+                        mBitmap = MusicService.copy(result);
                         if(mBitmap != null) {
                             remoteViews.setImageViewBitmap(R.id.appwidget_image, mBitmap);
                         } else {
