@@ -19,7 +19,6 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
-import remix.myplayer.model.MultiPosition;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -123,7 +122,7 @@ public class FolderAdapter extends BaseAdapter<String,FolderAdapter.FolderHolder
         }
 
         if(MultiChoice.TAG.equals(FolderActivity.TAG) &&
-                mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+                mMultiChoice.mSelectedPosition.contains(position)){
             mMultiChoice.AddView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);

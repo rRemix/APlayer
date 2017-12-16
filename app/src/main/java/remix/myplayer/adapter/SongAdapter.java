@@ -27,7 +27,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.interfaces.SortChangeCallback;
-import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -73,7 +72,6 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 
     private RecyclerView mRecyclerView;
     private int mLastIndex;
-
 
     public SongAdapter(Context context,int layoutId, MultiChoice multiChoice, int type,RecyclerView recyclerView) {
         super(context,layoutId,multiChoice);
@@ -213,14 +211,14 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 
         if(mType == ALLSONG){
             if(MultiChoice.TAG.equals(SongFragment.TAG) &&
-                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position - 1))){
+                    mMultiChoice.mSelectedPosition.contains(position - 1)){
                 mMultiChoice.AddView(holder.mContainer);
             } else {
                 holder.mContainer.setSelected(false);
             }
         } else {
             if(MultiChoice.TAG.equals(RecetenlyActivity.TAG) &&
-                    mMultiChoice.mSelectedPosition.contains(new MultiPosition(position - 1))){
+                    mMultiChoice.mSelectedPosition.contains(position - 1)){
                 mMultiChoice.AddView(holder.mContainer);
             } else {
                 holder.mContainer.setSelected(false);

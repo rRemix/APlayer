@@ -27,7 +27,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
-import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.Artist;
 import remix.myplayer.model.netease.NSearchRequest;
 import remix.myplayer.request.ImageUriRequest;
@@ -164,7 +163,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
         //是否处于选中状态
         if(MultiChoice.TAG.equals(ArtistFragment.TAG) &&
-                mMultiChoice.mSelectedPosition.contains(new MultiPosition(position - 1))){
+                mMultiChoice.mSelectedPosition.contains(position - 1)){
             mMultiChoice.AddView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);

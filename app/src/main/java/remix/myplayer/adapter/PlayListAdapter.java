@@ -24,7 +24,6 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.listener.AlbArtFolderPlaylistListener;
-import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.PlayList;
 import remix.myplayer.model.netease.NSearchRequest;
 import remix.myplayer.request.ImageUriRequest;
@@ -158,7 +157,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
         //是否处于选中状态
         if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&
-                mMultiChoice.mSelectedPosition.contains(new MultiPosition(position - 1))){
+                mMultiChoice.mSelectedPosition.contains(position - 1)){
             mMultiChoice.AddView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);

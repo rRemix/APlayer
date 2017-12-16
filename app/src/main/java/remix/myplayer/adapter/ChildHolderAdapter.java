@@ -23,7 +23,6 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.interfaces.SortChangeCallback;
-import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -37,6 +36,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -196,7 +196,8 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
         }
 
         if(MultiChoice.TAG.equals(ChildHolderActivity.TAG) &&
-                mMultiChoice.mSelectedPosition.contains(new MultiPosition(position))){
+                mMultiChoice.mSelectedPosition.contains(position - 1)){
+            LogUtil.d("ChildHolderAdapter","选中:" + position);
             mMultiChoice.AddView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);

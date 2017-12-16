@@ -13,7 +13,6 @@ import java.util.List;
 import remix.myplayer.R;
 import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
-import remix.myplayer.model.MultiPosition;
 import remix.myplayer.model.mp3.PlayList;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.ChildHolderActivity;
@@ -51,7 +50,7 @@ public class MultiChoice implements OnMultiItemClickListener {
     public ArrayList<View> mSelectedViews = new ArrayList<>();
 
     /** 所有选中view的position */
-    public ArrayList<MultiPosition> mSelectedPosition = new ArrayList<>();
+    public ArrayList<Integer> mSelectedPosition = new ArrayList<>();
 
     /** 所有选中view对应的参数 包括歌曲id 专辑id 艺术家id 文件夹名 播放列表名 */
     public ArrayList<Object> mSelectedArg = new ArrayList<>();
@@ -278,10 +277,8 @@ public class MultiChoice implements OnMultiItemClickListener {
     }
 
     public void AddView(View view){
-        if(!mSelectedViews.contains(view)) {
-            mSelectedViews.add(view);
-            setViewSelected(view, true);
-        }
+        mSelectedViews.add(view);
+        setViewSelected(view, true);
     }
 
     /**
@@ -291,6 +288,7 @@ public class MultiChoice implements OnMultiItemClickListener {
     public void RemoveOrAddView(View view){
         if(mSelectedViews.contains(view)){
             mSelectedViews.remove(view);
+
             setViewSelected(view,false);
         } else {
             mSelectedViews.add(view);
@@ -303,11 +301,10 @@ public class MultiChoice implements OnMultiItemClickListener {
      * @param position
      */
     public void RemoveOrAddPosition(int position){
-        MultiPosition pos = new MultiPosition(position);
-        if(mSelectedPosition.contains(pos))
-            mSelectedPosition.remove(pos);
+        if(mSelectedPosition.contains(position))
+            mSelectedPosition.remove(Integer.valueOf(position));
         else {
-            mSelectedPosition.add(pos);
+            mSelectedPosition.add(position);
         }
     }
 
