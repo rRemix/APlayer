@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import remix.myplayer.R;
-import remix.myplayer.model.mp3.Song;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.network.RemoteUriRequest;
 import remix.myplayer.service.MusicService;

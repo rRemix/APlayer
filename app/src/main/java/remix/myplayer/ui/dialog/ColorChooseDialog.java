@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.model.mp3.ColorChoose;
+import remix.myplayer.bean.mp3.ColorChoose;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 

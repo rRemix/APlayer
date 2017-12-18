@@ -16,11 +16,11 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.lyric.LrcRow;
 import remix.myplayer.lyric.LrcView;
 import remix.myplayer.lyric.SearchLRC;
-import remix.myplayer.model.mp3.Song;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -68,7 +68,7 @@ public class LrcFragment extends BaseFragment {
             mHandler = new LrcHandler(Looper.getMainLooper(),this);
         if(mOnFindListener != null)
             mOnFindListener.onViewInflateFinish(mLrcView);
-        mInfo = (Song)getArguments().getSerializable("Song");
+        mInfo = getArguments().getParcelable("Song");
         if(mLrcList != null && mLrcList.size() > 0){
             mHandler.sendEmptyMessage(UPDATE_LRC);
         }

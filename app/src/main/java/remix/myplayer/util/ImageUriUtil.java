@@ -11,9 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import remix.myplayer.R;
+import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.bean.netease.NSearchRequest;
 import remix.myplayer.misc.cache.DiskCache;
-import remix.myplayer.model.mp3.Song;
-import remix.myplayer.model.netease.NSearchRequest;
 import remix.myplayer.request.ImageUriRequest;
 
 /**

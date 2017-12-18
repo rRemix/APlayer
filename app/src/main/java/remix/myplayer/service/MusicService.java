@@ -53,6 +53,9 @@ import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.appwidgets.AppWidgetBig;
 import remix.myplayer.appwidgets.AppWidgetMedium;
 import remix.myplayer.appwidgets.AppWidgetSmall;
+import remix.myplayer.bean.FloatLrcContent;
+import remix.myplayer.bean.mp3.PlayListSong;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.MusicEventHelper;
@@ -63,9 +66,6 @@ import remix.myplayer.lyric.SearchLRC;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
-import remix.myplayer.model.FloatLrcContent;
-import remix.myplayer.model.mp3.PlayListSong;
-import remix.myplayer.model.mp3.Song;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.service.notification.Notify;
@@ -838,7 +838,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     break;
                 //临时播放一首歌曲
                 case Constants.PLAY_TEMP:
-                    Song temp = (Song) intent.getSerializableExtra("Song");
+                    Song temp = intent.getParcelableExtra("Song");
                     if(temp != null){
                         mCurrentInfo = temp;
                         prepare(mCurrentInfo.getUrl());

@@ -54,12 +54,12 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.lyric.LrcView;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
-import remix.myplayer.model.mp3.Song;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -659,7 +659,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mAdapter = new PagerAdapter(getSupportFragmentManager());
         Bundle bundle = new Bundle();
         bundle.putInt("Width", mWidth);
-        bundle.putSerializable("Song", mInfo);
+        bundle.putParcelable("Song", mInfo);
         //初始化所有fragment
         final RecordFragment recordFragment = new RecordFragment();
         mAdapter.AddFragment(recordFragment);

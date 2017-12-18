@@ -26,7 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.model.mp3.Song;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
@@ -73,7 +73,7 @@ public class OptionDialog extends BaseDialogActivity {
         setContentView(R.layout.dialog_option);
         ButterKnife.bind(this);
 
-        mInfo = (Song)getIntent().getExtras().getSerializable("Song");
+        mInfo = getIntent().getExtras().getParcelable("Song");
         if(mInfo == null)
             return;
         if(mIsDeletePlayList = getIntent().getExtras().getBoolean("IsDeletePlayList", false)){
@@ -133,7 +133,7 @@ public class OptionDialog extends BaseDialogActivity {
                 MobclickAgent.onEvent(this,"Share");
                 Intent intentShare = new Intent(OptionDialog.this,ShareDialog.class);
                 Bundle argShare = new Bundle();
-                argShare.putSerializable("Song",mInfo);
+                argShare.putParcelable("Song",mInfo);
                 argShare.putInt("Type",Constants.SHARESONG);
                 intentShare.putExtras(argShare);
                 startActivity(intentShare);

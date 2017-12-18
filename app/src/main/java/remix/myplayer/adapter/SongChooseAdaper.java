@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnSongChooseListener;
-import remix.myplayer.model.mp3.Song;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 

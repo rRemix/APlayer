@@ -20,8 +20,8 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.listener.CtrlButtonListener;
-import remix.myplayer.model.mp3.Song;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
@@ -87,7 +87,7 @@ public class BottomActionBarFragment extends BaseFragment{
                 return;
             Intent intent = new Intent(v.getContext(), PlayerActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putSerializable("Song",MusicService.getCurrentMP3());
+            bundle.putParcelable("Song",MusicService.getCurrentMP3());
             intent.putExtras(bundle);
             intent.putExtra("isPlay",MusicService.isPlay());
             intent.putExtra("FromActivity",true);

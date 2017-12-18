@@ -3,7 +3,7 @@ package remix.myplayer.request.network;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import remix.myplayer.model.netease.NSearchRequest;
+import remix.myplayer.bean.netease.NSearchRequest;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.RequestConfig;
 

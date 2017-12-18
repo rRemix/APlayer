@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Set;
 
 import remix.myplayer.R;
+import remix.myplayer.bean.mp3.PlayList;
+import remix.myplayer.bean.mp3.PlayListSong;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
-import remix.myplayer.model.mp3.PlayList;
-import remix.myplayer.model.mp3.PlayListSong;
-import remix.myplayer.model.mp3.Song;
 
 
 /**

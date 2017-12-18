@@ -13,29 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import remix.myplayer.model.mp3.PlayList;
-import remix.myplayer.model.mp3.PlayListSong;
+import remix.myplayer.bean.mp3.PlayList;
+import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.service.MusicService;
 
 /**
  * 一些全局变量
  */
 public class Global {
-    /**
-     * 当前正在设置封面的专辑或艺术家或播放列表id
-     */
-    public static int SetCoverID = 0;
-
-    /**
-     * 当前正在设置封面的专辑或艺术家或播放列表的名字
-     */
-    public static String SetCoverName = "";
-
-    /**
-     * 当前正在设置的是专辑还是艺术家还是播放列表
-     */
-    public static int SetCoverType = 1;
-
     /**
      * 操作类型
      */

@@ -3,7 +3,7 @@ package remix.myplayer.request;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import io.reactivex.Observable;
-import remix.myplayer.model.netease.NSearchRequest;
+import remix.myplayer.bean.netease.NSearchRequest;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.util.PlayListUtil;
 

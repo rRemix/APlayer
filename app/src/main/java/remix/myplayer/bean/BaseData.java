@@ -1,4 +1,4 @@
-package remix.myplayer.model;
+package remix.myplayer.bean;
 
 import java.io.Serializable;
 

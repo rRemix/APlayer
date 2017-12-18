@@ -39,7 +39,7 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
-import remix.myplayer.model.bmob.Error;
+import remix.myplayer.bean.bmob.Error;
 
 /**
  * Created by Remix on 2015/11/30.

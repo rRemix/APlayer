@@ -1,6 +1,6 @@
-package remix.myplayer.model.netease;
+package remix.myplayer.bean.netease;
 
-import remix.myplayer.model.BaseData;
+import remix.myplayer.bean.BaseData;
 
 /**
  * Created by Remix on 2017/12/4.

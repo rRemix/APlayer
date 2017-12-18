@@ -65,7 +65,7 @@ public class RecordFragment extends BaseFragment{
             Intent intent = new Intent(getActivity(), RecordShareActivity.class);
             Bundle arg = new Bundle();
             arg.putString("Content", mEdit.getText().toString());
-            arg.putSerializable("Song", MusicService.getCurrentMP3());
+            arg.putParcelable("Song", MusicService.getCurrentMP3());
             intent.putExtras(arg);
             startActivity(intent);
         });

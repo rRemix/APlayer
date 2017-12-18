@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity;
 
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -45,12 +46,13 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.HeaderAdapter;
 import remix.myplayer.adapter.PagerAdapter;
+import remix.myplayer.bean.CustomThumbBean;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
-import remix.myplayer.model.mp3.Song;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
@@ -435,9 +437,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null){
-            String errorTxt = getString(
-                    Global.SetCoverType == Constants.ALBUM ? R.string.set_album_cover_error : Global.SetCoverType == Constants.ARTIST ? R.string.set_artist_cover_error : R.string.set_playlist_cover_error);
-            final int id = Global.SetCoverID; //专辑、艺术家、播放列表封面
             switch (requestCode){
                 //设置主题后重启activity或者清除缓存后刷新adapter
                 case REQUEST_SETTING:
@@ -446,56 +445,64 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                     }else if(data.getBooleanExtra("needRefresh",false)){
                         mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                     }
-
                     break;
                 //图片选择
+                case Crop.REQUEST_CROP:
                 case Crop.REQUEST_PICK:
-                    if(resultCode == RESULT_OK){
+                    Intent intent = getIntent();
+                    final CustomThumbBean thumbBean = intent.getParcelableExtra("thumb");
+                    if(thumbBean == null)
+                        break;
+                    String errorTxt = getString(
+                            thumbBean.getType() == Constants.ALBUM ? R.string.set_album_cover_error : thumbBean.getType() == Constants.ARTIST ? R.string.set_artist_cover_error : R.string.set_playlist_cover_error);
+                    final int id = thumbBean.getId(); //专辑、艺术家、播放列表封面
+
+                    if(resultCode != Activity.RESULT_OK) {
+                        ToastUtil.show(this,errorTxt);
+                        break;
+                    }
+                    if(requestCode == Crop.REQUEST_PICK){
+                        //选择图片
                         File cacheDir = DiskCache.getDiskCacheDir(this,
-                                "thumbnail/" + (Global.SetCoverType == Constants.ALBUM ? "album" : Global.SetCoverType == Constants.ARTIST ? "artist" : "playlist"));
-                        if(!cacheDir.exists()){
-                            if(!cacheDir.mkdir()){
-                                ToastUtil.show(this,errorTxt);
-                                return;
-                            }
+                                "thumbnail/" + (thumbBean.getType() == Constants.ALBUM ? "album" : thumbBean.getType() == Constants.ARTIST ? "artist" : "playlist"));
+                        if(!cacheDir.exists() && !cacheDir.mkdirs()){
+                            ToastUtil.show(this,errorTxt);
+                            return;
                         }
                         Uri destination = Uri.fromFile(new File(cacheDir, Util.hashKeyForDisk((id * 255 ) + "")));
                         Crop.of(data.getData(), destination).asSquare().start(this);
                     } else {
-                        ToastUtil.show(this,errorTxt);
-                    }
-                    break;
-                //图片裁剪
-                case Crop.REQUEST_CROP:
-                    //裁剪后的图片路径
-                    if(Crop.getOutput(data) == null)
-                        return;
+                        //图片裁剪
+                        //裁剪后的图片路径
+                        if(Crop.getOutput(data) == null)
+                            return;
 
-                    final String path = Crop.getOutput(data).getEncodedPath();
-                    if(TextUtils.isEmpty(path) || id == -1){
-                        ToastUtil.show(mContext,errorTxt);
-                        return;
-                    }
-                    //清除fresco的缓存
-                    new Thread(){
-                        @Override
-                        public void run() {
-                            ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                            if(Global.SetCoverType != Constants.PLAYLIST){
-                                if(new File(path).exists()){
-                                    Uri fileUri = Uri.parse("file://" + path);
-                                    imagePipeline.evictFromCache(fileUri);
-                                } else {
-                                    Uri providerUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), id);
-                                    imagePipeline.evictFromCache(providerUri);
-                                }
-                            } else {
-                                imagePipeline.clearCaches();
-                            }
-                            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+                        final String path = Crop.getOutput(data).getEncodedPath();
+                        if(TextUtils.isEmpty(path) || id == -1){
+                            ToastUtil.show(mContext,errorTxt);
+                            return;
                         }
-                    }.start();
+                        //清除fresco的缓存
+                        new Thread(){
+                            @Override
+                            public void run() {
+                                ImagePipeline imagePipeline = Fresco.getImagePipeline();
+                                if(thumbBean.getType() != Constants.PLAYLIST){
+                                    if(new File(path).exists()){
+                                        Uri fileUri = Uri.parse("file://" + path);
+                                        imagePipeline.evictFromCache(fileUri);
+                                    } else {
+                                        Uri providerUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), id);
+                                        imagePipeline.evictFromCache(providerUri);
+                                    }
+                                    mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+                                }
+
+                            }
+                        }.start();
+                    }
                     break;
+
             }
         }
     }

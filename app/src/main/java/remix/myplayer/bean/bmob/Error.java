@@ -1,4 +1,4 @@
-package remix.myplayer.model.bmob;
+package remix.myplayer.bean.bmob;
 
 /**
  * @ClassName

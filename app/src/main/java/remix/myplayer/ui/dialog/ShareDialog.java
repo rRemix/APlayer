@@ -40,7 +40,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
-import remix.myplayer.model.mp3.Song;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.RecordShareActivity;
@@ -83,7 +83,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         setContentView(R.layout.dialog_share);
         ButterKnife.bind(this);
 
-        mInfo = (Song)getIntent().getExtras().getSerializable("Song");
+        mInfo = getIntent().getExtras().getParcelable("Song");
         mType = getIntent().getExtras().getInt("Type");
         mImageUrl = getIntent().getExtras().getString("Url");
         if(mInfo == null)

@@ -1,4 +1,4 @@
-package remix.myplayer.model;
+package remix.myplayer.bean;
 
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;

@@ -9,7 +9,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
-import remix.myplayer.model.netease.NSearchRequest;
+import remix.myplayer.bean.netease.NSearchRequest;
 import remix.myplayer.request.network.RxUtil;
 
 /**

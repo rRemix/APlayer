@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 
-import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.soundcloud.android.crop.Crop;
 import com.umeng.analytics.MobclickAgent;
@@ -16,6 +14,7 @@ import com.umeng.analytics.MobclickAgent;
 import java.util.List;
 
 import remix.myplayer.R;
+import remix.myplayer.bean.CustomThumbBean;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
@@ -85,10 +84,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                                 ToastUtil.show(mContext,PlayListUtil.deletePlayList(mId) ? R.string.delete_success : R.string.delete_error);
                             }
                         })
-                        .onNegative(new MaterialDialog.SingleButtonCallback() {
-                            @Override
-                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            }
+                        .onNegative((dialog, which) -> {
                         })
                         .backgroundColorAttr(R.attr.background_color_3)
                         .positiveColorAttr(R.attr.text_color_primary)
@@ -98,12 +94,22 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 break;
             //设置封面
             case R.id.menu_album_thumb:
-                Global.SetCoverID = mId;
-                Global.SetCoverType = mType;
-                Global.SetCoverName = mKey;
-                Intent ori = ((Activity)mContext).getIntent();
-                ori.putExtra("ID",mId);
-                ((Activity)mContext).setIntent(ori);
+                CustomThumbBean thumbBean = new CustomThumbBean(mId,mType,mKey);
+                Intent thumbIntent = ((Activity)mContext).getIntent();
+                thumbIntent.putExtra("thumb",thumbBean);
+                thumbIntent.putExtra("test",1234);
+                ((Activity)mContext).setIntent(thumbIntent);
+//                try {
+//                    Intent pickIntent = new Intent("android.intent.action.GET_CONTENT").setType("image/*");
+//                    pickIntent.putExtra("test",1234);
+//                    pickIntent.setExtrasClassLoader(CustomThumbBean.class.getClassLoader());
+//                    pickIntent.putExtra("thumb",thumbBean);
+//
+//                    ((Activity)mContext).startActivityForResult(pickIntent, Crop.REQUEST_PICK);
+//                }catch (Exception e){
+//                    Toast.makeText(mContext, com.soundcloud.android.crop.R.string.crop__pick_error, Toast.LENGTH_SHORT).show();
+//                }
+
                 Crop.pickImage((Activity) mContext, Crop.REQUEST_PICK);
                 break;
             default:

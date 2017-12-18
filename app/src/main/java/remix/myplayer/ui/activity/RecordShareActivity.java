@@ -35,8 +35,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.cache.DiskCache;
-import remix.myplayer.model.mp3.Song;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
@@ -146,7 +146,7 @@ public class RecordShareActivity extends BaseActivity {
         //初始化控件
         mContainer.setDrawingCacheEnabled(true);
 
-        mInfo = (Song)getIntent().getExtras().getSerializable("Song");
+        mInfo = getIntent().getExtras().getParcelable("Song");
         if(mInfo == null)
             return;
 
@@ -232,7 +232,7 @@ public class RecordShareActivity extends BaseActivity {
                 Bundle arg = new Bundle();
                 arg.putInt("Type", Constants.SHARERECORD);
                 arg.putString("Url",mFile.getAbsolutePath());
-                arg.putSerializable("Song",mInfo);
+                arg.putParcelable("Song",mInfo);
                 intent.putExtras(arg);
                 startActivity(intent);
             } catch (Exception e) {

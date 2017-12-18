@@ -1,4 +1,4 @@
-package remix.myplayer.model.mp3;
+package remix.myplayer.bean.mp3;
 
 import android.widget.ImageView;
 

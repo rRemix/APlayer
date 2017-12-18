@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import remix.myplayer.R;
+import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
-import remix.myplayer.model.mp3.PlayList;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.FolderActivity;

@@ -12,8 +12,8 @@ import android.widget.TextView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
+import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.model.mp3.PlayList;
 import remix.myplayer.util.PlayListUtil;
 
 /**

@@ -43,6 +43,15 @@
     <fields>;
     <methods>;
 }
+# 保留Parcelable序列化类不被混淆
+-keep class * implements android.os.Parcelable {
+    public static final android.os.Parcelable$Creator *;
+}
+-keepclasseswithmembers class * implements android.os.Parcelable{
+    <fields>;
+    <methods>;
+}
+
 
 #baseAdapter
 -keepclassmembers class remix.myplayer.adapter.holder.BaseViewHolder
