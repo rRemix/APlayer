@@ -519,6 +519,9 @@ public class Util {
             if(TextUtils.isEmpty(file.getAbsolutePath()) || TextUtils.isEmpty(displayName) ||
                     TextUtils.isEmpty(title) || TextUtils.isEmpty(artist))
                 return false;
+            //仅判断.lrc文件
+            if(!file.getName().endsWith("lrc"))
+                return false;
             //暂时忽略网易云的歌词
             if(file.getAbsolutePath().contains("netease/cloudmusic/"))
                 return false;

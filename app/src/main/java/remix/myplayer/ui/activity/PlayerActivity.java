@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
@@ -35,8 +36,13 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.drawable.ScalingUtils;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.image.ImageInfo;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
@@ -209,7 +215,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     /** 更新封面与背景的Handler */
     private Uri mUri;
-    private static final int UPDATE_COVER = 100;
     private static final int UPDATE_BG = 101;
     private static final int UPDATE_TIME_ONLY = 102;
     private static final int UPDATE_TIME_ALL = 103;
@@ -404,49 +409,88 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             if(mIsBacking || mAnimCover == null){
                return;
             }
-            //更新动画控件封面 保证退场动画的封面与fragment中封面一致
             mIsBacking = true;
-            mAnimCover.setImageURI(mUri);
 
-            final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
-            final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
-            final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
-            final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
-            Spring coverSpring = SpringSystem.create().createSpring();
-            coverSpring.addListener(new SimpleSpringListener(){
-                @Override
-                public void onSpringUpdate(Spring spring) {
-                    if(mAnimCover == null)
-                        return;
-                    final double currentVal = spring.getCurrentValue();
-                    mAnimCover.setTranslationX((float) (transitionX * currentVal));
-                    mAnimCover.setTranslationY((float) (transitionY * currentVal));
-                    mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
-                    mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
-                }
-                @Override
-                public void onSpringActivate(Spring spring) {
-                    mAnimCover.setVisibility(View.VISIBLE);
-                    //隐藏fragment中的image
-                    if(mAdapter.getItem(1) instanceof CoverFragment){
-                        ((CoverFragment) mAdapter.getItem(1)).hideImage();
-                    }
+            //更新动画控件封面 保证退场动画的封面与fragment中封面一致
+            ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(mUri);
+            DraweeController controller = Fresco.newDraweeControllerBuilder()
+                    .setImageRequest(imageRequestBuilder.build())
+                    .setOldController(mAnimCover.getController())
+                    .setControllerListener(new ControllerListener<ImageInfo>() {
+                        @Override
+                        public void onSubmit(String id, Object callerContext) {
 
-                }
-                @Override
-                public void onSpringAtRest(Spring spring) {
-                    finish();
-                    overridePendingTransition(0,0);
-                }
-            });
-            coverSpring.setOvershootClampingEnabled(true);
-            coverSpring.setCurrentValue(1);
-            coverSpring.setEndValue(0);
+                        }
+
+                        @Override
+                        public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
+                            playBackAnimation();
+                        }
+
+                        @Override
+                        public void onIntermediateImageSet(String id, ImageInfo imageInfo) {
+
+                        }
+
+                        @Override
+                        public void onIntermediateImageFailed(String id, Throwable throwable) {
+
+                        }
+
+                        @Override
+                        public void onFailure(String id, Throwable throwable) {
+                            playBackAnimation();
+                        }
+
+                        @Override
+                        public void onRelease(String id) {
+
+                        }
+                    })
+                    .build();
+            mAnimCover.setController(controller);
+            mAnimCover.setVisibility(View.VISIBLE);
         } else {
             finish();
             overridePendingTransition(0,R.anim.audio_out);
         }
 
+    }
+
+    private void playBackAnimation() {
+        final float transitionX = mTransitionBundle.getFloat(TRANSITION_X);
+        final float transitionY = mTransitionBundle.getFloat(TRANSITION_Y);
+        final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
+        final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
+        Spring coverSpring = SpringSystem.create().createSpring();
+        coverSpring.addListener(new SimpleSpringListener(){
+            @Override
+            public void onSpringUpdate(Spring spring) {
+                if(mAnimCover == null)
+                    return;
+                final double currentVal = spring.getCurrentValue();
+                mAnimCover.setTranslationX((float) (transitionX * currentVal));
+                mAnimCover.setTranslationY((float) (transitionY * currentVal));
+                mAnimCover.setScaleX((float) (1 + scaleX * currentVal));
+                mAnimCover.setScaleY((float) (1 + scaleY * currentVal));
+            }
+            @Override
+            public void onSpringActivate(Spring spring) {
+                //隐藏fragment中的image
+                if(mAdapter.getItem(1) instanceof CoverFragment){
+                    ((CoverFragment) mAdapter.getItem(1)).hideImage();
+                }
+
+            }
+            @Override
+            public void onSpringAtRest(Spring spring) {
+                finish();
+                overridePendingTransition(0,0);
+            }
+        });
+        coverSpring.setOvershootClampingEnabled(true);
+        coverSpring.setCurrentValue(1);
+        coverSpring.setEndValue(0);
     }
 
     /**
@@ -508,6 +552,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 break;
             //弹出窗口
             case R.id.top_more:
+                @SuppressLint("RestrictedApi")
                 Context wrapper = new ContextThemeWrapper(this,Theme.getPopupMenuStyle());
                 final PopupMenu popupMenu = new PopupMenu(wrapper,v, Gravity.TOP);
                 popupMenu.getMenuInflater().inflate(R.menu.audio_menu, popupMenu.getMenu());
@@ -660,10 +705,13 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         Bundle bundle = new Bundle();
         bundle.putInt("Width", mWidth);
         bundle.putParcelable("Song", mInfo);
+
         //初始化所有fragment
         final RecordFragment recordFragment = new RecordFragment();
         mAdapter.AddFragment(recordFragment);
         CoverFragment coverFragment = new CoverFragment();
+        coverFragment.setOnFirstLoadFinishListener(() -> mAnimCover.setVisibility(View.INVISIBLE));
+
         coverFragment.setInflateFinishListener(view -> {
             //从通知栏启动只设置位置信息并隐藏
             //不用启动动画
@@ -723,8 +771,11 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     if (mAdapter.getItem(1) instanceof CoverFragment) {
                         ((CoverFragment) mAdapter.getItem(1)).showImage();
                     }
-                    //隐藏动画用的封面
-                    mAnimCover.setVisibility(View.GONE);
+//                    mHandler.postDelayed(() -> {
+//                        //隐藏动画用的封面
+//                        mAnimCover.setVisibility(View.INVISIBLE);
+//                    },24);
+
                 }
                 @Override
                 public void onSpringActivate(Spring spring) {
@@ -936,9 +987,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         Theme.TintDrawable(mTopHide,R.drawable.icon_player_back,tintColor);
         Theme.TintDrawable(mTopMore,R.drawable.icon_player_more,tintColor);
         //播放模式与播放队列
-        int playmodel = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
-        Theme.TintDrawable(mPlayModel,playmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-                playmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+        int playmode = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
+        Theme.TintDrawable(mPlayModel,playmode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                playmode == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                         R.drawable.play_btn_loop_one,tintColor);
         Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,tintColor);
 
@@ -954,6 +1005,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private void updateBg() {
         if(!mDiscolour)
             return;
+
         Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
             mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
             if(mRawBitMap == null)
@@ -976,6 +1028,12 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     }
 
+    private void updateCoverActual(){
+        ((CoverFragment) mAdapter.getItem(1)).updateCover(mInfo,mUri,!mFistStart);
+//            mAnimCover.setImageURI(mUri);
+        mFistStart = false;
+    }
+
     /**
      * 更新封面
      */
@@ -983,28 +1041,25 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         //更新封面
         if(mInfo == null || (mInfo = MusicService.getCurrentMP3()) == null){
             mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
-            mHandler.removeMessages(UPDATE_COVER);
-            mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+            updateCoverActual();
         } else {
             new ImageUriRequest<String>(){
                 @Override
                 public void onError(String errMsg) {
-                    mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
-                    mHandler.removeMessages(UPDATE_COVER);
-                    mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+                    mUri = Uri.EMPTY;
+                    updateCoverActual();
                 }
 
                 @Override
                 public void onSuccess(String result) {
                     mUri = Uri.parse(result);
-                    mHandler.removeMessages(UPDATE_COVER);
-                    mHandler.sendEmptyMessageDelayed(UPDATE_COVER,mFistStart ? 16 : 0);
+                    updateCoverActual();
                 }
 
                 @Override
                 public void load() {
                     getThumbObservable(getSearchRequestWithAlbumType(mInfo))
-                            .compose(RxUtil.applySchedulerToIO())
+                            .compose(RxUtil.applyScheduler())
                             .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
                 }
             }.load();
@@ -1059,10 +1114,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     @OnHandleMessage
     public void handleInternal(Message msg){
-        if(msg.what == UPDATE_COVER){
-            ((CoverFragment) mAdapter.getItem(1)).updateCover(mInfo,mUri,!mFistStart);
-            mFistStart = false;
-        }
         if(msg.what == UPDATE_BG){
             int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
             int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);

@@ -1,5 +1,6 @@
 package remix.myplayer.ui.fragment;
 
+import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,7 +11,12 @@ import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.ControllerListener;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.image.ImageInfo;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
@@ -19,6 +25,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.interfaces.OnFirstLoadFinishListener;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
@@ -43,6 +50,8 @@ public class CoverFragment extends BaseFragment {
     private int mWidth;
     private Uri mUri = Uri.EMPTY;
     private OnInflateFinishListener mInflateFinishListener;
+    private OnFirstLoadFinishListener mFirstLoadFinishListener;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +61,6 @@ public class CoverFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         mWidth = getArguments().getInt("Width");
         View rootView = inflater.inflate(R.layout.fragment_cover,container,false);
         mUnBinder = ButterKnife.bind(this,rootView);
@@ -122,7 +130,7 @@ public class CoverFragment extends BaseFragment {
                     if(mImage == null || spring == null)
                         return;
                     mCoverContainer.setTranslationX((float) startValue);
-                    mImage.setImageURI(mUri);
+                    setImageUriInternal();
 
                     float endVal = 1;
                     final Spring inAnim = SpringSystem.create().createSpring();
@@ -154,9 +162,55 @@ public class CoverFragment extends BaseFragment {
             outAnim.setCurrentValue(startValue);
             outAnim.setEndValue(endValue);
         } else {
-            mImage.setImageURI(mUri);
+            setImageUriInternal();
             mShadow.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void setImageUriInternal(){
+        ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(mUri);
+        DraweeController controller = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(imageRequestBuilder.build())
+                .setOldController(mImage.getController())
+                .setControllerListener(new ControllerListener<ImageInfo>() {
+                    @Override
+                    public void onSubmit(String id, Object callerContext) {
+
+                    }
+
+                    @Override
+                    public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
+                        if(mFirstLoadFinishListener != null){
+                            mFirstLoadFinishListener.onFirstLoadFinish();
+                            mFirstLoadFinishListener = null;
+                        }
+                    }
+
+                    @Override
+                    public void onIntermediateImageSet(String id, ImageInfo imageInfo) {
+
+                    }
+
+                    @Override
+                    public void onIntermediateImageFailed(String id, Throwable throwable) {
+
+                    }
+
+                    @Override
+                    public void onFailure(String id, Throwable throwable) {
+                        if(mFirstLoadFinishListener != null){
+                            mFirstLoadFinishListener.onFirstLoadFinish();
+                            mFirstLoadFinishListener = null;
+                        }
+                    }
+
+                    @Override
+                    public void onRelease(String id) {
+
+                    }
+                })
+                .build();
+        mImage.setController(controller);
     }
 
     /**
@@ -177,4 +231,7 @@ public class CoverFragment extends BaseFragment {
             mCoverContainer.setVisibility(View.VISIBLE);
     }
 
+    public void setOnFirstLoadFinishListener(OnFirstLoadFinishListener onFirstLoadFinishListener) {
+        mFirstLoadFinishListener = onFirstLoadFinishListener;
+    }
 }

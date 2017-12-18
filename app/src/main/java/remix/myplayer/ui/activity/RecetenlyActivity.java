@@ -3,7 +3,6 @@ package remix.myplayer.ui.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,6 +24,8 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.misc.handler.MsgHandler;
+import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
@@ -48,20 +49,7 @@ public class RecetenlyActivity extends PermissionActivity<Song,SongAdapter> impl
     FastScrollRecyclerView mRecyclerView;
     private ArrayList<Integer> mIdList = new ArrayList<>();
 
-    private Handler mRefreshHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what){
-                case Constants.CLEAR_MULTI:
-                    mMultiChoice.clearSelectedViews();
-                    break;
-                case Constants.UPDATE_ADAPTER:
-                    if(mAdapter != null)
-                        mAdapter.notifyDataSetChanged();
-            }
-
-        }
-    };
+    private MsgHandler mHandler;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,6 +57,8 @@ public class RecetenlyActivity extends PermissionActivity<Song,SongAdapter> impl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recently);
         ButterKnife.bind(this);
+
+        mHandler = new MsgHandler(this);
 
         mAdapter = new SongAdapter(this, R.layout.item_song_recycle,mMultiChoice,SongAdapter.RECENTLY,mRecyclerView);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
@@ -149,7 +139,7 @@ public class RecetenlyActivity extends PermissionActivity<Song,SongAdapter> impl
         MobclickAgent.onPageStart(RecetenlyActivity.class.getSimpleName());
         super.onResume();
         if(mMultiChoice.isShow()){
-            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+            mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
     }
 
@@ -158,7 +148,19 @@ public class RecetenlyActivity extends PermissionActivity<Song,SongAdapter> impl
         MobclickAgent.onPageEnd(RecetenlyActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
-            mRefreshHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
+            mHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);
+        }
+    }
+
+    @OnHandleMessage
+    public void handleMessage(Message msg){
+        switch (msg.what){
+            case Constants.CLEAR_MULTI:
+                mMultiChoice.clearSelectedViews();
+                break;
+            case Constants.UPDATE_ADAPTER:
+                if(mAdapter != null)
+                    mAdapter.notifyDataSetChanged();
         }
     }
 
