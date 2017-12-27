@@ -3,8 +3,6 @@ package remix.myplayer.ui.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,19 +41,6 @@ public class RecordFragment extends BaseFragment{
         View rootView = inflater.inflate(R.layout.fragment_record,container,false);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-        mEdit.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                mRecord = s.toString();
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
         //启动分享心情的Activity
         (rootView.findViewById(R.id.sharebtn)).setOnClickListener(v -> {
             if (mEdit.getText().toString().equals("")) {
@@ -69,7 +54,6 @@ public class RecordFragment extends BaseFragment{
             intent.putExtras(arg);
             startActivity(intent);
         });
-
         mRecordContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
@@ -87,6 +71,9 @@ public class RecordFragment extends BaseFragment{
         return rootView;
     }
 
+//    @OnTextChanged(value = R.id.edit_record,callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+//    void afterExplainChanged(Editable s){
+//    }
 
 }
 

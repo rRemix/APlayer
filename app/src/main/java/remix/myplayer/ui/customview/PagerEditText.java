@@ -1,9 +1,9 @@
 package remix.myplayer.ui.customview;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatEditText;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.widget.EditText;
 
 /**
  * Created by taeja on 16-3-16.
@@ -12,7 +12,7 @@ import android.widget.EditText;
 /**
  * 自定义EdittText 嵌套与ViewPagrer
  */
-public class PagerEditText extends EditText {
+public class PagerEditText extends AppCompatEditText {
 
     public PagerEditText(Context context) {
         super(context);

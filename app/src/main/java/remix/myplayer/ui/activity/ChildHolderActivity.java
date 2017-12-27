@@ -72,6 +72,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     private static final int END = 1;
     private MsgHandler mRefreshHandler;
 
+    private GetSongThread mGetThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +87,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         mArg = getIntent().getStringExtra("Title");
 
         mAdapter = new ChildHolderAdapter(this,R.layout.item_child_holder,mType,mArg,mMultiChoice,mRecyclerView);
-        mAdapter.setCallback(() -> new GetSongList(false).start());
+        mAdapter.setCallback(() -> updateList(false));
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -151,8 +152,6 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
                 .backgroundColorAttr(R.attr.background_color_3)
                 .progressIndeterminateStyle(false).build();
 
-        //读取歌曲列表
-        new GetSongList().start();
         //初始化底部状态栏
         mBottombar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
@@ -178,21 +177,21 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
     @Override
     public void onMediaStoreChanged() {
-        updateList();
+        updateList(true);
     }
 
     @Override
     public void onPlayListChanged() {
-        updateList();
+        updateList(true);
     }
 
-    private class GetSongList extends Thread{
+    private class GetSongThread extends Thread{
         //是否需要重新查询歌曲列表
         private boolean mNeedReset = true;
-        GetSongList(boolean needReset) {
+        GetSongThread(boolean needReset) {
             this.mNeedReset = needReset;
         }
-        GetSongList(){}
+        GetSongThread(){}
 
         @Override
         public void run() {
@@ -293,6 +292,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         MobclickAgent.onPageStart(ChildHolderActivity.class.getSimpleName());
         super.onResume();
         mIsRunning = true;
+        updateList(true);
     }
 
     @Override
@@ -301,22 +301,32 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         mIsRunning = false;
     }
 
-    public void updateList() {
+    private void updateList(boolean reset) {
         if(mIsRunning){
-            if(mHasPermission)
-                new GetSongList().start();
+            if(mHasPermission){
+                if(mGetThread != null){
+                    mGetThread.interrupt();
+                    mGetThread = null;
+                }
+                mGetThread = new GetSongThread(reset);
+                mGetThread.start();
+            }
             else {
                 mInfoList = null;
                 mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
             }
         }
-
     }
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mRefreshHandler.remove();
+        if(mGetThread != null && mGetThread.isInterrupted()){
+            mGetThread.interrupt();
+            mGetThread = null;
+        }
     }
 
     @OnHandleMessage
