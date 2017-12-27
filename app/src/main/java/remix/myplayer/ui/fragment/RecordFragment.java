@@ -3,6 +3,7 @@ package remix.myplayer.ui.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.EditText;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnTextChanged;
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.RecordShareActivity;
@@ -71,9 +73,9 @@ public class RecordFragment extends BaseFragment{
         return rootView;
     }
 
-//    @OnTextChanged(value = R.id.edit_record,callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-//    void afterExplainChanged(Editable s){
-//    }
+    @OnTextChanged(value = R.id.edit_record,callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void afterExplainChanged(Editable s){
+    }
 
 }
 

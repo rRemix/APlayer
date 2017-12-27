@@ -3,12 +3,14 @@ package remix.myplayer.ui.customview;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.util.AttributeSet;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnTextChanged;
 import butterknife.Unbinder;
 import remix.myplayer.R;
 import remix.myplayer.theme.ThemeStore;
@@ -48,23 +50,23 @@ public class SearchToolBar extends Toolbar {
         mUnBinder.unbind();
     }
 
-//    @OnTextChanged(value = R.id.search_input,callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
-//    void afterExplainChanged(Editable s){
-//        //EditText不为空时显示尾部的删除按钮
-//        if(s != null){
-//            if(s.toString().equals("")){
-//                if(mSearchListener != null) {
-//                    mSearchListener.onClear();
-//                    mButtonClear.setVisibility(INVISIBLE);
-//                }
-//            }else {
-//                if (mSearchListener != null) {
-//                    mSearchListener.onSearch(s.toString(),false);
-//                    mButtonClear.setVisibility(VISIBLE);
-//                }
-//            }
-//        }
-//    }
+    @OnTextChanged(value = R.id.search_input,callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
+    void afterExplainChanged(Editable s){
+        //EditText不为空时显示尾部的删除按钮
+        if(s != null){
+            if(s.toString().equals("")){
+                if(mSearchListener != null) {
+                    mSearchListener.onClear();
+                    mButtonClear.setVisibility(INVISIBLE);
+                }
+            }else {
+                if (mSearchListener != null) {
+                    mSearchListener.onSearch(s.toString(),false);
+                    mButtonClear.setVisibility(VISIBLE);
+                }
+            }
+        }
+    }
 
     private void init(){
         //设置EditText光标与下划线颜色

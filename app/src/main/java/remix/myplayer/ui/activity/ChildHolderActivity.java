@@ -72,8 +72,6 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     private static final int END = 1;
     private MsgHandler mRefreshHandler;
 
-    private GetSongThread mGetThread;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -304,12 +302,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     private void updateList(boolean reset) {
         if(mIsRunning){
             if(mHasPermission){
-                if(mGetThread != null){
-                    mGetThread.interrupt();
-                    mGetThread = null;
-                }
-                mGetThread = new GetSongThread(reset);
-                mGetThread.start();
+                new GetSongThread(reset).start();
             }
             else {
                 mInfoList = null;
@@ -318,15 +311,10 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         }
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mRefreshHandler.remove();
-        if(mGetThread != null && mGetThread.isInterrupted()){
-            mGetThread.interrupt();
-            mGetThread = null;
-        }
     }
 
     @OnHandleMessage
