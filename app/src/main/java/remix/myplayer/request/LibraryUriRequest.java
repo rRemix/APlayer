@@ -11,6 +11,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import remix.myplayer.bean.netease.NSearchRequest;
 import remix.myplayer.request.network.RxUtil;
+import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2017/12/4.
@@ -27,6 +28,7 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
     public void onError(String errMsg){
         mImage.setImageURI(Uri.EMPTY);
+        LogUtil.d("UriRequest","Error: " + errMsg);
     }
 
     public void onSuccess(String result) {

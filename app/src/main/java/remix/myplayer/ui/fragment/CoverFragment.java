@@ -141,16 +141,11 @@ public class CoverFragment extends BaseFragment {
                                 return;
                             mCoverContainer.setScaleX((float) spring.getCurrentValue());
                             mCoverContainer.setScaleY((float) spring.getCurrentValue());
-
-                            //动画即将结束时重新显示阴影
-//                            if(spring.getCurrentValue() > endVal && mShadow.getVisibility() != View.VISIBLE){
-//                                mShadow.setVisibility(View.VISIBLE);
-//                            }
                         }
 
                         @Override
                         public void onSpringActivate(Spring spring) {
-//                            mShadow.setVisibility(View.INVISIBLE);
+
                         }
 
                     });
@@ -168,6 +163,7 @@ public class CoverFragment extends BaseFragment {
     }
 
     public void setImageUriInternal(){
+        mShadow.setVisibility(View.INVISIBLE);
         ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(mUri);
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(imageRequestBuilder.build())
@@ -184,6 +180,7 @@ public class CoverFragment extends BaseFragment {
                             mFirstLoadFinishListener.onFirstLoadFinish();
                             mFirstLoadFinishListener = null;
                         }
+                        mShadow.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -202,6 +199,7 @@ public class CoverFragment extends BaseFragment {
                             mFirstLoadFinishListener.onFirstLoadFinish();
                             mFirstLoadFinishListener = null;
                         }
+                        mShadow.setVisibility(View.VISIBLE);
                     }
 
                     @Override

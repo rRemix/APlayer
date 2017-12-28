@@ -189,13 +189,18 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         GetSongThread(boolean needReset) {
             this.mNeedReset = needReset;
         }
-        GetSongThread(){}
+
 
         @Override
         public void run() {
             mRefreshHandler.sendEmptyMessage(START);
             if(mNeedReset)
                 mInfoList = getMP3List();
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             sortList();
             mRefreshHandler.sendEmptyMessage(END);
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
