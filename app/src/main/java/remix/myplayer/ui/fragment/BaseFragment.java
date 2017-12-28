@@ -7,7 +7,6 @@ import android.support.v7.widget.RecyclerView;
 import com.umeng.analytics.MobclickAgent;
 
 import butterknife.Unbinder;
-import remix.myplayer.APlayerApplication;
 
 /**
  * @ClassName
@@ -31,12 +30,6 @@ public class BaseFragment extends Fragment {
         super.onDestroyView();
         if(mUnBinder != null)
             mUnBinder.unbind();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        APlayerApplication.getRefWatcher(mContext).watch(this);
     }
 
     public RecyclerView.Adapter getAdapter(){
