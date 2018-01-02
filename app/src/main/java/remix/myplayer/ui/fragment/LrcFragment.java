@@ -126,7 +126,7 @@ public class LrcFragment extends BaseFragment {
                                         }else {
                                             find = true;
                                             if(i - delta < translate.size())
-                                                original.get(i).setContent(original.get(i).getContent() + "" + translate.get(i - delta).getContent());
+                                                original.get(i).setContent(original.get(i).getContent() + "\n" + translate.get(i - delta).getContent());
                                         }
                                     }
                                 }

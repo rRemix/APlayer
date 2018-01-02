@@ -8,7 +8,8 @@
         android:id="@+id/lrc_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="@dimen/d16_size"
-        android:paddingRight="@dimen/d16_size"
+        android:layout_marginLeft="@dimen/d30_size"
+        android:layout_marginRight="@dimen/d30_size"
+        android:layout_marginTop="@dimen/d16_size"
         android:textColor="@color/day_enable_text_color" />
 </LinearLayout>
