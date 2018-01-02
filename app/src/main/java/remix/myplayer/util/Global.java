@@ -120,19 +120,28 @@ public class Global {
         new Thread(){
             @Override
             public void run() {
+                boolean shuffle = intent.getBooleanExtra("shuffle",false);
                 if(newQueueIdList == null || newQueueIdList.size() == 0){
                     return;
                 }
-                if (newQueueIdList.equals(PlayQueue)) {
+                //设置的播放队列相等
+                if(newQueueIdList.equals(PlayQueue)){
+                    if(shuffle){
+                        MusicService.getInstance().setPlayModel(Constants.PLAY_SHUFFLE);
+                        MusicService.getInstance().updateNextSong();
+                    }
                     context.sendBroadcast(intent);
                     return;
                 }
+
                 PlayQueue.clear();
                 PlayQueue.addAll(newQueueIdList);
-                if(intent.getBooleanExtra("shuffle",false)){
+                if(shuffle){
+                    MusicService.getInstance().setPlayModel(Constants.PLAY_SHUFFLE);
                     MusicService.getInstance().updateNextSong();
                 }
                 context.sendBroadcast(intent);
+
                 int deleteRow = 0;
                 int addRow = 0;
                 try {

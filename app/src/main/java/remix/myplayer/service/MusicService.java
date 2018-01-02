@@ -232,7 +232,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         LogUtil.d("ServiceLifeCycle","onTaskRemoved");
 //        unInit();
         stopSelf();
-//        System.exit(0);
+        System.exit(0);
     }
 
     @Override
@@ -1066,6 +1066,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             mNextId = Global.PlayQueue.get(mNextIndex);
         }
         mNextInfo = MediaStoreUtil.getMP3InfoById(mNextId);
+
     }
 
     /**
@@ -1105,7 +1106,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 生成随机播放列表
      * @param current
      */
-    public void makeShuffleList(final int current) {
+    public void makeShuffleList(int current) {
         if(mRandomList == null)
             mRandomList = new ArrayList<>();
         mRandomList.clear();
@@ -1113,9 +1114,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         if (mRandomList.isEmpty())
             return;
         if (current >= 0) {
-            mRandomList.remove(Integer.valueOf(current));
+            boolean removed = mRandomList.remove(Integer.valueOf(current));
             Collections.shuffle(mRandomList);
-            mRandomList.add(0,current);
+            if(removed)
+                mRandomList.add(0,current);
         } else {
             Collections.shuffle(mRandomList);
         }

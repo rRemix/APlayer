@@ -1,26 +1,46 @@
 package remix.myplayer.ui.fragment;
 
-import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.lang.ref.WeakReference;
+import com.google.gson.Gson;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.disposables.Disposable;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.bean.netease.NLrcResponse;
+import remix.myplayer.bean.netease.NSongSearchResponse;
 import remix.myplayer.interfaces.OnInflateFinishListener;
+import remix.myplayer.lyric.DefaultLrcParser;
 import remix.myplayer.lyric.LrcRow;
 import remix.myplayer.lyric.LrcView;
-import remix.myplayer.lyric.SearchLRC;
+import remix.myplayer.misc.cache.DiskCache;
+import remix.myplayer.misc.cache.DiskLruCache;
+import remix.myplayer.request.network.HttpClient;
+import remix.myplayer.request.network.RxUtil;
+import remix.myplayer.util.Global;
+import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -30,26 +50,17 @@ import remix.myplayer.lyric.SearchLRC;
  * 歌词界面Fragment
  */
 public class LrcFragment extends BaseFragment {
-    //是否找到歌词的几种状态
-    private static int UPDATE_LRC = 1;
-    private static int NO_LRC = 2;
-    private static int NO_NETWORK = 3;
-    private static int SEARCHING = 4;
     private OnInflateFinishListener mOnFindListener;
     private Song mInfo;
     @BindView(R.id.lrc_view)
     LrcView mLrcView;
     //歌词
     private List<LrcRow> mLrcList;
-    private LrcHandler mHandler;
+
+    private Disposable mDisposable;
 
     public void setOnInflateFinishListener(OnInflateFinishListener l){
         mOnFindListener = l;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
     }
 
     @Override
@@ -64,94 +75,162 @@ public class LrcFragment extends BaseFragment {
         View rootView = inflater.inflate(R.layout.fragment_lrc,container,false);
 
         mUnBinder = ButterKnife.bind(this,rootView);
-        if(mHandler == null)
-            mHandler = new LrcHandler(Looper.getMainLooper(),this);
         if(mOnFindListener != null)
             mOnFindListener.onViewInflateFinish(mLrcView);
         mInfo = getArguments().getParcelable("Song");
-        if(mLrcList != null && mLrcList.size() > 0){
-            mHandler.sendEmptyMessage(UPDATE_LRC);
-        }
-
         return rootView;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mHandler.removeCallbacksAndMessages(null);
+        if(mDisposable != null && !mDisposable.isDisposed()){
+            mDisposable.dispose();
+        }
     }
 
     public void updateLrc(Song song) {
-        if(song == null)
-            return;
-        if(mHandler == null)
-            mHandler = new LrcHandler(Looper.getMainLooper(),this);
         mInfo = song;
-
-        new DownloadThread().start();
+        getLrc("");
     }
 
     public void updateLrc(String lrcPath){
-        new DownloadThread(lrcPath).start();
+        getLrc(lrcPath);
     }
 
-    private void handleInternal(int what){
-        if(mLrcView == null)
-            return;
-        //是否正在搜索
-        if(what == SEARCHING){
-            mLrcView.setText(getString(R.string.searching));
-
-        } else if(what == UPDATE_LRC) {
-            //更新歌词
-            mLrcView.setLrcRows(mLrcList);
-        } else if (what == NO_LRC) {
-            //没有找到歌词
+    private void getLrc(String manualPath){
+        if(mInfo == null){
             mLrcView.setText(getString(R.string.no_lrc));
-        } else if (what == NO_NETWORK) {
-            //没用网络
-            mLrcView.setText(getString(R.string.check_network));
+            return;
         }
-    }
+        final DefaultLrcParser lrcParser = new DefaultLrcParser();
 
+        //网易歌词
+        Observable<List<LrcRow>> neteaseObservable = HttpClient.getNeteaseApiservice()
+                .getNeteaseSearch(mInfo.getArtist() + "-" + mInfo.getTitle(),0,1,1)
+                .flatMap(body -> HttpClient.getInstance()
+                        .getNeteaseLyric(new Gson().fromJson(body.string(),NSongSearchResponse.class).result.songs.get(0).id)
+                        .map(body1 -> {
+                            NLrcResponse lrcResponse = new Gson().fromJson(body1.string(),NLrcResponse.class);
+                            List<LrcRow> original = lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.lrc.lyric.getBytes(Charset.forName("utf8"))), Charset.forName("utf8"))),false,mInfo.getTitle(),mInfo.getArtist() + "/original");
+                            //有翻译 尝试合并
+                            if(lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
+                                List<LrcRow> translate = lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(Charset.forName("utf8"))), Charset.forName("utf8"))),false,mInfo.getTitle(),mInfo.getArtist() + "/translate");
+                                if(translate != null && translate.size() > 0){
+                                    LrcRow translateFirstRow = translate.get(0);
+                                    int delta = 0;
+                                    boolean find = false;
+                                    for(int i = 0; i < original.size();i++){
+                                        if(translateFirstRow.getTime() != original.get(i).getTime() && !find){
+                                            delta++;
+                                        }else {
+                                            find = true;
+                                            if(i - delta < translate.size())
+                                                original.get(i).setContent(original.get(i).getContent() + "" + translate.get(i - delta).getContent());
+                                        }
+                                    }
+                                }
+                            }
+                            return original;
+                        }))
+                .onErrorResumeNext(throwable -> {
+                    return Observable.empty();
+                });
+        //本地歌词
+        Observable<List<LrcRow>> localObservable = Observable.create(e -> {
+            String localPath = getlocalLrcPath();
+            if(!TextUtils.isEmpty(localPath)){
+                e.onNext(lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))),true, mInfo.getTitle(),mInfo.getArtist()));
+            }
+            e.onComplete();
+        });
+        //根据在线和本地的优先级 确定最后一级
+        boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting","OnlineLrc",false);
+        Observable<List<LrcRow>> last = Observable.concat(onlineFirst ? neteaseObservable : localObservable ,onlineFirst ? localObservable : neteaseObservable).firstOrError().toObservable();
 
-    private class DownloadThread extends Thread {
-        String mManualPath;
-        DownloadThread(String manualPath){
-            mManualPath = manualPath;
-        }
-        DownloadThread(){}
-        @Override
-        public void run() {
-            mHandler.sendEmptyMessage(SEARCHING);
-            SearchLRC searchLRC = new SearchLRC(mInfo);
-            //manualPath不为空说明为手动设置歌词
-            List<LrcRow> temp = searchLRC.getLrc(mManualPath);
-            if(searchLRC.getSongID() == mInfo.getId()){
-                mLrcList = temp;
+        final int songId = mInfo.getId();
+        Observable.create((ObservableOnSubscribe<List<LrcRow>>) e -> {
+            //手动设置的歌词
+            if(!TextUtils.isEmpty(manualPath)){
+                e.onNext(lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(manualPath))),true, mInfo.getTitle(),mInfo.getArtist()));
+            }
+            e.onComplete();
+        }).switchIfEmpty(Observable.create(e -> {
+            //缓存
+            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(Util.hashKeyForDisk(mInfo.getTitle() + "/" + mInfo.getArtist()));
+            if(snapShot != null){
+                e.onNext(lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))),false, mInfo.getTitle(),mInfo.getArtist()));
+            }
+            e.onComplete();
+        })).switchIfEmpty(last)
+        .compose(RxUtil.applyScheduler())
+        .doOnSubscribe(disposable -> {
+            mLrcView.setText(getString(R.string.searching));
+            mDisposable = disposable;
+        })
+        .subscribe(lrcRows -> {
+            if(songId == mInfo.getId()){
+                mLrcList = lrcRows;
                 if(mLrcList == null || mLrcList.size() == 0) {
-                    mHandler.sendEmptyMessage(NO_LRC);
+                    mLrcView.setText(getString(R.string.no_lrc));
                     return;
                 }
-                mHandler.sendEmptyMessage(UPDATE_LRC);
+                mLrcView.setLrcRows(mLrcList);
+            }
+        }, throwable -> {
+            if(songId == mInfo.getId()){
+                mLrcList = new ArrayList<>();
+                mLrcView.setText(getString(R.string.no_lrc));
+            }
+        });
+
+    }
+
+    /**
+     * 搜索本地所有歌词文件
+     * @return
+     */
+    private String getlocalLrcPath() {
+        //查找本地目录
+        String searchPath =  SPUtil.getValue(APlayerApplication.getContext(),"Setting","LrcSearchPath","");
+        if(mInfo == null)
+            return "";
+        if(!TextUtils.isEmpty(searchPath)){
+            //已设置歌词路径
+            Util.searchFile(mInfo.getDisplayname(),mInfo.getTitle(),mInfo.getArtist(), new File(searchPath));
+            if(!TextUtils.isEmpty(Global.CurrentLrcPath)){
+                return Global.CurrentLrcPath;
+            }
+        } else{
+            //没有设置歌词路径 搜索所有歌词文件
+            Cursor allLrcFiles = null;
+            try {
+                allLrcFiles = APlayerApplication.getContext().getContentResolver().
+                        query(MediaStore.Files.getContentUri("external"),
+                                null,
+                                MediaStore.Files.FileColumns.DATA + " like ? or " +
+                                        MediaStore.Files.FileColumns.DATA + " like ? or " +
+                                        MediaStore.Files.FileColumns.DATA + " like ? ",
+                                new String[]{"%lyric%","%Lyric%","%.lrc"},
+                                null);
+                if(allLrcFiles == null || !(allLrcFiles.getCount() > 0))
+                    return "";
+                while (allLrcFiles.moveToNext()){
+                    File file = new File(allLrcFiles.getString(allLrcFiles.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
+                    if (file.exists() && file.canRead()) {
+                        if(Util.isRightLrc(file, mInfo.getDisplayname(),mInfo.getTitle(),mInfo.getArtist())){
+                            return file.getAbsolutePath();
+                        }
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            } finally {
+                if(allLrcFiles != null && !allLrcFiles.isClosed())
+                    allLrcFiles.close();
             }
         }
+
+        return "";
     }
-
-    private static class LrcHandler extends Handler{
-        final WeakReference<LrcFragment> mRef;
-        LrcHandler(Looper looper,LrcFragment fragment){
-            super(looper);
-            mRef = new WeakReference<>(fragment);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            if(mRef.get() == null)
-                return;
-            mRef.get().handleInternal(msg.what);
-        }
-    }
-
 }

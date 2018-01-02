@@ -92,7 +92,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
                 if(position < 0 || mInfoList == null || position >= mInfoList.size())
                     return;
                 int songid = mInfoList.get(position).getId();
-                if( !mMultiChoice.itemAddorRemoveWithClick(view,position,songid,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
+                if(!mMultiChoice.itemAddorRemoveWithClick(view,position,songid,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
                     if (mInfoList != null && mInfoList.size() == 0)
                         return;
                     ArrayList<Integer> idList = new ArrayList<>();

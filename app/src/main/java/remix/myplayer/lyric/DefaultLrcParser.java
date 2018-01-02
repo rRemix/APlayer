@@ -58,8 +58,12 @@ public class DefaultLrcParser implements ILrcParser {
             lrcRows.get(lrcRows.size() - 1).setTotalTime(5000);
 
             if (needCache) {
-                lrcCacheStream.flush();
-                editor.commit();
+                if (lrcCacheStream != null) {
+                    lrcCacheStream.flush();
+                }
+                if (editor != null) {
+                    editor.commit();
+                }
                 DiskCache.getLrcDiskCache().flush();
             }
 
@@ -67,8 +71,7 @@ public class DefaultLrcParser implements ILrcParser {
             e.printStackTrace();
         } finally {
             try {
-                if(bufferedReader != null)
-                    bufferedReader.close();
+                bufferedReader.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }

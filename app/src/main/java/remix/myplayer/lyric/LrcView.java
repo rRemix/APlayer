@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.support.annotation.ColorInt;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -74,7 +75,8 @@ public class LrcView extends View implements ILrcView{
 	private boolean mIsDrawTimeLine = false;
 
 	/**歌词间默认的行距**/
-	private static final float DEFAULT_PADDING = 50;
+//	private static final float DEFAULT_PADDING = 50;
+    private static final float DEFAULT_PADDING = 70;
 	/**歌词当前的行距**/
 	private float mCurPadding = DEFAULT_PADDING;
 
@@ -119,7 +121,7 @@ public class LrcView extends View implements ILrcView{
 	@Override
 	public void init() {
 		mScroller = new Scroller(getContext());
-		mPaintForHighLightLrc = new Paint();
+		mPaintForHighLightLrc = new TextPaint();
 		mPaintForHighLightLrc.setAntiAlias(true);
 		mPaintForHighLightLrc.setColor(mCurColorForHightLightLrc);
 
@@ -127,14 +129,14 @@ public class LrcView extends View implements ILrcView{
 		mPaintForHighLightLrc.setTextSize(mCurSizeForHightLightLrc);
 		mPaintForHighLightLrc.setFakeBoldText(true);
 
-		mPaintForOtherLrc = new Paint();
+		mPaintForOtherLrc = new TextPaint();
         mPaintForOtherLrc.setAntiAlias(true);
 		mPaintForOtherLrc.setColor(mCurColorForOtherLrc);
 
         mCurSizeForOtherLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,13, APlayerApplication.getContext().getResources().getDisplayMetrics());
 		mPaintForOtherLrc.setTextSize(mCurSizeForOtherLrc);
 
-		mPaintForTimeLine = new Paint();
+		mPaintForTimeLine = new TextPaint();
         mPaintForTimeLine.setAntiAlias(true);
         mCurSizeForTimeLine = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,13, APlayerApplication.getContext().getResources().getDisplayMetrics());
         mPaintForTimeLine.setTextSize(mCurSizeForTimeLine);
@@ -171,7 +173,7 @@ public class LrcView extends View implements ILrcView{
 //			count = 1;
 //		int alpha = (0xFF - 0x10) / count;
 		//画出来的第一行歌词的y坐标
-		float rowY = getHeight() / 2 + minRaw*(mCurSizeForOtherLrc + mCurPadding);
+		float rowY = getHeight() / 2 + minRaw * (mCurSizeForOtherLrc + mCurPadding);
 		for (int i = minRaw; i <= maxRaw; i++) {
 			if(i == mCurRow){//画高亮歌词
 				//因为有缩放效果，所有需要动态设置歌词的字体大小
@@ -185,7 +187,7 @@ public class LrcView extends View implements ILrcView{
 					canvas.drawText(text, mCurTextXForHighLightLrc, rowY, mPaintForHighLightLrc);
 				}else{
 					//如果歌词宽度小于view的宽，则让歌词居中显示
-					float textX =  (getWidth()-textWidth) / 2;
+					float textX =  (getWidth() - textWidth) / 2;
 					canvas.drawText(text, textX, rowY, mPaintForHighLightLrc);
 				}
 			}else{
@@ -364,9 +366,9 @@ public class LrcView extends View implements ILrcView{
 						if(!mScroller.isFinished()){
 							mScroller.forceFinished(true);
 						}
-						scrollTo(getScrollX(), (int) (mCurRow * (mCurSizeForOtherLrc+mCurPadding)));
+						scrollTo(getScrollX(), (int) (mCurRow * (mCurSizeForOtherLrc + mCurPadding)));
 					}else{
-						smoothScrollTo( (int) (mCurRow * (mCurSizeForOtherLrc+mCurPadding)), DURATION_FOR_LRC_SCROLL);
+						smoothScrollTo( (int) (mCurRow * (mCurSizeForOtherLrc + mCurPadding)), DURATION_FOR_LRC_SCROLL);
 					}
 					//如果高亮歌词的宽度大于View的宽，就需要开启属性动画，让它水平滚动
 					float textWidth = mPaintForHighLightLrc.measureText(mLrcRows.get(mCurRow).getContent());
@@ -376,7 +378,7 @@ public class LrcView extends View implements ILrcView{
 							mScroller.forceFinished(true);
 						}
 						log("开始水平滚动歌词:" + mLrcRows.get(mCurRow).getContent());
-						startScrollLrc(getWidth()-textWidth, (long) (mLrcRows.get(mCurRow).getTotalTime() * 0.6));
+						startScrollLrc(getWidth() - textWidth, (long) (mLrcRows.get(mCurRow).getTotalTime() * 0.6));
 					}
 					invalidate();
 				}
@@ -403,7 +405,7 @@ public class LrcView extends View implements ILrcView{
 			mAnimator.setFloatValues(0,endX);
 		}
 		mAnimator.setDuration(duration);
-		mAnimator.setStartDelay((long) (duration*0.3)); //延迟执行属性动画
+		mAnimator.setStartDelay((long) (duration * 0.3)); //延迟执行属性动画
 		mAnimator.start();
 	}
 

@@ -19,11 +19,18 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -31,12 +38,16 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.bean.LrcRequest;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.bean.netease.NLrcResponse;
 import remix.myplayer.bean.netease.NSongSearchResponse;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.cache.DiskLruCache;
+import remix.myplayer.request.network.HttpClient;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
@@ -51,14 +62,12 @@ import remix.myplayer.util.Util;
  */
 public class SearchLRC {
     private static final String TAG = "SearchLRC";
-    private static final String DEFAULT_LOCAL = "GB2312";
-    private static final String LRC_REQUEST_ROOT = "http://s.geci.me/lrc/";
     private ILrcParser mLrcBuilder;
     private Song mInfo;
     private String mTitle;
     private String mArtistName;
     private String mDisplayName;
-    private String mManualPath;
+
 
     public SearchLRC(Song item) {
         mInfo = item;
@@ -76,15 +85,9 @@ public class SearchLRC {
         mLrcBuilder = new DefaultLrcParser();
     }
 
-    public SearchLRC(Song item, String manualPath){
-        this(item);
-        mManualPath = manualPath;
-    }
-
     public int getSongID(){
         return mInfo.getId();
     }
-
 
     /**
      * 获取酷狗歌词接口的参数
@@ -113,8 +116,6 @@ public class SearchLRC {
             @Override
             public void run() {
                 try {
-
-
                     Map<String,String> params = new HashMap<>();
                     params.put("s","Seemann");
                     params.put("offset","0");
@@ -166,11 +167,89 @@ public class SearchLRC {
 
     }
 
+    public void getLrcTest(String manualPath){
+        Observable<List<LrcRow>> manualObservable = Observable.create(new ObservableOnSubscribe<List<LrcRow>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<LrcRow>> e) throws Exception {
+                if(!TextUtils.isEmpty(manualPath)){
+                    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(manualPath)));
+                    e.onNext(mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName));
+                }
+                e.onComplete();
+            }
+        });
+
+        Observable<List<LrcRow>> cacheObservable = Observable.create(new ObservableOnSubscribe<List<LrcRow>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<LrcRow>> e) throws Exception {
+                DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(Util.hashKeyForDisk(mTitle + "/" + mArtistName));
+                if(snapShot != null){
+                    e.onNext(mLrcBuilder.getLrcRows(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))),false, mTitle,mArtistName));
+                }
+                e.onComplete();
+            }
+        });
+
+        Observable<List<LrcRow>> neteaseObservable = HttpClient.getNeteaseApiservice()
+                .getNeteaseSearch(mInfo.getArtist() + "-" + mInfo.getTitle(),0,1,1)
+                .flatMap(new Function<ResponseBody, ObservableSource<String>>() {
+                    @Override
+                    public ObservableSource<String> apply(ResponseBody body) throws Exception {
+                        NSongSearchResponse songSearchResponse = new Gson().fromJson(body.string(),NSongSearchResponse.class);
+                        return HttpClient.getInstance()
+                                .getNeteaseLyric(songSearchResponse.result.songs.get(0).id)
+                                .map(new Function<ResponseBody, String>() {
+                                    @Override
+                                    public String apply(ResponseBody body) throws Exception {
+                                        NLrcResponse  lrcResponse = new Gson().fromJson(body.string(),NLrcResponse.class);
+                                        return lrcResponse.lrc.lyric;
+                                    }
+                                });
+                    }
+                })
+                .map(new Function<String, List<LrcRow>>() {
+                    @Override
+                    public List<LrcRow> apply(String s) throws Exception {
+                        BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(s.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));
+
+                        return mLrcBuilder.getLrcRows(br,true,mTitle,mArtistName);
+                    }
+                });
+
+        Observable<List<LrcRow>> localObservable = Observable.create(new ObservableOnSubscribe<List<LrcRow>>() {
+            @Override
+            public void subscribe(ObservableEmitter<List<LrcRow>> e) throws Exception {
+                String localPath = getlocalLrcPath();
+                if(!TextUtils.isEmpty(localPath)){
+                    e.onNext(mLrcBuilder.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))),true, mTitle,mArtistName));
+                }
+                e.onComplete();
+            }
+        });
+
+        //是否优先搜索在线歌词
+        boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting","OnlineLrc",false);
+        manualObservable.switchIfEmpty(cacheObservable)
+                .switchIfEmpty(Observable.concat(onlineFirst ? neteaseObservable : localObservable ,onlineFirst ? localObservable : neteaseObservable).firstOrError().toObservable())
+                .compose(RxUtil.applyScheduler())
+                .subscribe(new Consumer<List<LrcRow>>() {
+                    @Override
+                    public void accept(List<LrcRow> lrcRows) throws Exception {
+
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+
+                    }
+                });
+    }
+
     /**
      * 根据歌词id,发送请求并解析歌词
      * @return 歌词信息list
      */
-    public List<LrcRow> getLrc(String lrcPath){
+    public List<LrcRow> getLrc(String manualPath){
         //判断是否是忽略的歌词
         Set<String> ignoreLrcId = SPUtil.getStringSet(APlayerApplication.getContext(),"Setting","IgnoreLrcID");
         if(ignoreLrcId != null && ignoreLrcId.size() > 0){
@@ -183,8 +262,8 @@ public class SearchLRC {
         BufferedReader br = null;
         //manualPath不为空说明为手动设置歌词
         try {
-            if(!TextUtils.isEmpty(lrcPath)){
-                br = new BufferedReader(new InputStreamReader(new FileInputStream(lrcPath)));
+            if(!TextUtils.isEmpty(manualPath)){
+                br = new BufferedReader(new InputStreamReader(new FileInputStream(manualPath)));
                 return mLrcBuilder.getLrcRows(br,true, mTitle,mArtistName);
             }
         } catch (Exception e){
@@ -260,6 +339,44 @@ public class SearchLRC {
         return null;
     }
 
+    private String getNeteaseLyric(){
+        final String url = "http://music.163.com/api/search/pc?s=" + mInfo.getArtist() + "-" + mInfo.getTitle() + "&offset=0&limit=10&type=1";
+        OkHttpClient client = new OkHttpClient.Builder().build();
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/x-www-form-urlencoded; charset=utf-8"),"");
+
+        Request songRequest = new Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader("Cookie","appver=1.5.0.75771")
+                .build();
+
+//        client.newCall(request).enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                String responseString = response.body().string();
+//                NSongSearchResponse searchResponse = new Gson().fromJson(responseString,NSongSearchResponse.class);
+//                LogUtil.d("NSongSearchResponse", searchResponse + "");
+//            }
+//        });
+
+        try {
+            Response response = client.newCall(songRequest).execute();
+            NSongSearchResponse neteaseSearchResponse = new Gson().fromJson(response.body().string(),NSongSearchResponse.class);
+            int id = neteaseSearchResponse.result.songs.get(0).id;
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     /**
      * 获得在线歌词
      * @return
@@ -303,7 +420,7 @@ public class SearchLRC {
      * 搜索本地所有歌词文件
      * @return
      */
-    private String getlocalLrcPath() {
+    public String getlocalLrcPath() {
         //查找本地目录
         String searchPath =  SPUtil.getValue(APlayerApplication.getContext(),"Setting","LrcSearchPath","");
         if(mInfo == null)
