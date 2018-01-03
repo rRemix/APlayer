@@ -480,7 +480,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         if(mUpdateFloatLrcThread != null)
             mUpdateFloatLrcThread.quitImmediately();
 
-
         if(mMediaExtractor != null)
             mMediaExtractor.release();
 
@@ -1414,12 +1413,19 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 int control = Global.Operation;
                 if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcRows == null)
                     mLrcRows = new SearchLRC(mCurrentInfo).getLrc("");
-                if(mShowFloatLrc && !isFloatLrcShowing()){
-                    mUpdateFloatLrcThread = new UpdateFloatLrcThread();
-                    mUpdateFloatLrcThread.start();
-                }
+                createFloatLrcThreadIfNeed();
             }
         });
+    }
+
+    /**
+     * 创建更新桌面歌词的线程
+     */
+    private void createFloatLrcThreadIfNeed() {
+        if(mShowFloatLrc && !isFloatLrcShowing()){
+            mUpdateFloatLrcThread = new UpdateFloatLrcThread();
+            mUpdateFloatLrcThread.start();
+        }
     }
 
     /**
@@ -1840,10 +1846,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 if(MusicService.isPlay() && SPUtil.getValue(context,"Setting","LockScreenOn", Constants.APLAYER_LOCKSCREEN) == Constants.APLAYER_LOCKSCREEN)
                     context.startActivity(new Intent(context, LockScreenActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 //重新显示桌面歌词
-                if(mShowFloatLrc && !isFloatLrcShowing()){
-                    mUpdateFloatLrcThread = new UpdateFloatLrcThread();
-                    mUpdateFloatLrcThread.start();
-                }
+                createFloatLrcThreadIfNeed();
             } else {
                 //屏幕熄灭 关闭桌面歌词
                 if(mShowFloatLrc && isFloatLrcShowing()) {

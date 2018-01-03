@@ -1,24 +1,23 @@
-package remix.myplayer.lyric;
+         package remix.myplayer.lyric;
 
-import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.os.Handler;
-import android.support.annotation.ColorInt;
-import android.text.Layout;
-import android.text.StaticLayout;
-import android.text.TextPaint;
-import android.text.TextUtils;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewConfiguration;
-import android.widget.Scroller;
+         import android.content.Context;
+         import android.graphics.Canvas;
+         import android.graphics.Color;
+         import android.os.Handler;
+         import android.support.annotation.ColorInt;
+         import android.text.Layout;
+         import android.text.StaticLayout;
+         import android.text.TextPaint;
+         import android.util.AttributeSet;
+         import android.util.Log;
+         import android.view.MotionEvent;
+         import android.view.View;
+         import android.view.ViewConfiguration;
+         import android.widget.Scroller;
 
-import java.util.List;
+         import java.util.List;
 
-import remix.myplayer.lyric.bean.LrcRow;
+         import remix.myplayer.lyric.bean.LrcRow;
 
 /**
  * Created by Remix on 2018/1/3.
@@ -40,7 +39,7 @@ public class NewLrcView extends View implements ILrcView{
     /** 跨行歌词之间额外的行距*/
     public static final float DEFAULT_SPACING_PADDING = 0;
     /** 跨行歌词之间行距倍数*/
-    public static final float DEFAULT_SPACING_MULT = 0.8f;
+    public static final  float DEFAULT_SPACING_MULT = 0.8f;
     /**高亮歌词当前的字体大小***/
     private float mSizeForHighLightLrc = DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC;
     /**高亮歌词的默认字体颜色**/
@@ -84,7 +83,7 @@ public class NewLrcView extends View implements ILrcView{
     /**实现歌词竖直方向平滑滚动的辅助对象**/
     private Scroller mScroller;
     /***移动一句歌词的持续时间**/
-    private static final int DURATION_FOR_LRC_SCROLL = 650;
+    private static final int DURATION_FOR_LRC_SCROLL = 1600;
     /***停止触摸时 如果View需要滚动 时的持续时间**/
     private static final int DURATION_FOR_ACTION_UP = 400;
 
@@ -118,8 +117,8 @@ public class NewLrcView extends View implements ILrcView{
         mPaintForHighLightLrc = new TextPaint();
         mPaintForHighLightLrc.setAntiAlias(true);
         mPaintForHighLightLrc.setColor(mColorForHighLightLrc);
-//        mSizeForHighLightLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,19, APlayerApplication.getContext().getResources().getDisplayMetrics());
-        mSizeForHighLightLrc = DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC + 10;
+//        mSizeForHighLightLrc = TypedValue.applyDimen sion(TypedValue.COMPLEX_UNIT_SP,19, APlayerApplication.getContext().getResources().getDisplayMetrics());
+        mSizeForHighLightLrc = DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC;
         mPaintForHighLightLrc.setTextSize(mSizeForHighLightLrc);
         mPaintForHighLightLrc.setFakeBoldText(true);
 
@@ -160,8 +159,8 @@ public class NewLrcView extends View implements ILrcView{
                 drawLrcRow(canvas,mPaintForHighLightLrc,availableWidth,mLrcRows.get(i));
             }else{  //普通歌词
                 //计算歌词透明度
-                int alpha = (int)(0xff /  Math.pow(Math.abs(i - mCurRow),1.2f));
-                mPaintForOtherLrc.setAlpha(alpha);
+//                int alpha = (int)(0xff /  Math.pow(Math.abs(i - mCurRow),1.2f));
+//                mPaintForOtherLrc.setAlpha(alpha);
                 drawLrcRow(canvas,mPaintForOtherLrc, availableWidth, mLrcRows.get(i));
             }
         }
@@ -171,7 +170,6 @@ public class NewLrcView extends View implements ILrcView{
             canvas.drawText(mLrcRows.get(mCurRow).getTimeStr(), 0, y - 5, mPaintForTimeLine);
             canvas.drawLine(0, y, getWidth(), y, mPaintForTimeLine);
         }
-
     }
 
     /**
@@ -183,9 +181,12 @@ public class NewLrcView extends View implements ILrcView{
      */
     private void drawLrcRow(Canvas canvas, TextPaint textPaint, int availableWidth, LrcRow lrcRow) {
         drawText(canvas,textPaint,availableWidth,lrcRow.getContent());
+        mRowY += lrcRow.getContentHeight();
         if(lrcRow.hasTranslate()){
             drawText(canvas,textPaint,availableWidth,lrcRow.getTranslate());
+            mRowY += lrcRow.getTranslateHeight();
         }
+//        mRowY += lrcRow.getHeight();
         mRowY += mLinePadding;
     }
 
@@ -207,7 +208,9 @@ public class NewLrcView extends View implements ILrcView{
         staticLayout.draw(canvas);
         canvas.restore();
         //根据一句歌词所占的行数计算出下一行歌词绘制的y坐标
-        mRowY += staticLayout.getHeight();
+        int height = (int) ((staticLayout.getLineCount() * textPaint.getTextSize()) + DEFAULT_SPACING_PADDING);
+        int height1 = staticLayout.getHeight();
+//        mRowY += height1;
     }
 
     /**是否可拖动歌词**/
@@ -300,8 +303,8 @@ public class NewLrcView extends View implements ILrcView{
                     }
                     if(getScrollY() < 0){
                         smoothScrollTo(0,DURATION_FOR_ACTION_UP);
-                    }else if(getScrollY() > getScrollYByCurrentRow(mCurRow)){
-                        smoothScrollTo(getScrollYByCurrentRow(mCurRow),DURATION_FOR_ACTION_UP);
+                    }else if(getScrollY() > getScrollYByRow(mCurRow)){
+                        smoothScrollTo(getScrollYByRow(mCurRow),DURATION_FOR_ACTION_UP);
                     }
                     mCanDrag = false;
                     mIsDrawTimeLine = false;
@@ -324,22 +327,34 @@ public class NewLrcView extends View implements ILrcView{
         mLrcRows = lrcRows;
         if(mLrcRows != null){
             //计算每一行歌词所占的高度
+//            for(LrcRow lrcRow : mLrcRows){
+//                int height = 0;
+//                String combine = lrcRow.getContent() + (!TextUtils.isEmpty(lrcRow.getTranslate()) ? "\t" + lrcRow.getTranslate() : "");
+//                String[] multiText = combine.split("\t");
+//                for (String text : multiText) {
+//                    float textWidth = mPaintForOtherLrc.measureText(text);
+//                    int lineNumber = (int) Math.ceil(textWidth / getWidth());
+//
+//                    height += lineNumber * mPaintForOtherLrc.getTextSize() + DEFAULT_SPACING_PADDING;
+//                }
+//                lrcRow.setHeight(height);
+//            }
             for(LrcRow lrcRow : mLrcRows){
-                int height = 0;
-
-                String combine = lrcRow.getContent() + (!TextUtils.isEmpty(lrcRow.getTranslate()) ? "\t" + lrcRow.getTranslate() : "");
-                String[] multiText = combine.split("\t");
-                for (String text : multiText) {
-                    float textWidth = mPaintForOtherLrc.measureText(text);
-                    int lineNumber = (int) Math.ceil(textWidth / getWidth());
-
-                    height += lineNumber * mPaintForOtherLrc.getTextSize() + DEFAULT_SPACING_PADDING;
+                lrcRow.setContentHeight(getSingleLineHeight(lrcRow.getContent()));
+                if(lrcRow.hasTranslate()){
+                    lrcRow.setTranslateHeight(getSingleLineHeight(lrcRow.getTranslate()));
                 }
-                lrcRow.setHeight(height);
+                lrcRow.setTotalHeight(lrcRow.getTranslateHeight() + lrcRow.getContentHeight());
             }
         }
-
         invalidate();
+    }
+
+    private int getSingleLineHeight(String text){
+        float textWidth = mPaintForOtherLrc.measureText(text);
+        StaticLayout staticLayout = new StaticLayout(text, mPaintForOtherLrc, getWidth(),textWidth > getWidth() ? Layout.Alignment.ALIGN_CENTER : Layout.Alignment.ALIGN_NORMAL,
+                DEFAULT_SPACING_MULT, DEFAULT_SPACING_PADDING, true);
+        return staticLayout.getHeight();
     }
 
     /**当前高亮歌词的行号**/
@@ -351,10 +366,10 @@ public class NewLrcView extends View implements ILrcView{
      * 到第n行所滚动过的距离
      * @return
      */
-    private int getScrollYByCurrentRow(int row){
+    private int getScrollYByRow(int row){
         int scrollY = 0;
         for(int i = 0 ;i < mLrcRows.size() &&  i < row;i++){
-            scrollY += mLrcRows.get(i).getHeight() + mLinePadding;
+            scrollY += mLrcRows.get(i).getTotalHeight() + mLinePadding;
         }
         return scrollY;
     }
@@ -367,7 +382,7 @@ public class NewLrcView extends View implements ILrcView{
         int totalY = 0;
         int line;
         for(line = 0; line < mLrcRows.size();line++){
-            totalY += mLinePadding + mLrcRows.get(line).getHeight();
+            totalY += mLinePadding + mLrcRows.get(line).getTotalHeight();
             if(totalY >= getScrollY())
                 return line;
         }
@@ -393,9 +408,9 @@ public class NewLrcView extends View implements ILrcView{
                         if(!mScroller.isFinished()){
                             mScroller.forceFinished(true);
                         }
-                        scrollTo(getScrollX(), getScrollYByCurrentRow(mCurRow));
+                        scrollTo(getScrollX(), getScrollYByRow(mCurRow));
                     }else{
-                        smoothScrollTo(getScrollYByCurrentRow(mCurRow), DURATION_FOR_LRC_SCROLL);
+                        smoothScrollTo(getScrollYByRow(mCurRow), DURATION_FOR_LRC_SCROLL);
                     }
                     //如果高亮歌词的宽度大于View的宽，就需要开启属性动画，让它水平滚动
 //					float textWidth = mPaintForHighLightLrc.measureText(mLrcRows.get(mCurRow).getContent());
@@ -425,7 +440,6 @@ public class NewLrcView extends View implements ILrcView{
         mSizeForOtherLrc = DEFAULT_SIZE_FOR_OTHER_LRC * mCurScalingFactor;
         mLinePadding = DEFAULT_PADDING * mCurScalingFactor;
         mTotalRow = (int) (getHeight() / (mSizeForOtherLrc + mLinePadding)) + 3;
-        log("mRowTotal="+ mTotalRow);
         scrollTo(getScrollX(), (int) (mCurRow * (mSizeForOtherLrc + mLinePadding)));
         invalidate();
         mScroller.forceFinished(true);

@@ -23,6 +23,7 @@ import remix.myplayer.util.Util;
  */
 
 public class DefaultLrcParser implements ILrcParser {
+    @Override
     public void saveLrcRows(List<LrcRow> lrcRows, String key){
         if(lrcRows == null || lrcRows.size() == 0)
             return;

@@ -258,7 +258,7 @@ public class MultiChoice implements OnMultiItemClickListener {
     public void itemAddorRemoveWithLongClick(View view,int position,Object arg,String newTag,int type){
         //当前没有处于多选状态
         if(!mIsShow && TAG.equals("")){
-            Util.Vibrate(mContext,150);
+            Util.vibrate(mContext,150);
             TAG = newTag;
             TYPE = type;
             mIsShow = true;

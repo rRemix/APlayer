@@ -104,7 +104,7 @@ public class Util {
      * @param context
      * @param milliseconds
      */
-    public static void Vibrate(final Context context,final long milliseconds) {
+    public static void vibrate(final Context context, final long milliseconds) {
         if(context == null)
             return;
         Vibrator vibrator = (Vibrator) context.getSystemService(Service.VIBRATOR_SERVICE);
@@ -203,7 +203,7 @@ public class Util {
                     return mimeType.substring(6,mimeType.length() - 1);
                 else
                     return mimeType;
-            } finally {
+            }catch (Exception e){
                 return mimeType;
             }
         }
@@ -265,8 +265,7 @@ public class Util {
      */
     public static boolean deleteFile(String path){
         File file = new File(path);
-        boolean s = file.exists() && file.delete();
-        return s;
+        return file.exists() && file.delete();
     }
 
     /**
@@ -370,48 +369,6 @@ public class Util {
     }
 
     /**
-     * 根据专辑id返回封面的url
-     * @param albumId
-     * @return
-     */
-    public static JSONObject getCoverJsonObject(int albumId){
-        BufferedReader br = null;
-        StringBuffer strBuffer = new StringBuffer();
-        String s;
-        try {
-            URL albumUrl = new URL("http://geci.me/api/cover/"  + albumId);
-            HttpURLConnection httpURLConnection = (HttpURLConnection)albumUrl.openConnection();
-            httpURLConnection.connect();
-            InputStreamReader inReader = new InputStreamReader(httpURLConnection.getInputStream());
-            br = new BufferedReader(inReader);
-            if(br == null)
-                return null;
-            while((s = br.readLine()) != null){
-                strBuffer.append(s);
-            }
-            return new JSONObject(strBuffer.toString());
-
-        }  catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            try {
-                if(br != null) {
-                    br.close();
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * 根据歌曲名和歌手请求歌曲信息
      * @param songname
      * @param artistname
@@ -464,21 +421,6 @@ public class Util {
         return null;
     }
 
-
-    public static String getCoverInCache(long albumId){
-        File coverCacheDir = new File(Environment.getExternalStorageDirectory() + "/Android/data/" + mContext.getPackageName() + "/cache/cover");
-        if(coverCacheDir.isDirectory()){
-            File files[] = coverCacheDir.listFiles();
-            if(files != null){
-                for (File f : files){
-                    if(f.getName().equals(albumId + "")){
-                        return f.getAbsolutePath();
-                    }
-                }
-            }
-        }
-        return "";
-    }
 
     /**
      * 查找歌曲的lrc文件

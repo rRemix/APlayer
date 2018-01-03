@@ -23,14 +23,32 @@ public class LrcRow implements Comparable<LrcRow>{
 	private String mTranslate;
 	/**该行歌词显示的总时间**/
 	private long mTotalTime;
-	/** 该行歌词所占的高度*/
-	private int mHeight;
+	/** 该行歌词内容所占的高度*/
+	private int mContentHeight;
+	/** 该行歌词翻译所占的高度*/
+	private int mTranslateHeight;
+	/** 该句歌词所占的总共高度*/
+	private int mTotalHeight;
 
-	public void setHeight(int height){
-	    this.mHeight = height;
+    public void setTotalHeight(int height){
+        this.mTotalHeight = height;
     }
-    public int getHeight(){
-	    return mHeight;
+    public int getTotalHeight(){
+        return mTotalHeight;
+    }
+
+	public void setContentHeight(int height){
+	    this.mContentHeight = height;
+    }
+    public int getContentHeight(){
+	    return mContentHeight;
+    }
+
+    public void setTranslateHeight(int height){
+        this.mTranslateHeight = height;
+    }
+    public int getTranslateHeight(){
+        return mTranslateHeight;
     }
 
 	public long getTotalTime() {
