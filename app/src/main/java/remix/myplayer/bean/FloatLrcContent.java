@@ -2,7 +2,7 @@ package remix.myplayer.bean;
 
 import java.io.Serializable;
 
-import remix.myplayer.lyric.LrcRow;
+import remix.myplayer.lyric.bean.LrcRow;
 
 /**
  * @ClassName

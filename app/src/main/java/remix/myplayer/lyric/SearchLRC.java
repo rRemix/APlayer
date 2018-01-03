@@ -44,6 +44,7 @@ import remix.myplayer.bean.LrcRequest;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.bean.netease.NLrcResponse;
 import remix.myplayer.bean.netease.NSongSearchResponse;
+import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.cache.DiskLruCache;
 import remix.myplayer.request.network.HttpClient;

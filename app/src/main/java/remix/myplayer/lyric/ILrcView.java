@@ -2,6 +2,8 @@ package remix.myplayer.lyric;
 
 import java.util.List;
 
+import remix.myplayer.lyric.bean.LrcRow;
+
 
 public interface ILrcView {
 	/**

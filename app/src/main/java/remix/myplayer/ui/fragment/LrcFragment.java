@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -32,8 +33,8 @@ import remix.myplayer.bean.netease.NLrcResponse;
 import remix.myplayer.bean.netease.NSongSearchResponse;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.lyric.DefaultLrcParser;
-import remix.myplayer.lyric.LrcRow;
-import remix.myplayer.lyric.LrcView;
+import remix.myplayer.lyric.NewLrcView;
+import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.cache.DiskLruCache;
 import remix.myplayer.request.network.HttpClient;
@@ -53,7 +54,7 @@ public class LrcFragment extends BaseFragment {
     private OnInflateFinishListener mOnFindListener;
     private Song mInfo;
     @BindView(R.id.lrc_view)
-    LrcView mLrcView;
+    NewLrcView mLrcView;
     //歌词
     private List<LrcRow> mLrcList;
 
@@ -111,27 +112,31 @@ public class LrcFragment extends BaseFragment {
                 .flatMap(body -> HttpClient.getInstance()
                         .getNeteaseLyric(new Gson().fromJson(body.string(),NSongSearchResponse.class).result.songs.get(0).id)
                         .map(body1 -> {
-                            NLrcResponse lrcResponse = new Gson().fromJson(body1.string(),NLrcResponse.class);
-                            List<LrcRow> original = lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.lrc.lyric.getBytes(Charset.forName("utf8"))), Charset.forName("utf8"))),false,mInfo.getTitle(),mInfo.getArtist() + "/original");
+                            final NLrcResponse lrcResponse = new Gson().fromJson(body1.string(),NLrcResponse.class);
+                            final Charset utf8 = Charset.forName("utf8");
+                            List<LrcRow> combine = lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.lrc.lyric.getBytes(utf8)),utf8)),false,mInfo.getTitle(),mInfo.getArtist() + "/original");
                             //有翻译 尝试合并
                             if(lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
-                                List<LrcRow> translate = lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(Charset.forName("utf8"))), Charset.forName("utf8"))),false,mInfo.getTitle(),mInfo.getArtist() + "/translate");
+                                List<LrcRow> translate = lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(utf8)),utf8)),false,mInfo.getTitle(),mInfo.getArtist() + "/translate");
                                 if(translate != null && translate.size() > 0){
                                     LrcRow translateFirstRow = translate.get(0);
                                     int delta = 0;
                                     boolean find = false;
-                                    for(int i = 0; i < original.size();i++){
-                                        if(translateFirstRow.getTime() != original.get(i).getTime() && !find){
+                                    for(int i = 0; i < combine.size();i++){
+                                        if(translateFirstRow.getTime() != combine.get(i).getTime() && !find){
                                             delta++;
                                         }else {
                                             find = true;
-                                            if(i - delta < translate.size())
-                                                original.get(i).setContent(original.get(i).getContent() + "\n" + translate.get(i - delta).getContent());
+                                            if(i - delta < translate.size()){
+                                                combine.get(i).setContent(combine.get(i).getContent());
+                                                combine.get(i).setTranslate(translate.get(i - delta).getContent());
+                                            }
                                         }
                                     }
                                 }
                             }
-                            return original;
+                            lrcParser.saveLrcRows(combine,mInfo.getTitle() + "/" + mInfo.getArtist());
+                            return combine;
                         }))
                 .onErrorResumeNext(throwable -> {
                     return Observable.empty();
@@ -159,7 +164,10 @@ public class LrcFragment extends BaseFragment {
             //缓存
             DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(Util.hashKeyForDisk(mInfo.getTitle() + "/" + mInfo.getArtist()));
             if(snapShot != null){
-                e.onNext(lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))),false, mInfo.getTitle(),mInfo.getArtist()));
+                BufferedReader br = new BufferedReader(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))));
+                String buffer = br.readLine();
+                e.onNext(new Gson().fromJson(buffer,new TypeToken<List<LrcRow>>(){}.getType()));
+//                e.onNext(lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))),false, mInfo.getTitle(),mInfo.getArtist()));
             }
             e.onComplete();
         })).switchIfEmpty(last)

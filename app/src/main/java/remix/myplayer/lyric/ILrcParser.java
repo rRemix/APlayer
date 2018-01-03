@@ -3,6 +3,8 @@ package remix.myplayer.lyric;
 import java.io.BufferedReader;
 import java.util.List;
 
+import remix.myplayer.lyric.bean.LrcRow;
+
 /**
  * @ClassName
  * @Description

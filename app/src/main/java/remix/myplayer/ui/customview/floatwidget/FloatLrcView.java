@@ -29,11 +29,12 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.adapter.FloatColorAdapter;
 import remix.myplayer.bean.FloatLrcContent;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.lyric.LrcRow;
+import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
@@ -56,9 +57,9 @@ public class FloatLrcView extends RelativeLayout {
     private FloatLrcContent mLrcContent;
     private Handler mUIHandler = new Handler();
     @BindView(R.id.widget_line1)
-    FloatTextView mLine1;
+    FloatTextView mText1;
     @BindView(R.id.widget_line2)
-    TextView mLine2;
+    TextView mText2;
     @BindView(R.id.widget_pannel)
     ViewGroup mPanel;
     @BindView(R.id.widget_lock)
@@ -147,7 +148,7 @@ public class FloatLrcView extends RelativeLayout {
                     @Override
                     public void onItemClick(View view, int position) {
                         final int themeColor = ThemeStore.getAllThemeColor().get(position);
-                        mLine1.setTextColor(ThemeStore.getThemeColorInt(themeColor));
+                        mText1.setTextColor(ThemeStore.getThemeColorInt(themeColor));
                         mColorAdapter.setCurrentColor(themeColor);
                         mColorAdapter.notifyDataSetChanged();
                         resetHide();
@@ -167,9 +168,9 @@ public class FloatLrcView extends RelativeLayout {
     }
 
     private void setUpView() {
-        mLine1.setTextColor(ThemeStore.getThemeColorInt(SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_COLOR,ThemeStore.getThemeColor())));
-        mLine1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
-        mLine2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
+        mText1.setTextColor(ThemeStore.getThemeColorInt(SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_COLOR,ThemeStore.getThemeColor())));
+        mText1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
+        mText2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
         mIsLock = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LRC_LOCK,false);
 
         mTextSizeType = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_SIZE,MEDIUM);
@@ -190,16 +191,18 @@ public class FloatLrcView extends RelativeLayout {
     }
 
 
+    private int DEFAULT_COLOR = APlayerApplication.getContext().getResources().getColor(R.color.float_text_color);
     public void setText(LrcRow lrc1, LrcRow lrc2) {
         if(lrc1 != null) {
             if(TextUtils.isEmpty(lrc1.getContent()))
                 lrc1.setContent("......");
-            mLine1.setLrcRow(lrc1);
+            mText1.setLrcRow(lrc1);
+            mText2.setTextColor(lrc1.hasTranslate() ? ThemeStore.getThemeColorInt(ThemeStore.getThemeColor()) : DEFAULT_COLOR);
         }
         if(lrc2 != null) {
             if(TextUtils.isEmpty(lrc2.getContent()))
                 lrc2.setContent(".....");
-            mLine2.setText(lrc2.getContent());
+            mText2.setText(lrc2.getContent());
         }
     }
 
@@ -325,8 +328,8 @@ public class FloatLrcView extends RelativeLayout {
                     needRefresh = true;
                 }
                 if(needRefresh){
-                    mLine1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
-                    mLine2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
+                    mText1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
+                    mText2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
                     SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_SIZE,mTextSizeType);
                     //操作后重置消息的时间
                     resetHide();

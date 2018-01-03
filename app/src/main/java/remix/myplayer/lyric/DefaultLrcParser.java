@@ -1,5 +1,8 @@
 package remix.myplayer.lyric;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -7,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.cache.DiskLruCache;
 import remix.myplayer.util.Util;
@@ -19,6 +23,36 @@ import remix.myplayer.util.Util;
  */
 
 public class DefaultLrcParser implements ILrcParser {
+    public void saveLrcRows(List<LrcRow> lrcRows, String key){
+        if(lrcRows == null || lrcRows.size() == 0)
+            return;
+        DiskLruCache.Editor editor;
+        OutputStream lrcCacheStream = null;
+        try {
+            DiskLruCache lrcDiskCache = DiskCache.getLrcDiskCache();
+            editor = lrcDiskCache.edit(Util.hashKeyForDisk(key));
+            lrcCacheStream = editor.newOutputStream(0);
+//            for(LrcRow lrcRow : lrcRows){
+//                lrcCacheStream.write((lrcRow + "\n").getBytes());
+//            }
+            lrcCacheStream.write(new Gson().toJson(lrcRows,new TypeToken<List<LrcRow>>(){}.getType()).getBytes());
+            lrcCacheStream.flush();
+            editor.commit();
+
+            DiskCache.getLrcDiskCache().flush();
+        }catch (Exception e){
+
+        } finally {
+            try {
+                if(lrcCacheStream != null)
+                    lrcCacheStream.close();
+            }catch (Exception e){
+
+            }
+        }
+
+    }
+
     @Override
     public List<LrcRow> getLrcRows(BufferedReader bufferedReader, boolean needCache,String songName,String artistName) {
         if(bufferedReader == null)
@@ -30,18 +64,7 @@ public class DefaultLrcParser implements ILrcParser {
 
         List<LrcRow> lrcRows = new ArrayList<>();
         try {
-            if (needCache) {
-                DiskLruCache lrcDiskCache = DiskCache.getLrcDiskCache();
-                if(lrcDiskCache != null)
-                    editor = lrcDiskCache.edit(Util.hashKeyForDisk(songName + "/" + artistName));
-                if(editor != null)
-                    lrcCacheStream = editor.newOutputStream(0);
-            }
-
             while ((s = bufferedReader.readLine()) != null) {
-                //缓存
-                if (needCache && lrcCacheStream != null)
-                    lrcCacheStream.write((s + "\n").getBytes());
                 //解析每一行歌词
                 List<LrcRow> rows = LrcRow.createRows(s);
                 if(rows != null && rows.size() > 0)
@@ -57,8 +80,14 @@ public class DefaultLrcParser implements ILrcParser {
             }
             lrcRows.get(lrcRows.size() - 1).setTotalTime(5000);
 
-            if (needCache) {
-                if (lrcCacheStream != null) {
+            if (needCache ) {
+                DiskLruCache lrcDiskCache = DiskCache.getLrcDiskCache();
+                if(lrcDiskCache != null)
+                    editor = lrcDiskCache.edit(Util.hashKeyForDisk(songName + "/" + artistName));
+                if(editor != null)
+                    lrcCacheStream = editor.newOutputStream(0);
+                if(lrcCacheStream != null){
+                    lrcCacheStream.write(new Gson().toJson(lrcRows,new TypeToken<List<LrcRow>>(){}.getType()).getBytes());
                     lrcCacheStream.flush();
                 }
                 if (editor != null) {

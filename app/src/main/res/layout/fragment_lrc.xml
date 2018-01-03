@@ -4,12 +4,12 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:paddingBottom="@dimen/d12_size">
-    <remix.myplayer.lyric.LrcView
+    <remix.myplayer.lyric.NewLrcView
         android:id="@+id/lrc_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="@dimen/d30_size"
         android:layout_marginRight="@dimen/d30_size"
-        android:layout_marginTop="@dimen/d16_size"
+        android:layout_marginTop="@dimen/d8_size"
         android:textColor="@color/day_enable_text_color" />
 </LinearLayout>

@@ -1,4 +1,4 @@
-package remix.myplayer.lyric;
+package remix.myplayer.lyric.bean;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,48 +14,86 @@ import java.util.List;
 public class LrcRow implements Comparable<LrcRow>{
 
 	/**开始时间 为00:10:00***/
-	private String timeStr;
+	private String mTimeStr;
 	/**开始时间 毫米数  00:10:00  为10000**/
-	private int time;
+	private int mTime;
 	/**歌词内容**/
-	private String content;
+	private String mContent;
+	/**歌词内容翻译*/
+	private String mTranslate;
 	/**该行歌词显示的总时间**/
-	private int totalTime;
-	
+	private long mTotalTime;
+	/** 该行歌词所占的高度*/
+	private int mHeight;
+
+	public void setHeight(int height){
+	    this.mHeight = height;
+    }
+    public int getHeight(){
+	    return mHeight;
+    }
+
 	public long getTotalTime() {
-		return totalTime;
+		return mTotalTime;
 	}
 	public void setTotalTime(int totalTime) {
-		this.totalTime = totalTime;
-	}
-	public String getTimeStr() {
-		return timeStr;
-	}
-	public void setTimeStr(String timeStr) {
-		this.timeStr = timeStr;
-	}
-	public int getTime() {
-		return time;
-	}
-	public void setTime(int time) {
-		this.time = time;
-	}
-	public String getContent() {
-		return content;
-	}
-	public void setContent(String content) {
-		this.content = content;
+		this.mTotalTime = totalTime;
 	}
 
-	public LrcRow() {
-		super();
+	public String getTimeStr() {
+		return mTimeStr;
 	}
+	public void setTimeStr(String timeStr) {
+		this.mTimeStr = timeStr;
+	}
+
+	public int getTime() {
+		return mTime;
+	}
+	public void setTime(int time) {
+		this.mTime = time;
+	}
+
+	public String getContent() {
+		return mContent;
+	}
+	public void setContent(String content) {
+		this.mContent = content;
+	}
+
+	public String getTranslate(){
+        return mTranslate;
+    }
+    public void setTranslate(String translate){
+	    mTranslate = translate;
+    }
+
+    public boolean hasTranslate(){
+        return !TextUtils.isEmpty(mTranslate);
+    }
+
+	public LrcRow() {
+	}
+
+	public LrcRow(LrcRow lrcRow){
+        mTimeStr = lrcRow.getTimeStr();
+        mTime = lrcRow.getTime();
+        mTotalTime = lrcRow.getTotalTime();
+        mContent = lrcRow.getContent();
+        mTranslate = lrcRow.getTranslate();
+    }
+
 	public LrcRow(String timeStr, int time, String content) {
 		super();
-		this.timeStr = timeStr;
-		this.time = time;
-		this.content = content;
+		mTimeStr = timeStr;
+		mTime = time;
+		String[] mulitiContent = content.split("\t");
+        mContent = mulitiContent[0];
+        if(mulitiContent.length > 1){
+		    mTranslate = mulitiContent[1];
+        }
 	}
+
 	/**
 	 * 将歌词文件中的某一行 解析成一个List<LrcRow> 
 	 * 因为一行中可能包含了多个LrcRow对象
@@ -99,19 +137,24 @@ public class LrcRow implements Comparable<LrcRow>{
 		timeStr = timeStr.replace('.', ':');
 		String[] times = timeStr.split(":");
 
-		return Integer.parseInt(times[0])*60*1000
-				+ Integer.parseInt(times[1])*1000 
+		return Integer.parseInt(times[0] )* 60 * 1000
+				+ Integer.parseInt(times[1]) * 1000
 				+ Integer.parseInt(times[2]);
 	}
 	@Override
 	public int compareTo(LrcRow anotherLrcRow) {
-		return this.time - anotherLrcRow.time;
+		return this.mTime - anotherLrcRow.mTime;
 	}
-	@Override
-	public String toString() {
-		return "LrcRow [timeStr=" + timeStr + ", time=" + time + ", totalTime=" + totalTime +", content="
-				+ content + "]";
-	} 
 
+//	@Override
+//	public String toString() {
+//		return "LrcRow [mTimeStr=" + mTimeStr + ", mTime=" + mTime + ", mTotalTime=" + mTotalTime +", mContent="
+//				+ mContent + "]";
+//	}
+
+    @Override
+    public String toString() {
+        return "[" + mTimeStr + "] " + mContent;
+    }
 
 }

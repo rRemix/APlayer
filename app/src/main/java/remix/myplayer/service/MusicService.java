@@ -61,8 +61,8 @@ import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.ShakeDetector;
-import remix.myplayer.lyric.LrcRow;
 import remix.myplayer.lyric.SearchLRC;
+import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
@@ -1564,13 +1564,19 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     break;
                 }
                 else if(progress >= lrcRow.getTime()){
-                    mCurrentLrc.Line1 = mLrcRows.get(i);
-                    mCurrentLrc.Line2 = (i + 1 < mLrcRows.size() ? mLrcRows.get(i + 1) : EMPTY_ROW);
+                    if(lrcRow.hasTranslate()){
+                        mCurrentLrc.Line1 = new LrcRow(lrcRow);
+                        mCurrentLrc.Line1.setContent(lrcRow.getContent());
+                        mCurrentLrc.Line2 = new LrcRow(lrcRow);
+                        mCurrentLrc.Line2.setContent(lrcRow.getTranslate());
+                    } else {
+                        mCurrentLrc.Line1 = lrcRow;
+                        mCurrentLrc.Line2 = new LrcRow(i + 1 < mLrcRows.size() ? mLrcRows.get(i + 1) : EMPTY_ROW);
+                    }
                     mUpdateUIHandler.obtainMessage(Constants.UPDATE_FLOAT_LRC_CONTENT).sendToTarget();
                     break;
                 }
             }
-
 //            for(int i = 0; i < mLrcRows.size(); i++){
 //                LrcRow lrcRow = mLrcRows.get(i);
 //                int interval = progress - lrcRow.getTime();
@@ -1620,7 +1626,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             param.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         else
             param.type = WindowManager.LayoutParams.TYPE_PHONE;
-
 
         param.format = PixelFormat.RGBA_8888;
         param.gravity = Gravity.TOP;
