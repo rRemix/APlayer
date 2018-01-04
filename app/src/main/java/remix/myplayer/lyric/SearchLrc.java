@@ -153,9 +153,9 @@ public class SearchLrc {
             DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(Util.hashKeyForDisk(mKey));
             if(snapShot != null){
                 BufferedReader br = new BufferedReader(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))));
-                String buffer = br.readLine();
-                e.onNext(new Gson().fromJson(buffer,new TypeToken<List<LrcRow>>(){}.getType()));
+                e.onNext(new Gson().fromJson(br.readLine(),new TypeToken<List<LrcRow>>(){}.getType()));
                 snapShot.close();
+                br.close();
 //                e.onNext(lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))),false, mInfo.getTitle(),mInfo.getArtist()));
             }
             e.onComplete();
