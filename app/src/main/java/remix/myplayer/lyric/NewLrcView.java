@@ -13,6 +13,8 @@
          import android.view.MotionEvent;
          import android.view.View;
          import android.view.ViewConfiguration;
+         import android.view.animation.DecelerateInterpolator;
+         import android.view.animation.Interpolator;
          import android.widget.Scroller;
 
          import java.util.List;
@@ -79,11 +81,12 @@ public class NewLrcView extends View implements ILrcView{
     private static final float DEFAULT_SCALING_FACTOR = 1.0f;
     /**歌词的当前缩放比例**/
     private float mCurScalingFactor = DEFAULT_SCALING_FACTOR;
-
     /**实现歌词竖直方向平滑滚动的辅助对象**/
     private Scroller mScroller;
+    /** 插值器*/
+    private Interpolator DEFAULT_INTERPOLATOR = new DecelerateInterpolator();
     /***移动一句歌词的持续时间**/
-    private static final int DURATION_FOR_LRC_SCROLL = 1600;
+    private static final int DURATION_FOR_LRC_SCROLL = 1000;
     /***停止触摸时 如果View需要滚动 时的持续时间**/
     private static final int DURATION_FOR_ACTION_UP = 400;
 
@@ -99,6 +102,7 @@ public class NewLrcView extends View implements ILrcView{
     /** 当前纵坐标*/
     private float mRowY;
 
+
     public NewLrcView(Context context) {
         super(context);
         init();
@@ -113,7 +117,7 @@ public class NewLrcView extends View implements ILrcView{
      */
     @Override
     public void init() {
-        mScroller = new Scroller(getContext());
+        mScroller = new Scroller(getContext(),DEFAULT_INTERPOLATOR);
         mPaintForHighLightLrc = new TextPaint();
         mPaintForHighLightLrc.setAntiAlias(true);
         mPaintForHighLightLrc.setColor(mColorForHighLightLrc);

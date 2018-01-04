@@ -1,49 +1,23 @@
 package remix.myplayer.ui.fragment;
 
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.bean.netease.NLrcResponse;
-import remix.myplayer.bean.netease.NSongSearchResponse;
 import remix.myplayer.interfaces.OnInflateFinishListener;
-import remix.myplayer.lyric.DefaultLrcParser;
 import remix.myplayer.lyric.NewLrcView;
-import remix.myplayer.lyric.NewSearchLrc;
+import remix.myplayer.lyric.SearchLrc;
 import remix.myplayer.lyric.bean.LrcRow;
-import remix.myplayer.misc.cache.DiskCache;
-import remix.myplayer.misc.cache.DiskLruCache;
-import remix.myplayer.request.network.HttpClient;
-import remix.myplayer.request.network.RxUtil;
-import remix.myplayer.util.Global;
-import remix.myplayer.util.SPUtil;
-import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -101,188 +75,33 @@ public class LrcFragment extends BaseFragment {
         getLrc(lrcPath);
     }
 
-    private void getLrc(String manualPath){
-        if(mInfo == null){
+    private void getLrc(String manualPath) {
+        if (mInfo == null) {
             mLrcView.setText(getString(R.string.no_lrc));
             return;
         }
         mLrcView.setTag(mInfo.getId());
-        new NewSearchLrc(mInfo).getLrc(manualPath,new Observer<List<LrcRow>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                mLrcView.setText(getString(R.string.searching));
-                mDisposable = d;
-            }
-
-            @Override
-            public void onNext(List<LrcRow> lrcRows) {
-                if(mLrcView.getTag() != null && (int)mLrcView.getTag() == mInfo.getId()){
-                    mLrcList = lrcRows;
-                    if(mLrcList == null || mLrcList.size() == 0) {
-                        mLrcView.setText(getString(R.string.no_lrc));
-                        return;
-                    }
-                    mLrcView.setLrcRows(mLrcList);
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                if(mLrcView.getTag() != null && (int)mLrcView.getTag() == mInfo.getId()){
-                    mLrcList = new ArrayList<>();
-                    mLrcView.setText(getString(R.string.no_lrc));
-                }
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });
-        if(true)
-            return;
-        final DefaultLrcParser lrcParser = new DefaultLrcParser();
-
-        //网易歌词
-        Observable<List<LrcRow>> neteaseObservable = HttpClient.getNeteaseApiservice()
-                .getNeteaseSearch(mInfo.getArtist() + "-" + mInfo.getTitle(),0,1,1)
-                .flatMap(body -> HttpClient.getInstance()
-                        .getNeteaseLyric(new Gson().fromJson(body.string(),NSongSearchResponse.class).result.songs.get(0).id)
-                        .map(body1 -> {
-                            final NLrcResponse lrcResponse = new Gson().fromJson(body1.string(),NLrcResponse.class);
-                            final Charset utf8 = Charset.forName("utf8");
-                            List<LrcRow> combine = lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.lrc.lyric.getBytes(utf8)),utf8)),false,mInfo.getTitle(),mInfo.getArtist() + "/original");
-                            //有翻译 合并
-//                            if(lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
-//                                List<LrcRow> translate = lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(utf8)),utf8)),false,mInfo.getTitle(),mInfo.getArtist() + "/translate");
-//                                if(translate != null && translate.size() > 0){
-//                                    for(int i = 0 ; i < translate.size();i++){
-//                                        for(int j = 0 ; j < combine.size();j++){
-//                                            if(translate.get(i).getTime() == combine.get(j).getTime()){
-//                                                combine.get(j).setTranslate(translate.get(i).getContent());
-//                                                break;
-//                                            }
-//                                        }
-//                                    }
-//
-//                                }
-//                            }
-                            lrcParser.saveLrcRows(combine,mInfo.getTitle() + "/" + mInfo.getArtist());
-                            return combine;
-                        }))
-                .onErrorResumeNext(throwable -> {
-                    return Observable.empty();
-                });
-        //本地歌词
-        Observable<List<LrcRow>> localObservable = Observable.create(e -> {
-            String localPath = getlocalLrcPath();
-            if(!TextUtils.isEmpty(localPath)){
-                e.onNext(lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))),true, mInfo.getTitle(),mInfo.getArtist()));
-            }
-            e.onComplete();
-        });
-        //根据在线和本地的优先级 确定最后一级
-        boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting","OnlineLrc",false);
-        Observable<List<LrcRow>> last = Observable.concat(onlineFirst ? neteaseObservable : localObservable ,onlineFirst ? localObservable : neteaseObservable).firstOrError().toObservable();
-
-        Observable.create((ObservableOnSubscribe<List<LrcRow>>) e -> {
-            //手动设置的歌词
-            if(!TextUtils.isEmpty(manualPath)){
-                e.onNext(lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(manualPath))),true, mInfo.getTitle(),mInfo.getArtist()));
-            }
-            e.onComplete();
-        }).switchIfEmpty(Observable.create(e -> {
-            //缓存
-            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(Util.hashKeyForDisk(mInfo.getTitle() + "/" + mInfo.getArtist()));
-            if(snapShot != null){
-                BufferedReader br = new BufferedReader(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))));
-                String buffer = br.readLine();
-                e.onNext(new Gson().fromJson(buffer,new TypeToken<List<LrcRow>>(){}.getType()));
-//                e.onNext(lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))),false, mInfo.getTitle(),mInfo.getArtist()));
-            }
-            e.onComplete();
-        })).switchIfEmpty(last)
-        .compose(RxUtil.applyScheduler())
-        .subscribe(new Observer<List<LrcRow>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                mLrcView.setText(getString(R.string.searching));
-                mDisposable = d;
-            }
-
-            @Override
-            public void onNext(List<LrcRow> lrcRows) {
-                if(mLrcView.getTag() != null && (int)mLrcView.getTag() == mInfo.getId()){
-                    mLrcList = lrcRows;
-                    if(mLrcList == null || mLrcList.size() == 0) {
-                        mLrcView.setText(getString(R.string.no_lrc));
-                        return;
-                    }
-                    mLrcView.setLrcRows(mLrcList);
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                if(mLrcView.getTag() != null && (int)mLrcView.getTag() == mInfo.getId()){
-                    mLrcList = new ArrayList<>();
-                    mLrcView.setText(getString(R.string.no_lrc));
-                }
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });
-
-    }
-
-    /**
-     * 搜索本地所有歌词文件
-     * @return
-     */
-    private String getlocalLrcPath() {
-        //查找本地目录
-        String searchPath =  SPUtil.getValue(APlayerApplication.getContext(),"Setting","LrcSearchPath","");
-        if(mInfo == null)
-            return "";
-        if(!TextUtils.isEmpty(searchPath)){
-            //已设置歌词路径
-            Util.searchFile(mInfo.getDisplayname(),mInfo.getTitle(),mInfo.getArtist(), new File(searchPath));
-            if(!TextUtils.isEmpty(Global.CurrentLrcPath)){
-                return Global.CurrentLrcPath;
-            }
-        } else{
-            //没有设置歌词路径 搜索所有歌词文件
-            Cursor allLrcFiles = null;
-            try {
-                allLrcFiles = APlayerApplication.getContext().getContentResolver().
-                        query(MediaStore.Files.getContentUri("external"),
-                                null,
-                                MediaStore.Files.FileColumns.DATA + " like ? or " +
-                                        MediaStore.Files.FileColumns.DATA + " like ? or " +
-                                        MediaStore.Files.FileColumns.DATA + " like ? ",
-                                new String[]{"%lyric%","%Lyric%","%.lrc"},
-                                null);
-                if(allLrcFiles == null || !(allLrcFiles.getCount() > 0))
-                    return "";
-                while (allLrcFiles.moveToNext()){
-                    File file = new File(allLrcFiles.getString(allLrcFiles.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
-                    if (file.exists() && file.canRead()) {
-                        if(Util.isRightLrc(file, mInfo.getDisplayname(),mInfo.getTitle(),mInfo.getArtist())){
-                            return file.getAbsolutePath();
+        new SearchLrc(mInfo).getLyric(manualPath)
+                .doOnSubscribe(disposable -> {
+                    mLrcView.setText(getString(R.string.searching));
+                    mDisposable = disposable;
+                })
+                .subscribe(lrcRows -> {
+                    if (mLrcView.getTag() != null && (int) mLrcView.getTag() == mInfo.getId()) {
+                        mLrcList = lrcRows;
+                        if (mLrcList == null || mLrcList.size() == 0) {
+                            mLrcView.setText(getString(R.string.no_lrc));
+                            return;
                         }
+                        mLrcView.setLrcRows(mLrcList);
                     }
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            } finally {
-                if(allLrcFiles != null && !allLrcFiles.isClosed())
-                    allLrcFiles.close();
-            }
-        }
+                }, throwable -> {
+                    if (mLrcView.getTag() != null && (int) mLrcView.getTag() == mInfo.getId()) {
+                        mLrcList = new ArrayList<>();
+                        mLrcView.setText(getString(R.string.no_lrc));
+                    }
+                });
 
-        return "";
     }
+
 }

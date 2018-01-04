@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import io.reactivex.Observable;
 import remix.myplayer.R;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.appwidgets.AppWidgetBig;
@@ -61,7 +62,7 @@ import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.ShakeDetector;
-import remix.myplayer.lyric.SearchLRC;
+import remix.myplayer.lyric.SearchLrc;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.observer.DBObserver;
@@ -183,7 +184,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /** 桌面歌词控件*/
     private FloatLrcView mFloatLrcView;
     /** 当前歌词*/
-    private List<LrcRow> mLrcRows = null;
+    private volatile List<LrcRow> mLrcRows = null;
     /** 已经生成过的随机数 用于随机播放模式*/
     private List<Integer> mRandomList = new ArrayList<>();
     /** service是否停止运行*/
@@ -1356,10 +1357,12 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     }
 
     /**
+     * 播放完毕后是否关闭
+     */
+    private boolean mCloseAfter;
+    /**
      * 定时关闭计时器
      */
-    //是否播放完毕
-    private boolean mCloseAfter;
     private class TimerUpdater extends CountDownTimer{
         TimerUpdater(long millisInFuture, long countDownInterval) {
             super(millisInFuture, countDownInterval);
@@ -1398,24 +1401,17 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             mWakeLock.acquire(30000L);
     }
 
-
     /**
      * 更新桌面歌词
      */
     private void updateFloatLrc() {
-        mPlaybackHandler.post(() -> {
-            synchronized (MusicService.class){
-                if (checkPermission())
-                    return;
-                if(!mShowFloatLrc)
-                    return;
-                //根据操作判断是否需要更新歌词
-                int control = Global.Operation;
-                if((control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcRows == null)
-                    mLrcRows = new SearchLRC(mCurrentInfo).getLrc("");
-                createFloatLrcThreadIfNeed();
-            }
-        });
+        final int control = Global.Operation;
+        Observable.just(!checkNoPermission() && mShowFloatLrc)
+                .filter(aBoolean -> aBoolean)
+                .flatMap(aBoolean -> (control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcRows == null ?
+                        new SearchLrc(mCurrentInfo).getLyric("") : null)
+                .doOnSubscribe(disposable -> createFloatLrcThreadIfNeed())
+                .subscribe(lrcRows -> mLrcRows = lrcRows, throwable -> mLrcRows = null);
     }
 
     /**
@@ -1433,8 +1429,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 没有权限关闭桌面歌词
      * @return
      */
-    private boolean checkPermission() {
-        //判断是否有权限
+    private boolean checkNoPermission() {
         if(!FloatWindowManager.getInstance().checkPermission(mContext)){
             closeFloatLrc();
             return true;
@@ -1528,7 +1523,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     break;
                 }
                 //判断权限
-                if (checkPermission())
+                if (checkNoPermission())
                     return;
                 if(mIsServiceStop){
                     mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
@@ -1621,7 +1616,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      */
     private boolean mIsFloatLrcInitializing = false;
     private void createFloatLrc(){
-        if (checkPermission())
+        if (checkNoPermission())
             return;
         if(mIsFloatLrcInitializing)
             return;

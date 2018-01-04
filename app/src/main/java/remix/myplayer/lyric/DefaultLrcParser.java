@@ -30,8 +30,7 @@ public class DefaultLrcParser implements ILrcParser {
         DiskLruCache.Editor editor;
         OutputStream lrcCacheStream = null;
         try {
-            DiskLruCache lrcDiskCache = DiskCache.getLrcDiskCache();
-            editor = lrcDiskCache.edit(Util.hashKeyForDisk(key));
+            editor = DiskCache.getLrcDiskCache().edit(Util.hashKeyForDisk(key));
             lrcCacheStream = editor.newOutputStream(0);
 //            for(LrcRow lrcRow : lrcRows){
 //                lrcCacheStream.write((lrcRow + "\n").getBytes());
@@ -82,9 +81,7 @@ public class DefaultLrcParser implements ILrcParser {
             lrcRows.get(lrcRows.size() - 1).setTotalTime(5000);
 
             if (needCache ) {
-                DiskLruCache lrcDiskCache = DiskCache.getLrcDiskCache();
-                if(lrcDiskCache != null)
-                    editor = lrcDiskCache.edit(Util.hashKeyForDisk(songName + "/" + artistName));
+                editor = DiskCache.getLrcDiskCache().edit(Util.hashKeyForDisk(songName + "/" + artistName));
                 if(editor != null)
                     lrcCacheStream = editor.newOutputStream(0);
                 if(lrcCacheStream != null){
