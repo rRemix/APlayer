@@ -39,7 +39,7 @@
 -keepattributes SourceFile,LineNumberTable
 
 #basedata
--keepclasseswithmembers class * extends remix.myplayer.model.BaseData{
+-keepclasseswithmembers class * extends remix.myplayer.bean.BaseData{
     <fields>;
     <methods>;
 }
