@@ -64,7 +64,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                     ToastUtil.show(mContext,R.string.list_is_empty);
                     return true;
                 }
-                ToastUtil.show(mContext,mContext.getString(R.string.add_song_playinglist_success,Global.AddSongToPlayQueue(idList)));
+                ToastUtil.show(mContext,mContext.getString(R.string.add_song_playqueue_success,Global.AddSongToPlayQueue(idList)));
                 break;
             //删除
             case R.id.menu_delete:
@@ -76,7 +76,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                         .onPositive((dialog, which) -> {
                             MobclickAgent.onEvent(mContext,"Delete");
                             if(mId == Global.MyLoveID && mType == Constants.PLAYLIST){
-                                ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delelte));
+                                ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delete));
                             }
                             if(mType != Constants.PLAYLIST){
                                 ToastUtil.show(mContext,MediaStoreUtil.delete(mId , mType) > 0 ? R.string.delete_success : R.string.delete_error);

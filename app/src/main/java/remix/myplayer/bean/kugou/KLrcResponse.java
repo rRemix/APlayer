@@ -7,6 +7,7 @@ import remix.myplayer.bean.BaseData;
  */
 
 public class KLrcResponse extends BaseData {
+    private static final long serialVersionUID = -5095962158319526120L;
     public String charset;
     public String content;
     public String fmt;

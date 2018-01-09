@@ -16,9 +16,9 @@ import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.ChildHolderActivity;
-import remix.myplayer.ui.activity.FolderActivity;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
+import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.util.Constants;
@@ -102,7 +102,7 @@ public class MultiChoice implements OnMultiItemClickListener {
         }
 
         num = Global.AddSongToPlayQueue(idList);
-        ToastUtil.show(mContext,mContext.getString(R.string.add_song_playinglist_success,num));
+        ToastUtil.show(mContext,mContext.getString(R.string.add_song_playqueue_success,num));
         UpdateOptionMenu(false);
     }
 
@@ -169,7 +169,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                                 int newPlayListId = PlayListUtil.addPlayList(input.toString());
                                 ToastUtil.show(mContext, newPlayListId > 0 ?
                                                 R.string.add_playlist_success :
-                                                newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
+                                                newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_already_exist,
                                         Toast.LENGTH_SHORT);
                                 if(newPlayListId < 0){
                                     return;
@@ -361,7 +361,7 @@ public class MultiChoice implements OnMultiItemClickListener {
             return Constants.ALBUM;
         else if (tag.equals(ArtistFragment.TAG))
             return Constants.ARTIST;
-        else if(tag.equals(FolderActivity.TAG))
+        else if(tag.equals(FolderFragment.TAG))
             return Constants.FOLDER;
         else if(tag.equals(PlayListFragment.TAG))
             return Constants.PLAYLIST;

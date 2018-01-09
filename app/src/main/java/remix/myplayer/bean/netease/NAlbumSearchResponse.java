@@ -9,6 +9,7 @@ import remix.myplayer.bean.BaseData;
  */
 
 public class NAlbumSearchResponse extends BaseData {
+    private static final long serialVersionUID = 3087250502584503377L;
     public ResultBean result;
     public int code;
 

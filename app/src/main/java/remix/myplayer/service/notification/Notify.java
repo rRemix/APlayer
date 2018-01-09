@@ -34,7 +34,6 @@ public abstract class Notify {
     static final String PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification";
     private static final int PLAYING_NOTIFICATION_ID = 1;
 
-
     Notification mNotification;
     boolean mIsStop;
 

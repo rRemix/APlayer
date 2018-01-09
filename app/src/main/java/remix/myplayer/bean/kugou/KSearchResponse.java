@@ -9,6 +9,7 @@ import remix.myplayer.bean.BaseData;
  */
 
 public class KSearchResponse extends BaseData {
+    private static final long serialVersionUID = -4932979292293561928L;
     public String info;
     public int status;
     public String proposal;
@@ -16,6 +17,7 @@ public class KSearchResponse extends BaseData {
     public List<SearchActutalData> candidates;
 
     public static class SearchActutalData extends BaseData{
+        private static final long serialVersionUID = -2720016148055276583L;
         public String soundname;
         public int krctype;
         public String nickname;

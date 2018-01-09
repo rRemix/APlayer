@@ -61,6 +61,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.fragment.BottomActionBarFragment;
+import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.LibraryFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
@@ -205,7 +206,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         mToolBar.setNavigationOnClickListener(v -> mDrawerLayout.openDrawer(mNavigationView));
     }
 
-
     public PagerAdapter getAdapter() {
         return mPagerAdapter;
     }
@@ -238,7 +238,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                                     newPlayListId = PlayListUtil.addPlayList(input.toString());
                                     ToastUtil.show(mContext, newPlayListId > 0 ?
                                                     R.string.add_playlist_success :
-                                                    newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
+                                                    newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_already_exist,
                                             Toast.LENGTH_SHORT);
                                     if(newPlayListId > 0){
                                         //跳转到添加歌曲界面
@@ -265,17 +265,37 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
+
+    public static final String DEFAULT_LIBRARY = APlayerApplication.getContext().getResources().getString(R.string.tab_song) + "," +
+            APlayerApplication.getContext().getResources().getString(R.string.tab_album) + "," +
+            APlayerApplication.getContext().getResources().getString(R.string.tab_artist) + "," +
+            APlayerApplication.getContext().getResources().getString(R.string.tab_playlist);
+    public static final String ALL_LIBRARY = APlayerApplication.getContext().getResources().getString(R.string.tab_song) + "," +
+            APlayerApplication.getContext().getResources().getString(R.string.tab_album) + "," +
+            APlayerApplication.getContext().getResources().getString(R.string.tab_artist) + "," +
+            APlayerApplication.getContext().getResources().getString(R.string.tab_playlist)  + "," +
+            APlayerApplication.getContext().getResources().getString(R.string.tab_folder);
     //初始化ViewPager
     private void setUpPager() {
+        String category = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.LIBRARY_CATEGORY,DEFAULT_LIBRARY);
+        String[] categories = category.split(",");
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
-        mPagerAdapter.setTitles(new String[]{getResources().getString(R.string.tab_song),
-                getResources().getString(R.string.tab_album),
-                getResources().getString(R.string.tab_artist),
-                getResources().getString(R.string.tab_playlist)});
-        mPagerAdapter.AddFragment(new SongFragment());
-        mPagerAdapter.AddFragment(new AlbumFragment());
-        mPagerAdapter.AddFragment(new ArtistFragment());
-        mPagerAdapter.AddFragment(new PlayListFragment());
+
+        for(String item : categories){
+            if(getResources().getString(R.string.tab_song).equals(item)){
+                mPagerAdapter.addFragment(new SongFragment());
+            } else if(getResources().getString(R.string.tab_album).equals(item)){
+                mPagerAdapter.addFragment(new AlbumFragment());
+            } else if(getResources().getString(R.string.tab_artist).equals(item)){
+                mPagerAdapter.addFragment(new ArtistFragment());
+            } else if(getResources().getString(R.string.tab_playlist).equals(item)){
+                mPagerAdapter.addFragment(new PlayListFragment());
+            } else if(getResources().getString(R.string.tab_folder).equals(item)){
+                mPagerAdapter.addFragment(new FolderFragment());
+            }
+            mPagerAdapter.addTitle(item);
+        }
+
 
         mAddButton.setImageResource(ThemeStore.isDay() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
         mViewPager.setAdapter(mPagerAdapter);
@@ -315,10 +335,11 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 //        mTablayout = new TabLayout(new ContextThemeWrapper(this,R.style.CustomTabLayout_Light));
 //        mTablayout.setLayoutParams(new AppBarLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,DensityUtil.dip2px(this,48)));
 //        mTablayout = new TabLayout(this);
-        mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_song)));
-        mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_album)));
-        mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_artist)));
-        mTablayout.addTab(mTablayout.newTab().setText(getResources().getString(R.string.tab_playlist)));
+        mTablayout.addTab(mTablayout.newTab().setText(R.string.tab_song));
+        mTablayout.addTab(mTablayout.newTab().setText(R.string.tab_album));
+        mTablayout.addTab(mTablayout.newTab().setText(R.string.tab_artist));
+        mTablayout.addTab(mTablayout.newTab().setText(R.string.tab_playlist));
+        mTablayout.addTab(mTablayout.newTab().setText(R.string.tab_folder));
         //viewpager与tablayout关联
         mTablayout.setupWithViewPager(mViewPager);
         mTablayout.setSelectedTabIndicatorColor(ColorUtil.getColor(isLightColor ? R.color.black : R.color.white));
@@ -357,19 +378,15 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                         break;
                     //最近添加
                     case 1:
-                        startActivity(new Intent(MainActivity.this,RecetenlyActivity.class));
-                        break;
-                    //文件夹
-                    case 2:
-                        startActivity(new Intent(MainActivity.this, FolderActivity.class));
+                        startActivity(new Intent(mContext,RecetenlyActivity.class));
                         break;
                     //夜间模式
-                    case 3:
+                    case 2:
                         setNightMode(ThemeStore.isDay());
                         break;
                     //设置
-                    case 4:
-                        startActivityForResult(new Intent(MainActivity.this,SettingActivity.class), REQUEST_SETTING);
+                    case 3:
+                        startActivityForResult(new Intent(mContext,SettingActivity.class), REQUEST_SETTING);
                         break;
                 }
                 mDrawerAdapter.setSelectIndex(position);
@@ -397,7 +414,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             public void onDrawerStateChanged(int newState) {
             }
         });
-
     }
 
     /**
@@ -418,19 +434,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         mHeadRoot.setBackgroundColor(ThemeStore.isDay() ? ThemeStore.getMaterialPrimaryColor() : ColorUtil.getColor(R.color.night_background_color_main));
         mNavigationView.setBackgroundColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.gray_343438));
 
-//        GradientDrawable bg = new GradientDrawable();
-//        bg.setColor(ThemeStore.getAccentColor());
-//        bg.setColor(ThemeStore.isDay() ?
-//                !ColorUtil.isColorLight(ThemeStore.getMaterialPrimaryColor()) ? ThemeStore.getMaterialPrimaryDarkColor() : ColorUtil.getColor(R.color.black)
-//                : ColorUtil.getColor(R.color.gray_343438));
-//        bg.setCornerRadius(DensityUtil.dip2px(this,4));
-//        mHeadText.setBackground(bg);
-//        mHeadText.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.white_e5e5e5));
-//        //抽屉
-//        mHeadRoot.setBackgroundColor(ThemeStore.isDay() ?
-//                ColorUtil.isColorLight(ThemeStore.getMaterialPrimaryColor()) ? ColorUtil.getColor(R.color.md_white_primary_dark) : ThemeStore.getMaterialPrimaryColor() :
-//                ColorUtil.getColor(R.color.night_background_color_main));
-//        mNavigationView.setBackgroundColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.white : R.color.gray_343438));
     }
 
     @Override
@@ -438,11 +441,10 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         super.onActivityResult(requestCode, resultCode, data);
         if(data != null){
             switch (requestCode){
-                //设置主题后重启activity或者清除缓存后刷新adapter
                 case REQUEST_SETTING:
-                    if(data.getBooleanExtra("needRecreate",false)) {
+                    if(data.getBooleanExtra("needRecreate",false)) { //设置后需要重启activity
                         mRefreshHandler.sendEmptyMessage(Constants.RECREATE_ACTIVITY);
-                    }else if(data.getBooleanExtra("needRefresh",false)){
+                    }else if(data.getBooleanExtra("needRefresh",false)){ //清除缓存后刷新adapter
                         mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
                     }
                     break;

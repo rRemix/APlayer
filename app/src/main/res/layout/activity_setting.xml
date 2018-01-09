@@ -164,10 +164,58 @@
                 </RelativeLayout>
 
                 <View
-                    android:id="@+id/setting_divider_1"
                     android:layout_below="@id/setting_shake_container"
                     android:layout_width="match_parent"
-                    android:layout_height="1px" />
+                    android:layout_height="1px"
+                    android:background="?attr/divider_color"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/setting_library_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/library"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="@dimen/d14_size"
+                    android:textSize="@dimen/s16_size"
+                    android:textColor="?attr/colorAccent"/>
+                <LinearLayout
+                    android:id="@+id/setting_library_category_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/setting_library_title"
+                    android:paddingTop="@dimen/d10_size"
+                    android:paddingBottom="@dimen/d10_size"
+                    android:paddingLeft="@dimen/d16_size"
+                    android:background="?attr/background_common">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/library_category"
+                        android:textColor="?attr/text_color_primary"
+                        android:textSize="@dimen/s16_size"
+                        android:layout_marginBottom="@dimen/d2_size"/>
+                    <TextView
+                        android:id="@+id/setting_library_category_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/configure_library_category"
+                        android:textColor="?attr/text_color"
+                        android:textSize="@dimen/s14_size"/>
+                </LinearLayout>
+                <View
+                    android:layout_below="@id/setting_library_category_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="?attr/divider_color"/>
             </RelativeLayout>
 
             <RelativeLayout
@@ -212,10 +260,10 @@
                         android:textSize="@dimen/s14_size"/>
                 </LinearLayout>
                 <View
-                    android:id="@+id/setting_divider_2"
                     android:layout_below="@id/setting_album_cover_container"
                     android:layout_width="match_parent"
-                    android:layout_height="1px" />
+                    android:layout_height="1px"
+                    android:background="?attr/divider_color"/>
             </RelativeLayout>
 
             <RelativeLayout
@@ -389,10 +437,10 @@
                 </RelativeLayout>
 
                 <View
-                    android:id="@+id/setting_divider_3"
                     android:layout_below="@id/setting_screen_container"
                     android:layout_width="match_parent"
-                    android:layout_height="1px" />
+                    android:layout_height="1px"
+                    android:background="?attr/divider_color"/>
             </RelativeLayout>
 
             <RelativeLayout
@@ -479,10 +527,10 @@
                 </LinearLayout>
 
                 <View
-                    android:id="@+id/setting_divider_4"
                     android:layout_below="@id/setting_notify_color_container"
                     android:layout_width="match_parent"
-                    android:layout_height="1px" />
+                    android:layout_height="1px"
+                    android:background="?attr/divider_color"/>
             </RelativeLayout>
 
             <RelativeLayout
@@ -581,10 +629,10 @@
                 </RelativeLayout>
 
                 <View
-                    android:id="@+id/setting_divider_5"
                     android:layout_below="@id/setting_navigation_container"
                     android:layout_width="match_parent"
-                    android:layout_height="1px" />
+                    android:layout_height="1px"
+                    android:background="?attr/divider_color"/>
             </RelativeLayout>
 
             <RelativeLayout
@@ -766,10 +814,10 @@
                 </RelativeLayout>
 
                 <View
-                    android:id="@+id/setting_divider_6"
                     android:layout_below="@id/setting_clear_container"
                     android:layout_width="match_parent"
-                    android:layout_height="1px" />
+                    android:layout_height="1px"
+                    android:background="?attr/divider_color"/>
             </RelativeLayout>
         </LinearLayout>
     </ScrollView>

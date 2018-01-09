@@ -118,8 +118,8 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                 ToastUtil.show(mContext,R.string.song_not_empty);
                                 return;
                             }
-                            artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString() : mContext.getString(R.string.unknow_artist);
-                            album = mAlbumLayout.getEditText() != null ? mAlbumLayout.getEditText().getText().toString() : mContext.getString(R.string.unknow_album);
+                            artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString() : mContext.getString(R.string.unknown_artist);
+                            album = mAlbumLayout.getEditText() != null ? mAlbumLayout.getEditText().getText().toString() : mContext.getString(R.string.unknown_album);
                             year = mYearLayout.getEditText() != null ? mYearLayout.getEditText().getText().toString() : " ";
                             genre = mGenreLayout.getEditText() != null ? mGenreLayout.getEditText().getText().toString() : "";
 
@@ -218,7 +218,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         mDetailName.setText(mInfo.getDisplayname());
                     //歌曲大小
                     if(mDetailSize != null)
-                        mDetailSize.setText(mContext.getString(R.string.cache_szie,1.0f * mInfo.getSize() / ByteConstants.MB));
+                        mDetailSize.setText(mContext.getString(R.string.cache_size,1.0f * mInfo.getSize() / ByteConstants.MB));
                     //歌曲格式
                     if(mDetailMime != null){
                         String path = mInfo.getUrl();

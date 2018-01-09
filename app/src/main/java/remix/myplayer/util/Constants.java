@@ -48,6 +48,7 @@ public class Constants {
     public final static int PLAY_TEMP = 9;
     public final static int TOGGLE_NOTIFY = 10;
     public final static int UNLOCK_DESTOP_LYRIC = 11;
+    public final static int CLOSE_NOTIFY = 12;
     //播放模式
     public final static int PLAY_LOOP = 50;
     public final static int PLAY_SHUFFLE = 51;

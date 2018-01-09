@@ -733,7 +733,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 
     /**
      * 接受控制命令
-     * 包括暂停、播放、上下首、播放模式
+     * 包括暂停、播放、上下首、改版播放模式等
      */
     public class ControlReceiver extends BroadcastReceiver {
         @Override
@@ -744,37 +744,31 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             //保存控制命令,用于播放界面判断动画
             Global.setOperation(control);
             mControl = control;
-            //先判断是否是关闭通知栏
-            if(intent.getExtras().getBoolean("Close")){
-                Global.setNotifyShowing(false);
-                pause(false);
-                //AndroidN仅从通知栏移除 不做其他处理
-                if(!intent.getExtras().getBoolean("FromImpl24")){
-                    mUpdateUIHandler.postDelayed(() -> {
-                        mNotify.cancelPlayingNotify();
-                        if(mUpdateFloatLrcThread != null) {
-                            mUpdateFloatLrcThread.quitDelay();
-                        }
-                    },50);
-                }
-                return;
-            }
 
             if(control == Constants.PLAYSELECTEDSONG || control == Constants.PREV || control == Constants.NEXT
                     || control == Constants.TOGGLE || control == Constants.PAUSE || control == Constants.START){
                 if(Global.PlayQueue == null || Global.PlayQueue.size() == 0) {
-//                    ToastUtil.show(mContext,R.string.list_is_empty);
-//                    return;
                     //列表为空，尝试读取
                     Global.PlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
                     Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
                 }
-//                if(Util.isFastDoubleClick()) {
-//                    return;
-//                }
             }
 
             switch (control) {
+                //关闭通知栏
+                case Constants.CLOSE_NOTIFY:
+                    Global.setNotifyShowing(false);
+                    pause(false);
+                    //AndroidN仅从通知栏移除 不做其他处理
+                    if(!intent.getExtras().getBoolean("FromImpl24")){
+                        mUpdateUIHandler.postDelayed(() -> {
+                            mNotify.cancelPlayingNotify();
+                            if(mUpdateFloatLrcThread != null) {
+                                mUpdateFloatLrcThread.quitDelay();
+                            }
+                        },50);
+                    }
+                    break;
                 //播放选中的歌曲
                 case Constants.PLAYSELECTEDSONG:
                     playSelectSong(intent.getIntExtra("Position", -1));
@@ -789,7 +783,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     break;
                 //暂停或者继续播放
                 case Constants.TOGGLE:
-//                    mIsplay = !mIsplay;
                     toggle();
                     break;
                 //暂停

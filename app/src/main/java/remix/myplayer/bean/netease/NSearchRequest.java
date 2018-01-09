@@ -8,6 +8,7 @@ import remix.myplayer.bean.BaseData;
 
 public class NSearchRequest extends BaseData {
     public static final NSearchRequest DEFAULT_REQUEST = new NSearchRequest(-1,"",0,0);
+    private static final long serialVersionUID = -4168031236748350436L;
 
     private String mKey;
     //网易查询的类型

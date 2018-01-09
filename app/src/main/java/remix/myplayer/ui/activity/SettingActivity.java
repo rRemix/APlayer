@@ -52,6 +52,8 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
+import static remix.myplayer.ui.activity.MainActivity.ALL_LIBRARY;
+
 /**
  * @ClassName SettingActivity
  * @Description 设置界面
@@ -96,8 +98,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     //缓存大小
     private long mCacheSize = 0;
     private final int RECREATE = 100;
-    private final int CACHESIZE = 101;
-    private final int CLEARFINISH = 102;
+    private final int CACHE_SIZE = 101;
+    private final int CLEAR_FINISH = 102;
     private MsgHandler mHandler;
     private final int[] mScanSize = new int[]{0,500 * ByteConstants.KB,ByteConstants.MB, 2 * ByteConstants.MB};
     private String mOriginalAlbumChoice;
@@ -162,7 +164,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         startActivity(intent);
                                     }
-                                    ToastUtil.show(mContext,R.string.plase_give_float_permission);
+                                    ToastUtil.show(mContext,R.string.plz_give_float_permission);
                                     return;
                                 }
                                 mFloatLrcTip.setText(isChecked ? R.string.opened_float_lrc : R.string.closed_float_lrc);
@@ -204,11 +206,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow),findView(R.id.setting_donate_arrow)},
                 (ButterKnife.Action<ImageView>) (view, index) -> Theme.TintDrawable(view,view.getBackground(),arrowColor));
 
-        //分根线颜色
-        ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),findView(R.id.setting_divider_6),
-                findView(R.id.setting_divider_3),findView(R.id.setting_divider_4),findView(R.id.setting_divider_5)},
-                (ButterKnife.Action<View>) (view, index) -> view.setBackgroundColor(ThemeStore.getDividerColor()));
-
         //封面
         mOriginalAlbumChoice = SPUtil.getValue(mContext,"Setting",SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only));
         mAlbumCoverText.setText(mOriginalAlbumChoice);
@@ -220,7 +217,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 mCacheSize = 0;
                 mCacheSize += Util.getFolderSize(getExternalCacheDir());
                 mCacheSize += Util.getFolderSize(getCacheDir());
-                mHandler.sendEmptyMessage(CACHESIZE);
+                mHandler.sendEmptyMessage(CACHE_SIZE);
             }
         }.start();
     }
@@ -270,7 +267,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
             R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container,
             R.id.setting_screen_container,R.id.setting_scan_container,R.id.setting_classic_notify_container,
-            R.id.setting_album_cover_container})
+            R.id.setting_album_cover_container,R.id.setting_library_category_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -296,6 +293,39 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .theme(ThemeStore.getMDDialogTheme())
                         .positiveText(R.string.confirm)
                         .positiveColorAttr(R.attr.text_color_primary)
+                        .show();
+                break;
+            //曲库
+            case R.id.setting_library_category_container:
+                String[] oldCategories = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.LIBRARY_CATEGORY, ALL_LIBRARY).split(",");
+                if(oldCategories.length == 0){
+                    ToastUtil.show(mContext,getString(R.string.load_failed));
+                    break;
+                }
+                new MaterialDialog.Builder(mContext)
+                        .title(R.string.library_category)
+                        .titleColorAttr(R.attr.text_color_primary)
+                        .positiveText(R.string.confirm)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .buttonRippleColorAttr(R.attr.ripple_color)
+                        .items(ALL_LIBRARY.split(","))
+                        .itemsCallbackMultiChoice(new Integer[]{}, (dialog, which, text) -> {
+                            if(text.length == 0){
+                                ToastUtil.show(mContext,getString(R.string.plz_choose_at_least_one_category));
+                                return true;
+                            }
+                            mNeedRecreate = true;
+
+                            StringBuilder changedCategory = new StringBuilder();
+                            for(CharSequence category : text){
+                                changedCategory.append(category).append(",");
+                            }
+                            SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.LIBRARY_CATEGORY,changedCategory.toString());
+                            return true;
+                        })
+                        .itemsColorAttr(R.attr.text_color_primary)
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .theme(ThemeStore.getMDDialogTheme())
                         .show();
                 break;
             //桌面歌词
@@ -429,7 +459,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     }else if(updateStatus == UpdateStatus.IGNORED){
                         ToastUtil.show(mContext,getString(R.string.update_ignore));
                     }else if(updateStatus == UpdateStatus.TimeOut){
-                        ToastUtil.show(mContext,R.string.updat_error);
+                        ToastUtil.show(mContext,R.string.update_error);
                     }
                 });
                 BmobUpdateAgent.forceUpdate(this);
@@ -466,7 +496,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 deleteDatabase(DBOpenHelper.DBNAME);
                                 //清除fresco缓存
                                 Fresco.getImagePipeline().clearCaches();
-                                mHandler.sendEmptyMessage(CLEARFINISH);
+                                mHandler.sendEmptyMessage(CLEAR_FINISH);
                                 mNeedRefresh = true;
                             }
                         }.start())
@@ -514,10 +544,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     public void handleInternal(Message msg){
         if(msg.what == RECREATE)
             recreate();
-        if(msg.what == CACHESIZE){
-            mCache.setText(getString(R.string.cache_szie,mCacheSize / 1024f / 1024));
+        if(msg.what == CACHE_SIZE){
+            mCache.setText(getString(R.string.cache_size,mCacheSize / 1024f / 1024));
         }
-        if(msg.what == CLEARFINISH){
+        if(msg.what == CLEAR_FINISH){
             ToastUtil.show(SettingActivity.this,getString(R.string.clear_success));
             mCache.setText(R.string.zero_size);
             mLrcPath.setText(R.string.default_lrc_path);

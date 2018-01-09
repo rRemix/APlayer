@@ -7,6 +7,7 @@ import remix.myplayer.bean.BaseData;
  */
 
 public class NLrcResponse extends BaseData {
+    private static final long serialVersionUID = 3447785606973976839L;
     public boolean sgc;
     public boolean sfy;
     public boolean qfy;

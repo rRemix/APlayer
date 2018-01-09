@@ -9,15 +9,18 @@ import remix.myplayer.bean.BaseData;
  */
 
 public class NSongSearchResponse extends BaseData {
+    private static final long serialVersionUID = -649254748472577314L;
     public int code;
     public SeachActualData result;
 
     public static class SeachActualData extends BaseData{
+        private static final long serialVersionUID = -8875856782646205962L;
         public int songCount;
         public List<SearchInnerData> songs;
     }
 
     public static class SearchInnerData extends BaseData{
+        private static final long serialVersionUID = 835870151533020922L;
         public String name;
         public int id;
         public int position;

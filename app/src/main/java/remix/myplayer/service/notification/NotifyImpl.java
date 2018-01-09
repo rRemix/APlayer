@@ -147,7 +147,7 @@ public class NotifyImpl extends Notify {
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_prev,prevIntent);
 
         //关闭通知栏
-        actionIntent.putExtra("Close", true);
+        actionIntent.putExtra("Control", Constants.CLOSE_NOTIFY);
         PendingIntent closeIntent = PendingIntent.getBroadcast(context, 3, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_close, closeIntent);
         mRemoteView.setOnClickPendingIntent(R.id.notify_close,closeIntent);

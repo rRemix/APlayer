@@ -9,6 +9,7 @@ import remix.myplayer.bean.BaseData;
  */
 
 public class NArtistSearchResponse extends BaseData {
+    private static final long serialVersionUID = 7911648889868864488L;
     /**
      * result : {"artistCount":6,"artists":[{"id":18355,"name":"AKB48","picUrl":"http://p1.music.126.net/AjQKwXEp0VXXAkyISRl7Xw==/109951163016683093.jpg","alias":["エーケービー フォーティエイト"],"albumSize":200,"picId":109951163016683093,"img1v1Url":"http://p1.music.126.net/ybqv1sPl7l1J-inzlcMRRg==/109951163073222217.jpg","img1v1":109951163073222217,"mvSize":217,"followed":false,"alia":["エーケービー フォーティエイト"],"trans":null}]}
      * code : 200
