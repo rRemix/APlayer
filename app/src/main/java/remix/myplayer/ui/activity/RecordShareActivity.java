@@ -6,8 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -26,7 +24,6 @@ import com.umeng.analytics.MobclickAgent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -37,6 +34,8 @@ import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.cache.DiskCache;
+import remix.myplayer.misc.handler.MsgHandler;
+import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
@@ -91,42 +90,30 @@ public class RecordShareActivity extends BaseActivity {
     //截屏文件
     private File mFile;
     //更新处理结果的Handler
-    private ProcessHandler mHandler;
-    private static class ProcessHandler extends Handler{
-        private WeakReference<RecordShareActivity> mRef;
+    private MsgHandler mHandler;
 
-        public ProcessHandler(Looper looper,RecordShareActivity activity) {
-            super(looper);
-            mRef = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            RecordShareActivity activity = mRef != null ? mRef.get() : null;
-            if(activity == null)
-                return;
-            switch (msg.what){
-                //开始处理
-                case START:
-                   activity.showLoading();
-                    break;
-                //处理中止
-                case STOP:
-                    activity.dismissLoading("");
-                    break;
-                //处理完成
-                case COMPLETE:
-                    if(activity.mFile != null)
-                        ToastUtil.show(activity,R.string.screenshot_save_at,activity.mFile.getAbsoluteFile());
-                    break;
-                //处理错误
-                case ERROR:
-                    activity.dismissLoading(activity.getString(R.string.share_error) + ":" + msg.obj);
-                    break;
-            }
+    @OnHandleMessage
+    public void handleMessage(Message msg){
+        switch (msg.what){
+            //开始处理
+            case START:
+                showLoading();
+                break;
+            //处理中止
+            case STOP:
+                dismissLoading("");
+                break;
+            //处理完成
+            case COMPLETE:
+                if(mFile != null)
+                    ToastUtil.show(mContext,R.string.screenshot_save_at,mFile.getAbsoluteFile());
+                break;
+            //处理错误
+            case ERROR:
+                dismissLoading(getString(R.string.share_error) + ":" + msg.obj);
+                break;
         }
     }
-
 
     @Override
     protected void setStatusBar() {
@@ -172,7 +159,13 @@ public class RecordShareActivity extends BaseActivity {
                 .backgroundColorRes(R.color.day_background_color_3)
                 .progressIndeterminateStyle(false).build();
 
-        mHandler = new ProcessHandler(getMainLooper(),this);
+        mHandler = new MsgHandler(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mHandler.remove();
     }
 
     public static Bitmap getBg(){

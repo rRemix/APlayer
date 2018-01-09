@@ -14,7 +14,7 @@ import com.umeng.analytics.MobclickAgent;
 import java.util.List;
 
 import remix.myplayer.R;
-import remix.myplayer.bean.CustomThumbBean;
+import remix.myplayer.bean.CustomThumb;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
@@ -94,7 +94,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 break;
             //设置封面
             case R.id.menu_album_thumb:
-                CustomThumbBean thumbBean = new CustomThumbBean(mId,mType,mKey);
+                CustomThumb thumbBean = new CustomThumb(mId,mType,mKey);
                 Intent thumbIntent = ((Activity)mContext).getIntent();
                 thumbIntent.putExtra("thumb",thumbBean);
                 thumbIntent.putExtra("test",1234);
@@ -102,7 +102,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
 //                try {
 //                    Intent pickIntent = new Intent("android.intent.action.GET_CONTENT").setType("image/*");
 //                    pickIntent.putExtra("test",1234);
-//                    pickIntent.setExtrasClassLoader(CustomThumbBean.class.getClassLoader());
+//                    pickIntent.setExtrasClassLoader(CustomThumb.class.getClassLoader());
 //                    pickIntent.putExtra("thumb",thumbBean);
 //
 //                    ((Activity)mContext).startActivityForResult(pickIntent, Crop.REQUEST_PICK);

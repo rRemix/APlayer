@@ -110,20 +110,20 @@ public class SearchLrc {
                                     new InputStreamReader(
                                             new ByteArrayInputStream(lrcResponse.lrc.lyric.getBytes(utf8)),utf8)),false,mSong.getTitle(),mSong.getArtist() + "/original");
                             //有翻译 合并
-//                            if(lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
-//                                List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(utf8)),utf8)),false,mSong.getTitle(),mSong.getArtist() + "/translate");
-//                                if(translate != null && translate.size() > 0){
-//                                    for(int i = 0 ; i < translate.size();i++){
-//                                        for(int j = 0 ; j < combine.size();j++){
-//                                            if(translate.get(i).getTime() == combine.get(j).getTime()){
-//                                                combine.get(j).setTranslate(translate.get(i).getContent());
-//                                                break;
-//                                            }
-//                                        }
-//                                    }
-//
-//                                }
-//                            }
+                            if(lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
+                                List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(utf8)),utf8)),false,mSong.getTitle(),mSong.getArtist() + "/translate");
+                                if(translate != null && translate.size() > 0){
+                                    for(int i = 0 ; i < translate.size();i++){
+                                        for(int j = 0 ; j < combine.size();j++){
+                                            if(translate.get(i).getTime() == combine.get(j).getTime()){
+                                                combine.get(j).setTranslate(translate.get(i).getContent());
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
 
                             mLrcParser.saveLrcRows(combine,mKey);
                             return combine;

@@ -474,7 +474,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mIsInitialized = false;
         mShortcutManager.updateContinueShortcut();
 
-        mNotify.cancelAll();
+        mNotify.cancelPlayingNotify();
 
         updateAppwidget();
         removeFloatLrc();
@@ -574,11 +574,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 暂停
      */
     @Override
-    public void pause(boolean updateMediasessionOnly) {
+    public void pause(boolean updateMediaSessionOnly) {
         mIsplay = false;
         mMediaPlayer.pause();
 
-        if(updateMediasessionOnly)
+        if(updateMediaSessionOnly)
             updateMediaSession(Global.Operation);
         else
             update(Global.Operation);
@@ -750,10 +750,12 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 pause(false);
                 //AndroidN仅从通知栏移除 不做其他处理
                 if(!intent.getExtras().getBoolean("FromImpl24")){
-                    mNotify.cancelPlayingNotify();
-                    if(mUpdateFloatLrcThread != null) {
-                        mUpdateFloatLrcThread.quitDelay();
-                    }
+                    mUpdateUIHandler.postDelayed(() -> {
+                        mNotify.cancelPlayingNotify();
+                        if(mUpdateFloatLrcThread != null) {
+                            mUpdateFloatLrcThread.quitDelay();
+                        }
+                    },50);
                 }
                 return;
             }

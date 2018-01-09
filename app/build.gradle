@@ -12,15 +12,15 @@ ext {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    buildToolsVersion "26.0.3"
 
 
     defaultConfig {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 42
-        versionName "1.2.3.1"
+        versionCode 43
+        versionName "1.2.3.2"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {

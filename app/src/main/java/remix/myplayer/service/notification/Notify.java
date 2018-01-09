@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 import remix.myplayer.R;
@@ -35,8 +34,6 @@ public abstract class Notify {
     static final String PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification";
     private static final int PLAYING_NOTIFICATION_ID = 1;
 
-    private static final String LOADING_NOTIFICATION_CHANNEL_ID = "processing_notification";
-    private static final int LOADING_NOTIFICATION_ID = 2;
 
     Notification mNotification;
     boolean mIsStop;
@@ -61,29 +58,9 @@ public abstract class Notify {
         playingNotificationChannel.enableVibration(false);
         playingNotificationChannel.setDescription(mService.getString(R.string.playing_notification_description));
         mNotificationManager.createNotificationChannel(playingNotificationChannel);
-
-
-        NotificationChannel processingNotificationChannel = new NotificationChannel(LOADING_NOTIFICATION_CHANNEL_ID,mService.getString(R.string.loading_notification), NotificationManager.IMPORTANCE_LOW);
-        processingNotificationChannel.setShowBadge(false);
-        processingNotificationChannel.enableLights(false);
-        processingNotificationChannel.enableVibration(false);
-        processingNotificationChannel.setDescription(mService.getString(R.string.loading_notification_description));
-        mNotificationManager.createNotificationChannel(processingNotificationChannel);
     }
 
     public abstract void updateForPlaying();
-
-    public void updateForLoading(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            mService.startForeground(LOADING_NOTIFICATION_ID, new NotificationCompat.Builder(mService, LOADING_NOTIFICATION_CHANNEL_ID)
-                    .setContentTitle(mService.getString(R.string.loading))
-                    .setShowWhen(false)
-                    .setOngoing(false)
-                    .setSmallIcon(R.drawable.notifbar_icon)
-                    .build());
-        }
-
-    }
 
     void pushNotify() {
         final int newNotifyMode;
@@ -125,17 +102,10 @@ public abstract class Notify {
         mNotifyMode = NOTIFY_MODE_NONE;
     }
 
-    public void cancelLoadingNotify(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            mService.stopForeground(true);
-            mNotificationManager.cancel(LOADING_NOTIFICATION_ID);
-        }
-    }
-
-    public void cancelAll(){
-        cancelPlayingNotify();
-        mNotificationManager.cancelAll();
-    }
+//    public void cancelAll(){
+//        cancelPlayingNotify();
+//        mNotificationManager.cancelAll();
+//    }
 
     /**
      * @return 最近是否在播放

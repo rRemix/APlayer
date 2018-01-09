@@ -240,7 +240,6 @@
     <string name="playing_notification">正在播放通知</string>
     <string name="playing_notification_description">正在播放通知提供了播放/暂停等便捷操作</string>
     <string name="unlock_notification_description">解锁桌面歌词通知提供解锁桌面歌词功能</string>
-    <string name="loading_notification_description">启动时加载</string>
     <string name="previous">上一首</string>
     <string name="next">下一首</string>
     <string name="play_pause">播放/暂停</string>
@@ -251,7 +250,6 @@
     <string name="unlock_notification">解锁桌面歌词通知</string>
     <string name="click_to_unlock">点击解除锁定</string>
     <string name="please_give_write_settings_permission">请授予修改系统设置权限</string>
-    <string name="loading_notification">正在加载通知</string>
     <string name="loading">正在加载</string>
     <string name="choose_lyric_source">歌词源选择</string>
     <string name="cover">封面</string>

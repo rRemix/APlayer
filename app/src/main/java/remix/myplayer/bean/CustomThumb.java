@@ -7,12 +7,12 @@ import android.os.Parcelable;
  * Created by Remix on 2017/12/18.
  */
 
-public class CustomThumbBean implements Parcelable {
+public class CustomThumb implements Parcelable {
     private int mId;
     private int mType;
     private String mkey;
 
-    public CustomThumbBean(int id, int type, String key) {
+    public CustomThumb(int id, int type, String key) {
         this.mId = id;
         this.mType = type;
         this.mkey = key;
@@ -54,21 +54,21 @@ public class CustomThumbBean implements Parcelable {
         dest.writeString(this.mkey);
     }
 
-    public CustomThumbBean(Parcel in) {
+    public CustomThumb(Parcel in) {
         this.mId = in.readInt();
         this.mType = in.readInt();
         this.mkey = in.readString();
     }
 
-    public static final Parcelable.Creator<CustomThumbBean> CREATOR = new Parcelable.Creator<CustomThumbBean>() {
+    public static final Parcelable.Creator<CustomThumb> CREATOR = new Parcelable.Creator<CustomThumb>() {
         @Override
-        public CustomThumbBean createFromParcel(Parcel source) {
-            return new CustomThumbBean(source);
+        public CustomThumb createFromParcel(Parcel source) {
+            return new CustomThumb(source);
         }
 
         @Override
-        public CustomThumbBean[] newArray(int size) {
-            return new CustomThumbBean[size];
+        public CustomThumb[] newArray(int size) {
+            return new CustomThumb[size];
         }
     };
 }

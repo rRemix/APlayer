@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.SwitchCompat;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.bean.Drawer;
 import remix.myplayer.interfaces.OnModeChangeListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -25,12 +23,12 @@ import remix.myplayer.util.ColorUtil;
  * @Date 2016/10/26 11:05
  */
 
-public class DrawerAdapter extends BaseAdapter<Drawer,DrawerAdapter.DrawerHolder>{
+public class DrawerAdapter extends BaseAdapter<Integer,DrawerAdapter.DrawerHolder>{
     //当前选中项
     private int mSelectIndex = 0;
-    private int[] mImgs = new int[]{R.drawable.drawer_icon_musicbox,R.drawable.drawer_icon_recently,R.drawable.darwer_icon_folder,
+    private int[] IMAGES = new int[]{R.drawable.drawer_icon_musicbox,R.drawable.drawer_icon_recently,R.drawable.darwer_icon_folder,
                                     R.drawable.darwer_icon_night,R.drawable.darwer_icon_set};
-    private int[] mTitles = new int[]{R.string.drawer_song,R.string.drawer_recently,
+    private int[] TITLES = new int[]{R.string.drawer_song,R.string.drawer_recently,
                                     R.string.drawer_folder,R.string.drawer_night,R.string.drawer_setting};
     public DrawerAdapter(Context Context,int layoutId) {
         super(Context,layoutId);
@@ -47,33 +45,25 @@ public class DrawerAdapter extends BaseAdapter<Drawer,DrawerAdapter.DrawerHolder
     }
 
     @Override
-    protected Drawer getItem(int position) {
-        return new Drawer(mTitles[position],mImgs[position]);
+    protected Integer getItem(int position) {
+        return position;
     }
 
     @Override
-    protected void convert(final DrawerHolder holder, Drawer drawer, int position) {
-        Theme.TintDrawable(holder.mImg, drawer.getImageResID(),ThemeStore.getAccentColor());
-        holder.mText.setText(drawer.getTitleResId());
+    protected void convert(final DrawerHolder holder, Integer item, int position) {
+        Theme.TintDrawable(holder.mImg, IMAGES[position],ThemeStore.getAccentColor());
+        holder.mText.setText(TITLES[position]);
         holder.mText.setTextColor(ThemeStore.isDay() ? ColorUtil.getColor(R.color.gray_34353a) : ThemeStore.getTextColorPrimary());
         holder.mText.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_34353a : R.color.white_e5e5e5));
         if(position == 3){
             holder.mSwitch.setVisibility(View.VISIBLE);
             holder.mSwitch.setChecked(!ThemeStore.isDay());
-            holder.mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if(mModeChangeListener != null)
-                        mModeChangeListener.OnModeChange(isChecked);
-                }
+            holder.mSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if(mModeChangeListener != null)
+                    mModeChangeListener.OnModeChange(isChecked);
             });
         }
-        holder.mRoot.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition());
-            }
-        });
+        holder.mRoot.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition()));
         holder.mRoot.setSelected(mSelectIndex == position);
         holder.mRoot.setBackground(Theme.getPressAndSelectedStateListRippleDrawable(mContext,
                 Theme.getShape(GradientDrawable.RECTANGLE, ThemeStore.getDrawerEffectColor()),
@@ -83,7 +73,7 @@ public class DrawerAdapter extends BaseAdapter<Drawer,DrawerAdapter.DrawerHolder
 
     @Override
     public int getItemCount() {
-        return mTitles != null ? mTitles.length : 0;
+        return TITLES != null ? TITLES.length : 0;
     }
 
     static class DrawerHolder extends BaseViewHolder{

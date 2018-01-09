@@ -46,7 +46,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.HeaderAdapter;
 import remix.myplayer.adapter.PagerAdapter;
-import remix.myplayer.bean.CustomThumbBean;
+import remix.myplayer.bean.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
@@ -450,7 +450,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 case Crop.REQUEST_CROP:
                 case Crop.REQUEST_PICK:
                     Intent intent = getIntent();
-                    final CustomThumbBean thumbBean = intent.getParcelableExtra("thumb");
+                    final CustomThumb thumbBean = intent.getParcelableExtra("thumb");
                     if(thumbBean == null)
                         break;
                     String errorTxt = getString(
