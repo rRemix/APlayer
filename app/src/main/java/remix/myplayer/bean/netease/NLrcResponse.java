@@ -1,12 +1,12 @@
 package remix.myplayer.bean.netease;
 
-import remix.myplayer.bean.BaseData;
+import java.io.Serializable;
 
 /**
  * Created by Remix on 2017/11/19.
  */
 
-public class NLrcResponse extends BaseData {
+public class NLrcResponse implements Serializable {
     private static final long serialVersionUID = 3447785606973976839L;
     public boolean sgc;
     public boolean sfy;
@@ -17,7 +17,8 @@ public class NLrcResponse extends BaseData {
     public LrcActualData tlyric;
     public TransUserData transUser;
 
-    public static class TransUserData extends BaseData{
+    public static class TransUserData implements Serializable{
+        private static final long serialVersionUID = 6288902941579934143L;
         public int id;
         public int status;
         public int demand;
@@ -26,7 +27,8 @@ public class NLrcResponse extends BaseData {
         public long uptime;
     }
 
-    public static class LrcActualData extends BaseData{
+    public static class LrcActualData implements Serializable{
+        private static final long serialVersionUID = -1692673455916843725L;
         public int version;
         public String lyric;
     }

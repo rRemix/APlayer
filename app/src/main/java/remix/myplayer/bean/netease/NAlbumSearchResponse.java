@@ -1,20 +1,19 @@
 package remix.myplayer.bean.netease;
 
+import java.io.Serializable;
 import java.util.List;
-
-import remix.myplayer.bean.BaseData;
 
 /**
  * Created by Remix on 2017/11/30.
  */
 
-public class NAlbumSearchResponse extends BaseData {
+public class NAlbumSearchResponse implements Serializable {
     private static final long serialVersionUID = 3087250502584503377L;
     public ResultBean result;
     public int code;
 
-    public static class ResultBean {
-
+    public static class ResultBean implements Serializable{
+        private static final long serialVersionUID = -966951494042024200L;
         public int albumCount;
         public List<AlbumsBean> albums;
 

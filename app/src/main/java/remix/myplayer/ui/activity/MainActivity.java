@@ -33,10 +33,13 @@ import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,7 +48,8 @@ import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.HeaderAdapter;
-import remix.myplayer.adapter.PagerAdapter;
+import remix.myplayer.adapter.MainPagerAdapter;
+import remix.myplayer.bean.Category;
 import remix.myplayer.bean.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
@@ -58,13 +62,8 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.fragment.AlbumFragment;
-import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.fragment.BottomActionBarFragment;
-import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.LibraryFragment;
-import remix.myplayer.ui.fragment.PlayListFragment;
-import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -76,6 +75,7 @@ import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
+import static remix.myplayer.bean.Category.DEFAULT_LIBRARY;
 import static remix.myplayer.service.MusicService.ACTION_LOAD_FINISH;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
@@ -105,7 +105,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private BottomActionBarFragment mBottomBar;
     private final static String TAG = "MainActivity";
     private DrawerAdapter mDrawerAdapter;
-    private PagerAdapter mPagerAdapter;
+    private MainPagerAdapter mPagerAdapter;
     //是否正在运行
     private static boolean mIsRunning = false;
 
@@ -206,10 +206,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         mToolBar.setNavigationOnClickListener(v -> mDrawerLayout.openDrawer(mNavigationView));
     }
 
-    public PagerAdapter getAdapter() {
-        return mPagerAdapter;
-    }
-
     /**
      * 新建播放列表
      * @param v
@@ -265,37 +261,26 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-
-    public static final String DEFAULT_LIBRARY = APlayerApplication.getContext().getResources().getString(R.string.tab_song) + "," +
-            APlayerApplication.getContext().getResources().getString(R.string.tab_album) + "," +
-            APlayerApplication.getContext().getResources().getString(R.string.tab_artist) + "," +
-            APlayerApplication.getContext().getResources().getString(R.string.tab_playlist);
-    public static final String ALL_LIBRARY = APlayerApplication.getContext().getResources().getString(R.string.tab_song) + "," +
-            APlayerApplication.getContext().getResources().getString(R.string.tab_album) + "," +
-            APlayerApplication.getContext().getResources().getString(R.string.tab_artist) + "," +
-            APlayerApplication.getContext().getResources().getString(R.string.tab_playlist)  + "," +
-            APlayerApplication.getContext().getResources().getString(R.string.tab_folder);
+//    public static final String DEFAULT_LIBRARY = APlayerApplication.getContext().getResources().getString(R.string.tab_song) + "," +
+//            APlayerApplication.getContext().getResources().getString(R.string.tab_album) + "," +
+//            APlayerApplication.getContext().getResources().getString(R.string.tab_artist) + "," +
+//            APlayerApplication.getContext().getResources().getString(R.string.tab_playlist);
+//    public static final String ALL_LIBRARY = APlayerApplication.getContext().getResources().getString(R.string.tab_song) + "," +
+//            APlayerApplication.getContext().getResources().getString(R.string.tab_album) + "," +
+//            APlayerApplication.getContext().getResources().getString(R.string.tab_artist) + "," +
+//            APlayerApplication.getContext().getResources().getString(R.string.tab_playlist)  + "," +
+//            APlayerApplication.getContext().getResources().getString(R.string.tab_folder);
     //初始化ViewPager
     private void setUpPager() {
-        String category = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.LIBRARY_CATEGORY,DEFAULT_LIBRARY);
-        String[] categories = category.split(",");
-        mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
-
-        for(String item : categories){
-            if(getResources().getString(R.string.tab_song).equals(item)){
-                mPagerAdapter.addFragment(new SongFragment());
-            } else if(getResources().getString(R.string.tab_album).equals(item)){
-                mPagerAdapter.addFragment(new AlbumFragment());
-            } else if(getResources().getString(R.string.tab_artist).equals(item)){
-                mPagerAdapter.addFragment(new ArtistFragment());
-            } else if(getResources().getString(R.string.tab_playlist).equals(item)){
-                mPagerAdapter.addFragment(new PlayListFragment());
-            } else if(getResources().getString(R.string.tab_folder).equals(item)){
-                mPagerAdapter.addFragment(new FolderFragment());
-            }
-            mPagerAdapter.addTitle(item);
+        String categoryJson = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.LIBRARY_CATEGORY,"");
+        List<Category> categories = TextUtils.isEmpty(categoryJson) ? new ArrayList<>() : new Gson().fromJson(categoryJson,new TypeToken<List<Category>>(){}.getType());
+        if(categories.size() == 0){
+            categories.addAll(DEFAULT_LIBRARY);
+            SPUtil.putValue(mContext,"Setting",SPUtil.SPKEY.LIBRARY_CATEGORY,new Gson().toJson(DEFAULT_LIBRARY,new TypeToken<List<Category>>(){}.getType()));
         }
-
+        mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
+        mPagerAdapter.setList(categories);
+//        mPagerAdapter.notifyDataSetChanged();
 
         mAddButton.setImageResource(ThemeStore.isDay() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
         mViewPager.setAdapter(mPagerAdapter);
@@ -444,8 +429,16 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 case REQUEST_SETTING:
                     if(data.getBooleanExtra("needRecreate",false)) { //设置后需要重启activity
                         mRefreshHandler.sendEmptyMessage(Constants.RECREATE_ACTIVITY);
-                    }else if(data.getBooleanExtra("needRefresh",false)){ //清除缓存后刷新adapter
+                    } else if(data.getBooleanExtra("needRefreshAdapter",false)){ //清除缓存后刷新adapter
                         mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+                    } else if(data.getBooleanExtra("needRefreshLibrary",false)){ //刷新Library
+                        List<Category> categories = (List<Category>) data.getSerializableExtra("Category");
+                        if(categories != null && categories.size() > 0){
+                            mViewPager.setOffscreenPageLimit(categories.size() - 1);
+                            mPagerAdapter.setList(categories);
+                            mPagerAdapter.notifyDataSetChanged();
+                        }
+//                        setUpPager();
                     }
                     break;
                 //图片选择
