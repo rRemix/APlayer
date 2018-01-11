@@ -15,7 +15,7 @@ import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnInflateFinishListener;
-import remix.myplayer.lyric.NewLrcView;
+import remix.myplayer.lyric.LrcView;
 import remix.myplayer.lyric.SearchLrc;
 import remix.myplayer.lyric.bean.LrcRow;
 
@@ -30,7 +30,7 @@ public class LrcFragment extends BaseFragment {
     private OnInflateFinishListener mOnFindListener;
     private Song mInfo;
     @BindView(R.id.lrc_view)
-    NewLrcView mLrcView;
+    LrcView mLrcView;
     //歌词
     private List<LrcRow> mLrcList;
 

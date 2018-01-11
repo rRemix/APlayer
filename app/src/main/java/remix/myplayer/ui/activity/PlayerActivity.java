@@ -64,7 +64,6 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.lyric.LrcView;
-import remix.myplayer.lyric.NewLrcView;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.request.ImageUriRequest;
@@ -155,7 +154,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     @BindView(R.id.next_song)
     TextView mNextSong;
     //歌词控件
-    private NewLrcView mLrcView;
+    private LrcView mLrcView;
     //高亮与非高亮指示器
     private Drawable mHighLightIndicator;
     private Drawable mNormalIndicator;
@@ -793,7 +792,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mAdapter.AddFragment(coverFragment);
         final LrcFragment lrcFragment = new LrcFragment();
         lrcFragment.setOnInflateFinishListener(view -> {
-            mLrcView = (NewLrcView) view;
+            mLrcView = (LrcView) view;
             mLrcView.setOnLrcClickListener(new LrcView.OnLrcClickListener() {
                 @Override
                 public void onClick() {
