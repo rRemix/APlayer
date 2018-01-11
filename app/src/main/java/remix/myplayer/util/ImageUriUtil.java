@@ -99,9 +99,9 @@ public class ImageUriUtil {
     public static NSearchRequest getSearchRequest(Song song,int localType){
         if(song == null)
             return NSearchRequest.DEFAULT_REQUEST;
-        boolean isTitlelegal = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(mContext.getString(R.string.unknow_song));
-        boolean isAlbumlegal = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(mContext.getString(R.string.unknow_album));
-        boolean isArtistlegal = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(mContext.getString(R.string.unknow_artist));
+        boolean isTitlelegal = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(mContext.getString(R.string.unknown_song));
+        boolean isAlbumlegal = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(mContext.getString(R.string.unknown_album));
+        boolean isArtistlegal = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(mContext.getString(R.string.unknown_artist));
 
         //歌曲名合法
         if(isTitlelegal){
@@ -132,9 +132,9 @@ public class ImageUriUtil {
     public static String getLyricSearchKey(Song song){
         if(song == null)
             return "";
-        boolean isTitlelegal = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(mContext.getString(R.string.unknow_song));
-        boolean isAlbumlegal = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(mContext.getString(R.string.unknow_album));
-        boolean isArtistlegal = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(mContext.getString(R.string.unknow_artist));
+        boolean isTitlelegal = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(mContext.getString(R.string.unknown_song));
+        boolean isAlbumlegal = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(mContext.getString(R.string.unknown_album));
+        boolean isArtistlegal = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(mContext.getString(R.string.unknown_artist));
 
         //歌曲名合法
         if(isTitlelegal){

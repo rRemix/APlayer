@@ -59,7 +59,7 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                int artistId = getArtsitId(position);
+                int artistId = getArtistId(position);
                 if(getUserVisibleHint() && artistId > 0 &&
                         !mMultiChoice.itemAddorRemoveWithClick(view,position,artistId,TAG)){
                     if (mAdapter.getDatas() != null) {
@@ -76,7 +76,7 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
             }
             @Override
             public void onItemLongClick(View view, int position) {
-                int artistId = getArtsitId(position);
+                int artistId = getArtistId(position);
                 if(getUserVisibleHint() && artistId > 0)
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,artistId,TAG,Constants.ARTIST);
             }
@@ -93,7 +93,7 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
     }
 
 
-    private int getArtsitId(int position){
+    private int getArtistId(int position){
         int artistId = -1;
         if(mAdapter.getDatas() != null){
             artistId = mAdapter.getDatas().get(position).getArtistID();

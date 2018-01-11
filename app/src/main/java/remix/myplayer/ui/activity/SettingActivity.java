@@ -22,9 +22,13 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.umeng.analytics.MobclickAgent;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,6 +37,7 @@ import cn.bmob.v3.update.BmobUpdateAgent;
 import cn.bmob.v3.update.UpdateStatus;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
+import remix.myplayer.bean.Category;
 import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;
@@ -51,6 +56,8 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
+
+import static remix.myplayer.bean.Category.ALL_LIBRARY_STRING;
 
 /**
  * @ClassName SettingActivity
@@ -90,14 +97,16 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     //是否需要重建activity
     private boolean mNeedRecreate = false;
     //是否需要刷新adapter
-    private boolean mNeedRefresh = false;
+    private boolean mNeedRefreshAdapter = false;
+    //是否需要刷新library
+    private boolean mNeedRefreshLibrary;
     //是否从主题颜色选择对话框返回
     private boolean mFromColorChoose = false;
     //缓存大小
     private long mCacheSize = 0;
     private final int RECREATE = 100;
-    private final int CACHESIZE = 101;
-    private final int CLEARFINISH = 102;
+    private final int CACHE_SIZE = 101;
+    private final int CLEAR_FINISH = 102;
     private MsgHandler mHandler;
     private final int[] mScanSize = new int[]{0,500 * ByteConstants.KB,ByteConstants.MB, 2 * ByteConstants.MB};
     private String mOriginalAlbumChoice;
@@ -114,7 +123,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         //读取重启aitivity之前的数据
         if(savedInstanceState != null){
             mNeedRecreate = savedInstanceState.getBoolean("needRecreate");
-            mNeedRefresh = savedInstanceState.getBoolean("needRefresh");
+            mNeedRefreshAdapter = savedInstanceState.getBoolean("needRefresh");
             mFromColorChoose = savedInstanceState.getBoolean("fromColorChoose");
         }
 
@@ -162,7 +171,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         startActivity(intent);
                                     }
-                                    ToastUtil.show(mContext,R.string.plase_give_float_permission);
+                                    ToastUtil.show(mContext,R.string.plz_give_float_permission);
                                     return;
                                 }
                                 mFloatLrcTip.setText(isChecked ? R.string.opened_float_lrc : R.string.closed_float_lrc);
@@ -204,11 +213,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow),findView(R.id.setting_donate_arrow)},
                 (ButterKnife.Action<ImageView>) (view, index) -> Theme.TintDrawable(view,view.getBackground(),arrowColor));
 
-        //分根线颜色
-        ButterKnife.apply(new View[]{findView(R.id.setting_divider_1),findView(R.id.setting_divider_2),findView(R.id.setting_divider_6),
-                findView(R.id.setting_divider_3),findView(R.id.setting_divider_4),findView(R.id.setting_divider_5)},
-                (ButterKnife.Action<View>) (view, index) -> view.setBackgroundColor(ThemeStore.getDividerColor()));
-
         //封面
         mOriginalAlbumChoice = SPUtil.getValue(mContext,"Setting",SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only));
         mAlbumCoverText.setText(mOriginalAlbumChoice);
@@ -220,7 +224,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 mCacheSize = 0;
                 mCacheSize += Util.getFolderSize(getExternalCacheDir());
                 mCacheSize += Util.getFolderSize(getCacheDir());
-                mHandler.sendEmptyMessage(CACHESIZE);
+                mHandler.sendEmptyMessage(CACHE_SIZE);
             }
         }.start();
     }
@@ -236,9 +240,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent();
+        Intent intent = getIntent();
         intent.putExtra("needRecreate", mNeedRecreate);
-        intent.putExtra("needRefresh",mNeedRefresh);
+        intent.putExtra("needRefreshAdapter", mNeedRefreshAdapter);
+        intent.putExtra("needRefreshLibrary", mNeedRefreshLibrary);
         setResult(Activity.RESULT_OK,intent);
         finish();
     }
@@ -270,7 +275,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
             R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container,
             R.id.setting_screen_container,R.id.setting_scan_container,R.id.setting_classic_notify_container,
-            R.id.setting_album_cover_container})
+            R.id.setting_album_cover_container,R.id.setting_library_category_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -296,6 +301,49 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .theme(ThemeStore.getMDDialogTheme())
                         .positiveText(R.string.confirm)
                         .positiveColorAttr(R.attr.text_color_primary)
+                        .show();
+                break;
+            //曲库
+            case R.id.setting_library_category_container:
+                String categoryJson = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.LIBRARY_CATEGORY,"");
+
+                List<Category> oldCategories = new Gson().fromJson(categoryJson,new TypeToken<List<Category>>(){}.getType());
+                if(oldCategories == null || oldCategories.size() == 0){
+                    ToastUtil.show(mContext,getString(R.string.load_failed));
+                    break;
+                }
+                List<Integer> selected = new ArrayList<>();
+                for(Category temp : oldCategories){
+                    selected.add(temp.getIndex());
+
+                }
+                new MaterialDialog.Builder(mContext)
+                        .title(R.string.library_category)
+                        .titleColorAttr(R.attr.text_color_primary)
+                        .positiveText(R.string.confirm)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .buttonRippleColorAttr(R.attr.ripple_color)
+                        .items(ALL_LIBRARY_STRING)
+                        .itemsCallbackMultiChoice(selected.toArray(new Integer[selected.size()]), (dialog, which, text) -> {
+                            if(text.length == 0){
+                                ToastUtil.show(mContext,getString(R.string.plz_choose_at_least_one_category));
+                                return true;
+                            }
+                            ArrayList<Category> newCategories = new ArrayList<>();
+                            for(CharSequence item : text){
+                                Category category = new Category(item.toString());
+                                newCategories.add(category);
+                            }
+                            if(!newCategories.equals(oldCategories)){
+                                mNeedRefreshLibrary = true;
+                                getIntent().putExtra("Category",newCategories);
+                                SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.LIBRARY_CATEGORY,new Gson().toJson(newCategories,new TypeToken<List<Category>>(){}.getType()));
+                            }
+                            return true;
+                        })
+                        .itemsColorAttr(R.attr.text_color_primary)
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .theme(ThemeStore.getMDDialogTheme())
                         .show();
                 break;
             //桌面歌词
@@ -429,7 +477,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     }else if(updateStatus == UpdateStatus.IGNORED){
                         ToastUtil.show(mContext,getString(R.string.update_ignore));
                     }else if(updateStatus == UpdateStatus.TimeOut){
-                        ToastUtil.show(mContext,R.string.updat_error);
+                        ToastUtil.show(mContext,R.string.update_error);
                     }
                 });
                 BmobUpdateAgent.forceUpdate(this);
@@ -466,8 +514,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 deleteDatabase(DBOpenHelper.DBNAME);
                                 //清除fresco缓存
                                 Fresco.getImagePipeline().clearCaches();
-                                mHandler.sendEmptyMessage(CLEARFINISH);
-                                mNeedRefresh = true;
+                                mHandler.sendEmptyMessage(CLEAR_FINISH);
+                                mNeedRefreshAdapter = true;
                             }
                         }.start())
                         .backgroundColorAttr(R.attr.background_color_3)
@@ -482,7 +530,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             //专辑与艺术家封面自动下载
             case R.id.setting_album_cover_container:
                 final String choice =  SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only));
-                final int selected = mContext.getString(R.string.wifi_only).equals(choice) ? 1 : mContext.getString(R.string.always).equals(choice) ? 0 : 2;
                 new MaterialDialog.Builder(this)
                         .title(R.string.auto_download_album_cover)
                         .titleColorAttr(R.attr.text_color_primary)
@@ -490,11 +537,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .positiveColorAttr(R.attr.text_color_primary)
                         .buttonRippleColorAttr(R.attr.ripple_color)
                         .items(new String[]{getString(R.string.always),getString(R.string.wifi_only),getString(R.string.never)})
-                        .itemsCallbackSingleChoice(selected,
+                        .itemsCallbackSingleChoice(mContext.getString(R.string.wifi_only).equals(choice) ? 1 : mContext.getString(R.string.always).equals(choice) ? 0 : 2,
                                 (dialog, view, which, text) -> {
                                     mAlbumCoverText.setText(text);
                                     //仅从从不改变到仅在wifi下或者总是的情况下，才刷新Adapter
-                                    mNeedRefresh |= ((mContext.getString(R.string.wifi_only).equals(text) | mContext.getString(R.string.always).equals(text))
+                                    mNeedRefreshAdapter |= ((mContext.getString(R.string.wifi_only).equals(text) | mContext.getString(R.string.always).equals(text))
                                             & !mOriginalAlbumChoice.equals(text));
                                     ImageUriRequest.AUTO_DOWNLOAD_ALBUM = text.toString();
                                     SPUtil.putValue(mContext,"Setting",
@@ -514,10 +561,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     public void handleInternal(Message msg){
         if(msg.what == RECREATE)
             recreate();
-        if(msg.what == CACHESIZE){
-            mCache.setText(getString(R.string.cache_szie,mCacheSize / 1024f / 1024));
+        if(msg.what == CACHE_SIZE){
+            mCache.setText(getString(R.string.cache_size,mCacheSize / 1024f / 1024));
         }
-        if(msg.what == CLEARFINISH){
+        if(msg.what == CLEAR_FINISH){
             ToastUtil.show(SettingActivity.this,getString(R.string.clear_success));
             mCache.setText(R.string.zero_size);
             mLrcPath.setText(R.string.default_lrc_path);
@@ -529,7 +576,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         super.onSaveInstanceState(outState);
         outState.putBoolean("needRecreate", mNeedRecreate);
         outState.putBoolean("fromColorChoose",mFromColorChoose);
-        outState.putBoolean("needRefresh",mNeedRefresh);
+        outState.putBoolean("needRefresh", mNeedRefreshAdapter);
     }
 
     @Override

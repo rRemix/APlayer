@@ -26,10 +26,9 @@ import remix.myplayer.util.ColorUtil;
 public class DrawerAdapter extends BaseAdapter<Integer,DrawerAdapter.DrawerHolder>{
     //当前选中项
     private int mSelectIndex = 0;
-    private int[] IMAGES = new int[]{R.drawable.drawer_icon_musicbox,R.drawable.drawer_icon_recently,R.drawable.darwer_icon_folder,
+    private int[] IMAGES = new int[]{R.drawable.drawer_icon_musicbox,R.drawable.drawer_icon_recently,
                                     R.drawable.darwer_icon_night,R.drawable.darwer_icon_set};
-    private int[] TITLES = new int[]{R.string.drawer_song,R.string.drawer_recently,
-                                    R.string.drawer_folder,R.string.drawer_night,R.string.drawer_setting};
+    private int[] TITLES = new int[]{R.string.drawer_song,R.string.drawer_recently,R.string.drawer_night,R.string.drawer_setting};
     public DrawerAdapter(Context Context,int layoutId) {
         super(Context,layoutId);
     }
@@ -46,16 +45,16 @@ public class DrawerAdapter extends BaseAdapter<Integer,DrawerAdapter.DrawerHolde
 
     @Override
     protected Integer getItem(int position) {
-        return position;
+        return TITLES[position];
     }
 
     @Override
-    protected void convert(final DrawerHolder holder, Integer item, int position) {
+    protected void convert(final DrawerHolder holder, Integer titleRes, int position) {
         Theme.TintDrawable(holder.mImg, IMAGES[position],ThemeStore.getAccentColor());
-        holder.mText.setText(TITLES[position]);
+        holder.mText.setText(titleRes);
         holder.mText.setTextColor(ThemeStore.isDay() ? ColorUtil.getColor(R.color.gray_34353a) : ThemeStore.getTextColorPrimary());
         holder.mText.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_34353a : R.color.white_e5e5e5));
-        if(position == 3){
+        if(titleRes == R.string.drawer_night){
             holder.mSwitch.setVisibility(View.VISIBLE);
             holder.mSwitch.setChecked(!ThemeStore.isDay());
             holder.mSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {

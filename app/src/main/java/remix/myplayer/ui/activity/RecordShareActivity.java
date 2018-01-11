@@ -194,7 +194,7 @@ public class RecordShareActivity extends BaseActivity {
             //开始处理,显示进度条
             if(!mHasPermission){
                 Message errMsg = mHandler.obtainMessage(ERROR);
-                errMsg.obj = mContext.getString(R.string.please_give_access_external_storage_permission);
+                errMsg.obj = mContext.getString(R.string.plz_give_access_external_storage_permission);
                 mHandler.sendMessage(errMsg);
                 return;
             }

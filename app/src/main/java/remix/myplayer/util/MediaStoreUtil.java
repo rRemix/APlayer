@@ -743,9 +743,6 @@ public class MediaStoreUtil {
         //之前保存的所有移除歌曲id
         Set<String> oriID = new HashSet<>(SPUtil.getStringSet(mContext,"Setting","DeleteID"));
 
-        if(oriID == null){
-            oriID = new HashSet<>();
-        }
         Cursor cursor = null;
         //拼接参数
         switch (type) {

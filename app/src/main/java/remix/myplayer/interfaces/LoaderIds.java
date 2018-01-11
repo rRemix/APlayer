@@ -14,4 +14,5 @@ public interface LoaderIds {
     int CHILDHOLDER_ACTIVITY = 7;
     int SEARCH_ACTIVITY = 8;
     int SONGCHOOSE_ACTIVITY = 9;
+    int FOLDER_FRAGMENT = 10;
 }

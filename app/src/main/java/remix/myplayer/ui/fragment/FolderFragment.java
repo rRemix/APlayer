@@ -1,29 +1,32 @@
 package remix.myplayer.ui.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.FolderAdapter;
+import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
+import remix.myplayer.bean.mp3.Folder;
+import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.ui.ListItemDecoration;
-import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2015/12/5.
@@ -32,32 +35,24 @@ import remix.myplayer.util.Util;
 /**
  * 文件夹Fragment
  */
-public class FolderFragment extends BaseFragment {
-    public static FolderFragment mInstance;
-    @BindView(R.id.recyclerview)
+public class FolderFragment extends LibraryFragment<Folder,FolderAdapter>  {
+    @BindView(R.id.folder_recyclerview)
     RecyclerView mRecyclerView;
 
-    private FolderAdapter mAdapter;
     public static final String TAG = FolderFragment.class.getSimpleName();
-    private MultiChoice mMultiChoice;
 
-    @Nullable
     @Override
-    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_folder,null);
-        mUnBinder = ButterKnife.bind(this,rootView);
+    protected int getLayoutID() {
+        return R.layout.fragment_folder;
+    }
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerView.addItemDecoration(new ListItemDecoration(getContext(),ListItemDecoration.VERTICAL_LIST, DensityUtil.dip2px(getActivity(),8)));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        if(getActivity() instanceof MultiChoiceActivity){
-            mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
-        }
+    @Override
+    protected void initAdapter() {
         mAdapter = new FolderAdapter(mContext,R.layout.item_folder_recycle,mMultiChoice);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                String path = Util.getMapkeyByPosition(Global.FolderMap,position);
+                String path = mAdapter.getDatas().get(position).getPath();
                 if(getUserVisibleHint() && !TextUtils.isEmpty(path) &&
                         !mMultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
                     Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
@@ -66,19 +61,37 @@ public class FolderFragment extends BaseFragment {
                     intent.putExtra("Title",path);
                     startActivity(intent);
                 }
-
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                String path = Util.getMapkeyByPosition(Global.FolderMap,position);
+                String path = mAdapter.getDatas().get(position).getPath();
                 if(getUserVisibleHint() && !TextUtils.isEmpty(path))
                     mMultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG,Constants.FOLDER);
             }
         });
-        mRecyclerView.setAdapter(mAdapter);
+    }
 
-        return rootView;
+    @Override
+    protected void initView() {
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.addItemDecoration(new ListItemDecoration(getContext(),ListItemDecoration.VERTICAL_LIST, DensityUtil.dip2px(getActivity(),8)));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        if(getActivity() instanceof MultiChoiceActivity){
+            mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
+        }
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
+    protected Loader<List<Folder>> getLoader() {
+        return new AsyncFolderLoader(mContext);
+    }
+
+    @Override
+    protected int getLoaderId() {
+        return LoaderIds.FOLDER_FRAGMENT;
     }
 
     @Override
@@ -87,22 +100,33 @@ public class FolderFragment extends BaseFragment {
         mPageName = TAG;
     }
 
-
-    public void UpdateAdapter() {
-        if(mRecyclerView != null && mRecyclerView.getAdapter() != null){
-            mRecyclerView.getAdapter().notifyDataSetChanged();
-        }
-    }
-
     @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-
-
-    @Override
-    public RecyclerView.Adapter getAdapter() {
+    public FolderAdapter getAdapter() {
         return mAdapter;
+    }
+
+    private static class AsyncFolderLoader extends WrappedAsyncTaskLoader<List<Folder>> {
+        private AsyncFolderLoader(Context context) {
+            super(context);
+        }
+
+        @Override
+        public List<Folder> loadInBackground() {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            List<Folder> folderList = new ArrayList<>();
+            if(Global.FolderMap == null || Global.FolderMap.size() < 0)
+                return folderList;
+            for (String path : Global.FolderMap.keySet()) {
+                String folderName = path.substring(path.lastIndexOf("/") + 1, path.length());
+                int count = Global.FolderMap.get(path).size();
+                folderList.add(new Folder(folderName, count, path));
+            }
+
+            return folderList;
+        }
     }
 }

@@ -15,7 +15,7 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import java.util.List;
 
 import butterknife.ButterKnife;
-import remix.myplayer.adapter.HeaderAdapter;
+import remix.myplayer.adapter.BaseAdapter;
 import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.MultiChoice;
@@ -26,7 +26,7 @@ import remix.myplayer.util.Util;
  * Created by Remix on 2016/12/23.
  */
 
-public abstract class LibraryFragment<D,A extends HeaderAdapter> extends BaseFragment implements MusicEventHelper.MusicEventCallback,LoaderManager.LoaderCallbacks<List<D>>{
+public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseFragment implements MusicEventHelper.MusicEventCallback,LoaderManager.LoaderCallbacks<List<D>>{
     protected A mAdapter;
     protected boolean mHasPermission = false;
     protected MultiChoice mMultiChoice;

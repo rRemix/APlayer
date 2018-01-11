@@ -1,12 +1,12 @@
 <resources>
-    <string name="version">v1.1.8.2</string>
+    <string name="version">v1.2.3.2</string>
     <string name="app_name">APlayer</string>
-    <string name="action_settings">Settings</string>
 
     <string name="tab_song">歌曲</string>
     <string name="tab_album">专辑</string>
     <string name="tab_artist">歌手</string>
     <string name="tab_playlist">列表</string>
+    <string name="tab_folder">文件夹</string>
 
     <string name="drawer_song">歌曲库</string>
     <string name="drawer_recently">最近添加</string>
@@ -14,15 +14,14 @@
     <string name="drawer_night">夜间模式</string>
     <string name="drawer_setting">设置</string>
 
-
     <string name="from_aplayer">来自APlayer播放器</string>
     <string name="about">关于APlayer</string>
     <string name="model_random">随机播放</string>
     <string name="model_repeat">单曲播放</string>
     <string name="model_normal">顺序播放</string>
-    <string name="unknow_song">未知歌曲</string>
-    <string name="unknow_artist">未知艺术家</string>
-    <string name="unknow_album">未知专辑</string>
+    <string name="unknown_song">未知歌曲</string>
+    <string name="unknown_artist">未知艺术家</string>
+    <string name="unknown_album">未知专辑</string>
     <string name="eq_initial_failed">均衡器初始化失败</string>
     <string name="use_eq">使用均衡器</string>
     <string name="plz_earphone">请插入耳机</string>
@@ -47,13 +46,13 @@
     <string name="song_lose_effect">该歌曲已经失效</string>
     <string name="add_playlist_success">新建播放列表成功</string>
     <string name="add_playlist_error">新建播放列表失败</string>
-    <string name="playlist_alread_exist">该播放列表已存在</string>
+    <string name="playlist_already_exist">该播放列表已存在</string>
 
     <string name="add_error">添加失败</string>
     <string name="add_to_playlist">添加到播放列表</string>
     <string name="add_song_playlist_success">添加%1$d首歌曲到%2$s</string>
     <string name="delete_multi_song">移除%d首歌曲</string>
-    <string name="add_song_playinglist_success">添加%d首歌曲到播放队列</string>
+    <string name="add_song_playqueue_success">添加%d首歌曲到播放队列</string>
     <string name="add_song_playlist_error">添加歌曲到播放列表失败</string>
 
     <string name="load_playlist_error">加载播放列表失败</string>
@@ -100,9 +99,9 @@
     <string name="play_now">正在播放: %s</string>
     <string name="default_lrc_path">默认扫描所有歌词文件</string>
     <string name="lrc_tip">%s</string>
-    <string name="cache_szie">%1$2.2f MB</string>
+    <string name="cache_size">%1$2.2f MB</string>
     <string name="confirm_clear_cache">确认清除缓存?</string>
-    <string name="mylove_cant_delelte">我的收藏列表不可删除</string>
+    <string name="mylove_cant_delete">我的收藏列表不可删除</string>
     <string name="error">错误</string>
     <string name="share_to">分享到</string>
     <string name="qq">QQ</string>
@@ -123,7 +122,7 @@
     <string name="delete">移除</string>
     <string name="ring">铃声</string>
     <string name="join">加入</string>
-    <string name="updat_error">查询出错或查询超时</string>
+    <string name="update_error">查询出错或查询超时</string>
     <string name="update_ignore">该版本已被忽略更新</string>
     <string name="no_update">当前已经是最新版本</string>
     <string name="search">搜索</string>
@@ -160,7 +159,7 @@
     <string name="choose">选择</string>
     <string name="donate_tip">您的支持，是我们进步的动力。</string>
     <string name="jump_alipay_account">跳转支付宝</string>
-    <string name="alread_copy">已复制到剪切板</string>
+    <string name="already_copy">已复制到剪切板</string>
     <string name="confirm_delete_playlist">是否移除所选播放列表?</string>
     <string name="confirm_delete_from_playlist">是否从播放列表移除?</string>
     <string name="confirm_delete_from_library">是否从曲库移除?</string>
@@ -224,9 +223,9 @@
     <string name="mediaplayer_error">MediaPlayer{what:%1$d,extra:%2$d}\r\n正在重新初始化</string>
     <string name="screen_always_on_title">歌词界面屏幕常亮</string>
     <string name="screen_always_on_tip">开启后切换到歌词界面屏幕将常亮</string>
-    <string name="plase_give_float_permission">请在设置中授予悬浮窗权限</string>
+    <string name="plz_give_float_permission">请在设置中授予悬浮窗权限</string>
     <string name="jump_alipay_error">跳转失败\n已复制支付宝账户(*博睿)</string>
-    <string name="please_give_access_external_storage_permission">请授予读写存储空间的权限</string>
+    <string name="plz_give_access_external_storage_permission">请授予读写存储空间的权限</string>
     <string name="show_recently">显示近一周导入的歌曲</string>
     <string name="no_audio_ID">请在播放歌曲后再次尝试此操作</string>
     <string name="need_earphone">使用此功能需要插入耳机</string>
@@ -258,6 +257,9 @@
     <string name="wifi_only">仅在wifi下</string>
     <string name="auto_download_album_cover">自动下载专辑封面</string>
     <string name="zero_size">0MB</string>
-
-
+    <string name="library">曲库</string>
+    <string name="library_category">曲库目录</string>
+    <string name="configure_library_category">配置所有曲库目录是否可见</string>
+    <string name="load_failed">读取失败</string>
+    <string name="plz_choose_at_least_one_category">请至少选择一个目录</string>
 </resources>

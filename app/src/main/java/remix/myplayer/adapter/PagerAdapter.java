@@ -21,19 +21,23 @@ public class PagerAdapter extends FragmentPagerAdapter {
     public PagerAdapter(FragmentManager fm) {
         super(fm);
     }
-    private String[] mTitles;
+    private List<String> mTitles = new ArrayList<>();
 
-    public void AddFragment(Fragment fragment) {
+    public void addFragment(Fragment fragment) {
         mFragmentList.add(fragment);
     }
 
-    public void setTitles(String[] titles){
+    public void setTitles(List<String> titles){
         mTitles = titles;
+    }
+
+    public void addTitle(String title){
+        mTitles.add(title);
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return mTitles[position];
+        return mTitles.get(position);
     }
 
     @Override
@@ -45,11 +49,5 @@ public class PagerAdapter extends FragmentPagerAdapter {
     public int getCount() {
         return mFragmentList.size();
     }
-
-    public void SetFragment(Fragment fragment, int position) {
-        mFragmentList.set(position,fragment);
-        notifyDataSetChanged();
-    }
-
 
 }

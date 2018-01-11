@@ -145,7 +145,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                                     newPlayListId = PlayListUtil.addPlayList(input.toString());
                                     ToastUtil.show(AddtoPlayListDialog.this, newPlayListId > 0 ?
                                                     R.string.add_playlist_success :
-                                                    newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_alread_exist,
+                                                    newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_already_exist,
                                             Toast.LENGTH_SHORT);
                                     if(newPlayListId < 0){
                                         return;

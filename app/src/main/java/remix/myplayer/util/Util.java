@@ -280,14 +280,14 @@ public class Util {
     public static String processInfo(String origin,int type){
         if(type == SONGTYPE){
             if(origin == null || origin.equals("") || origin.contains("unknown") ){
-                return mContext.getString(R.string.unknow_song);
+                return mContext.getString(R.string.unknown_song);
             } else {
 //                return origin.lastIndexOf(".") > 0 ? origin.substring(0, origin.lastIndexOf(".")) : origin;
                 return origin;
             }
         } else{
             if(origin == null || origin.equals("") || origin.contains("unknown") ){
-                return mContext.getString(type == ARTISTTYPE ? R.string.unknow_artist : R.string.unknow_album);
+                return mContext.getString(type == ARTISTTYPE ? R.string.unknown_artist : R.string.unknown_album);
             } else {
                 return origin;
             }

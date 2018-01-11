@@ -89,9 +89,6 @@
             android:name=".ui.activity.SearchActivity"
             android:theme="@style/ActivityStyle" />
         <activity
-            android:name=".ui.activity.FolderActivity"
-            android:theme="@style/ActivityStyle" />
-        <activity
             android:name=".ui.activity.ChildHolderActivity"
             android:theme="@style/ActivityStyle" />
         <activity

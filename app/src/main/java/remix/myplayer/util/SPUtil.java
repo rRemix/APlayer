@@ -29,7 +29,7 @@ public class SPUtil {
     }
 
     public static Set<String> getStringSet(Context context, String name, String key){
-        return context.getSharedPreferences(name,Context.MODE_PRIVATE).getStringSet(key,new HashSet<String>());
+        return context.getSharedPreferences(name,Context.MODE_PRIVATE).getStringSet(key,new HashSet<>());
     }
 
     public static boolean putValue(Context context,String name,String key,int value) {
@@ -87,6 +87,8 @@ public class SPUtil {
         public static final String AUTO_DOWNLOAD_ALBUM_COVER = "auto_download_album_cover";
         //是否自动下载艺术家封面
         public static final String AUTO_DOWNLOAD_ARTIST_COVER = "auto_download_artist_cover";
+        //曲库配置
+        public static final String LIBRARY_CATEGORY = "library_category";
     }
 
 }

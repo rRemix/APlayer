@@ -128,9 +128,9 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         if(mType != Constants.FOLDER) {
             if(mArg.contains("unknown")){
                 if(mType == Constants.ARTIST)
-                    Title = getString(R.string.unknow_artist);
+                    Title = getString(R.string.unknown_artist);
                 else if(mType == Constants.ALBUM){
-                    Title = getString(R.string.unknow_album);
+                    Title = getString(R.string.unknown_album);
                 }
             } else {
                 Title = mArg;

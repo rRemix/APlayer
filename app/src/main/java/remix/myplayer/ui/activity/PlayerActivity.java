@@ -671,7 +671,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         String album =  song.getAlbum() == null ? "" : song.getAlbum();
 
         if(title.equals(""))
-            mTopTitle.setText(getString(R.string.unknow_song));
+            mTopTitle.setText(getString(R.string.unknown_song));
         else
             mTopTitle.setText(title);
         if(artist.equals(""))
@@ -708,7 +708,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
         //初始化所有fragment
         final RecordFragment recordFragment = new RecordFragment();
-        mAdapter.AddFragment(recordFragment);
+        mAdapter.addFragment(recordFragment);
         CoverFragment coverFragment = new CoverFragment();
         coverFragment.setOnFirstLoadFinishListener(() -> mAnimCover.setVisibility(View.INVISIBLE));
 
@@ -789,7 +789,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         });
         coverFragment.setArguments(bundle);
 
-        mAdapter.AddFragment(coverFragment);
+        mAdapter.addFragment(coverFragment);
         final LrcFragment lrcFragment = new LrcFragment();
         lrcFragment.setOnInflateFinishListener(view -> {
             mLrcView = (LrcView) view;
@@ -848,7 +848,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mLrcView.setTimeLineColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
         });
         lrcFragment.setArguments(bundle);
-        mAdapter.AddFragment(lrcFragment);
+        mAdapter.addFragment(lrcFragment);
 
         mPager.setAdapter(mAdapter);
         mPager.setOffscreenPageLimit(mAdapter.getCount() - 1);

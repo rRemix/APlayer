@@ -1,23 +1,25 @@
 package remix.myplayer.bean.netease;
 
+import java.io.Serializable;
 import java.util.List;
-
-import remix.myplayer.bean.BaseData;
 
 /**
  * Created by Remix on 2017/11/19.
  */
 
-public class NSongSearchResponse extends BaseData {
+public class NSongSearchResponse implements Serializable {
+    private static final long serialVersionUID = -649254748472577314L;
     public int code;
-    public SeachActualData result;
+    public SearchActualData result;
 
-    public static class SeachActualData extends BaseData{
+    public static class SearchActualData implements Serializable{
+        private static final long serialVersionUID = -8875856782646205962L;
         public int songCount;
         public List<SearchInnerData> songs;
     }
 
-    public static class SearchInnerData extends BaseData{
+    public static class SearchInnerData implements Serializable{
+        private static final long serialVersionUID = 835870151533020922L;
         public String name;
         public int id;
         public int position;
@@ -40,7 +42,8 @@ public class NSongSearchResponse extends BaseData {
         public String ringtone;
     }
 
-    public static class SearchArtistData extends BaseData{
+    public static class SearchArtistData implements Serializable{
+        private static final long serialVersionUID = -871165113774382844L;
         public String name;
         public int id;
         public long picId;
@@ -54,7 +57,8 @@ public class NSongSearchResponse extends BaseData {
         public int musicSize;
     }
 
-    public static class SearchAlbumData extends BaseData{
+    public static class SearchAlbumData implements Serializable{
+        private static final long serialVersionUID = -3427976565299765848L;
         public String name;
         public int id;
         public String type;
