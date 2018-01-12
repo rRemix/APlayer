@@ -1,10 +1,10 @@
 package remix.myplayer.ui.dialog;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -64,7 +64,9 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     @BindView(R.id.share_wechat)
     View mWechat;
     @BindView(R.id.share_circlefriend)
-    View mCircleFrient;
+    View mCircleFriend;
+
+    private boolean mShareSuccess;
 
     private Song mInfo;
     //Api
@@ -110,19 +112,20 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         mShareListener = new UMShareListener() {
             @Override
             public void onResult(SHARE_MEDIA share_media) {
-                ToastUtil.show(ShareDialog.this,R.string.share_success);
+                ToastUtil.show(mContext,R.string.share_success);
+                mShareSuccess = true;
                 finish();
             }
 
             @Override
             public void onError(SHARE_MEDIA share_media, Throwable throwable) {
-                ToastUtil.show(ShareDialog.this,R.string.share_error);
+                ToastUtil.show(mContext,R.string.share_error);
                 finish();
             }
 
             @Override
             public void onCancel(SHARE_MEDIA share_media) {
-                ToastUtil.show(ShareDialog.this,R.string.share_cancel);
+                ToastUtil.show(mContext,R.string.share_cancel);
                 finish();
             }
         };
@@ -143,15 +146,10 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
             ((ImageView)findViewById(R.id.share_circlefriend_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.icon_moment),tintColor));
         }
 
-        ButterKnife.apply( new TextView[]{findView(R.id.share_circlefriend_text),findView(R.id.share_wechat_text),
-                        findView(R.id.share_qq_text),findView(R.id.share_weibo_text)},
-                new ButterKnife.Action<TextView>(){
-                    @Override
-                    public void apply(@NonNull TextView textView, int index) {
-                        textView.setTextColor(tintColor);
-                    }
-                });
+        ButterKnife.apply( new TextView[]{findView(R.id.share_circlefriend_text),findView(R.id.share_wechat_text), findView(R.id.share_qq_text),findView(R.id.share_weibo_text)},
+                (ButterKnife.Action<TextView>) (textView, index) -> textView.setTextColor(tintColor));
     }
+
 
     @OnClick({R.id.share_qq,R.id.share_weibo,R.id.share_wechat,R.id.share_circlefriend})
     public void onShare(View v){
@@ -300,8 +298,9 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if(intent.getAction().equals("com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY"))
+        if("com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY".equals(intent.getAction()))
             mWeiboApi.handleWeiboResponse(intent, this);
+
     }
 
     //微博回调
@@ -310,6 +309,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
         switch (baseResponse.errCode) {
             case WBConstants.ErrorCode.ERR_OK:
                 ToastUtil.show(this,R.string.share_success);
+                mShareSuccess = true;
                 break;
             case WBConstants.ErrorCode.ERR_CANCEL:
                 ToastUtil.show(this,R.string.share_cancel);
@@ -333,18 +333,19 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     private class BaseUiListener implements IUiListener {
         @Override
         public void onComplete(Object o) {
-            ToastUtil.show(ShareDialog.this, R.string.share_success);
+            ToastUtil.show(mContext, R.string.share_success);
+            mShareSuccess=  true;
             finish();
         }
 
         @Override
         public void onError(UiError uiError) {
-            ToastUtil.show(ShareDialog.this,R.string.share_error);
+            ToastUtil.show(mContext,R.string.share_error);
             finish();
         }
         @Override
         public void onCancel() {
-            ToastUtil.show(ShareDialog.this,R.string.share_cancel);
+            ToastUtil.show(mContext,R.string.share_cancel);
             finish();
         }
     }
@@ -358,6 +359,7 @@ public class ShareDialog extends BaseDialogActivity implements IWeiboHandler.Res
     @Override
     public void finish() {
         super.finish();
+        setResult(Activity.RESULT_OK,new Intent().putExtra("ShareSuccess",mShareSuccess));
         overridePendingTransition(0, R.anim.slide_bottom_out);
     }
 }

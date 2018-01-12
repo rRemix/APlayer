@@ -6,7 +6,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
 import android.util.DisplayMetrics;
@@ -15,7 +14,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -141,11 +139,11 @@ public class TimerDialog extends BaseDialogActivity {
         ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
 
         //读取保存的配置
-        boolean hasdefault = SPUtil.getValue(this, "Setting", "TimerDefault", false);
+        boolean hasDefault = SPUtil.getValue(this, "Setting", "TimerDefault", false);
         final int time = SPUtil.getValue(this,"Setting","TimerNum",-1);
 
         //默认选项
-        if(hasdefault && time > 0){
+        if(hasDefault && time > 0){
             //如果有默认设置并且没有开始计时，直接开始计时
             //如果有默认设置但已经开始计时，打开该popupwindow,并更改switch外观
             if(!mIsTiming) {
@@ -153,25 +151,22 @@ public class TimerDialog extends BaseDialogActivity {
                 toggle();
             }
         }
-        mSwitch.setChecked(hasdefault);
-        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    if (mSaveTime > 0) {
-                        ToastUtil.show(TimerDialog.this,R.string.set_success);
-                        SPUtil.putValue(TimerDialog.this, "Setting", "TimerDefault", true);
-                        SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", mSaveTime);
-                    } else {
-                        ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
-                        mSwitch.setChecked(false);
-                    }
+        mSwitch.setChecked(hasDefault);
+        mSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                if (mSaveTime > 0) {
+                    ToastUtil.show(TimerDialog.this,R.string.set_success);
+                    SPUtil.putValue(TimerDialog.this, "Setting", "TimerDefault", true);
+                    SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", mSaveTime);
                 } else {
-                    ToastUtil.show(TimerDialog.this,R.string.cancel_success);
-                    SPUtil.putValue(TimerDialog.this, "Setting", "TimerDefault", false);
-                    SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", -1);
-                    mSaveTime = -1;
+                    ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
+                    mSwitch.setChecked(false);
                 }
+            } else {
+                ToastUtil.show(TimerDialog.this,R.string.cancel_success);
+                SPUtil.putValue(TimerDialog.this, "Setting", "TimerDefault", false);
+                SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", -1);
+                mSaveTime = -1;
             }
         });
 
@@ -187,12 +182,7 @@ public class TimerDialog extends BaseDialogActivity {
                 ColorUtil.getColor(R.color.gray_404040),
                 0,0,1);
         ButterKnife.apply(new View[]{findView(R.id.timer_minute_container),findView(R.id.timer_second_container)},
-                new ButterKnife.Action<View>() {
-                    @Override
-                    public void apply(@NonNull View view, int index) {
-                        view.setBackground(containerDrawable);
-                    }
-                });
+                (ButterKnife.Action<View>) (view, index) -> view.setBackground(containerDrawable));
 
     }
 

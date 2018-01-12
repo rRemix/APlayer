@@ -1,5 +1,6 @@
 package remix.myplayer.ui.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -31,6 +32,9 @@ public class RecordFragment extends BaseFragment{
     @BindView(R.id.record_container)
     View mRecordContainer;
 
+    public static final int REQUEST_SHARE = 1;
+    private boolean mShareSuccess;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +58,7 @@ public class RecordFragment extends BaseFragment{
             arg.putString("Content", mEdit.getText().toString());
             arg.putParcelable("Song", MusicService.getCurrentMP3());
             intent.putExtras(arg);
-            startActivity(intent);
+            startActivityForResult(intent,REQUEST_SHARE);
         });
         mRecordContainer.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
@@ -75,7 +79,15 @@ public class RecordFragment extends BaseFragment{
 
     @OnTextChanged(value = R.id.edit_record,callback = OnTextChanged.Callback.AFTER_TEXT_CHANGED)
     void afterExplainChanged(Editable s){
+
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == REQUEST_SHARE && resultCode == Activity.RESULT_OK ){
+            mShareSuccess = data.getBooleanExtra("ShareSuccess",false);
+        }
+    }
 }
 

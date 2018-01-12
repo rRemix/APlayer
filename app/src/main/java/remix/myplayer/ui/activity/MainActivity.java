@@ -438,7 +438,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                             mPagerAdapter.setList(categories);
                             mPagerAdapter.notifyDataSetChanged();
                         }
-//                        setUpPager();
                     }
                     break;
                 //图片选择
@@ -568,6 +567,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private class LoadFinishReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent receive) {
+            unregisterReceiver(mLoadReceiver);
             String action = receive != null ? receive.getAction() : "";
             if(ACTION_LOAD_FINISH.equals(action)){
                 initBottombar();
@@ -586,7 +586,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                     Global.setPlayQueue(list,mContext,intent);
                 }
             }
-            unregisterReceiver(mLoadReceiver);
         }
     }
 }

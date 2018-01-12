@@ -19,6 +19,7 @@ import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.fragment.FolderFragment;
 import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
+import remix.myplayer.util.LogUtil;
 
 import static com.squareup.haha.guava.base.Joiner.checkNotNull;
 
@@ -49,6 +50,7 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
         WeakReference<Fragment> reference = mCacheMap.get(category.getTitle());
 
         if(reference != null && reference.get() != null){
+            LogUtil.d("ConfigViewPager","缓存命中: " + reference.get());
             return reference.get();
         }
         Fragment fragment = category.getTitle().equals(APlayerApplication.getContext().getString(R.string.tab_song)) ? new SongFragment() :
@@ -56,6 +58,7 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
                 category.getTitle().equals(APlayerApplication.getContext().getString(R.string.tab_artist)) ? new ArtistFragment() :
                 category.getTitle().equals(APlayerApplication.getContext().getString(R.string.tab_playlist)) ? new PlayListFragment() : new FolderFragment();
         mCacheMap.put(category.getTitle(),new WeakReference<>(fragment));
+        LogUtil.d("ConfigViewPager","重新创建: " + fragment);
         return fragment;
     }
 

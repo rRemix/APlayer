@@ -90,7 +90,7 @@ public class CircleSeekBar extends AbsSeekBar {
     /**
      * 轨道颜色
      */
-    private int mProgressCorlor;
+    private int mProgressColor;
     private Context mContext;
 
     /**
@@ -221,7 +221,7 @@ public class CircleSeekBar extends AbsSeekBar {
         mThumbDrawable = Theme.getTinThumb(mContext);
 
         //轨道颜色 宽度 最大值
-        mProgressCorlor = typedArray.getColor(R.styleable.CircleSeekBar_progress_color,
+        mProgressColor = typedArray.getColor(R.styleable.CircleSeekBar_progress_color,
                 ThemeStore.getAccentColor());
         mProgressWidth = (int)typedArray.getDimension(R.styleable.CircleSeekBar_progress_width,14);
         mProgressMax = typedArray.getInteger(R.styleable.CircleSeekBar_progress_max,600);
@@ -237,7 +237,7 @@ public class CircleSeekBar extends AbsSeekBar {
         //圆弧画笔
         mArcPaint = new Paint();
         mArcPaint.setAntiAlias(true);
-        mArcPaint.setColor(mProgressCorlor);
+        mArcPaint.setColor(mProgressColor);
         mArcPaint.setStyle(Paint.Style.STROKE);
         mArcPaint.setStrokeWidth(mProgressWidth);
 

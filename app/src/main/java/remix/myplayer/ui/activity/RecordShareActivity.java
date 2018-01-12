@@ -1,6 +1,8 @@
 package remix.myplayer.ui.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -47,6 +49,7 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
 
+import static remix.myplayer.ui.fragment.RecordFragment.REQUEST_SHARE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
@@ -58,6 +61,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  */
 public class RecordShareActivity extends BaseActivity {
     private static final int IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),268);
+
     @BindView(R.id.recordshare_image)
     SimpleDraweeView mImage;
     //歌曲名与分享内容
@@ -149,7 +153,6 @@ public class RecordShareActivity extends BaseActivity {
         mBackground2.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0,DensityUtil.dip2px(this,1), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));
         mImageBackground.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0,DensityUtil.dip2px(this,1), ColorUtil.getColor(R.color.white_f6f6f5),0,0,1));
 
-
         mProgressDialog = new MaterialDialog.Builder(this)
                 .title(R.string.please_wait)
                 .titleColorRes(R.color.day_textcolor_primary)
@@ -188,7 +191,8 @@ public class RecordShareActivity extends BaseActivity {
      * 将图片保存到本地
      */
     private class ProcessThread extends Thread{
-        FileOutputStream fos = null;
+        FileOutputStream mFileOutputStream = null;
+        @SuppressLint("SimpleDateFormat")
         @Override
         public void run() {
             //开始处理,显示进度条
@@ -204,38 +208,38 @@ public class RecordShareActivity extends BaseActivity {
             mFile = null;
             try {
                 //将截屏内容保存到文件
-                File shareDir = DiskCache.getDiskCacheDir(RecordShareActivity.this,"share");
+                File shareDir = DiskCache.getDiskCacheDir(mContext,"share");
                 if(!shareDir.exists()){
                     shareDir.mkdirs();
                 }
-                mFile = new File(String.format("%s/%s.png", DiskCache.getDiskCacheDir(RecordShareActivity.this, "share"), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()))));
+                mFile = new File(String.format("%s/%s.png", DiskCache.getDiskCacheDir(mContext, "share"), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()))));
                 if (!mFile.exists()) {
                     mFile.createNewFile();
                 }
-                fos = new FileOutputStream(mFile);
-                mBackgroudCache.compress(Bitmap.CompressFormat.JPEG, 80, fos);
-                fos.flush();
-                fos.close();
+                mFileOutputStream = new FileOutputStream(mFile);
+                mBackgroudCache.compress(Bitmap.CompressFormat.JPEG, 80, mFileOutputStream);
+                mFileOutputStream.flush();
+                mFileOutputStream.close();
                 //处理完成
                 mHandler.sendEmptyMessage(COMPLETE);
                 mHandler.sendEmptyMessage(STOP);
 
                 //打开分享的Dialog
-                Intent intent = new Intent(RecordShareActivity.this, ShareDialog.class);
+                Intent intent = new Intent(mContext, ShareDialog.class);
                 Bundle arg = new Bundle();
                 arg.putInt("Type", Constants.SHARERECORD);
                 arg.putString("Url",mFile.getAbsolutePath());
                 arg.putParcelable("Song",mInfo);
                 intent.putExtras(arg);
-                startActivity(intent);
+                startActivityForResult(intent,REQUEST_SHARE);
             } catch (Exception e) {
                 Message errMsg = mHandler.obtainMessage(ERROR);
                 errMsg.obj = e.toString();
                 mHandler.sendMessage(errMsg);
             } finally {
-                if(fos != null)
+                if(mFileOutputStream != null)
                     try {
-                        fos.close();
+                        mFileOutputStream.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -269,9 +273,16 @@ public class RecordShareActivity extends BaseActivity {
                     }
                 });
     }
+
     public void onPause() {
         MobclickAgent.onPageEnd(RecetenlyActivity.class.getSimpleName());
         super.onPause();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        setResult(Activity.RESULT_OK,data);
+        finish();
+    }
 }
