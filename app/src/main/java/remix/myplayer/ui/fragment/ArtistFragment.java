@@ -53,7 +53,7 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
     protected void initAdapter() {
         mAdapter = new ArtistAdapter(mContext,R.layout.item_artist_recycle_grid,mMultiChoice);
         mAdapter.setModeChangeCallback(mode -> {
-            mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
+            mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
             mRecyclerView.setAdapter(mAdapter);
         });
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
@@ -66,7 +66,7 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
                         Artist artist =  mAdapter.getDatas().get(position);
                         int artistid = artist.getArtistID();
                         String title = artist.getArtist();
-                        Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
+                        Intent intent = new Intent(mContext, ChildHolderActivity.class);
                         intent.putExtra("Id", artistid);
                         intent.putExtra("Title", title);
                         intent.putExtra("Type", Constants.ARTIST);
@@ -85,8 +85,8 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
 
     @Override
     protected void initView() {
-        int model = SPUtil.getValue(getActivity(),"Setting","ArtistModel",Constants.GRID_MODEL);
-        mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+        int model = SPUtil.getValue(mContext,"Setting","ArtistModel",Constants.GRID_MODEL);
+        mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);

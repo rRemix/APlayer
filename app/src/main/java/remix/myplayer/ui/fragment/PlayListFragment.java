@@ -45,7 +45,7 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
     protected void initAdapter() {
         mAdapter = new PlayListAdapter(mContext,R.layout.item_playlist_recycle_grid,mMultiChoice);
         mAdapter.setModeChangeCallback(mode -> {
-            mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
+            mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
             mRecyclerView.setAdapter(mAdapter);
         });
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
@@ -54,10 +54,10 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
                 String name = getPlayListName(position);
                 if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,getPlayListId(position),TAG)){
                     if(getPlayListSongCount(position) == 0) {
-                        ToastUtil.show(getActivity(),getString(R.string.list_is_empty));
+                        ToastUtil.show(mContext,getString(R.string.list_is_empty));
                         return;
                     }
-                    Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
+                    Intent intent = new Intent(mContext, ChildHolderActivity.class);
                     intent.putExtra("Id", getPlayListId(position));
                     intent.putExtra("Title", name);
                     intent.putExtra("Type", Constants.PLAYLIST);
@@ -77,9 +77,9 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
 
     @Override
     protected void initView() {
-        int model = SPUtil.getValue(getActivity(),"Setting","PlayListModel",Constants.GRID_MODEL);
+        int model = SPUtil.getValue(mContext,"Setting","PlayListModel",Constants.GRID_MODEL);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getActivity(), 2));
+        mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
     }

@@ -21,12 +21,11 @@ import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.bean.mp3.Folder;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.ui.ListItemDecoration;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.activity.MultiChoiceActivity;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * Created by Remix on 2015/12/5.
@@ -55,7 +54,7 @@ public class FolderFragment extends LibraryFragment<Folder,FolderAdapter>  {
                 String path = mAdapter.getDatas().get(position).getPath();
                 if(getUserVisibleHint() && !TextUtils.isEmpty(path) &&
                         !mMultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
-                    Intent intent = new Intent(getActivity(), ChildHolderActivity.class);
+                    Intent intent = new Intent(mContext, ChildHolderActivity.class);
                     intent.putExtra("Id", position);
                     intent.putExtra("Type", Constants.FOLDER);
                     intent.putExtra("Title",path);
@@ -76,10 +75,9 @@ public class FolderFragment extends LibraryFragment<Folder,FolderAdapter>  {
     protected void initView() {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.addItemDecoration(new ListItemDecoration(getContext(),ListItemDecoration.VERTICAL_LIST, DensityUtil.dip2px(getActivity(),8)));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        if(getActivity() instanceof MultiChoiceActivity){
-            mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
+        if(mContext instanceof MultiChoiceActivity){
+            mMultiChoice = ((MultiChoiceActivity) mContext).getMultiChoice();
         }
         mRecyclerView.setAdapter(mAdapter);
     }
@@ -112,14 +110,11 @@ public class FolderFragment extends LibraryFragment<Folder,FolderAdapter>  {
 
         @Override
         public List<Folder> loadInBackground() {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             List<Folder> folderList = new ArrayList<>();
+            Global.FolderMap = MediaStoreUtil.getFolder();
             if(Global.FolderMap == null || Global.FolderMap.size() < 0)
                 return folderList;
+
             for (String path : Global.FolderMap.keySet()) {
                 String folderName = path.substring(path.lastIndexOf("/") + 1, path.length());
                 int count = Global.FolderMap.get(path).size();

@@ -47,7 +47,6 @@ import butterknife.OnClick;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
-import remix.myplayer.adapter.HeaderAdapter;
 import remix.myplayer.adapter.MainPagerAdapter;
 import remix.myplayer.bean.Category;
 import remix.myplayer.bean.CustomThumb;
@@ -555,10 +554,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             //刷新适配器
             for(Fragment temp : getSupportFragmentManager().getFragments()){
                 if(temp instanceof LibraryFragment){
-                    HeaderAdapter headerAdapter = (HeaderAdapter) ((LibraryFragment)temp).getAdapter();
-                    if(headerAdapter != null){
-                        headerAdapter.notifyDataSetChanged();
-                    }
+                    ((LibraryFragment) temp).getAdapter().notifyDataSetChanged();
                 }
             }
         }

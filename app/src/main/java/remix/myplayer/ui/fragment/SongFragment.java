@@ -52,7 +52,7 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
 
     @Override
     protected void initAdapter() {
-        mAdapter = new SongAdapter(getActivity(),R.layout.item_song_recycle,mMultiChoice, SongAdapter.ALLSONG,mRecyclerView);
+        mAdapter = new SongAdapter(mContext,R.layout.item_song_recycle,mMultiChoice, SongAdapter.ALLSONG,mRecyclerView);
         mAdapter.setChangeCallback(() -> getLoaderManager().restartLoader(getLoaderId(),null,SongFragment.this));
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
@@ -65,7 +65,7 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    Global.setPlayQueue(Global.AllSongList,getActivity(),intent);
+                    Global.setPlayQueue(Global.AllSongList,mContext,intent);
                 }
             }
             @Override

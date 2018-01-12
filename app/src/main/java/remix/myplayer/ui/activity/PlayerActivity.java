@@ -635,6 +635,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mHandler.sendEmptyMessage(UPDATE_TIME_ONLY);
+                mCurrentTime = progress;
                 if(mLrcView != null)
                     mLrcView.seekTo(progress,true,fromUser);
             }
@@ -923,7 +924,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
             }
             updateBg();
-            updateCover();
+            requestCover();
         }
         //更新按钮状态
         updatePlayButton(isplay);
@@ -1003,7 +1004,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private void updateBg() {
         if(!mDiscolour)
             return;
-
         Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
             mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
             if(mRawBitMap == null)
@@ -1026,7 +1026,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     }
 
-    private void updateCoverActual(){
+    private void updateCover(){
         ((CoverFragment) mAdapter.getItem(1)).updateCover(mInfo,mUri,!mFistStart);
 //            mAnimCover.setImageURI(mUri);
         mFistStart = false;
@@ -1035,23 +1035,23 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     /**
      * 更新封面
      */
-    private void updateCover() {
+    private void requestCover() {
         //更新封面
         if(mInfo == null || (mInfo = MusicService.getCurrentMP3()) == null){
             mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
-            updateCoverActual();
+            updateCover();
         } else {
             new ImageUriRequest<String>(){
                 @Override
                 public void onError(String errMsg) {
                     mUri = Uri.EMPTY;
-                    updateCoverActual();
+                    updateCover();
                 }
 
                 @Override
                 public void onSuccess(String result) {
                     mUri = Uri.parse(result);
-                    updateCoverActual();
+                    updateCover();
                 }
 
                 @Override
@@ -1062,7 +1062,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 }
             }.load();
         }
-
     }
 
     @Override

@@ -25,7 +25,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import remix.myplayer.R;
 import remix.myplayer.adapter.SongAdapter;
@@ -158,6 +160,10 @@ public class MediaStoreUtil {
         return songs;
     }
 
+    /**
+     * 获得所有歌曲id
+     * @return
+     */
     public static ArrayList<Integer> getAllSongsId() {
         ArrayList<Integer> allSongList = new ArrayList<>();
         ContentResolver resolver = mContext.getContentResolver();
@@ -193,6 +199,48 @@ public class MediaStoreUtil {
     }
 
     /**
+     * 获得文件夹信息
+     * @return
+     */
+    public static Map<String,List<Integer>> getFolder(){
+        ContentResolver resolver = mContext.getContentResolver();
+        Cursor cursor = null;
+        Map<String,List<Integer>> folder = new TreeMap<>(String::compareToIgnoreCase);
+
+
+        //默认过滤文件大小500K
+        Constants.SCAN_SIZE = SPUtil.getValue(mContext,"Setting","ScanSize",-1);
+        if( Constants.SCAN_SIZE < 0) {
+            Constants.SCAN_SIZE = 500 * ByteConstants.KB;
+            SPUtil.putValue(mContext,"Setting","ScanSize",500 * ByteConstants.KB);
+        }
+
+        try{
+            cursor = resolver.query(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA},
+                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
+                    null,
+                    null);
+            if(cursor != null) {
+                while (cursor.moveToNext()) {
+                    int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+                    //根据歌曲路径对歌曲按文件夹分类
+                    String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                    sortFolder(folder,id,path);
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
+        }
+
+        return folder;
+    }
+
+    /**
      * 获得所有歌曲id 并按文件夹分类
      * @return
      */
@@ -223,7 +271,7 @@ public class MediaStoreUtil {
                     allSongList.add(id);
                     //根据歌曲路径对歌曲按文件夹分类
                     String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                    SortWithFolder(id,path);
+                    sortFolder(Global.FolderMap,id,path);
                 }
             }
         } catch (Exception e){
@@ -239,16 +287,16 @@ public class MediaStoreUtil {
     /**
      * 将歌曲按文件夹分类
      * @param id 歌曲id
-     * @param fullpath 歌曲完整路径
+     * @param fullPath 歌曲完整路径
      */
-    public static void SortWithFolder(int id,String fullpath) {
-        String dirPath = fullpath.substring(0, fullpath.lastIndexOf("/"));
-        if (!Global.FolderMap.containsKey(dirPath)) {
+    public static void sortFolder(Map<String,List<Integer>> folder, int id, String fullPath) {
+        String dirPath = fullPath.substring(0, fullPath.lastIndexOf("/"));
+        if (!folder.containsKey(dirPath)) {
             List<Integer> list = new ArrayList<>();
             list.add(id);
-            Global.FolderMap.put(dirPath, list);
+            folder.put(dirPath, list);
         } else {
-            List<Integer> list = Global.FolderMap.get(dirPath);
+            List<Integer> list = folder.get(dirPath);
             list.add(id);
         }
     }

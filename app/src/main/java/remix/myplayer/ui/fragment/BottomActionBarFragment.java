@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v13.app.ActivityCompat;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,7 +95,7 @@ public class BottomActionBarFragment extends BaseFragment{
 
             ActivityOptionsCompat options = ActivityOptionsCompat
                     .makeSceneTransitionAnimation(getActivity(), mCover, "image");
-            ActivityCompat.startActivity(getActivity(), intent, options.toBundle());
+            ActivityCompat.startActivity(mContext, intent, options.toBundle());
         });
         //播放按钮
         CtrlButtonListener listener = new CtrlButtonListener(getContext());

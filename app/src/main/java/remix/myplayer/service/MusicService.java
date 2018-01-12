@@ -260,9 +260,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 
         if(!mLoadFinished && (mHasPermission = Util.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}))) {
             //读取数据
-//            mNotify.updateForLoading();
-            loadDataSync();
-//            mNotify.cancelLoadingNotify();
+            loadSync();
         }
 
         String action = commandIntent.getAction();
@@ -433,9 +431,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(mMediaPlayer == null) {
                 setUpMediaPlayer();
             }
-            prepare(mCurrentInfo.getUrl());
-//            mMediaPlayer.setDataSource(mCurrentInfo.getUrl());
-//            mMediaPlayer.prepareAsync();
+            prepare(mCurrentInfo.getUrl(),false);
         } catch (Exception e) {
             mUpdateUIHandler.post(() -> ToastUtil.show(mContext,e.toString()));
         }
@@ -620,7 +616,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     public void onPermissionChanged(boolean has) {
         if(has != mHasPermission && has){
             mHasPermission = true;
-            loadAsync();
+            loadSync();
         }
     }
 
@@ -957,24 +953,26 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         }
     }
 
-
     /**
      * 准备播放
      * @param path 播放歌曲的路径
      */
-    private void prepare(final String path) {
+    private void prepare(final String path,final boolean requestFocus) {
         try {
             LogUtil.d(TAG,"准备播放");
             if(TextUtils.isEmpty(path)){
                 mUpdateUIHandler.post(() -> ToastUtil.show(mContext,getString(R.string.path_empty)));
                 return;
             }
-            mAudioFocus = mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
-                    AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-            if(!mAudioFocus) {
-                mUpdateUIHandler.post(() -> ToastUtil.show(mContext,getString(R.string.cant_request_audio_focus)));
-                return;
+            if(requestFocus){
+                mAudioFocus = mAudioManager.requestAudioFocus(mAudioFocusListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN) ==
+                        AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+                if(!mAudioFocus) {
+                    mUpdateUIHandler.post(() -> ToastUtil.show(mContext,getString(R.string.cant_request_audio_focus)));
+                    return;
+                }
             }
+
             if(isPlay()){
                 pause(true);
             }
@@ -989,6 +987,14 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             mUpdateUIHandler.post(() -> ToastUtil.show(mContext,getString(R.string.play_failed) + e.toString()));
             mIsInitialized = false;
         }
+    }
+
+    /**
+     * 准备播放
+     * @param path 播放歌曲的路径
+     */
+    private void prepare(final String path) {
+        prepare(path,true);
     }
 
     /**
@@ -1229,22 +1235,18 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /**
      * 读取歌曲id列表与播放队列
      */
-    private void loadAsync() {
-        new Thread(){
-            @Override
-            public void run() {
-                loadDataSync();
-            }
-        }.start();
-
+    private void loadSync() {
+        mPlaybackHandler.post(this::loadAsync);
     }
 
-    private void loadDataSync(){
+    private void loadAsync(){
         final boolean isFirst = SPUtil.getValue(mContext, "Setting", "First", true);
         SPUtil.putValue(mContext,"Setting","First",false);
         //读取sd卡歌曲id
 
-        Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
+        Global.AllSongList = MediaStoreUtil.getAllSongsId();
+//        Global.AllSongList = MediaStoreUtil.getAllSongsId();
+//        Global.FolderMap = MediaStoreUtil.getFolder();
         //第一次启动软件
         if(isFirst){
             try {
@@ -1279,6 +1281,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mLoadFinished = true;
         sendBroadcast(new Intent(ACTION_LOAD_FINISH));
     }
+
 
     /**
      * 初始化上一次退出时时正在播放的歌曲

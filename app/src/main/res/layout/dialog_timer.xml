@@ -93,11 +93,8 @@
                         android:id="@+id/timer_minute_container"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@color/gray_6c6a6c"
-                        android:layout_gravity="center"
-                        android:padding="0dp">
+                        android:layout_gravity="center">
                         <TextView
-                            android:padding="0dp"
                             android:layout_gravity="center"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -118,10 +115,8 @@
                         android:id="@+id/timer_second_container"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/d12_size"
-                        android:padding="0dp">
+                        android:layout_marginLeft="@dimen/d12_size">
                         <TextView
-                            android:padding="0dp"
                             android:layout_gravity="center"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"

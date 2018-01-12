@@ -52,8 +52,8 @@ public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseFragm
         final View rootView = inflater.inflate(getLayoutID(),container,false);
         mUnBinder = ButterKnife.bind(this,rootView);
 
-        if(getActivity() instanceof MultiChoiceActivity){
-            mMultiChoice = ((MultiChoiceActivity) getActivity()).getMultiChoice();
+        if(mContext instanceof MultiChoiceActivity){
+            mMultiChoice = ((MultiChoiceActivity)mContext).getMultiChoice();
         }
         initAdapter();
         initView();

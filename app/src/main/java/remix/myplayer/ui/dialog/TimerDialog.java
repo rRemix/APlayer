@@ -174,15 +174,17 @@ public class TimerDialog extends BaseDialogActivity {
         mToggle.setText(mIsTiming ? "取消计时" : "开始计时");
 
         //分钟 秒 背景框
-        final Drawable containerDrawable = Theme.getShape(
-                GradientDrawable.RECTANGLE,
-                Color.TRANSPARENT,
-                DensityUtil.dip2px(this,1),
-                DensityUtil.dip2px(this,1),
-                ColorUtil.getColor(R.color.gray_404040),
-                0,0,1);
-        ButterKnife.apply(new View[]{findView(R.id.timer_minute_container),findView(R.id.timer_second_container)},
-                (ButterKnife.Action<View>) (view, index) -> view.setBackground(containerDrawable));
+        ButterKnife.apply(new View[]{findView(R.id.timer_minute_container), findView(R.id.timer_second_container)},
+                (ButterKnife.Action<View>) (view, index) -> {
+                    final Drawable drawable = Theme.getShape(
+                            GradientDrawable.RECTANGLE,
+                            Color.TRANSPARENT,
+                            DensityUtil.dip2px(mContext,1),
+                            DensityUtil.dip2px(mContext,1),
+                            ColorUtil.getColor(R.color.gray_404040),
+                            0,0,1);
+                    view.setBackground(drawable);
+        });
 
     }
 

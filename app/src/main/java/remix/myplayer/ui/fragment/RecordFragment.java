@@ -50,10 +50,10 @@ public class RecordFragment extends BaseFragment{
         //启动分享心情的Activity
         (rootView.findViewById(R.id.sharebtn)).setOnClickListener(v -> {
             if (mEdit.getText().toString().equals("")) {
-                ToastUtil.show(getActivity(),R.string.plz_input_sharecontent);
+                ToastUtil.show(mContext,R.string.plz_input_sharecontent);
                 return;
             }
-            Intent intent = new Intent(getActivity(), RecordShareActivity.class);
+            Intent intent = new Intent(mContext, RecordShareActivity.class);
             Bundle arg = new Bundle();
             arg.putString("Content", mEdit.getText().toString());
             arg.putParcelable("Song", MusicService.getCurrentMP3());

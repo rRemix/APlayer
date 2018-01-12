@@ -22,7 +22,9 @@ public class MediaStoreObserver extends BaseObserver {
 
     @Override
     void onAccept(Uri uri) {
-        Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
+        Global.AllSongList = MediaStoreUtil.getAllSongsId();
+//        Global.FolderMap = MediaStoreUtil.getFolder();
+//        Global.AllSongList = MediaStoreUtil.getAllSongsIdWithFolder();
         mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
     }
 
