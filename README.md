@@ -32,7 +32,7 @@
 - [RxAndroid](https://github.com/ReactiveX/RxAndroid)
 - [Retrofit](https://github.com/square/retrofit)
 - [Butter Knife](https://github.com/JakeWharton/butterknife)
-- [Material-dialogs](com.afollestad.material-dialogs:core)
+- [Material-dialogs](https://github.com/afollestad/material-dialogs)
 - [Rxpermissions](https://github.com/tbruyelle/RxPermissions)
 - [Android-crop](https://github.com/jdamcd/android-crop)
 - [TinyPinyin](https://github.com/promeG/TinyPinyin)
