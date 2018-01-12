@@ -125,7 +125,7 @@ dependencies {
     implementation 'com.facebook.fresco:fresco:1.5.0'
     implementation 'com.facebook.rebound:rebound:0.3.8'
     implementation 'com.umeng.analytics:analytics:6.1.2'
-    implementation 'com.afollestad.material-dialogs:core:0.9.4.7'
+    implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
     implementation 'cn.bmob.android:bmob-sdk:3.5.0'
     implementation 'com.jakewharton:butterknife:8.8.1'
