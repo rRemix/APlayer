@@ -27,13 +27,18 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.request.LibraryUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
+
+import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 
 /**
  * Created by Remix on 2015/12/6.
@@ -81,8 +86,8 @@ public class OptionDialog extends BaseDialogActivity {
         }
 
         //设置歌曲名与封面
-        mTitle.setText(mInfo.getTitle() + "-" + mInfo.getArtist());
-        mDraweeView.setImageURI(ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), mInfo.getAlbumId()));
+        mTitle.setText(String.format("%s-%s", mInfo.getTitle(), mInfo.getArtist()));
+        new LibraryUriRequest(mDraweeView, ImageUriUtil.getSearchRequestWithAlbumType(mInfo),new RequestConfig.Builder(SMALL_IMAGE_SIZE,SMALL_IMAGE_SIZE).build()).load();
         //置于底部
         Window w = getWindow();
 //        w.setWindowAnimations(R.style.AnimBottom);
@@ -104,7 +109,7 @@ public class OptionDialog extends BaseDialogActivity {
         ((ImageView)findViewById(R.id.popup_share_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_share),tintColor));
         ((ImageView)findViewById(R.id.popup_delete_img)).setImageDrawable(Theme.TintDrawable(getResources().getDrawable(R.drawable.pop_btn_delete),tintColor));
 
-        ButterKnife.apply( new TextView[]{findView(R.id.popup_add_text),findView(R.id.popup_ring_text),
+        ButterKnife.apply(new TextView[]{findView(R.id.popup_add_text),findView(R.id.popup_ring_text),
                         findView(R.id.popup_share_text),findView(R.id.popup_delete_text)},
                 (ButterKnife.Action<TextView>) (textView, index) -> textView.setTextColor(tintColor));
     }

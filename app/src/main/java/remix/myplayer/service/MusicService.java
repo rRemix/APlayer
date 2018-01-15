@@ -350,8 +350,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         if(!Util.isIntentAvailable(this,i)){
             EQActivity.Init();
         }
-
-
     }
 
     /**
