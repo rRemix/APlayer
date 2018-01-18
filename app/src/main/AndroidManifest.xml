@@ -33,6 +33,7 @@
             android:name="UMENG_CHANNEL"
             android:value="${CHANNEL_VALUE}" />
 
+        <!--主页面-->
         <activity
             android:name=".ui.activity.MainActivity"
             android:theme="@style/ActivityStyle">
@@ -76,6 +77,7 @@
                 <data android:mimeType="vnd.android.cursor.dir/audio"/>
             </intent-filter>
         </activity>
+        <!--播放界面-->
         <activity
             android:name=".ui.activity.PlayerActivity"
             android:parentActivityName=".ui.activity.MainActivity"
@@ -85,58 +87,75 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.activity.MainActivity" />
         </activity>
+        <!--搜索-->
         <activity
             android:name=".ui.activity.SearchActivity"
             android:theme="@style/ActivityStyle" />
+        <!--子目录列表-->
         <activity
             android:name=".ui.activity.ChildHolderActivity"
             android:theme="@style/ActivityStyle" />
+        <!--海报分享-->
         <activity
             android:name=".ui.activity.RecordShareActivity"
             android:theme="@style/ActivityStyle" />
+        <!--关于-->
         <activity
             android:name=".ui.activity.AboutActivity"
             android:theme="@style/ActivityStyle" />
+        <!--最近添加-->
         <activity
-            android:name=".ui.activity.RecetenlyActivity"
+            android:name=".ui.activity.RecentlyActivity"
             android:theme="@style/ActivityStyle" />
+        <!--反馈-->
         <activity
             android:name=".ui.activity.FeedBackActivity"
             android:theme="@style/ActivityStyle" />
+        <!--扫描大小设置-->
         <activity
             android:name=".ui.activity.ScanActivity"
             android:theme="@style/ActivityStyle" />
+        <!--均衡器-->
         <activity
             android:name=".ui.activity.EQActivity"
             android:theme="@style/ActivityStyle" />
+        <!--设置-->
         <activity
             android:name=".ui.activity.SettingActivity"
             android:theme="@style/ActivityStyle" />
+        <!--播放列表歌曲选择-->
         <activity
             android:name=".ui.activity.SongChooseActivity"
             android:theme="@style/ActivityStyle" />
+        <!--锁屏页-->
         <activity
             android:name=".ui.activity.LockScreenActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleInstance"
             android:theme="@style/LockScreenActivity" />
+        <!--shortcut过渡-->
         <activity android:name=".ui.activity.AppShortcutActivity"
             android:theme="@style/AppShortcut"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"/>
+        <!--添加歌曲到播放列表-->
         <activity
             android:name=".ui.dialog.AddtoPlayListDialog"
             android:theme="@style/BaseDialogTheme" />
+        <!--播放队列-->
         <activity
             android:name=".ui.dialog.PlayQueueDialog"
             android:theme="@style/BaseDialogTheme" />
+        <!--选项-->
         <activity
             android:name=".ui.dialog.OptionDialog"
             android:theme="@style/BaseDialogTheme" />
+        <!--定时停止-->
         <activity
             android:name=".ui.dialog.TimerDialog"
             android:theme="@style/BaseDialogTheme" />
+        <!--主题色选择-->
         <activity
             android:name=".ui.dialog.ColorChooseDialog"
             android:theme="@style/BaseDialogTheme" />
@@ -189,11 +208,13 @@
                 <data android:scheme="tencent1105030910" />
             </intent-filter>
         </activity>
+        <!--腾讯-->
         <activity
             android:name="com.tencent.connect.common.AssistActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
+        <!--线控-->
         <receiver android:name=".receiver.MediaButtonReceiver">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MEDIA_BUTTON" />

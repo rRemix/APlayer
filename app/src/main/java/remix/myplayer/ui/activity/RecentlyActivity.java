@@ -40,8 +40,8 @@ import remix.myplayer.util.MediaStoreUtil;
  * 最近添加歌曲的界面
  * 目前为最近7天添加
  */
-public class RecetenlyActivity extends PermissionActivity<Song,SongAdapter> implements UpdateHelper.Callback{
-    public static final String TAG = RecetenlyActivity.class.getSimpleName();
+public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> implements UpdateHelper.Callback{
+    public static final String TAG = RecentlyActivity.class.getSimpleName();
 
     @BindView(R.id.recently_placeholder)
     View mPlaceHolder;
@@ -136,7 +136,7 @@ public class RecetenlyActivity extends PermissionActivity<Song,SongAdapter> impl
 
     @Override
     protected void onResume() {
-        MobclickAgent.onPageStart(RecetenlyActivity.class.getSimpleName());
+        MobclickAgent.onPageStart(RecentlyActivity.class.getSimpleName());
         super.onResume();
         if(mMultiChoice.isShow()){
             mHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
@@ -145,7 +145,7 @@ public class RecetenlyActivity extends PermissionActivity<Song,SongAdapter> impl
 
     @Override
     protected void onPause() {
-        MobclickAgent.onPageEnd(RecetenlyActivity.class.getSimpleName());
+        MobclickAgent.onPageEnd(RecentlyActivity.class.getSimpleName());
         super.onPause();
         if(mMultiChoice.isShow()){
             mHandler.sendEmptyMessageDelayed(Constants.CLEAR_MULTI,500);

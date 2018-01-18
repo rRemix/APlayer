@@ -34,7 +34,7 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
-import remix.myplayer.ui.activity.RecetenlyActivity;
+import remix.myplayer.ui.activity.RecentlyActivity;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
 import remix.myplayer.ui.dialog.OptionDialog;
@@ -217,7 +217,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
                 holder.mContainer.setSelected(false);
             }
         } else {
-            if(MultiChoice.TAG.equals(RecetenlyActivity.TAG) &&
+            if(MultiChoice.TAG.equals(RecentlyActivity.TAG) &&
                     mMultiChoice.mSelectedPosition.contains(position - 1)){
                 mMultiChoice.AddView(holder.mContainer);
             } else {

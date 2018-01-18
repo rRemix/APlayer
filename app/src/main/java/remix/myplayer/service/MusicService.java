@@ -227,11 +227,12 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         return mInstance;
     }
 
+    private boolean mAlreadyUnInit;
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
         LogUtil.d("ServiceLifeCycle","onTaskRemoved");
-//        unInit();
+        unInit();
         stopSelf();
         System.exit(0);
     }
@@ -363,7 +364,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mMediaSession.setCallback(new SessionCallBack());
         mMediaSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
         mMediaSession.setActive(true);
-
     }
 
     /**
@@ -456,6 +456,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     }
 
     private void unInit(){
+        if(mAlreadyUnInit)
+            return;
         MusicEventHelper.removeCallback(this);
         closeAudioEffectSession();
         if(mMediaPlayer != null) {
@@ -503,6 +505,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         getContentResolver().unregisterContentObserver(mPlayListSongObserver);
 
         ShakeDetector.getInstance(mContext).stopListen();
+
+        mAlreadyUnInit = true;
     }
 
     private void closeAudioEffectSession() {
@@ -849,6 +853,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 case Constants.UNLOCK_DESTOP_LYRIC:
                     if(mFloatLrcView != null)
                         mFloatLrcView.saveLock(false, true);
+                    break;
+                //某一首歌曲添加至下一首播放
+                case Constants.ADD_TO_NEXT_SONG:
+                    Song song = intent.getParcelableExtra("song");
+
                     break;
                 default:break;
             }

@@ -38,7 +38,6 @@ import cn.bmob.v3.update.UpdateStatus;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.bean.Category;
-import remix.myplayer.db.DBOpenHelper;
 import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
@@ -510,8 +509,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 //清除配置文件、数据库等缓存
                                 Util.deleteFilesByDirectory(getCacheDir());
                                 Util.deleteFilesByDirectory(getExternalCacheDir());
-                                SPUtil.deleteFile(SettingActivity.this,"Setting");
-                                deleteDatabase(DBOpenHelper.DBNAME);
+//                                SPUtil.deleteFile(mContext,"Setting");
+//                                deleteDatabase(DBOpenHelper.DBNAME);
                                 //清除fresco缓存
                                 Fresco.getImagePipeline().clearCaches();
                                 mHandler.sendEmptyMessage(CLEAR_FINISH);

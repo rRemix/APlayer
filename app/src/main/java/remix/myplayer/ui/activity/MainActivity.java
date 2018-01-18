@@ -362,7 +362,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                         break;
                     //最近添加
                     case 1:
-                        startActivity(new Intent(mContext,RecetenlyActivity.class));
+                        startActivity(new Intent(mContext,RecentlyActivity.class));
                         break;
                     //夜间模式
                     case 2:

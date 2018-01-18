@@ -275,7 +275,7 @@ public class RecordShareActivity extends BaseActivity {
     }
 
     public void onPause() {
-        MobclickAgent.onPageEnd(RecetenlyActivity.class.getSimpleName());
+        MobclickAgent.onPageEnd(RecentlyActivity.class.getSimpleName());
         super.onPause();
     }
 

@@ -17,6 +17,7 @@ import remix.myplayer.util.MediaStoreUtil;
  * @Author Xiaoborui
  * @Date 2016/8/22 16:12
  */
+@Deprecated
 public class AsynLoadImage extends AsyncTask<Object,Integer,String> {
     private final SimpleDraweeView mImage;
     public AsynLoadImage(SimpleDraweeView imageView) {
