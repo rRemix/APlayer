@@ -21,7 +21,6 @@ import remix.myplayer.ui.fragment.PlayListFragment;
 import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.util.LogUtil;
 
-import static com.squareup.haha.guava.base.Joiner.checkNotNull;
 
 /**
  * Created by Remix on 2018/1/10.
@@ -63,7 +62,6 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     public void setList(List<Category> categories){
-        checkNotNull(categories);
         mCateGory = categories;
     }
 
