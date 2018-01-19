@@ -135,6 +135,11 @@ public class OptionDialog extends BaseDialogActivity {
                 break;
             //分享
             case R.id.popup_share:
+//                Intent intent = new Intent(MusicService.ACTION_CMD);
+//                intent.putExtra("Control",Constants.ADD_TO_NEXT_SONG);
+//                intent.putExtra("song",mInfo);
+//                sendBroadcast(intent);
+//                finish();
                 MobclickAgent.onEvent(this,"Share");
                 Intent intentShare = new Intent(OptionDialog.this,ShareDialog.class);
                 Bundle argShare = new Bundle();
