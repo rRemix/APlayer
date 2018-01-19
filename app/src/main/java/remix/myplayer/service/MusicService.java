@@ -13,7 +13,6 @@ import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.media.session.PlaybackState;
-import android.net.Uri;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -30,15 +29,6 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-
-import com.facebook.common.executors.CallerThreadExecutor;
-import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.DataSource;
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -68,7 +58,8 @@ import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
 import remix.myplayer.receiver.HeadsetPlugReceiver;
-import remix.myplayer.request.ImageUriRequest;
+import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.network.RemoteUriRequest;
 import remix.myplayer.service.notification.Notify;
 import remix.myplayer.service.notification.NotifyImpl;
 import remix.myplayer.service.notification.NotifyImpl24;
@@ -84,6 +75,8 @@ import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
+
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 
 /**
@@ -920,43 +913,31 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY_PAUSE |
                             PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).build());
 
-
-            final String uri = MediaStoreUtil.getImageUrl(mCurrentInfo.getAlbumId(), ImageUriRequest.URL_ALBUM);
-            ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(!TextUtils.isEmpty(uri) ? Uri.parse(uri) : Uri.EMPTY)
-                        .build();
-            DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);
-            dataSource.subscribe(new BaseBitmapDataSubscriber() {
+            new RemoteUriRequest(getSearchRequestWithAlbumType(mCurrentInfo),new RequestConfig.Builder(400,400).build()){
                 @Override
-                protected void onNewResultImpl(Bitmap bitmap) {
+                public void onError(String errMsg) {
+                    setMediaSessionData(null);
+                }
+
+                @Override
+                public void onSuccess(Bitmap result) {
+                    setMediaSessionData(result);
+                }
+
+                private void setMediaSessionData(Bitmap result) {
                     mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
                             .putString(MediaMetadataCompat.METADATA_KEY_ALBUM,mCurrentInfo.getAlbum())
                             .putString(MediaMetadataCompat.METADATA_KEY_ARTIST,mCurrentInfo.getArtist())
                             .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST,mCurrentInfo.getArtist())
                             .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE,mCurrentInfo.getDisplayname())
                             .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,mCurrentInfo.getDuration())
-                            .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER,mCurrentIndex)
-                            .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS,Global.PlayQueue != null ? Global.PlayQueue.size() : 0)
-                            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART,copy(bitmap))
+                            .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, Global.PlayQueue != null ? Global.PlayQueue.size() : 0 )
+                            .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS,mCurrentIndex)
+                            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART,result)
                             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mCurrentInfo.getTitle())
                             .build());
                 }
-
-                @Override
-                protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-                    mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
-                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM,mCurrentInfo.getAlbum())
-                            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST,mCurrentInfo.getArtist())
-                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST,mCurrentInfo.getArtist())
-                            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE,mCurrentInfo.getDisplayname())
-                            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,mCurrentInfo.getDuration())
-                            .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER,mCurrentIndex)
-                            .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS,Global.PlayQueue != null ? Global.PlayQueue.size() : 0)
-                            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART,null)
-                            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mCurrentInfo.getTitle())
-                            .build());
-                }
-            }, CallerThreadExecutor.getInstance());
-
+            }.load();
         }
     }
 
