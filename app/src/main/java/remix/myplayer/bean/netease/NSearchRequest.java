@@ -7,6 +7,10 @@ import java.io.Serializable;
  */
 
 public class NSearchRequest implements Serializable {
+    public static final int TYPE_NETEASE_SONG = 1;
+    public static final int TYPE_NETEASE_ALBUM = 10;
+    public static final int TYPE_NETEASE_ARTIST = 100;
+
     public static final NSearchRequest DEFAULT_REQUEST = new NSearchRequest(-1,"",0,0);
     private static final long serialVersionUID = -4168031236748350436L;
 
@@ -38,5 +42,15 @@ public class NSearchRequest implements Serializable {
 
     public int getNType() {
         return mNeteaseType;
+    }
+
+    @Override
+    public String toString() {
+        return "NSearchRequest{" +
+                "mKey='" + mKey + '\'' +
+                ", mNeteaseType=" + mNeteaseType +
+                ", mLocalType=" + mLocalType +
+                ", mID=" + mID +
+                '}';
     }
 }

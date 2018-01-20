@@ -260,15 +260,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-//    public static final String DEFAULT_LIBRARY = APlayerApplication.getContext().getResources().getString(R.string.tab_song) + "," +
-//            APlayerApplication.getContext().getResources().getString(R.string.tab_album) + "," +
-//            APlayerApplication.getContext().getResources().getString(R.string.tab_artist) + "," +
-//            APlayerApplication.getContext().getResources().getString(R.string.tab_playlist);
-//    public static final String ALL_LIBRARY = APlayerApplication.getContext().getResources().getString(R.string.tab_song) + "," +
-//            APlayerApplication.getContext().getResources().getString(R.string.tab_album) + "," +
-//            APlayerApplication.getContext().getResources().getString(R.string.tab_artist) + "," +
-//            APlayerApplication.getContext().getResources().getString(R.string.tab_playlist)  + "," +
-//            APlayerApplication.getContext().getResources().getString(R.string.tab_folder);
+
     //初始化ViewPager
     private void setUpPager() {
         String categoryJson = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.LIBRARY_CATEGORY,"");
@@ -279,7 +271,10 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mPagerAdapter.setList(categories);
-//        mPagerAdapter.notifyDataSetChanged();
+        //有且仅有播放列表一个tab
+        if(categories.size() == 1 && categories.get(0).getTitle().equals(getString(R.string.tab_playlist))){
+            showAddPlayListButton(true);
+        }
 
         mAddButton.setImageResource(ThemeStore.isDay() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
         mViewPager.setAdapter(mPagerAdapter);
@@ -292,23 +287,30 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
             @Override
             public void onPageSelected(int position) {
-                mAddButton.setVisibility(position == 3 ? View.VISIBLE: View.GONE);
-                if(position == 3){
-                    SpringSystem.create().createSpring()
-                            .addListener(new SimpleSpringListener(){
-                                @Override
-                                public void onSpringUpdate(Spring spring) {
-                                    mAddButton.setScaleX((float) spring.getCurrentValue());
-                                    mAddButton.setScaleY((float) spring.getCurrentValue());
-                                }
-                            })
-                            .setEndValue(1);
-                }
+                showAddPlayListButton(mPagerAdapter.getList().get(position).getTitle().equals(getString(R.string.tab_playlist)));
             }
             @Override
             public void onPageScrollStateChanged(int state) {
             }
         });
+    }
+
+    private void showAddPlayListButton(boolean show) {
+        if(show){
+            mAddButton.setVisibility(View.VISIBLE);
+            SpringSystem.create().createSpring()
+                    .addListener(new SimpleSpringListener(){
+                        @Override
+                        public void onSpringUpdate(Spring spring) {
+                            mAddButton.setScaleX((float) spring.getCurrentValue());
+                            mAddButton.setScaleY((float) spring.getCurrentValue());
+                        }
+                    })
+                    .setEndValue(1);
+        }else {
+            mAddButton.setVisibility(View.GONE);
+        }
+
     }
 
     //初始化custontab

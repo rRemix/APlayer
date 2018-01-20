@@ -67,6 +67,10 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
         mCateGory = categories;
     }
 
+    public List<Category> getList(){
+        return mCateGory;
+    }
+
     @Override
     public CharSequence getPageTitle(int position) {
         return mCateGory.get(position).getTitle();
