@@ -211,10 +211,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     public final static String ACTION_CMD = APLAYER_PACKAGE_NAME + ".cmd";
     public final static String ACTION_WIDGET_UPDATE = APLAYER_PACKAGE_NAME + ".widget_update";
 
-    public MusicService(){}
-    public MusicService(Context context) {
-        mContext = context;
-    }
 
     public synchronized static MusicService getInstance(){
         return mInstance;
