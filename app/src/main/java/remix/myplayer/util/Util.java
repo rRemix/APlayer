@@ -456,7 +456,7 @@ public class Util {
     public static boolean isRightLrc(File file,String displayName,String title,String artist){
         BufferedReader br = null;
         try {
-            if(file == null || !file.canRead() || !file.isFile())
+            if(file == null || !file.canRead())
                 return false;
             if(TextUtils.isEmpty(file.getAbsolutePath()) || TextUtils.isEmpty(displayName) ||
                     TextUtils.isEmpty(title) || TextUtils.isEmpty(artist))

@@ -315,21 +315,21 @@ public class SearchLrc {
             }
         } else{
             //没有设置歌词路径 搜索所有歌词文件
-            Cursor allLrcFiles = null;
+            Cursor filesCursor = null;
             try {
-                allLrcFiles = APlayerApplication.getContext().getContentResolver().
+                filesCursor = APlayerApplication.getContext().getContentResolver().
                         query(MediaStore.Files.getContentUri("external"),
                                 null,
                                 MediaStore.Files.FileColumns.DATA + " like ? or " +
                                         MediaStore.Files.FileColumns.DATA + " like ? or " +
                                         MediaStore.Files.FileColumns.DATA + " like ? ",
-                                new String[]{"%lyric%","%Lyric%","%.lrc"},
+                                new String[]{"%lyric%","%Lyric%","%.lrc%"},
                                 null);
-                if(allLrcFiles == null || !(allLrcFiles.getCount() > 0))
+                if(filesCursor == null || !(filesCursor.getCount() > 0))
                     return "";
-                while (allLrcFiles.moveToNext()){
-                    File file = new File(allLrcFiles.getString(allLrcFiles.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
-                    if (file.exists() && file.canRead()) {
+                while (filesCursor.moveToNext()){
+                    File file = new File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
+                    if (file.exists() && file.isFile() && file.canRead()) {
                         if(Util.isRightLrc(file, mDisplayName,mSong.getTitle(),mSong.getArtist())){
                             return file.getAbsolutePath();
                         }
@@ -338,8 +338,8 @@ public class SearchLrc {
             }catch (Exception e){
                 e.printStackTrace();
             } finally {
-                if(allLrcFiles != null && !allLrcFiles.isClosed())
-                    allLrcFiles.close();
+                if(filesCursor != null && !filesCursor.isClosed())
+                    filesCursor.close();
             }
         }
 

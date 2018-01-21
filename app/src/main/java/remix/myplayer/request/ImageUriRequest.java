@@ -41,6 +41,9 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.SPUtil;
 
+import static remix.myplayer.bean.netease.NSearchRequest.TYPE_NETEASE_ALBUM;
+import static remix.myplayer.bean.netease.NSearchRequest.TYPE_NETEASE_ARTIST;
+import static remix.myplayer.bean.netease.NSearchRequest.TYPE_NETEASE_SONG;
 import static remix.myplayer.service.MusicService.copy;
 import static remix.myplayer.util.Util.isWifi;
 
@@ -147,15 +150,15 @@ public abstract class ImageUriRequest<T> {
     @Nullable
     private String parseNetworkImageUrl(NSearchRequest request, ResponseBody body) throws IOException {
         String imageUrl = "";
-        if (request.getNType() == 1) {
+        if (request.getNType() == TYPE_NETEASE_SONG) {
             //搜索的是歌曲
             NSongSearchResponse response = new Gson().fromJson(body.string(), NSongSearchResponse.class);
             imageUrl =  response.result.songs.get(0).album.picUrl;
-        } else if (request.getNType() == 10) {
+        } else if (request.getNType() == TYPE_NETEASE_ALBUM) {
             //搜索的是专辑
             NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);
             imageUrl = response.result.albums.get(0).picUrl;
-        } else if (request.getNType() == 100) {
+        } else if (request.getNType() == TYPE_NETEASE_ARTIST) {
             //搜索的是艺术家
             NArtistSearchResponse response = new Gson().fromJson(body.string(), NArtistSearchResponse.class);
             imageUrl = response.getResult().getArtists().get(0).getPicUrl();
