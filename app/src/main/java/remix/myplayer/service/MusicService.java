@@ -900,9 +900,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * @param control
      */
     private void updateMediaSession(int control) {
-        if(SPUtil.getValue(mContext,"Setting","LockScreenOn",Constants.APLAYER_LOCKSCREEN) != Constants.SYSTEM_LOCKSCREEN || mCurrentSong == null)
+        if(mCurrentSong == null)
             return;
-//        mMediaSession.setActive(true);
+
         int playState = mIsplay
                 ? PlaybackStateCompat.STATE_PLAYING
                 : PlaybackStateCompat.STATE_PAUSED;
@@ -1737,7 +1737,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(event == null)
                 return  true;
 
-            Util.uploadException("SessionCallBack","KeyCode: " + event.getKeyCode() + " Action: " + event.getAction());
             boolean isActionUp = (event.getAction() == KeyEvent.ACTION_UP);
             if(!isActionUp) {
                 return true;

@@ -38,32 +38,13 @@ public class Category implements Serializable{
         return this == o || !(o == null || getClass() != o.getClass()) && mTitle.equals(((Category)o).getTitle());
     }
 
-    public enum CategoryEnum {
-        SONGS("1",0),
-        ALBUMS("2",1),
-        ARTISTS("3",2),
-        PLAYLIST("4",3),
-        FOLDER("5",4);
-
-        public final String mTitle;
-        public final int mIndex;
-
-        CategoryEnum(String title,int index) {
-            mTitle = title;
-            mIndex = index;
-        }
-    }
-
-    public static final List<Category> ALL_LIBRARY = Arrays.asList(new Category(APlayerApplication.getContext().getString(R.string.tab_song)),
+    public static final List<String> ALL_LIBRARY_STRING = Arrays.asList(APlayerApplication.getContext().getResources().getString(R.string.tab_song),
+            APlayerApplication.getContext().getResources().getString(R.string.tab_album),APlayerApplication.getContext().getResources().getString(R.string.tab_artist),
+            APlayerApplication.getContext().getResources().getString(R.string.tab_playlist),APlayerApplication.getContext().getResources().getString(R.string.tab_folder));
+    public static final List<Category> DEFAULT_LIBRARY = Arrays.asList(
+            new Category(APlayerApplication.getContext().getString(R.string.tab_song)),
             new Category(APlayerApplication.getContext().getString(R.string.tab_album)),
             new Category(APlayerApplication.getContext().getString(R.string.tab_artist)),
             new Category(APlayerApplication.getContext().getString(R.string.tab_playlist)),
             new Category(APlayerApplication.getContext().getString(R.string.tab_folder)));
-    public static final List<String> ALL_LIBRARY_STRING = Arrays.asList(APlayerApplication.getContext().getResources().getString(R.string.tab_song),
-            APlayerApplication.getContext().getResources().getString(R.string.tab_album),APlayerApplication.getContext().getResources().getString(R.string.tab_artist),
-            APlayerApplication.getContext().getResources().getString(R.string.tab_playlist),APlayerApplication.getContext().getResources().getString(R.string.tab_folder));
-    public static final List<Category> DEFAULT_LIBRARY = Arrays.asList(new Category(APlayerApplication.getContext().getString(R.string.tab_song)),
-            new Category(APlayerApplication.getContext().getString(R.string.tab_album)),
-            new Category(APlayerApplication.getContext().getString(R.string.tab_artist)),
-            new Category(APlayerApplication.getContext().getString(R.string.tab_playlist)));
 }
