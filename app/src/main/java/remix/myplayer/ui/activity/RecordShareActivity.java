@@ -146,7 +146,8 @@ public class RecordShareActivity extends BaseActivity {
                 new RequestConfig.Builder(IMAGE_SIZE,IMAGE_SIZE).build()).load();
 
         //设置歌曲名与分享内容
-        mContent.setText(getIntent().getExtras().getString("Content"));
+        String content = getIntent().getExtras().getString("Content");
+        mContent.setText(TextUtils.isEmpty(content) ? "" : content);
         mSong.setText(String.format("《%s》", mInfo.getTitle()));
         //背景
         mBackground1.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.WHITE,0, DensityUtil.dip2px(this,2), ColorUtil.getColor(R.color.black_2a2a2a),0,0,1));

@@ -17,7 +17,6 @@ import butterknife.OnTextChanged;
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.RecordShareActivity;
-import remix.myplayer.util.ToastUtil;
 
 /**
  * Created by Remix on 2015/12/28.
@@ -49,10 +48,10 @@ public class RecordFragment extends BaseFragment{
 
         //启动分享心情的Activity
         (rootView.findViewById(R.id.sharebtn)).setOnClickListener(v -> {
-            if (mEdit.getText().toString().equals("")) {
-                ToastUtil.show(mContext,R.string.plz_input_sharecontent);
-                return;
-            }
+//            if (mEdit.getText().toString().equals("")) {
+//                ToastUtil.show(mContext,R.string.plz_input_sharecontent);
+//                return;
+//            }
             Intent intent = new Intent(mContext, RecordShareActivity.class);
             Bundle arg = new Bundle();
             arg.putString("Content", mEdit.getText().toString());

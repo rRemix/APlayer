@@ -436,7 +436,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             mNextIndex = mCurrentIndex;
             updateNextSong();
         } else {
-            mNextIndex = mPlayModel == Constants.PLAY_SHUFFLE ?  Global.PlayQueue.indexOf(mNextId) : mRandomList.indexOf(mNextId);
+            mNextIndex = mPlayModel != Constants.PLAY_SHUFFLE ?  Global.PlayQueue.indexOf(mNextId) : mRandomList.indexOf(mNextId);
             mNextSong = MediaStoreUtil.getMP3InfoById(mNextId);
             if(mNextSong != null)
                 return;
@@ -900,7 +900,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * @param control
      */
     private void updateMediaSession(int control) {
-        if(SPUtil.getValue(mContext,"Setting","LockScreenOn",Constants.APLAYER_LOCKSCREEN) != Constants.SYSTEM_LOCKSCREEN ||  mCurrentSong == null)
+        if(SPUtil.getValue(mContext,"Setting","LockScreenOn",Constants.APLAYER_LOCKSCREEN) != Constants.SYSTEM_LOCKSCREEN || mCurrentSong == null)
             return;
 //        mMediaSession.setActive(true);
         int playState = mIsplay
@@ -1737,6 +1737,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(event == null)
                 return  true;
 
+            Util.uploadException("SessionCallBack","KeyCode: " + event.getKeyCode() + " Action: " + event.getAction());
             boolean isActionUp = (event.getAction() == KeyEvent.ACTION_UP);
             if(!isActionUp) {
                 return true;
