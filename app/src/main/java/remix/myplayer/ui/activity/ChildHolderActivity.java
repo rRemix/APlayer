@@ -106,7 +106,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
                     arg.putInt("Control", Constants.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
-                    Global.setPlayQueue(idList,ChildHolderActivity.this,intent);
+                    Global.setPlayQueue(idList,mContext,intent);
                 }
             }
 

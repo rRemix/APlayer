@@ -128,7 +128,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         //导航栏是否变色 是否启用摇一摇切歌
         final String[] keyWord = new String[]{"ColorNavigation","Shake",
-                "OnlineLrc","FloatLrc", SPUtil.SPKEY.SCREEN_ALWAYS_ON,SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,};
+                "OnlineLrc","FloatLrc", SPUtil.SPKEY.SCREEN_ALWAYS_ON,SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,};
         ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch
                 ,mFloatLrcSwitch,mScreenSwitch, mNotifyStyleSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
@@ -187,7 +187,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             case 5:
                                 sendBroadcast(new Intent(MusicService.ACTION_CMD)
                                         .putExtra("Control",Constants.TOGGLE_NOTIFY)
-                                        .putExtra(SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,isChecked));
+                                        .putExtra(SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,isChecked));
                                 break;
                         }
                         SPUtil.putValue(SettingActivity.this,"Setting",keyWord[index],isChecked);
@@ -215,6 +215,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         //封面
         mOriginalAlbumChoice = SPUtil.getValue(mContext,"Setting",SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only));
         mAlbumCoverText.setText(mOriginalAlbumChoice);
+
+        //根据系统版本决定是否显示通知栏样式切换
+        findView(R.id.setting_classic_notify_container).setVisibility(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
 
         //计算缓存大小
         new Thread(){
@@ -416,7 +419,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //通知栏底色
             case R.id.setting_notify_color_container:
-                if(!SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,false)){
+                if(!SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,false)){
                     ToastUtil.show(mContext,R.string.notify_bg_color_warnning);
                     return;
                 }
@@ -433,7 +436,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     SPUtil.putValue(mContext,"Setting","IsSystemColor",which == 0);
                                     sendBroadcast(new Intent(MusicService.ACTION_CMD)
                                             .putExtra("Control",Constants.TOGGLE_NOTIFY)
-                                            .putExtra(SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,mNotifyStyleSwitch.isChecked()));
+                                            .putExtra(SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,mNotifyStyleSwitch.isChecked()));
                                     return true;
                                 })
                         .backgroundColorAttr(R.attr.background_color_3)

@@ -62,7 +62,7 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.network.RemoteUriRequest;
 import remix.myplayer.service.notification.Notify;
 import remix.myplayer.service.notification.NotifyImpl;
-import remix.myplayer.service.notification.NotifyImpl24;
+import remix.myplayer.service.notification.NotifyImpl26;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.LockScreenActivity;
@@ -279,8 +279,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mWakeLock = ((PowerManager)getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,getClass().getSimpleName());
         mWakeLock.setReferenceCounted(false);
         //通知栏
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N & !SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,false)){
-            mNotify = new NotifyImpl24(this);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O & !SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,false)){
+            mNotify = new NotifyImpl26(this);
         } else {
             mNotify = new NotifyImpl(this);
         }
@@ -689,7 +689,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 Intent lastedIntent = new Intent(ACTION_CMD);
                 lastedIntent.putExtra("Control", Constants.PLAYSELECTEDSONG);
                 lastedIntent.putExtra("Position",0);
-
                 Global.setPlayQueue(lastAddIds,mContext,lastedIntent);
                 break;
         }
@@ -829,11 +828,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 //切换通知栏样式
                 case Constants.TOGGLE_NOTIFY:
                     mNotify.cancelPlayingNotify();
-                    boolean classic = intent.getBooleanExtra(SPUtil.SPKEY.NOTIFTY_STYLE_CLASS,false);
+                    boolean classic = intent.getBooleanExtra(SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,false);
                     if(classic){
                         mNotify = new NotifyImpl(MusicService.this);
                     } else {
-                        mNotify = new NotifyImpl24(MusicService.this);
+                        mNotify = new NotifyImpl26(MusicService.this);
                     }
                     if(Global.isNotifyShowing())
                         mNotify.updateForPlaying();
@@ -900,7 +899,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * @param control
      */
     private void updateMediaSession(int control) {
-        if(mCurrentSong == null)
+        if(SPUtil.getValue(mContext,"Setting","LockScreenOn",Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN || mCurrentSong == null)
             return;
 
         int playState = mIsplay
@@ -1046,6 +1045,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 //            mNextIndex = Global.PlayQueue.indexOf(mNextId);
 //        }
 
+        LogUtil.d("PlayTempSong","PlayQueue: " + Global.PlayQueue);
         if(mPlayModel == Constants.PLAY_SHUFFLE){
             if(mRandomList.size() == 0){
                 makeShuffleList(mCurrentId);
@@ -1059,7 +1059,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             mNextId = Global.PlayQueue.get(mNextIndex);
         }
         mNextSong = MediaStoreUtil.getMP3InfoById(mNextId);
-
+        LogUtil.d("PlayTempSong","NextSong: " + mNextSong);
     }
 
     /**
@@ -1235,10 +1235,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         final boolean isFirst = SPUtil.getValue(mContext, "Setting", "First", true);
         SPUtil.putValue(mContext,"Setting","First",false);
         //读取sd卡歌曲id
-
         Global.AllSongList = MediaStoreUtil.getAllSongsId();
-//        Global.AllSongList = MediaStoreUtil.getAllSongsId();
-//        Global.FolderMap = MediaStoreUtil.getFolder();
         //第一次启动软件
         if(isFirst){
             try {
@@ -1252,8 +1249,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 //保存默认主题设置
                 SPUtil.putValue(mContext,"Setting","ThemeMode", ThemeStore.DAY);
                 SPUtil.putValue(mContext,"Setting","ThemeColor",ThemeStore.THEME_BLUE);
+                //通知栏样式
+                SPUtil.putValue(mContext,"Setting",SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O));
             } catch (Exception e){
-                Util.uploadException("新建列表错误",e);
+                Util.uploadException("初始化失败",e);
             }
         }else {
             //播放模式
@@ -1269,7 +1268,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 ShakeDetector.getInstance(mContext).beginListen();
             }
         }
-        initLastSong();
+        setUpLastSong();
         mLoadFinished = true;
         sendBroadcast(new Intent(ACTION_LOAD_FINISH));
     }
@@ -1279,7 +1278,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 初始化上一次退出时时正在播放的歌曲
      * @return
      */
-    private void initLastSong() {
+    private void setUpLastSong() {
         if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
             return ;
         //读取上次退出时正在播放的歌曲的id

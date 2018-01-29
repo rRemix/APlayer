@@ -82,7 +82,7 @@ public class SPUtil {
         //是否开启屏幕常亮
         public static final String SCREEN_ALWAYS_ON = "key_screen_always_on";
         //通知栏是否启用经典样式
-        public static final String NOTIFTY_STYLE_CLASS = "notify_class";
+        public static final String NOTIFY_STYLE_CLASSIC = "notify_classic";
         //是否自动下载专辑封面
         public static final String AUTO_DOWNLOAD_ALBUM_COVER = "auto_download_album_cover";
         //是否自动下载艺术家封面

@@ -139,10 +139,10 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        startService(new Intent(this, MusicService.class));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        startService(new Intent(this, MusicService.class));
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //receiver
@@ -157,12 +157,28 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         setUpViewColor();
         //handler
         mRefreshHandler = new MsgHandler(this);
+        mRefreshHandler.postDelayed(() -> {
+            final Intent param = getIntent();
+            if(param != null && param.getData() != null){
+                int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
+                if(id < 0)
+                    return;
+                Intent intent = new Intent(MusicService.ACTION_CMD);
+                Bundle arg = new Bundle();
+                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                arg.putInt("Position", 0);
+                intent.putExtras(arg);
+                ArrayList<Integer> list = new ArrayList<>();
+                list.add(id);
+                Global.setPlayQueue(list,mContext,intent);
+            }
+        },1000);
     }
 
     /**
      * 初始化底部显示控件
      */
-    private void initBottombar() {
+    private void setUpBottomBar() {
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         int lastId = SPUtil.getValue(mContext,"Setting","LastSongId",-1);
@@ -568,21 +584,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             unregisterReceiver(mLoadReceiver);
             String action = receive != null ? receive.getAction() : "";
             if(ACTION_LOAD_FINISH.equals(action)){
-                initBottombar();
-                final Intent param = getIntent();
-                if(param != null && param.getData() != null){
-                    int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
-                    if(id < 0)
-                        return;
-                    Intent intent = new Intent(MusicService.ACTION_CMD);
-                    Bundle arg = new Bundle();
-                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                    arg.putInt("Position", 0);
-                    intent.putExtras(arg);
-                    ArrayList<Integer> list = new ArrayList<>();
-                    list.add(id);
-                    Global.setPlayQueue(list,mContext,intent);
-                }
+                setUpBottomBar();
             }
         }
     }

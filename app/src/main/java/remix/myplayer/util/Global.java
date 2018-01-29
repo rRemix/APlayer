@@ -75,8 +75,6 @@ public class Global {
     public static int PlayQueueID = 0;
     /** 我的收藏id */
     public static int MyLoveID = 0;
-    /** 最近添加id */
-    public static int RecentlyID = 0;
 
     /**
      * 设置播放队列
@@ -88,7 +86,6 @@ public class Global {
             @Override
             public void run() {
                 if(newQueueIdList == null || newQueueIdList.size() == 0){
-                    Util.uploadException("SetEmptyQueue","");
                     return;
                 }
                 if (newQueueIdList.equals(PlayQueue))
@@ -120,27 +117,26 @@ public class Global {
         new Thread(){
             @Override
             public void run() {
-                boolean shuffle = intent.getBooleanExtra("shuffle",false);
+                //当前模式是随机播放 或者即将设置为随机播放 都要更新mRandomList
+                boolean shuffle = intent.getBooleanExtra("shuffle",false) | SPUtil.getValue(context,"Setting", "PlayModel",Constants.PLAY_LOOP) == Constants.PLAY_SHUFFLE;
                 if(newQueueIdList == null || newQueueIdList.size() == 0){
                     return;
                 }
                 //设置的播放队列相等
-                if(newQueueIdList.equals(PlayQueue)){
-                    if(shuffle){
-                        MusicService.getInstance().setPlayModel(Constants.PLAY_SHUFFLE);
-                        MusicService.getInstance().updateNextSong();
-                    }
-                    context.sendBroadcast(intent);
-                    return;
+                boolean equals = newQueueIdList.equals(PlayQueue);
+                if(!equals){
+                    PlayQueue.clear();
+                    PlayQueue.addAll(newQueueIdList);
                 }
-
-                PlayQueue.clear();
-                PlayQueue.addAll(newQueueIdList);
                 if(shuffle){
                     MusicService.getInstance().setPlayModel(Constants.PLAY_SHUFFLE);
                     MusicService.getInstance().updateNextSong();
                 }
                 context.sendBroadcast(intent);
+
+                if(equals){
+                    return;
+                }
 
                 int deleteRow = 0;
                 int addRow = 0;
@@ -153,7 +149,6 @@ public class Global {
                     if(addRow == 0)
                         Util.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
                 }
-
             }
         }.start();
     }

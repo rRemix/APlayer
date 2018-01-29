@@ -19,8 +19,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 46
-        versionName "1.2.5"
+        versionCode 47
+        versionName "1.2.5.1"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
@@ -70,12 +70,12 @@ android {
 //        alibaba{}
 //        meizu{}
 
-        qihu360{}
-        assistant91{}
-        baidu{}
-        anzhuomarket{}
-        chuizi{}
-        xiaomi{}
+//        qihu360{}
+//        assistant91{}
+//        baidu{}
+//        anzhuomarket{}
+//        chuizi{}
+//        xiaomi{}
         kuan{}
         productFlavors.all { flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]

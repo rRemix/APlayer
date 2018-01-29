@@ -24,8 +24,8 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * Created by Remix on 2017/11/22.
  */
 @TargetApi(Build.VERSION_CODES.O)
-public class NotifyImpl24 extends Notify{
-    public NotifyImpl24(MusicService context) {
+public class NotifyImpl26 extends Notify{
+    public NotifyImpl26(MusicService context) {
         super(context);
     }
 
