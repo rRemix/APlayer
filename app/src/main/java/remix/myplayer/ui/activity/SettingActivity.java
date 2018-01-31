@@ -217,7 +217,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         mAlbumCoverText.setText(mOriginalAlbumChoice);
 
         //根据系统版本决定是否显示通知栏样式切换
-        findView(R.id.setting_classic_notify_container).setVisibility(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? View.VISIBLE : View.GONE);
+        findView(R.id.setting_classic_notify_container).setVisibility(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 ? View.VISIBLE : View.GONE);
 
         //计算缓存大小
         new Thread(){
