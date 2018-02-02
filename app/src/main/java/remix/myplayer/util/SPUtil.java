@@ -89,6 +89,8 @@ public class SPUtil {
         public static final String AUTO_DOWNLOAD_ARTIST_COVER = "auto_download_artist_cover";
         //曲库配置
         public static final String LIBRARY_CATEGORY = "library_category";
+        //锁屏设置
+        public static final String LOCKSCREEN = "lockScreen";
     }
 
 }

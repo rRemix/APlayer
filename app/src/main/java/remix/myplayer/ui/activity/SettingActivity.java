@@ -91,6 +91,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     View mNotifyColorContainer;
     @BindView(R.id.setting_album_cover_text)
     TextView mAlbumCoverText;
+    @BindView(R.id.setting_lockscreen_text)
+    TextView mLockScreenTip;
 
 
     //是否需要重建activity
@@ -135,7 +137,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             public void apply(@NonNull SwitchCompat view, final int index) {
                 view.setChecked(SPUtil.getValue(mContext,"Setting",keyWord[index],false));
                 //5.0以上才支持变色导航栏
-                if(index == 0){
+                if(view.getId() == R.id.setting_navaigation_switch){
                     view.setEnabled(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
                 }
                 view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -218,6 +220,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         //根据系统版本决定是否显示通知栏样式切换
         findView(R.id.setting_classic_notify_container).setVisibility(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 ? View.VISIBLE : View.GONE);
+
+        //锁屏样式
+        int lockScreen = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN);
+        mLockScreenTip.setText(lockScreen == 0 ? R.string.aplayer_lockscreen_tip :
+                lockScreen == 1 ? R.string.system_lockscreen_tip : R.string.lockscreen_off_tip);
 
         //计算缓存大小
         new Thread(){
@@ -381,16 +388,18 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //锁屏显示
             case R.id.setting_lockscreen_container:
-                //0:软件锁屏 1:系统锁屏 2:关闭
+                //0:APlayer锁屏 1:系统锁屏 2:关闭
                 new MaterialDialog.Builder(this).title(R.string.lockscreen_show)
                     .titleColorAttr(R.attr.text_color_primary)
                     .positiveText(R.string.choose)
                     .positiveColorAttr(R.attr.text_color_primary)
                     .buttonRippleColorAttr(R.attr.ripple_color)
                     .items(new String[]{getString(R.string.aplayer_lockscreen), getString(R.string.system_lockscreen), getString(R.string.close)})
-                    .itemsCallbackSingleChoice(SPUtil.getValue(SettingActivity.this,"Setting","LockScreenOn",Constants.APLAYER_LOCKSCREEN) ,
+                    .itemsCallbackSingleChoice(SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN) ,
                             (dialog, view, which, text) -> {
-                                SPUtil.putValue(SettingActivity.this,"Setting","LockScreenOn",which);
+                                SPUtil.putValue(SettingActivity.this,"Setting",SPUtil.SPKEY.LOCKSCREEN,which);
+                                mLockScreenTip.setText(which == 0 ? R.string.aplayer_lockscreen_tip :
+                                        which == 1 ? R.string.system_lockscreen_tip : R.string.lockscreen_off_tip);
                                 Intent intent = new Intent(MusicService.ACTION_CMD);
                                 intent.putExtra("Control",Constants.TOGGLE_MEDIASESSION);
                                 sendBroadcast(intent);

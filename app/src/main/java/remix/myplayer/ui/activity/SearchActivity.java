@@ -23,7 +23,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
-import remix.myplayer.adapter.SearchResAdapter;
+import remix.myplayer.adapter.SearchAdapter;
 import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.LoaderIds;
@@ -42,7 +42,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 搜索界面，根据关键字，搜索歌曲名，艺术家，专辑中的记录
  */
-public class SearchActivity extends PermissionActivity<Song,SearchResAdapter> {
+public class SearchActivity extends PermissionActivity<Song,SearchAdapter> {
     //搜索的关键字
     private String mkey;
     //搜索结果的listview
@@ -85,7 +85,7 @@ public class SearchActivity extends PermissionActivity<Song,SearchResAdapter> {
             }
         });
 
-        mAdapter = new SearchResAdapter(this,R.layout.item_search_reulst);
+        mAdapter = new SearchAdapter(this,R.layout.item_search_reulst);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {

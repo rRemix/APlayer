@@ -1,7 +1,11 @@
 package remix.myplayer.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -13,6 +17,11 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.dialog.OptionDialog;
+import remix.myplayer.util.ColorUtil;
+import remix.myplayer.util.DensityUtil;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
@@ -24,9 +33,16 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 /**
  * 搜索结果的适配器
  */
-public class SearchResAdapter extends BaseAdapter<Song,SearchResAdapter.SearchResHolder> {
-    public SearchResAdapter(Context context,int layoutId){
+public class SearchAdapter extends BaseAdapter<Song,SearchAdapter.SearchResHolder> {
+
+    private final GradientDrawable mDefaultDrawable;
+    private final GradientDrawable mSelectDrawable;
+
+    public SearchAdapter(Context context, int layoutId){
         super(context,layoutId);
+        int size = DensityUtil.dip2px(mContext,60);
+        mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
+        mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getSelectColor(),size,size);
     }
 
     @Override
@@ -37,6 +53,24 @@ public class SearchResAdapter extends BaseAdapter<Song,SearchResAdapter.SearchRe
         new LibraryUriRequest(holder.mImage,
                 getSearchRequestWithAlbumType(song),
                 new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
+
+        //设置按钮着色
+        int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;
+        Theme.TintDrawable(holder.mButton,R.drawable.icon_player_more,tintColor);
+
+        //按钮点击效果
+        holder.mButton.setBackground(Theme.getPressDrawable(
+                mDefaultDrawable,
+                mSelectDrawable,
+                ThemeStore.getRippleColor(),
+                null,null));
+
+        holder.mButton.setOnClickListener(v -> {
+            Intent intent = new Intent(mContext, OptionDialog.class);
+            intent.putExtra("Song", song);
+            mContext.startActivity(intent);
+        });
+
         if(mOnItemClickLitener != null && holder.mRooView != null){
             holder.mRooView.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition()));
         }
@@ -51,6 +85,8 @@ public class SearchResAdapter extends BaseAdapter<Song,SearchResAdapter.SearchRe
         TextView mName;
         @BindView(R.id.search_detail)
         TextView mOther;
+        @BindView(R.id.search_button)
+        ImageButton mButton;
         SearchResHolder(View itemView){
            super(itemView);
         }

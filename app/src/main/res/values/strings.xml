@@ -167,8 +167,12 @@
     <string name="eq">均衡器</string>
     <string name="collect">收藏</string>
     <string name="only_lollopop">仅支持安卓5.0及以上</string>
-    <string name="aplayer_lockscreen">软件锁屏</string>
+    <string name="aplayer_lockscreen">APlayer锁屏</string>
     <string name="system_lockscreen">系统锁屏</string>
+    <string name="aplayer_lockscreen_tip">锁屏页会显示当前歌曲的封面,样式取决于APlayer</string>
+    <string name="system_lockscreen_tip">锁屏页会显示当前歌曲的封面,样式取决于你的系统</string>
+    <string name="lockscreen_off_tip">锁屏页将不会显示歌曲封面</string>
+
     <string name="choose_or_close_lockscreen">选择锁屏显示方式或者关闭锁屏</string>
     <string name="cant_play_this_sont">无法播放该歌曲</string>
     <string name="try_set_empty_list">将设置的播放列表为空</string>

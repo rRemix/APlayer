@@ -66,11 +66,11 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
     private int mType;
     public static final int ALLSONG = 0;
     public static final int RECENTLY = 1;
-    private Drawable mDefaultDrawable;
-    private Drawable mSelectDrawable;
+    private final Drawable mDefaultDrawable;
+    private final Drawable mSelectDrawable;
     private SortChangeCallback mCallback;
 
-    private RecyclerView mRecyclerView;
+    private final RecyclerView mRecyclerView;
     private int mLastIndex;
 
     public SongAdapter(Context context,int layoutId, MultiChoice multiChoice, int type,RecyclerView recyclerView) {

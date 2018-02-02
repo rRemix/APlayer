@@ -807,7 +807,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     }
                     break;
                 case Constants.TOGGLE_MEDIASESSION:
-                    switch (SPUtil.getValue(mContext,"Setting","LockScreenOn",Constants.APLAYER_LOCKSCREEN)){
+                    switch (SPUtil.getValue(mContext,"Setting",SPUtil.SPKEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN)){
                         case Constants.APLAYER_LOCKSCREEN:
                         case Constants.CLOSE_LOCKSCREEN:
                             cleanMetaData();
@@ -899,7 +899,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * @param control
      */
     private void updateMediaSession(int control) {
-        if(SPUtil.getValue(mContext,"Setting","LockScreenOn",Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN || mCurrentSong == null)
+        if(SPUtil.getValue(mContext,"Setting",SPUtil.SPKEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN || mCurrentSong == null)
             return;
 
         int playState = mIsplay
@@ -1827,7 +1827,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             String action = intent.getAction();
             if(Intent.ACTION_SCREEN_ON.equals(action)){
                 //显示锁屏
-                if(MusicService.isPlay() && SPUtil.getValue(context,"Setting","LockScreenOn", Constants.APLAYER_LOCKSCREEN) == Constants.APLAYER_LOCKSCREEN)
+                if(MusicService.isPlay() && SPUtil.getValue(context,"Setting",SPUtil.SPKEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN) == Constants.APLAYER_LOCKSCREEN)
                     context.startActivity(new Intent(context, LockScreenActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 //重新显示桌面歌词
                 createFloatLrcThreadIfNeed();

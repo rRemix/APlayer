@@ -46,6 +46,16 @@
             android:ellipsize="end"/>
     </LinearLayout>
 
+    <!--结尾处按钮-->
+    <ImageButton
+        android:layout_alignParentRight="true"
+        android:id="@+id/search_button"
+        android:layout_width="@dimen/d60_size"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:src="@drawable/icon_player_more"
+        android:background="@color/transparent"/>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/d1_size"
