@@ -179,7 +179,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /** 当前歌词*/
     private volatile List<LrcRow> mLrcRows = null;
     /** 已经生成过的随机数 用于随机播放模式*/
-    private List<Integer> mRandomList = new ArrayList<>();
+    private ArrayList<Integer> mRandomList = new ArrayList<>();
     /** service是否停止运行*/
     private boolean mIsServiceStop = false;
     /** handlerThread*/
@@ -582,12 +582,17 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             ToastUtil.show(mContext,R.string.illegal_arg);
             return;
         }
-
         mCurrentId = Global.PlayQueue.get(mCurrentIndex);
         mCurrentSong = MediaStoreUtil.getMP3InfoById(mCurrentId);
 
         mNextIndex = mCurrentIndex;
         mNextId = mCurrentId;
+
+        //如果是随机播放 需要调整下RandomList
+        //保证正常播放队列和随机播放队列中当前歌曲的索引一致
+        if(mPlayModel == Constants.PLAY_SHUFFLE){
+            Collections.swap(mRandomList,mCurrentIndex,mRandomList.indexOf(mCurrentId));
+        }
 
         if(mCurrentSong == null) {
             ToastUtil.show(mContext,R.string.song_lose_effect);
@@ -847,12 +852,31 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     Song nextSong = intent.getParcelableExtra("song");
                     if(nextSong == null)
                         return;
-                    //先将之前的下一首歌曲保存起来
-//                    Song tempNextSong = mNextSong;
-                    mNextSong = nextSong;
-//                    mNextId = mCurrentId;
+                    //添加到播放队列
+                    if(Global.PlayQueue.contains(nextSong.getId())){
+                        Global.PlayQueue.remove(Integer.valueOf(nextSong.getId()));
+                        Global.PlayQueue.add(mCurrentIndex + 1,nextSong.getId());
+                    } else {
+                        Global.PlayQueue.add(Global.PlayQueue.indexOf(mCurrentId) + 1,nextSong.getId());
+                    }
+
+                    if(mPlayModel == Constants.PLAY_SHUFFLE){
+                        if(mRandomList.contains(nextSong.getId())){
+                            mRandomList.remove(Integer.valueOf(nextSong.getId()));
+                            mRandomList.add(mCurrentIndex + 1,nextSong.getId());
+                        } else {
+                            mRandomList.add(mRandomList.indexOf(mCurrentId) + 1,nextSong.getId());
+                        }
+                    }
+                    
+                    //更新下一首
                     mNextIndex = mCurrentIndex;
-//                    updateNextSong();
+                    updateNextSong();
+                    //保存到数据库
+                    mPlaybackHandler.post(() -> {
+                        PlayListUtil.clearTable(Constants.PLAY_QUEUE);
+                        PlayListUtil.addMultiSongs(Global.PlayQueue,Constants.PLAY_QUEUE, Global.PlayQueueID);
+                    });
                     ToastUtil.show(mContext,"已添加至下一首播放");
                     break;
                 default:break;
@@ -1034,18 +1058,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             ToastUtil.show(mContext,R.string.list_is_empty);
             return;
         }
-//        if(mPlayModel == Constants.PLAY_LOOP || mPlayModel == Constants.PLAY_REPEATONE){
-//            if ((++mNextIndex) > Global.PlayQueue.size() - 1)
-//                mNextIndex = 0;
-//            if(mNextIndex <= Global.PlayQueue.size()){
-//                mNextId = Global.PlayQueue.get(mNextIndex);
-//            }
-//        } else{
-//            mNextId = getShuffle();
-//            mNextIndex = Global.PlayQueue.indexOf(mNextId);
-//        }
 
-        LogUtil.d("PlayTempSong","PlayQueue: " + Global.PlayQueue);
         if(mPlayModel == Constants.PLAY_SHUFFLE){
             if(mRandomList.size() == 0){
                 makeShuffleList(mCurrentId);
@@ -1059,7 +1072,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             mNextId = Global.PlayQueue.get(mNextIndex);
         }
         mNextSong = MediaStoreUtil.getMP3InfoById(mNextId);
-        LogUtil.d("PlayTempSong","NextSong: " + mNextSong);
     }
 
     /**
@@ -1106,14 +1118,15 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mRandomList.addAll(Global.PlayQueue);
         if (mRandomList.isEmpty())
             return;
-        if (current >= 0) {
-            boolean removed = mRandomList.remove(Integer.valueOf(current));
-            Collections.shuffle(mRandomList);
-            if(removed)
-                mRandomList.add(0,current);
-        } else {
-            Collections.shuffle(mRandomList);
-        }
+//        if (current >= 0) {
+//            boolean removed = mRandomList.remove(Integer.valueOf(current));
+//            Collections.shuffle(mRandomList);
+//            if(removed)
+//                mRandomList.add(0,current);
+//        } else {
+//            Collections.shuffle(mRandomList);
+//        }
+        Collections.shuffle(mRandomList);
     }
 
     /**
