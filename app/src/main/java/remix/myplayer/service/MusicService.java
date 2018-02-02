@@ -877,7 +877,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                         PlayListUtil.clearTable(Constants.PLAY_QUEUE);
                         PlayListUtil.addMultiSongs(Global.PlayQueue,Constants.PLAY_QUEUE, Global.PlayQueueID);
                     });
-                    ToastUtil.show(mContext,"已添加至下一首播放");
+                    ToastUtil.show(mContext,R.string.add_to_next_song);
                     break;
                 default:break;
             }
