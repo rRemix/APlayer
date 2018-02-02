@@ -171,7 +171,7 @@ public class FloatLrcView extends RelativeLayout {
         mText1.setTextColor(ThemeStore.getThemeColorInt(SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_COLOR,ThemeStore.getThemeColor())));
         mText1.setTextSize(mTextSizeType == SMALL ? FIRST_LINE_SMALL : mTextSizeType == BIG ? FIRST_LINE_BIG : FIRST_LINE_MEDIUM);
         mText2.setTextSize(mTextSizeType == SMALL ? SECOND_LINE_SMALL : mTextSizeType == BIG ? SECOND_LINE_BIG : SECOND_LINE_MEDIUM);
-        mIsLock = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LRC_LOCK,false);
+        mIsLock = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LYRIC_LOCK,false);
 
         mTextSizeType = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_SIZE,MEDIUM);
         setPlayIcon(MusicService.isPlay());
@@ -274,7 +274,7 @@ public class FloatLrcView extends RelativeLayout {
         switch (view.getId()) {
             //关闭桌面歌词
             case R.id.widget_close:
-                SPUtil.putValue(mContext,"Setting","FloatLrc",false);
+                SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LYRIC,false);
                 Intent closeIntent = new Intent(MusicService.ACTION_CMD);
                 closeIntent.putExtra("FloatLrc",false);
                 closeIntent.putExtra("Control",Constants.TOGGLE_FLOAT_LRC);
@@ -340,7 +340,7 @@ public class FloatLrcView extends RelativeLayout {
 
     public void saveLock(boolean lock, boolean toast){
         mIsLock = lock;
-        SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LRC_LOCK, mIsLock);
+        SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LYRIC_LOCK, mIsLock);
         if(toast){
             ToastUtil.show(mContext, !mIsLock ? R.string.float_unlock : R.string.float_lock);
         }

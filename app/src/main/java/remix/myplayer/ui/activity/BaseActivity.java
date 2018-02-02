@@ -68,6 +68,11 @@ public class BaseActivity extends AppCompatActivity {
             case ThemeStore.THEME_WHITE:
                 setTheme(R.style.DayTheme_White);
                 break;
+            case ThemeStore.THEME_PINK:
+                setTheme(R.style.DayTheme_Pink);
+                break;
+            default:
+                throw new IllegalArgumentException("No Available Theme");
         }
     }
 
@@ -118,7 +123,7 @@ public class BaseActivity extends AppCompatActivity {
      */
     protected void setNavigationBarColor(){
         //导航栏变色
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil.getValue(this,"Setting","ColorNavigation",false)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && SPUtil.getValue(this,"Setting", SPUtil.SPKEY.COLOR_NAVIGATION,false)) {
             getWindow().setNavigationBarColor(ThemeStore.getAccentColor());
         }
     }

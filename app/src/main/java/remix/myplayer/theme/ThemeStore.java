@@ -35,6 +35,7 @@ public class ThemeStore {
     public static final int THEME_PLUM = 107;
     public static final int THEME_BLUE = 108;
     public static final int THEME_WHITE = 109;
+    public static final int THEME_PINK = 110;
 
     /** 当前主题颜色 */
     public static int THEME_COLOR = THEME_BLUE;
@@ -92,6 +93,10 @@ public class ThemeStore {
                 break;
             case THEME_WHITE:
                 colorRes = R.color.md_white_primary;
+                break;
+            case THEME_PINK:
+                colorRes = R.color.md_pink_primary;
+                break;
         }
         return colorRes;
     }
@@ -136,6 +141,10 @@ public class ThemeStore {
                 break;
             case THEME_WHITE:
                 colorRes = R.color.md_white_primary_dark;
+                break;
+            case THEME_PINK:
+                colorRes = R.color.md_pink_primary_dark;
+                break;
         }
         return colorRes;
     }
@@ -271,6 +280,7 @@ public class ThemeStore {
         themeColor.add(THEME_INDIGO);
         themeColor.add(THEME_PLUM);
         themeColor.add(THEME_BLUE);
+        themeColor.add(THEME_PINK);
 
         return themeColor;
     }
@@ -313,6 +323,9 @@ public class ThemeStore {
                 break;
             case THEME_WHITE:
                 colorRes = R.color.md_white_primary;
+                break;
+            case THEME_PINK:
+                colorRes = R.color.md_pink_primary;
                 break;
             default:
                 return Color.WHITE;

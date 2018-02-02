@@ -214,6 +214,8 @@ public class Theme {
                 return R.style.DayTheme_Plum;
             case ThemeStore.THEME_BLUE:
                 return R.style.DayTheme_Blue;
+            case ThemeStore.THEME_PINK:
+                return R.style.DayTheme_Pink;
             default:return -1;
         }
     }
@@ -429,22 +431,4 @@ public class Theme {
         }
     }
 
-    public static ColorStateList getPressedColorSelector(int normalColor, int pressedColor) {
-        return new ColorStateList(
-                new int[][]
-                        {
-                                new int[]{android.R.attr.state_pressed},
-                                new int[]{android.R.attr.state_focused},
-                                new int[]{android.R.attr.state_activated},
-                                new int[]{}
-                        },
-                new int[]
-                        {
-                                pressedColor,
-                                pressedColor,
-                                pressedColor,
-                                normalColor
-                        }
-        );
-    }
 }

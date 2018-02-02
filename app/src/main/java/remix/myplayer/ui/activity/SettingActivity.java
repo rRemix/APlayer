@@ -47,8 +47,8 @@ import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.dialog.ColorChooseDialog;
 import remix.myplayer.ui.dialog.FolderChooserDialog;
+import remix.myplayer.ui.dialog.ThemeDialog;
 import remix.myplayer.util.AlipayUtil;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -129,8 +129,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
 
         //导航栏是否变色 是否启用摇一摇切歌
-        final String[] keyWord = new String[]{"ColorNavigation","Shake",
-                "OnlineLrc","FloatLrc", SPUtil.SPKEY.SCREEN_ALWAYS_ON,SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,};
+        final String[] keyWord = new String[]{SPUtil.SPKEY.COLOR_NAVIGATION, SPUtil.SPKEY.SHAKE,
+                SPUtil.SPKEY.ONLINE_LYRIC_FIRST, SPUtil.SPKEY.FLOAT_LYRIC, SPUtil.SPKEY.SCREEN_ALWAYS_ON,SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,};
         ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch
                 ,mFloatLrcSwitch,mScreenSwitch, mNotifyStyleSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
@@ -158,7 +158,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //设置歌词搜索优先级
                             case 2:
-                                SPUtil.putValue(APlayerApplication.getContext(),"Setting","OnlineLrc",isChecked);
+                                SPUtil.putValue(APlayerApplication.getContext(),"Setting", SPUtil.SPKEY.ONLINE_LYRIC_FIRST,isChecked);
                                 break;
                             //桌面歌词
                             case 3:
@@ -424,7 +424,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //选择主色调
             case R.id.setting_color_container:
-                startActivityForResult(new Intent(this, ColorChooseDialog.class),0);
+                startActivityForResult(new Intent(this, ThemeDialog.class),0);
                 break;
             //通知栏底色
             case R.id.setting_notify_color_container:

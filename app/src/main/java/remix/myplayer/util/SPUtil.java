@@ -72,7 +72,7 @@ public class SPUtil {
 
     public static class SPKEY{
         //桌面歌词是否可移动
-        public static final String FLOAT_LRC_LOCK = "float_lrc_lock";
+        public static final String FLOAT_LYRIC_LOCK = "float_lyric_lock";
         //桌面歌词字体大小
         public static final String FLOAT_TEXT_SIZE = "float_text_size";
         //桌面歌词y坐标
@@ -91,6 +91,14 @@ public class SPUtil {
         public static final String LIBRARY_CATEGORY = "library_category";
         //锁屏设置
         public static final String LOCKSCREEN = "lockScreen";
+        //导航浪变色
+        public static final String COLOR_NAVIGATION = "ColorNavigation";
+        //摇一摇
+        public static final String SHAKE = "shake";
+        //优先搜索在线歌词
+        public static final String ONLINE_LYRIC_FIRST = "online_lyric_first";
+        //是否开启桌面歌词
+        public static final String FLOAT_LYRIC = "float_lyric";
     }
 
 }

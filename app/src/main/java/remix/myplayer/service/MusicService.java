@@ -1261,10 +1261,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             Global.MyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);
             Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
             Global.PlayList = PlayListUtil.getAllPlayListInfo();
-            mShowFloatLrc = SPUtil.getValue(mContext,"Setting","FloatLrc",false);
+            mShowFloatLrc = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LYRIC,false);
 
             //摇一摇
-            if(SPUtil.getValue(mContext,"Setting","Shake",false)){
+            if(SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.SHAKE,false)){
                 ShakeDetector.getInstance(mContext).beginListen();
             }
         }

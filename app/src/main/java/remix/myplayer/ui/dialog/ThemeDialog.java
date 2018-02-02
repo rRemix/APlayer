@@ -24,21 +24,22 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 
 /**
- * @ClassName ColorChooseDialog
+ * @ClassName ThemeDialog
  * @Description 主题颜色选择
  * @Author Xiaoborui
  * @Date 2016/8/26 11:14
  */
-public class ColorChooseDialog extends BaseDialogActivity {
+public class ThemeDialog extends BaseDialogActivity {
     @BindView(R.id.color_container)
     LinearLayout mColorContainer;
     private final int[] mColors = new int[]{R.color.md_blue_primary,R.color.md_red_primary,R.color.md_brown_primary,R.color.md_navy_primary,
             R.color.md_green_primary,R.color.md_yellow_primary,R.color.md_purple_primary,R.color.md_indigo_primary,R.color.md_plum_primary,
-            R.color.md_white_primary_dark};
+            R.color.md_pink_primary,R.color.md_white_primary_dark};
     private final String[] mColorTexts = new String[]{"默认","韓紅色","灰汁色","青碧色","常盤色","藤黄色",
-                                                        "桔梗色","竜膽色","红梅色","银白色"};
+                                                        "桔梗色","竜膽色","红梅色","哔哩粉","银白色"};
     private final int[] mThemeColors = new int[]{ThemeStore.THEME_BLUE,ThemeStore.THEME_RED,ThemeStore.THEME_BROWN,ThemeStore.THEME_NAVY,
-            ThemeStore.THEME_GREEN,ThemeStore.THEME_YELLOW,ThemeStore.THEME_PURPLE,ThemeStore.THEME_INDIGO,ThemeStore.THEME_PLUM,ThemeStore.THEME_WHITE};
+            ThemeStore.THEME_GREEN,ThemeStore.THEME_YELLOW,ThemeStore.THEME_PURPLE,ThemeStore.THEME_INDIGO,ThemeStore.THEME_PLUM,
+            ThemeStore.THEME_PINK,ThemeStore.THEME_WHITE};
 
     private ArrayList<ColorChoose> mColorInfoList = new ArrayList<>();
 
@@ -95,7 +96,7 @@ public class ColorChooseDialog extends BaseDialogActivity {
         public void onClick(View v) {
 
             if(!ThemeStore.isDay()){
-                new MaterialDialog.Builder(ColorChooseDialog.this)
+                new MaterialDialog.Builder(ThemeDialog.this)
                         .content("当前为夜间模式，是否切换主题颜色?")
                         .buttonRippleColor(ThemeStore.getRippleColor())
                         .backgroundColorAttr(R.attr.background_color_3)

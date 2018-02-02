@@ -173,4 +173,7 @@
     <color name="md_white_primary">#fefefe</color>
     <color name="md_white_primary_dark">#e5e5e5</color>
 
+    <color name="md_pink_primary">#fa7299</color>
+    <color name="md_pink_primary_dark">#ed6d99</color>
+
 </resources>

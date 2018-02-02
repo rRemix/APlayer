@@ -139,7 +139,7 @@ public class SearchLrc {
             e.onComplete();
         });
         //根据在线和本地的优先级 确定最后一级
-        boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting","OnlineLrc",false);
+        boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting", SPUtil.SPKEY.ONLINE_LYRIC_FIRST,false);
         Observable<List<LrcRow>> last = Observable.concat(onlineFirst ? neteaseObservable : localObservable ,onlineFirst ? localObservable : neteaseObservable).firstOrError().toObservable();
 
         return Observable.create((ObservableOnSubscribe<List<LrcRow>>) e -> {
@@ -217,7 +217,7 @@ public class SearchLrc {
         //搜索歌词
         try {
             //是否优先搜索在线歌词
-            boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting","OnlineLrc",false);
+            boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting", SPUtil.SPKEY.ONLINE_LYRIC_FIRST,false);
             if(onlineFirst){
                 String onlineLrcContent = getOnlineLrcContent();
                 if(!TextUtils.isEmpty(onlineLrcContent)){

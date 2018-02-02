@@ -157,7 +157,7 @@
             android:theme="@style/BaseDialogTheme" />
         <!--主题色选择-->
         <activity
-            android:name=".ui.dialog.ColorChooseDialog"
+            android:name=".ui.dialog.ThemeDialog"
             android:theme="@style/BaseDialogTheme" />
 
         <!-- 图片裁剪 -->
