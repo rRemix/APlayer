@@ -272,5 +272,7 @@
     <string name="set_artist_cover">设置艺术家封面</string>
     <string name="set_playlist_cover">设置播放列表封面</string>
     <string name="add_to_next_song">已添加至下一首播放</string>
+    <string name="immersive">沉浸式状态栏</string>
+    <string name="immersive_tip">开启后状态栏与背景颜色一致</string>
 
 </resources>

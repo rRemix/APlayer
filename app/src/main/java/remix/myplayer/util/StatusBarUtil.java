@@ -46,19 +46,30 @@ public class StatusBarUtil {
     public static void setColor(Activity activity, int color, int statusBarAlpha) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
             return;
+        //非miui 非魅族 非6.0以上 需要改变颜色
+        if(!Build.MANUFACTURER.equalsIgnoreCase("Meizu") && !Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") &&
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+            if(ThemeStore.isLightTheme())
+                color = ColorUtil.getColor(R.color.statusbar_gray_color);
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setColorForLollipop(activity, color, statusBarAlpha);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setColorForKitkat(activity, color, statusBarAlpha);
         }
-        setDarkStatusBar(activity);
+        setDarkModeIfNeed(activity);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static void setColorForLollipop(Activity activity, int color, int statusBarAlpha) {
-        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        activity.getWindow().setStatusBarColor(calculateStatusColor(color, statusBarAlpha));
+        if(Build.MANUFACTURER.equals("Meizu")){
+            MeizuStatusbar.setStatusBarColor(activity.getWindow(),calculateStatusColor(color, statusBarAlpha));
+        } else {
+            activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            activity.getWindow().setStatusBarColor(calculateStatusColor(color, statusBarAlpha));
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -75,10 +86,10 @@ public class StatusBarUtil {
         setRootView(activity);
     }
 
-    public static void setDarkStatusBar(Activity activity){
+    private static void setDarkModeIfNeed(Activity activity){
         if(activity == null)
             return;
-        if(ThemeStore.isDay() && ThemeStore.isLightTheme()){
+        if(ThemeStore.isLightTheme()){
             //获得miui版本
             String miui = "";
             int miuiVersion = 0;
@@ -96,10 +107,9 @@ public class StatusBarUtil {
             }
             if(Build.MANUFACTURER.equals("Meizu")){
                 MeizuStatusbar.setStatusBarDarkIcon(activity,true);
-            } else if (Build.MANUFACTURER.equals("Xiaomi") && miuiVersion >= 6 ){
+            } else if (Build.MANUFACTURER.equals("Xiaomi") && miuiVersion >= 6 && miuiVersion < 9){
                 XiaomiStatusbar.setStatusBarDarkMode(true,activity);
             }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-                StatusBarUtil.setTransparent(activity);
                 activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
             }
         }
@@ -175,6 +185,12 @@ public class StatusBarUtil {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return;
         }
+        //非miui 非魅族 非6.0以上 需要改变颜色
+        if(!Build.MANUFACTURER.equalsIgnoreCase("Meizu") && !Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") &&
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+            if(ThemeStore.isLightTheme())
+                color = ColorUtil.getColor(R.color.statusbar_gray_color);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -203,11 +219,11 @@ public class StatusBarUtil {
         contentLayout.setClipToPadding(true);
         drawer.setFitsSystemWindows(false);
         // 侧滑添加statusbarView
-        LinearLayout headerContainer = (LinearLayout) drawer.findViewById(R.id.header);
+        LinearLayout headerContainer = drawer.findViewById(R.id.header);
         if(headerContainer != null){
             headerContainer.addView(createStatusBarView(activity,color),0);
         }
-        setDarkStatusBar(activity);
+        setDarkModeIfNeed(activity);
 
 //        addTranslucentView(activity, statusBarAlpha);
 

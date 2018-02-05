@@ -206,27 +206,25 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
      */
     private void sortList(){
         Collections.sort(mInfoList, (o1, o2) -> {
-            if(o1 == null || o2 == null)
+            boolean isAsc = ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC;
+            if(o1 == null && o2 == null)
                 return 0;
+            if(o1 == null)
+                return isAsc ? -1 : 1;
+            if(o2 == null)
+                return isAsc? 1 : -1;
             //当前是按名字排序
             if(ChildHolderAdapter.SORT == ChildHolderAdapter.NAME){
-                if(TextUtils.isEmpty(o1.getTitleKey()) || TextUtils.isEmpty(o2.getTitleKey()))
+                if(TextUtils.isEmpty(o1.getTitleKey()) && TextUtils.isEmpty(o2.getTitleKey()))
                     return 0;
-                if(ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC){
-                    return o1.getTitleKey().compareTo(o2.getTitleKey());
-                } else {
-                    return o2.getTitleKey().compareTo(o1.getTitleKey());
-                }
+                if(TextUtils.isEmpty(o1.getTitleKey()))
+                    return isAsc ? -1 : 1;
+                if(TextUtils.isEmpty(o2.getTitleKey()))
+                    return isAsc ? 1 : -1;
+                return isAsc ? o1.getTitleKey().compareTo(o2.getTitleKey()) : o2.getTitleKey().compareTo(o1.getTitleKey());
             } else if(ChildHolderAdapter.SORT == ChildHolderAdapter.ADDTIME){
                 //当前是按添加时间排序
-                if(o1.getAddTime() == o2.getAddTime()){
-                    return 0;
-                }
-                if(ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC){
-                    return Long.valueOf(o1.getAddTime()).compareTo(o2.getAddTime());
-                } else {
-                    return Long.valueOf(o2.getAddTime()).compareTo(o1.getAddTime());
-                }
+                return isAsc ? Long.valueOf(o1.getAddTime()).compareTo(o2.getAddTime()) : Long.valueOf(o2.getAddTime()).compareTo(o1.getAddTime());
             } else {
                 return 0;
             }

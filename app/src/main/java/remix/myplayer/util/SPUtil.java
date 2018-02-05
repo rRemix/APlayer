@@ -99,6 +99,8 @@ public class SPUtil {
         public static final String ONLINE_LYRIC_FIRST = "online_lyric_first";
         //是否开启桌面歌词
         public static final String FLOAT_LYRIC = "float_lyric";
+        //沉浸式状态栏
+        public static final String IMMERSIVE_MODE = "immersive_mode";
     }
 
 }

@@ -93,7 +93,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     TextView mAlbumCoverText;
     @BindView(R.id.setting_lockscreen_text)
     TextView mLockScreenTip;
-
+    @BindView(R.id.setting_immersive_switch)
+    SwitchCompat mImmersiveSwitch;
 
     //是否需要重建activity
     private boolean mNeedRecreate = false;
@@ -129,10 +130,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         }
 
         //导航栏是否变色 是否启用摇一摇切歌
-        final String[] keyWord = new String[]{SPUtil.SPKEY.COLOR_NAVIGATION, SPUtil.SPKEY.SHAKE,
-                SPUtil.SPKEY.ONLINE_LYRIC_FIRST, SPUtil.SPKEY.FLOAT_LYRIC, SPUtil.SPKEY.SCREEN_ALWAYS_ON,SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,};
-        ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch
-                ,mFloatLrcSwitch,mScreenSwitch, mNotifyStyleSwitch}, new ButterKnife.Action<SwitchCompat>() {
+        final String[] keyWord = new String[]{SPUtil.SPKEY.COLOR_NAVIGATION, SPUtil.SPKEY.SHAKE, SPUtil.SPKEY.ONLINE_LYRIC_FIRST,
+                SPUtil.SPKEY.FLOAT_LYRIC, SPUtil.SPKEY.SCREEN_ALWAYS_ON,SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC, SPUtil.SPKEY.IMMERSIVE_MODE};
+        ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch,mFloatLrcSwitch,
+                mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
                 view.setChecked(SPUtil.getValue(mContext,"Setting",keyWord[index],false));
@@ -190,6 +191,12 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 sendBroadcast(new Intent(MusicService.ACTION_CMD)
                                         .putExtra("Control",Constants.TOGGLE_NOTIFY)
                                         .putExtra(SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,isChecked));
+                                break;
+                            //沉浸式状态栏
+                            case 6:
+                                ThemeStore.IMMERSIVE_MODE = view.isChecked();
+                                mNeedRecreate = true;
+                                mHandler.sendEmptyMessage(RECREATE);
                                 break;
                         }
                         SPUtil.putValue(SettingActivity.this,"Setting",keyWord[index],isChecked);
@@ -284,7 +291,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
             R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container,
             R.id.setting_screen_container,R.id.setting_scan_container,R.id.setting_classic_notify_container,
-            R.id.setting_album_cover_container,R.id.setting_library_category_container})
+            R.id.setting_album_cover_container,R.id.setting_library_category_container,R.id.setting_immersive_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -564,6 +571,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .itemsColorAttr(R.attr.text_color_primary)
                         .theme(ThemeStore.getMDDialogTheme())
                         .show();
+                break;
+            //沉浸式状态栏
+            case R.id.setting_immersive_container:
+                mImmersiveSwitch.setChecked(!mImmersiveSwitch.isChecked());
                 break;
         }
     }

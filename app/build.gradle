@@ -19,8 +19,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 49
-        versionName "1.2.5.3"
+        versionCode 50
+        versionName "1.2.5.4"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
@@ -56,6 +56,12 @@ android {
             zipAlignEnabled true
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            android.applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "APlayer_v${defaultConfig.versionName}_${variant.productFlavors[0].name}.apk"
+                }
+            }
         }
     }
 
@@ -70,12 +76,12 @@ android {
 //        alibaba{}
 //        meizu{}
 
-        qihu360{}
-        assistant91{}
-        baidu{}
-        anzhuomarket{}
-        chuizi{}
-        xiaomi{}
+//        assistant91{}
+//        baidu{}
+//        anzhuomarket{}
+//        qihu360{}
+//        chuizi{}
+//        xiaomi{}
         kuan{}
         productFlavors.all { flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]

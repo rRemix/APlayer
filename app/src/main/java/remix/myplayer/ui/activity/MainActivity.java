@@ -205,7 +205,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     protected void setStatusBar() {
         StatusBarUtil.setColorNoTranslucentForDrawerLayout(this,
                 findViewById(R.id.drawer_layout),
-                ThemeStore.getMaterialPrimaryDarkColor());
+                ThemeStore.getStatusBarColor());
     }
 
     /**
@@ -214,11 +214,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      */
     protected void setUpToolbar(Toolbar toolbar) {
         super.setUpToolbar(toolbar,"");
-        mToolBar.setTitle("");
-
-        int themeColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white);
-        toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.actionbar_menu,themeColor));
-        mToolBar.setNavigationOnClickListener(v -> mDrawerLayout.openDrawer(mNavigationView));
+        if(mToolBar != null){
+            mToolBar.setTitle("");
+            int themeColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white);
+            toolbar.setNavigationIcon(Theme.TintDrawable(R.drawable.actionbar_menu,themeColor));
+            mToolBar.setNavigationOnClickListener(v -> mDrawerLayout.openDrawer(mNavigationView));
+        }
     }
 
     /**

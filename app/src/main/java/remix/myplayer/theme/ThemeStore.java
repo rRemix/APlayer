@@ -11,6 +11,7 @@ import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.StatusBarUtil;
 
 /**
  * @ClassName
@@ -44,6 +45,7 @@ public class ThemeStore {
     public static int MATERIAL_COLOR_PRIMARY = R.color.transparent;
     public static int MATERIAL_COLOR_PRIMARY_DARK = R.color.transparent;
 
+    public static boolean IMMERSIVE_MODE = SPUtil.getValue(APlayerApplication.getContext(),"Setting", SPUtil.SPKEY.IMMERSIVE_MODE,false);
 
     /**
      * 当前是否是白天主题
@@ -200,6 +202,10 @@ public class ThemeStore {
         return ColorUtil.getColor(getMaterialPrimaryDarkColorRes());
     }
 
+    @ColorInt
+    public static int getStatusBarColor(){
+        return IMMERSIVE_MODE ? getMaterialPrimaryColor() : getMaterialPrimaryDarkColor();
+    }
 
     @ColorInt
     public static int getTextColorPrimary(){
@@ -261,8 +267,7 @@ public class ThemeStore {
     }
 
     public static boolean isLightTheme(){
-        return isDay()&& (THEME_COLOR == THEME_WHITE);
-//        return ColorUtil.isColorLight(getMaterialPrimaryColor());
+        return StatusBarUtil.MeizuStatusbar.toGrey(getMaterialPrimaryColor()) >= 254;
     }
 
     /**
@@ -281,7 +286,6 @@ public class ThemeStore {
         themeColor.add(THEME_PLUM);
         themeColor.add(THEME_BLUE);
         themeColor.add(THEME_PINK);
-
         return themeColor;
     }
 
@@ -332,4 +336,5 @@ public class ThemeStore {
         }
         return ColorUtil.getColor(colorRes);
     }
+
 }

@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Animatable;
@@ -28,6 +26,7 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -56,8 +55,6 @@ import java.util.Set;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.bean.mp3.Song;
@@ -84,7 +81,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
@@ -147,7 +143,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     SeekBar mSeekBar;
     //背景
     @BindView(R.id.audio_holder_container)
-    FrameLayout mContainer;
+    ViewGroup mContainer;
     @BindView(R.id.holder_pager)
     AudioViewPager mPager;
     //下一首歌曲
@@ -178,8 +174,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private boolean mFromActivity = false;
     //是否需要更新
     private boolean mNeedUpdateUI = true;
-    //是否开启变色背景
-    private boolean mDiscolour = false;
 
     private static final String SCALE_WIDTH = "SCALE_WIDTH";
     private static final String SCALE_HEIGHT = "SCALE_HEIGHT";
@@ -233,13 +227,11 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     @Override
     protected void setStatusBar() {
-        //是否开启背景变色
-        mDiscolour = SPUtil.getValue(this,"Setting","Discolour",false) && ThemeStore.isDay();
         if(ThemeStore.isDay()){
             //获得miui版本
             String miui = "";
             int miuiVersion = 0;
-            if(Build.MANUFACTURER.equals("Xiaomi")){
+            if(Build.MANUFACTURER.equalsIgnoreCase("Xiaomi")){
                 try {
                     Class<?> c = Class.forName("android.os.SystemProperties");
                     Method get = c.getMethod("get", String.class, String.class );
@@ -251,26 +243,17 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     Util.uploadException("miui版本解析错误",e);
                 }
             }
-            if(Build.MANUFACTURER.equals("Meizu")){
+            if(Build.MANUFACTURER.equalsIgnoreCase("Meizu")){
+                StatusBarUtil.setTransparent(this);
                 StatusBarUtil.MeizuStatusbar.setStatusBarDarkIcon(this,true);
-                if(mDiscolour)
-                    StatusBarUtil.setTransparent(this);
-                else
-                    StatusBarUtil.setColorNoTranslucent(this, Color.WHITE);
-            } else if (Build.MANUFACTURER.equals("Xiaomi") && miuiVersion >= 6 && miuiVersion < 9){
+            } else if (Build.MANUFACTURER.equalsIgnoreCase("Xiaomi") && miuiVersion >= 6 && miuiVersion < 9){
+                StatusBarUtil.setTransparent(this);
                 StatusBarUtil.XiaomiStatusbar.setStatusBarDarkMode(true,this);
-                if(mDiscolour)
-                    StatusBarUtil.setTransparent(this);
-                else
-                    StatusBarUtil.setColorNoTranslucent(this, Color.WHITE);
             }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 StatusBarUtil.setTransparent(this);
                 getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
             }  else {
-                if(mDiscolour)
-                    StatusBarUtil.setTransparent(this);
-                else
-                    StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.statusbar_gray_color));
+                StatusBarUtil.setColorNoTranslucent(this,ColorUtil.getColor(R.color.statusbar_gray_color));
             }
         } else {
             StatusBarUtil.setTransparent(this);
@@ -1002,33 +985,32 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     //更新背景
     private void updateBg() {
-        if(!mDiscolour)
-            return;
-        Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
-            mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
-            if(mRawBitMap == null)
-                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
-            Palette.from(mRawBitMap).generate(palette -> {
-                if(palette == null || palette.getMutedSwatch() == null){
-                    mSwatch = new Palette.Swatch(Color.GRAY,100);
-                } else {
-                    mSwatch = palette.getMutedSwatch();//柔和 暗色
-                }
-                e.onNext(mSwatch);
-            });
-        })
-        .compose(RxUtil.applyScheduler())
-        .subscribe(swatch -> {
-            int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
-            int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
-            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
-        });
+//        if(!mDiscolour)
+//            return;
+//        Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
+//            mRawBitMap = MediaStoreUtil.getAlbumBitmap(mInfo.getAlbumId(),false);
+//            if(mRawBitMap == null)
+//                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
+//            Palette.from(mRawBitMap).generate(palette -> {
+//                if(palette == null || palette.getMutedSwatch() == null){
+//                    mSwatch = new Palette.Swatch(Color.GRAY,100);
+//                } else {
+//                    mSwatch = palette.getMutedSwatch();//柔和 暗色
+//                }
+//                e.onNext(mSwatch);
+//            });
+//        })
+//        .compose(RxUtil.applyScheduler())
+//        .subscribe(swatch -> {
+//            int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
+//            int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
+//            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
+//        });
 
     }
 
     private void updateCover(){
         ((CoverFragment) mAdapter.getItem(1)).updateCover(mInfo,mUri,!mFistStart);
-//            mAnimCover.setImageURI(mUri);
         mFistStart = false;
     }
 
@@ -1111,11 +1093,11 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     @OnHandleMessage
     public void handleInternal(Message msg){
-        if(msg.what == UPDATE_BG){
-            int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
-            int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
-            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
-        }
+//        if(msg.what == UPDATE_BG){
+//            int colorFrom = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.3f);
+//            int colorTo = ColorUtil.adjustAlpha(mSwatch.getRgb(),0.05f);
+//            mContainer.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,new int[]{colorFrom, colorTo}));
+//        }
         if(msg.what == UPDATE_TIME_ONLY && !mIsDragSeekBarFromUser){
             updateProgressByHandler();
         }
