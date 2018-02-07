@@ -15,7 +15,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.umeng.analytics.MobclickAgent;
@@ -228,15 +227,15 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     public void UpdateUI(Song Song, boolean isplay) {
         mInfo = Song;
         mIsPlay = isplay;
-        if(!mIsRunning)
+        if(!mIsRunning){
+            ToastUtil.show(mContext,R.string.error);
             return;
+        }
         if(mInfo == null){
-            ToastUtil.show(this,"mp3Info:null", Toast.LENGTH_LONG);
-        }
-        if(!mIsRunning ) {
-            ToastUtil.show(this,"isRunning:false", Toast.LENGTH_LONG);
+            ToastUtil.show(mContext,R.string.error);
             return;
         }
+
         //更新播放按钮
         if(mPlayButton != null){
             mPlayButton.setImageResource(MusicService.isPlay() ? R.drawable.lock_btn_pause : R.drawable.lock_btn_play);

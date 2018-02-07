@@ -81,13 +81,14 @@ public class LrcFragment extends BaseFragment {
             return;
         }
         mLrcView.setTag(mInfo.getId());
+        final int id = mInfo.getId();
         new SearchLrc(mInfo).getLyric(manualPath)
                 .doOnSubscribe(disposable -> {
                     mLrcView.setText(getString(R.string.searching));
                     mDisposable = disposable;
                 })
                 .subscribe(lrcRows -> {
-                    if (mLrcView.getTag() != null && (int) mLrcView.getTag() == mInfo.getId()) {
+                    if (id == mInfo.getId()) {
                         mLrcList = lrcRows;
                         if (mLrcList == null || mLrcList.size() == 0) {
                             mLrcView.setText(getString(R.string.no_lrc));

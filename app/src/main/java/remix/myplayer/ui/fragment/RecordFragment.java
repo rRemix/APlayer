@@ -84,7 +84,7 @@ public class RecordFragment extends BaseFragment{
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_SHARE && resultCode == Activity.RESULT_OK ){
+        if(data != null && requestCode == REQUEST_SHARE && resultCode == Activity.RESULT_OK ){
             mShareSuccess = data.getBooleanExtra("ShareSuccess",false);
         }
     }
