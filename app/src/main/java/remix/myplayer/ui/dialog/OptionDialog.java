@@ -163,9 +163,7 @@ public class OptionDialog extends BaseDialogActivity {
                                 boolean deleteSuccess = !mIsDeletePlayList ?
                                         MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0 :
                                         PlayListUtil.deleteSong(mInfo.getId(),mPlayListName);
-//                                    if(deleteSuccess){
-//                                        sendBroadcast(new Intent(MusicService.ACTION_MEDIA_CHANGE));
-//                                    }
+
                                 ToastUtil.show(OptionDialog.this,deleteSuccess ? R.string.delete_success : R.string.delete_error);
                                 finish();
                             })

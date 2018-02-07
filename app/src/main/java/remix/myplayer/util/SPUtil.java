@@ -101,6 +101,8 @@ public class SPUtil {
         public static final String FLOAT_LYRIC = "float_lyric";
         //沉浸式状态栏
         public static final String IMMERSIVE_MODE = "immersive_mode";
+        //移除的同时删除源文件
+        public static final String DELETE_SOURCE = "delete_source";
     }
 
 }

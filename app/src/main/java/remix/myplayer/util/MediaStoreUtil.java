@@ -779,24 +779,18 @@ public class MediaStoreUtil {
      * 删除歌曲
      * @param data 删除参数 包括歌曲路径、专辑id、艺术家id、播放列表id、文件夹索引
      * @param type 删除类型 包括单个歌曲、专辑、艺术家、文件夹、播放列表
-     * @return 是否删除成功
+     * @return 是否歌曲数量
      */
-    public static int delete(int data, int type) {
-        ContentResolver resolver = mContext.getContentResolver();
-        String where ;
-        String[] arg;
-        String folderName;
-        int deleteNum = 0;
+    public static int delete(int data, int type){
+        List<Song> songs = new ArrayList<>();
+        String where = null;
+        String[] arg = null;
 
-        //之前保存的所有移除歌曲id
-        Set<String> oriID = new HashSet<>(SPUtil.getStringSet(mContext,"Setting","DeleteID"));
-
-        Cursor cursor = null;
         //拼接参数
-        switch (type) {
+        switch (type){
             case Constants.SONG:
-                oriID.add(data + "");
-                deleteNum = 1;
+                where = MediaStore.Audio.Media._ID + "=?";
+                arg = new String[]{data + ""};
                 break;
             case Constants.ALBUM:
             case Constants.ARTIST:
@@ -807,38 +801,170 @@ public class MediaStoreUtil {
                     where = MediaStore.Audio.Media.ARTIST_ID + "=?";
                     arg = new String[]{data + ""};
                 }
-                try {
-                    cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,new String[]{MediaStore.Audio.Media._ID},where,arg,null);
-                    if(cursor != null && cursor.getCount() > 0){
-                        while (cursor.moveToNext()){
-                            oriID.add(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
-                        }
-                        deleteNum = cursor.getCount();
-                    }
-                } finally {
-                    if(cursor != null && !cursor.isClosed())
-                        cursor.close();
-                }
                 break;
             case Constants.FOLDER:
-                try {
-                    folderName = Util.getMapkeyByPosition(Global.FolderMap,data);
-                    if(Global.FolderMap.get(folderName) != null){
-                        for(Integer id : Global.FolderMap.get(folderName)){
-                            oriID.add(id + "");
-                        }
-                        deleteNum = Global.FolderMap.get(folderName).size();
-                    }
-                } catch (Exception e){
-                    e.printStackTrace();
+                String folderName = Util.getMapkeyByPosition(Global.FolderMap,data);
+                List<Integer> ids = Global.FolderMap.get(folderName);
+                StringBuilder selection = new StringBuilder(127);
+                for(int i = 0 ; i < ids.size();i++){
+                    selection.append(MediaStore.Audio.Media._ID).append("=").append(ids.get(i)).append(i != ids.size() - 1 ? " and " : " ");
                 }
+                where = selection.toString();
+                arg = null;
                 break;
         }
-        SPUtil.putStringSet(mContext, "Setting", "DeleteID", oriID);
-        resolver.notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
 
-        return deleteNum;
+        Cursor cursor = null;
+        try {
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    null,
+                    where,arg,null);
+            if(cursor != null && cursor.getCount() > 0){
+                while (cursor.moveToNext()){
+                    songs.add(getMP3Info(cursor));
+                }
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
+        }
 
+        return delete(songs,SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.DELETE_SOURCE,false));
+    }
+
+    /**
+     * 删除指定歌曲
+     * @param songs
+     * @param deleteSource
+     * @return
+     */
+    public static int delete(List<Song> songs,boolean deleteSource){
+        if(songs == null || songs.size() == 0)
+            return 0;
+
+        //删除之前保存的所有移除歌曲id
+        Set<String> deleteId = new HashSet<>(SPUtil.getStringSet(mContext,"Setting","DeleteID"));
+        //保存到sp
+        for(Song temp : songs){
+            deleteId.add(temp.getId() + "");
+        }
+        SPUtil.putStringSet(mContext, "Setting", "DeleteID", deleteId);
+        mContext.getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
+        //删除源文件
+        if(deleteSource)
+            deleteSource(songs);
+
+        return songs.size();
+    }
+
+//    /**
+//     * 删除歌曲
+//     * @param data 删除参数 包括歌曲路径、专辑id、艺术家id、播放列表id、文件夹索引
+//     * @param type 删除类型 包括单个歌曲、专辑、艺术家、文件夹、播放列表
+//     * @return 是否删除成功
+//     */
+//    public static int delete(int data, int type) {
+//        int deleteNum = 0;
+//        //删除之前保存的所有移除歌曲id
+//        Set<String> deleteId = new HashSet<>(SPUtil.getStringSet(mContext,"Setting","DeleteID"));
+//        //待删除的id
+//        List<Integer> wangToDelete = new ArrayList<>();
+//
+//        //一.添加到黑名单
+//        Cursor cursor = null;
+//        //拼接参数
+//        switch (type) {
+//            case Constants.SONG:
+//                deleteNum = 1;
+//                wangToDelete.add(data);
+//                break;
+//            case Constants.ALBUM:
+//            case Constants.ARTIST:
+//                String where;
+//                String[] arg;
+//                if(type == Constants.ALBUM) {
+//                    where = MediaStore.Audio.Media.ALBUM_ID + "=?";
+//                    arg = new String[]{data + ""};
+//                } else {
+//                    where = MediaStore.Audio.Media.ARTIST_ID + "=?";
+//                    arg = new String[]{data + ""};
+//                }
+//                try {
+//                    cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,new String[]{MediaStore.Audio.Media._ID},where,arg,null);
+//                    if(cursor != null && cursor.getCount() > 0){
+//                        while (cursor.moveToNext()){
+//                            wangToDelete.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
+//                        }
+//                        deleteNum = cursor.getCount();
+//                    }
+//                } finally {
+//                    if(cursor != null && !cursor.isClosed())
+//                        cursor.close();
+//                }
+//                break;
+//            case Constants.FOLDER:
+//                try {
+//                    String folderName = Util.getMapkeyByPosition(Global.FolderMap,data);
+//                    if(Global.FolderMap.get(folderName) != null){
+//                        wangToDelete.addAll(Global.FolderMap.get(folderName));
+//                        deleteNum = Global.FolderMap.get(folderName).size();
+//                    }
+//                } catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//                break;
+//        }
+//        //保存到sp
+//        for(Integer temp : wangToDelete){
+//            deleteId.add(temp + "");
+//        }
+//
+//        SPUtil.putStringSet(mContext, "Setting", "DeleteID", deleteId);
+//        mContext.getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
+//
+//        //二.删除源文件
+//        if(SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.DELETE_SOURCE,false))
+//        deleteSource(wangToDelete);
+//        return deleteNum;
+//
+//    }
+
+//    /**
+//     * 删除源文件
+//     * @param ids
+//     */
+//    public static void deleteSource(List<Integer> ids){
+//        if(ids == null || ids.size() == 0)
+//            return;
+//        Cursor cursor = null;
+//        try {
+//            StringBuilder selection = new StringBuilder(127);
+//            for(int i = 0 ; i < ids.size();i++){
+//                selection.append(MediaStore.Audio.Media._ID).append("=").append(ids.get(i)).append(i != ids.size() - 1 ? " and " : " ");
+//            }
+//            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,new String[]{MediaStore.Audio.Media.DATA},selection.toString(),null,null);
+//            if(cursor != null && cursor.getCount() > 0){
+//                while (cursor.moveToNext()){
+//                    Util.deleteFileSafely(new File(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))));
+//                }
+//            }
+//        } finally {
+//            if(cursor != null && !cursor.isClosed())
+//                cursor.close();
+//        }
+//    }
+
+    /**
+     * 删除源文件
+     * @param songs
+     */
+    public static void deleteSource(List<Song> songs){
+        if(songs == null || songs.size() == 0)
+            return;
+
+        for(Song song : songs){
+            Util.deleteFileSafely(new File(song.getUrl()));
+        }
     }
 
     /**

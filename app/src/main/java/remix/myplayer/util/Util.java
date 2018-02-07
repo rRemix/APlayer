@@ -166,8 +166,7 @@ public class Util {
         if (file != null) {
             String tmpPath = file.getParent() + File.separator + System.currentTimeMillis();
             File tmp = new File(tmpPath);
-            file.renameTo(tmp);
-            return tmp.delete();
+            return file.renameTo(tmp) && tmp.delete();
         }
         return false;
     }
