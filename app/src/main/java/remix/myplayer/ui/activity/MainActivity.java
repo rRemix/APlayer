@@ -138,6 +138,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Util.unregisterReceiver(mContext,mLoadReceiver);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -579,10 +585,13 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
+    private static boolean LOAD_COMPLETE = false;
     private class LoadFinishReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent receive) {
-            unregisterReceiver(mLoadReceiver);
+            if(LOAD_COMPLETE)
+                return;
+            LOAD_COMPLETE = true;
             String action = receive != null ? receive.getAction() : "";
             if(ACTION_LOAD_FINISH.equals(action)){
                 setUpBottomBar();

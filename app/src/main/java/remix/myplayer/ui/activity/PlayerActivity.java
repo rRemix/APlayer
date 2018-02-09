@@ -395,7 +395,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mIsBacking = true;
 
             //更新动画控件封面 保证退场动画的封面与fragment中封面一致
-            ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(mUri);
+            ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(mUri == null ? Uri.EMPTY : mUri);
             DraweeController controller = Fresco.newDraweeControllerBuilder()
                     .setImageRequest(imageRequestBuilder.build())
                     .setOldController(mAnimCover.getController())
