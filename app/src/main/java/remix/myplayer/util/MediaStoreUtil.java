@@ -807,7 +807,7 @@ public class MediaStoreUtil {
                 List<Integer> ids = Global.FolderMap.get(folderName);
                 StringBuilder selection = new StringBuilder(127);
                 for(int i = 0 ; i < ids.size();i++){
-                    selection.append(MediaStore.Audio.Media._ID).append("=").append(ids.get(i)).append(i != ids.size() - 1 ? " and " : " ");
+                    selection.append(MediaStore.Audio.Media._ID).append(" = ").append(ids.get(i)).append(i != ids.size() - 1 ? " or " : " ");
                 }
                 where = selection.toString();
                 arg = null;
