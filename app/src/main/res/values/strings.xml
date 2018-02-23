@@ -274,5 +274,6 @@
     <string name="add_to_next_song">已添加至下一首播放</string>
     <string name="immersive">沉浸式状态栏</string>
     <string name="immersive_tip">开启后状态栏与背景颜色一致</string>
-
+    <string name="delete_source">删除歌曲</string>
+    <string name="delete_source_tip">开启后从曲库移除的同时会删除源文件</string>
 </resources>

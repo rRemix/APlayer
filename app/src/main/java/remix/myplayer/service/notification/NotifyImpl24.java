@@ -63,7 +63,7 @@ public class NotifyImpl24 extends Notify{
         deleteIntent.putExtra("Close", true);
         deleteIntent.putExtra("FromImpl24",true);
 
-        mNotification = new NotificationCompat.Builder(mService, PLAYING_NOTIFICATION_CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(mService, PLAYING_NOTIFICATION_CHANNEL_ID)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.notifbar_icon)
                 .addAction(R.drawable.ic_skip_previous_black_24dp, mService.getString(R.string.previous),
@@ -85,7 +85,7 @@ public class NotifyImpl24 extends Notify{
                 .build();
         if(mIsStop)
             return;
-        pushNotify();
+        pushNotify(notification);
     }
 
     private Intent getControlIntent(int control){

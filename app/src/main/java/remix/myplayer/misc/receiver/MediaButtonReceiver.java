@@ -1,4 +1,4 @@
-package remix.myplayer.receiver;
+package remix.myplayer.misc.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

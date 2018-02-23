@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
@@ -23,18 +24,15 @@ public abstract class Notify {
     MusicService mService;
     private NotificationManager mNotificationManager;
 
-    private static final int IDLE_DELAY = 5 * 60 * 1000;
-    private long mLastPlayedTime;
-    private int mNotifyMode = NOTIFY_MODE_NONE;
-    protected long mNotificationPostTime = 0;
-    private static final int NOTIFY_MODE_NONE = 0;
+    private int mNotifyMode = NOTIFY_MODE_BACKGROUND;
+
     private static final int NOTIFY_MODE_FOREGROUND = 1;
     private static final int NOTIFY_MODE_BACKGROUND = 2;
 
     static final String PLAYING_NOTIFICATION_CHANNEL_ID = "playing_notification";
     private static final int PLAYING_NOTIFICATION_ID = 1;
 
-    Notification mNotification;
+//    Notification mNotification;
     boolean mIsStop;
 
     Notify(MusicService context){
@@ -61,32 +59,25 @@ public abstract class Notify {
 
     public abstract void updateForPlaying();
 
-    void pushNotify() {
+    void pushNotify(Notification notification) {
         final int newNotifyMode;
         if (MusicService.isPlay()) {
             newNotifyMode = NOTIFY_MODE_FOREGROUND;
-        } else if (recentlyPlayed()) {
+        } else{
             newNotifyMode = NOTIFY_MODE_BACKGROUND;
-        } else {
-            newNotifyMode = NOTIFY_MODE_NONE;
         }
 
-        mNotificationManager.notify(PLAYING_NOTIFICATION_ID, mNotification);
-        if (mNotifyMode != newNotifyMode) {
-            if (mNotifyMode == NOTIFY_MODE_FOREGROUND) {
-                mService.stopForeground(newNotifyMode == NOTIFY_MODE_NONE);
-            } else if (newNotifyMode == NOTIFY_MODE_NONE) {
-                mNotificationManager.cancel(PLAYING_NOTIFICATION_ID);
-            }
+        if (mNotifyMode != newNotifyMode && newNotifyMode == NOTIFY_MODE_BACKGROUND) {
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+                mService.stopForeground(false);
         }
+        Log.d("APlayerPlayingNotify","OriginalMode: " + mNotifyMode + " newMode:" + newNotifyMode);
         if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
-            mService.startForeground(PLAYING_NOTIFICATION_ID, mNotification);
-        } else if (newNotifyMode == NOTIFY_MODE_BACKGROUND) {
-            mNotificationManager.notify(PLAYING_NOTIFICATION_ID, mNotification);
+            mService.startForeground(PLAYING_NOTIFICATION_ID, notification);
+        } else  {
+            mNotificationManager.notify(PLAYING_NOTIFICATION_ID, notification);
         }
 
-        //记录最后一次播放的时间
-        mLastPlayedTime = System.currentTimeMillis();
         mNotifyMode = newNotifyMode;
         Global.setNotifyShowing(true);
     }
@@ -98,20 +89,9 @@ public abstract class Notify {
         mService.stopForeground(true);
         mNotificationManager.cancel(PLAYING_NOTIFICATION_ID);
         mIsStop = true;
-        mNotifyMode = NOTIFY_MODE_NONE;
+//        mNotifyMode = NOTIFY_MODE_NONE;
     }
 
-//    public void cancelAll(){
-//        cancelPlayingNotify();
-//        mNotificationManager.cancelAll();
-//    }
-
-    /**
-     * @return 最近是否在播放
-     */
-    private boolean recentlyPlayed() {
-        return MusicService.isPlay() || System.currentTimeMillis() - mLastPlayedTime < IDLE_DELAY;
-    }
 
     PendingIntent getContentIntent(){
         Intent result = new Intent(mService,PlayerActivity.class);

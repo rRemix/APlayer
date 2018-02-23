@@ -57,7 +57,7 @@ import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
-import remix.myplayer.receiver.HeadsetPlugReceiver;
+import remix.myplayer.misc.receiver.HeadsetPlugReceiver;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.network.RemoteUriRequest;
 import remix.myplayer.service.notification.Notify;

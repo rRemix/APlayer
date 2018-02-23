@@ -215,7 +215,7 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!--线控-->
-        <receiver android:name=".receiver.MediaButtonReceiver">
+        <receiver android:name=".misc.receiver.MediaButtonReceiver">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
@@ -225,7 +225,7 @@
                 <!--<action android:name="remix.music.NOTIFY" />-->
             <!--</intent-filter>-->
         <!--</receiver>-->
-        <receiver android:name=".receiver.ExitReceiver">
+        <receiver android:name=".misc.receiver.ExitReceiver">
             <intent-filter>
                 <action android:name="remix.music.EXIT" />
             </intent-filter>

@@ -1,5 +1,6 @@
 package remix.myplayer.service.notification;
 
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -41,7 +42,7 @@ public class NotifyImpl extends Notify {
         boolean isPlay = MusicService.isPlay();
 
         buildAction(mService);
-        buildNotification(mService);
+        Notification notification = buildNotification(mService);
 
         if((MusicService.getCurrentMP3() != null)) {
             boolean isSystemColor = SPUtil.getValue(mService,"Setting","IsSystemColor",true);
@@ -80,7 +81,7 @@ public class NotifyImpl extends Notify {
                 public void onError(String errMsg) {
                     mRemoteBigView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
                     mRemoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
-                    pushNotify();
+                    pushNotify(notification);
                 }
 
                 @Override
@@ -97,7 +98,7 @@ public class NotifyImpl extends Notify {
                     } catch (Exception e){
                         Util.uploadException("PushNotify Error",e);
                     } finally {
-                        pushNotify();
+                        pushNotify(notification);
                     }
                 }
 
@@ -105,26 +106,20 @@ public class NotifyImpl extends Notify {
         }
     }
 
-    private void buildNotification(Context context) {
+    private Notification buildNotification(Context context) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, PLAYING_NOTIFICATION_CHANNEL_ID);
-        if(mNotification == null){
-            builder.setContent(mRemoteView)
-                    .setCustomBigContentView(mRemoteBigView)
-                    .setContentText("")
-                    .setContentTitle("")
-                    .setShowWhen(false)
-                    .setPriority(NotificationCompat.PRIORITY_MAX)
-                    .setOngoing(MusicService.isPlay())
-                    .setContentIntent(getContentIntent())
-                    .setSmallIcon(R.drawable.notifbar_icon);
-            builder.setCustomBigContentView(mRemoteBigView);
-            builder.setCustomContentView(mRemoteView);
-
-            mNotification = builder.build();
-        } else {
-            mNotification.bigContentView = mRemoteBigView;
-            mNotification.contentView = mRemoteView;
-        }
+        builder.setContent(mRemoteView)
+                .setCustomBigContentView(mRemoteBigView)
+                .setContentText("")
+                .setContentTitle("")
+                .setShowWhen(false)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setOngoing(MusicService.isPlay())
+                .setContentIntent(getContentIntent())
+                .setSmallIcon(R.drawable.notifbar_icon);
+        builder.setCustomBigContentView(mRemoteBigView);
+        builder.setCustomContentView(mRemoteView);
+        return builder.build();
     }
 
     private void buildAction(Context context) {
