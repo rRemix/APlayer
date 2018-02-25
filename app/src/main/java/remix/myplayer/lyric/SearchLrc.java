@@ -21,6 +21,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -132,9 +133,43 @@ public class SearchLrc {
                 });
         //本地歌词
         Observable<List<LrcRow>> localObservable = Observable.create(e -> {
-            String localPath = getLocalLrcPath();
-            if(!TextUtils.isEmpty(localPath)){
-                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))),true, mSong.getTitle(),mSong.getArtist()));
+            List<String> localPaths = getAllLocalLrcPath();
+            if(localPaths.size()>0) {
+                if(localPaths.size()==1) {
+                    String localPath = localPaths.get(0);
+                    e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist()));
+                }else{
+                    String localPath = localPaths.get(0);
+                    String translatePath=null;
+                    for (String path : localPaths) {
+                        if(path.contains("translate")&&!path.equals(localPath)){
+                            translatePath=path;
+                            break;
+                        }
+                    }
+                    if(translatePath==null){
+                        e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist()));
+                    }else{
+                        List<LrcRow> source = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist());
+                        List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(translatePath))),false,mSong.getTitle(),mSong.getArtist() + "/translate");
+                        if(translate != null && translate.size() > 0) {
+                            int j = 0;
+                            for (int i = 0; i < source.size(); ) {
+                                boolean match = Math.abs(translate.get(j).getTime() - source.get(i).getTime()) < 1000;
+                                if (match) {
+                                    source.get(i).setTranslate(translate.get(j).getContent());
+                                    i++;
+                                } else if(translate.get(j).getTime()>source.get(i).getTime()){
+                                    i++;
+                                } else {
+                                    j++;
+                                }
+                            }
+                            mLrcParser.saveLrcRows(source,mKey);
+                            e.onNext(source);
+                        }
+                    }
+                }
             }
             e.onComplete();
         });
@@ -344,6 +379,53 @@ public class SearchLrc {
         }
 
         return "";
+    }
+
+    private List<String> getAllLocalLrcPath() {
+        List<String> results = new ArrayList<>();
+        //查找本地目录
+        String searchPath = SPUtil.getValue(APlayerApplication.getContext(), "Setting", "LrcSearchPath", "");
+        if (mSong == null)
+            return results;
+        if (!TextUtils.isEmpty(searchPath)) {
+            //已设置歌词路径
+            Util.searchFile(mDisplayName, mSong.getTitle(), mSong.getArtist(), new File(searchPath));
+            if (!TextUtils.isEmpty(Global.CurrentLrcPath)) {
+                results.add(Global.CurrentLrcPath);
+                return results;
+            }
+        } else {
+            //没有设置歌词路径 搜索所有歌词文件
+            Cursor filesCursor = null;
+            try {
+                filesCursor = APlayerApplication.getContext().getContentResolver().
+                        query(MediaStore.Files.getContentUri("external"),
+                                null,
+                                MediaStore.Files.FileColumns.DATA + " like ? or " +
+                                        MediaStore.Files.FileColumns.DATA + " like ? or " +
+                                        MediaStore.Files.FileColumns.DATA + " like ? ",
+                                new String[]{"%lyric%", "%Lyric%", "%.lrc%"},
+                                null);
+                if (filesCursor == null || !(filesCursor.getCount() > 0))
+                    return results;
+                while (filesCursor.moveToNext()) {
+                    File file = new File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
+                    if (file.exists() && file.isFile() && file.canRead()) {
+                        if (Util.isRightLrc(file, mDisplayName, mSong.getTitle(), mSong.getArtist())) {
+                            results.add(file.getAbsolutePath());
+                        }
+                    }
+                }
+                return results;
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (filesCursor != null && !filesCursor.isClosed())
+                    filesCursor.close();
+            }
+        }
+
+        return results;
     }
 
 }
