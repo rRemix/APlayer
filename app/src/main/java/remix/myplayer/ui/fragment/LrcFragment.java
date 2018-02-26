@@ -97,7 +97,7 @@ public class LrcFragment extends BaseFragment {
                         mLrcView.setLrcRows(mLrcList);
                     }
                 }, throwable -> {
-                    if (mLrcView.getTag() != null && (int) mLrcView.getTag() == mInfo.getId()) {
+                    if (id == mInfo.getId()) {
                         mLrcList = new ArrayList<>();
                         mLrcView.setText(getString(R.string.no_lrc));
                     }
