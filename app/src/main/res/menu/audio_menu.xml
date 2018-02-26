@@ -17,7 +17,7 @@
             android:title="@string/collect"/>
         <!--<item android:title="音量调节"-->
             <!--android:id="@+id/menu_vol"/>-->
-        <!--<item android:title="删除"-->
-            <!--android:id="@+id/menu_delete"/>-->
+        <item android:title="@string/delete"
+            android:id="@+id/menu_delete"/>
     </group>
 </menu>

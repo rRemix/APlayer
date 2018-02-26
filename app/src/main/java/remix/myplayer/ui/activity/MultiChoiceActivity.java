@@ -24,6 +24,8 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.SPUtil;
 
+import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
+
 /**
  * @ClassName
  * @Description
@@ -69,12 +71,13 @@ public class MultiChoiceActivity extends ToolbarActivity{
                                     .buttonRippleColor(ThemeStore.getRippleColor())
                                     .positiveText(R.string.confirm)
                                     .negativeText(R.string.cancel)
-                                    .onPositive((dialog, which) -> {
-                                        MobclickAgent.onEvent(MultiChoiceActivity.this,"Delete");
-                                        if(mMultiChoice != null)
-                                            mMultiChoice.OnDelete();
-                                    })
-                                    .onNegative((dialog, which) -> {
+                                    .checkBoxPromptRes(R.string.delete_source, false, null)
+                                    .onAny((dialog, which) -> {
+                                        if(which == POSITIVE){
+                                            MobclickAgent.onEvent(mContext,"Delete");
+                                            if(mMultiChoice != null)
+                                                mMultiChoice.OnDelete(dialog.isPromptCheckBoxChecked());
+                                        }
                                     })
                                     .backgroundColorAttr(R.attr.background_color_3)
                                     .positiveColorAttr(R.attr.text_color_primary)

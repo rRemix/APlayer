@@ -38,6 +38,8 @@ import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
+import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
+
 /**
  * @ClassName AudioPopupListener
  * @Description
@@ -267,21 +269,24 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         .content(R.string.confirm_delete_from_library)
                         .positiveText(R.string.confirm)
                         .negativeText(R.string.cancel)
-                        .onPositive((dialog, which) -> {
-                            if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0){
-                                if(PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)){
-                                    ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
-                                    //移除的是正在播放的歌曲
-                                    if(MusicService.getCurrentMP3() == null)
-                                        return;
-                                    if(mInfo.getId() == MusicService.getCurrentMP3().getId() && Global.PlayQueue.size() >= 2){
-                                        Intent intent = new Intent(MusicService.ACTION_CMD);
-                                        intent.putExtra("Control", Constants.NEXT);
-                                        mContext.sendBroadcast(intent);
+                        .checkBoxPromptRes(R.string.delete_source, false, null)
+                        .onAny((dialog, which) -> {
+                            if(which == POSITIVE){
+                                if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG,dialog.isPromptCheckBoxChecked()) > 0){
+                                    if(PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)){
+                                        ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
+                                        //移除的是正在播放的歌曲
+                                        if(MusicService.getCurrentMP3() == null)
+                                            return;
+                                        if(mInfo.getId() == MusicService.getCurrentMP3().getId() && Global.PlayQueue.size() >= 2){
+                                            Intent intent = new Intent(MusicService.ACTION_CMD);
+                                            intent.putExtra("Control", Constants.NEXT);
+                                            mContext.sendBroadcast(intent);
+                                        }
                                     }
+                                } else {
+                                    ToastUtil.show(mContext, mContext.getString(R.string.delete_error));
                                 }
-                            } else {
-                                ToastUtil.show(mContext, mContext.getString(R.string.delete_error));
                             }
                         })
                         .backgroundColorAttr(R.attr.background_color_3)

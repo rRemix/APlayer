@@ -23,6 +23,8 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 
+import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
+
 /**
  * Created by taeja on 16-1-25.
  */
@@ -73,18 +75,20 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                         .buttonRippleColor(ThemeStore.getRippleColor())
                         .positiveText(R.string.confirm)
                         .negativeText(R.string.cancel)
-                        .onPositive((dialog, which) -> {
-                            MobclickAgent.onEvent(mContext,"Delete");
-                            if(mId == Global.MyLoveID && mType == Constants.PLAYLIST){
-                                ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delete));
+                        .checkBoxPromptRes(R.string.delete_source, false, null)
+                        .onAny((dialog, which) -> {
+                            if(which == POSITIVE){
+                                MobclickAgent.onEvent(mContext,"Delete");
+                                MobclickAgent.onEvent(mContext,"Delete");
+                                if(mId == Global.MyLoveID && mType == Constants.PLAYLIST){
+                                    ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delete));
+                                }
+                                if(mType != Constants.PLAYLIST){
+                                    ToastUtil.show(mContext,MediaStoreUtil.delete(mId , mType,dialog.isPromptCheckBoxChecked()) > 0 ? R.string.delete_success : R.string.delete_error);
+                                } else {
+                                    ToastUtil.show(mContext,PlayListUtil.deletePlayList(mId) ? R.string.delete_success : R.string.delete_error);
+                                }
                             }
-                            if(mType != Constants.PLAYLIST){
-                                ToastUtil.show(mContext,MediaStoreUtil.delete(mId , mType) > 0 ? R.string.delete_success : R.string.delete_error);
-                            } else {
-                                ToastUtil.show(mContext,PlayListUtil.deletePlayList(mId) ? R.string.delete_success : R.string.delete_error);
-                            }
-                        })
-                        .onNegative((dialog, which) -> {
                         })
                         .backgroundColorAttr(R.attr.background_color_3)
                         .positiveColorAttr(R.attr.text_color_primary)

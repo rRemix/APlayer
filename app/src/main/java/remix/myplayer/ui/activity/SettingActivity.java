@@ -95,8 +95,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     TextView mLockScreenTip;
     @BindView(R.id.setting_immersive_switch)
     SwitchCompat mImmersiveSwitch;
-    @BindView(R.id.setting_delete_switch)
-    SwitchCompat mDeleteSwitch;
 
     //是否需要重建activity
     private boolean mNeedRecreate = false;
@@ -133,10 +131,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         //导航栏是否变色 是否启用摇一摇切歌
         final String[] keyWord = new String[]{SPUtil.SPKEY.COLOR_NAVIGATION, SPUtil.SPKEY.SHAKE, SPUtil.SPKEY.ONLINE_LYRIC_FIRST,
-                SPUtil.SPKEY.FLOAT_LYRIC, SPUtil.SPKEY.SCREEN_ALWAYS_ON,SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC, SPUtil.SPKEY.IMMERSIVE_MODE,
-                SPUtil.SPKEY.DELETE_SOURCE};
+                SPUtil.SPKEY.FLOAT_LYRIC, SPUtil.SPKEY.SCREEN_ALWAYS_ON,SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC, SPUtil.SPKEY.IMMERSIVE_MODE};
         ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch,mFloatLrcSwitch,
-                mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch,mDeleteSwitch}, new ButterKnife.Action<SwitchCompat>() {
+                mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
                 view.setChecked(SPUtil.getValue(mContext,"Setting",keyWord[index],false));
@@ -199,10 +196,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 ThemeStore.IMMERSIVE_MODE = view.isChecked();
                                 mNeedRecreate = true;
                                 mHandler.sendEmptyMessage(RECREATE);
-                                break;
-                            //移除时同时删除源文件
-                            case R.id.setting_delete_switch:
-
                                 break;
                         }
                         SPUtil.putValue(SettingActivity.this,"Setting",keyWord[index],isChecked);
@@ -297,8 +290,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
             R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container,
             R.id.setting_screen_container,R.id.setting_scan_container,R.id.setting_classic_notify_container,
-            R.id.setting_album_cover_container,R.id.setting_library_category_container,R.id.setting_immersive_container,
-            R.id.setting_delete_container})
+            R.id.setting_album_cover_container,R.id.setting_library_category_container,R.id.setting_immersive_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -583,10 +575,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             //沉浸式状态栏
             case R.id.setting_immersive_container:
                 mImmersiveSwitch.setChecked(!mImmersiveSwitch.isChecked());
-                break;
-            //移除时同时删除源文件
-            case R.id.setting_delete_container:
-                mDeleteSwitch.setChecked(!mDeleteSwitch.isChecked());
                 break;
         }
     }
