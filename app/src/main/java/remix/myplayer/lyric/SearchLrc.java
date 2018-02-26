@@ -177,24 +177,39 @@ public class SearchLrc {
         boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting", SPUtil.SPKEY.ONLINE_LYRIC_FIRST,false);
         Observable<List<LrcRow>> last = Observable.concat(onlineFirst ? neteaseObservable : localObservable ,onlineFirst ? localObservable : neteaseObservable).firstOrError().toObservable();
 
-        return Observable.create((ObservableOnSubscribe<List<LrcRow>>) e -> {
-            //手动设置的歌词
-            if(!TextUtils.isEmpty(manualPath)){
-                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(manualPath))),true, mSong.getTitle(),mSong.getArtist()));
-            }
-            e.onComplete();
-        }).switchIfEmpty(Observable.create(e -> {
-            //缓存
-            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(Util.hashKeyForDisk(mKey));
-            if(snapShot != null){
-                BufferedReader br = new BufferedReader(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))));
-                e.onNext(new Gson().fromJson(br.readLine(),new TypeToken<List<LrcRow>>(){}.getType()));
-                snapShot.close();
-                br.close();
-//                e.onNext(lrcParser.getLrcRows(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))),false, mInfo.getTitle(),mInfo.getArtist()));
-            }
-            e.onComplete();
-        })).switchIfEmpty(last).compose(RxUtil.applyScheduler());
+        return Observable.just(SPUtil.getStringSet(APlayerApplication.getContext(),"Setting","IgnoreLrcID"))
+                .flatMap(ignoreLrcId -> Observable.create((ObservableOnSubscribe<List<LrcRow>>) e -> {
+                    boolean ignore = false;
+                    if(ignoreLrcId != null && ignoreLrcId.size() > 0){
+                        for (String id : ignoreLrcId){
+                            if((mSong.getId() + "").equals(id)){
+                                ignore = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(ignore)
+                        e.onError(new Throwable("已忽略歌词"));
+                    else
+                        e.onComplete();
+                }).switchIfEmpty(Observable.create((ObservableOnSubscribe<List<LrcRow>>) e -> {
+                    //手动设置的歌词
+                    if(!TextUtils.isEmpty(manualPath)){
+                        e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(manualPath))),true, mSong.getTitle(),mSong.getArtist()));
+                    }
+                    e.onComplete();
+                }).switchIfEmpty(Observable.create(e -> {
+                    //缓存
+                    DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(Util.hashKeyForDisk(mKey));
+                    if(snapShot != null){
+                        BufferedReader br = new BufferedReader(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))));
+                        e.onNext(new Gson().fromJson(br.readLine(),new TypeToken<List<LrcRow>>(){}.getType()));
+                        snapShot.close();
+                        br.close();
+                    }
+                    e.onComplete();
+                })).switchIfEmpty(last).compose(RxUtil.applyScheduler())));
+
     }
 
     /**
