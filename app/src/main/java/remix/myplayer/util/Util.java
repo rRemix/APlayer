@@ -469,7 +469,7 @@ public class Util {
             String fileName = file.getName().indexOf('.') > 0 ?
                     file.getName().substring(0,file.getName().lastIndexOf('.')) : file.getName();
             //判断歌词文件名与歌曲文件名是否一致
-            if(fileName.toUpperCase().equals(displayName.toUpperCase())) {
+            if(fileName.toUpperCase().startsWith(displayName.toUpperCase())) {
                 return true;
             }
             //判断是否包含歌手名和歌曲名
