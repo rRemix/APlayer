@@ -134,7 +134,7 @@ public class LrcRow implements Comparable<LrcRow>{
 		String[] timesArray = times.split("-");
 		List<LrcRow> lrcRows = new ArrayList<>();
 		for (String tem : timesArray) {
-			if(TextUtils.isEmpty(tem.trim())){
+			if(TextUtils.isEmpty(tem.trim())||TextUtils.isEmpty(content)){
 				continue;
 			}
 			try{
