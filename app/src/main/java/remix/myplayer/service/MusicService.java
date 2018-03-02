@@ -1731,7 +1731,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                         pause(false);
                     }
                     break;
-
             }
             //通知更新ui
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
@@ -1741,9 +1740,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /**
      * 记录在一秒中线控按下的次数
      */
-    private static int mHeadSetHookCount = 0;
     private class SessionCallBack extends MediaSessionCompat.Callback{
         private HeadSetRunnable mHeadsetRunnable;
+        private int mHeadSetHookCount = 0;
         @Override
         public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
             if(mediaButtonEvent == null)
@@ -1761,9 +1760,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             int keyCode = event.getKeyCode();
             if(keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ||
                     keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ||
-                    keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
-                intent.putExtra("Control", keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.TOGGLE :
-                        keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Constants.NEXT : Constants.PREV);
+                    keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY || keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
+                intent.putExtra("Control",
+                        keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE  || keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY ?
+                                Constants.TOGGLE :
+                                keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Constants.NEXT : Constants.PREV);
                 mContext.sendBroadcast(intent);
                 return true;
             }
