@@ -1702,34 +1702,36 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         private boolean mNeedContinue = false;
         @Override
         public void onAudioFocusChange(int focusChange) {
-            //获得AudioFocus
-            if(focusChange == AudioManager.AUDIOFOCUS_GAIN){
-                mAudioFocus = true;
-                if(mMediaPlayer == null)
-                    init();
-                else if(mNeedContinue){
-                    play();
-                    mNeedContinue = false;
-                    Global.setOperation(Constants.TOGGLE);
-                }
-                mMediaPlayer.setVolume(1.0f,1.0f);
-            }
-            //暂停播放
-            if(focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ||
-                    focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK){
-                mNeedContinue = mIsplay;
-                if(mIsplay && mMediaPlayer != null){
-                    Global.setOperation(Constants.TOGGLE);
-                    pause(false);
-                }
-            }
-            //失去audiofocus 暂停播放
-            if(focusChange == AudioManager.AUDIOFOCUS_LOSS){
-                mAudioFocus = false;
-                if(mIsplay && mMediaPlayer != null) {
-                    Global.setOperation(Constants.TOGGLE);
-                    pause(false);
-                }
+            switch (focusChange){
+                case AudioManager.AUDIOFOCUS_GAIN://获得AudioFocus
+                    mAudioFocus = true;
+                    if(mMediaPlayer == null)
+                        init();
+                    else if(mNeedContinue){
+                        play();
+                        mNeedContinue = false;
+                        Global.setOperation(Constants.TOGGLE);
+                    }
+                    mMediaPlayer.setVolume(1,1);
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT://短暂暂停
+                    mNeedContinue = mIsplay;
+                    if(mIsplay && mMediaPlayer != null){
+                        Global.setOperation(Constants.TOGGLE);
+                        pause(false);
+                    }
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK://减小音量
+                    mMediaPlayer.setVolume(.1f,.1f);
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS://暂停
+                    mAudioFocus = false;
+                    if(mIsplay && mMediaPlayer != null) {
+                        Global.setOperation(Constants.TOGGLE);
+                        pause(false);
+                    }
+                    break;
+
             }
             //通知更新ui
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
