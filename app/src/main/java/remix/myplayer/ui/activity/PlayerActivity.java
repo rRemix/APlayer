@@ -50,6 +50,7 @@ import com.umeng.analytics.MobclickAgent;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import butterknife.BindView;
@@ -783,8 +784,19 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 }
                 @Override
                 public void onLongClick() {
+                    //如果之前忽略过该歌曲的歌词，取消忽略
+                    final Set<String> ignoreLrcID = new HashSet<>(SPUtil.getStringSet(mContext, "Setting", "IgnoreLrcID"));
+                    final boolean[] alreadyIgnore = new boolean[1];
+                    if(ignoreLrcID.size() > 0){
+                        for (String id : ignoreLrcID){
+                            if((mInfo.getId() + "").equals(id)){
+                                alreadyIgnore[0] = true;
+                                break;
+                            }
+                        }
+                    }
                     new MaterialDialog.Builder(mContext)
-                            .items(getString(R.string.ignore_lrc), getString(R.string.select_lrc))
+                            .items(getString(!alreadyIgnore[0] ? R.string.ignore_lrc : R.string.cancel_ignore_lrc), getString(R.string.select_lrc))
                             .itemsColorAttr(R.attr.text_color_primary)
                             .backgroundColorAttr(R.attr.background_color_3)
                             .itemsCallback((dialog, itemView, position, text) -> {
@@ -796,16 +808,28 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                                                 .negativeColorAttr(R.attr.text_color_primary)
                                                 .positiveText(R.string.confirm)
                                                 .positiveColorAttr(R.attr.text_color_primary)
-                                                .title(R.string.confirm_ignore_lrc)
+                                                .title(!alreadyIgnore[0] ? R.string.confirm_ignore_lrc : R.string.confirm_cancel_ignore_lrc)
                                                 .titleColorAttr(R.attr.text_color_primary)
                                                 .backgroundColorAttr(R.attr.background_color_3)
                                                 .onPositive((dialog1, which) -> {
-                                                    Set<String> ignoreLrcID = SPUtil.getStringSet(mContext, "Setting", "IgnoreLrcID");
-                                                    if (mInfo != null && ignoreLrcID != null) {
-                                                        ignoreLrcID.add(mInfo.getId() + "");
-                                                        SPUtil.putStringSet(mContext, "Setting", "IgnoreLrcID", ignoreLrcID);
+                                                    if(!alreadyIgnore[0]){//忽略
+                                                        if (mInfo != null) {
+                                                            ignoreLrcID.add(mInfo.getId() + "");
+                                                            SPUtil.putStringSet(mContext, "Setting", "IgnoreLrcID", ignoreLrcID);
+                                                            lrcFragment.updateLrc(mInfo);
+                                                        }
+                                                    } else {//取消忽略
+                                                        if(ignoreLrcID.size() > 0){
+                                                            for (String id : ignoreLrcID){
+                                                                if((mInfo.getId() + "").equals(id)){
+                                                                    ignoreLrcID.remove(mInfo.getId() + "");
+                                                                    SPUtil.putStringSet(mContext,"Setting","IgnoreLrcID",ignoreLrcID);
+                                                                }
+                                                            }
+                                                        }
                                                         lrcFragment.updateLrc(mInfo);
                                                     }
+
                                                 })
                                                 .show();
                                         break;
