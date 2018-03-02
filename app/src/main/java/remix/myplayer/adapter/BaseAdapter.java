@@ -23,13 +23,10 @@ import remix.myplayer.interfaces.OnItemClickListener;
 public abstract class BaseAdapter<D,T extends BaseViewHolder> extends RecyclerView.Adapter<T> {
     protected Context mContext;
     protected OnItemClickListener mOnItemClickLitener;
-    protected List<D> mDatas;
-    protected int mLayoutId;
-    protected Constructor mConstructor;
+    List<D> mDatas;
+    private int mLayoutId;
+    private Constructor mConstructor;
 
-    public BaseAdapter(Context Context) {
-        this.mContext = Context;
-    }
 
     public BaseAdapter(Context context,int layoutId){
         this.mContext = context;
@@ -62,6 +59,7 @@ public abstract class BaseAdapter<D,T extends BaseViewHolder> extends RecyclerVi
 
     protected abstract void convert(final T holder, D d, final int position);
 
+    @SuppressWarnings("unchecked")
     @Override
     public T onCreateViewHolder(ViewGroup parent, int viewType) {
         try {

@@ -2,6 +2,8 @@ package remix.myplayer.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
+import remix.myplayer.adapter.LyricAdapter;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.lyric.LrcView;
@@ -31,6 +34,9 @@ public class LrcFragment extends BaseFragment {
     private Song mInfo;
     @BindView(R.id.lrc_view)
     LrcView mLrcView;
+    @BindView(R.id.lrc_recyclerview)
+    RecyclerView mLyricRecyclerView;
+    private LyricAdapter mLyricAdapter;
     //歌词
     private List<LrcRow> mLrcList;
 
@@ -55,6 +61,12 @@ public class LrcFragment extends BaseFragment {
         if(mOnFindListener != null)
             mOnFindListener.onViewInflateFinish(mLrcView);
         mInfo = getArguments().getParcelable("Song");
+
+        mLyricRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+
+        mLyricAdapter = new LyricAdapter(mContext,R.layout.item_lyric,mLyricRecyclerView);
+        mLyricRecyclerView.setAdapter(mLyricAdapter);
+
         return rootView;
     }
 
@@ -95,6 +107,9 @@ public class LrcFragment extends BaseFragment {
                             return;
                         }
                         mLrcView.setLrcRows(mLrcList);
+
+                        mLyricAdapter.setData(mLrcList);
+                        mLyricAdapter.notifyDataSetChanged();
                     }
                 }, throwable -> {
                     if (id == mInfo.getId()) {
