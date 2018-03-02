@@ -11,15 +11,14 @@
         android:layout_marginLeft="@dimen/d30_size"
         android:layout_marginRight="@dimen/d30_size"
         android:layout_marginTop="@dimen/d8_size"
-        android:textColor="@color/day_enable_text_color"
-        android:visibility="visible"/>
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/lrc_recyclerview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="@dimen/d30_size"
-        android:layout_marginRight="@dimen/d30_size"
-        android:layout_marginTop="@dimen/d8_size"
-        android:overScrollMode="never"
-        android:visibility="gone"/>
+        android:textColor="@color/day_enable_text_color"/>
+    <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:id="@+id/lrc_recyclerview"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_marginLeft="@dimen/d30_size"-->
+        <!--android:layout_marginRight="@dimen/d30_size"-->
+        <!--android:layout_marginTop="@dimen/d8_size"-->
+        <!--android:overScrollMode="never"-->
+        <!--android:visibility="gone"/>-->
 </LinearLayout>
