@@ -455,7 +455,7 @@ public class Util {
     public static boolean isRightLrc(File file,String displayName,String title,String artist){
         BufferedReader br = null;
         try {
-            if(file == null || !file.canRead())
+            if(file == null || !file.canRead() || !file.isFile())
                 return false;
             if(TextUtils.isEmpty(file.getAbsolutePath()) || TextUtils.isEmpty(displayName) ||
                     TextUtils.isEmpty(title) || TextUtils.isEmpty(artist))
@@ -469,7 +469,7 @@ public class Util {
             String fileName = file.getName().indexOf('.') > 0 ?
                     file.getName().substring(0,file.getName().lastIndexOf('.')) : file.getName();
             //判断歌词文件名与歌曲文件名是否一致
-            if(fileName.toUpperCase().equals(displayName.toUpperCase())) {
+            if(fileName.toUpperCase().startsWith(displayName.toUpperCase())) {
                 return true;
             }
             //判断是否包含歌手名和歌曲名

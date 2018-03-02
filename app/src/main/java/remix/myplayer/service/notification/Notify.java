@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
@@ -71,7 +70,6 @@ public abstract class Notify {
             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
                 mService.stopForeground(false);
         }
-        Log.d("APlayerPlayingNotify","OriginalMode: " + mNotifyMode + " newMode:" + newNotifyMode);
         if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
             mService.startForeground(PLAYING_NOTIFICATION_ID, notification);
         } else  {

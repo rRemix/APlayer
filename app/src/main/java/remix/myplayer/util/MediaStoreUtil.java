@@ -781,7 +781,7 @@ public class MediaStoreUtil {
      * @param type 删除类型 包括单个歌曲、专辑、艺术家、文件夹、播放列表
      * @return 是否歌曲数量
      */
-    public static int delete(int data, int type){
+    public static int delete(int data, int type,boolean deleteSource){
         List<Song> songs = new ArrayList<>();
         String where = null;
         String[] arg = null;
@@ -829,7 +829,7 @@ public class MediaStoreUtil {
                 cursor.close();
         }
 
-        return delete(songs,SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.DELETE_SOURCE,false));
+        return delete(songs,deleteSource);
     }
 
     /**
@@ -961,7 +961,6 @@ public class MediaStoreUtil {
     public static void deleteSource(List<Song> songs){
         if(songs == null || songs.size() == 0)
             return;
-
         for(Song song : songs){
             Util.deleteFileSafely(new File(song.getUrl()));
         }

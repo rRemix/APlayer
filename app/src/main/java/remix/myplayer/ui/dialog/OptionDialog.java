@@ -38,6 +38,7 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
 
+import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
 
 /**
@@ -159,15 +160,17 @@ public class OptionDialog extends BaseDialogActivity {
                             .buttonRippleColor(ThemeStore.getRippleColor())
                             .positiveText(R.string.confirm)
                             .negativeText(R.string.cancel)
-                            .onPositive((dialog, which) -> {
-                                boolean deleteSuccess = !mIsDeletePlayList ?
-                                        MediaStoreUtil.delete(mInfo.getId() , Constants.SONG) > 0 :
-                                        PlayListUtil.deleteSong(mInfo.getId(),mPlayListName);
+                            .checkBoxPromptRes(R.string.delete_source, false, null)
+                            .onAny((dialog, which) -> {
+                                if(which == POSITIVE){
+                                    MobclickAgent.onEvent(mContext,"Delete");
+                                    boolean deleteSuccess = !mIsDeletePlayList ?
+                                            MediaStoreUtil.delete(mInfo.getId() , Constants.SONG,dialog.isPromptCheckBoxChecked()) > 0 :
+                                            PlayListUtil.deleteSong(mInfo.getId(),mPlayListName);
 
-                                ToastUtil.show(OptionDialog.this,deleteSuccess ? R.string.delete_success : R.string.delete_error);
-                                finish();
-                            })
-                            .onNegative((dialog, which) -> {
+                                    ToastUtil.show(OptionDialog.this,deleteSuccess ? R.string.delete_success : R.string.delete_error);
+                                    finish();
+                                }
                             })
                             .backgroundColorAttr(R.attr.background_color_3)
                             .positiveColorAttr(R.attr.text_color_primary)

@@ -184,7 +184,7 @@ public class MultiChoice implements OnMultiItemClickListener {
     }
 
     @Override
-    public void OnDelete() {
+    public void OnDelete(boolean deleteSource) {
         int num = 0;
         ArrayList<Integer> idList = new ArrayList<>();
         switch (TYPE){
@@ -214,7 +214,7 @@ public class MultiChoice implements OnMultiItemClickListener {
             case Constants.ARTIST:
             case Constants.FOLDER:
                 for(Object arg : mSelectedArg){
-                    num += MediaStoreUtil.delete((Integer) arg,TYPE);
+                    num += MediaStoreUtil.delete((Integer) arg,TYPE,deleteSource);
                 }
                 break;
         }
