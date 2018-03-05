@@ -8,8 +8,11 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +31,7 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.interfaces.SortChangeCallback;
+import remix.myplayer.listener.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
@@ -37,7 +41,6 @@ import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.RecentlyActivity;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
-import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -188,9 +191,19 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         holder.mButton.setOnClickListener(v -> {
             if(mMultiChoice.isShow())
                 return;
-            Intent intent = new Intent(mContext, OptionDialog.class);
-            intent.putExtra("Song", song);
-            mContext.startActivity(intent);
+            Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
+            final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton, Gravity.END);
+            popupMenu.getMenuInflater().inflate(R.menu.song_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new SongPopupListener(mContext,
+                    song.getAlbumId(),
+                    Constants.ALBUM,
+                    song.getAlbum()));
+            popupMenu.show();
+//            if(mMultiChoice.isShow())
+//                return;
+//            Intent intent = new Intent(mContext, OptionDialog.class);
+//            intent.putExtra("Song", song);
+//            mContext.startActivity(intent);
         });
 
         holder.mContainer.setOnClickListener(v -> {
@@ -212,14 +225,14 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         if(mType == ALLSONG){
             if(MultiChoice.TAG.equals(SongFragment.TAG) &&
                     mMultiChoice.mSelectedPosition.contains(position - 1)){
-                mMultiChoice.AddView(holder.mContainer);
+                mMultiChoice.addView(holder.mContainer);
             } else {
                 holder.mContainer.setSelected(false);
             }
         } else {
             if(MultiChoice.TAG.equals(RecentlyActivity.TAG) &&
                     mMultiChoice.mSelectedPosition.contains(position - 1)){
-                mMultiChoice.AddView(holder.mContainer);
+                mMultiChoice.addView(holder.mContainer);
             } else {
                 holder.mContainer.setSelected(false);
             }

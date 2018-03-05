@@ -103,7 +103,7 @@ public class MultiChoice implements OnMultiItemClickListener {
 
         num = Global.AddSongToPlayQueue(idList);
         ToastUtil.show(mContext,mContext.getString(R.string.add_song_playqueue_success,num));
-        UpdateOptionMenu(false);
+        updateOptionMenu(false);
     }
 
     @Override
@@ -147,7 +147,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                 .itemsCallback((dialog, view, which, text) -> {
                     final int num = PlayListUtil.addMultiSongs(idList,playListInfoList.get(which).Name,playListInfoList.get(which)._Id);
                     ToastUtil.show(mContext,mContext.getString(R.string.add_song_playlist_success,num,playListInfoList.get(which).Name));
-                    UpdateOptionMenu(false);
+                    updateOptionMenu(false);
                 })
                 .neutralText(R.string.create_playlist)
                 .neutralColorAttr(R.attr.text_color_primary)
@@ -176,7 +176,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                                 }
                                 num = PlayListUtil.addMultiSongs(idList,input.toString(),newPlayListId);
                                 ToastUtil.show(mContext,mContext.getString(R.string.add_song_playlist_success,num,input.toString()));
-                                UpdateOptionMenu(false);
+                                updateOptionMenu(false);
                             }
                         })
                         .show())
@@ -222,7 +222,7 @@ public class MultiChoice implements OnMultiItemClickListener {
 //        if(num > 0){
 //            mContext.sendBroadcast(new Intent(MusicService.ACTION_MEDIA_CHANGE));
 //        }
-        UpdateOptionMenu(false);
+        updateOptionMenu(false);
     }
 
 
@@ -240,9 +240,9 @@ public class MultiChoice implements OnMultiItemClickListener {
     public boolean itemAddorRemoveWithClick(View view,int position,Object arg,String tag){
         if(mIsShow && TAG.equals(tag)){
             mIsShow = true;
-            RemoveOrAddView(view);
-            RemoveOrAddPosition(position);
-            RemoveOrAddArg(arg);
+            removeOrAddView(view);
+            removeOrAddPosition(position);
+            removeOrAddArg(arg);
             return true;
         }
         return false;
@@ -265,18 +265,18 @@ public class MultiChoice implements OnMultiItemClickListener {
             if(mUpdateOptionMenuListener != null)
                 mUpdateOptionMenuListener.onUpdate(true);
         }
-        RemoveOrAddView(view);
-        RemoveOrAddPosition(position);
-        RemoveOrAddArg(arg);
+        removeOrAddView(view);
+        removeOrAddPosition(position);
+        removeOrAddArg(arg);
 
     }
 
-    public void UpdateOptionMenu(boolean multishow){
+    public void updateOptionMenu(boolean multishow){
         if(mUpdateOptionMenuListener != null)
             mUpdateOptionMenuListener.onUpdate(multishow);
     }
 
-    public void AddView(View view){
+    public void addView(View view){
         mSelectedViews.add(view);
         setViewSelected(view, true);
     }
@@ -285,7 +285,7 @@ public class MultiChoice implements OnMultiItemClickListener {
      * 添加或者删除选中的view
      * @param view
      */
-    public void RemoveOrAddView(View view){
+    public void removeOrAddView(View view){
         if(mSelectedViews.contains(view)){
             mSelectedViews.remove(view);
 
@@ -300,7 +300,7 @@ public class MultiChoice implements OnMultiItemClickListener {
      * 添加或者删除选中view在adapter中的position
      * @param position
      */
-    public void RemoveOrAddPosition(int position){
+    public void removeOrAddPosition(int position){
         if(mSelectedPosition.contains(position))
             mSelectedPosition.remove(Integer.valueOf(position));
         else {
@@ -312,7 +312,7 @@ public class MultiChoice implements OnMultiItemClickListener {
      * 添加或者删除选中的view对应的参数，如歌曲id
      * @param arg
      */
-    public void RemoveOrAddArg(Object arg){
+    public void removeOrAddArg(Object arg){
         if(mSelectedArg.contains(arg)){
             mSelectedArg.remove(arg);
         } else {

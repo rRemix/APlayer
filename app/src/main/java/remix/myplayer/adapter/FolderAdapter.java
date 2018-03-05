@@ -96,7 +96,7 @@ public class FolderAdapter extends BaseAdapter<Folder,FolderAdapter.FolderHolder
 
         if(MultiChoice.TAG.equals(FolderFragment.TAG) &&
                 mMultiChoice.mSelectedPosition.contains(position)){
-            mMultiChoice.AddView(holder.mContainer);
+            mMultiChoice.addView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);
         }

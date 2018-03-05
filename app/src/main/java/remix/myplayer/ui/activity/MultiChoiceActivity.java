@@ -164,7 +164,7 @@ public class MultiChoiceActivity extends ToolbarActivity{
     }
 
     public void onBackPress(){
-        mMultiChoice.UpdateOptionMenu(false);
+        mMultiChoice.updateOptionMenu(false);
         if(mTipPopupWindow != null && mTipPopupWindow.isShowing()){
             mTipPopupWindow.dismiss();
             mTipPopupWindow = null;

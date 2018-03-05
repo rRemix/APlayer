@@ -854,19 +854,24 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     if(nextSong == null)
                         return;
                     //添加到播放队列
-                    if(Global.PlayQueue.contains(nextSong.getId())){
-                        Global.PlayQueue.remove(Integer.valueOf(nextSong.getId()));
-                        Global.PlayQueue.add(mCurrentIndex + 1,nextSong.getId());
-                    } else {
-                        Global.PlayQueue.add(Global.PlayQueue.indexOf(mCurrentId) + 1,nextSong.getId());
+                    if(mNextId == nextSong.getId()){
+                        ToastUtil.show(mContext,R.string.already_add_to_next_song);
+                        return;
                     }
-
+                    //根据当前播放模式，添加到队列
                     if(mPlayModel == Constants.PLAY_SHUFFLE){
                         if(mRandomList.contains(nextSong.getId())){
                             mRandomList.remove(Integer.valueOf(nextSong.getId()));
-                            mRandomList.add(mCurrentIndex + 1,nextSong.getId());
+                            mRandomList.add(mCurrentIndex + 1 < mRandomList.size() ? mCurrentIndex + 1 : 0,nextSong.getId());
                         } else {
                             mRandomList.add(mRandomList.indexOf(mCurrentId) + 1,nextSong.getId());
+                        }
+                    } else {
+                        if(Global.PlayQueue.contains(nextSong.getId())){
+                            Global.PlayQueue.remove(Integer.valueOf(nextSong.getId()));
+                            Global.PlayQueue.add(mCurrentIndex + 1 < Global.PlayQueue.size() ? mCurrentIndex + 1 : 0,nextSong.getId());
+                        } else {
+                            Global.PlayQueue.add(Global.PlayQueue.indexOf(mCurrentId) + 1,nextSong.getId());
                         }
                     }
                     
@@ -874,11 +879,13 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     mNextIndex = mCurrentIndex;
                     updateNextSong();
                     //保存到数据库
-                    mPlaybackHandler.post(() -> {
-                        PlayListUtil.clearTable(Constants.PLAY_QUEUE);
-                        PlayListUtil.addMultiSongs(Global.PlayQueue,Constants.PLAY_QUEUE, Global.PlayQueueID);
-                    });
-                    ToastUtil.show(mContext,R.string.add_to_next_song);
+                    if(mPlayModel != Constants.PLAY_SHUFFLE){
+                        mPlaybackHandler.post(() -> {
+                            PlayListUtil.clearTable(Constants.PLAY_QUEUE);
+                            PlayListUtil.addMultiSongs(Global.PlayQueue,Constants.PLAY_QUEUE, Global.PlayQueueID);
+                        });
+                    }
+                    ToastUtil.show(mContext,R.string.already_add_to_next_song);
                     break;
                 default:break;
             }

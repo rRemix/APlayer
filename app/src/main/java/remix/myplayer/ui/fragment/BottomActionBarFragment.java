@@ -59,7 +59,7 @@ public class BottomActionBarFragment extends BaseFragment{
     SimpleDraweeView mCover;
 
     //保存封面位置信息
-    private static Rect mCoverRect;
+    private Rect mCoverRect;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -107,10 +107,9 @@ public class BottomActionBarFragment extends BaseFragment{
             @Override
             public boolean onPreDraw() {
                 mCover.getViewTreeObserver().removeOnPreDrawListener(this);
-                mCoverRect = new Rect();
-                mCover.getGlobalVisibleRect(mCoverRect);
                 //数据失效重新获取位置信息
                 if(mCoverRect == null || mCoverRect.width() <= 0 || mCoverRect.height() <= 0){
+                    mCoverRect = new Rect();
                     mCover.getGlobalVisibleRect(mCoverRect);
                 }
                 return true;
@@ -145,10 +144,6 @@ public class BottomActionBarFragment extends BaseFragment{
                     R.drawable.bf_btn_play,
                     ColorUtil.getColor(ThemeStore.THEME_MODE == ThemeStore.DAY ? R.color.black_323335 : R.color.white));
         }
-    }
-
-    public static Rect getCoverRect(){
-        return mCoverRect;
     }
 
 }

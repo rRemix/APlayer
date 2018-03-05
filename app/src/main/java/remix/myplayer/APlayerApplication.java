@@ -51,8 +51,6 @@ public class APlayerApplication extends MultiDexApplication{
         //友盟异常捕获
         MobclickAgent.setCatchUncaughtExceptions(true);
         MobclickAgent.setDebugMode(BuildConfig.DEBUG);
-        //字体
-        Util.setFontSize(this);
         //友盟分享
         UMShareAPI.get(this);
         Config.DEBUG = BuildConfig.DEBUG;

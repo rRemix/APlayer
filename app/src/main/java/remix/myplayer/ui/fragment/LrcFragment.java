@@ -88,7 +88,7 @@ public class LrcFragment extends BaseFragment {
             mLrcView.setText(getString(R.string.no_lrc));
             return;
         }
-        mLrcView.setTag(mInfo.getId());
+
         final int id = mInfo.getId();
         new SearchLrc(mInfo).getLyric(manualPath)
                 .doOnSubscribe(disposable -> {

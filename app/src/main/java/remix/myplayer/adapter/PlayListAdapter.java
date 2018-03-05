@@ -158,7 +158,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         //是否处于选中状态
         if(MultiChoice.TAG.equals(PlayListFragment.TAG) &&
                 mMultiChoice.mSelectedPosition.contains(position - 1)){
-            mMultiChoice.AddView(holder.mContainer);
+            mMultiChoice.addView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);
         }

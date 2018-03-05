@@ -276,7 +276,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 mMultiToolBar.setVisibility(View.GONE);
                 mToolBar.setVisibility(View.VISIBLE);
                 if(mMultiChoice.isShow()){
-                    mMultiChoice.UpdateOptionMenu(false);
+                    mMultiChoice.updateOptionMenu(false);
                     mMultiChoice.clear();
                 }
                 break;

@@ -168,7 +168,7 @@ public class OptionDialog extends BaseDialogActivity {
                                             MediaStoreUtil.delete(mInfo.getId() , Constants.SONG,dialog.isPromptCheckBoxChecked()) > 0 :
                                             PlayListUtil.deleteSong(mInfo.getId(),mPlayListName);
 
-                                    ToastUtil.show(OptionDialog.this,deleteSuccess ? R.string.delete_success : R.string.delete_error);
+                                    ToastUtil.show(mContext,deleteSuccess ? R.string.delete_success : R.string.delete_error);
                                     finish();
                                 }
                             })
@@ -176,6 +176,7 @@ public class OptionDialog extends BaseDialogActivity {
                             .positiveColorAttr(R.attr.text_color_primary)
                             .negativeColorAttr(R.attr.text_color_primary)
                             .contentColorAttr(R.attr.text_color_primary)
+                            .theme(ThemeStore.getMDDialogTheme())
                             .show();
                 } catch (Exception e){
                     e.printStackTrace();
