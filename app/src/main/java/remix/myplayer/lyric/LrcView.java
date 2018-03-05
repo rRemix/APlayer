@@ -1,25 +1,31 @@
-         package remix.myplayer.lyric;
+package remix.myplayer.lyric;
 
-         import android.content.Context;
-         import android.graphics.Canvas;
-         import android.graphics.Color;
-         import android.os.Handler;
-         import android.support.annotation.ColorInt;
-         import android.text.Layout;
-         import android.text.StaticLayout;
-         import android.text.TextPaint;
-         import android.util.AttributeSet;
-         import android.util.Log;
-         import android.view.MotionEvent;
-         import android.view.View;
-         import android.view.ViewConfiguration;
-         import android.view.animation.DecelerateInterpolator;
-         import android.view.animation.Interpolator;
-         import android.widget.Scroller;
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.support.annotation.ColorInt;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
+import android.widget.Scroller;
 
-         import java.util.List;
+import java.util.List;
 
-         import remix.myplayer.lyric.bean.LrcRow;
+import remix.myplayer.APlayerApplication;
+import remix.myplayer.R;
+import remix.myplayer.lyric.bean.LrcRow;
+import remix.myplayer.theme.Theme;
 
 /**
  * Created by Remix on 2018/1/3.
@@ -32,9 +38,8 @@ public class LrcView extends View implements ILrcView{
     /**画高亮歌词的画笔***/
     private TextPaint mPaintForHighLightLrc;
     /**高亮歌词的默认字体大小***/
-    public static final float DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC = 35;
+    public static final float DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC = 45;
     /**歌词间默认的行距**/
-//	private static final float DEFAULT_PADDING = 50;
     public static final float DEFAULT_PADDING = 55;
     /** 跨行歌词之间额外的行距*/
     public static final float DEFAULT_SPACING_PADDING = 0;
@@ -50,7 +55,7 @@ public class LrcView extends View implements ILrcView{
     /**画其他歌词的画笔***/
     private TextPaint mPaintForOtherLrc;
     /**其他歌词的默认字体大小***/
-    private static final float DEFAULT_SIZE_FOR_OTHER_LRC = 35;
+    private static final float DEFAULT_SIZE_FOR_OTHER_LRC = 45;
     /**其他歌词当前的字体大小***/
     private float mSizeForOtherLrc = DEFAULT_SIZE_FOR_OTHER_LRC;
     /**其他歌词的默认字体颜色**/
@@ -64,7 +69,9 @@ public class LrcView extends View implements ILrcView{
     /***时间线的颜色**/
     private int mTimeLineColor = Color.GRAY;
     /**时间文字大小**/
-    private float mSizeForTimeLine = 30;
+    private float mSizeForTimeLine;
+    /** 时间线默认大小*/
+    private static final float DEFAULT_SIZE_FOR_TIMELINE = 35;
     /**是否画时间线**/
     private boolean mIsDrawTimeLine = false;
 
@@ -84,22 +91,23 @@ public class LrcView extends View implements ILrcView{
     /** 插值器*/
     private Interpolator DEFAULT_INTERPOLATOR = new DecelerateInterpolator();
     /***移动一句歌词的持续时间**/
-    private static final int DURATION_FOR_LRC_SCROLL = 1000;
+    private static final int DURATION_FOR_LRC_SCROLL = 800;
     /***停止触摸时 如果View需要滚动 时的持续时间**/
     private static final int DURATION_FOR_ACTION_UP = 400;
-
+    /** 滑动后TimeLine显示的时间*/
+    private static final int DURATION_TIME_LINE = 3000;
+    /** 时间线的图标*/
+    private static final Drawable TIMELINE_DRAWABLE = Theme.getDrawable(APlayerApplication.getContext(), R.drawable.icon_lyric_timeline);
+    /** 初始状态时间线图标所在的位置*/
+    private static Rect TIMELINE_DRAWABLE_RECT;
     /**控制文字缩放的因子**/
     private float mCurFraction = 0;
     private int mTouchSlop;
-
-    /**外部viewpager是否正在滑动*/
-    private boolean mIsViewPagerScroll = false;
 
     /** 错误提示文字 */
     private String mText = "正在搜索";
     /** 当前纵坐标*/
     private float mRowY;
-
 
     public LrcView(Context context) {
         super(context);
@@ -135,14 +143,25 @@ public class LrcView extends View implements ILrcView{
         mPaintForTimeLine = new TextPaint();
         mPaintForTimeLine.setAntiAlias(true);
 //        mSizeForTimeLine = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,13, APlayerApplication.getContext().getResources().getDisplayMetrics());
-        mSizeForTimeLine = DEFAULT_SIZE_FOR_OTHER_LRC;
+        mSizeForTimeLine = DEFAULT_SIZE_FOR_TIMELINE;
         mPaintForTimeLine.setTextSize(mSizeForTimeLine);
         mPaintForTimeLine.setColor(mTimeLineColor);
 
         mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
     }
 
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if(TIMELINE_DRAWABLE_RECT == null)
+            TIMELINE_DRAWABLE_RECT = new Rect(0,
+                    (getHeight() - TIMELINE_DRAWABLE.getIntrinsicHeight()) / 2,
+                    TIMELINE_DRAWABLE.getIntrinsicWidth(),
+                    (getHeight() + TIMELINE_DRAWABLE.getIntrinsicHeight()) / 2);
+    }
+
     private int mTotalRow;
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
         if(mLrcRows == null || mLrcRows.size() == 0){
@@ -168,9 +187,28 @@ public class LrcView extends View implements ILrcView{
         }
         //画时间线和时间
         if(mIsDrawTimeLine){
-            float y = getHeight() / 2 + getScrollY();
-            canvas.drawText(mLrcRows.get(mCurRow).getTimeStr(), 0, y - 5, mPaintForTimeLine);
-            canvas.drawLine(0, y, getWidth(), y, mPaintForTimeLine);
+            final int timeLineOffsetY =
+                    mCurRow >= 0 && mLrcRows != null && mCurRow <= mLrcRows.size() - 1 ?
+                    (mLrcRows.get(mCurRow).getContentHeight() + mLrcRows.get(mCurRow).getTranslateHeight()) / 2 :
+                    0;
+            float y = getHeight() / 2 + getScrollY() + timeLineOffsetY;
+            canvas.drawText(mLrcRows.get(mCurRow).getTimeStr(), TIMELINE_DRAWABLE.getIntrinsicWidth() + 5, y - 10, mPaintForTimeLine);
+            canvas.drawLine(TIMELINE_DRAWABLE.getIntrinsicWidth() + 10, y, getWidth(), y, mPaintForTimeLine);
+            TIMELINE_DRAWABLE.setBounds(0,
+                    (int)y - TIMELINE_DRAWABLE.getIntrinsicHeight() / 2,
+                    TIMELINE_DRAWABLE.getIntrinsicWidth(),
+                    (int)y + TIMELINE_DRAWABLE.getIntrinsicHeight() / 2 );
+            TIMELINE_DRAWABLE.draw(canvas);
+
+//            float y = getHeight() / 2 + getScrollY();
+//            canvas.drawText(mLrcRows.get(mCurRow).getTimeStr(), TIMELINE_DRAWABLE.getIntrinsicWidth() + 5, y - 10, mPaintForTimeLine);
+//            canvas.drawLine(TIMELINE_DRAWABLE.getIntrinsicWidth() + 10, y, getWidth(), y, mPaintForTimeLine);
+//            TIMELINE_DRAWABLE.setBounds(0,
+//                    (int)y - TIMELINE_DRAWABLE.getIntrinsicHeight() / 2,
+//                    TIMELINE_DRAWABLE.getIntrinsicWidth(),
+//                    (int)y + TIMELINE_DRAWABLE.getIntrinsicHeight() / 2 );
+//            TIMELINE_DRAWABLE.draw(canvas);
+
         }
     }
 
@@ -209,10 +247,6 @@ public class LrcView extends View implements ILrcView{
         canvas.translate(textX,mRowY);
         staticLayout.draw(canvas);
         canvas.restore();
-        //根据一句歌词所占的行数计算出下一行歌词绘制的y坐标
-        int height = (int) ((staticLayout.getLineCount() * textPaint.getTextSize()) + DEFAULT_SPACING_PADDING);
-        int height1 = staticLayout.getHeight();
-//        mRowY += height1;
     }
 
     /**是否可拖动歌词**/
@@ -222,8 +256,11 @@ public class LrcView extends View implements ILrcView{
     /**事件的上一次的y坐标**/
     private float mLastY;
     private float mLastX;
+    /** 等待TimeLine*/
+    private boolean mTimeLineWaiting;
     /** 长按runnable*/
     private Runnable mLongPressRunnable = new LongPressRunnable();
+    private Runnable mTimeLineDisableRunnable = new TimeLineRunnable();
     private Handler mHandler = new Handler();
 
     private class LongPressRunnable implements Runnable{
@@ -232,6 +269,15 @@ public class LrcView extends View implements ILrcView{
             if(mOnLrcClickListener != null) {
                 mOnLrcClickListener.onLongClick();
             }
+        }
+    }
+
+    private class TimeLineRunnable implements Runnable{
+        @Override
+        public void run() {
+            mTimeLineWaiting = false;
+            mIsDrawTimeLine = false;
+            invalidate();
         }
     }
 
@@ -250,6 +296,15 @@ public class LrcView extends View implements ILrcView{
                 if(hasLrc()){
                     mFirstY = event.getRawY();
                     mLastX = event.getRawX();
+                    if(mTimeLineWaiting){
+                        //点击定位图标
+                        if(TIMELINE_DRAWABLE_RECT.contains((int) event.getX(),(int) event.getY())  && onSeekToListener!= null && mCurRow != -1){
+                            mHandler.removeCallbacks(mTimeLineDisableRunnable);
+                            mHandler.post(mTimeLineDisableRunnable);
+                            onSeekToListener.onSeekTo(mLrcRows.get(mCurRow).getTime());
+                            return false;
+                        }
+                    }
                 }
                 mLongPressRunnable = new LongPressRunnable();
                 mHandler.postDelayed(mLongPressRunnable, ViewConfiguration.getLongPressTimeout());
@@ -266,9 +321,10 @@ public class LrcView extends View implements ILrcView{
                         mLastY = event.getRawY();
                     }
                     if(mCanDrag){
+                        mTimeLineWaiting = false;
                         mHandler.removeCallbacks(mLongPressRunnable);
                         float offset = event.getRawY() - mLastY;//偏移量
-                        if( getScrollY() - offset < 0){
+                        if(getScrollY() - offset < 0){
                             if(offset > 0){
                                 offset = offset / 3;
                             }
@@ -300,16 +356,17 @@ public class LrcView extends View implements ILrcView{
                     mHandler.removeCallbacks(mLongPressRunnable);
                     mLongPressRunnable = null;
                 }else{
-                    if(onSeekToListener!= null && mCurRow != -1){
-                        onSeekToListener.onSeekTo(mLrcRows.get(mCurRow).getTime());
-                    }
+                    //显示三秒TimeLine
+                    mHandler.removeCallbacks(mTimeLineDisableRunnable);
+                    mHandler.postDelayed(mTimeLineDisableRunnable,DURATION_TIME_LINE);
+                    mTimeLineWaiting = true;
                     if(getScrollY() < 0){
                         smoothScrollTo(0,DURATION_FOR_ACTION_UP);
                     }else if(getScrollY() > getScrollYByRow(mCurRow)){
                         smoothScrollTo(getScrollYByRow(mCurRow),DURATION_FOR_ACTION_UP);
                     }
                     mCanDrag = false;
-                    mIsDrawTimeLine = false;
+//                    mIsDrawTimeLine = false;
                     invalidate();
                 }
                 break;
@@ -398,6 +455,10 @@ public class LrcView extends View implements ILrcView{
         }
         //如果是由seekbar的进度改变触发 并且这时候处于拖动状态，则返回
         if(fromSeekBar && mCanDrag){
+            return;
+        }
+        //滑动处于等待的状态
+        if(mTimeLineWaiting){
             return;
         }
         for (int i = mLrcRows.size() - 1; i >= 0; i--) {
@@ -525,14 +586,6 @@ public class LrcView extends View implements ILrcView{
     }
 
     /**
-     * 外部viewpager是否正在滑动
-     * @param scrolling
-     */
-    public void setViewPagerScroll(boolean scrolling){
-        mIsViewPagerScroll = scrolling;
-    }
-
-    /**
      * 设置高亮歌词颜色
      * @param color
      */
@@ -558,9 +611,11 @@ public class LrcView extends View implements ILrcView{
      * @param color
      */
     public void setTimeLineColor(@ColorInt int color){
-        mTimeLineColor = color;
-        if(mPaintForTimeLine != null)
+        if(mTimeLineColor != color){
+            mTimeLineColor = color;
+            Theme.TintDrawable(TIMELINE_DRAWABLE,color);
             mPaintForTimeLine.setColor(color);
+        }
     }
 
     @Override

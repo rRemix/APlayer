@@ -887,8 +887,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     mPager.setIntercept(true);
                 else
                     mPager.setIntercept(false);
-                if (mLrcView != null)
-                    mLrcView.setViewPagerScroll(false);
                 //歌词界面常亮
                 if(position == 2 && SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.SCREEN_ALWAYS_ON,false)){
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -897,8 +895,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                if (mLrcView != null)
-                    mLrcView.setViewPagerScroll(state != ViewPager.SCROLL_STATE_IDLE);
             }
         });
         mPager.setCurrentItem(1);
