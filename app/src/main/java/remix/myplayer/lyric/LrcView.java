@@ -97,7 +97,7 @@ public class LrcView extends View implements ILrcView{
     /** 滑动后TimeLine显示的时间*/
     private static final int DURATION_TIME_LINE = 3000;
     /** 时间线的图标*/
-    private static final Drawable TIMELINE_DRAWABLE = Theme.getDrawable(APlayerApplication.getContext(), R.drawable.icon_appshortcut_last_add);
+    private static final Drawable TIMELINE_DRAWABLE = Theme.getDrawable(APlayerApplication.getContext(), R.drawable.icon_lyric_timeline);
     /** 初始状态时间线图标所在的位置*/
     private static Rect TIMELINE_DRAWABLE_RECT;
     /**控制文字缩放的因子**/
