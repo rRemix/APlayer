@@ -8,8 +8,10 @@
         android:id="@+id/lrc_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="@dimen/d30_size"
-        android:layout_marginRight="@dimen/d30_size"
+        android:layout_marginLeft="@dimen/d10_size"
+        android:layout_marginRight="@dimen/d10_size"
+        android:paddingLeft="@dimen/d30_size"
+        android:paddingRight="@dimen/d30_size"
         android:layout_marginTop="@dimen/d8_size"
         android:textColor="@color/day_enable_text_color"/>
     <!--<android.support.v7.widget.RecyclerView-->

@@ -5,6 +5,7 @@ import android.graphics.PorterDuff;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.util.AttributeSet;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -76,7 +77,13 @@ public class SearchToolBar extends Toolbar {
                 PorterDuff.Mode.SRC_ATOP);
         mEditText.setTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor_primary : R.color.night_textcolor_primary));
         mEditText.setHintTextColor(ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.day_textcolor : R.color.search_hint_text_color));
-
+        mEditText.setOnEditorActionListener((v, actionId, event) -> {
+            if(actionId == EditorInfo.IME_ACTION_SEARCH){
+                afterExplainChanged(v.getEditableText());
+                return true;
+            }
+            return false;
+        });
         mButtonClear.setOnClickListener(v -> {
             mEditText.setText("");
             mButtonClear.setVisibility(INVISIBLE);

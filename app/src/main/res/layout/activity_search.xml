@@ -23,10 +23,11 @@
                     android:id="@+id/search_input"
                     android:textSize="@dimen/s16_size"
                     android:textColorHint="@color/search_hint_text_color"
-                    android:maxLines="1"
+                    android:singleLine="true"
                     android:layout_marginRight="@dimen/d8_size"
                     android:hint="@string/search_song_artist_album"
-                    android:textCursorDrawable="?attr/textCursor"/>
+                    android:textCursorDrawable="?attr/textCursor"
+                    android:imeOptions="actionSearch"/>
                 <ImageButton
                     android:src="@drawable/actionbar_delete"
                     android:background="@color/transparent"

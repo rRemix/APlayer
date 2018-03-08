@@ -44,7 +44,7 @@ public class LrcView extends View implements ILrcView{
     /** 跨行歌词之间额外的行距*/
     public static final float DEFAULT_SPACING_PADDING = 0;
     /** 跨行歌词之间行距倍数*/
-    public static final  float DEFAULT_SPACING_MULT = 0.8f;
+    public static final  float DEFAULT_SPACING_MULT = 1f;
     /**高亮歌词当前的字体大小***/
     private float mSizeForHighLightLrc = DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC;
     /**高亮歌词的默认字体颜色**/
@@ -154,10 +154,11 @@ public class LrcView extends View implements ILrcView{
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         if(TIMELINE_DRAWABLE_RECT == null)
-            TIMELINE_DRAWABLE_RECT = new Rect(0,
-                    (getHeight() - TIMELINE_DRAWABLE.getIntrinsicHeight()) / 2,
-                    TIMELINE_DRAWABLE.getIntrinsicWidth(),
-                    (getHeight() + TIMELINE_DRAWABLE.getIntrinsicHeight()) / 2);
+            //扩大点击区域
+            TIMELINE_DRAWABLE_RECT = new Rect(-TIMELINE_DRAWABLE.getIntrinsicWidth() / 2,
+                    (getHeight() / 2 - TIMELINE_DRAWABLE.getIntrinsicHeight()),
+                    TIMELINE_DRAWABLE.getIntrinsicWidth() + TIMELINE_DRAWABLE.getIntrinsicWidth() / 2,
+                    (getHeight() / 2 + TIMELINE_DRAWABLE.getIntrinsicHeight()));
     }
 
     private int mTotalRow;
@@ -173,7 +174,8 @@ public class LrcView extends View implements ILrcView{
             return;
         }
 
-        final int availableWidth = getWidth();
+        final int availableWidth = getWidth() - (getPaddingLeft() + getPaddingRight());
+
         mRowY = getHeight() / 2;
         for (int i = 0; i < mLrcRows.size(); i++) {
             if(i == mCurRow){   //画高亮歌词
@@ -189,9 +191,11 @@ public class LrcView extends View implements ILrcView{
         if(mIsDrawTimeLine){
             final int timeLineOffsetY =
                     mCurRow >= 0 && mLrcRows != null && mCurRow <= mLrcRows.size() - 1 ?
-                    (mLrcRows.get(mCurRow).getContentHeight() + mLrcRows.get(mCurRow).getTranslateHeight()) / 2 :
+                    mLrcRows.get(mCurRow).getTotalHeight() / 2 :
                     0;
-            float y = getHeight() / 2 + getScrollY() + timeLineOffsetY;
+
+//            float y = getHeight() / 2 + getScrollY() + timeLineOffsetY ;
+            float y = getHeight() / 2 + getScrollY();
             canvas.drawText(mLrcRows.get(mCurRow).getTimeStr(), TIMELINE_DRAWABLE.getIntrinsicWidth() + 5, y - 10, mPaintForTimeLine);
             canvas.drawLine(TIMELINE_DRAWABLE.getIntrinsicWidth() + 10, y, getWidth(), y, mPaintForTimeLine);
             TIMELINE_DRAWABLE.setBounds(0,
@@ -199,15 +203,6 @@ public class LrcView extends View implements ILrcView{
                     TIMELINE_DRAWABLE.getIntrinsicWidth(),
                     (int)y + TIMELINE_DRAWABLE.getIntrinsicHeight() / 2 );
             TIMELINE_DRAWABLE.draw(canvas);
-
-//            float y = getHeight() / 2 + getScrollY();
-//            canvas.drawText(mLrcRows.get(mCurRow).getTimeStr(), TIMELINE_DRAWABLE.getIntrinsicWidth() + 5, y - 10, mPaintForTimeLine);
-//            canvas.drawLine(TIMELINE_DRAWABLE.getIntrinsicWidth() + 10, y, getWidth(), y, mPaintForTimeLine);
-//            TIMELINE_DRAWABLE.setBounds(0,
-//                    (int)y - TIMELINE_DRAWABLE.getIntrinsicHeight() / 2,
-//                    TIMELINE_DRAWABLE.getIntrinsicWidth(),
-//                    (int)y + TIMELINE_DRAWABLE.getIntrinsicHeight() / 2 );
-//            TIMELINE_DRAWABLE.draw(canvas);
 
         }
     }
@@ -221,12 +216,12 @@ public class LrcView extends View implements ILrcView{
      */
     private void drawLrcRow(Canvas canvas, TextPaint textPaint, int availableWidth, LrcRow lrcRow) {
         drawText(canvas,textPaint,availableWidth,lrcRow.getContent());
-        mRowY += lrcRow.getContentHeight();
+//        mRowY += lrcRow.getContentHeight();
         if(lrcRow.hasTranslate()){
             drawText(canvas,textPaint,availableWidth,lrcRow.getTranslate());
-            mRowY += lrcRow.getTranslateHeight();
+//            mRowY += lrcRow.getTranslateHeight();
         }
-//        mRowY += lrcRow.getHeight();
+//        mRowY += lrcRow.getTotalHeight();
         mRowY += mLinePadding;
     }
 
@@ -238,13 +233,15 @@ public class LrcView extends View implements ILrcView{
      * @param text
      */
     private void drawText(Canvas canvas, TextPaint textPaint, int availableWidth, String text) {
-        float textWidth = textPaint.measureText(text);
-        StaticLayout staticLayout = new StaticLayout(text, textPaint, availableWidth,textWidth > availableWidth ? Layout.Alignment.ALIGN_CENTER : Layout.Alignment.ALIGN_NORMAL,
+        StaticLayout staticLayout = new StaticLayout(text, textPaint, availableWidth,Layout.Alignment.ALIGN_CENTER ,
                 DEFAULT_SPACING_MULT, DEFAULT_SPACING_PADDING, true);
-
-        float textX = textWidth > availableWidth ? 0 : (availableWidth - textWidth) / 2;
+        mRowY += staticLayout.getHeight();
+//        for(int i = 0 ; i < staticLayout.getLineCount();i++){
+//            LogUtil.d("LyricView","LineTop: " + staticLayout.getLineTop(i) + " LineBottom: " + staticLayout.getLineBottom(i));
+//            mRowY += (staticLayout.getLineBottom(i) - staticLayout.getLineTop(i));
+//        }
         canvas.save();
-        canvas.translate(textX,mRowY);
+        canvas.translate(getPaddingLeft(),mRowY - staticLayout.getHeight());
         staticLayout.draw(canvas);
         canvas.restore();
     }
@@ -410,8 +407,7 @@ public class LrcView extends View implements ILrcView{
     }
 
     private int getSingleLineHeight(String text){
-        float textWidth = mPaintForOtherLrc.measureText(text);
-        StaticLayout staticLayout = new StaticLayout(text, mPaintForOtherLrc, getWidth(),textWidth > getWidth() ? Layout.Alignment.ALIGN_CENTER : Layout.Alignment.ALIGN_NORMAL,
+        StaticLayout staticLayout = new StaticLayout(text, mPaintForOtherLrc, getWidth() - getPaddingLeft() - getPaddingRight(),Layout.Alignment.ALIGN_CENTER,
                 DEFAULT_SPACING_MULT, DEFAULT_SPACING_PADDING, true);
         return staticLayout.getHeight();
     }
