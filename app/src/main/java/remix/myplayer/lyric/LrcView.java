@@ -189,11 +189,10 @@ public class LrcView extends View implements ILrcView{
         }
         //画时间线和时间
         if(mIsDrawTimeLine){
-            final int timeLineOffsetY =
-                    mCurRow >= 0 && mLrcRows != null && mCurRow <= mLrcRows.size() - 1 ?
-                    mLrcRows.get(mCurRow).getTotalHeight() / 2 :
-                    0;
-
+//            final int timeLineOffsetY =
+//                    mCurRow >= 0 && mLrcRows != null && mCurRow <= mLrcRows.size() - 1 ?
+//                    mLrcRows.get(mCurRow).getTotalHeight() / 2 :
+//                    0;
 //            float y = getHeight() / 2 + getScrollY() + timeLineOffsetY ;
             float y = getHeight() / 2 + getScrollY();
             canvas.drawText(mLrcRows.get(mCurRow).getTimeStr(), TIMELINE_DRAWABLE.getIntrinsicWidth() + 5, y - 10, mPaintForTimeLine);
@@ -235,15 +234,12 @@ public class LrcView extends View implements ILrcView{
     private void drawText(Canvas canvas, TextPaint textPaint, int availableWidth, String text) {
         StaticLayout staticLayout = new StaticLayout(text, textPaint, availableWidth,Layout.Alignment.ALIGN_CENTER ,
                 DEFAULT_SPACING_MULT, DEFAULT_SPACING_PADDING, true);
-        mRowY += staticLayout.getHeight();
-//        for(int i = 0 ; i < staticLayout.getLineCount();i++){
-//            LogUtil.d("LyricView","LineTop: " + staticLayout.getLineTop(i) + " LineBottom: " + staticLayout.getLineBottom(i));
-//            mRowY += (staticLayout.getLineBottom(i) - staticLayout.getLineTop(i));
-//        }
+
         canvas.save();
-        canvas.translate(getPaddingLeft(),mRowY - staticLayout.getHeight());
+        canvas.translate(getPaddingLeft(), (mRowY -  staticLayout.getHeight() / 2 ));
         staticLayout.draw(canvas);
         canvas.restore();
+        mRowY += staticLayout.getHeight();
     }
 
     /**是否可拖动歌词**/
@@ -406,6 +402,11 @@ public class LrcView extends View implements ILrcView{
         invalidate();
     }
 
+    /**
+     * 获得单句歌词的高度，可能有多行
+     * @param text
+     * @return
+     */
     private int getSingleLineHeight(String text){
         StaticLayout staticLayout = new StaticLayout(text, mPaintForOtherLrc, getWidth() - getPaddingLeft() - getPaddingRight(),Layout.Alignment.ALIGN_CENTER,
                 DEFAULT_SPACING_MULT, DEFAULT_SPACING_PADDING, true);
@@ -436,6 +437,7 @@ public class LrcView extends View implements ILrcView{
     private int getRowByScrollY(){
         int totalY = 0;
         int line;
+
         for(line = 0; line < mLrcRows.size();line++){
             totalY += mLinePadding + mLrcRows.get(line).getTotalHeight();
             if(totalY >= getScrollY())
@@ -514,6 +516,9 @@ public class LrcView extends View implements ILrcView{
         }
         mTotalRow = 0;
         mLrcRows = null;
+        mHandler.removeCallbacks(mLongPressRunnable);
+        mHandler.removeCallbacks(mTimeLineDisableRunnable);
+        mHandler.post(mTimeLineDisableRunnable);
         scrollTo(getScrollX(), 0);
         invalidate();
     }
