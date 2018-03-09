@@ -4,13 +4,17 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.facebook.common.util.ByteConstants;
@@ -1089,6 +1093,43 @@ public class MediaStoreUtil {
             }
         }
         return -1;
+    }
+
+    /**
+     * 设置铃声
+     * @param audioId
+     */
+    public static void setRing(Context context,int audioId) {
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put(MediaStore.Audio.Media.IS_RINGTONE, true);
+            cv.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);
+            cv.put(MediaStore.Audio.Media.IS_ALARM, false);
+            cv.put(MediaStore.Audio.Media.IS_MUSIC, true);
+            // 把需要设为铃声的歌曲更新铃声库
+            if(mContext.getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cv, MediaStore.MediaColumns._ID + "=?", new String[]{audioId + ""}) > 0) {
+                Uri newUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, audioId);
+                RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, newUri);
+                ToastUtil.show(context,R.string.set_ringtone_success);
+            }
+            else
+                ToastUtil.show(context,R.string.set_ringtone_error);
+        }catch (Exception e){
+            //没有权限
+            if(e instanceof SecurityException){
+                ToastUtil.show(context,R.string.please_give_write_settings_permission);
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (!Settings.System.canWrite(mContext)) {
+                        Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                        intent.setData(Uri.parse("package:" + mContext.getPackageName()));
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                    }
+                }
+            }
+
+        }
+
     }
 
 }

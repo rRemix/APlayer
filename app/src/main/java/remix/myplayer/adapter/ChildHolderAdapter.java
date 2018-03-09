@@ -1,12 +1,16 @@
 package remix.myplayer.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +28,7 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.interfaces.SortChangeCallback;
+import remix.myplayer.listener.SongPopupListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -31,7 +36,6 @@ import remix.myplayer.ui.MultiChoice;
 import remix.myplayer.ui.activity.ChildHolderActivity;
 import remix.myplayer.ui.customview.ColumnView;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScroller;
-import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -43,6 +47,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * Created by taeja on 16-6-24.
  */
+@SuppressLint("RestrictedApi")
 public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> implements FastScroller.SectionIndexer,OnUpdateHighLightListener{
     //升序
     public static final int ASC = 0;
@@ -163,13 +168,18 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
                 holder.mButton.setOnClickListener(v -> {
                     if(mMultiChoice.isShow())
                         return;
-                    Intent intent = new Intent(mContext, OptionDialog.class);
-                    intent.putExtra("Song", song);
-                    if (mType == Constants.PLAYLIST) {
-                        intent.putExtra("IsDeletePlayList", true);
-                        intent.putExtra("PlayListName", mArg);
-                    }
-                    mContext.startActivity(intent);
+                    Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
+                    final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton, Gravity.END);
+                    popupMenu.getMenuInflater().inflate(R.menu.song_menu, popupMenu.getMenu());
+                    popupMenu.setOnMenuItemClickListener(new SongPopupListener(mContext,song,mType == Constants.PLAYLIST,mArg));
+                    popupMenu.show();
+//                    Intent intent = new Intent(mContext, OptionDialog.class);
+//                    intent.putExtra("Song", song);
+//                    if (mType == Constants.PLAYLIST) {
+//                        intent.putExtra("IsDeletePlayList", true);
+//                        intent.putExtra("PlayListName", mArg);
+//                    }
+//                    mContext.startActivity(intent);
                 });
             }
         }

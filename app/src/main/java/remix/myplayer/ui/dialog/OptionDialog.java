@@ -1,14 +1,7 @@
 package remix.myplayer.ui.dialog;
 
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -131,7 +124,7 @@ public class OptionDialog extends BaseDialogActivity {
             //设置铃声
             case R.id.popup_ring:
                 MobclickAgent.onEvent(this,"Ring");
-                setRing(mInfo.getId());
+                MediaStoreUtil.setRing(this,mInfo.getId());
                 finish();
                 break;
             //分享
@@ -142,7 +135,7 @@ public class OptionDialog extends BaseDialogActivity {
 //                sendBroadcast(intent);
 //                finish();
                 MobclickAgent.onEvent(this,"Share");
-                Intent intentShare = new Intent(OptionDialog.this,ShareDialog.class);
+                Intent intentShare = new Intent(mContext,ShareDialog.class);
                 Bundle argShare = new Bundle();
                 argShare.putParcelable("Song",mInfo);
                 argShare.putInt("Type",Constants.SHARESONG);
@@ -184,44 +177,6 @@ public class OptionDialog extends BaseDialogActivity {
                 break;
 
         }
-    }
-
-
-    /**
-     * 设置铃声
-     * @param audioId
-     */
-    private void setRing(int audioId) {
-        try {
-            ContentValues cv = new ContentValues();
-            cv.put(MediaStore.Audio.Media.IS_RINGTONE, true);
-            cv.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);
-            cv.put(MediaStore.Audio.Media.IS_ALARM, false);
-            cv.put(MediaStore.Audio.Media.IS_MUSIC, true);
-            // 把需要设为铃声的歌曲更新铃声库
-            if(getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, cv, MediaStore.MediaColumns._ID + "=?", new String[]{audioId + ""}) > 0) {
-                Uri newUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, audioId);
-                RingtoneManager.setActualDefaultRingtoneUri(this, RingtoneManager.TYPE_RINGTONE, newUri);
-                ToastUtil.show(this,R.string.set_ringtone_success);
-            }
-            else
-                ToastUtil.show(this,R.string.set_ringtone_error);
-        }catch (Exception e){
-            //没有权限
-            if(e instanceof SecurityException){
-                ToastUtil.show(mContext,R.string.please_give_write_settings_permission);
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (!Settings.System.canWrite(mContext)) {
-                        Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                        intent.setData(Uri.parse("package:" + mContext.getPackageName()));
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        mContext.startActivity(intent);
-                    }
-                }
-            }
-
-        }
-
     }
 
     @Override
