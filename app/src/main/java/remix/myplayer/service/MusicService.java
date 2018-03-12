@@ -279,7 +279,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mWakeLock = ((PowerManager)getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,getClass().getSimpleName());
         mWakeLock.setReferenceCounted(false);
         //通知栏
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 & !SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,false)){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 & !SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,false)){
             mNotify = new NotifyImpl24(this);
         } else {
             mNotify = new NotifyImpl(this);
@@ -431,7 +431,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         }
         //查找上次退出时保存的下一首歌曲是否还存在
         //如果不存在，重新设置下一首歌曲
-        mNextId = SPUtil.getValue(mContext,"Setting","NextSongId",-1);
+        mNextId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"NextSongId",-1);
         if(mNextId == -1){
             mNextIndex = mCurrentIndex;
             updateNextSong();
@@ -538,8 +538,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 
         mPlaybackHandler.post(() -> {
             //保存当前播放和下一首播放的歌曲的id
-            SPUtil.putValue(mContext,"Setting","LastSongId", mCurrentId);
-            SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId", mCurrentId);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"NextSongId",mNextId);
         });
 
     }
@@ -741,7 +741,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     || control == Constants.TOGGLE || control == Constants.PAUSE || control == Constants.START){
                 if(Global.PlayQueue == null || Global.PlayQueue.size() == 0) {
                     //列表为空，尝试读取
-                    Global.PlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
+                    Global.PlayQueueID = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"PlayQueueID",-1);
                     Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
                 }
             }
@@ -813,7 +813,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     }
                     break;
                 case Constants.TOGGLE_MEDIASESSION:
-                    switch (SPUtil.getValue(mContext,"Setting",SPUtil.SPKEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN)){
+                    switch (SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN)){
                         case Constants.APLAYER_LOCKSCREEN:
                         case Constants.CLOSE_LOCKSCREEN:
                             cleanMetaData();
@@ -834,7 +834,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 //切换通知栏样式
                 case Constants.TOGGLE_NOTIFY:
                     mNotify.cancelPlayingNotify();
-                    boolean classic = intent.getBooleanExtra(SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,false);
+                    boolean classic = intent.getBooleanExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,false);
                     if(classic){
                         mNotify = new NotifyImpl(MusicService.this);
                     } else {
@@ -931,7 +931,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * @param control
      */
     private void updateMediaSession(int control) {
-        if(SPUtil.getValue(mContext,"Setting",SPUtil.SPKEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN || mCurrentSong == null)
+        if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN || mCurrentSong == null)
             return;
 
         int playState = mIsplay
@@ -1105,10 +1105,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     public void setPlayModel(int playModel) {
         mPlayModel = playModel;
         updateAppwidget();
-        SPUtil.putValue(mContext,"Setting", "PlayModel",mPlayModel);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, "PlayModel",mPlayModel);
         //保存正在播放和下一首歌曲
-        SPUtil.putValue(mContext,"Setting","NextSongId",mNextId);
-        SPUtil.putValue(mContext,"Setting","LastSongId",mCurrentId);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"NextSongId",mNextId);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId",mCurrentId);
         if(mPlayModel == Constants.PLAY_SHUFFLE){
             mRandomList.clear();
             makeShuffleList(mCurrentId);
@@ -1253,8 +1253,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     }
 
     private void loadAsync(){
-        final boolean isFirst = SPUtil.getValue(mContext, "Setting", "First", true);
-        SPUtil.putValue(mContext,"Setting","First",false);
+        final boolean isFirst = SPUtil.getValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, "First", true);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"First",false);
         //读取sd卡歌曲id
         Global.AllSongList = MediaStoreUtil.getAllSongsId();
         //第一次启动软件
@@ -1263,29 +1263,29 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 //默认全部歌曲为播放队列
                 Global.PlayQueueID = PlayListUtil.addPlayList(Constants.PLAY_QUEUE);
                 Global.setPlayQueue(Global.AllSongList);
-                SPUtil.putValue(mContext,"Setting","PlayQueueID",Global.PlayQueueID);
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"PlayQueueID",Global.PlayQueueID);
                 //添加我的收藏列表
                 Global.MyLoveID = PlayListUtil.addPlayList(getString(R.string.my_favorite));
-                SPUtil.putValue(mContext,"Setting","MyLoveID",Global.MyLoveID);
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"MyLoveID",Global.MyLoveID);
                 //保存默认主题设置
-                SPUtil.putValue(mContext,"Setting","ThemeMode", ThemeStore.DAY);
-                SPUtil.putValue(mContext,"Setting","ThemeColor",ThemeStore.THEME_BLUE);
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ThemeMode", ThemeStore.DAY);
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ThemeColor",ThemeStore.THEME_BLUE);
                 //通知栏样式
-                SPUtil.putValue(mContext,"Setting",SPUtil.SPKEY.NOTIFY_STYLE_CLASSIC,!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O));
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O));
             } catch (Exception e){
                 Util.uploadException("初始化失败",e);
             }
         }else {
             //播放模式
-            mPlayModel = SPUtil.getValue(mContext,"Setting", "PlayModel",Constants.PLAY_LOOP);
-            Global.PlayQueueID = SPUtil.getValue(mContext,"Setting","PlayQueueID",-1);
-            Global.MyLoveID = SPUtil.getValue(mContext,"Setting","MyLoveID",-1);
+            mPlayModel = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, "PlayModel",Constants.PLAY_LOOP);
+            Global.PlayQueueID = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"PlayQueueID",-1);
+            Global.MyLoveID = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"MyLoveID",-1);
             Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
             Global.PlayList = PlayListUtil.getAllPlayListInfo();
-            mShowFloatLrc = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_LYRIC,false);
+            mShowFloatLrc = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC,false);
 
             //摇一摇
-            if(SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.SHAKE,false)){
+            if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.SHAKE,false)){
                 ShakeDetector.getInstance(mContext).beginListen();
             }
         }
@@ -1303,7 +1303,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
             return ;
         //读取上次退出时正在播放的歌曲的id
-        int lastId = SPUtil.getValue(mContext,"Setting","LastSongId",-1);
+        int lastId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId",-1);
         //上次退出时正在播放的歌曲是否还存在
         boolean isLastSongExist = false;
         //上次退出时正在播放的歌曲的pos
@@ -1332,7 +1332,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     break;
             }
             item = MediaStoreUtil.getMP3InfoById(id);
-            SPUtil.putValue(mContext,"Setting","LastSongId",id);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId",id);
             initDataSource(item,0);
         }
     }
@@ -1419,7 +1419,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         Observable.just(!checkNoPermission() && mShowFloatLrc)
                 .filter(aBoolean -> aBoolean)
                 .flatMap(aBoolean -> (control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcRows == null ?
-                        new SearchLrc(mCurrentSong).getLyric("") : null)
+                        new SearchLrc(mCurrentSong).getLyric() : null)
                 .doOnSubscribe(disposable -> createFloatLrcThreadIfNeed())
                 .subscribe(lrcRows -> mLrcRows = lrcRows, throwable -> mLrcRows = null);
     }
@@ -1643,7 +1643,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         param.width = mContext.getResources().getDisplayMetrics().widthPixels;
         param.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         param.x = 0;
-        param.y = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_Y,0);
+        param.y = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_Y,0);
 
         if(mFloatLrcView != null){
             mWindowManager.removeView(mFloatLrcView);
@@ -1680,7 +1680,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 关闭桌面歌词
      */
     private void closeFloatLrc() {
-        SPUtil.putValue(mContext,"Setting","FloatLrc",false);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"FloatLrc",false);
         mShowFloatLrc = false;
         mUpdateFloatLrcThread = null;
         if(mLrcRows != null)
@@ -1851,7 +1851,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             String action = intent.getAction();
             if(Intent.ACTION_SCREEN_ON.equals(action)){
                 //显示锁屏
-                if(MusicService.isPlay() && SPUtil.getValue(context,"Setting",SPUtil.SPKEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN) == Constants.APLAYER_LOCKSCREEN)
+                if(MusicService.isPlay() && SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN, Constants.APLAYER_LOCKSCREEN) == Constants.APLAYER_LOCKSCREEN)
                     context.startActivity(new Intent(context, LockScreenActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 //重新显示桌面歌词
                 createFloatLrcThreadIfNeed();

@@ -50,8 +50,6 @@ import com.umeng.analytics.MobclickAgent;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -314,8 +312,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             return false;
         });
 
-        if(SPUtil.getValue(this,"Setting","LrcHint",true)){
-            SPUtil.putValue(this,"Setting","LrcHint",false);
+        if(SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"LrcHint",true)){
+            SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"LrcHint",false);
             new MaterialDialog.Builder(mContext)
                     .content(getString(R.string.lc_operation_hint))
                     .contentColorAttr(R.attr.text_color_primary)
@@ -664,7 +662,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         else if(album.equals(""))
             mTopDetail.setText(song.getArtist());
         else
-            mTopDetail.setText(song.getArtist() + "-" + song.getAlbum());
+            mTopDetail.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
     }
 
     /**
@@ -784,57 +782,43 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 }
                 @Override
                 public void onLongClick() {
-                    //如果之前忽略过该歌曲的歌词，取消忽略
-                    final Set<String> ignoreLrcID = new HashSet<>(SPUtil.getStringSet(mContext, "Setting", "IgnoreLrcID"));
-                    final boolean[] alreadyIgnore = new boolean[1];
-                    if(ignoreLrcID.size() > 0){
-                        for (String id : ignoreLrcID){
-                            if((mInfo.getId() + "").equals(id)){
-                                alreadyIgnore[0] = true;
-                                break;
-                            }
-                        }
-                    }
+                    //是否已经忽略
+                    final boolean alreadyIgnore = SPUtil.getValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
                     new MaterialDialog.Builder(mContext)
-                            .items(getString(!alreadyIgnore[0] ? R.string.ignore_lrc : R.string.cancel_ignore_lrc), getString(R.string.select_lrc))
+                            .items(getString(R.string.netease),getString(R.string.kugou),getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc),getString(R.string.select_lrc))
                             .itemsColorAttr(R.attr.text_color_primary)
                             .backgroundColorAttr(R.attr.background_color_3)
                             .itemsCallback((dialog, itemView, position, text) -> {
                                 switch (position){
-                                    case 0:
-                                        //忽略这首歌的歌词
+                                    case 0: //网易 酷狗
+                                    case 1:
+                                        SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
+                                        lrcFragment.updateLrc(mInfo,true);
+                                        break;
+                                    case 2: //忽略或者取消忽略
                                         new MaterialDialog.Builder(mContext)
                                                 .negativeText(R.string.cancel)
                                                 .negativeColorAttr(R.attr.text_color_primary)
                                                 .positiveText(R.string.confirm)
                                                 .positiveColorAttr(R.attr.text_color_primary)
-                                                .title(!alreadyIgnore[0] ? R.string.confirm_ignore_lrc : R.string.confirm_cancel_ignore_lrc)
+                                                .title(!alreadyIgnore ? R.string.confirm_ignore_lrc : R.string.confirm_cancel_ignore_lrc)
                                                 .titleColorAttr(R.attr.text_color_primary)
                                                 .backgroundColorAttr(R.attr.background_color_3)
                                                 .onPositive((dialog1, which) -> {
-                                                    if(!alreadyIgnore[0]){//忽略
+                                                    if(!alreadyIgnore){//忽略
                                                         if (mInfo != null) {
-                                                            ignoreLrcID.add(mInfo.getId() + "");
-                                                            SPUtil.putStringSet(mContext, "Setting", "IgnoreLrcID", ignoreLrcID);
+                                                            SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_IGNORE);
                                                             lrcFragment.updateLrc(mInfo);
                                                         }
                                                     } else {//取消忽略
-                                                        if(ignoreLrcID.size() > 0){
-                                                            for (String id : ignoreLrcID){
-                                                                if((mInfo.getId() + "").equals(id)){
-                                                                    ignoreLrcID.remove(mInfo.getId() + "");
-                                                                    SPUtil.putStringSet(mContext,"Setting","IgnoreLrcID",ignoreLrcID);
-                                                                }
-                                                            }
-                                                        }
+                                                        SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE);
                                                         lrcFragment.updateLrc(mInfo);
                                                     }
 
                                                 })
                                                 .show();
                                         break;
-                                    case 1:
-                                        //手动选择歌词
+                                    case 3: //手动选择歌词
                                         new FileChooserDialog.Builder(PlayerActivity.this)
                                                 .extensionsFilter(".lrc")
                                                 .show();
@@ -888,7 +872,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 else
                     mPager.setIntercept(false);
                 //歌词界面常亮
-                if(position == 2 && SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.SCREEN_ALWAYS_ON,false)){
+                if(position == 2 && SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON,false)){
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 }
             }
@@ -989,7 +973,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         Theme.TintDrawable(mTopHide,R.drawable.icon_player_back,tintColor);
         Theme.TintDrawable(mTopMore,R.drawable.icon_player_more,tintColor);
         //播放模式与播放队列
-        int playmode = SPUtil.getValue(this,"Setting", "PlayModel",Constants.PLAY_LOOP);
+        int playmode = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME, "PlayModel",Constants.PLAY_LOOP);
         Theme.TintDrawable(mPlayModel,playmode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                 playmode == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                         R.drawable.play_btn_loop_one,tintColor);
@@ -1080,16 +1064,17 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      */
     @Override
     public void onFileSelection(@NonNull FileChooserDialog dialog, @NonNull File file) {
-        //如果之前忽略过该歌曲的歌词，取消忽略
-        Set<String> ignoreLrcId = SPUtil.getStringSet(this,"Setting","IgnoreLrcID");
-        if(ignoreLrcId != null && ignoreLrcId.size() > 0){
-            for (String id : ignoreLrcId){
-                if((mInfo.getId() + "").equals(id)){
-                    ignoreLrcId.remove(mInfo.getId() + "");
-                    SPUtil.putStringSet(this,"Setting","IgnoreLrcID",ignoreLrcId);
-                }
-            }
-        }
+//        //如果之前忽略过该歌曲的歌词，取消忽略
+//        Set<String> ignoreLrcId = new HashSet<>(SPUtil.getStringSet(this,SPUtil.SETTING_KEY.SETTING_NAME,"IgnoreLrcID"));
+//        if(ignoreLrcId.size() > 0){
+//            for (String id : ignoreLrcId){
+//                if((mInfo.getId() + "").equals(id)){
+//                    ignoreLrcId.remove(mInfo.getId() + "");
+//                    SPUtil.putStringSet(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"IgnoreLrcID",ignoreLrcId);
+//                }
+//            }
+//        }
+        SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_MANUAL);
         ((LrcFragment) mAdapter.getItem(2)).updateLrc(file.getAbsolutePath());
     }
 

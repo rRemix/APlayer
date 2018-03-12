@@ -70,7 +70,17 @@ public class SPUtil {
         editor.clear().apply();
     }
 
-    public static class SPKEY{
+    public static class LYRIC_KEY{
+        public static final String LYRIC_NAME = "Lyric";
+        public static final int LYRIC_IGNORE = 1;
+        public static final int LYRIC_NETEASE = 2;
+        public static final int LYRIC_KUGOU = 3;
+        public static final int LYRIC_MANUAL = 4;
+    }
+
+
+    public static class SETTING_KEY {
+        public static final String SETTING_NAME = "Setting";
         //桌面歌词是否可移动
         public static final String FLOAT_LYRIC_LOCK = "float_lyric_lock";
         //桌面歌词字体大小

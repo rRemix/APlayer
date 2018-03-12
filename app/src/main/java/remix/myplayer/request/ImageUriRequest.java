@@ -58,7 +58,7 @@ public abstract class ImageUriRequest<T> {
     public static final int URL_ALBUM = 10;
     public static final int URL_ARTIST = 100;
 
-    public static String AUTO_DOWNLOAD_ALBUM = SPUtil.getValue(APlayerApplication.getContext(),"Setting", SPUtil.SPKEY.AUTO_DOWNLOAD_ALBUM_COVER,APlayerApplication.getContext().getString(R.string.wifi_only));
+    public static String AUTO_DOWNLOAD_ALBUM = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,APlayerApplication.getContext().getString(R.string.wifi_only));
 
     protected RequestConfig mConfig = DEFAULT_CONFIG;
 

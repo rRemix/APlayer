@@ -59,7 +59,6 @@ public class DefaultLrcParser implements ILrcParser {
             return null;
         //解析歌词
         String s;
-        DiskLruCache.Editor editor = null;
         OutputStream lrcCacheStream = null;
 
         List<LrcRow> lrcRows = new ArrayList<>();
@@ -80,18 +79,19 @@ public class DefaultLrcParser implements ILrcParser {
             }
             lrcRows.get(lrcRows.size() - 1).setTotalTime(5000);
 
-            if (needCache ) {
-                editor = DiskCache.getLrcDiskCache().edit(Util.hashKeyForDisk(songName + "/" + artistName));
-                if(editor != null)
-                    lrcCacheStream = editor.newOutputStream(0);
-                if(lrcCacheStream != null){
-                    lrcCacheStream.write(new Gson().toJson(lrcRows,new TypeToken<List<LrcRow>>(){}.getType()).getBytes());
-                    lrcCacheStream.flush();
-                }
-                if (editor != null) {
-                    editor.commit();
-                }
-                DiskCache.getLrcDiskCache().flush();
+            if (needCache) {
+                saveLrcRows(lrcRows,Util.hashKeyForDisk(songName + "/" + artistName));
+//                editor = DiskCache.getLrcDiskCache().edit(Util.hashKeyForDisk(songName + "/" + artistName));
+//                if(editor != null)
+//                    lrcCacheStream = editor.newOutputStream(0);
+//                if(lrcCacheStream != null){
+//                    lrcCacheStream.write(new Gson().toJson(lrcRows,new TypeToken<List<LrcRow>>(){}.getType()).getBytes());
+//                    lrcCacheStream.flush();
+//                }
+//                if (editor != null) {
+//                    editor.commit();
+//                }
+//                DiskCache.getLrcDiskCache().flush();
             }
 
         } catch (Exception e) {

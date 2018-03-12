@@ -74,23 +74,27 @@ public class LrcFragment extends BaseFragment {
         }
     }
 
-    public void updateLrc(Song song) {
+    public void updateLrc(Song song){
+        updateLrc(song,false);
+    }
+
+    public void updateLrc(Song song,boolean clearCache) {
         mInfo = song;
-        getLrc("");
+        getLrc("",clearCache);
     }
 
     public void updateLrc(String lrcPath){
-        getLrc(lrcPath);
+        getLrc(lrcPath,true);
     }
 
-    private void getLrc(String manualPath) {
+    private void getLrc(String manualPath,boolean clearCache) {
         if (mInfo == null) {
             mLrcView.setText(getString(R.string.no_lrc));
             return;
         }
 
         final int id = mInfo.getId();
-        new SearchLrc(mInfo).getLyric(manualPath)
+        new SearchLrc(mInfo).getLyric(manualPath,clearCache)
                 .doOnSubscribe(disposable -> {
                     mLrcView.setText(getString(R.string.searching));
                     mDisposable = disposable;

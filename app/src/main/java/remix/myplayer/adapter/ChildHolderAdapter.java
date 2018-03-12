@@ -64,9 +64,9 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
     private Drawable mSelectDrawable;
     private SortChangeCallback mCallback;
     //当前是升序还是降序 0:升序 1:降序
-    public static int ASC_DESC = SPUtil.getValue(APlayerApplication.getContext(),"Setting","SubDirAscDesc", ASC);
+    public static int ASC_DESC = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"SubDirAscDesc", ASC);
     //当前是按字母排序还是添加时间 0:字母 1:时间
-    public static int SORT = SPUtil.getValue(APlayerApplication.getContext(),"Setting","SubDirSort", NAME);
+    public static int SORT = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"SubDirSort", NAME);
     private RecyclerView mRecyclerView;
     private int mLastIndex;
 
@@ -123,7 +123,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
 //            final Song currentMP3 = MusicService.getCurrentMP3();
 //            //判断该歌曲是否是正在播放的歌曲
 //            //如果是,高亮该歌曲，并显示动画
-//            if(SPUtil.getValue(mContext,"Setting","ShowHighLight",false))
+//            if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ShowHighLight",false))
 //            if(currentMP3 != null){
 //                boolean highlight = song.getId() == currentMP3.getId();
 //                if(highlight)
@@ -236,7 +236,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
                 } else if(SORT == ADDTIME){
                     SORT = NAME;
                 }
-                SPUtil.putValue(mContext,"Setting","SubDirSort",SORT);
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"SubDirSort",SORT);
                 headerHolder.mSort.setText(SORT != NAME ?  R.string.sort_as_add_time : R.string.sort_as_letter);
                 mCallback.SortChange();
                 break;
@@ -246,7 +246,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
                 } else if(ASC_DESC == DESC){
                     ASC_DESC = ASC;
                 }
-                SPUtil.putValue(mContext,"Setting","SubDirAscDesc",ASC_DESC);
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"SubDirAscDesc",ASC_DESC);
                 headerHolder.mAscDesc.setText(ASC_DESC != ASC ? R.string.sort_as_desc : R.string.sort_as_asc);
                 mCallback.SortChange();
                 break;

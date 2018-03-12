@@ -77,7 +77,7 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
 
     @Override
     protected void initView() {
-        int model = SPUtil.getValue(mContext,"Setting","PlayListModel",Constants.GRID_MODEL);
+        int model = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"PlayListModel",Constants.GRID_MODEL);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(model == 1 ? new LinearLayoutManager(mContext) : new GridLayoutManager(getActivity(), 2));
         mRecyclerView.setAdapter(mAdapter);

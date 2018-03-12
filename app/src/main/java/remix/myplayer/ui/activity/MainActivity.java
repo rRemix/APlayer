@@ -187,7 +187,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private void setUpBottomBar() {
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        int lastId = SPUtil.getValue(mContext,"Setting","LastSongId",-1);
+        int lastId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId",-1);
         Song item;
         if(lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
             mBottomBar.updateBottomStatus(item,  MusicService.isPlay());
@@ -286,11 +286,11 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
     //初始化ViewPager
     private void setUpPager() {
-        String categoryJson = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.LIBRARY_CATEGORY,"");
+        String categoryJson = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,"");
         List<Category> categories = TextUtils.isEmpty(categoryJson) ? new ArrayList<>() : new Gson().fromJson(categoryJson,new TypeToken<List<Category>>(){}.getType());
         if(categories.size() == 0){
             categories.addAll(DEFAULT_LIBRARY);
-            SPUtil.putValue(mContext,"Setting",SPUtil.SPKEY.LIBRARY_CATEGORY,new Gson().toJson(DEFAULT_LIBRARY,new TypeToken<List<Category>>(){}.getType()));
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,new Gson().toJson(DEFAULT_LIBRARY,new TypeToken<List<Category>>(){}.getType()));
         }
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mPagerAdapter.setList(categories);

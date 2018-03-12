@@ -45,7 +45,7 @@ public class NotifyImpl extends Notify {
         Notification notification = buildNotification(mService);
 
         if((MusicService.getCurrentMP3() != null)) {
-            boolean isSystemColor = SPUtil.getValue(mService,"Setting","IsSystemColor",true);
+            boolean isSystemColor = SPUtil.getValue(mService,SPUtil.SETTING_KEY.SETTING_NAME,"IsSystemColor",true);
 
             Song song = MusicService.getCurrentMP3();
             //设置歌手，歌曲名

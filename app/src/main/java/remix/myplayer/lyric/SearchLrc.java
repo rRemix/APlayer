@@ -26,9 +26,10 @@ import java.util.List;
 import java.util.Set;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.bean.LrcRequest;
+import remix.myplayer.bean.kugou.KLrcResponse;
+import remix.myplayer.bean.kugou.KSearchResponse;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.bean.netease.NLrcResponse;
 import remix.myplayer.bean.netease.NSongSearchResponse;
@@ -73,66 +74,80 @@ public class SearchLrc {
 
 
     /**
-     * 获取酷狗歌词接口的参数
-     * @return
+     * 根据歌词id,发送请求并解析歌词
+     * @return 歌词
      */
-    public LrcRequest getLrcParam(){
-        //酷狗
-        try {
-            JSONObject response = Util.getSongJsonObject(URLEncoder.encode(mSong.getTitle(), "utf-8"),
-                            URLEncoder.encode(mSong.getArtist(), "utf-8"), mSong.getDuration());
-            if(response != null && response.length() > 0){
-                if(response.getJSONArray("candidates").length() > 0){
-                    JSONObject jsonObject = response.getJSONArray("candidates").getJSONObject(0);
-                    if(jsonObject.getInt("score") >= 60)
-                        return new LrcRequest(jsonObject.getInt("id"),jsonObject.getString("accesskey"));
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return new LrcRequest();
+    public Observable<List<LrcRow>> getLyric(String manualPath,boolean clearCache){
+        int type = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.LYRIC_KEY.LYRIC_NAME,mSong.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE);
+        Observable<List<LrcRow>> networkObservable = getNetworkObservable(type);
+        Observable<List<LrcRow>> localObservable = getLocalObservable();
+
+        //根据在线和本地的优先级 确定最后一级
+        boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,false);
+        Observable<List<LrcRow>> last = Observable.concat(onlineFirst ? networkObservable : localObservable ,onlineFirst ? localObservable : networkObservable).firstOrError().toObservable();
+
+
+
+        return type == SPUtil.LYRIC_KEY.LYRIC_IGNORE ? Observable.error(new Throwable("Ignore")) :
+                Observable.concat(getCacheObservable(),getManualObservable(manualPath),last).firstOrError().toObservable()
+                .doOnSubscribe(disposable -> {
+                    //清除缓存
+                    if(clearCache){
+                        DiskCache.getLrcDiskCache().remove(Util.hashKeyForDisk(mKey));
+                    }
+                })
+                .compose(RxUtil.applyScheduler());
+
     }
+
 
     /**
      * 根据歌词id,发送请求并解析歌词
-     * @return 歌词信息list
+     * @return 歌词
      */
-    public Observable<List<LrcRow>> getLyric(String manualPath){
-        //网易歌词
-        Observable<List<LrcRow>> neteaseObservable = HttpClient.getNeteaseApiservice()
-                .getNeteaseSearch(mSong.getArtist() + "-" + mSong.getTitle(),0,1,1)
-                .flatMap(body -> HttpClient.getInstance()
-                        .getNeteaseLyric(new Gson().fromJson(body.string(),NSongSearchResponse.class).result.songs.get(0).id)
-                        .map(body1 -> {
-                            final NLrcResponse lrcResponse = new Gson().fromJson(body1.string(),NLrcResponse.class);
-                            final Charset utf8 = Charset.forName("utf8");
-                            List<LrcRow> combine = mLrcParser.getLrcRows(new BufferedReader(
-                                    new InputStreamReader(
-                                            new ByteArrayInputStream(lrcResponse.lrc.lyric.getBytes(utf8)),utf8)),false,mSong.getTitle(),mSong.getArtist() + "/original");
-                            //有翻译 合并
-                            if(lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
-                                List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(utf8)),utf8)),false,mSong.getTitle(),mSong.getArtist() + "/translate");
-                                if(translate != null && translate.size() > 0){
-                                    for(int i = 0 ; i < translate.size();i++){
-                                        for(int j = 0 ; j < combine.size();j++){
-                                            if(translate.get(i).getTime() == combine.get(j).getTime()){
-                                                combine.get(j).setTranslate(translate.get(i).getContent());
-                                                break;
-                                            }
-                                        }
-                                    }
+    public Observable<List<LrcRow>> getLyric(){
+        return getLyric("",false);
+    }
 
-                                }
-                            }
 
-                            mLrcParser.saveLrcRows(combine,mKey);
-                            return combine;
-                        })).onErrorResumeNext(throwable -> {
-                    return Observable.empty();
-                });
-        //本地歌词
-        Observable<List<LrcRow>> localObservable = Observable.create(e -> {
+    /**
+     * 手动设置歌词
+     */
+    private Observable<List<LrcRow>> getManualObservable(final String manualPath){
+        return Observable.create(e -> {
+            //手动设置的歌词
+            if(!TextUtils.isEmpty(manualPath)){
+                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(manualPath))),true, mSong.getTitle(),mSong.getArtist()));
+            }
+            e.onComplete();
+        });
+    }
+
+
+    /**
+     * 缓存
+     */
+    private Observable<List<LrcRow>> getCacheObservable(){
+        return Observable.create(e -> {
+            //缓存
+            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(Util.hashKeyForDisk(mKey));
+            if(snapShot != null){
+                BufferedReader br = new BufferedReader(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))));
+                e.onNext(new Gson().fromJson(br.readLine(),new TypeToken<List<LrcRow>>(){}.getType()));
+                snapShot.close();
+                br.close();
+            }
+            e.onComplete();
+        });
+    }
+
+
+    /**
+     * 本地歌词
+     * @return
+     */
+    private Observable<List<LrcRow>> getLocalObservable() {
+        return Observable.create(e -> {
             List<String> localPaths = getAllLocalLrcPath();
             if(localPaths.size()>0) {
                 if(localPaths.size()==1) {
@@ -150,6 +165,7 @@ public class SearchLrc {
                     if(translatePath==null){
                         e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist()));
                     }else{
+                        //合并歌词
                         List<LrcRow> source = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist());
                         List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(translatePath))),false,mSong.getTitle(),mSong.getArtist() + "/translate");
                         if(translate != null && translate.size() > 0) {
@@ -173,42 +189,63 @@ public class SearchLrc {
             }
             e.onComplete();
         });
-        //根据在线和本地的优先级 确定最后一级
-        boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting", SPUtil.SPKEY.ONLINE_LYRIC_FIRST,false);
-        Observable<List<LrcRow>> last = Observable.concat(onlineFirst ? neteaseObservable : localObservable ,onlineFirst ? localObservable : neteaseObservable).firstOrError().toObservable();
+    }
 
-        return Observable.just(SPUtil.getStringSet(APlayerApplication.getContext(),"Setting","IgnoreLrcID"))
-                .flatMap(ignoreLrcId -> Observable.create((ObservableOnSubscribe<List<LrcRow>>) e -> {
-                    boolean ignore = false;
-                    if(ignoreLrcId != null && ignoreLrcId.size() > 0){
-                        for (String id : ignoreLrcId){
-                            if((mSong.getId() + "").equals(id)){
-                                ignore = true;
-                                break;
-                            }
-                        }
-                    }
-                    if(ignore)
-                        e.onError(new Throwable("已忽略歌词"));
-                    else
-                        e.onComplete();
-                }).switchIfEmpty(Observable.create((ObservableOnSubscribe<List<LrcRow>>) e -> {
-                    //手动设置的歌词
-                    if(!TextUtils.isEmpty(manualPath)){
-                        e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(manualPath))),true, mSong.getTitle(),mSong.getArtist()));
-                    }
-                    e.onComplete();
-                }).switchIfEmpty(Observable.create(e -> {
-                    //缓存
-                    DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(Util.hashKeyForDisk(mKey));
-                    if(snapShot != null){
-                        BufferedReader br = new BufferedReader(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))));
-                        e.onNext(new Gson().fromJson(br.readLine(),new TypeToken<List<LrcRow>>(){}.getType()));
-                        snapShot.close();
-                        br.close();
-                    }
-                    e.onComplete();
-                })).switchIfEmpty(last).compose(RxUtil.applyScheduler())));
+
+    /**
+     * 在线歌词
+     * @return
+     * @param type
+     */
+    private Observable<List<LrcRow>> getNetworkObservable(int type) {
+        if(type == SPUtil.LYRIC_KEY.LYRIC_KUGOU){
+            //酷狗歌词
+            return HttpClient.getKuGouApiservice().getKuGouSearch(1,"yes","pc",mSong.getArtist() + "-" + mSong.getTitle(),mSong.getDuration(),"")
+                    .flatMap(body -> {
+                        final KSearchResponse searchResponse = new Gson().fromJson(body.string(),KSearchResponse.class);
+                        return HttpClient.getKuGouApiservice().getKuGouLyric(1,"pc","lrc","utf8",searchResponse.candidates.get(0).id,
+                                searchResponse.candidates.get(0).accesskey)
+                                .map(lrcBody -> {
+                                    final KLrcResponse lrcResponse = new Gson().fromJson(lrcBody.string(),KLrcResponse.class);
+                                    return mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(Base64.decode(lrcResponse.content, Base64.DEFAULT)))),
+                                            true,mSong.getTitle(),
+                                            mSong.getArtist());
+                                });
+                    });
+        }else {
+            //网易歌词
+            return HttpClient.getNeteaseApiservice()
+                    .getNeteaseSearch(mSong.getArtist() + "-" + mSong.getTitle(),0,1,1)
+                    .flatMap(body -> HttpClient.getInstance()
+                            .getNeteaseLyric(new Gson().fromJson(body.string(),NSongSearchResponse.class).result.songs.get(0).id)
+                            .map(body1 -> {
+                                final NLrcResponse lrcResponse = new Gson().fromJson(body1.string(),NLrcResponse.class);
+                                final Charset utf8 = Charset.forName("utf8");
+                                List<LrcRow> combine = mLrcParser.getLrcRows(new BufferedReader(
+                                        new InputStreamReader(
+                                                new ByteArrayInputStream(lrcResponse.lrc.lyric.getBytes(utf8)),utf8)),false,mSong.getTitle(),mSong.getArtist() + "/original");
+                                //有翻译 合并
+                                if(lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
+                                    List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(utf8)),utf8)),false,mSong.getTitle(),mSong.getArtist() + "/translate");
+                                    if(translate != null && translate.size() > 0){
+                                        for(int i = 0 ; i < translate.size();i++){
+                                            for(int j = 0 ; j < combine.size();j++){
+                                                if(translate.get(i).getTime() == combine.get(j).getTime()){
+                                                    combine.get(j).setTranslate(translate.get(i).getContent());
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                                mLrcParser.saveLrcRows(combine,mKey);
+                                return combine;
+                            })).onErrorResumeNext(throwable -> {
+                        return Observable.empty();
+                    });
+        }
 
     }
 
@@ -219,7 +256,7 @@ public class SearchLrc {
     @Deprecated
     public List<LrcRow> getLrc(String manualPath){
         //判断是否是忽略的歌词
-        Set<String> ignoreLrcId = SPUtil.getStringSet(APlayerApplication.getContext(),"Setting","IgnoreLrcID");
+        Set<String> ignoreLrcId = SPUtil.getStringSet(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"IgnoreLrcID");
         if(ignoreLrcId != null && ignoreLrcId.size() > 0){
             for (String id : ignoreLrcId){
                 if((mSong.getId() + "").equals(id)){
@@ -267,7 +304,7 @@ public class SearchLrc {
         //搜索歌词
         try {
             //是否优先搜索在线歌词
-            boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),"Setting", SPUtil.SPKEY.ONLINE_LYRIC_FIRST,false);
+            boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,false);
             if(onlineFirst){
                 String onlineLrcContent = getOnlineLrcContent();
                 if(!TextUtils.isEmpty(onlineLrcContent)){
@@ -307,6 +344,29 @@ public class SearchLrc {
                 }
         }
         return null;
+    }
+
+
+    /**
+     * 获取酷狗歌词接口的参数
+     * @return
+     */
+    public LrcRequest getLrcParam(){
+        //酷狗
+        try {
+            JSONObject response = Util.getSongJsonObject(URLEncoder.encode(mSong.getTitle(), "utf-8"),
+                    URLEncoder.encode(mSong.getArtist(), "utf-8"), mSong.getDuration());
+            if(response != null && response.length() > 0){
+                if(response.getJSONArray("candidates").length() > 0){
+                    JSONObject jsonObject = response.getJSONArray("candidates").getJSONObject(0);
+                    if(jsonObject.getInt("score") >= 60)
+                        return new LrcRequest(jsonObject.getInt("id"),jsonObject.getString("accesskey"));
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new LrcRequest();
     }
 
     /**
@@ -354,7 +414,7 @@ public class SearchLrc {
      */
     private String getLocalLrcPath() {
         //查找本地目录
-        String searchPath =  SPUtil.getValue(APlayerApplication.getContext(),"Setting","LrcSearchPath","");
+        String searchPath =  SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"LrcSearchPath","");
         if(mSong == null)
             return "";
         if(!TextUtils.isEmpty(searchPath)){
@@ -399,7 +459,7 @@ public class SearchLrc {
     private List<String> getAllLocalLrcPath() {
         List<String> results = new ArrayList<>();
         //查找本地目录
-        String searchPath = SPUtil.getValue(APlayerApplication.getContext(), "Setting", "LrcSearchPath", "");
+        String searchPath = SPUtil.getValue(APlayerApplication.getContext(), SPUtil.SETTING_KEY.SETTING_NAME, "LrcSearchPath", "");
         if (mSong == null)
             return results;
         if (!TextUtils.isEmpty(searchPath)) {

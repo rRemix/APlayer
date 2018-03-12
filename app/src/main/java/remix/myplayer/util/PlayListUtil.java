@@ -416,7 +416,7 @@ public class PlayListUtil {
      * @return
      */
     public static String getDeleteID(){
-        Set<String> deleteId = SPUtil.getStringSet(mContext,"Setting","DeleteID");
+        Set<String> deleteId = SPUtil.getStringSet(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"DeleteID");
         if(deleteId == null || deleteId.size() == 0)
             return "";
         StringBuilder stringBuilder = new StringBuilder();

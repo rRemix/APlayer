@@ -1,10 +1,10 @@
 package remix.myplayer.ui.dialog;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.SwitchCompat;
@@ -26,6 +26,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
+import remix.myplayer.misc.handler.MsgHandler;
+import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -76,24 +78,17 @@ public class TimerDialog extends BaseDialogActivity {
     //每一秒中更新数据
     private Timer mUpdateTimer;
     //更新seekbar与剩余时间
-    private Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            if(msg.getData() != null){
-                mMinute.setText(msg.getData().getString("Minute"));
-                mSecond.setText(msg.getData().getString("Second"));
-            }
-            mSeekbar.setProgress(msg.arg1);
-        }
-    };
+    private MsgHandler mHandler;
 
 
+    @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         MobclickAgent.onEvent(this,"Timer");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_timer);
         ButterKnife.bind(this);
+        mHandler = new MsgHandler(this);
 
         //居中显示
         Window w = getWindow();
@@ -104,6 +99,7 @@ public class TimerDialog extends BaseDialogActivity {
         WindowManager.LayoutParams lp = getWindow().getAttributes();
         w.setAttributes(lp);
         w.setGravity(Gravity.CENTER);
+
 
         //如果正在计时，设置seekbar的进度
         if(mIsTiming) {
@@ -139,8 +135,8 @@ public class TimerDialog extends BaseDialogActivity {
         ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
 
         //读取保存的配置
-        boolean hasDefault = SPUtil.getValue(this, "Setting", "TimerDefault", false);
-        final int time = SPUtil.getValue(this,"Setting","TimerNum",-1);
+        boolean hasDefault = SPUtil.getValue(this, SPUtil.SETTING_KEY.SETTING_NAME, "TimerDefault", false);
+        final int time = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"TimerNum",-1);
 
         //默认选项
         if(hasDefault && time > 0){
@@ -156,22 +152,21 @@ public class TimerDialog extends BaseDialogActivity {
             if (isChecked) {
                 if (mSaveTime > 0) {
                     ToastUtil.show(TimerDialog.this,R.string.set_success);
-                    SPUtil.putValue(TimerDialog.this, "Setting", "TimerDefault", true);
-                    SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", mSaveTime);
+                    SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, "TimerDefault", true);
+                    SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, "TimerNum", mSaveTime);
                 } else {
                     ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
                     mSwitch.setChecked(false);
                 }
             } else {
                 ToastUtil.show(TimerDialog.this,R.string.cancel_success);
-                SPUtil.putValue(TimerDialog.this, "Setting", "TimerDefault", false);
-                SPUtil.putValue(TimerDialog.this, "Setting", "TimerNum", -1);
+                SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, "TimerDefault", false);
+                SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, "TimerNum", -1);
                 mSaveTime = -1;
             }
         });
 
-
-        mToggle.setText(mIsTiming ? "取消计时" : "开始计时");
+        mToggle.setText(mIsTiming ? R.string.cancel_timer : R.string.start_timer);
 
         //分钟 秒 背景框
         ButterKnife.apply(new View[]{findView(R.id.timer_minute_container), findView(R.id.timer_second_container)},
@@ -227,6 +222,18 @@ public class TimerDialog extends BaseDialogActivity {
         }
     }
 
+    @OnHandleMessage
+    public void handlerInternal(Message msg){
+        if(msg != null){
+            if(msg.getData() != null){
+                mMinute.setText(msg.getData().getString("Minute"));
+                mSecond.setText(msg.getData().getString("Second"));
+            }
+            mSeekbar.setProgress(msg.arg1);
+        }
+
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -260,6 +267,7 @@ public class TimerDialog extends BaseDialogActivity {
             mUpdateTimer.cancel();
             mUpdateTimer = null;
         }
+        mHandler.remove();
     }
 
     @Override

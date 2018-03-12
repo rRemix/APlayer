@@ -55,7 +55,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
     public PlayListAdapter(Context context,int layoutId,MultiChoice multiChoice) {
         super(context,layoutId,multiChoice);
-        ListModel =  SPUtil.getValue(context,"Setting","PlayListModel",Constants.GRID_MODEL);
+        ListModel =  SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,"PlayListModel",Constants.GRID_MODEL);
         this.mMultiChoice = multiChoice;
     }
 
@@ -207,7 +207,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 
     @Override
     protected void saveMode() {
-        SPUtil.putValue(mContext,"Setting","PlayListModel",ListModel);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"PlayListModel",ListModel);
     }
 
     static class PlayListListHolder extends PlayListHolder{

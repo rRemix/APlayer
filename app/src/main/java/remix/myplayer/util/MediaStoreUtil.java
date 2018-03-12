@@ -115,10 +115,10 @@ public class MediaStoreUtil {
         Cursor cursor = null;
 
         //默认过滤文件大小500K
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,"Setting","ScanSize",-1);
+        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",-1);
         if( Constants.SCAN_SIZE < 0) {
             Constants.SCAN_SIZE = 500 * ByteConstants.KB;
-            SPUtil.putValue(mContext,"Setting","ScanSize",500 * ByteConstants.KB);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",500 * ByteConstants.KB);
         }
         try {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -174,10 +174,10 @@ public class MediaStoreUtil {
         Cursor cursor = null;
 
         //默认过滤文件大小500K
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,"Setting","ScanSize",-1);
+        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",-1);
         if( Constants.SCAN_SIZE < 0) {
             Constants.SCAN_SIZE = 500 * ByteConstants.KB;
-            SPUtil.putValue(mContext,"Setting","ScanSize",500 * ByteConstants.KB);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",500 * ByteConstants.KB);
         }
         try{
             cursor = resolver.query(
@@ -185,8 +185,8 @@ public class MediaStoreUtil {
                     null,
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
                     null,
-                    SPUtil.getValue(mContext,"Setting","Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER)
-                            + SPUtil.getValue(mContext,"Setting","AscDesc"," asc"));
+                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER)
+                            + SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"AscDesc"," asc"));
             if(cursor != null) {
                 while (cursor.moveToNext()) {
                     allSongList.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
@@ -213,10 +213,10 @@ public class MediaStoreUtil {
 
 
         //默认过滤文件大小500K
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,"Setting","ScanSize",-1);
+        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",-1);
         if( Constants.SCAN_SIZE < 0) {
             Constants.SCAN_SIZE = 500 * ByteConstants.KB;
-            SPUtil.putValue(mContext,"Setting","ScanSize",500 * ByteConstants.KB);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",500 * ByteConstants.KB);
         }
 
         try{
@@ -254,10 +254,10 @@ public class MediaStoreUtil {
         Cursor cursor = null;
 
         //默认过滤文件大小500K
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,"Setting","ScanSize",-1);
+        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",-1);
         if( Constants.SCAN_SIZE < 0) {
             Constants.SCAN_SIZE = 500 * ByteConstants.KB;
-            SPUtil.putValue(mContext,"Setting","ScanSize",500 * ByteConstants.KB);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",500 * ByteConstants.KB);
         }
 
         try{
@@ -266,8 +266,8 @@ public class MediaStoreUtil {
                     new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA},
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
                     null,
-                    SPUtil.getValue(mContext,"Setting","Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER)
-                            + SPUtil.getValue(mContext,"Setting","AscDesc"," asc"));
+                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER)
+                            + SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"AscDesc"," asc"));
             if(cursor != null) {
                 Global.FolderMap.clear();
                 while (cursor.moveToNext()) {
@@ -847,12 +847,12 @@ public class MediaStoreUtil {
             return 0;
 
         //删除之前保存的所有移除歌曲id
-        Set<String> deleteId = new HashSet<>(SPUtil.getStringSet(mContext,"Setting","DeleteID"));
+        Set<String> deleteId = new HashSet<>(SPUtil.getStringSet(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"DeleteID"));
         //保存到sp
         for(Song temp : songs){
             deleteId.add(temp.getId() + "");
         }
-        SPUtil.putStringSet(mContext, "Setting", "DeleteID", deleteId);
+        SPUtil.putStringSet(mContext, SPUtil.SETTING_KEY.SETTING_NAME, "DeleteID", deleteId);
         mContext.getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
         //删除源文件
         if(deleteSource)
@@ -870,7 +870,7 @@ public class MediaStoreUtil {
 //    public static int delete(int data, int type) {
 //        int deleteNum = 0;
 //        //删除之前保存的所有移除歌曲id
-//        Set<String> deleteId = new HashSet<>(SPUtil.getStringSet(mContext,"Setting","DeleteID"));
+//        Set<String> deleteId = new HashSet<>(SPUtil.getStringSet(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"DeleteID"));
 //        //待删除的id
 //        List<Integer> wangToDelete = new ArrayList<>();
 //
@@ -923,11 +923,11 @@ public class MediaStoreUtil {
 //            deleteId.add(temp + "");
 //        }
 //
-//        SPUtil.putStringSet(mContext, "Setting", "DeleteID", deleteId);
+//        SPUtil.putStringSet(mContext, SPUtil.SETTING_KEY.SETTING_NAME, "DeleteID", deleteId);
 //        mContext.getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
 //
 //        //二.删除源文件
-//        if(SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.DELETE_SOURCE,false))
+//        if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.DELETE_SOURCE,false))
 //        deleteSource(wangToDelete);
 //        return deleteNum;
 //
@@ -1040,7 +1040,7 @@ public class MediaStoreUtil {
      * @return
      */
     public static String getBaseSelection(){
-//        Set<String> deleteId = SPUtil.getStringSet(mContext,"Setting","DeleteID");
+//        Set<String> deleteId = SPUtil.getStringSet(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"DeleteID");
 //        if(deleteId == null || deleteId.size() == 0)
 //            return BASE_SELECTION;
 //        StringBuilder stringBuilder = new StringBuilder();
@@ -1052,7 +1052,7 @@ public class MediaStoreUtil {
 //        }
 //        return stringBuilder.toString();
 
-        Set<String> deleteId = SPUtil.getStringSet(mContext,"Setting","DeleteID");
+        Set<String> deleteId = SPUtil.getStringSet(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"DeleteID");
         if(deleteId == null || deleteId.size() == 0)
             return BASE_SELECTION;
         StringBuilder blacklist = new StringBuilder();

@@ -28,7 +28,7 @@ public class FloatColorAdapter extends BaseAdapter<Integer,FloatColorAdapter.Flo
     private int mItemWidth;
     public FloatColorAdapter(Context Context,int layoutId,int width) {
         super(Context,layoutId);
-        mCurrentColor = SPUtil.getValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_COLOR,ThemeStore.getThemeColor());
+        mCurrentColor = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_COLOR,ThemeStore.getThemeColor());
         mItemWidth = width / ThemeStore.getAllThemeColor().size();
         //宽度太小
         if(mItemWidth < DensityUtil.dip2px(mContext,20))
@@ -46,7 +46,7 @@ public class FloatColorAdapter extends BaseAdapter<Integer,FloatColorAdapter.Flo
 
     public void setCurrentColor(int theme){
         mCurrentColor = theme;
-        SPUtil.putValue(mContext,"Setting", SPUtil.SPKEY.FLOAT_TEXT_COLOR,mCurrentColor);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_TEXT_COLOR,mCurrentColor);
     }
 
 

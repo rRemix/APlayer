@@ -76,7 +76,7 @@ public class ScanActivity extends ToolbarActivity {
                 int size = mSizeList.get(position);
                 if(size >= 0) {
                     //纪录下设置的大小
-                    SPUtil.putValue(ScanActivity.this, "Setting", "ScanSize", size);
+                    SPUtil.putValue(ScanActivity.this, SPUtil.SETTING_KEY.SETTING_NAME, "ScanSize", size);
                     Constants.SCAN_SIZE = size;
                 }
             }

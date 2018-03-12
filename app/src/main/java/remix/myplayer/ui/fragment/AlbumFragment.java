@@ -86,7 +86,7 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdapter>{
 
     @Override
     protected void initView() {
-        int model = SPUtil.getValue(mContext,"Setting","AlbumModel",Constants.GRID_MODEL);
+        int model = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"AlbumModel",Constants.GRID_MODEL);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(model == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
         mRecyclerView.setAdapter(mAdapter);

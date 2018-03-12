@@ -112,7 +112,6 @@
     <string name="share">分享</string>
     <string name="timer">伴着音乐入睡</string>
     <string name="as_default">设为默认</string>
-    <string name="start_timer">开始计时</string>
     <string name="close">关闭</string>
     <string name="timer_info_1">“定时停止”时间设为默认</string>
     <string name="timer_info_2">“定时停止”时间设为默认后，下次点击定时停止按钮后，将直接按之前设置好的时间开始计时。\n\n想要更改“定时停止”的时间，点击两次定时停止按钮即可进入设置页面。</string>
@@ -225,7 +224,7 @@
     <string name="float_lock">桌面歌词已锁定</string>
     <string name="float_lock_ticker">桌面歌词已锁定,可在通知栏解锁</string>
     <string name="float_unlock">桌面歌词已解除锁定</string>
-    <string name="lc_operation_hint">歌词界面长按可以忽略或者手动选择本地歌词</string>
+    <string name="lc_operation_hint">歌词界面长按可以选择歌词来源</string>
     <string name="mediaplayer_error">MediaPlayer{what:%1$d,extra:%2$d}\n正在重新初始化</string>
     <string name="screen_always_on_title">歌词界面屏幕常亮</string>
     <string name="screen_always_on_tip">开启后切换到歌词界面屏幕将常亮</string>
@@ -278,4 +277,8 @@
     <string name="immersive">沉浸式状态栏</string>
     <string name="immersive_tip">开启后状态栏与背景颜色一致</string>
     <string name="delete_source">同时删除源文件</string>
+    <string name="kugou">酷狗</string>
+    <string name="netease">网易</string>
+    <string name="cancel_timer">取消计时</string>
+    <string name="start_timer">开始计时</string>
 </resources>
