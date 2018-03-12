@@ -1,5 +1,6 @@
 package remix.myplayer.listener;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,9 +8,11 @@ import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.soundcloud.android.crop.Crop;
 import com.umeng.analytics.MobclickAgent;
 
 import remix.myplayer.R;
+import remix.myplayer.bean.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
@@ -55,6 +58,13 @@ public class SongPopupListener implements PopupMenu.OnMenuItemClickListener {
                 ardAdd.putInt("Id",mSong.getId());
                 intentAdd.putExtras(ardAdd);
                 mContext.startActivity(intentAdd);
+                break;
+            case R.id.menu_album_thumb:
+                CustomThumb thumbBean = new CustomThumb(mSong.getAlbumId(),Constants.ALBUM,mSong.getAlbum());
+                Intent thumbIntent = ((Activity)mContext).getIntent();
+                thumbIntent.putExtra("thumb",thumbBean);
+                ((Activity)mContext).setIntent(thumbIntent);
+                Crop.pickImage((Activity) mContext, Crop.REQUEST_PICK);
                 break;
             case R.id.menu_ring:
                 MobclickAgent.onEvent(mContext,"Ring");

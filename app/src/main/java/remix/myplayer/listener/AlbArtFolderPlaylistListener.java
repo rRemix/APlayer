@@ -101,7 +101,6 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 CustomThumb thumbBean = new CustomThumb(mId,mType,mKey);
                 Intent thumbIntent = ((Activity)mContext).getIntent();
                 thumbIntent.putExtra("thumb",thumbBean);
-                thumbIntent.putExtra("test",1234);
                 ((Activity)mContext).setIntent(thumbIntent);
 //                try {
 //                    Intent pickIntent = new Intent("android.intent.action.GET_CONTENT").setType("image/*");

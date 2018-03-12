@@ -5,8 +5,8 @@
             android:id="@+id/menu_next"/>
         <item android:title="@string/add_to_play_queue"
             android:id="@+id/menu_add"/>
-        <!--<item android:title="@string/set_album_cover"-->
-            <!--android:id="@+id/menu_set_cover"/>-->
+        <item android:title="@string/set_album_cover"
+            android:id="@+id/menu_album_thumb"/>
         <item android:title="@string/ring"
             android:id="@+id/menu_ring"/>
         <item android:title="@string/delete"

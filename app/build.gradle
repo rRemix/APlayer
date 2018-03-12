@@ -21,8 +21,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 54
-        versionName "1.2.7"
+        versionCode 55
+        versionName "1.2.7.1"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
@@ -89,6 +89,11 @@ android {
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
         }
     }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
