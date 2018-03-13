@@ -12,6 +12,6 @@ public interface Playback {
     void toggle();
     void playNext();
     void playPrevious();
-    void play();
+    void play(boolean fadeIn);
     void pause(boolean updateMediasessionOnly);
 }

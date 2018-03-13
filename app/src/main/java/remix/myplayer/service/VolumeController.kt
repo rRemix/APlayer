@@ -1,33 +1,17 @@
 package remix.myplayer.service
 
-import android.content.Context
-import android.media.AudioManager
 import android.os.CountDownTimer
 import android.os.Handler
+import android.support.annotation.FloatRange
 
 /**
  * Created by Remix on 2018/3/13.
  */
-const val DURATION_IN_MS = 1000L
-const val STUB_FADE_OUT = 1
-const val STUB_FADE_IN = 2
-class VolumeController(private val mService: MusicService){
+
+class VolumeController {
     private val mHandler: Handler = Handler()
-
-    fun to(toVolume: Float){
-        to(toVolume,toVolume)
-    }
-
-    fun to(leftVolume: Float,rightVolume: Float){
+    private val mFadeInRunnable: Runnable = Runnable {
         val mediaPlayer = MusicService.getMediaPlayer()
-        mediaPlayer.setVolume(leftVolume,rightVolume)
-    }
-
-    fun fadeOut(){
-        if(mHandler.hasMessages(STUB_FADE_OUT))
-            return
-        val mediaPlayer = MusicService.getMediaPlayer()
-        mHandler.sendEmptyMessageDelayed(STUB_FADE_OUT, DURATION_IN_MS)
         object : CountDownTimer(DURATION_IN_MS, DURATION_IN_MS / 10) {
             override fun onFinish() {
                 to(1)
@@ -37,26 +21,52 @@ class VolumeController(private val mService: MusicService){
                 val volume = 1f - millisUntilFinished * 1.0f / DURATION_IN_MS
                 mediaPlayer?.setVolume(volume, volume)
             }
-        }.cancel()
+        }.start()
     }
-
-    fun fadeIn(){
-        if(mHandler.hasMessages(STUB_FADE_IN))
-            return
-        mHandler.sendEmptyMessageDelayed(STUB_FADE_IN, DURATION_IN_MS)
+    private val mFadeOutRunnable: Runnable = Runnable {
         val mediaPlayer = MusicService.getMediaPlayer()
         object : CountDownTimer(DURATION_IN_MS,DURATION_IN_MS / 10){
             override fun onTick(millisUntilFinished: Long) {
                 val volume = millisUntilFinished * 1.0f / DURATION_IN_MS
                 mediaPlayer?.setVolume(volume,volume)
-                mediaPlayer?.pause()
             }
 
             override fun onFinish() {
                 to(0)
+                mediaPlayer?.pause()
             }
 
         }.start()
     }
 
+    fun to(@FloatRange(from = 0.0, to = 1.0) toVolume: Float){
+        to(toVolume,toVolume)
+    }
+
+    fun to(@FloatRange(from = 0.0, to = 1.0) leftVolume: Float, @FloatRange(from = 0.0, to = 1.0) rightVolume: Float){
+        val mediaPlayer = MusicService.getMediaPlayer()
+        mediaPlayer.setVolume(leftVolume,rightVolume)
+    }
+
+    /**
+     * 淡入
+     */
+    fun fadeIn(){
+        mHandler.removeCallbacks(mFadeInRunnable)
+        mHandler.removeCallbacks(mFadeOutRunnable)
+        mHandler.post(mFadeInRunnable)
+    }
+
+    /**
+     * 淡出
+     */
+    fun fadeOut(){
+        mHandler.removeCallbacks(mFadeInRunnable)
+        mHandler.removeCallbacks(mFadeOutRunnable)
+        mHandler.post(mFadeOutRunnable)
+    }
+
+    companion object {
+        private val DURATION_IN_MS = 600L
+    }
 }

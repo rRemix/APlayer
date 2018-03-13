@@ -31,12 +31,9 @@ import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.Util;
 
 /**
- * Created by taeja on 16-3-16.
+ * Created by Remix on 16-3-16.
  */
 
-/**
- * 错误收集与上报
- */
 public class APlayerApplication extends MultiDexApplication{
     private static Context mContext;
 
@@ -74,14 +71,14 @@ public class APlayerApplication extends MultiDexApplication{
 
     private void initUtil() {
         //初始化工具类
-        DBManager.initialInstance(new DBOpenHelper(mContext));
-        PermissionUtil.setContext(mContext);
-        MediaStoreUtil.setContext(mContext);
-        Util.setContext(mContext);
-        ImageUriUtil.setContext(mContext);
-        DiskCache.init(mContext);
-        ColorUtil.setContext(mContext);
-        PlayListUtil.setContext(mContext);
+        DBManager.initialInstance(new DBOpenHelper(this));
+        PermissionUtil.setContext(this);
+        MediaStoreUtil.setContext(this);
+        Util.setContext(this);
+        ImageUriUtil.setContext(this);
+        DiskCache.init(this);
+        ColorUtil.setContext(this);
+        PlayListUtil.setContext(this);
         final int cacheSize = (int)(Runtime.getRuntime().maxMemory() / 8);
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
                 .setBitmapMemoryCacheParamsSupplier(() -> new MemoryCacheParams(cacheSize, Integer.MAX_VALUE,cacheSize,Integer.MAX_VALUE, 2 * ByteConstants.MB))

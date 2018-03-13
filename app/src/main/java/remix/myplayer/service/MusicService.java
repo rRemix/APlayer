@@ -192,7 +192,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private DynamicShortcutManager mShortcutManager;
 
     /** 音量控制*/
-    private VolumeController mVolumeControl;
+    private VolumeController mVolumeController;
 
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
@@ -268,7 +268,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         MusicEventHelper.addCallback(this);
 
         mShortcutManager = new DynamicShortcutManager(mContext);
-        mVolumeControl = new VolumeController(this);
+        mVolumeController = new VolumeController();
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
 
         Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
@@ -387,7 +387,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 return;
             }
             LogUtil.d(TAG,"开始播放");
-            play();
+            play(false);
         });
 
         mMediaPlayer.setOnErrorListener((mp, what, extra) -> {
@@ -529,7 +529,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 开始播放
      */
     @Override
-    public void play() {
+    public void play(boolean fadeIn) {
         mAudioFocus = mAudioManager.requestAudioFocus(
                 mAudioFocusListener,
                 AudioManager.STREAM_MUSIC,
@@ -539,15 +539,16 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mIsplay = true; //更新所有界面
         update(Global.getOperation());
         mMediaPlayer.start();
-
-        mVolumeControl.fadeOut();
+        if(fadeIn)
+            mVolumeController.fadeIn();
+        else
+            mVolumeController.to(1);
 
         mPlaybackHandler.post(() -> {
             //保存当前播放和下一首播放的歌曲的id
             SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId", mCurrentId);
             SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"NextSongId",mNextId);
         });
-
     }
 
 
@@ -559,7 +560,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         if(mMediaPlayer.isPlaying()) {
             pause(false);
         } else {
-            play();
+            play(true);
         }
     }
 
@@ -568,15 +569,14 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      */
     @Override
     public void pause(boolean updateMediaSessionOnly) {
-        mIsplay = false;
-
-//        mVolumeControl.reduceGradually();
-        mMediaPlayer.pause();
-
         if(updateMediaSessionOnly)
             updateMediaSession(Global.Operation);
-        else
+        else{
+            mIsplay = false;
             update(Global.Operation);
+            mVolumeController.fadeOut();
+        }
+
     }
 
     /**
@@ -791,7 +791,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     break;
                 //继续播放
                 case Constants.START:
-                    play();
+                    play(false);
                     break;
                 //改变播放模式
                 case Constants.CHANGE_MODEL:
@@ -1723,11 +1723,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     if(mMediaPlayer == null)
                         init();
                     else if(mNeedContinue){
-                        play();
+                        play(true);
                         mNeedContinue = false;
                         Global.setOperation(Constants.TOGGLE);
                     }
-                    mMediaPlayer.setVolume(1,1);
+                    mVolumeController.to(1);
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT://短暂暂停
                     mNeedContinue = mIsplay;
@@ -1737,7 +1737,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     }
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK://减小音量
-                    mMediaPlayer.setVolume(.1f,.1f);
+                    mVolumeController.to(.1f);
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS://暂停
                     mAudioFocus = false;

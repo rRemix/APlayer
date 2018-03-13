@@ -215,11 +215,11 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!--线控-->
-        <receiver android:name=".misc.receiver.MediaButtonReceiver">
-            <intent-filter android:priority="1000">
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
+        <!--<receiver android:name=".misc.receiver.MediaButtonReceiver">-->
+            <!--<intent-filter android:priority="1000">-->
+                <!--<action android:name="android.intent.action.MEDIA_BUTTON" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
         <!--<receiver android:name=".receiver.NotifyReceiver">-->
             <!--<intent-filter>-->
                 <!--<action android:name="remix.music.NOTIFY" />-->
