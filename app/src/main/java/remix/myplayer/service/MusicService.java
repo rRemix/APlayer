@@ -191,6 +191,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /** shortcut*/
     private DynamicShortcutManager mShortcutManager;
 
+    /** 音量控制*/
+    private VolumeController mVolumeControl;
+
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
     private DBObserver mPlayListSongObserver;
@@ -265,8 +268,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         MusicEventHelper.addCallback(this);
 
         mShortcutManager = new DynamicShortcutManager(mContext);
-
+        mVolumeControl = new VolumeController(this);
         mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
+
         Global.setHeadsetOn(mAudioManager.isWiredHeadsetOn());
 
         mPlaybackThread = new HandlerThread("IO");
@@ -536,6 +540,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         update(Global.getOperation());
         mMediaPlayer.start();
 
+        mVolumeControl.fadeOut();
+
         mPlaybackHandler.post(() -> {
             //保存当前播放和下一首播放的歌曲的id
             SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId", mCurrentId);
@@ -563,6 +569,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     @Override
     public void pause(boolean updateMediaSessionOnly) {
         mIsplay = false;
+
+//        mVolumeControl.reduceGradually();
         mMediaPlayer.pause();
 
         if(updateMediaSessionOnly)
@@ -733,12 +741,12 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(intent == null || intent.getExtras() == null)
                 return;
             int control = intent.getIntExtra("Control",-1);
-            //保存控制命令,用于播放界面判断动画
-            Global.setOperation(control);
             mControl = control;
 
             if(control == Constants.PLAYSELECTEDSONG || control == Constants.PREV || control == Constants.NEXT
                     || control == Constants.TOGGLE || control == Constants.PAUSE || control == Constants.START){
+                //保存控制命令,用于播放界面判断动画
+                Global.setOperation(control);
                 if(Global.PlayQueue == null || Global.PlayQueue.size() == 0) {
                     //列表为空，尝试读取
                     Global.PlayQueueID = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"PlayQueueID",-1);

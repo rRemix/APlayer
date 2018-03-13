@@ -196,11 +196,6 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
             popupMenu.getMenuInflater().inflate(R.menu.song_menu, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new SongPopupListener(mContext,song,false,""));
             popupMenu.show();
-//            if(mMultiChoice.isShow())
-//                return;
-//            Intent intent = new Intent(mContext, OptionDialog.class);
-//            intent.putExtra("Song", song);
-//            mContext.startActivity(intent);
         });
 
         holder.mContainer.setOnClickListener(v -> {
