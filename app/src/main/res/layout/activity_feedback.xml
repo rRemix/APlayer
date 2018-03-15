@@ -48,9 +48,9 @@
             android:background="@drawable/set_submit_input_bg"
             android:gravity="left|center_vertical"
             android:textSize="@dimen/s13_size"
-            android:textColor="@color/drawer_list_color"
+            android:textColor="?attr/text_color_primary"
             android:hint="@string/feedback_contact_hint"
-            android:textColorHint="@color/drawer_list_color"
+            android:textColorHint="?attr/text_color"
             android:textCursorDrawable="@drawable/bg_cursor_light"
             android:padding="@dimen/d4_size"/>
 
