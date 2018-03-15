@@ -13,6 +13,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -26,6 +27,7 @@ import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.theme.Theme;
+import remix.myplayer.util.DensityUtil;
 
 /**
  * Created by Remix on 2018/1/3.
@@ -38,15 +40,15 @@ public class LrcView extends View implements ILrcView{
     /**画高亮歌词的画笔***/
     private TextPaint mPaintForHighLightLrc;
     /**高亮歌词的默认字体大小***/
-    public static final float DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC = 45;
+//    public static final float DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC = 45;
     /**歌词间默认的行距**/
-    public static final float DEFAULT_PADDING = 55;
+    public static final float DEFAULT_PADDING = DensityUtil.dip2px(APlayerApplication.getContext(),15);
     /** 跨行歌词之间额外的行距*/
     public static final float DEFAULT_SPACING_PADDING = 0;
     /** 跨行歌词之间行距倍数*/
     public static final  float DEFAULT_SPACING_MULT = 1f;
     /**高亮歌词当前的字体大小***/
-    private float mSizeForHighLightLrc = DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC;
+    private float mSizeForHighLightLrc;
     /**高亮歌词的默认字体颜色**/
     private static final int DEFAULT_COLOR_FOR_HIGH_LIGHT_LRC = Color.BLACK;
     /**高亮歌词当前的字体颜色**/
@@ -55,9 +57,9 @@ public class LrcView extends View implements ILrcView{
     /**画其他歌词的画笔***/
     private TextPaint mPaintForOtherLrc;
     /**其他歌词的默认字体大小***/
-    private static final float DEFAULT_SIZE_FOR_OTHER_LRC = 45;
+//    private static final float DEFAULT_SIZE_FOR_OTHER_LRC = 45;
     /**其他歌词当前的字体大小***/
-    private float mSizeForOtherLrc = DEFAULT_SIZE_FOR_OTHER_LRC;
+    private float mSizeForOtherLrc;
     /**其他歌词的默认字体颜色**/
     private static final int DEFAULT_COLOR_FOR_OTHER_LRC = Color.GRAY;
     /**高亮歌词当前的字体颜色**/
@@ -127,8 +129,9 @@ public class LrcView extends View implements ILrcView{
         mPaintForHighLightLrc = new TextPaint();
         mPaintForHighLightLrc.setAntiAlias(true);
         mPaintForHighLightLrc.setColor(mColorForHighLightLrc);
-//        mSizeForHighLightLrc = TypedValue.applyDimen sion(TypedValue.COMPLEX_UNIT_SP,19, APlayerApplication.getContext().getResources().getDisplayMetrics());
-        mSizeForHighLightLrc = DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC;
+        float size = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,15, getContext().getResources().getDisplayMetrics());
+
+        mSizeForHighLightLrc = size;
         mPaintForHighLightLrc.setTextSize(mSizeForHighLightLrc);
         mPaintForHighLightLrc.setFakeBoldText(true);
 
@@ -136,14 +139,12 @@ public class LrcView extends View implements ILrcView{
         mPaintForOtherLrc.setAntiAlias(true);
         mPaintForOtherLrc.setColor(mColorForOtherLrc);
 
-//        mSizeForOtherLrc = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,13, APlayerApplication.getContext().getResources().getDisplayMetrics());
-        mSizeForOtherLrc = DEFAULT_SIZE_FOR_OTHER_LRC;
+        mSizeForOtherLrc = size;
         mPaintForOtherLrc.setTextSize(mSizeForOtherLrc);
 
         mPaintForTimeLine = new TextPaint();
         mPaintForTimeLine.setAntiAlias(true);
-//        mSizeForTimeLine = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,13, APlayerApplication.getContext().getResources().getDisplayMetrics());
-        mSizeForTimeLine = DEFAULT_SIZE_FOR_TIMELINE;
+        mSizeForTimeLine = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,11, getContext().getResources().getDisplayMetrics());
         mPaintForTimeLine.setTextSize(mSizeForTimeLine);
         mPaintForTimeLine.setColor(mTimeLineColor);
 
@@ -497,8 +498,8 @@ public class LrcView extends View implements ILrcView{
     @Override
     public void setLrcScalingFactor(float scalingFactor) {
         mCurScalingFactor = scalingFactor;
-        mSizeForHighLightLrc = DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC * mCurScalingFactor;
-        mSizeForOtherLrc = DEFAULT_SIZE_FOR_OTHER_LRC * mCurScalingFactor;
+        mSizeForHighLightLrc *= mCurScalingFactor;
+        mSizeForOtherLrc *= mCurScalingFactor;
         mLinePadding = DEFAULT_PADDING * mCurScalingFactor;
         mTotalRow = (int) (getHeight() / (mSizeForOtherLrc + mLinePadding)) + 3;
         scrollTo(getScrollX(), (int) (mCurRow * (mSizeForOtherLrc + mLinePadding)));

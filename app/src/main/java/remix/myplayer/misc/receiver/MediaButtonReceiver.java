@@ -32,17 +32,16 @@ public class MediaButtonReceiver extends BroadcastReceiver {
         if(!isActionUp) {
             return;
         }
-        Intent intent_ctl = null;
+
         int keyCode = event.getKeyCode();
         if(keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ||
                 keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ||
-                keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
-            LogUtil.d(TAG,"receive remote ctrl");
-            intent_ctl = new Intent(MusicService.ACTION_CMD);
-            int arg = keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE ? Constants.TOGGLE :
-                    keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Constants.NEXT : Constants.PREV;
-            intent_ctl.putExtra("Control", arg);
-            context.sendBroadcast(intent_ctl);
+                keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY || keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
+            intent.putExtra("Control",
+                    keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE  || keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY ?
+                            Constants.TOGGLE :
+                            keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Constants.NEXT : Constants.PREV);
+            context.sendBroadcast(intent);
             return;
         }
 
