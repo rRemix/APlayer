@@ -12,14 +12,26 @@
         <include layout="@layout/toolbar"/>
     </android.support.design.widget.AppBarLayout>
 
-    <remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/custom_sort_recyclerView"
-        android:background="?attr/background_color_main"
-        app:bubbleColor="?attr/colorAccent"
-        app:handleColor="?attr/colorAccent"
-        app:hideScrollbar="true"
-        app:showTrack="true"/>
+        android:layout_height="match_parent">
+        <remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/custom_sort_recyclerView"
+            android:background="?attr/background_color_main"
+            app:bubbleColor="?attr/colorAccent"
+            app:handleColor="?attr/colorAccent"
+            app:hideScrollbar="true"
+            app:showTrack="true"/>
+        <android.support.design.widget.FloatingActionButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:id="@+id/custom_sort_save"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/d16_size"
+            app:srcCompat="@drawable/ic_save_white_24dp" />
+    </FrameLayout>
+
 
 </LinearLayout>

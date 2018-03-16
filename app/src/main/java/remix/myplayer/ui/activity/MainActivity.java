@@ -377,7 +377,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private void setUpDrawerLayout() {
         mDrawerAdapter = new DrawerAdapter(this,R.layout.item_drawer);
         mDrawerAdapter.setOnModeChangeListener(this::setNightMode);
-        mDrawerAdapter.setOnItemClickLitener(new OnItemClickListener() {
+        mDrawerAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 switch (position){

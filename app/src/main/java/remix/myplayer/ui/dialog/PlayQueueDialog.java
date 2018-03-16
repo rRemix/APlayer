@@ -62,7 +62,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
 
         mHandler = new MsgHandler(this);
         mAdapter = new PlayQueueAdapter(this,R.layout.item_playqueue);
-        mAdapter.setOnItemClickLitener(new OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 Intent intent = new Intent(MusicService.ACTION_CMD);

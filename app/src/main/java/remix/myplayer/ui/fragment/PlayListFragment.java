@@ -48,7 +48,7 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
             mRecyclerView.setLayoutManager(mode == Constants.LIST_MODEL ? new LinearLayoutManager(mContext) : new GridLayoutManager(mContext, 2));
             mRecyclerView.setAdapter(mAdapter);
         });
-        mAdapter.setOnItemClickLitener(new OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 String name = getPlayListName(position);

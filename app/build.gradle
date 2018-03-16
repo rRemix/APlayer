@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: "kotlin-android"
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 repositories {
     maven {
@@ -151,10 +152,14 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
     implementation 'androidx.core:core-ktx:0.2'
-    implementation 'org.jetbrains.anko:anko-common:0.8.2'
+    implementation 'org.jetbrains.anko:anko-common:0.10.4'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    kapt  'com.jakewharton:butterknife-compiler:8.8.1'
 
+}
+
+kapt {
+    generateStubs = true
 }
 

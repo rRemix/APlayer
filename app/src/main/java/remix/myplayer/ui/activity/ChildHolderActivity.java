@@ -72,6 +72,8 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     private static final int END = 1;
     private MsgHandler mRefreshHandler;
 
+    private static final int REQUEST_CUSTOM_SORT = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,13 +88,13 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
         mAdapter = new ChildHolderAdapter(this,R.layout.item_child_holder,mType,mArg,mMultiChoice,mRecyclerView);
         mAdapter.setCallback(() -> updateList(false));
-        mAdapter.setOnItemClickLitener(new OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 if(position < 0 || mInfoList == null || position >= mInfoList.size())
                     return;
-                int songid = mInfoList.get(position).getId();
-                if(!mMultiChoice.itemAddorRemoveWithClick(view,position,songid,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
+                int songId = mInfoList.get(position).getId();
+                if(!mMultiChoice.itemAddorRemoveWithClick(view,position,songId,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
                     if (mInfoList != null && mInfoList.size() == 0)
                         return;
                     ArrayList<Integer> idList = new ArrayList<>();
@@ -107,13 +109,17 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
                     Global.setPlayQueue(idList,mContext,intent);
+
+//                    startActivity(new Intent(mContext,CustomSortActivity.class)
+//                            .putExtra("list",new ArrayList<>(mInfoList))
+//                            .putExtra("name",mArg)
+//                            .putExtra("id",mId);
                 }
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
-                int songid = mInfoList.get(position).getId();
-                mMultiChoice.itemAddorRemoveWithLongClick(view,position,songid, TAG,mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
+                mMultiChoice.itemAddorRemoveWithLongClick(view,position,mInfoList.get(position).getId(), TAG,mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
             }
         });
 

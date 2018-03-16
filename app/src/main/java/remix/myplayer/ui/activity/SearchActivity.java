@@ -86,7 +86,7 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter> {
         });
 
         mAdapter = new SearchAdapter(this,R.layout.item_search_reulst);
-        mAdapter.setOnItemClickLitener(new OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 if(mAdapter != null && mAdapter.getDatas() != null){

@@ -70,7 +70,7 @@ public abstract class BaseAdapter<D,T extends BaseViewHolder> extends RecyclerVi
         }
     }
 
-    public void setOnItemClickLitener(OnItemClickListener l) {
+    public void setOnItemClickListener(OnItemClickListener l) {
         this.mOnItemClickLitener = l;
     }
 

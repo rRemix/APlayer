@@ -61,7 +61,7 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
         mHandler = new MsgHandler(this);
 
         mAdapter = new SongAdapter(this, R.layout.item_song_recycle,mMultiChoice,SongAdapter.RECENTLY,mRecyclerView);
-        mAdapter.setOnItemClickLitener(new OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 int id = getSongId(position);
