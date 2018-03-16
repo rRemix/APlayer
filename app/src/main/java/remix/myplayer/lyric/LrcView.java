@@ -377,6 +377,7 @@ public class LrcView extends View implements ILrcView{
     @Override
     public void setLrcRows(List<LrcRow> lrcRows) {
         reset();
+
         mLrcRows = lrcRows;
         if(mLrcRows != null){
             //计算每一行歌词所占的高度
@@ -515,6 +516,7 @@ public class LrcView extends View implements ILrcView{
         if(!mScroller.isFinished()){
             mScroller.forceFinished(true);
         }
+        mCurRow = 0;
         mTotalRow = 0;
         mLrcRows = null;
         mHandler.removeCallbacks(mLongPressRunnable);

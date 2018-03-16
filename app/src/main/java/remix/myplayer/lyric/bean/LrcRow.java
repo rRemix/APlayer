@@ -1,5 +1,6 @@
 package remix.myplayer.lyric.bean;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -119,7 +120,7 @@ public class LrcRow implements Comparable<LrcRow>{
 	 * @param lrcLine
 	 * @return
 	 */
-	public static List<LrcRow> createRows(String lrcLine){
+	public static List<LrcRow> createRows(String lrcLine,int offset){
 		if(!lrcLine.startsWith("[") || (lrcLine.indexOf("]") != 9 && lrcLine.indexOf(']') != 10)){
 			return null;
 		}
@@ -138,7 +139,7 @@ public class LrcRow implements Comparable<LrcRow>{
 				continue;
 			}
 			try{
-				LrcRow lrcRow = new LrcRow(tem, formatTime(tem), content);
+				LrcRow lrcRow = new LrcRow(tem, formatTime(tem) - offset, content);
 				lrcRows.add(lrcRow);
 			}catch(Exception e){
 				Log.d("LrcRow", e.getMessage());
@@ -160,7 +161,7 @@ public class LrcRow implements Comparable<LrcRow>{
 				+ Integer.parseInt(times[2]);
 	}
 	@Override
-	public int compareTo(LrcRow anotherLrcRow) {
+	public int compareTo(@NonNull LrcRow anotherLrcRow) {
 		return this.mTime - anotherLrcRow.mTime;
 	}
 
@@ -175,4 +176,7 @@ public class LrcRow implements Comparable<LrcRow>{
         return "[" + mTimeStr + "] " + mContent;
     }
 
+    public static int getOffset(){
+        return 0;
+    }
 }

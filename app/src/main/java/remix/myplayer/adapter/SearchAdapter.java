@@ -1,9 +1,12 @@
 package remix.myplayer.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.PopupMenu;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -15,11 +18,11 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.listener.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.ui.dialog.OptionDialog;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 
@@ -45,6 +48,7 @@ public class SearchAdapter extends BaseAdapter<Song,SearchAdapter.SearchResHolde
         mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getSelectColor(),size,size);
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     protected void convert(final SearchResHolder holder, Song song, int position) {
         holder.mName.setText(song.getTitle());
@@ -66,9 +70,11 @@ public class SearchAdapter extends BaseAdapter<Song,SearchAdapter.SearchResHolde
                 null,null));
 
         holder.mButton.setOnClickListener(v -> {
-            Intent intent = new Intent(mContext, OptionDialog.class);
-            intent.putExtra("Song", song);
-            mContext.startActivity(intent);
+            Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
+            final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton, Gravity.END);
+            popupMenu.getMenuInflater().inflate(R.menu.song_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new SongPopupListener(mContext,song,false,""));
+            popupMenu.show();
         });
 
         if(mOnItemClickLitener != null && holder.mRooView != null){

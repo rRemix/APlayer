@@ -785,7 +785,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                     //是否已经忽略
                     final boolean alreadyIgnore = SPUtil.getValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
                     new MaterialDialog.Builder(mContext)
-                            .items(getString(R.string.netease),getString(R.string.kugou),getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc),getString(R.string.select_lrc))
+                            .items(getString(R.string.netease),getString(R.string.kugou),getString(R.string.select_lrc),getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc))
                             .itemsColorAttr(R.attr.text_color_primary)
                             .backgroundColorAttr(R.attr.background_color_3)
                             .itemsCallback((dialog, itemView, position, text) -> {
@@ -795,7 +795,12 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                                         SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
                                         lrcFragment.updateLrc(mInfo,true);
                                         break;
-                                    case 2: //忽略或者取消忽略
+                                    case 2: //手动选择歌词
+                                        new FileChooserDialog.Builder(PlayerActivity.this)
+                                                .extensionsFilter(".lrc")
+                                                .show();
+                                        break;
+                                    case 3: //忽略或者取消忽略
                                         new MaterialDialog.Builder(mContext)
                                                 .negativeText(R.string.cancel)
                                                 .negativeColorAttr(R.attr.text_color_primary)
@@ -816,11 +821,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                                                     }
 
                                                 })
-                                                .show();
-                                        break;
-                                    case 3: //手动选择歌词
-                                        new FileChooserDialog.Builder(PlayerActivity.this)
-                                                .extensionsFilter(".lrc")
                                                 .show();
                                         break;
                                 }
