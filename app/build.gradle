@@ -23,7 +23,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 26
         versionCode 55
-        versionName "1.2.7.1"
+        versionName "1.2.8"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {

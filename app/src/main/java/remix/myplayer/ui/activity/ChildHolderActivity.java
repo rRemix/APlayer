@@ -72,8 +72,6 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     private static final int END = 1;
     private MsgHandler mRefreshHandler;
 
-    private static final int REQUEST_CUSTOM_SORT = 1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
