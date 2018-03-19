@@ -184,13 +184,13 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     /**
      * 初始化底部显示控件
      */
-    private void setUpBottomBar() {
+    private void setUpBottomBar(Song song) {
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        int lastId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId",-1);
-        Song item;
-        if(lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
-            mBottomBar.updateBottomStatus(item,  MusicService.isPlay());
+        int lastId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_SONG_ID,-1);
+
+        if(song != null) {
+            mBottomBar.updateBottomStatus(song,  MusicService.isPlay());
         } else {
             if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
                 return ;
@@ -200,7 +200,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 if (id != lastId)
                     break;
             }
-            item = MediaStoreUtil.getMP3InfoById(id);
+            Song item = MediaStoreUtil.getMP3InfoById(id);
             if(item != null){
                 mBottomBar.updateBottomStatus(item,  MusicService.isPlay());
             }
@@ -594,7 +594,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             LOAD_COMPLETE = true;
             String action = receive != null ? receive.getAction() : "";
             if(ACTION_LOAD_FINISH.equals(action)){
-                setUpBottomBar();
+                setUpBottomBar(receive != null ? receive.getParcelableExtra("song") : null);
             }
         }
     }

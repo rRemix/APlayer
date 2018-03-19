@@ -60,7 +60,7 @@ class CustomSortActivity : ToolbarActivity() {
 
         })
 
-        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
+        ItemTouchHelper(object : ItemTouchHelper.Callback() {
             override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
                 val dragFlag = ItemTouchHelper.LEFT or ItemTouchHelper.DOWN or ItemTouchHelper.UP or ItemTouchHelper.RIGHT
                 return makeMovementFlags(dragFlag, 0)
@@ -77,8 +77,9 @@ class CustomSortActivity : ToolbarActivity() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
             }
-        })
-        itemTouchHelper.attachToRecyclerView(mRecyclerView)
+
+
+        }).attachToRecyclerView(mRecyclerView)
 
         mRecyclerView.layoutManager = LinearLayoutManager(this)
         mRecyclerView.itemAnimator = DefaultItemAnimator()

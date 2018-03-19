@@ -3,6 +3,8 @@ package remix.myplayer.bean.mp3;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import remix.myplayer.service.MusicService;
+
 /**
  * Created by Remix on 2015/11/30.
  */
@@ -174,7 +176,7 @@ public class Song implements Cloneable, Parcelable {
     }
 
     public long getDuration() {
-        return Duration;
+        return Duration > 0 ? Duration : MusicService.getDuration();
     }
 
     public void setDuration(long duration) {

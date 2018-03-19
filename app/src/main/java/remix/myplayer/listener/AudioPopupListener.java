@@ -85,9 +85,6 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
     @BindView(R.id.song_detail_bit_rate)
     @Nullable
     TextView mDetailBitRate;
-    @BindView(R.id.song_detail_sample_rate)
-    @Nullable
-    TextView mDetailSampleRate;
 
     private Genre mGenreInfo;
 
@@ -223,26 +220,14 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         mDetailSize.setText(mContext.getString(R.string.cache_size,1.0f * mInfo.getSize() / ByteConstants.MB));
                     //歌曲格式
                     if(mDetailMime != null){
-                        String path = mInfo.getUrl();
-                        if(!TextUtils.isEmpty(path)){
-                            String extension;
-                            if(path.lastIndexOf('.') > -1 && path.lastIndexOf('.') < path.length() - 1){
-                                extension = mInfo.getUrl().substring(mInfo.getUrl().lastIndexOf('.') + 1 ,mInfo.getUrl().length());
-                            } else {
-                                extension = Util.getType(MusicService.getRateInfo(Constants.MIME));
-                            }
-                            mDetailMime.setText(extension);
-                        }
+                        mDetailMime.setText(MusicService.getRateInfo(Constants.MIME));
                     }
                     //歌曲时长
                     if(mDetailDuration != null)
                         mDetailDuration.setText(Util.getTime(mInfo.getDuration()));
                     //歌曲码率
                     if(mDetailBitRate != null)
-                        mDetailBitRate.setText(MusicService.getRateInfo(Constants.BIT_RATE) + " kb/s");
-                    //歌曲采样率
-                    if(mDetailSampleRate != null)
-                        mDetailSampleRate.setText(MusicService.getRateInfo(Constants.SAMPLE_RATE) + " Hz");
+                        mDetailBitRate.setText(String.format("%s kb/s", MusicService.getRateInfo(Constants.BIT_RATE)));
 
                 }
                 break;

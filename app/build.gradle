@@ -23,7 +23,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 26
         versionCode 56
-        versionName "1.2.8.1"
+        versionName "1.2.9-beta"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
@@ -153,6 +153,10 @@ dependencies {
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
     implementation 'androidx.core:core-ktx:0.2'
     implementation 'org.jetbrains.anko:anko-common:0.10.4'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
+//    debugImplementation 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.8'
+//    debugImplementation 'tv.danmaku.ijk.media:ijkplayer-x86_64:0.8.8'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     kapt  'com.jakewharton:butterknife-compiler:8.8.1'
