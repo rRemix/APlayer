@@ -258,3 +258,6 @@
 #kotlin
 -dontwarn kotlin.**
 
+#ijkplayer
+-keep class tv.danmaku.ijk.media.**{*;}
+
