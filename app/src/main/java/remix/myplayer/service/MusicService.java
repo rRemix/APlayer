@@ -360,6 +360,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mMediaPlayer.setOnCompletionListener(mp -> {
             if(mCloseAfter){
                 sendBroadcast(new Intent(Constants.EXIT));
+                mCloseAfter = false;
             } else {
                 if(mPlayModel == Constants.PLAY_REPEATONE){
                     prepare(mCurrentSong.getUrl());
@@ -373,7 +374,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 
         mMediaPlayer.setOnPreparedListener(mp -> {
             if(mFirstPrepared){
-                mVolumeController.to(0);
                 mFirstPrepared = false;
                 pause(false);
             }else {
@@ -383,17 +383,12 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         });
 
         mMediaPlayer.setOnErrorListener((mp, what, extra) -> {
-            try {
-                mIsInitialized = false;
-                if(mMediaPlayer != null)
-                    mMediaPlayer.release();
-                setUpMediaPlayer();
-                ToastUtil.show(mContext,R.string.mediaplayer_error,what,extra);
-                return true;
-            } catch (Exception e){
-
-            }
-            return false;
+            mIsInitialized = false;
+            if(mMediaPlayer != null)
+                mMediaPlayer.release();
+            setUpMediaPlayer();
+            ToastUtil.show(mContext,R.string.mediaplayer_error,what,extra);
+            return true;
         });
     }
 
@@ -991,12 +986,15 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     ToastUtil.show(mContext,getString(R.string.cant_request_audio_focus));
                     return;
                 }
+
             }
             if(isPlay()){
                 pause(true);
             }
             mIsInitialized = false;
             mMediaPlayer.reset();
+            if(mFirstPrepared)
+                mVolumeController.to(0);
             mMediaPlayer.setDataSource(path);
             mMediaPlayer.prepareAsync();
             mIsInitialized = true;
