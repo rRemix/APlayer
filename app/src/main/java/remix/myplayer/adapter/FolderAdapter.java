@@ -76,7 +76,7 @@ public class FolderAdapter extends BaseAdapter<Folder,FolderAdapter.FolderHolder
             holder.mButton.setOnClickListener(v -> {
                 Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                 final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-                popupMenu.getMenuInflater().inflate(R.menu.folder_menu, popupMenu.getMenu());
+                popupMenu.getMenuInflater().inflate(R.menu.menu_folder_detail, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
                         holder.getAdapterPosition(),
                         Constants.FOLDER,

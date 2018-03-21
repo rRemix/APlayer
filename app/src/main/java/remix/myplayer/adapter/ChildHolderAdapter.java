@@ -170,7 +170,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
                         return;
                     Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                     final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton, Gravity.END);
-                    popupMenu.getMenuInflater().inflate(R.menu.song_menu, popupMenu.getMenu());
+                    popupMenu.getMenuInflater().inflate(R.menu.menu_song_detail, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(new SongPopupListener(mContext,song,mType == Constants.PLAYLIST,mArg));
                     popupMenu.show();
 //                    Intent intent = new Intent(mContext, OptionDialog.class);

@@ -152,7 +152,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
                 return;
             Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-            popupMenu.getMenuInflater().inflate(R.menu.artist_menu, popupMenu.getMenu());
+            popupMenu.getMenuInflater().inflate(R.menu.menu_artist_detail, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
                     artistId,
                     Constants.ARTIST,

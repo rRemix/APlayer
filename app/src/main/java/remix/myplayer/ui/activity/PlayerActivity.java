@@ -537,7 +537,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 @SuppressLint("RestrictedApi")
                 Context wrapper = new ContextThemeWrapper(this,Theme.getPopupMenuStyle());
                 final PopupMenu popupMenu = new PopupMenu(wrapper,v, Gravity.TOP);
-                popupMenu.getMenuInflater().inflate(R.menu.audio_menu, popupMenu.getMenu());
+                popupMenu.getMenuInflater().inflate(R.menu.menu_audio_detail, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new AudioPopupListener(this,mInfo));
                 popupMenu.show();
                 break;

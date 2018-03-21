@@ -283,7 +283,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-
     //初始化ViewPager
     private void setUpPager() {
         String categoryJson = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,"");
@@ -294,10 +293,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mPagerAdapter.setList(categories);
+        mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(0).getTitle());
         //有且仅有播放列表一个tab
         if(categories.size() == 1 && categories.get(0).getTitle().equals(getString(R.string.tab_playlist))){
             showAddPlayListButton(true);
         }
+
 
         mAddButton.setImageResource(ThemeStore.isDay() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
         mViewPager.setAdapter(mPagerAdapter);
@@ -311,11 +312,30 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             @Override
             public void onPageSelected(int position) {
                 showAddPlayListButton(mPagerAdapter.getList().get(position).getTitle().equals(getString(R.string.tab_playlist)));
+                mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(position).getTitle());
+                invalidateOptionsMenu();
             }
             @Override
             public void onPageScrollStateChanged(int state) {
             }
         });
+    }
+
+    private int mMenuLayoutId = R.menu.menu_main;
+    public int parseMenuId(String category) {
+        if(TextUtils.isEmpty(category)){
+            mMenuLayoutId = R.menu.menu_main;
+        }
+        return category.equalsIgnoreCase(getString(R.string.tab_song)) ? R.menu.menu_main :
+                category.equalsIgnoreCase(getString(R.string.tab_album)) ? R.menu.menu_album :
+                category.equalsIgnoreCase(getString(R.string.tab_artist)) ? R.menu.menu_artist :
+                category.equalsIgnoreCase(getString(R.string.tab_playlist)) ? R.menu.menu_playlist :
+                category.equalsIgnoreCase(getString(R.string.tab_folder)) ? R.menu.menu_folder : R.menu.menu_main_simple;
+    }
+
+    @Override
+    protected int getMenuLayoutId() {
+        return mMenuLayoutId;
     }
 
     private void showAddPlayListButton(boolean show) {

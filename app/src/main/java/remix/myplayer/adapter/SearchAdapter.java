@@ -72,7 +72,7 @@ public class SearchAdapter extends BaseAdapter<Song,SearchAdapter.SearchResHolde
         holder.mButton.setOnClickListener(v -> {
             Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton, Gravity.END);
-            popupMenu.getMenuInflater().inflate(R.menu.song_menu, popupMenu.getMenu());
+            popupMenu.getMenuInflater().inflate(R.menu.menu_song_detail, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new SongPopupListener(mContext,song,false,""));
             popupMenu.show();
         });

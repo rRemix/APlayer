@@ -136,7 +136,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
                 return;
             Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-            popupMenu.getMenuInflater().inflate(R.menu.playlist_menu, popupMenu.getMenu());
+            popupMenu.getMenuInflater().inflate(R.menu.menu_playlist_detail, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext, info._Id, Constants.PLAYLIST, info.Name));
             popupMenu.show();
         });

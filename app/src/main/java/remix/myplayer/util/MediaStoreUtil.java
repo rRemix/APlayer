@@ -581,10 +581,16 @@ public class MediaStoreUtil {
         Cursor cursor = null;
         ArrayList<Song> list = new ArrayList<>();
         try {
+            List<Integer> ids = Global.FolderMap.get(folderName);
+            StringBuilder selection = new StringBuilder(127);
+            selection.append(MediaStore.Audio.Media._ID + " in (");
+            for(int i = 0 ; i < ids.size();i++){
+                selection.append(ids.get(i)).append( i == ids.size() - 1 ? ") " : ",");
+            }
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
-                    MediaStore.Audio.Media.DATA + " like ? " + MediaStoreUtil.getBaseSelection(),
-                    new String[]{folderName + "%"},null,null);
+                    selection.toString(),
+                    null,null,null);
             if(cursor != null && cursor.getCount() > 0){
                 while (cursor.moveToNext()){
                     list.add(getMP3Info(cursor));
@@ -810,8 +816,12 @@ public class MediaStoreUtil {
                 String folderName = Util.getMapkeyByPosition(Global.FolderMap,data);
                 List<Integer> ids = Global.FolderMap.get(folderName);
                 StringBuilder selection = new StringBuilder(127);
+//                for(int i = 0 ; i < ids.size();i++){
+//                    selection.append(MediaStore.Audio.Media._ID).append(" = ").append(ids.get(i)).append(i != ids.size() - 1 ? " or " : " ");
+//                }
+                selection.append(MediaStore.Audio.Media._ID + " in (");
                 for(int i = 0 ; i < ids.size();i++){
-                    selection.append(MediaStore.Audio.Media._ID).append(" = ").append(ids.get(i)).append(i != ids.size() - 1 ? " or " : " ");
+                    selection.append(ids.get(i)).append( i == ids.size() - 1 ? ") " : ",");
                 }
                 where = selection.toString();
                 arg = null;

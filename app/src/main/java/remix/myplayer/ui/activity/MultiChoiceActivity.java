@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -32,7 +33,8 @@ import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
  * @Author Xiaoborui
  * @Date 2016/9/29 10:37
  */
-public class MultiChoiceActivity extends ToolbarActivity{
+@SuppressLint("Registered")
+public abstract class MultiChoiceActivity extends ToolbarActivity{
     @Nullable
     @BindView(R.id.toolbar)
     Toolbar mToolBar;
@@ -138,29 +140,36 @@ public class MultiChoiceActivity extends ToolbarActivity{
         super.setUpToolbar(toolbar,title);
         toolbar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
-                case R.id.toolbar_search:
-                    startActivity(new Intent(MultiChoiceActivity.this, SearchActivity.class));
+                case R.id.action_search:
+                    startActivity(new Intent(mContext, SearchActivity.class));
                     break;
-                case R.id.toolbar_timer:
-                    startActivity(new Intent(MultiChoiceActivity.this, TimerDialog.class));
+                case R.id.action_timer:
+                    startActivity(new Intent(mContext, TimerDialog.class));
                     break;
             }
             return true;
         });
     }
 
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(getMenuLayoutId(),menu);
+        tintMenuIcon(menu);
+        return true;
+    }
 
-        getMenuInflater().inflate(R.menu.toolbar_menu,menu);
+
+    protected void tintMenuIcon(Menu menu){
         //主题颜色
         int themeColor = ColorUtil.getColor(ThemeStore.isLightTheme() ? R.color.black : R.color.white);
         for(int i = 0 ; i < menu.size();i++){
             MenuItem menuItem = menu.getItem(i);
-            menuItem.setIcon(Theme.TintDrawable(menuItem.getIcon(),themeColor));
+            if(menuItem.getIcon() != null)
+                menuItem.setIcon(Theme.TintDrawable(menuItem.getIcon(),themeColor));
         }
-        return true;
     }
 
     public void onBackPress(){
@@ -169,6 +178,10 @@ public class MultiChoiceActivity extends ToolbarActivity{
             mTipPopupWindow.dismiss();
             mTipPopupWindow = null;
         }
+    }
+
+    protected int getMenuLayoutId(){
+        return R.menu.menu_main_simple;
     }
 
 }
