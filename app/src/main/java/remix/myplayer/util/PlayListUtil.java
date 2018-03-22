@@ -15,8 +15,10 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.db.DBManager;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
+import remix.myplayer.helper.SortOrder;
 
 
 /**
@@ -48,6 +50,7 @@ public class PlayListUtil {
         ContentValues cv = new ContentValues();
         cv.put(PlayLists.PlayListColumns.COUNT, 0);
         cv.put(PlayLists.PlayListColumns.NAME, playListName);
+        cv.put(PlayLists.PlayListColumns.DATE,System.currentTimeMillis());
         Uri uri = mContext.getContentResolver().insert(PlayLists.CONTENT_URI, cv);
         return uri != null ? (int) ContentUris.parseId(uri) : -1;
     }
@@ -69,16 +72,16 @@ public class PlayListUtil {
     public static int deleteMultiPlayList(List<Integer> IdList){
         if(IdList == null || IdList.size() == 0)
             return 0;
-        String where = "";
+        StringBuilder where = new StringBuilder();
         String[] whereArgs = new String[IdList.size()];
         for(int i = 0 ; i < IdList.size() ;i++){
             whereArgs[i] = IdList.get(i) + "";
-            where += (PlayLists.PlayListColumns._ID + "=?");
+            where.append(PlayLists.PlayListColumns._ID + "=?");
             if(i != IdList.size() - 1){
-                where += " or ";
+                where.append(" or ");
             }
         }
-        return mContext.getContentResolver().delete(PlayLists.CONTENT_URI,where,whereArgs);
+        return mContext.getContentResolver().delete(PlayLists.CONTENT_URI, where.toString(),whereArgs);
     }
 
     /**
@@ -206,24 +209,24 @@ public class PlayListUtil {
         try {
             if(IdList == null || IdList.size() == 0)
                 return 0;
-            String where = "";
+            StringBuilder where = new StringBuilder();
             String[] whereArgs = new String[IdList.size() + 1];
             for(int i = 0 ; i < IdList.size() + 1;i++) {
                 if (i != IdList.size()) {
                     if (i == 0) {
-                        where += "(";
+                        where.append("(");
                     }
-                    where += (PlayListSongs.PlayListSongColumns.AUDIO_ID + "=?");
+                    where.append(PlayListSongs.PlayListSongColumns.AUDIO_ID + "=?");
                     if (i != IdList.size() - 1) {
-                        where += " or ";
+                        where.append(" or ");
                     }
                     whereArgs[i] = IdList.get(i) + "";
                 }else {
-                    where += (") and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?");
+                    where.append(") and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?");
                     whereArgs[i] = playlistId + "";
                 }
             }
-            return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI,where,whereArgs);
+            return mContext.getContentResolver().delete(PlayListSongs.CONTENT_URI, where.toString(),whereArgs);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -245,6 +248,9 @@ public class PlayListUtil {
                 return cursor.getString(cursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
         }
         return "";
     }
@@ -263,6 +269,9 @@ public class PlayListUtil {
                 return cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns._ID));
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
         }
         return -1;
     }
@@ -275,14 +284,19 @@ public class PlayListUtil {
         ArrayList<PlayList> playList = new ArrayList<>();
         Cursor cursor = null;
         try {
-            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI,null,PlayLists.PlayListColumns.NAME + "!= ?",
-                    new String[]{Constants.PLAY_QUEUE},null);
+            String sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER, SortOrder.PlayListSortOrder.PLAYLIST_DATE);
+            LogUtil.d("QueryPlayList","SortOrder: " + sortOrder);
+            cursor = DBManager.getInstance().openDataBase().rawQuery("select * from play_list where name != '" + Constants.PLAY_QUEUE + "' order by " + sortOrder,null);
+//            cursor = mContext.getContentResolver().query(PlayLists.CONTENT_URI,null,PlayLists.PlayListColumns.NAME + "!= ?",
+//                    new String[]{Constants.PLAY_QUEUE},
+//                    sortOrder);
             if(cursor != null && cursor.getCount() > 0){
                 while (cursor.moveToNext()){
                     PlayList info = new PlayList();
                     info._Id = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns._ID));
                     info.Count = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.COUNT));
                     info.Name = cursor.getString(cursor.getColumnIndex(PlayLists.PlayListColumns.NAME));
+                    info.Date = cursor.getInt(cursor.getColumnIndex(PlayLists.PlayListColumns.DATE));
                     playList.add(info);
                 }
             }
@@ -292,6 +306,7 @@ public class PlayListUtil {
             if(cursor != null && !cursor.isClosed())
                 cursor.close();
         }
+        LogUtil.d("QueryPlayList",playList + "");
         return playList;
     }
 
@@ -309,6 +324,7 @@ public class PlayListUtil {
                 }
             }
         } catch (Exception e){
+            e.printStackTrace();
         } finally {
             if(cursor != null && !cursor.isClosed())
                 cursor.close();

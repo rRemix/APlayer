@@ -295,4 +295,7 @@
     <string name="name">名称</string>
     <string name="name_desc">名称降序</string>
     <string name="create_time">创建时间</string>
+    <string name="custom">自定义</string>
+    <string name="order">顺序</string>
+    <string name="create_time_desc">创建时间降序</string>
 </resources>

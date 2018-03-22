@@ -160,7 +160,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
                 return;
             Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
-            popupMenu.getMenuInflater().inflate(R.menu.menu_album_detail, popupMenu.getMenu());
+            popupMenu.getMenuInflater().inflate(R.menu.menu_album_item, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
                     albumid,
                     Constants.ALBUM,

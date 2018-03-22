@@ -21,6 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,6 +52,7 @@ import remix.myplayer.adapter.MainPagerAdapter;
 import remix.myplayer.bean.Category;
 import remix.myplayer.bean.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.SortOrder;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.misc.cache.DiskCache;
@@ -61,8 +63,12 @@ import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.fragment.AlbumFragment;
+import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.ui.fragment.LibraryFragment;
+import remix.myplayer.ui.fragment.PlayListFragment;
+import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -113,6 +119,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private final int REQUEST_SETTING = 1;
     private BroadcastReceiver mLoadReceiver;
 
+    //当前选中的fragment
+    private LibraryFragment mCurrentFragment;
     @Override
     protected void onResume() {
         super.onResume();
@@ -299,7 +307,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             showAddPlayListButton(true);
         }
 
-
         mAddButton.setImageResource(ThemeStore.isDay() ? R.drawable.icon_floatingbtn_day : R.drawable.icon_floatingbtn_night);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
@@ -313,12 +320,14 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             public void onPageSelected(int position) {
                 showAddPlayListButton(mPagerAdapter.getList().get(position).getTitle().equals(getString(R.string.tab_playlist)));
                 mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(position).getTitle());
+                mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(position);
                 invalidateOptionsMenu();
             }
             @Override
             public void onPageScrollStateChanged(int state) {
             }
         });
+        mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(0);
     }
 
     private int mMenuLayoutId = R.menu.menu_main;
@@ -334,8 +343,45 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        String sortOrder = null;
+
+        if(mCurrentFragment instanceof SongFragment){
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z);
+        } else if(mCurrentFragment instanceof AlbumFragment){
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,SortOrder.AlbumSortOrder.ALBUM_A_Z);
+        } else if(mCurrentFragment instanceof ArtistFragment){
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,SortOrder.ArtistSortOrder.ARTIST_A_Z);
+        } else if(mCurrentFragment instanceof PlayListFragment){
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,SortOrder.PlayListSortOrder.PLAYLIST_DATE);
+        }
+
+        if(TextUtils.isEmpty(sortOrder)){
+            return true;
+        }
+        setUpMenuItem(menu, sortOrder);
+        return true;
+    }
+
+
+    @Override
     protected int getMenuLayoutId() {
         return mMenuLayoutId;
+    }
+
+    @Override
+    protected void saveSortOrder(String sortOrder) {
+        if(mCurrentFragment instanceof SongFragment){
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SONG_SORT_ORDER,sortOrder);
+        } else if(mCurrentFragment instanceof AlbumFragment){
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,sortOrder);
+        } else if(mCurrentFragment instanceof ArtistFragment){
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,sortOrder);
+        } else if(mCurrentFragment instanceof PlayListFragment ){
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,sortOrder);
+        }
+        mCurrentFragment.onMediaStoreChanged();
     }
 
     private void showAddPlayListButton(boolean show) {
@@ -481,6 +527,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                             mViewPager.setOffscreenPageLimit(categories.size() - 1);
                             mPagerAdapter.setList(categories);
                             mPagerAdapter.notifyDataSetChanged();
+                            mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(mViewPager.getCurrentItem()).getTitle());
+                            mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(mViewPager.getCurrentItem());
+                            invalidateOptionsMenu();
                         }
                     }
                     break;

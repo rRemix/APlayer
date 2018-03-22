@@ -102,7 +102,7 @@ public class SPUtil {
         //锁屏设置
         public static final String LOCKSCREEN = "lockScreen";
         //导航浪变色
-        public static final String COLOR_NAVIGATION = "ColorNavigation";
+        public static final String COLOR_NAVIGATION = "color_Navigation";
         //摇一摇
         public static final String SHAKE = "shake";
         //优先搜索在线歌词
@@ -111,6 +111,32 @@ public class SPUtil {
         public static final String FLOAT_LYRIC = "float_lyric";
         //沉浸式状态栏
         public static final String IMMERSIVE_MODE = "immersive_mode";
+        //过滤大小
+        public static final String SCAN_SIZE = "scan_size";
+        //歌曲排序
+//        public static final String SONG_SORT = "song_sort";
+        //歌曲排序顺序
+        public static final String SONG_SORT_ORDER = "song_sort_order";
+        //专辑排序
+//        public static final String ALBUM_SORT = "album_sort";
+        //专辑排序顺序
+        public static final String ALBUM_SORT_ORDER = "album_sort_order";
+        //艺术家
+//        public static final String ARTIST_SORT = "artist_sort";
+        //艺术家排序顺序
+        public static final String ARTIST_SORT_ORDER = "artist_sort_order";
+        //播放列表排序
+//        public static final String PLAYLIST_SORT = "playlist_sort";
+        //播放列表排序顺序
+        public static final String PLAYLIST_SORT_ORDER = "playlist_sort_order";
+        //非播放列表内歌曲排序
+//        public static final String CHILD_SONG_SORT = "child_song_sort";
+        //非播放列表内歌曲排序顺序
+        public static final String CHILD_SONG_SORT_ORDER = "child_song_sort_order";
+        //播放列表内歌曲排序
+//        public static final String PALYLIST_SONG_SORT = "playlist_song_sort";
+        //播放列表内歌曲排序顺序
+        public static final String PLAYLIST_SONG_SORT_ORDER = "playlist_song_sort_order";
     }
 
 }

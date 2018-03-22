@@ -1,0 +1,55 @@
+package remix.myplayer.helper;
+
+import android.provider.MediaStore;
+
+import remix.myplayer.db.PlayLists;
+
+import static remix.myplayer.helper.SortOrder.SongSortOrder.SONG_ALBUM_A_Z;
+import static remix.myplayer.helper.SortOrder.SongSortOrder.SONG_ARTIST_A_Z;
+import static remix.myplayer.helper.SortOrder.SongSortOrder.SONG_ARTIST_Z_A;
+
+/**
+ * Created by Remix on 2018/3/22.
+ */
+
+public final class SortOrder {
+    private SortOrder(){}
+
+    public interface SongSortOrder {
+        String SONG_A_Z = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
+        String SONG_Z_A = SONG_A_Z + " desc ";
+        String SONG_ARTIST_A_Z = MediaStore.Audio.Artists.DEFAULT_SORT_ORDER;
+        String SONG_ARTIST_Z_A = SONG_ARTIST_A_Z + " desc ";
+        String SONG_ALBUM_A_Z = MediaStore.Audio.Albums.DEFAULT_SORT_ORDER;
+        String SONG_ALBUM_Z_A = SONG_ALBUM_A_Z + " desc ";
+        String SONG_DATE = MediaStore.Audio.Media.DATE_ADDED;
+        String SONG_DURATION = MediaStore.Audio.Media.DURATION;
+        String SONG_YEAR = MediaStore.Audio.Media.YEAR;
+    }
+
+    public interface AlbumSortOrder {
+        String ALBUM_A_Z = SONG_ALBUM_A_Z;
+        String ALBUM_Z_A = SONG_ALBUM_A_Z + " desc";
+        String ALBUM_ARTIST_A_Z = SONG_ARTIST_A_Z;
+        String ALBUM_ARTIST_Z_A = SONG_ARTIST_Z_A;
+    }
+
+    public interface ArtistSortOrder {
+        String ARTIST_A_Z = SONG_ARTIST_A_Z;
+        String ARTIST_Z_A = SONG_ARTIST_Z_A;
+    }
+
+    public interface PlayListSortOrder {
+        String PLAYLIST_A_Z = PlayLists.PlayListColumns.NAME;
+        String PLAYLIST_Z_A = PLAYLIST_A_Z + " desc ";
+        String PLAYLIST_DATE = PlayLists.PlayListColumns.DATE;
+    }
+
+    public interface ChildHolderSongSortOrder extends SongSortOrder {
+
+    }
+
+    public interface PlayListSongSortOrder extends SongSortOrder {
+        String PLAYLIST_SONG_CUSTOM = "custom";
+    }
+}

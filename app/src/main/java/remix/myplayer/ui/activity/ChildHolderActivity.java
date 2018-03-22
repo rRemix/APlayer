@@ -7,6 +7,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,7 +15,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -22,6 +22,7 @@ import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.adapter.ChildHolderAdapter;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.SortOrder;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
@@ -36,6 +37,7 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -85,7 +87,6 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         mArg = getIntent().getStringExtra("Title");
 
         mAdapter = new ChildHolderAdapter(this,R.layout.item_child_holder,mType,mArg,mMultiChoice,mRecyclerView);
-        mAdapter.setCallback(() -> updateList(false));
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -163,10 +164,50 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        String sortOrder = null;
+        if(mType == Constants.PLAYLIST){
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER, SortOrder.PlayListSongSortOrder.SONG_A_Z);
+        } else {
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
+        }
+        if(TextUtils.isEmpty(sortOrder))
+            return true;
+        setUpMenuItem(menu,sortOrder);
+        return true;
+    }
+
+
+    @Override
+    protected void saveSortOrder(String sortOrder) {
+        if(mType == Constants.PLAYLIST){
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER,sortOrder);
+            if(sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)){
+                startActivity(new Intent(mContext,CustomSortActivity.class)
+                    .putExtra("list",new ArrayList<>(mInfoList))
+                    .putExtra("id",mId)
+                    .putExtra("name",mArg));
+            }
+        } else{
+            //当列表内不是自定义排序 其排序方式与其他排序一致
+            if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER,SortOrder.ChildHolderSongSortOrder.SONG_A_Z)
+                    .equalsIgnoreCase(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER,SortOrder.PlayListSongSortOrder.SONG_A_Z)))
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER,sortOrder);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER,sortOrder);
+        }
+        updateList(true);
+    }
+
+    @Override
+    protected int getMenuLayoutId() {
+        return mType == Constants.PLAYLIST ? R.menu.menu_child_holder_for_playlist : R.menu.menu_child_holder;
+    }
+
+    @Override
     protected int getLoaderId() {
         return LoaderIds.CHILDHOLDER_ACTIVITY;
     }
-
 
     @Override
     public void onBackPressed() {
@@ -209,30 +250,30 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
      * 根据条件排序
      */
     private void sortList(){
-        Collections.sort(mInfoList, (o1, o2) -> {
-            boolean isAsc = ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC;
-            if(o1 == null && o2 == null)
-                return 0;
-            if(o1 == null)
-                return isAsc ? -1 : 1;
-            if(o2 == null)
-                return isAsc? 1 : -1;
-            //当前是按名字排序
-            if(ChildHolderAdapter.SORT == ChildHolderAdapter.NAME){
-                if(TextUtils.isEmpty(o1.getTitleKey()) && TextUtils.isEmpty(o2.getTitleKey()))
-                    return 0;
-                if(TextUtils.isEmpty(o1.getTitleKey()))
-                    return isAsc ? -1 : 1;
-                if(TextUtils.isEmpty(o2.getTitleKey()))
-                    return isAsc ? 1 : -1;
-                return isAsc ? o1.getTitleKey().compareTo(o2.getTitleKey()) : o2.getTitleKey().compareTo(o1.getTitleKey());
-            } else if(ChildHolderAdapter.SORT == ChildHolderAdapter.ADDTIME){
-                //当前是按添加时间排序
-                return isAsc ? Long.valueOf(o1.getAddTime()).compareTo(o2.getAddTime()) : Long.valueOf(o2.getAddTime()).compareTo(o1.getAddTime());
-            } else {
-                return 0;
-            }
-        });
+//        Collections.sort(mInfoList, (o1, o2) -> {
+//            boolean isAsc = ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC;
+//            if(o1 == null && o2 == null)
+//                return 0;
+//            if(o1 == null)
+//                return isAsc ? -1 : 1;
+//            if(o2 == null)
+//                return isAsc? 1 : -1;
+//            //当前是按名字排序
+//            if(ChildHolderAdapter.SORT == ChildHolderAdapter.NAME){
+//                if(TextUtils.isEmpty(o1.getTitleKey()) && TextUtils.isEmpty(o2.getTitleKey()))
+//                    return 0;
+//                if(TextUtils.isEmpty(o1.getTitleKey()))
+//                    return isAsc ? -1 : 1;
+//                if(TextUtils.isEmpty(o2.getTitleKey()))
+//                    return isAsc ? 1 : -1;
+//                return isAsc ? o1.getTitleKey().compareTo(o2.getTitleKey()) : o2.getTitleKey().compareTo(o1.getTitleKey());
+//            } else if(ChildHolderAdapter.SORT == ChildHolderAdapter.ADDTIME){
+//                //当前是按添加时间排序
+//                return isAsc ? Long.valueOf(o1.getAddTime()).compareTo(o2.getAddTime()) : Long.valueOf(o2.getAddTime()).compareTo(o1.getAddTime());
+//            } else {
+//                return 0;
+//            }
+//        });
     }
 
     /**

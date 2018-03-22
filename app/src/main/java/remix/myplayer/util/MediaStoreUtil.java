@@ -34,11 +34,11 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import remix.myplayer.R;
-import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.bean.mp3.Album;
 import remix.myplayer.bean.mp3.Artist;
 import remix.myplayer.bean.mp3.Genre;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.SortOrder;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.request.ImageUriRequest;
 
@@ -68,7 +68,7 @@ public class MediaStoreUtil {
                     new String[]{"distinct " + MediaStore.Audio.Media.ARTIST_ID,MediaStore.Audio.Media.ARTIST},
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE +  MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ARTIST_ID,
                     null,
-                    MediaStore.Audio.Artists.DEFAULT_SORT_ORDER);
+                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,SortOrder.ArtistSortOrder.ARTIST_A_Z));
             if(cursor != null){
                 while (cursor.moveToNext()){
                     artists.add(new Artist(cursor.getInt(0),cursor.getString(1)));
@@ -94,7 +94,7 @@ public class MediaStoreUtil {
                             MediaStore.Audio.Media.ARTIST},
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection() + ")" + " GROUP BY (" + MediaStore.Audio.Media.ALBUM_ID,
                     null,
-                    MediaStore.Audio.Albums.DEFAULT_SORT_ORDER);
+                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,SortOrder.AlbumSortOrder.ALBUM_A_Z));
             if(cursor != null) {
                 while (cursor.moveToNext()) {
                     albums.add(new Album(cursor.getInt(0),
@@ -114,18 +114,18 @@ public class MediaStoreUtil {
         ArrayList<Song> songs = new ArrayList<>();
         Cursor cursor = null;
 
-        //默认过滤文件大小500K
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",-1);
+        //默认过滤文件大小1MB
+        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SCAN_SIZE,-1);
         if( Constants.SCAN_SIZE < 0) {
-            Constants.SCAN_SIZE = 500 * ByteConstants.KB;
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",500 * ByteConstants.KB);
+            Constants.SCAN_SIZE = 1024 * ByteConstants.KB;
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SCAN_SIZE,Constants.SCAN_SIZE);
         }
         try {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + getBaseSelection(),
                     null,
-                    SongAdapter.SORT + SongAdapter.ASCDESC);
+                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z));
             if(cursor != null) {
                 while (cursor.moveToNext()) {
                     songs.add(getMP3Info(cursor));
@@ -185,8 +185,7 @@ public class MediaStoreUtil {
                     null,
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
                     null,
-                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER)
-                            + SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"AscDesc"," asc"));
+                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z));
             if(cursor != null) {
                 while (cursor.moveToNext()) {
                     allSongList.add(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)));
@@ -266,7 +265,7 @@ public class MediaStoreUtil {
                     new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA},
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
                     null,
-                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER)
+                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"SortOrder",MediaStore.Audio.Media.DEFAULT_SORT_ORDER)
                             + SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"AscDesc"," asc"));
             if(cursor != null) {
                 Global.FolderMap.clear();
@@ -319,11 +318,15 @@ public class MediaStoreUtil {
         try {
             if (type == Constants.ALBUM) {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                         MediaStore.Audio.Media.ALBUM_ID + "=" + id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(), null, null);
+                         MediaStore.Audio.Media.ALBUM_ID + "=" + id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
+                        null,
+                        SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER,SortOrder.ChildHolderSongSortOrder.SONG_A_Z));
             }
             if (type == Constants.ARTIST) {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                        MediaStore.Audio.Media.ARTIST_ID + "=" + id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(), null, null);
+                        MediaStore.Audio.Media.ARTIST_ID + "=" + id + " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
+                        null,
+                        SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER,SortOrder.ChildHolderSongSortOrder.SONG_A_Z));
             }
 
             if(cursor != null && cursor.getCount() > 0) {
@@ -590,7 +593,8 @@ public class MediaStoreUtil {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
                     selection.toString(),
-                    null,null,null);
+                    null,
+                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER,SortOrder.ChildHolderSongSortOrder.SONG_A_Z));
             if(cursor != null && cursor.getCount() > 0){
                 while (cursor.moveToNext()){
                     list.add(getMP3Info(cursor));

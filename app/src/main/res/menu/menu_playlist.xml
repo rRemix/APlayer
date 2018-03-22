@@ -7,7 +7,7 @@
             <group android:checkableBehavior="single">
                 <item android:title="@string/name" android:id="@+id/action_sort_order_playlist_name" />
                 <item android:title="@string/name_desc" android:id="@+id/action_sort_order_playlist_name_desc"/>
-                <item android:title="@string/create_time" android:id="@+id/action_sort_order_create_time"/>
+                <item android:title="@string/create_time" android:id="@+id/action_sort_order_playlist_date"/>
             </group>
         </menu>
     </item>

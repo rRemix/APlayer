@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:title="@string/sort_order" android:id="@+id/action_sort_order"  android:icon="@drawable/ic_sort_black_24dp"
+        app:showAsAction="ifRoom">
+        <menu>
+            <group >
+                <item android:title="@string/order">
+                    <menu >
+                        <group android:id="@+id/action_sort_order_title_group" android:checkableBehavior="single">
+                            <item android:id="@+id/action_sort_order_title_asc" android:title="@string/sort_as_asc"/>
+                            <item android:id="@+id/action_2" android:title="@string/sort_as_desc"/>
+                        </group>
+                    </menu>
+                </item>
+                <item android:title="@string/order">
+                    <menu>
+                        <group android:id="@+id/action_sort_order_album_group" android:checkableBehavior="single">
+                            <item android:id="@+id/action_sort_order_album_asc" android:title="@string/sort_as_asc"/>
+                            <item android:id="@+id/action_sort_order_album_desc" android:title="@string/sort_as_desc"/>
+                        </group>
+                    </menu>
+                </item>
+                <item android:title="@string/order">
+                    <menu>
+                        <group android:id="@+id/action_sort_order_artist_group" android:checkableBehavior="single">
+                            <item android:id="@+id/action_sort_order_artist_asc" android:title="@string/sort_as_asc"/>
+                            <item android:id="@+id/action_sort_order_artist_desc" android:title="@string/sort_as_desc"/>
+                        </group>
+                    </menu>
+                </item>
+                <item android:title="@string/order">
+                    <menu>
+                        <group android:id="@+id/action_sort_order_date_group" android:checkableBehavior="single">
+                            <item android:id="@+id/action_sort_order_date_asc" android:title="@string/sort_as_asc"/>
+                            <item android:id="@+id/action_sort_order_date_desc" android:title="@string/sort_as_desc"/>
+                        </group>
+                    </menu>
+                </item>
+                <item android:title="@string/order">
+                    <menu>
+                        <group android:id="@+id/action_sort_order_duration_group" android:checkableBehavior="single">
+                            <item android:id="@+id/action_sort_order_duration_asc" android:title="@string/sort_as_asc"/>
+                            <item android:id="@+id/action_sort_order_duration_desc" android:title="@string/sort_as_desc"/>
+                        </group>
+                    </menu>
+                </item>
+                <item android:title="@string/order">
+                    <menu>
+                        <group android:id="@+id/action_sort_order_year_group" android:checkableBehavior="single">
+                            <item android:id="@+id/action_sort_order_year_asc" android:title="@string/sort_as_asc"/>
+                            <item android:id="@+id/action_sort_order_year_desc" android:title="@string/sort_as_desc"/>
+                        </group>
+                    </menu>
+                </item>
+            </group>
+        </menu>
+    </item>
+    <item android:id="@+id/action_timer" android:icon="@drawable/act_btn_timer"
+        android:title="@string/timer_close" android:orderInCategory="80" app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_search" android:icon="@drawable/act_btn_search"
+        android:title="@string/search" android:orderInCategory="90" app:showAsAction="ifRoom" />
+
+</menu>

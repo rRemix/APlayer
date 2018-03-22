@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,6 +18,7 @@ import com.umeng.analytics.MobclickAgent;
 import butterknife.BindView;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
+import remix.myplayer.helper.SortOrder;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -136,22 +139,73 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
     }
 
     @Override
-    protected void setUpToolbar(Toolbar toolbar, String title) {
-        super.setUpToolbar(toolbar,title);
-        toolbar.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.action_search:
-                    startActivity(new Intent(mContext, SearchActivity.class));
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.action_search){
+            startActivity(new Intent(mContext, SearchActivity.class));
+            return true;
+        } else if(item.getItemId() == R.id.action_timer){
+            startActivity(new Intent(mContext, TimerDialog.class));
+            return true;
+        } else {
+            String sortOrder = null;
+            switch (item.getItemId()){
+                case R.id.action_sort_order_title:
+                    sortOrder = SortOrder.SongSortOrder.SONG_A_Z;
+                    item.setChecked(true);
                     break;
-                case R.id.action_timer:
-                    startActivity(new Intent(mContext, TimerDialog.class));
+                case R.id.action_sort_order_title_desc:
+                    sortOrder = SortOrder.SongSortOrder.SONG_Z_A;
+                    item.setChecked(true);
+                    break;
+                case R.id.action_sort_order_album:
+                    sortOrder = SortOrder.SongSortOrder.SONG_ALBUM_A_Z;
+                    item.setChecked(true);
+                    break;
+                case R.id.action_sort_order_album_desc:
+                    sortOrder = SortOrder.SongSortOrder.SONG_ALBUM_Z_A;
+                    item.setChecked(true);
+                    break;
+                case R.id.action_sort_order_artist:
+                    sortOrder = SortOrder.SongSortOrder.SONG_ARTIST_A_Z;
+                    item.setChecked(true);
+                    break;
+                case R.id.action_sort_order_artist_desc:
+                    sortOrder = SortOrder.SongSortOrder.SONG_ARTIST_Z_A;
+                    item.setChecked(true);
+                    break;
+                case R.id.action_sort_order_duration:
+                    sortOrder = SortOrder.SongSortOrder.SONG_DURATION;
+                    item.setChecked(true);
+                    break;
+                case R.id.action_sort_order_date:
+                    sortOrder = SortOrder.SongSortOrder.SONG_DATE;
+                    item.setChecked(true);
+                    break;
+                case R.id.action_sort_order_year:
+                    sortOrder = SortOrder.SongSortOrder.SONG_YEAR;
+                    item.setChecked(true);
+                    break;
+                case R.id.action_sort_order_playlist_name:
+                    sortOrder = SortOrder.PlayListSortOrder.PLAYLIST_A_Z;
+                    item.setChecked(true);
+                    break;
+                case R.id.action_sort_order_playlist_name_desc:
+                    sortOrder = SortOrder.PlayListSortOrder.PLAYLIST_Z_A;
+                    item.setChecked(true);
+                    break;
+                case R.id.action_sort_order_playlist_date:
+                    sortOrder = SortOrder.PlayListSortOrder.PLAYLIST_DATE;
+                    item.setChecked(true);
+                    break;
+                case R.id.action_sort_order_custom:
+                    sortOrder = SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM;
                     break;
             }
-            return true;
-        });
+            if(!TextUtils.isEmpty(sortOrder))
+                saveSortOrder(sortOrder);
+        }
+        return true;
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -161,6 +215,50 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
         return true;
     }
 
+    protected void setUpMenuItem(Menu menu, String sortOrder) {
+        SubMenu subMenu = menu.findItem(R.id.action_sort_order).getSubMenu();
+        switch (sortOrder){
+            case SortOrder.SongSortOrder.SONG_A_Z:
+                subMenu.findItem(R.id.action_sort_order_title).setChecked(true);
+                break;
+            case SortOrder.SongSortOrder.SONG_Z_A:
+                subMenu.findItem(R.id.action_sort_order_title_desc).setChecked(true);
+                break;
+            case SortOrder.SongSortOrder.SONG_ALBUM_A_Z:
+                subMenu.findItem(R.id.action_sort_order_album).setChecked(true);
+                break;
+            case SortOrder.SongSortOrder.SONG_ALBUM_Z_A:
+                subMenu.findItem(R.id.action_sort_order_album_desc).setChecked(true);
+                break;
+            case SortOrder.SongSortOrder.SONG_ARTIST_A_Z:
+                subMenu.findItem(R.id.action_sort_order_artist).setChecked(true);
+                break;
+            case SortOrder.SongSortOrder.SONG_ARTIST_Z_A:
+                subMenu.findItem(R.id.action_sort_order_artist_desc).setChecked(true);
+                break;
+            case SortOrder.SongSortOrder.SONG_DATE:
+                subMenu.findItem(R.id.action_sort_order_date).setChecked(true);
+                break;
+            case SortOrder.SongSortOrder.SONG_DURATION:
+                subMenu.findItem(R.id.action_sort_order_duration).setChecked(true);
+                break;
+            case SortOrder.SongSortOrder.SONG_YEAR:
+                subMenu.findItem(R.id.action_sort_order_year).setChecked(true);
+                break;
+            case SortOrder.PlayListSortOrder.PLAYLIST_A_Z:
+                subMenu.findItem(R.id.action_sort_order_playlist_name).setChecked(true);
+                break;
+            case SortOrder.PlayListSortOrder.PLAYLIST_Z_A:
+                subMenu.findItem(R.id.action_sort_order_playlist_name_desc).setChecked(true);
+                break;
+            case SortOrder.PlayListSortOrder.PLAYLIST_DATE:
+                subMenu.findItem(R.id.action_sort_order_playlist_date).setChecked(true);
+                break;
+            case SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM:
+                subMenu.findItem(R.id.action_sort_order_custom).setChecked(true);
+                break;
+        }
+    }
 
     protected void tintMenuIcon(Menu menu){
         //主题颜色
@@ -183,5 +281,7 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
     protected int getMenuLayoutId(){
         return R.menu.menu_main_simple;
     }
+    protected void saveSortOrder(String sortOrder){
 
+    }
 }

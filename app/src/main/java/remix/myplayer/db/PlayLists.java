@@ -15,6 +15,6 @@ public class PlayLists{
         public static final String _ID = "_id";
         public static final String NAME = "name";
         public static final String COUNT = "count";
-
+        public static final String DATE = "date";
     }
 }
