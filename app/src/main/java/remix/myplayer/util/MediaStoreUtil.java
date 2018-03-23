@@ -265,8 +265,7 @@ public class MediaStoreUtil {
                     new String[]{MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DATA},
                     MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection(),
                     null,
-                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"SortOrder",MediaStore.Audio.Media.DEFAULT_SORT_ORDER)
-                            + SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"AscDesc"," asc"));
+                    null);
             if(cursor != null) {
                 Global.FolderMap.clear();
                 while (cursor.moveToNext()) {
@@ -612,25 +611,26 @@ public class MediaStoreUtil {
      * @param idList 歌曲id列表
      * @return 对应所有歌曲信息列表
      */
+    @Deprecated
     public static ArrayList<Song> getMP3ListByIds(ArrayList<Integer> idList) {
         if(idList == null)
             return new ArrayList<>();
         String[] arg = new String[idList.size()];
-        String where = "";
+        StringBuilder where = new StringBuilder();
         for(int i = 0 ; i < idList.size() ;i++){
             arg[i] = idList.get(i) + "";
-            where += (MediaStore.Audio.Media._ID + "=?");
+            where.append(MediaStore.Audio.Media._ID + "=?");
             if(i != idList.size() - 1){
-                where += " or ";
+                where.append(" or ");
             }
             if(i == idList.size() - 1)
-                where += ( " and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE +  MediaStoreUtil.getBaseSelection() );
+                where.append(" and " + MediaStore.Audio.Media.SIZE + ">").append(Constants.SCAN_SIZE).append(MediaStoreUtil.getBaseSelection());
         }
 
         Cursor cursor = null;
         ArrayList<Song> list = new ArrayList<>();
         try {
-            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null,where,arg,null,null);
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null, where.toString(),arg,null,null);
             if(cursor != null ){
                 while (cursor.moveToNext()){
                     list.add(getMP3Info(cursor));

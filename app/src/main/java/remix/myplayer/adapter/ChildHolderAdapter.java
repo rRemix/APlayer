@@ -181,7 +181,8 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
                     ToastUtil.show(mContext,R.string.illegal_arg);
                     return;
                 }
-                mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition() - 1);
+                if(song != null && song.getId() > 0)
+                    mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition() - 1);
             });
             holder.mContainer.setOnLongClickListener(v -> {
                 if(holder.getAdapterPosition() - 1 < 0){

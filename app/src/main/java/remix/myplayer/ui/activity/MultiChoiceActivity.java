@@ -199,6 +199,7 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
                     break;
                 case R.id.action_sort_order_custom:
                     sortOrder = SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM;
+                    item.setChecked(true);
                     break;
             }
             if(!TextUtils.isEmpty(sortOrder))

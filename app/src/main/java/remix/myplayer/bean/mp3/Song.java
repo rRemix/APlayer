@@ -46,6 +46,10 @@ public class Song implements Cloneable, Parcelable {
         AddTime = addTime;
     }
 
+    public Song(int id){
+        Id = id;
+    }
+
     public Song(Song info) {
         if(info == null)
             return;
@@ -94,7 +98,7 @@ public class Song implements Cloneable, Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Song && ((Song)o).getId() == this.getId();
+        return o instanceof Song  && ((Song)o).getId() == this.getId();
     }
 
     public long getAddTime() {

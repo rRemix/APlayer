@@ -110,6 +110,7 @@ class CustomSortActivity : ToolbarActivity() {
             uiThread {
                 ToastUtil.show(mContext,if(result > 0) R.string.save_success else R.string.save_error)
                 mMDDialog.dismiss()
+                finish()
             }
         }
     }

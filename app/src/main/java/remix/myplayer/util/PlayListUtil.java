@@ -5,13 +5,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
@@ -19,6 +19,8 @@ import remix.myplayer.db.DBManager;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.SortOrder;
+
+import static remix.myplayer.util.MediaStoreUtil.getMP3Info;
 
 
 /**
@@ -201,26 +203,26 @@ public class PlayListUtil {
 
     /**
      * 删除多首歌曲
-     * @param IdList
+     * @param audioIdList
      * @param playlistId
      * @return
      */
-    public static int deleteMultiSongs(List<Integer> IdList,int playlistId){
+    public static int deleteMultiSongs(List<Integer> audioIdList,int playlistId){
         try {
-            if(IdList == null || IdList.size() == 0)
+            if(audioIdList == null || audioIdList.size() == 0)
                 return 0;
             StringBuilder where = new StringBuilder();
-            String[] whereArgs = new String[IdList.size() + 1];
-            for(int i = 0 ; i < IdList.size() + 1;i++) {
-                if (i != IdList.size()) {
+            String[] whereArgs = new String[audioIdList.size() + 1];
+            for(int i = 0 ; i < audioIdList.size() + 1;i++) {
+                if (i != audioIdList.size()) {
                     if (i == 0) {
                         where.append("(");
                     }
                     where.append(PlayListSongs.PlayListSongColumns.AUDIO_ID + "=?");
-                    if (i != IdList.size() - 1) {
+                    if (i != audioIdList.size() - 1) {
                         where.append(" or ");
                     }
-                    whereArgs[i] = IdList.get(i) + "";
+                    whereArgs[i] = audioIdList.get(i) + "";
                 }else {
                     where.append(") and " + PlayListSongs.PlayListSongColumns.PLAY_LIST_ID + "=?");
                     whereArgs[i] = playlistId + "";
@@ -402,28 +404,120 @@ public class PlayListUtil {
     }
 
     /**
-     * 根据多个歌曲id返回多个歌曲详细信息
-     * @param idList 歌曲id列表
-     * @return 对应所有歌曲信息列表
+     * 根据id列表查询歌曲
+     * @param idList
+     * @return
      */
-    public static List<Song> getMP3ListByIds(List<Integer> idList) {
+    public static List<Song> getMP3ListByIds(List<Integer> idList){
         if(idList == null || idList.size() == 0)
             return new ArrayList<>();
 
-        ArrayList<Song> songList = new ArrayList<>();
-
-        for(Integer id : idList){
-            Song temp = MediaStoreUtil.getMP3InfoById(id);
-            if(temp != null && temp.getId() == id){
-                songList.add(temp);
-            } else {
-                //如果外部删除了某些歌曲 手动添加歌曲信息，保证点击播放列表前后歌曲数目一致
-                Song item = new Song();
-                item.Title = mContext.getString(R.string.song_lose_effect);
-                item.Id = id;
-                songList.add(item);
+        StringBuilder selection = new StringBuilder(128);
+        for(int i = 0; i < idList.size(); i++){
+            selection.append(idList.get(i)).append( i == idList.size() - 1 ? ") " : ",");
+        }
+        List<Song> songList = new ArrayList<>();
+        Cursor cursor = null;
+        try {
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    null,
+                    selection.toString(),
+                    null,
+                    null);
+            if(cursor != null && cursor.getCount() > 0){
+                while (cursor.moveToNext()){
+                    songList.add(getMP3Info(cursor));
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(cursor != null && !cursor.isClosed()){
+                cursor.close();
             }
         }
+        return songList;
+    }
+
+    /**
+     * 根据多个歌曲id返回多个歌曲详细信息
+     * @param idList 歌曲id列表
+     * @param playlistId 播放列表id
+     * @return 对应所有歌曲信息列表
+     */
+    public static List<Song> getMP3ListByIds(List<Integer> idList, int playlistId) {
+        if(idList == null || idList.size() == 0)
+            return new ArrayList<>();
+
+        StringBuilder selection = new StringBuilder(127);
+        selection.append(MediaStore.Audio.Media._ID + " in (");
+        StringBuilder sortOrder = new StringBuilder(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER,SortOrder.PlayListSongSortOrder.SONG_A_Z));
+//        //自定义排序 sqlite不支持find_in_set
+//        if(sortOrder.toString().equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)){
+//            sortOrder.delete(0,sortOrder.length());
+//            sortOrder.append("find_in_set(" + MediaStore.Audio.Media._ID + ",'");
+//            for(int i = 0 ; i < idList.size();i++){
+//                sortOrder.append(idList.get(i)).append( i == idList.size() - 1 ? "') " : ",");
+//            }
+//        }
+        boolean isCustom = sortOrder.toString().equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM);
+        if(isCustom){
+            sortOrder.delete(0,sortOrder.length());
+        }
+        for(int i = 0 ; i < idList.size();i++){
+            selection.append(idList.get(i)).append( i == idList.size() - 1 ? ") " : ",");
+        }
+        Cursor cursor = null;
+        List<Song> songList = new ArrayList<>(idList.size());
+        Song[] tempArray = new Song[idList.size()];
+        try {
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    null,
+                    selection.toString(),
+                    null,
+                    sortOrder.toString());
+            if(cursor != null && cursor.getCount() > 0){
+                while (cursor.moveToNext()){
+                    Song temp = getMP3Info(cursor);
+                    tempArray[isCustom ? idList.indexOf(temp.getId()) : cursor.getPosition()] = temp;
+                }
+                for(Song temp : tempArray){
+                    if(temp != null)
+                        songList.add(temp);
+                }
+
+                //有不存在的歌曲 从播放列表移除
+                if(songList.size() < idList.size()){
+                    List<Integer> deleteId = new ArrayList<>();
+                    for(Integer id : idList){
+                        Song deleteSong = new Song(id);
+                        if(!songList.contains(deleteSong)){
+                            deleteId.add(id);
+                        }
+                    }
+                    PlayListUtil.deleteMultiSongs(deleteId,playlistId);
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(cursor != null && !cursor.isClosed()){
+                cursor.close();
+            }
+        }
+
+//        for(Integer id : idList){
+//            Song temp = MediaStoreUtil.getMP3InfoById(id);
+//            if(temp != null && temp.getId() == id){
+//                songList.add(temp);
+//            } else {
+//                //如果外部删除了某些歌曲 手动添加歌曲信息，保证点击播放列表前后歌曲数目一致
+//                Song item = new Song();
+//                item.Title = mContext.getString(R.string.song_lose_effect);
+//                item.Id = id;
+//                songList.add(item);
+//            }
+//        }
         return songList;
     }
 

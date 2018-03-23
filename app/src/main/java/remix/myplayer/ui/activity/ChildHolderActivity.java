@@ -181,22 +181,33 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
     @Override
     protected void saveSortOrder(String sortOrder) {
+        boolean update = false;
         if(mType == Constants.PLAYLIST){
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER,sortOrder);
-            if(sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)){
-                startActivity(new Intent(mContext,CustomSortActivity.class)
-                    .putExtra("list",new ArrayList<>(mInfoList))
-                    .putExtra("id",mId)
-                    .putExtra("name",mArg));
+            //手动排序或者排序发生变化
+            if(sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM) ||
+                    !SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER,SortOrder.PlayListSongSortOrder.SONG_A_Z).equalsIgnoreCase(sortOrder)){
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER,sortOrder);
+                //选择的是手动排序
+                if(sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)){
+                    startActivity(new Intent(mContext,CustomSortActivity.class)
+                            .putExtra("list",new ArrayList<>(mInfoList))
+                            .putExtra("id",mId)
+                            .putExtra("name",mArg));
+                } else {
+                    update = true;
+                }
             }
         } else{
-            //当列表内不是自定义排序 其排序方式与其他排序一致
-            if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER,SortOrder.ChildHolderSongSortOrder.SONG_A_Z)
-                    .equalsIgnoreCase(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER,SortOrder.PlayListSongSortOrder.SONG_A_Z)))
-                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER,sortOrder);
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER,sortOrder);
+            //排序发生变化
+            if(!SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER,SortOrder.ChildHolderSongSortOrder.SONG_A_Z)
+                    .equalsIgnoreCase(sortOrder)){
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER,sortOrder);
+                update = true;
+            }
+
         }
-        updateList(true);
+        if(update)
+            updateList(true);
     }
 
     @Override
@@ -240,7 +251,6 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
             mRefreshHandler.sendEmptyMessage(START);
             if(mNeedReset)
                 mInfoList = getMP3List();
-            sortList();
             mRefreshHandler.sendEmptyMessage(END);
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
@@ -294,7 +304,6 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
                 break;
             //文件夹名
             case Constants.FOLDER:
-//                mInfoList = MediaStoreUtil.getMP3ListByIds(Global.FolderMap.get(mArg));
                 mInfoList = MediaStoreUtil.getMP3ListByFolderName(mArg);
                 break;
             //播放列表名
@@ -303,7 +312,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
                 List<Integer> playListSongIDList = PlayListUtil.getIDList(mId);
                 if(playListSongIDList == null)
                     return mInfoList;
-                mInfoList = PlayListUtil.getMP3ListByIds(playListSongIDList);
+                mInfoList = PlayListUtil.getMP3ListByIds(playListSongIDList,mId);
                 break;
         }
         return mInfoList;
