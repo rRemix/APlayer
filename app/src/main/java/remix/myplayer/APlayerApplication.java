@@ -11,6 +11,7 @@ import com.facebook.imagepipeline.cache.MemoryCacheParams;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.squareup.leakcanary.LeakCanary;
 import com.umeng.analytics.MobclickAgent;
+import com.umeng.commonsdk.UMConfigure;
 import com.umeng.socialize.Config;
 import com.umeng.socialize.PlatformConfig;
 import com.umeng.socialize.UMShareAPI;
@@ -45,10 +46,11 @@ public class APlayerApplication extends MultiDexApplication{
         initUtil();
         initTheme();
 
-        //友盟异常捕获
+        //友盟
+        UMConfigure.init(this,null,null,UMConfigure.DEVICE_TYPE_PHONE,null);
         MobclickAgent.setCatchUncaughtExceptions(true);
-        MobclickAgent.setDebugMode(BuildConfig.DEBUG);
-        //友盟分享
+        UMConfigure.setLogEnabled(BuildConfig.DEBUG);
+        //友盟
         UMShareAPI.get(this);
         Config.DEBUG = BuildConfig.DEBUG;
         //bomb

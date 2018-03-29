@@ -113,30 +113,22 @@ public class SPUtil {
         public static final String IMMERSIVE_MODE = "immersive_mode";
         //过滤大小
         public static final String SCAN_SIZE = "scan_size";
-        //歌曲排序
-//        public static final String SONG_SORT = "song_sort";
         //歌曲排序顺序
         public static final String SONG_SORT_ORDER = "song_sort_order";
-        //专辑排序
-//        public static final String ALBUM_SORT = "album_sort";
         //专辑排序顺序
         public static final String ALBUM_SORT_ORDER = "album_sort_order";
-        //艺术家
-//        public static final String ARTIST_SORT = "artist_sort";
         //艺术家排序顺序
         public static final String ARTIST_SORT_ORDER = "artist_sort_order";
-        //播放列表排序
-//        public static final String PLAYLIST_SORT = "playlist_sort";
         //播放列表排序顺序
         public static final String PLAYLIST_SORT_ORDER = "playlist_sort_order";
-        //非播放列表内歌曲排序
-//        public static final String CHILD_SONG_SORT = "child_song_sort";
-        //非播放列表内歌曲排序顺序
-        public static final String CHILD_SONG_SORT_ORDER = "child_song_sort_order";
-        //播放列表内歌曲排序
-//        public static final String PALYLIST_SONG_SORT = "playlist_song_sort";
+        //文件夹内歌曲排序顺序
+        public static final String CHILD_FOLDER_SONG_SORT_ORDER = "child_folder_song_sort_order";
+        //艺术家内歌曲排序顺序
+        public static final String CHILD_ARTIST_SONG_SORT_ORDER = "child_artist_sort_order";
+        //专辑内歌曲排序顺序
+        public static final String CHILD_ALBUM_SONG_SORT_ORDER = "child_album_song_sort_order";
         //播放列表内歌曲排序顺序
-        public static final String PLAYLIST_SONG_SORT_ORDER = "playlist_song_sort_order";
+        public static final String CHILD_PLAYLIST_SONG_SORT_ORDER = "child_playlist_song_sort_order";
     }
 
 }

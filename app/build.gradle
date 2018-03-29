@@ -15,7 +15,7 @@ ext {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.3"
+    buildToolsVersion '27.0.3'
 
 
     defaultConfig {
@@ -79,12 +79,12 @@ android {
 //        alibaba{}
 //        meizu{}
 
-//        assistant91{}
-//        baidu{}
-//        anzhuomarket{}
-//        qihu360{}
-//        chuizi{}
-//        xiaomi{}
+        assistant91{}
+        baidu{}
+        anzhuomarket{}
+        qihu360{}
+        chuizi{}
+        xiaomi{}
         kuan {}
         productFlavors.all { flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
@@ -139,7 +139,8 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.2'
     implementation 'com.facebook.fresco:fresco:1.5.0'
     implementation 'com.facebook.rebound:rebound:0.3.8'
-    implementation 'com.umeng.analytics:analytics:6.1.2'
+    implementation 'com.umeng.sdk:common:1.4.4'
+    implementation 'com.umeng.sdk:analytics:7.4.4'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
     implementation 'cn.bmob.android:bmob-sdk:3.5.0'

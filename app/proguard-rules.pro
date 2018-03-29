@@ -47,12 +47,14 @@
 -keep class * implements android.os.Parcelable {
     public static final android.os.Parcelable$Creator *;
 }
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
 -keepclasseswithmembers class * implements android.os.Parcelable{
     <fields>;
     <methods>;
 }
-
-
 #baseAdapter
 -keepclassmembers class remix.myplayer.adapter.holder.BaseViewHolder
 -keepclasseswithmembers class remix.myplayer.adapter.holder.BaseViewHolder {
@@ -65,6 +67,9 @@
 }
 
 -keep class **.R$* {*;}
+-keep public class remix.myplayer.R$*{
+public static final int *;
+}
 -keepclasseswithmembers class * extends android.app.Activity{
     <methods>;
 }

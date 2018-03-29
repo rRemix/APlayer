@@ -46,10 +46,10 @@ public final class SortOrder {
     }
 
     public interface ChildHolderSongSortOrder extends SongSortOrder {
-
+        String SONG_TRACK_NUMBER = MediaStore.Audio.Media.TRACK;
     }
 
-    public interface PlayListSongSortOrder extends SongSortOrder {
+    public interface PlayListSongSortOrder extends ChildHolderSongSortOrder {
         String PLAYLIST_SONG_CUSTOM = "custom";
     }
 }

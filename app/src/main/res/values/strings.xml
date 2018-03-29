@@ -255,7 +255,6 @@
     <string name="click_to_unlock">点击解除锁定</string>
     <string name="please_give_write_settings_permission">请授予修改系统设置权限</string>
     <string name="loading">正在加载</string>
-    <string name="choose_lyric_source">歌词源选择</string>
     <string name="cover">封面</string>
     <string name="always">总是</string>
     <string name="never">从不</string>
@@ -298,4 +297,6 @@
     <string name="custom">自定义</string>
     <string name="order">顺序</string>
     <string name="create_time_desc">创建时间降序</string>
+    <string name="lyric">歌词</string>
+    <string name="track_number">音轨号</string>
 </resources>

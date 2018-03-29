@@ -34,7 +34,6 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.drawable.ScalingUtils;
@@ -312,15 +311,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             return false;
         });
 
-        if(SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"LrcHint",true)){
-            SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"LrcHint",false);
-            new MaterialDialog.Builder(mContext)
-                    .content(getString(R.string.lc_operation_hint))
-                    .contentColorAttr(R.attr.text_color_primary)
-                    .positiveColorAttr(R.attr.text_color_primary)
-                    .backgroundColorAttr(R.attr.background_color_3)
-                    .show();
-        }
     }
 
     /**
@@ -782,50 +772,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 }
                 @Override
                 public void onLongClick() {
-                    //是否已经忽略
-                    final boolean alreadyIgnore = SPUtil.getValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
-                    new MaterialDialog.Builder(mContext)
-                            .items(getString(R.string.netease),getString(R.string.kugou),getString(R.string.select_lrc),getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc))
-                            .itemsColorAttr(R.attr.text_color_primary)
-                            .backgroundColorAttr(R.attr.background_color_3)
-                            .itemsCallback((dialog, itemView, position, text) -> {
-                                switch (position){
-                                    case 0: //网易 酷狗
-                                    case 1:
-                                        SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
-                                        lrcFragment.updateLrc(mInfo,true);
-                                        break;
-                                    case 2: //手动选择歌词
-                                        new FileChooserDialog.Builder(PlayerActivity.this)
-                                                .extensionsFilter(".lrc")
-                                                .show();
-                                        break;
-                                    case 3: //忽略或者取消忽略
-                                        new MaterialDialog.Builder(mContext)
-                                                .negativeText(R.string.cancel)
-                                                .negativeColorAttr(R.attr.text_color_primary)
-                                                .positiveText(R.string.confirm)
-                                                .positiveColorAttr(R.attr.text_color_primary)
-                                                .title(!alreadyIgnore ? R.string.confirm_ignore_lrc : R.string.confirm_cancel_ignore_lrc)
-                                                .titleColorAttr(R.attr.text_color_primary)
-                                                .backgroundColorAttr(R.attr.background_color_3)
-                                                .onPositive((dialog1, which) -> {
-                                                    if(!alreadyIgnore){//忽略
-                                                        if (mInfo != null) {
-                                                            SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_IGNORE);
-                                                            lrcFragment.updateLrc(mInfo);
-                                                        }
-                                                    } else {//取消忽略
-                                                        SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE);
-                                                        lrcFragment.updateLrc(mInfo);
-                                                    }
-
-                                                })
-                                                .show();
-                                        break;
-                                }
-                            })
-                            .show();
                 }
             });
             mLrcView.setOnSeekToListener(progress -> {
@@ -1110,6 +1056,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             updateProgressByHandler();
             updateSeekbarByHandler();
         }
+    }
+
+    public LrcFragment getLyricFragment(){
+        return (LrcFragment) mAdapter.getItem(2);
     }
 
 }

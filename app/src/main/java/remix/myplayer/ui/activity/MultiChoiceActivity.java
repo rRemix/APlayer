@@ -201,6 +201,10 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
                     sortOrder = SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM;
                     item.setChecked(true);
                     break;
+                case R.id.action_sort_order_track_number:
+                    sortOrder = SortOrder.ChildHolderSongSortOrder.SONG_TRACK_NUMBER;
+                    item.setChecked(true);
+                    break;
             }
             if(!TextUtils.isEmpty(sortOrder))
                 saveSortOrder(sortOrder);
@@ -254,6 +258,9 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
                 break;
             case SortOrder.PlayListSortOrder.PLAYLIST_DATE:
                 subMenu.findItem(R.id.action_sort_order_playlist_date).setChecked(true);
+                break;
+            case SortOrder.ChildHolderSongSortOrder.SONG_TRACK_NUMBER:
+                subMenu.findItem(R.id.action_sort_order_track_number).setChecked(true);
                 break;
             case SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM:
                 subMenu.findItem(R.id.action_sort_order_custom).setChecked(true);

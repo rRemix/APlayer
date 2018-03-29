@@ -69,6 +69,8 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
     private MaterialDialog mMDDialog;
 
+    //当前排序
+    private String mSortOrder;
     //更新
     private static final int START = 0;
     private static final int END = 1;
@@ -146,10 +148,11 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         setUpToolbar(mToolBar,Title);
 
         //加载歌曲列表
+
         mMDDialog = new MaterialDialog.Builder(this)
-                .title("加载中")
+                .title(R.string.loading)
                 .titleColorAttr(R.attr.text_color_primary)
-                .content("请稍等")
+                .content(R.string.please_wait)
                 .contentColorAttr(R.attr.text_color_primary)
                 .progress(true, 0)
                 .backgroundColorAttr(R.attr.background_color_3)
@@ -166,15 +169,18 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        String sortOrder = null;
         if(mType == Constants.PLAYLIST){
-            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER, SortOrder.PlayListSongSortOrder.SONG_A_Z);
+            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER, SortOrder.PlayListSongSortOrder.SONG_A_Z);
+        } else if(mType == Constants.ALBUM){
+            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
+        } else if(mType == Constants.ARTIST){
+            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
         } else {
-            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
+            mSortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER, SortOrder.ChildHolderSongSortOrder.SONG_A_Z);
         }
-        if(TextUtils.isEmpty(sortOrder))
+        if(TextUtils.isEmpty(mSortOrder))
             return true;
-        setUpMenuItem(menu,sortOrder);
+        setUpMenuItem(menu,mSortOrder);
         return true;
     }
 
@@ -185,8 +191,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         if(mType == Constants.PLAYLIST){
             //手动排序或者排序发生变化
             if(sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM) ||
-                    !SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER,SortOrder.PlayListSongSortOrder.SONG_A_Z).equalsIgnoreCase(sortOrder)){
-                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SONG_SORT_ORDER,sortOrder);
+                    !mSortOrder.equalsIgnoreCase(sortOrder)){
                 //选择的是手动排序
                 if(sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)){
                     startActivity(new Intent(mContext,CustomSortActivity.class)
@@ -199,20 +204,30 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
             }
         } else{
             //排序发生变化
-            if(!SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER,SortOrder.ChildHolderSongSortOrder.SONG_A_Z)
-                    .equalsIgnoreCase(sortOrder)){
-                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_SONG_SORT_ORDER,sortOrder);
+            if(!mSortOrder.equalsIgnoreCase(sortOrder)){
                 update = true;
             }
-
         }
+        if(mType == Constants.PLAYLIST){
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_PLAYLIST_SONG_SORT_ORDER,sortOrder);
+        } else if(mType == Constants.ALBUM){
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_ALBUM_SONG_SORT_ORDER,sortOrder);
+        } else if(mType == Constants.ARTIST){
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,sortOrder);
+        } else {
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_FOLDER_SONG_SORT_ORDER,sortOrder);
+        }
+        mSortOrder = sortOrder;
         if(update)
             updateList(true);
+
     }
 
     @Override
     protected int getMenuLayoutId() {
-        return mType == Constants.PLAYLIST ? R.menu.menu_child_holder_for_playlist : R.menu.menu_child_holder;
+        return mType == Constants.PLAYLIST ? R.menu.menu_child_for_playlist :
+                mType == Constants.ALBUM ? R.menu.menu_child_for_album :
+                mType == Constants.ARTIST ? R.menu.menu_child_for_artist : R.menu.menu_child_for_folder;
     }
 
     @Override

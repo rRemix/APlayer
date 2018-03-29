@@ -7,12 +7,12 @@
             android:id="@+id/menu_edit"/>
         <item android:title="@string/song_detail"
             android:id="@+id/menu_detail"/>
-        <!--<item android:title="@string/choose_lyric_source"-->
-            <!--android:id="@+id/menu_lyric"/>-->
         <item android:title="@string/sleep_timer"
             android:id="@+id/menu_timer"/>
         <item android:title="@string/eq"
             android:id="@+id/menu_eq"/>
+        <item android:id="@+id/menu_lyric"
+            android:title="@string/lyric"/>
         <item android:id="@+id/menu_collect"
             android:title="@string/collect"/>
         <!--<item android:title="音量调节"-->

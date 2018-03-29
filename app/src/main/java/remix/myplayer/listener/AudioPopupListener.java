@@ -1,7 +1,6 @@
 package remix.myplayer.listener;
 
-import android.app.Activity;
-import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -30,11 +29,14 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.PlayerActivity;
+import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.TimerDialog;
+import remix.myplayer.ui.fragment.LrcFragment;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
@@ -46,8 +48,8 @@ import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
  * @Author Xiaoborui
  * @Date 2016/8/29 15:33
  */
-public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
-    private Context mContext;
+public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMenuItemClickListener{
+    private PlayerActivity mActivity;
     private Song mInfo;
     private View mEditRootView;
     @BindView(R.id.song_layout)
@@ -91,20 +93,64 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
 
     private Genre mGenreInfo;
 
-    public AudioPopupListener(Context context,Song info){
-        mContext = context;
+    public AudioPopupListener(PlayerActivity activity,Song info){
+        super(activity);
+        mActivity = activity;
         mInfo = info;
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        MobclickAgent.onEvent(mContext,item.getItemId() == R.id.menu_edit ? "SongEdit" : "SongDetail" );
+        MobclickAgent.onEvent(mActivity,item.getItemId() == R.id.menu_edit ? "SongEdit" : "SongDetail" );
         switch (item.getItemId()){
-//            case R.id.menu_lrc:
-//
-//                break;
+            case R.id.menu_lyric:
+                final boolean alreadyIgnore = SPUtil.getValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
+                final LrcFragment lrcFragment = mActivity.getLyricFragment();
+                new MaterialDialog.Builder(mActivity)
+                        .items(getString(R.string.netease), getString(R.string.kugou), getString(R.string.select_lrc), getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc))
+                        .itemsColorAttr(R.attr.text_color_primary)
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .itemsCallback((dialog, itemView, position, text) -> {
+                            switch (position){
+                                case 0: //网易 酷狗
+                                case 1:
+                                    SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
+                                    lrcFragment.updateLrc(mInfo,true);
+                                    break;
+                                case 2: //手动选择歌词
+                                    new FileChooserDialog.Builder(mActivity)
+                                            .extensionsFilter(".lrc")
+                                            .show();
+                                    break;
+                                case 3: //忽略或者取消忽略
+                                    new MaterialDialog.Builder(mActivity)
+                                            .negativeText(R.string.cancel)
+                                            .negativeColorAttr(R.attr.text_color_primary)
+                                            .positiveText(R.string.confirm)
+                                            .positiveColorAttr(R.attr.text_color_primary)
+                                            .title(!alreadyIgnore ? R.string.confirm_ignore_lrc : R.string.confirm_cancel_ignore_lrc)
+                                            .titleColorAttr(R.attr.text_color_primary)
+                                            .backgroundColorAttr(R.attr.background_color_3)
+                                            .onPositive((dialog1, which) -> {
+                                                if(!alreadyIgnore){//忽略
+                                                    if (mInfo != null) {
+                                                        SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_IGNORE);
+                                                        lrcFragment.updateLrc(mInfo);
+                                                    }
+                                                } else {//取消忽略
+                                                    SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE);
+                                                    lrcFragment.updateLrc(mInfo);
+                                                }
+
+                                            })
+                                            .show();
+                                    break;
+                            }
+                        })
+                        .show();
+                break;
             case R.id.menu_edit:
-                MaterialDialog editDialog = new MaterialDialog.Builder(mContext)
+                MaterialDialog editDialog = new MaterialDialog.Builder(mActivity)
                         .title(R.string.song_edit)
                         .titleColorAttr(R.attr.text_color_primary)
                         .customView(R.layout.dialog_song_edit,true)
@@ -117,11 +163,11 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                             String title = "",artist = "",album = "",genre = "",year = "";
                             title = mSongLayout.getEditText() != null ? mSongLayout.getEditText().getText().toString() : mInfo.getTitle();
                             if(TextUtils.isEmpty(title)){
-                                ToastUtil.show(mContext,R.string.song_not_empty);
+                                ToastUtil.show(mActivity,R.string.song_not_empty);
                                 return;
                             }
-                            artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString() : mContext.getString(R.string.unknown_artist);
-                            album = mAlbumLayout.getEditText() != null ? mAlbumLayout.getEditText().getText().toString() : mContext.getString(R.string.unknown_album);
+                            artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString() : getString(R.string.unknown_artist);
+                            album = mAlbumLayout.getEditText() != null ? mAlbumLayout.getEditText().getText().toString() : getString(R.string.unknown_album);
                             year = mYearLayout.getEditText() != null ? mYearLayout.getEditText().getText().toString() : " ";
                             genre = mGenreLayout.getEditText() != null ? mGenreLayout.getEditText().getText().toString() : "";
 
@@ -145,15 +191,15 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                                 e.printStackTrace();
                             }
                             if(updateGenreRow > 0 && updateRow > 0){
-                                ToastUtil.show(mContext,R.string.save_success);
+                                ToastUtil.show(mActivity,R.string.save_success);
                                 mInfo.setAlbum(album);
                                 mInfo.setArtist(artist);
                                 mInfo.setTitle(title);
                                 mInfo.setYear(year);
-                                ((PlayerActivity)mContext).updateTopStatus(mInfo);
-                                ((PlayerActivity)mContext).setMP3Item(mInfo);
+                                mActivity.updateTopStatus(mInfo);
+                                mActivity.setMP3Item(mInfo);
                             } else {
-                                ToastUtil.show(mContext,R.string.save_error);
+                                ToastUtil.show(mActivity,R.string.save_error);
                             }
                         }).build();
                 editDialog.show();
@@ -167,7 +213,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                             mSongLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
                             mSongLayout.getEditText().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
                         }
-                        mSongLayout.getEditText().addTextChangedListener(new TextInputEditWatcher(mSongLayout,mContext.getString(R.string.song_not_empty)));
+                        mSongLayout.getEditText().addTextChangedListener(new TextInputEditWatcher(mSongLayout,getString(R.string.song_not_empty)));
                         mSongLayout.getEditText().setText(mInfo.getTitle());
                     }
                     if(mAlbumLayout.getEditText() != null) {
@@ -199,7 +245,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 break;
 
             case R.id.menu_detail:
-                MaterialDialog detailDialog = new MaterialDialog.Builder(mContext)
+                MaterialDialog detailDialog = new MaterialDialog.Builder(mActivity)
                         .title(R.string.song_detail)
                         .titleColorAttr(R.attr.text_color_primary)
                         .customView(R.layout.dialog_song_detail,true)
@@ -220,7 +266,7 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         mDetailName.setText(mInfo.getDisplayname());
                     //歌曲大小
                     if(mDetailSize != null)
-                        mDetailSize.setText(mContext.getString(R.string.cache_size,1.0f * mInfo.getSize() / ByteConstants.MB));
+                        mDetailSize.setText(getString(R.string.cache_size,1.0f * mInfo.getSize() / ByteConstants.MB));
                     //歌曲格式
                     if(mDetailMime != null){
                         String path = mInfo.getUrl();
@@ -247,25 +293,25 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                 }
                 break;
             case R.id.menu_timer:
-                mContext.startActivity(new Intent(mContext, TimerDialog.class));
+                mActivity.startActivity(new Intent(mActivity, TimerDialog.class));
                 break;
             case R.id.menu_eq:
-                MobclickAgent.onEvent(mContext,"EQ");
+                MobclickAgent.onEvent(mActivity,"EQ");
                 Intent audioEffectIntent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
                 audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
-                if(Util.isIntentAvailable(mContext,audioEffectIntent)){
-                    ((Activity)mContext).startActivityForResult(audioEffectIntent, 0);
+                if(Util.isIntentAvailable(mActivity,audioEffectIntent)){
+                    mActivity.startActivityForResult(audioEffectIntent, 0);
                 } else {
-                    mContext.startActivity(new Intent(mContext,EQActivity.class));
+                    mActivity.startActivity(new Intent(mActivity,EQActivity.class));
                 }
                 break;
             case R.id.menu_collect:
                 PlayListSong info = new PlayListSong(mInfo.getId(), Global.MyLoveID,Constants.MYLOVE);
-                ToastUtil.show(mContext,
-                        PlayListUtil.addSong(info) > 0 ? mContext.getString(R.string.add_song_playlist_success, 1,Constants.MYLOVE) : mContext.getString(R.string.add_song_playlist_error));
+                ToastUtil.show(mActivity,
+                        PlayListUtil.addSong(info) > 0 ? getString(R.string.add_song_playlist_success, 1,Constants.MYLOVE) : getString(R.string.add_song_playlist_error));
                 break;
             case R.id.menu_delete:
-                new MaterialDialog.Builder(mContext)
+                new MaterialDialog.Builder(mActivity)
                         .content(R.string.confirm_delete_from_library)
                         .positiveText(R.string.confirm)
                         .negativeText(R.string.cancel)
@@ -274,18 +320,18 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                             if(which == POSITIVE){
                                 if(MediaStoreUtil.delete(mInfo.getId() , Constants.SONG,dialog.isPromptCheckBoxChecked()) > 0){
                                     if(PlayListUtil.deleteSong(mInfo.getId(), Global.PlayQueueID)){
-                                        ToastUtil.show(mContext, mContext.getString(R.string.delete_success));
+                                        ToastUtil.show(mActivity, getString(R.string.delete_success));
                                         //移除的是正在播放的歌曲
                                         if(MusicService.getCurrentMP3() == null)
                                             return;
                                         if(mInfo.getId() == MusicService.getCurrentMP3().getId() && Global.PlayQueue.size() >= 2){
                                             Intent intent = new Intent(MusicService.ACTION_CMD);
                                             intent.putExtra("Control", Constants.NEXT);
-                                            mContext.sendBroadcast(intent);
+                                            mActivity.sendBroadcast(intent);
                                         }
                                     }
                                 } else {
-                                    ToastUtil.show(mContext, mContext.getString(R.string.delete_error));
+                                    ToastUtil.show(mActivity, getString(R.string.delete_error));
                                 }
                             }
                         })
@@ -295,84 +341,6 @@ public class AudioPopupListener implements PopupMenu.OnMenuItemClickListener{
                         .contentColorAttr(R.attr.text_color_primary)
                         .show();
                 break;
-//            case R.id.menu_lyric:
-//                String key = ImageUriUtil.getLyricSearchKey(mInfo);
-//                Observable.zip(HttpClient.getKuGouApiservice().getKuGouSearch(1, "yes", "pc", key, (int) mInfo.getDuration(), "")
-//                        .flatMap(new Function<ResponseBody, ObservableSource<KLrcResponse>>() {
-//                            @Override
-//                            public ObservableSource<KLrcResponse> apply(ResponseBody body) throws Exception {
-//                                KSearchResponse response = new Gson().fromJson(body.string(), KSearchResponse.class);
-//                                return HttpClient.getKuGouApiservice()
-//                                        .getKuGouLyric(1, "pc", "lrc", "utf8", response.candidates.get(0).id, response.candidates.get(0).accesskey)
-//                                        .map(new Function<ResponseBody, KLrcResponse>() {
-//                                            @Override
-//                                            public KLrcResponse apply(ResponseBody body) throws Exception {
-//                                                return new Gson().fromJson(body.string(), KLrcResponse.class);
-//                                            }
-//                                        });
-//                            }
-//                        }), HttpClient.getNeteaseApiservice().getNeteaseSearch(key, 0, 1, 1)
-//                        .flatMap(new Function<ResponseBody, ObservableSource<NLrcResponse>>() {
-//                            @Override
-//                            public ObservableSource<NLrcResponse> apply(ResponseBody body) throws Exception {
-//                                NSongSearchResponse response = new Gson().fromJson(body.string(), NSongSearchResponse.class);
-//                                return HttpClient.getNeteaseApiservice()
-//                                        .getNeteaseLyric("pc", response.result.songs.get(0).id, -1, -1, -1)
-//                                        .map(new Function<ResponseBody, NLrcResponse>() {
-//                                            @Override
-//                                            public NLrcResponse apply(ResponseBody body) throws Exception {
-//                                                return new Gson().fromJson(body.string(), NLrcResponse.class);
-//                                            }
-//                                        });
-//                            }
-//                        }), new BiFunction<KLrcResponse, NLrcResponse, String>() {
-//                    @Override
-//                    public String apply(KLrcResponse kLrcResponse, NLrcResponse nLrcResponse) throws Exception {
-//                        if(kLrcResponse != null && nLrcResponse != null){
-//                            return "KN";
-//                        }
-//                        if(kLrcResponse != null)
-//                            return "K";
-//                        if(nLrcResponse != null)
-//                            return "N";
-//                        return "";
-//                    }
-//                }).compose(RxUtil.applyScheduler())
-//                .subscribe(new Consumer<String>() {
-//                    @Override
-//                    public void accept(String s) throws Exception {
-//                        List<String> sources = new ArrayList<>();
-//                        if (s.contains("K"))
-//                            sources.add("酷狗");
-//                        if (s.contains("N"))
-//                            sources.add("网易");
-//                        sources.add("手动选择");
-//                        sources.add("忽略歌词");
-//
-//                        MaterialDialog lyricDialog = new MaterialDialog.Builder(mContext)
-//                                .title("选择歌词源")
-//                                .titleColorAttr(R.attr.text_color_primary)
-//                                .items(sources)
-//                                .itemsCallback(new MaterialDialog.ListCallback() {
-//                                    @Override
-//                                    public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
-//                                        ToastUtil.show(mContext, text);
-//                                    }
-//                                })
-//                                .positiveText(R.string.confirm)
-//                                .positiveColorAttr(R.attr.text_color_primary)
-//                                .backgroundColorAttr(R.attr.background_color_3)
-//                                .build();
-//                        lyricDialog.show();
-//                    }
-//                }, new Consumer<Throwable>() {
-//                    @Override
-//                    public void accept(Throwable throwable) throws Exception {
-//                        ToastUtil.show(mContext, throwable.toString());
-//                    }
-//                });
-//                break;
-
 //            case R.id.menu_vol:
 //                AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
 //                if(audioManager != null){
