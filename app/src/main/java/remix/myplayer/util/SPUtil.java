@@ -129,6 +129,8 @@ public class SPUtil {
         public static final String CHILD_ALBUM_SONG_SORT_ORDER = "child_album_song_sort_order";
         //播放列表内歌曲排序顺序
         public static final String CHILD_PLAYLIST_SONG_SORT_ORDER = "child_playlist_song_sort_order";
+        //移除歌曲
+        public static final String BLACKLIST_SONG = "black_list_song";
     }
 
 }

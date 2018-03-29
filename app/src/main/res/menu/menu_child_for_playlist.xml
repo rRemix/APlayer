@@ -12,8 +12,9 @@
                 <item android:title="@string/artist" android:id="@+id/action_sort_order_artist"/>
                 <item android:title="@string/artist_desc" android:id="@+id/action_sort_order_artist_desc"/>
                 <item android:title="@string/date" android:id="@+id/action_sort_order_date"/>
-                <item android:title="@string/duration" android:id="@+id/action_sort_order_duration"/>
-                <item android:title="@string/year" android:id="@+id/action_sort_order_year"/>
+                <item android:title="@string/date_desc" android:id="@+id/action_sort_order_date_desc"/>
+                <!--<item android:title="@string/duration" android:id="@+id/action_sort_order_duration"/>-->
+                <!--<item android:title="@string/year" android:id="@+id/action_sort_order_year"/>-->
                 <item android:title="@string/custom" android:id="@+id/action_sort_order_custom"/>
             </group>
         </menu>

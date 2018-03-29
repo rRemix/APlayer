@@ -33,7 +33,7 @@ public class AsynLoadSongNum extends AsyncTask<Integer, Integer, Integer> {
         try {
             cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     new String[]{MediaStore.Audio.Media._ID},
-                    MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection()
+                    MediaStoreUtil.getBaseSelection()
                     + " and " + (isAlbum ? MediaStore.Audio.Media.ALBUM_ID  : MediaStore.Audio.Media.ARTIST_ID)+ "=" + params[0],
                     null,null);
             return cursor != null ? cursor.getCount() : 0;

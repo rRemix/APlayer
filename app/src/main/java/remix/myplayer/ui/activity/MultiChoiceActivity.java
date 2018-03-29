@@ -173,18 +173,21 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
                     sortOrder = SortOrder.SongSortOrder.SONG_ARTIST_Z_A;
                     item.setChecked(true);
                     break;
-                case R.id.action_sort_order_duration:
-                    sortOrder = SortOrder.SongSortOrder.SONG_DURATION;
-                    item.setChecked(true);
-                    break;
                 case R.id.action_sort_order_date:
                     sortOrder = SortOrder.SongSortOrder.SONG_DATE;
                     item.setChecked(true);
                     break;
-                case R.id.action_sort_order_year:
-                    sortOrder = SortOrder.SongSortOrder.SONG_YEAR;
-                    item.setChecked(true);
+                case R.id.action_sort_order_date_desc:
+                    sortOrder = SortOrder.SongSortOrder.SONG_DATE_DESC;
                     break;
+//                case R.id.action_sort_order_duration:
+//                    sortOrder = SortOrder.SongSortOrder.SONG_DURATION;
+//                    item.setChecked(true);
+//                    break;
+//                case R.id.action_sort_order_year:
+//                    sortOrder = SortOrder.SongSortOrder.SONG_YEAR;
+//                    item.setChecked(true);
+//                    break;
                 case R.id.action_sort_order_playlist_name:
                     sortOrder = SortOrder.PlayListSortOrder.PLAYLIST_A_Z;
                     item.setChecked(true);
@@ -244,12 +247,15 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
             case SortOrder.SongSortOrder.SONG_DATE:
                 subMenu.findItem(R.id.action_sort_order_date).setChecked(true);
                 break;
-            case SortOrder.SongSortOrder.SONG_DURATION:
-                subMenu.findItem(R.id.action_sort_order_duration).setChecked(true);
+            case SortOrder.SongSortOrder.SONG_DATE_DESC:
+                subMenu.findItem(R.id.action_sort_order_date_desc).setChecked(true);
                 break;
-            case SortOrder.SongSortOrder.SONG_YEAR:
-                subMenu.findItem(R.id.action_sort_order_year).setChecked(true);
-                break;
+//            case SortOrder.SongSortOrder.SONG_DURATION:
+//                subMenu.findItem(R.id.action_sort_order_duration).setChecked(true);
+//                break;
+//            case SortOrder.SongSortOrder.SONG_YEAR:
+//                subMenu.findItem(R.id.action_sort_order_year).setChecked(true);
+//                break;
             case SortOrder.PlayListSortOrder.PLAYLIST_A_Z:
                 subMenu.findItem(R.id.action_sort_order_playlist_name).setChecked(true);
                 break;

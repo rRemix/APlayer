@@ -162,7 +162,7 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter> {
             List<Song> songs = new ArrayList<>();
             try {
                 String selection = MediaStore.Audio.Media.TITLE + " like ? " + "or " + MediaStore.Audio.Media.ARTIST + " like ? "
-                        + "or " + MediaStore.Audio.Media.ALBUM + " like ? and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection();
+                        + "or " + MediaStore.Audio.Media.ALBUM + " like ? and " +  MediaStoreUtil.getBaseSelection();
                 cursor = getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                         null,
                         selection,

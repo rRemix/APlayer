@@ -526,7 +526,7 @@ public class PlayListUtil {
      * @return
      */
     public static String getDeleteID(){
-        Set<String> deleteId = SPUtil.getStringSet(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"DeleteID");
+        Set<String> deleteId = SPUtil.getStringSet(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.BLACKLIST_SONG);
         if(deleteId == null || deleteId.size() == 0)
             return "";
         StringBuilder stringBuilder = new StringBuilder();
