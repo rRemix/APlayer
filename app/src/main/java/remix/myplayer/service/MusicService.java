@@ -939,8 +939,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * @param control
      */
     private void updateMediaSession(int control) {
-        boolean isChuizi = Build.MANUFACTURER.equalsIgnoreCase("chuizi");
-        if((!isChuizi && SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN ) ||
+        boolean isSmartisan = Build.MANUFACTURER.equalsIgnoreCase("smartisan");
+        if((!isSmartisan && SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN ) ||
                 mCurrentSong == null)
             return;
 

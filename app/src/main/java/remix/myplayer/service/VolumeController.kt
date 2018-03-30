@@ -67,6 +67,6 @@ class VolumeController {
     }
 
     companion object {
-        private val DURATION_IN_MS = 600L
+        private const val DURATION_IN_MS = 600L
     }
 }
