@@ -78,10 +78,10 @@ android {
 //        tencent{}
 //        alibaba{}
 //        meizu{}
+//        assistant91{}
+//        baidu{}
+//        anzhuomarket{}
 
-        assistant91{}
-        baidu{}
-        anzhuomarket{}
         qihu360{}
         chuizi{}
         xiaomi{}
@@ -157,7 +157,6 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     kapt  'com.jakewharton:butterknife-compiler:8.8.1'
-
 }
 
 kapt {
