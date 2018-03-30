@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -19,9 +20,11 @@ import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SearchAdapter;
 import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
@@ -32,6 +35,7 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.customview.SearchToolBar;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -158,6 +162,8 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter> {
 
         @Override
         public List<Song> loadInBackground() {
+            if(TextUtils.isEmpty(mkey))
+                return new ArrayList<>();
             Cursor cursor = null;
             List<Song> songs = new ArrayList<>();
             try {
@@ -169,8 +175,10 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter> {
                         new String[]{"%" + mkey + "%","%" + mkey + "%","%" + mkey + "%"}, null);
 
                 if (cursor != null && cursor.getCount() > 0) {
+                    Set<String> blackList = SPUtil.getStringSet(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.BLACKLIST_SONG);
                     while (cursor.moveToNext()){
-                        songs.add(MediaStoreUtil.getMP3Info(cursor));
+                        if(!blackList.contains(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))))
+                            songs.add(MediaStoreUtil.getMP3Info(cursor));
                     }
                 }
             }finally {
