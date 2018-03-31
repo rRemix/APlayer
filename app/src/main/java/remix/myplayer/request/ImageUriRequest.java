@@ -133,7 +133,7 @@ public abstract class ImageUriRequest<T> {
         return Observable.concat(new Observable<String>() {
             @Override
             protected void subscribeActual(Observer<? super String> observer) {
-                String imageUrl = SPUtil.getValue(APlayerApplication.getContext(),"HttpCache",request.getKey(),"");
+                String imageUrl = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getKey(),"");
                 if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
                     observer.onNext(imageUrl);
                 }
@@ -164,7 +164,7 @@ public abstract class ImageUriRequest<T> {
             imageUrl = response.getResult().getArtists().get(0).getPicUrl();
         }
         if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
-            SPUtil.putValue(APlayerApplication.getContext(),"HttpCache",request.getKey(),imageUrl);
+            SPUtil.putValue(APlayerApplication.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getKey(),imageUrl);
         }
         return imageUrl;
     }
@@ -173,10 +173,10 @@ public abstract class ImageUriRequest<T> {
         return getThumbObservable(request)
                 .flatMap(new Function<String, ObservableSource<Bitmap>>() {
                     @Override
-                    public ObservableSource<Bitmap> apply(String url) throws Exception {
+                    public ObservableSource<Bitmap> apply(String url) {
                         return Observable.create(new ObservableOnSubscribe<Bitmap>() {
                             @Override
-                            public void subscribe(ObservableEmitter<Bitmap> e) throws Exception {
+                            public void subscribe(ObservableEmitter<Bitmap> e) {
                                 Uri imageUri = !TextUtils.isEmpty(url) ? Uri.parse(url) : Uri.EMPTY;
                                 ImageRequest imageRequest =
                                         ImageRequestBuilder.newBuilderWithSource(imageUri)

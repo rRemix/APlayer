@@ -78,6 +78,10 @@ public class SPUtil {
         public static final int LYRIC_MANUAL = 4;
     }
 
+    public static class COVER_KEY{
+        public static final String COVER_NAME = "Cover";
+    }
+
 
     public static class SETTING_KEY {
         public static final String SETTING_NAME = "Setting";
@@ -130,7 +134,7 @@ public class SPUtil {
         //播放列表内歌曲排序顺序
         public static final String CHILD_PLAYLIST_SONG_SORT_ORDER = "child_playlist_song_sort_order";
         //移除歌曲
-        public static final String BLACKLIST_SONG = "black_list_song";
+        public static final String BLACKLIST_SONG = "black_list_song";;
     }
 
 }
