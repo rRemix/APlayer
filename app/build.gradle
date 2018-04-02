@@ -22,8 +22,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 57
-        versionName "1.2.9.1"
+        versionCode 58
+        versionName "1.2.9.2"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {

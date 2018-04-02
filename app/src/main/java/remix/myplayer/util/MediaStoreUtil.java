@@ -322,7 +322,7 @@ public class MediaStoreUtil {
             }
             if (type == Constants.ARTIST) {
                 cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                        MediaStore.Audio.Media.ARTIST_ID + "=" + " and " + MediaStoreUtil.getBaseSelection(),
+                        MediaStore.Audio.Media.ARTIST_ID + "=" + id + " and " + MediaStoreUtil.getBaseSelection(),
                         null,
                         SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.CHILD_ARTIST_SONG_SORT_ORDER,SortOrder.ChildHolderSongSortOrder.SONG_A_Z));
             }
