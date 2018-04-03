@@ -64,7 +64,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
     private final Drawable mSelectDrawable;
 
     private final RecyclerView mRecyclerView;
-    private int mLastIndex;
+    private int mLastIndex = 1;
 
     public SongAdapter(Context context,int layoutId, MultiChoice multiChoice, int type,RecyclerView recyclerView) {
         super(context,layoutId,multiChoice);

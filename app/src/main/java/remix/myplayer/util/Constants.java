@@ -4,6 +4,8 @@ package remix.myplayer.util;
  * Created by taeja on 16-2-17.
  */
 
+import com.facebook.common.util.ByteConstants;
+
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 
@@ -94,7 +96,7 @@ public class Constants {
     public static final int TOGGLE_FLOAT_LRC = 503;
 
     //扫描文件默认大小设置
-    public static int SCAN_SIZE = 0;
+    public static int SCAN_SIZE = ByteConstants.MB;
 
     //分享心情还是歌曲
     public final static int SHARESONG = 1;

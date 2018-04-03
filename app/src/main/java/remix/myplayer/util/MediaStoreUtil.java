@@ -115,11 +115,7 @@ public class MediaStoreUtil {
         Cursor cursor = null;
 
         //默认过滤文件大小1MB
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SCAN_SIZE,-1);
-        if( Constants.SCAN_SIZE < 0) {
-            Constants.SCAN_SIZE = 1024 * ByteConstants.KB;
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SCAN_SIZE,Constants.SCAN_SIZE);
-        }
+        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SCAN_SIZE,ByteConstants.MB);
         try {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
@@ -173,11 +169,7 @@ public class MediaStoreUtil {
         Cursor cursor = null;
 
         //默认过滤文件大小500K
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",-1);
-        if( Constants.SCAN_SIZE < 0) {
-            Constants.SCAN_SIZE = 500 * ByteConstants.KB;
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",500 * ByteConstants.KB);
-        }
+        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",ByteConstants.MB);
         try{
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -211,12 +203,7 @@ public class MediaStoreUtil {
 
 
         //默认过滤文件大小500K
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",-1);
-        if( Constants.SCAN_SIZE < 0) {
-            Constants.SCAN_SIZE = 500 * ByteConstants.KB;
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",500 * ByteConstants.KB);
-        }
-
+        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",ByteConstants.MB);
         try{
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -252,11 +239,7 @@ public class MediaStoreUtil {
         Cursor cursor = null;
 
         //默认过滤文件大小500K
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",-1);
-        if( Constants.SCAN_SIZE < 0) {
-            Constants.SCAN_SIZE = 500 * ByteConstants.KB;
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",500 * ByteConstants.KB);
-        }
+        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",ByteConstants.MB);
 
         try{
             cursor = resolver.query(
