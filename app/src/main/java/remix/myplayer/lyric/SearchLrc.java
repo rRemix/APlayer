@@ -27,6 +27,7 @@ import java.util.Set;
 
 import io.reactivex.Observable;
 import remix.myplayer.APlayerApplication;
+import remix.myplayer.R;
 import remix.myplayer.bean.LrcRequest;
 import remix.myplayer.bean.kugou.KLrcResponse;
 import remix.myplayer.bean.kugou.KSearchResponse;
@@ -196,9 +197,16 @@ public class SearchLrc {
      * @param type
      */
     private Observable<List<LrcRow>> getNetworkObservable(int type) {
+        if(mSong == null){
+            return Observable.error(new Throwable("no available song"));
+        }
+        String key = getLyricSearchKey(mSong);
+        if(TextUtils.isEmpty(key)){
+            return Observable.error(new Throwable("no available key"));
+        }
         if(type == SPUtil.LYRIC_KEY.LYRIC_KUGOU){
             //酷狗歌词
-            return HttpClient.getKuGouApiservice().getKuGouSearch(1,"yes","pc",mSong.getArtist() + "-" + mSong.getTitle(),mSong.getDuration(),"")
+            return HttpClient.getKuGouApiservice().getKuGouSearch(1,"yes","pc",key,mSong.getDuration(),"")
                     .flatMap(body -> {
                         final KSearchResponse searchResponse = new Gson().fromJson(body.string(),KSearchResponse.class);
                         return HttpClient.getKuGouApiservice().getKuGouLyric(1,"pc","lrc","utf8",searchResponse.candidates.get(0).id,
@@ -213,7 +221,7 @@ public class SearchLrc {
         }else {
             //网易歌词
             return HttpClient.getNeteaseApiservice()
-                    .getNeteaseSearch(mSong.getArtist() + "-" + mSong.getTitle(),0,1,1)
+                    .getNeteaseSearch(key,0,1,1)
                     .flatMap(body -> HttpClient.getInstance()
                             .getNeteaseLyric(new Gson().fromJson(body.string(),NSongSearchResponse.class).result.songs.get(0).id)
                             .map(body1 -> {
@@ -501,4 +509,30 @@ public class SearchLrc {
         return results;
     }
 
+    /**
+     * 获得搜索歌词的关键字
+     * @param song
+     * @return
+     */
+    private String getLyricSearchKey(Song song){
+        if(song == null)
+            return "";
+        boolean isTitleAvailable = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(APlayerApplication.getContext().getString(R.string.unknown_song));
+        boolean isAlbumAvailable = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(APlayerApplication.getContext().getString(R.string.unknown_album));
+        boolean isArtistAvailable = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(APlayerApplication.getContext().getString(R.string.unknown_artist));
+
+        //歌曲名合法
+        if(isTitleAvailable){
+            //艺术家合法
+            if(isArtistAvailable){
+                return song.getTitle() + "-" + song.getArtist();
+            } else if(isAlbumAvailable){
+                //专辑名合法
+                return song.getTitle() + "-" + song.getAlbum();
+            } else {
+                return song.getTitle();
+            }
+        }
+        return "";
+    }
 }
