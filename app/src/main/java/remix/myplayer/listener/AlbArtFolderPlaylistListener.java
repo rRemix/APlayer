@@ -11,12 +11,14 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.soundcloud.android.crop.Crop;
 import com.umeng.analytics.MobclickAgent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import remix.myplayer.R;
 import remix.myplayer.bean.CustomThumb;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.dialog.AddtoPlayListDialog;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -61,12 +63,20 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 Global.setPlayQueue(idList,mContext,intent);
                 break;
             //添加到播放队列
-            case R.id.menu_add:
+            case R.id.menu_add_to_play_queue:
                 if((idList == null || idList.size() == 0)){
                     ToastUtil.show(mContext,R.string.list_is_empty);
                     return true;
                 }
                 ToastUtil.show(mContext,mContext.getString(R.string.add_song_playqueue_success,Global.AddSongToPlayQueue(idList)));
+                break;
+            //添加到播放列表
+            case R.id.menu_add_to_playlist:
+                Intent intentAdd = new Intent(mContext,AddtoPlayListDialog.class);
+                Bundle ardAdd = new Bundle();
+                ardAdd.putSerializable("list",new ArrayList<>(idList));
+                intentAdd.putExtras(ardAdd);
+                mContext.startActivity(intentAdd);
                 break;
             //删除
             case R.id.menu_delete:

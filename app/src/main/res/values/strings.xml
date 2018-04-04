@@ -300,4 +300,16 @@
     <string name="create_time_desc">创建时间降序</string>
     <string name="lyric">歌词</string>
     <string name="track_number">音轨号</string>
+    <string name="playlist_import">歌单导入</string>
+    <string name="playlist_import_tip">将外部或者其他播放器的歌单导入到现有或新的播放列表中</string>
+    <string name="import_playlist_to">导入至</string>
+    <string name="import_playlist_to_count">导入至%1$s%2$d首歌曲</string>
+    <string name="import_fail">导入失败: %s</string>
+    <string name="new_create">新建</string>
+    <string name="choose_import_way">选择导入方式</string>
+    <string name="import_from_external_storage">从外部存储导入</string>
+    <string name="import_from_others">从已有播放列表导入</string>
+    <string name="no_playlist_can_import">无歌单可导入</string>
+    <string name="choose_import_playlist">选择要导入的歌单</string>
+    <string name="import_count">导入%s首歌曲</string>
 </resources>

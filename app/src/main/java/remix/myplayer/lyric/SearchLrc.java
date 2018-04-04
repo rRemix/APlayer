@@ -39,7 +39,6 @@ import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.cache.DiskLruCache;
 import remix.myplayer.request.network.HttpClient;
 import remix.myplayer.request.network.RxUtil;
-import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
@@ -53,6 +52,10 @@ import remix.myplayer.util.Util;
  */
 public class SearchLrc {
     private static final String TAG = "SearchLrc";
+    /**
+     * 当前播放歌曲的lrc文件路径
+     */
+    public static String CurrentLrcPath = "";
     private ILrcParser mLrcParser;
     private Song mSong;
     private String mDisplayName;
@@ -91,6 +94,7 @@ public class SearchLrc {
                 Observable.concat(getCacheObservable(),getManualObservable(manualPath),last).firstOrError().toObservable()
                 .doOnSubscribe(disposable -> {
                     //清除缓存
+                    CurrentLrcPath = "";
                     if(clearCache){
                         DiskCache.getLrcDiskCache().remove(Util.hashKeyForDisk(mKey));
                     }
@@ -420,14 +424,14 @@ public class SearchLrc {
      */
     private String getLocalLrcPath() {
         //查找本地目录
-        String searchPath =  SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"LrcSearchPath","");
+        String searchPath =  SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR,"");
         if(mSong == null)
             return "";
         if(!TextUtils.isEmpty(searchPath)){
             //已设置歌词路径
             Util.searchFile(mDisplayName,mSong.getTitle(),mSong.getArtist(), new File(searchPath));
-            if(!TextUtils.isEmpty(Global.CurrentLrcPath)){
-                return Global.CurrentLrcPath;
+            if(!TextUtils.isEmpty(CurrentLrcPath)){
+                return CurrentLrcPath;
             }
         } else{
             //没有设置歌词路径 搜索所有歌词文件
@@ -465,14 +469,14 @@ public class SearchLrc {
     private List<String> getAllLocalLrcPath() {
         List<String> results = new ArrayList<>();
         //查找本地目录
-        String searchPath = SPUtil.getValue(APlayerApplication.getContext(), SPUtil.SETTING_KEY.SETTING_NAME, "LrcSearchPath", "");
+        String searchPath = SPUtil.getValue(APlayerApplication.getContext(), SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "");
         if (mSong == null)
             return results;
         if (!TextUtils.isEmpty(searchPath)) {
             //已设置歌词路径
             Util.searchFile(mDisplayName, mSong.getTitle(), mSong.getArtist(), new File(searchPath));
-            if (!TextUtils.isEmpty(Global.CurrentLrcPath)) {
-                results.add(Global.CurrentLrcPath);
+            if (!TextUtils.isEmpty(CurrentLrcPath)) {
+                results.add(CurrentLrcPath);
                 return results;
             }
         } else {

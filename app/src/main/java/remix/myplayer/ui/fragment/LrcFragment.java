@@ -1,5 +1,6 @@
 package remix.myplayer.ui.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -87,7 +88,8 @@ public class LrcFragment extends BaseFragment {
         getLrc(lrcPath,true);
     }
 
-    private void getLrc(String manualPath,boolean clearCache) {
+    @SuppressLint("CheckResult")
+    private void getLrc(String manualPath, boolean clearCache) {
         if (mInfo == null) {
             mLrcView.setText(getString(R.string.no_lrc));
             return;

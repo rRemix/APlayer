@@ -171,11 +171,6 @@ public class Global {
     }
 
     /**
-     * 当前播放歌曲的lrc文件路径
-     */
-    public static String CurrentLrcPath = "";
-
-    /**
      * 所有可能的歌词目录
      */
     public static ArrayList<File> LyricDir = new ArrayList<>();

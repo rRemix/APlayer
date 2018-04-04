@@ -11,6 +11,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.soundcloud.android.crop.Crop;
 import com.umeng.analytics.MobclickAgent;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import remix.myplayer.R;
 import remix.myplayer.bean.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
@@ -18,6 +21,7 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.AddtoPlayListDialog;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
@@ -51,13 +55,16 @@ public class SongPopupListener implements PopupMenu.OnMenuItemClickListener {
                 intent.putExtra("song",mSong);
                 mContext.sendBroadcast(intent);
                 break;
-            case R.id.menu_add:
+            case R.id.menu_add_to_playlist:
                 MobclickAgent.onEvent(mContext,"AddtoPlayList");
                 Intent intentAdd = new Intent(mContext,AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
-                ardAdd.putInt("Id",mSong.getId());
+                ardAdd.putSerializable("list", new ArrayList<>(Collections.singletonList(mSong.getId())));
                 intentAdd.putExtras(ardAdd);
                 mContext.startActivity(intentAdd);
+                break;
+            case R.id.menu_add_to_play_queue:
+                ToastUtil.show(mContext,mContext.getString(R.string.add_song_playqueue_success, Global.AddSongToPlayQueue(Collections.singletonList(mSong.getId()))));
                 break;
             case R.id.menu_album_thumb:
                 CustomThumb thumbBean = new CustomThumb(mSong.getAlbumId(),Constants.ALBUM,mSong.getAlbum());

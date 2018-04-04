@@ -42,7 +42,6 @@ import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.StatusBarUtil;
-import remix.myplayer.util.ToastUtil;
 
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
@@ -228,11 +227,11 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
         mInfo = Song;
         mIsPlay = isplay;
         if(!mIsRunning){
-            ToastUtil.show(mContext,R.string.error);
+//            ToastUtil.show(mContext,R.string.error);
             return;
         }
         if(mInfo == null){
-            ToastUtil.show(mContext,R.string.error);
+//            ToastUtil.show(mContext,R.string.error);
             return;
         }
 

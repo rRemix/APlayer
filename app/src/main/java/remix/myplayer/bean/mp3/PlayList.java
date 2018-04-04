@@ -17,6 +17,11 @@ public class PlayList {
         Count = count;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
     public int getId() {
         return _Id;
     }

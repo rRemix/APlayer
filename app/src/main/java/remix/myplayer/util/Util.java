@@ -40,6 +40,7 @@ import cn.bmob.v3.listener.SaveListener;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.bean.bmob.Error;
+import remix.myplayer.lyric.SearchLrc;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -140,6 +141,8 @@ public class Util {
      * @param directory
      */
     public static void deleteFilesByDirectory(File directory) {
+        if(directory == null)
+            return;
         if(directory.isFile()){
             deleteFileSafely(directory);
             return;
@@ -437,7 +440,7 @@ public class Util {
                     searchFile(displayName,songName,artistName,file);
                 } else {
                     if(isRightLrc(file,displayName,songName,artistName)){
-                        Global.CurrentLrcPath = file.getAbsolutePath();
+                        SearchLrc.CurrentLrcPath = file.getAbsolutePath();
                         return;
                     }
                 }

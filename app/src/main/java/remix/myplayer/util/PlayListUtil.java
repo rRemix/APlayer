@@ -9,7 +9,9 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import remix.myplayer.bean.mp3.PlayList;
@@ -564,5 +566,37 @@ public class PlayListUtil {
                 cursor.close();
         }
         return NONEXIST;
+    }
+
+    public static Map<String,List<Integer>> getPlaylistFromMediaStore(){
+        final Map<String,List<Integer>> map = new HashMap<>();
+        Cursor playlistCursor = null;
+        Cursor songCursor = null;
+        try {
+            playlistCursor = mContext.getContentResolver().query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+                    null,null,null,null);
+            if(playlistCursor == null || playlistCursor.getCount() == 0)
+                return map;
+            while (playlistCursor.moveToNext()){
+                List<Integer> helperList = new ArrayList<>();
+                songCursor = mContext.getContentResolver().query(MediaStore.Audio.Playlists.Members.getContentUri("external",playlistCursor.getInt(playlistCursor.getColumnIndex(MediaStore.Audio.Playlists.Members._ID))),
+                        null,null,null,null);
+                if(songCursor != null){
+                    while (songCursor.moveToNext()){
+                        helperList.add(songCursor.getInt(songCursor.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID)));
+                    }
+                }
+                map.put(playlistCursor.getString(playlistCursor.getColumnIndex(MediaStore.Audio.PlaylistsColumns.NAME)),helperList);
+                songCursor = null;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(playlistCursor != null && !playlistCursor.isClosed())
+                playlistCursor.close();
+            if(songCursor != null && !songCursor.isClosed())
+                songCursor.close();
+        }
+        return map;
     }
 }

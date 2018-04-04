@@ -86,7 +86,7 @@ public class HttpClient implements HttpHelper {
 //
 //            return new Response.Builder()
 //                    .removeHeader("Pragma")
-//                    .body(ResponseBody.create(MediaType.parse("text/plain;charset=UTF-8"), cacheBytes))
+//                    .body(ResponseBody.create(MediaType.importM3UFile("text/plain;charset=UTF-8"), cacheBytes))
 //                    .request(request)
 //                    .protocol(Protocol.HTTP_1_1)
 //                    .code(200)

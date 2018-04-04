@@ -1,5 +1,6 @@
 package remix.myplayer.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -29,29 +30,38 @@ import com.umeng.analytics.MobclickAgent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.bmob.v3.update.BmobUpdateAgent;
 import cn.bmob.v3.update.UpdateStatus;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
 import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.bean.Category;
+import remix.myplayer.bean.mp3.PlayList;
+import remix.myplayer.helper.M3UHelper;
 import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.request.ImageUriRequest;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.FolderChooserDialog;
 import remix.myplayer.ui.dialog.ThemeDialog;
 import remix.myplayer.util.AlipayUtil;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.Global;
+import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
@@ -64,7 +74,7 @@ import static remix.myplayer.bean.Category.ALL_LIBRARY_STRING;
  * @Author Xiaoborui
  * @Date 2016/8/23 13:51
  */
-public class SettingActivity extends ToolbarActivity implements FolderChooserDialog.FolderCallback{
+public class SettingActivity extends ToolbarActivity implements FolderChooserDialog.FolderCallback,FileChooserDialog.FileCallback{
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.setting_color_src)
@@ -205,8 +215,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         });
 
         //歌词搜索路径
-        if(!SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"LrcSearchPath","").equals("")) {
-            mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"LrcSearchPath","")));
+        if(!SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR,"").equals("")) {
+            mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR,"")));
         }
         //桌面歌词
         mFloatLrcTip.setText(mFloatLrcSwitch.isChecked() ? R.string.opened_float_lrc : R.string.closed_float_lrc);
@@ -216,9 +226,12 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 ThemeStore.isDay() ? ThemeStore.isLightTheme() ? ColorUtil.getColor(R.color.md_white_primary_dark) : ThemeStore.getMaterialPrimaryColor() : Color.TRANSPARENT);
         //初始化箭头颜色
         final int arrowColor = ThemeStore.getAccentColor();
-        ButterKnife.apply( new ImageView[]{findView(R.id.setting_eq_arrow),findView(R.id.setting_feedback_arrow),
-                        findView(R.id.setting_about_arrow),findView(R.id.setting_update_arrow),findView(R.id.setting_donate_arrow)},
-                (ButterKnife.Action<ImageView>) (view, index) -> Theme.TintDrawable(view,view.getBackground(),arrowColor));
+        ButterKnife.apply( new ImageView[]{findView(R.id.setting_eq_arrow),
+                        findView(R.id.setting_feedback_arrow),
+                        findView(R.id.setting_about_arrow),
+                        findView(R.id.setting_update_arrow),
+                        findView(R.id.setting_donate_arrow)},
+                (view, index) -> Theme.TintDrawable(view,view.getBackground(),arrowColor));
 
         //封面
         mOriginalAlbumChoice = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only));
@@ -273,24 +286,65 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         String tag = dialog.getTag();
         switch (tag){
             case "Lrc":
-                boolean success = SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"LrcSearchPath",folder.getAbsolutePath());
+                boolean success = SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR,folder.getAbsolutePath());
                 ToastUtil.show(this, success ? R.string.setting_success : R.string.setting_error, Toast.LENGTH_SHORT);
-                mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"LrcPath","")));
+                mLrcPath.setText(getString(R.string.lrc_tip,SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR,"")));
                 break;
             case "Scan":
                 new MediaScanner(mContext).scanFiles(folder,"audio/*");
                 break;
         }
+    }
+
+    @Override
+    public void onFileSelection(@NonNull FileChooserDialog dialog, @NonNull File file) {
+        switch (dialog.getTag()){
+            case "Import":
+                List<String> allPlayListsName = new ArrayList<>();
+                String newPlaylistName = file.getName().substring(0,file.getName().lastIndexOf("."));
+
+                boolean alreadyExist = false;
+                for(PlayList temp : Global.PlayList){
+                    allPlayListsName.add(temp.getName());
+                    if(temp.getName().equalsIgnoreCase(newPlaylistName))
+                        alreadyExist = true;
+                }
+                //已经存在不新建
+                if(!alreadyExist){
+                    allPlayListsName.add(0,newPlaylistName + "(" + getString(R.string.new_create) + ")");
+                }
+                new MaterialDialog.Builder(this)
+                        .title(R.string.import_playlist_to)
+                        .titleColorAttr(R.attr.text_color_primary)
+                        .items(allPlayListsName)
+                        .itemsColorAttr(R.attr.text_color_primary)
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .itemsCallback((dialog1, itemView, position, text) -> {
+                            final boolean newCreate = text.equals(allPlayListsName.get(0));
+                            M3UHelper.INSTANCE.importM3UFile(file,newCreate ? newPlaylistName : text.toString(),newCreate);
+                        })
+                        .theme(ThemeStore.getMDDialogTheme())
+                        .positiveText(R.string.confirm)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .show();
+                break;
+        }
+    }
+
+    @Override
+    public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
 
     }
 
+    @SuppressLint("CheckResult")
     @OnClick ({R.id.setting_filter_container,R.id.setting_color_container,R.id.setting_notify_color_container,
             R.id.setting_feedback_container,R.id.setting_about_container, R.id.setting_update_container,
             R.id.setting_lockscreen_container,R.id.setting_lrc_priority_container,R.id.setting_lrc_float_container,
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
             R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container,
             R.id.setting_screen_container,R.id.setting_scan_container,R.id.setting_classic_notify_container,
-            R.id.setting_album_cover_container,R.id.setting_library_category_container,R.id.setting_immersive_container})
+            R.id.setting_album_cover_container,R.id.setting_library_category_container,R.id.setting_immersive_container,
+            R.id.setting_import_playlist_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -547,7 +601,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //专辑与艺术家封面自动下载
             case R.id.setting_album_cover_container:
-                final String choice =  SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only));
+                final String choice =  SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.always));
                 new MaterialDialog.Builder(this)
                         .title(R.string.auto_download_album_cover)
                         .titleColorAttr(R.attr.text_color_primary)
@@ -559,8 +613,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 (dialog, view, which, text) -> {
                                     mAlbumCoverText.setText(text);
                                     //仅从从不改变到仅在wifi下或者总是的情况下，才刷新Adapter
-                                    mNeedRefreshAdapter |= ((mContext.getString(R.string.wifi_only).equals(text) | mContext.getString(R.string.always).equals(text))
-                                            & !mOriginalAlbumChoice.equals(text));
+                                    mNeedRefreshAdapter |= ((mContext.getString(R.string.wifi_only).contentEquals(text) | mContext.getString(R.string.always).contentEquals(text))
+                                            & !mOriginalAlbumChoice.contentEquals(text));
                                     ImageUriRequest.AUTO_DOWNLOAD_ALBUM = text.toString();
                                     SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,
                                             SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
@@ -575,6 +629,58 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             //沉浸式状态栏
             case R.id.setting_immersive_container:
                 mImmersiveSwitch.setChecked(!mImmersiveSwitch.isChecked());
+                break;
+            //歌单导入
+            case R.id.setting_import_playlist_container:
+                new MaterialDialog.Builder(this)
+                        .title(R.string.choose_import_way)
+                        .titleColorAttr(R.attr.text_color_primary)
+                        .negativeText(R.string.cancel)
+                        .negativeColorAttr(R.attr.text_color_primary)
+                        .buttonRippleColorAttr(R.attr.ripple_color)
+                        .items(new String[]{getString(R.string.import_from_external_storage),getString(R.string.import_from_others)})
+                        .itemsCallback((dialog, itemView, position1, text) -> {
+                            if(position1 == 0){
+                                new FileChooserDialog.Builder(SettingActivity.this)
+                                        .tag("Import")
+                                        .extensionsFilter(".m3u")
+                                        .show();
+                            } else {
+                                Observable.create((ObservableOnSubscribe<Map<String, List<Integer>>>) e -> {
+                                    e.onNext(PlayListUtil.getPlaylistFromMediaStore());
+                                    e.onComplete();
+                                }).compose(RxUtil.applyScheduler())
+                                .subscribe(map -> {
+                                    if(map == null || map.size() == 0){
+                                        ToastUtil.show(mContext,R.string.import_fail,getString(R.string.no_playlist_can_import));
+                                        return;
+                                    }
+                                    List<Integer> selectedIndices = new ArrayList<>();
+                                    for(int i = 0 ; i < map.size();i++){
+                                        selectedIndices.add(i);
+                                    }
+                                    new MaterialDialog.Builder(this)
+                                            .title(R.string.choose_import_playlist)
+                                            .titleColorAttr(R.attr.text_color_primary)
+                                            .positiveText(R.string.choose)
+                                            .positiveColorAttr(R.attr.text_color_primary)
+                                            .buttonRippleColorAttr(R.attr.ripple_color)
+                                            .items(map.keySet())
+                                            .itemsCallbackMultiChoice(selectedIndices.toArray(new Integer[selectedIndices.size()]), (dialog1, which, text1) -> {
+                                                M3UHelper.INSTANCE.importLocalPlayList(map, text1);
+                                                return true;
+                                            })
+                                            .backgroundColorAttr(R.attr.background_color_3)
+                                            .itemsColorAttr(R.attr.text_color_primary)
+                                            .theme(ThemeStore.getMDDialogTheme())
+                                            .show();
+                                }, throwable -> ToastUtil.show(mContext,R.string.import_fail,throwable.toString()));
+                            }
+                        })
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .itemsColorAttr(R.attr.text_color_primary)
+                        .theme(ThemeStore.getMDDialogTheme())
+                        .show();
                 break;
         }
     }

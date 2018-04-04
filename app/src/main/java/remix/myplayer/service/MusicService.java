@@ -1573,7 +1573,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 
         private void findCurrentLyric() {
             int progress = getProgress();
-
+            if(mLrcRows == null || mLrcRows.size() == 0)
+                return;
             for(int i = mLrcRows.size() - 1;i >= 0 ;i--){
                 LrcRow lrcRow = mLrcRows.get(i);
                 int interval = progress - lrcRow.getTime();

@@ -8,7 +8,7 @@ import android.net.Uri;
 public class PlayLists{
 
     public static final String TABLE_NAME = "play_list";
-//    public static final Uri SINGLE = Uri.parse(DBContentProvider.CONTENT_AUTHORITY_SLASH + TABLE_NAME + "#");
+//    public static final Uri SINGLE = Uri.importM3UFile(DBContentProvider.CONTENT_AUTHORITY_SLASH + TABLE_NAME + "#");
     public static final Uri CONTENT_URI = Uri.parse(DBContentProvider.CONTENT_AUTHORITY_SLASH + TABLE_NAME);
 
     public static class PlayListColumns  {

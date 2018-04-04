@@ -257,7 +257,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 //        }
 //        @Override
 //        protected void onPostExecute(String url) {
-//            Uri uri = Uri.parse("file:///" + url);
+//            Uri uri = Uri.importM3UFile("file:///" + url);
 //            if(mImage != null)
 //                mImage.setImageURI(uri);
 //        }

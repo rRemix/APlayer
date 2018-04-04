@@ -497,17 +497,17 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             //设置播放模式
             case R.id.playbar_model:
                 MobclickAgent.onEvent(this,"PlayModel");
-                int currentmodel = MusicService.getPlayModel();
-                currentmodel = (currentmodel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentmodel);
-                MusicService.getInstance().setPlayModel(currentmodel);
-                Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-                        currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+                int currentModel = MusicService.getPlayModel();
+                currentModel = (currentModel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentModel);
+                MusicService.getInstance().setPlayModel(currentModel);
+                Theme.TintDrawable(mPlayModel,currentModel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                        currentModel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                                 R.drawable.play_btn_loop_one,ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b));
 
-                String msg = currentmodel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
-                        currentmodel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
+                String msg = currentModel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
+                        currentModel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
                 //刷新下一首
-                if(currentmodel != Constants.PLAY_SHUFFLE && MusicService.getNextMP3() != null){
+                if(currentModel != Constants.PLAY_SHUFFLE && MusicService.getNextMP3() != null){
                     mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
                 }
                 ToastUtil.show(this,msg);

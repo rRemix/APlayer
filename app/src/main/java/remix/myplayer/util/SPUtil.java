@@ -134,7 +134,9 @@ public class SPUtil {
         //播放列表内歌曲排序顺序
         public static final String CHILD_PLAYLIST_SONG_SORT_ORDER = "child_playlist_song_sort_order";
         //移除歌曲
-        public static final String BLACKLIST_SONG = "black_list_song";;
+        public static final String BLACKLIST_SONG = "black_list_song";
+        //本地歌词搜索路径
+        public static final String LOCAL_LYRIC_SEARCH_DIR = "local_lyric_search_dir";
     }
 
 }
