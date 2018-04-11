@@ -73,7 +73,7 @@ import remix.myplayer.ui.customview.playpause.PlayPauseView;
 import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.PlayQueueDialog;
 import remix.myplayer.ui.fragment.CoverFragment;
-import remix.myplayer.ui.fragment.LrcFragment;
+import remix.myplayer.ui.fragment.LyricFragment;
 import remix.myplayer.ui.fragment.RecordFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -763,8 +763,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         coverFragment.setArguments(bundle);
 
         mAdapter.addFragment(coverFragment);
-        final LrcFragment lrcFragment = new LrcFragment();
-        lrcFragment.setOnInflateFinishListener(view -> {
+        final LyricFragment lyricFragment = new LyricFragment();
+        lyricFragment.setOnInflateFinishListener(view -> {
             mLrcView = (LrcView) view;
             mLrcView.setOnLrcClickListener(new LrcView.OnLrcClickListener() {
                 @Override
@@ -785,8 +785,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mLrcView.setOtherColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
             mLrcView.setTimeLineColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
         });
-        lrcFragment.setArguments(bundle);
-        mAdapter.addFragment(lrcFragment);
+        lyricFragment.setArguments(bundle);
+        mAdapter.addFragment(lyricFragment);
 
         mPager.setAdapter(mAdapter);
         mPager.setOffscreenPageLimit(mAdapter.getCount() - 1);
@@ -846,7 +846,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             //更新顶部信息
             updateTopStatus(mInfo);
             //更新歌词
-            mHandler.postDelayed(() -> ((LrcFragment) mAdapter.getItem(2)).updateLrc(mInfo),mFistStart ? 50 : 0);
+            mHandler.postDelayed(() -> ((LyricFragment) mAdapter.getItem(2)).updateLrc(mInfo),mFistStart ? 100 : 0);
             //更新进度条
             int temp = MusicService.getProgress();
             mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
@@ -1021,7 +1021,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //            }
 //        }
         SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_MANUAL);
-        ((LrcFragment) mAdapter.getItem(2)).updateLrc(file.getAbsolutePath());
+        ((LyricFragment) mAdapter.getItem(2)).updateLrc(file.getAbsolutePath());
         sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
     }
 
@@ -1059,8 +1059,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         }
     }
 
-    public LrcFragment getLyricFragment(){
-        return (LrcFragment) mAdapter.getItem(2);
+    public LyricFragment getLyricFragment(){
+        return (LyricFragment) mAdapter.getItem(2);
     }
 
 }

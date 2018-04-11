@@ -31,7 +31,7 @@ import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.TimerDialog;
-import remix.myplayer.ui.fragment.LrcFragment;
+import remix.myplayer.ui.fragment.LyricFragment;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
@@ -105,7 +105,7 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
         switch (item.getItemId()){
             case R.id.menu_lyric:
                 final boolean alreadyIgnore = SPUtil.getValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
-                final LrcFragment lrcFragment = mActivity.getLyricFragment();
+                final LyricFragment lyricFragment = mActivity.getLyricFragment();
                 new MaterialDialog.Builder(mActivity)
                         .items(getString(R.string.netease), getString(R.string.kugou), getString(R.string.select_lrc), getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc))
                         .itemsColorAttr(R.attr.text_color_primary)
@@ -115,7 +115,7 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                                 case 0: //网易 酷狗
                                 case 1:
                                     SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
-                                    lrcFragment.updateLrc(mInfo,true);
+                                    lyricFragment.updateLrc(mInfo,true);
                                     sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
                                     break;
                                 case 2: //手动选择歌词
@@ -136,11 +136,11 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                                                 if(!alreadyIgnore){//忽略
                                                     if (mInfo != null) {
                                                         SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_IGNORE);
-                                                        lrcFragment.updateLrc(mInfo);
+                                                        lyricFragment.updateLrc(mInfo);
                                                     }
                                                 } else {//取消忽略
                                                     SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE);
-                                                    lrcFragment.updateLrc(mInfo);
+                                                    lyricFragment.updateLrc(mInfo);
                                                 }
                                             })
                                             .show();

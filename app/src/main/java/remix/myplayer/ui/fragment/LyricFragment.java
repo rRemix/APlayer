@@ -27,7 +27,7 @@ import remix.myplayer.lyric.bean.LrcRow;
 /**
  * 歌词界面Fragment
  */
-public class LrcFragment extends BaseFragment {
+public class LyricFragment extends BaseFragment {
     private OnInflateFinishListener mOnFindListener;
     private Song mInfo;
     @BindView(R.id.lrc_view)
@@ -47,7 +47,7 @@ public class LrcFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPageName = LrcFragment.class.getSimpleName();
+        mPageName = LyricFragment.class.getSimpleName();
     }
 
     @Nullable
@@ -91,35 +91,33 @@ public class LrcFragment extends BaseFragment {
     @SuppressLint("CheckResult")
     private void getLrc(String manualPath, boolean clearCache) {
         if (mInfo == null) {
-            mLrcView.setText(getString(R.string.no_lrc));
+            mLrcView.setText(getStringSafely(R.string.no_lrc));
             return;
         }
 
         final int id = mInfo.getId();
         new SearchLrc(mInfo).getLyric(manualPath,clearCache)
                 .doOnSubscribe(disposable -> {
-                    mLrcView.setText(getString(R.string.searching));
+                    mLrcView.setText(getStringSafely(R.string.searching));
                     mDisposable = disposable;
                 })
                 .subscribe(lrcRows -> {
                     if (id == mInfo.getId()) {
                         mLrcList = lrcRows;
                         if (mLrcList == null || mLrcList.size() == 0) {
-                            mLrcView.setText(getString(R.string.no_lrc));
+                            mLrcView.setText(getStringSafely(R.string.no_lrc));
                             return;
                         }
                         mLrcView.setLrcRows(mLrcList);
-
 //                        mLyricAdapter.setData(mLrcList);
 //                        mLyricAdapter.notifyDataSetChanged();
                     }
                 }, throwable -> {
                     if (id == mInfo.getId()) {
                         mLrcList = new ArrayList<>();
-                        mLrcView.setText(getString(R.string.no_lrc));
+                        mLrcView.setText(getStringSafely(R.string.no_lrc));
                     }
                 });
-
     }
 
 }

@@ -117,27 +117,6 @@ public class MediaStoreUtil {
         //默认过滤文件大小1MB
         Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SCAN_SIZE,ByteConstants.MB);
         try {
-            Cursor playListcursor = mContext.getContentResolver().query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                    null,null,null,null);
-            if(playListcursor != null){
-                playListcursor.moveToFirst();
-                String name = playListcursor.getString(playListcursor.getColumnIndex(MediaStore.Audio.PlaylistsColumns.DATA));
-                File m3uFile = new File(name);
-                boolean exist = m3uFile.exists();
-                boolean canRead = m3uFile.canRead();
-                Cursor tempCursor = mContext.getContentResolver().query(MediaStore.Audio.Playlists.Members.getContentUri("external",playListcursor.getInt(playListcursor.getColumnIndex(MediaStore.Audio.Playlists.Members._ID))),
-                        null,null,null,null);
-//                if(tempCursor != null){
-//                    tempCursor.moveToFirst();
-//                    for(int i = 0 ; i < tempCursor.getCount();i++){
-//                        for(int j = 0 ; j < tempCursor.getColumnCount();j++){
-//                            LogUtil.d("PlayListQuery","Name: " + tempCursor.getColumnName(j) + " Value: " + tempCursor.getString(j));
-//                        }
-//                    }
-//                }
-
-            }
-
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
                     getBaseSelection(),

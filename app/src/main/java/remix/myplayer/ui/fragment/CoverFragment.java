@@ -72,11 +72,11 @@ public class CoverFragment extends BaseFragment {
                 mImage.getViewTreeObserver().removeOnPreDrawListener(this);
 
                 int imageWidth = mImage.getWidth();
-                int imageHeigh = mImage.getHeight();
+                int imageHeight = mImage.getHeight();
                 //如果封面宽度大于高度 需要处理下
-                if(imageWidth > imageHeigh){
+                if(imageWidth > imageHeight){
                     RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mImage.getLayoutParams();
-                    lp.width = lp.height = imageHeigh;
+                    lp.width = lp.height = imageHeight;
                     mImage.setLayoutParams(lp);
                 }
 

@@ -54,7 +54,7 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
                 String name = getPlayListName(position);
                 if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,getPlayListId(position),TAG)){
                     if(getPlayListSongCount(position) == 0) {
-                        ToastUtil.show(mContext,getString(R.string.list_is_empty));
+                        ToastUtil.show(mContext,getStringSafely(R.string.list_is_empty));
                         return;
                     }
                     Intent intent = new Intent(mContext, ChildHolderActivity.class);

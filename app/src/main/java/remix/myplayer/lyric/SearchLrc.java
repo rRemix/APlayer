@@ -63,7 +63,6 @@ public class SearchLrc {
 
     public SearchLrc(Song item) {
         mSong = item;
-        mKey = mSong.getTitle() + "/" + mSong.getArtist();
         try {
             if(!TextUtils.isEmpty(mSong.getDisplayname())){
                 String temp = mSong.getDisplayname();
@@ -93,10 +92,10 @@ public class SearchLrc {
         return type == SPUtil.LYRIC_KEY.LYRIC_IGNORE ? Observable.error(new Throwable("Ignore")) :
                 Observable.concat(getCacheObservable(),getManualObservable(manualPath),last).firstOrError().toObservable()
                 .doOnSubscribe(disposable -> {
-                    //清除缓存
+                    mKey = Util.hashKeyForDisk(mSong.getTitle() + "/" + mSong.getArtist());
                     CurrentLrcPath = "";
                     if(clearCache){
-                        DiskCache.getLrcDiskCache().remove(Util.hashKeyForDisk(mKey));
+                        DiskCache.getLrcDiskCache().remove(mKey);
                     }
                 })
                 .compose(RxUtil.applyScheduler());
@@ -133,7 +132,7 @@ public class SearchLrc {
     private Observable<List<LrcRow>> getCacheObservable(){
         return Observable.create(e -> {
             //缓存
-            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(Util.hashKeyForDisk(mKey));
+            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(mKey);
             if(snapShot != null){
                 BufferedReader br = new BufferedReader(new BufferedReader(new InputStreamReader(snapShot.getInputStream(0))));
                 e.onNext(new Gson().fromJson(br.readLine(),new TypeToken<List<LrcRow>>(){}.getType()));
