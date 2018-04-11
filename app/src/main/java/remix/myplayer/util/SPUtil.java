@@ -137,6 +137,14 @@ public class SPUtil {
         public static final String BLACKLIST_SONG = "black_list_song";
         //本地歌词搜索路径
         public static final String LOCAL_LYRIC_SEARCH_DIR = "local_lyric_search_dir";
+        //退出时播放时间
+        public static final String LAST_PLAY_PROGRESS = "last_play_progress";
+        //退出时播放的歌曲
+        public static final String LAST_SONG_ID = "last_song_id";
+        //退出时下一首歌曲
+        public static final String NEXT_SONG_ID = "next_song_id";
+        //播放模式
+        public static final String PLAY_MODEL = "play_model";
     }
 
 }

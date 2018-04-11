@@ -195,7 +195,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private void setUpBottomBar() {
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
-        int lastId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId",-1);
+        int lastId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_SONG_ID,-1);
         Song item;
         if(lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
             mBottomBar.updateBottomStatus(item,  MusicService.isPlay());

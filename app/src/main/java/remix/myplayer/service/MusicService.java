@@ -197,6 +197,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /** 音量控制*/
     private VolumeController mVolumeController;
 
+    /** 退出时播放的进度*/
+    private int mLastProgress;
+
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
     private DBObserver mPlayListSongObserver;
@@ -216,7 +219,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     public static final String ACTION_LOAD_FINISH = APLAYER_PACKAGE_NAME + "load.finish";
     public final static String ACTION_CMD = APLAYER_PACKAGE_NAME + ".cmd";
     public final static String ACTION_WIDGET_UPDATE = APLAYER_PACKAGE_NAME + ".widget_update";
-
 
     public synchronized static MusicService getInstance(){
         return mInstance;
@@ -387,6 +389,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             LogUtil.d(TAG,"准备完成:" + mFirstPrepared);
             if(mFirstPrepared){
                 mFirstPrepared = false;
+                if(mLastProgress > 0){
+                    mMediaPlayer.seekTo(mLastProgress);
+                }
                 return;
             }
             LogUtil.d(TAG,"开始播放");
@@ -438,15 +443,17 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         }
         //查找上次退出时保存的下一首歌曲是否还存在
         //如果不存在，重新设置下一首歌曲
-        mNextId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"NextSongId",-1);
+        mNextId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.NEXT_SONG_ID,-1);
         if(mNextId == -1){
             mNextIndex = mCurrentIndex;
             updateNextSong();
         } else {
             mNextIndex = mPlayModel != Constants.PLAY_SHUFFLE ?  Global.PlayQueue.indexOf(mNextId) : mRandomList.indexOf(mNextId);
             mNextSong = MediaStoreUtil.getMP3InfoById(mNextId);
-            if(mNextSong != null)
+            if(mNextSong != null){
+                mLastProgress = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,0);
                 return;
+            }
             updateNextSong();
         }
     }
@@ -549,8 +556,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 
         mPlaybackHandler.post(() -> {
             //保存当前播放和下一首播放的歌曲的id
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId", mCurrentId);
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"NextSongId",mNextId);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_SONG_ID, mCurrentId);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.NEXT_SONG_ID,mNextId);
         });
     }
 
@@ -1123,10 +1130,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     public void setPlayModel(int playModel) {
         mPlayModel = playModel;
         updateAppwidget();
-        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, "PlayModel",mPlayModel);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,mPlayModel);
         //保存正在播放和下一首歌曲
-        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"NextSongId",mNextId);
-        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId",mCurrentId);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.NEXT_SONG_ID,mNextId);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_SONG_ID,mCurrentId);
         if(mPlayModel == Constants.PLAY_SHUFFLE){
             mRandomList.clear();
             makeShuffleList(mCurrentId);
@@ -1295,7 +1302,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             }
         }else {
             //播放模式
-            mPlayModel = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, "PlayModel",Constants.PLAY_LOOP);
+            mPlayModel = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP);
             Global.PlayQueueID = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"PlayQueueID",-1);
             Global.MyLoveID = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"MyLoveID",-1);
             Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
@@ -1321,7 +1328,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
             return ;
         //读取上次退出时正在播放的歌曲的id
-        int lastId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId",-1);
+        int lastId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_SONG_ID,-1);
         //上次退出时正在播放的歌曲是否还存在
         boolean isLastSongExist = false;
         //上次退出时正在播放的歌曲的pos
@@ -1350,7 +1357,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     break;
             }
             item = MediaStoreUtil.getMP3InfoById(id);
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"LastSongId",id);
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_SONG_ID,id);
             initDataSource(item,0);
         }
     }
@@ -1510,7 +1517,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(mWidgetTimer != null)
                 return;
             mWidgetTimer = new Timer();
-            mWidgetTask = new SeekbarTask();
+            mWidgetTask = new WidgetTask();
             mWidgetTimer.schedule(mWidgetTask,1000,1000);
         }
     }
@@ -1710,15 +1717,18 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /** 更新桌面部件进度*/
     private Timer mWidgetTimer;
     private TimerTask mWidgetTask;
-    private class SeekbarTask extends TimerTask{
+    private class WidgetTask extends TimerTask{
         @Override
         public void run() {
-            if(mAppWidgetSmall != null)
-                mAppWidgetSmall.updateWidget(mContext,null,false);
-            if(mAppWidgetMedium != null)
-                mAppWidgetMedium.updateWidget(mContext,null,false);
-            if(mAppWidgetBig != null)
-                mAppWidgetBig.updateWidget(mContext,null,false);
+            mUpdateUIHandler.post(() -> {
+                if(mAppWidgetSmall != null)
+                    mAppWidgetSmall.updateWidget(mContext,null,false);
+                if(mAppWidgetMedium != null)
+                    mAppWidgetMedium.updateWidget(mContext,null,false);
+                if(mAppWidgetBig != null)
+                    mAppWidgetBig.updateWidget(mContext,null,false);
+            });
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,mMediaPlayer.getCurrentPosition());
         }
     }
 

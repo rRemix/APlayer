@@ -201,6 +201,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private boolean mIsBacking = false;
     private float mEventY1;
     private float mEventY2;
+    private float mEventX1;
+    private float mEventX2;
 
     /** 更新Handler */
     private MsgHandler mHandler;
@@ -298,13 +300,17 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mOriginRect = savedInstanceState.getParcelable("Rect");
         }
 
+        final int THRESHOLD_Y = DensityUtil.dip2px(mContext,40);
+        final int THRESHOLD_X = DensityUtil.dip2px(mContext,10);
         getWindow().getDecorView().setOnTouchListener((v,event) -> {
             if(event.getAction() == MotionEvent.ACTION_DOWN){
+                mEventX1 = event.getX();
                 mEventY1 = event.getY();
             }
             if(event.getAction() == MotionEvent.ACTION_UP){
+                mEventX1 = event.getX();
                 mEventY2 = event.getY();
-                if(mEventY2 - mEventY1 > 100){
+                if(mEventY2 - mEventY1 > THRESHOLD_Y && Math.abs(mEventX1 - mEventX2) < THRESHOLD_X){
                     onBackPressed();
                 }
             }
@@ -587,7 +593,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         final int temp = MusicService.getProgress();
         mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
 
-        if(mDuration > 0 && mCurrentTime >= 0 && (mDuration - mCurrentTime) > 0){
+        if(mDuration > 0 && mDuration - mCurrentTime > 0){
             mHasPlay.setText(Util.getTime(mCurrentTime));
             mRemainPlay.setText(Util.getTime(mDuration - mCurrentTime));
         }
@@ -919,7 +925,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         Theme.TintDrawable(mTopHide,R.drawable.icon_player_back,tintColor);
         Theme.TintDrawable(mTopMore,R.drawable.icon_player_more,tintColor);
         //播放模式与播放队列
-        int playmode = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME, "PlayModel",Constants.PLAY_LOOP);
+        int playmode = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP);
         Theme.TintDrawable(mPlayModel,playmode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
                 playmode == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                         R.drawable.play_btn_loop_one,tintColor);
