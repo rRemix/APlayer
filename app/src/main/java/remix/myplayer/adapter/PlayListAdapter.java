@@ -25,7 +25,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.bean.netease.NSearchRequest;
-import remix.myplayer.listener.AlbArtFolderPlaylistListener;
+import remix.myplayer.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.PlayListUriRequest;
 import remix.myplayer.request.RequestConfig;

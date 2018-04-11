@@ -8,7 +8,7 @@ import android.content.Intent;
 import com.umeng.analytics.MobclickAgent;
 
 import remix.myplayer.db.DBManager;
-import remix.myplayer.listener.ShakeDetector;
+import remix.myplayer.menu.ShakeDetector;
 import remix.myplayer.misc.manager.ActivityManager;
 import remix.myplayer.misc.manager.ServiceManager;
 

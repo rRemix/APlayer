@@ -30,7 +30,7 @@ import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.listener.CtrlButtonListener;
+import remix.myplayer.menu.CtrlButtonListener;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -163,6 +163,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                 //如果往右或者是往左没有超过最左边,移动View
                 if(mDistance > 0 || ((mView.getScrollX() + (-mDistance)) < 0)) {
                     mView.scrollBy((int) -mDistance, 0);
+                    finish();
                 }
                 LogUtil.d(TAG,"distance:" + mDistance + "\r\n");
                 break;

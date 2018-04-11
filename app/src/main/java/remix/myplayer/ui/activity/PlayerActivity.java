@@ -57,8 +57,8 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.listener.AudioPopupListener;
 import remix.myplayer.lyric.LrcView;
+import remix.myplayer.menu.AudioPopupListener;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.request.ImageUriRequest;
@@ -1022,6 +1022,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //        }
         SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_MANUAL);
         ((LrcFragment) mAdapter.getItem(2)).updateLrc(file.getAbsolutePath());
+        sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
     }
 
     @Override

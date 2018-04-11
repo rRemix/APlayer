@@ -27,7 +27,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.bean.mp3.Artist;
-import remix.myplayer.listener.AlbArtFolderPlaylistListener;
+import remix.myplayer.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;

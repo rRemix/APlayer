@@ -1,4 +1,4 @@
-package remix.myplayer.listener;
+package remix.myplayer.menu;
 
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -116,6 +116,7 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                                 case 1:
                                     SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
                                     lrcFragment.updateLrc(mInfo,true);
+                                    sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
                                     break;
                                 case 2: //手动选择歌词
                                     new FileChooserDialog.Builder(mActivity)
@@ -141,11 +142,12 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                                                     SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE);
                                                     lrcFragment.updateLrc(mInfo);
                                                 }
-
                                             })
                                             .show();
+                                    sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
                                     break;
                             }
+
                         })
                         .show();
                 break;

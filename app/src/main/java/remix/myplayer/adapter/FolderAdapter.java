@@ -17,7 +17,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Folder;
-import remix.myplayer.listener.AlbArtFolderPlaylistListener;
+import remix.myplayer.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;

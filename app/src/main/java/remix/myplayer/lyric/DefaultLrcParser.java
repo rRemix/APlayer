@@ -32,7 +32,7 @@ public class DefaultLrcParser implements ILrcParser {
         DiskLruCache.Editor editor;
         OutputStream lrcCacheStream = null;
         try {
-            editor = DiskCache.getLrcDiskCache().edit(Util.hashKeyForDisk(key));
+            editor = DiskCache.getLrcDiskCache().edit(key);
             lrcCacheStream = editor.newOutputStream(0);
 //            for(LrcRow lrcRow : lrcRows){
 //                lrcCacheStream.write((lrcRow + "\n").getBytes());

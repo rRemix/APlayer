@@ -1,6 +1,7 @@
 package remix.myplayer.service;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +40,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.Function;
 import remix.myplayer.R;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
 import remix.myplayer.appwidgets.AppWidgetBig;
@@ -51,9 +54,9 @@ import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.listener.ShakeDetector;
 import remix.myplayer.lyric.SearchLrc;
 import remix.myplayer.lyric.bean.LrcRow;
+import remix.myplayer.menu.ShakeDetector;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
@@ -814,7 +817,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     if(mShowFloatLrc != open){
                         mShowFloatLrc = open;
                         if(mShowFloatLrc){
-                            updateFloatLrc();
+                            updateFloatLrc(false);
                         } else {
                             closeFloatLrc();
                         }
@@ -894,6 +897,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                         });
                     }
                     ToastUtil.show(mContext,R.string.already_add_to_next_song);
+                    break;
+                case Constants.CHANGE_LYRIC:
+                    if(mShowFloatLrc){
+                        updateFloatLrc(true);
+                    }
                     break;
                 default:break;
             }
@@ -1424,12 +1432,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /**
      * 更新桌面歌词
      */
-    private void updateFloatLrc() {
+    @SuppressLint("CheckResult")
+    private void updateFloatLrc(boolean force) {
         final int control = Global.Operation;
-        Observable.just(!checkNoPermission() && mShowFloatLrc)
-                .filter(aBoolean -> aBoolean)
-                .flatMap(aBoolean -> (control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START) || mLrcRows == null ?
-                        new SearchLrc(mCurrentSong).getLyric() : null)
+        Observable.just(!checkNoPermission() && mShowFloatLrc && (control != Constants.TOGGLE && control != Constants.PAUSE && control != Constants.START || mLrcRows == null || force))
+                .flatMap((Function<Boolean, ObservableSource<List<LrcRow>>>) filter -> filter ? new SearchLrc(mCurrentSong).getLyric() : Observable.empty())
                 .doOnSubscribe(disposable -> createFloatLrcThreadIfNeed())
                 .subscribe(lrcRows -> mLrcRows = lrcRows, throwable -> mLrcRows = null);
     }
@@ -1831,7 +1838,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             switch (msg.what){
                 case Constants.UPDATE_UI:
                     musicService.updateAppwidget();
-                    musicService.updateFloatLrc();
+                    musicService.updateFloatLrc(false);
                     UpdateHelper.update(mCurrentSong,mIsplay);
                     break;
                 case Constants.UPDATE_FLOAT_LRC_CONTENT:

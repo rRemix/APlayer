@@ -44,7 +44,7 @@ import remix.myplayer.R;
 import remix.myplayer.bean.Category;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.helper.M3UHelper;
-import remix.myplayer.listener.ShakeDetector;
+import remix.myplayer.menu.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.handler.MsgHandler;
