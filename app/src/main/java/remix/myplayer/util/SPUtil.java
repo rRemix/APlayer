@@ -145,6 +145,8 @@ public class SPUtil {
         public static final String NEXT_SONG_ID = "next_song_id";
         //播放模式
         public static final String PLAY_MODEL = "play_model";
+        //经典通知栏背景是否是系统背景色
+        public static final String NOTIFY_SYSTEM_COLOR = "notify_system_color";
     }
 
 }

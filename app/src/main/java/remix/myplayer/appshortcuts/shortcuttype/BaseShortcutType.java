@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.pm.ShortcutInfo;
 import android.os.Build;
 
-import remix.myplayer.ui.activity.AppShortcutActivity;
+import remix.myplayer.appshortcuts.AppShortcutActivity;
 
 /**
  * Created by Remix on 2017/11/1.

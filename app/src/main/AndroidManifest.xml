@@ -148,7 +148,7 @@
             android:theme="@style/LockScreenActivity" />
         <!-- shortcut过渡 -->
         <activity
-            android:name=".ui.activity.AppShortcutActivity"
+            android:name=".appshortcuts.AppShortcutActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:theme="@style/AppShortcut" />

@@ -1,9 +1,10 @@
-package remix.myplayer.ui.activity;
+package remix.myplayer.appshortcuts;
 
 import android.content.Intent;
 import android.os.Bundle;
 
 import remix.myplayer.service.MusicService;
+import remix.myplayer.ui.activity.BaseActivity;
 
 /**
  * Created by Remix on 2017/11/1.

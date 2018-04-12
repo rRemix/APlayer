@@ -389,9 +389,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             LogUtil.d(TAG,"准备完成:" + mFirstPrepared);
             if(mFirstPrepared){
                 mFirstPrepared = false;
-                if(mLastProgress > 0){
-                    mMediaPlayer.seekTo(mLastProgress);
-                }
+//                if(mLastProgress > 0){
+//                    mMediaPlayer.seekTo(mLastProgress);
+//                }
                 return;
             }
             LogUtil.d(TAG,"开始播放");
@@ -715,6 +715,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 lastedIntent.putExtra("Position",0);
                 Global.setPlayQueue(lastAddIds,mContext,lastedIntent);
                 break;
+            default:
+                if(action.equalsIgnoreCase(ACTION_CMD))
+                    mControlRecevier.onReceive(this,commandIntent);
         }
     }
 
@@ -769,15 +772,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 case Constants.CLOSE_NOTIFY:
                     Global.setNotifyShowing(false);
                     pause(false);
-                    //AndroidN仅从通知栏移除 不做其他处理
-                    if(!intent.getExtras().getBoolean("FromImpl24")){
-                        mUpdateUIHandler.postDelayed(() -> {
-                            mNotify.cancelPlayingNotify();
-                            if(mUpdateFloatLrcThread != null) {
-                                mUpdateFloatLrcThread.quitDelay();
-                            }
-                        },50);
+                    if(mUpdateFloatLrcThread != null) {
+                        mUpdateFloatLrcThread.quitImmediately();
                     }
+                    mUpdateUIHandler.postDelayed(() -> mNotify.cancelPlayingNotify(),100);
                     break;
                 //播放选中的歌曲
                 case Constants.PLAYSELECTEDSONG:
@@ -1553,6 +1551,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     Thread.sleep(LRC_INTERVAL);
                 } catch (InterruptedException e) {
                     LogUtil.d("DesktopLrc","捕获异常,线程退出");
+                    mShowFloatLrc = false;
                     mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
                     break;
                 }

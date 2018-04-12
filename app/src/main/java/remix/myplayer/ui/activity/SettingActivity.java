@@ -500,9 +500,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .positiveColorAttr(R.attr.text_color_primary)
                         .buttonRippleColorAttr(R.attr.ripple_color)
                         .items(new String[]{getString(R.string.use_system_color),getString(R.string.use_black_color)})
-                        .itemsCallbackSingleChoice(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"IsSystemColor",true) ? 0 : 1,
+                        .itemsCallbackSingleChoice(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR,true) ? 0 : 1,
                                 (dialog, view, which, text) -> {
-                                    SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"IsSystemColor",which == 0);
+                                    SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR,which == 0);
                                     sendBroadcast(new Intent(MusicService.ACTION_CMD)
                                             .putExtra("Control",Constants.TOGGLE_NOTIFY)
                                             .putExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,mNotifyStyleSwitch.isChecked()));

@@ -7,8 +7,8 @@ import android.graphics.drawable.Icon;
 import android.os.Build;
 
 import remix.myplayer.R;
+import remix.myplayer.appshortcuts.AppShortcutActivity;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.activity.AppShortcutActivity;
 
 /**
  * Created by Remix on 2017/11/16.
