@@ -16,7 +16,7 @@
 
     <dimen name="item_height">72dp</dimen>
 
-    <dimen name="tab_text_size">15sp</dimen>
+    <dimen name="tab_text_size">16sp</dimen>
     <dimen name="tab_height">48dp</dimen>
     <dimen name="d1_size">1dp</dimen>
     <dimen name="d2_size">2dp</dimen>
@@ -118,5 +118,6 @@
     <dimen name="player_seekbar_margin">8dp</dimen>
     <dimen name="cover_margin">9dp</dimen>
     <dimen name="record_margin">34dp</dimen>
+
 
 </resources>

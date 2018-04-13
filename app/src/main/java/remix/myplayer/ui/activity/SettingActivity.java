@@ -66,6 +66,7 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
+import static remix.myplayer.bean.Category.ALL_LIBRARY_RES;
 import static remix.myplayer.bean.Category.ALL_LIBRARY_STRING;
 
 /**
@@ -384,7 +385,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 List<Integer> selected = new ArrayList<>();
                 for(Category temp : oldCategories){
                     selected.add(temp.getIndex());
-
                 }
                 new MaterialDialog.Builder(mContext)
                         .title(R.string.library_category)
@@ -399,9 +399,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 return true;
                             }
                             ArrayList<Category> newCategories = new ArrayList<>();
-                            for(CharSequence item : text){
-                                Category category = new Category(item.toString());
-                                newCategories.add(category);
+                            for(Integer choose : which){
+                                newCategories.add(new Category(ALL_LIBRARY_RES.get(choose)));
                             }
                             if(!newCategories.equals(oldCategories)){
                                 mNeedRefreshLibrary = true;

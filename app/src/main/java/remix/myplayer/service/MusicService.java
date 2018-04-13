@@ -1306,11 +1306,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
             Global.PlayList = PlayListUtil.getAllPlayListInfo();
             mShowFloatLrc = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC,false);
+        }
 
-            //摇一摇
-            if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.SHAKE,false)){
-                ShakeDetector.getInstance(mContext).beginListen();
-            }
+        //摇一摇
+        if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.SHAKE,false)){
+            ShakeDetector.getInstance(mContext).beginListen();
         }
         setUpLastSong();
         mLoadFinished = true;

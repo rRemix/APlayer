@@ -22,22 +22,20 @@ public class ShakeDetector implements SensorEventListener{
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private Context mContext;
-    private static final int UPTATE_INTERVAL_TIME = 50;
+    private static final int UPDATE_INTERVAL_TIME = 50;
     private static final int SPEED_THRESHOLD = 30;
 
     private long mLastUpdateTime;
     private float mLastX;
     private float mLastY;
     private float mLastZ;
-    //每500ms最多响应一次操作
-    private final int TIME_DELAY = 500;
     private boolean mDetect = false;
+    private Handler mHandler = new Handler();
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            Intent intent = new Intent(MusicService.ACTION_CMD);
-            intent.putExtra("Control", Constants.NEXT);
-            mContext.sendBroadcast(intent);
+            mContext.sendBroadcast(new Intent(MusicService.ACTION_CMD)
+                    .putExtra("Control", Constants.NEXT));
         }
     };
     private static ShakeDetector mInstance;
@@ -59,22 +57,22 @@ public class ShakeDetector implements SensorEventListener{
             return;
         if(mSensorManager == null)
             mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
-        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if(mSensor != null) {
-            mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        }
+        if(mSensor == null)
+            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     public void stopListen(){
         mDetect = false;
-        if(mSensor != null){
-            if(mSensorManager == null)
-                mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
-            mSensorManager.unregisterListener(this,mSensor);
-            mSensorManager = null;
-            mSensor = null;
-        }
 
+        if(mSensorManager == null)
+            mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+
+        if(mSensor == null){
+            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        }
+        mSensorManager.unregisterListener(this,mSensor);
+        mHandler.removeCallbacks(mRunnable);
     }
 
     @Override
@@ -83,9 +81,6 @@ public class ShakeDetector implements SensorEventListener{
             return;
         long currentUpdateTime = System.currentTimeMillis();
         long timeInterval = currentUpdateTime - mLastUpdateTime;
-        if (timeInterval < UPTATE_INTERVAL_TIME) {
-            return;
-        }
         mLastUpdateTime = currentUpdateTime;
         // 计算传感器差值
         float[] values = event.values;
@@ -97,8 +92,8 @@ public class ShakeDetector implements SensorEventListener{
         float deltaZ = z - mLastZ;
         double speed = (Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ) / timeInterval) * 100;
         if(speed > SPEED_THRESHOLD ){
-            new Handler().removeCallbacks(mRunnable);
-            new Handler().postDelayed(mRunnable,TIME_DELAY);
+            mHandler.removeCallbacks(mRunnable);
+            mHandler.postDelayed(mRunnable,UPDATE_INTERVAL_TIME);
         }
         mLastX = x;
         mLastY = y;

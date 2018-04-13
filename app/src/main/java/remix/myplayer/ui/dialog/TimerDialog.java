@@ -170,7 +170,7 @@ public class TimerDialog extends BaseDialogActivity {
 
         //分钟 秒 背景框
         ButterKnife.apply(new View[]{findView(R.id.timer_minute_container), findView(R.id.timer_second_container)},
-                (ButterKnife.Action<View>) (view, index) -> {
+                (view, index) -> {
                     final Drawable drawable = Theme.getShape(
                             GradientDrawable.RECTANGLE,
                             Color.TRANSPARENT,

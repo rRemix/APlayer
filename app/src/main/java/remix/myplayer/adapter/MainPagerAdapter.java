@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.bean.Category;
 import remix.myplayer.ui.fragment.AlbumFragment;
@@ -28,7 +27,7 @@ import remix.myplayer.util.LogUtil;
 
 public class MainPagerAdapter extends FragmentStatePagerAdapter {
     private List<Category> mCateGory = new ArrayList<>();
-    private Map<String,WeakReference<Fragment>> mCacheMap = new HashMap<>();
+    private Map<Integer,WeakReference<Fragment>> mCacheMap = new HashMap<>();
     public MainPagerAdapter(FragmentManager fm) {
         super(fm);
     }
@@ -46,17 +45,17 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         Category category = mCateGory.get(position);
-        WeakReference<Fragment> reference = mCacheMap.get(category.getTitle());
+        WeakReference<Fragment> reference = mCacheMap.get(category.getResId());
 
         if(reference != null && reference.get() != null){
             LogUtil.d("ConfigViewPager","缓存命中: " + reference.get());
             return reference.get();
         }
-        Fragment fragment = category.getTitle().equals(APlayerApplication.getContext().getString(R.string.tab_song)) ? new SongFragment() :
-                category.getTitle().equals(APlayerApplication.getContext().getString(R.string.tab_album)) ? new AlbumFragment() :
-                category.getTitle().equals(APlayerApplication.getContext().getString(R.string.tab_artist)) ? new ArtistFragment() :
-                category.getTitle().equals(APlayerApplication.getContext().getString(R.string.tab_playlist)) ? new PlayListFragment() : new FolderFragment();
-        mCacheMap.put(category.getTitle(),new WeakReference<>(fragment));
+        Fragment fragment = category.getResId() == R.string.tab_song ? new SongFragment() :
+                category.getResId() == R.string.tab_album ? new AlbumFragment() :
+                category.getResId() == R.string.tab_artist ? new ArtistFragment() :
+                category.getResId() == R.string.tab_playlist ? new PlayListFragment() : new FolderFragment();
+        mCacheMap.put(category.getResId(),new WeakReference<>(fragment));
         LogUtil.d("ConfigViewPager","重新创建: " + fragment);
         return fragment;
     }

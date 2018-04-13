@@ -301,9 +301,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mPagerAdapter.setList(categories);
-        mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(0).getTitle());
+        mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(0).getResId());
         //有且仅有播放列表一个tab
-        if(categories.size() == 1 && categories.get(0).getTitle().equals(getString(R.string.tab_playlist))){
+        if(categories.size() == 1 && categories.get(0).getResId() == R.string.tab_playlist){
             showAddPlayListButton(true);
         }
 
@@ -319,7 +319,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             @Override
             public void onPageSelected(int position) {
                 showAddPlayListButton(mPagerAdapter.getList().get(position).getTitle().equals(getString(R.string.tab_playlist)));
-                mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(position).getTitle());
+                mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(position).getResId());
                 mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(position);
                 invalidateOptionsMenu();
             }
@@ -331,15 +331,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     }
 
     private int mMenuLayoutId = R.menu.menu_main;
-    public int parseMenuId(String category) {
-        if(TextUtils.isEmpty(category)){
-            mMenuLayoutId = R.menu.menu_main;
-        }
-        return category.equalsIgnoreCase(getString(R.string.tab_song)) ? R.menu.menu_main :
-                category.equalsIgnoreCase(getString(R.string.tab_album)) ? R.menu.menu_album :
-                category.equalsIgnoreCase(getString(R.string.tab_artist)) ? R.menu.menu_artist :
-                category.equalsIgnoreCase(getString(R.string.tab_playlist)) ? R.menu.menu_playlist :
-                category.equalsIgnoreCase(getString(R.string.tab_folder)) ? R.menu.menu_folder : R.menu.menu_main_simple;
+    public int parseMenuId(int resId) {
+        return resId == R.string.tab_song ? R.menu.menu_main :
+                resId == R.string.tab_album ? R.menu.menu_album :
+                resId == R.string.tab_artist ? R.menu.menu_artist :
+                resId == R.string.tab_playlist ? R.menu.menu_playlist :
+                resId ==  R.string.tab_folder ? R.menu.menu_folder : R.menu.menu_main_simple;
     }
 
     @Override
@@ -527,7 +524,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                             mViewPager.setOffscreenPageLimit(categories.size() - 1);
                             mPagerAdapter.setList(categories);
                             mPagerAdapter.notifyDataSetChanged();
-                            mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(mViewPager.getCurrentItem()).getTitle());
+                            mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(mViewPager.getCurrentItem()).getResId());
                             mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(mViewPager.getCurrentItem());
                             invalidateOptionsMenu();
                         }
