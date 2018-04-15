@@ -78,16 +78,10 @@ public class APlayerApplication extends MultiDexApplication{
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1)
             new DynamicShortcutManager(this).setUpShortcut();
 
-//        if(SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"Temp",true)){
-//            SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"Temp",false);
-//            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,"");
-//        }
         //兼容性
-        if(/**SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"Temp",true)*/true){
+        if(SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"Temp",true)){
             SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"Temp",false);
-
-//            String categoryJson = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,"");
-            String categoryJson = "[{\"mIndex\":0,\"mTitle\":\"歌曲\"},{\"mIndex\":1,\"mTitle\":\"专辑\"},{\"mIndex\":2,\"mTitle\":\"艺术家\"},{\"mIndex\":3,\"mTitle\":\"播放列表\"},{\"mIndex\":4,\"mTitle\":\"文件夹\"}]";
+            String categoryJson = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,"");
             List<Category> oldCategories = TextUtils.isEmpty(categoryJson) ? new ArrayList<>() : new Gson().fromJson(categoryJson,new TypeToken<List<Category>>(){}.getType());
             if(oldCategories == null || oldCategories.size() == 0){
                 return;

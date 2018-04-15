@@ -205,8 +205,8 @@
     <string name="play_failed">unable to play:</string>
     <string name="cant_request_audio_focus">Audio focus denied</string>
     <string name="float_lrc">Desktop lyric</string>
-    <string name="closed_float_lrc">Desktop lyric is opened</string>
-    <string name="opened_float_lrc">Desktop lyric is closed</string>
+    <string name="closed_float_lrc">Desktop lyric is closed</string>
+    <string name="opened_float_lrc">Desktop lyric is opened</string>
     <string name="confirm_ignore_lrc">Confirm to ignore lyric?</string>
     <string name="confirm_cancel_ignore_lrc">Confirm to cancel ignore?</string>
     <string name="ignore_lrc">Ignore lyric</string>
