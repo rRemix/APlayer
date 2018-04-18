@@ -773,7 +773,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     Global.setNotifyShowing(false);
                     pause(false);
                     if(mUpdateFloatLrcThread != null) {
-                        mUpdateFloatLrcThread.quitImmediately();
+                        mUpdateFloatLrcThread.quitByNotification();
                     }
                     mUpdateUIHandler.postDelayed(() -> mNotify.cancelPlayingNotify(),100);
                     break;
@@ -1305,7 +1305,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             Global.MyLoveID = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"MyLoveID",-1);
             Global.PlayQueue = PlayListUtil.getIDList(Global.PlayQueueID);
             Global.PlayList = PlayListUtil.getAllPlayListInfo();
-            mShowFloatLrc = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC,false);
+            mShowFloatLrc = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW,false);
         }
 
         //摇一摇
@@ -1526,11 +1526,18 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private static final int LRC_INTERVAL = 400;
 //    public String mCurrentLrc;
     private UpdateFloatLrcThread mUpdateFloatLrcThread;
+    private boolean mNeedShowFloatLrc;
     private FloatLrcContent mCurrentLrc = new FloatLrcContent();
     private LrcRow EMPTY_ROW = new LrcRow("",0,"");
     private class UpdateFloatLrcThread extends Thread{
         UpdateFloatLrcThread(){
             LogUtil.d("DesktopLrc","创建线程");
+        }
+
+        void quitByNotification(){
+            interrupt();
+            mNeedShowFloatLrc = true;
+            mShowFloatLrc = false;
         }
 
         void quitImmediately(){
@@ -1547,14 +1554,13 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 try {
 //                    int interval = getInterval();
 //                    LogUtil.d("DesktopLrc","间隔:" + interval);
-                    LogUtil.d("DesktopLrc","Thread:" + Thread.currentThread());
                     Thread.sleep(LRC_INTERVAL);
                 } catch (InterruptedException e) {
                     LogUtil.d("DesktopLrc","捕获异常,线程退出");
-                    mShowFloatLrc = false;
                     mUpdateUIHandler.sendEmptyMessage(Constants.REMOVE_FLOAT_LRC);
-                    break;
+                    return;
                 }
+                LogUtil.d("DesktopLrc","Thread:" + Thread.currentThread());
                 //判断权限
                 if (checkNoPermission())
                     return;
@@ -1704,7 +1710,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 关闭桌面歌词
      */
     private void closeFloatLrc() {
-        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"FloatLrc",false);
+        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW,false);
         mShowFloatLrc = false;
         mUpdateFloatLrcThread = null;
         if(mLrcRows != null)
@@ -1847,6 +1853,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             switch (msg.what){
                 case Constants.UPDATE_UI:
                     musicService.updateAppwidget();
+                    if(musicService.mNeedShowFloatLrc){
+                        musicService.mShowFloatLrc = true;
+                        musicService.mNeedShowFloatLrc = false;
+                    }
                     musicService.updateFloatLrc(false);
                     UpdateHelper.update(mCurrentSong,mIsplay);
                     break;

@@ -42,11 +42,11 @@ public class LrcView extends View implements ILrcView{
     /**高亮歌词的默认字体大小***/
 //    public static final float DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC = 45;
     /**歌词间默认的行距**/
-    public static final float DEFAULT_PADDING = DensityUtil.dip2px(APlayerApplication.getContext(),15);
+    public static final float DEFAULT_PADDING = DensityUtil.dip2px(APlayerApplication.getContext(),10);
     /** 跨行歌词之间额外的行距*/
-    public static final float DEFAULT_SPACING_PADDING = 0;
+    public static final float DEFAULT_SPACING_PADDING = DensityUtil.dip2px(APlayerApplication.getContext(),5);
     /** 跨行歌词之间行距倍数*/
-    public static final  float DEFAULT_SPACING_MULT = 1f;
+    public static final float DEFAULT_SPACING_MULTI = 1f;
     /**高亮歌词当前的字体大小***/
     private float mSizeForHighLightLrc;
     /**高亮歌词的默认字体颜色**/
@@ -195,7 +195,7 @@ public class LrcView extends View implements ILrcView{
 //                    mLrcRows.get(mCurRow).getTotalHeight() / 2 :
 //                    0;
 //            float y = getHeight() / 2 + getScrollY() + timeLineOffsetY ;
-            float y = getHeight() / 2 + getScrollY();
+            float y = getHeight() / 2 + getScrollY() + DEFAULT_SPACING_PADDING;
             canvas.drawText(mLrcRows.get(mCurRow).getTimeStr(), TIMELINE_DRAWABLE.getIntrinsicWidth() + 5, y - 10, mPaintForTimeLine);
             canvas.drawLine(TIMELINE_DRAWABLE.getIntrinsicWidth() + 10, y, getWidth(), y, mPaintForTimeLine);
             TIMELINE_DRAWABLE.setBounds(0,
@@ -216,12 +216,9 @@ public class LrcView extends View implements ILrcView{
      */
     private void drawLrcRow(Canvas canvas, TextPaint textPaint, int availableWidth, LrcRow lrcRow) {
         drawText(canvas,textPaint,availableWidth,lrcRow.getContent());
-//        mRowY += lrcRow.getContentHeight();
         if(lrcRow.hasTranslate()){
             drawText(canvas,textPaint,availableWidth,lrcRow.getTranslate());
-//            mRowY += lrcRow.getTranslateHeight();
         }
-//        mRowY += lrcRow.getTotalHeight();
         mRowY += mLinePadding;
     }
 
@@ -234,10 +231,10 @@ public class LrcView extends View implements ILrcView{
      */
     private void drawText(Canvas canvas, TextPaint textPaint, int availableWidth, String text) {
         StaticLayout staticLayout = new StaticLayout(text, textPaint, availableWidth,Layout.Alignment.ALIGN_CENTER ,
-                DEFAULT_SPACING_MULT, DEFAULT_SPACING_PADDING, true);
+                DEFAULT_SPACING_MULTI, -DEFAULT_SPACING_PADDING, true);
 
         canvas.save();
-        canvas.translate(getPaddingLeft(), (mRowY -  staticLayout.getHeight() / 2 ));
+        canvas.translate(getPaddingLeft(), (mRowY - staticLayout.getHeight() / 2));
         staticLayout.draw(canvas);
         canvas.restore();
         mRowY += staticLayout.getHeight();
@@ -411,7 +408,7 @@ public class LrcView extends View implements ILrcView{
      */
     private int getSingleLineHeight(String text){
         StaticLayout staticLayout = new StaticLayout(text, mPaintForOtherLrc, getWidth() - getPaddingLeft() - getPaddingRight(),Layout.Alignment.ALIGN_CENTER,
-                DEFAULT_SPACING_MULT, DEFAULT_SPACING_PADDING, true);
+                DEFAULT_SPACING_MULTI, DEFAULT_SPACING_PADDING, true);
         return staticLayout.getHeight();
     }
 

@@ -142,7 +142,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         //导航栏是否变色 是否启用摇一摇切歌
         final String[] keyWord = new String[]{SPUtil.SETTING_KEY.COLOR_NAVIGATION, SPUtil.SETTING_KEY.SHAKE, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,
-                SPUtil.SETTING_KEY.FLOAT_LYRIC, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, SPUtil.SETTING_KEY.IMMERSIVE_MODE};
+                SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, SPUtil.SETTING_KEY.IMMERSIVE_MODE};
         ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch,mFloatLrcSwitch,
                 mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override

@@ -112,7 +112,7 @@ public class SPUtil {
         //优先搜索在线歌词
         public static final String ONLINE_LYRIC_FIRST = "online_lyric_first";
         //是否开启桌面歌词
-        public static final String FLOAT_LYRIC = "float_lyric";
+        public static final String FLOAT_LYRIC_SHOW = "float_lyric_show";
         //沉浸式状态栏
         public static final String IMMERSIVE_MODE = "immersive_mode";
         //过滤大小
