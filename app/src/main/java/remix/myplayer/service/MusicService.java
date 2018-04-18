@@ -53,10 +53,10 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.db.PlayListSongs;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.helper.MusicEventHelper;
+import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.lyric.SearchLrc;
 import remix.myplayer.lyric.bean.LrcRow;
-import remix.myplayer.menu.ShakeDetector;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
@@ -507,7 +507,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         getContentResolver().unregisterContentObserver(mPlayListObserver);
         getContentResolver().unregisterContentObserver(mPlayListSongObserver);
 
-        ShakeDetector.getInstance(mContext).stopListen();
+        ShakeDetector.getInstance().stopListen();
 
         mAlreadyUnInit = true;
     }
@@ -1310,7 +1310,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 
         //摇一摇
         if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.SHAKE,false)){
-            ShakeDetector.getInstance(mContext).beginListen();
+            ShakeDetector.getInstance().beginListen();
         }
         setUpLastSong();
         mLoadFinished = true;
@@ -1719,15 +1719,15 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private class WidgetTask extends TimerTask{
         @Override
         public void run() {
-            mUpdateUIHandler.post(() -> {
-                if(mAppWidgetSmall != null)
-                    mAppWidgetSmall.updateWidget(mContext,null,false);
-                if(mAppWidgetMedium != null)
-                    mAppWidgetMedium.updateWidget(mContext,null,false);
-                if(mAppWidgetBig != null)
-                    mAppWidgetBig.updateWidget(mContext,null,false);
-            });
-            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,mMediaPlayer.getCurrentPosition());
+            if(mAppWidgetSmall != null)
+                mAppWidgetSmall.updateWidget(mContext,null,false);
+            if(mAppWidgetMedium != null)
+                mAppWidgetMedium.updateWidget(mContext,null,false);
+            if(mAppWidgetBig != null)
+                mAppWidgetBig.updateWidget(mContext,null,false);
+            final int progress = getProgress();
+            if(progress > 0)
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,progress);
         }
     }
 

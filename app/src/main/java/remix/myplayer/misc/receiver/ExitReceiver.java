@@ -8,7 +8,7 @@ import android.content.Intent;
 import com.umeng.analytics.MobclickAgent;
 
 import remix.myplayer.db.DBManager;
-import remix.myplayer.menu.ShakeDetector;
+import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.misc.manager.ActivityManager;
 import remix.myplayer.misc.manager.ServiceManager;
 
@@ -30,7 +30,7 @@ public class ExitReceiver extends BroadcastReceiver {
             //关闭通知
             ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
             //停止摇一摇
-            ShakeDetector.getInstance(context).stopListen();
+            ShakeDetector.getInstance().stopListen();
             MobclickAgent.onKillProcess(context);
             //关闭所有activity
             ActivityManager.FinishAll();

@@ -79,6 +79,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
@@ -299,24 +300,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         if(savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null){
             mOriginRect = savedInstanceState.getParcelable("Rect");
         }
-
-        final int THRESHOLD_Y = DensityUtil.dip2px(mContext,40);
-        final int THRESHOLD_X = DensityUtil.dip2px(mContext,10);
-        getWindow().getDecorView().setOnTouchListener((v,event) -> {
-            if(event.getAction() == MotionEvent.ACTION_DOWN){
-                mEventX1 = event.getX();
-                mEventY1 = event.getY();
-            }
-            if(event.getAction() == MotionEvent.ACTION_UP){
-                mEventX1 = event.getX();
-                mEventY2 = event.getY();
-                if(mEventY2 - mEventY1 > THRESHOLD_Y && Math.abs(mEventX1 - mEventX2) < THRESHOLD_X){
-                    onBackPressed();
-                }
-            }
-            return false;
-        });
-
     }
 
     /**
@@ -679,6 +662,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     /**
      * 初始化viewpager
      */
+    @SuppressLint("ClickableViewAccessibility")
     private void setUpViewPager(){
         mAdapter = new PagerAdapter(getSupportFragmentManager());
         Bundle bundle = new Bundle();
@@ -796,15 +780,23 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
         mPager.setAdapter(mAdapter);
         mPager.setOffscreenPageLimit(mAdapter.getCount() - 1);
+
+        final int THRESHOLD_Y = DensityUtil.dip2px(mContext,40);
+        final int THRESHOLD_X = DensityUtil.dip2px(mContext,60);
         //下滑关闭
         mPager.setOnTouchListener((v, event) -> {
             if(event.getAction() == MotionEvent.ACTION_DOWN){
+                mEventX1 = event.getX();
                 mEventY1 = event.getY();
             }
             if(event.getAction() == MotionEvent.ACTION_UP){
+                mEventX2 = event.getX();
                 mEventY2 = event.getY();
-                if(mEventY2 - mEventY1 > 200)
+                LogUtil.d("PlayerAction","ThresHoldX: " + THRESHOLD_X + " DistanceX: " + Math.abs(mEventX1 - mEventX2));
+                LogUtil.d("PlayerAction","ThresHoldY: " + THRESHOLD_Y + " DistanceY: " + (mEventY2 - mEventY1));
+                if(mEventY2 - mEventY1 > THRESHOLD_Y && Math.abs(mEventX1 - mEventX2) < THRESHOLD_X){
                     onBackPressed();
+                }
             }
             return false;
         });

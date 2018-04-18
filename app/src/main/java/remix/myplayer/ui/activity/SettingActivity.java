@@ -44,7 +44,7 @@ import remix.myplayer.R;
 import remix.myplayer.bean.Category;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.helper.M3UHelper;
-import remix.myplayer.menu.ShakeDetector;
+import remix.myplayer.helper.ShakeDetector;
 import remix.myplayer.misc.MediaScanner;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.handler.MsgHandler;
@@ -164,9 +164,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             //摇一摇
                             case R.id.setting_shake_switch:
                                 if(isChecked)
-                                    ShakeDetector.getInstance(mContext).beginListen();
+                                    ShakeDetector.getInstance().beginListen();
                                 else
-                                    ShakeDetector.getInstance(mContext).stopListen();
+                                    ShakeDetector.getInstance().stopListen();
                                 break;
                             //设置歌词搜索优先级
                             case R.id.setting_lrc_priority_switch:
