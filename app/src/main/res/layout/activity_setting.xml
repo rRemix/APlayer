@@ -838,7 +838,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/donate"
+                        android:text="@string/support_develop"
                         android:textSize="@dimen/s16_size"
                         android:textColor="?attr/text_color_primary"
                         android:layout_centerVertical="true"

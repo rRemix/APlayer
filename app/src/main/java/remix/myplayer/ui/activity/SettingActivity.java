@@ -57,7 +57,6 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.FolderChooserDialog;
 import remix.myplayer.ui.dialog.ThemeDialog;
-import remix.myplayer.util.AlipayUtil;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -66,6 +65,7 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
+import static remix.myplayer.APlayerApplication.IS_GP;
 import static remix.myplayer.bean.Category.ALL_LIBRARY_RES;
 import static remix.myplayer.bean.Category.ALL_LIBRARY_STRING;
 
@@ -256,6 +256,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 mHandler.sendEmptyMessage(CACHE_SIZE);
             }
         }.start();
+
+        if(IS_GP){
+            findViewById(R.id.setting_update_container).setVisibility(View.GONE);
+        }
     }
 
     public void onResume() {
@@ -342,7 +346,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_feedback_container,R.id.setting_about_container, R.id.setting_update_container,
             R.id.setting_lockscreen_container,R.id.setting_lrc_priority_container,R.id.setting_lrc_float_container,
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
-            R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_donate_container,
+            R.id.setting_lrc_path_container,R.id.setting_clear_container,
             R.id.setting_screen_container,R.id.setting_scan_container,R.id.setting_classic_notify_container,
             R.id.setting_album_cover_container,R.id.setting_library_category_container,R.id.setting_immersive_container,
             R.id.setting_import_playlist_container})
@@ -551,21 +555,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     }
                 });
                 BmobUpdateAgent.forceUpdate(this);
-                break;
-            //捐赠
-            case R.id.setting_donate_container:
-                new MaterialDialog.Builder(this)
-                        .title(R.string.donate)
-                        .titleColorAttr(R.attr.text_color_primary)
-                        .positiveText(R.string.jump_alipay_account)
-                        .negativeText(R.string.cancel)
-                        .content(R.string.donate_tip)
-                        .onPositive((dialog, which) -> AlipayUtil.startAlipayClient((Activity) mContext,"FKX01908X8ECOECIQZIL43"))
-                        .backgroundColorAttr(R.attr.background_color_3)
-                        .positiveColorAttr(R.attr.text_color_primary)
-                        .negativeColorAttr(R.attr.text_color_primary)
-                        .contentColorAttr(R.attr.text_color_primary)
-                        .show();
                 break;
             //清除缓存
             case R.id.setting_clear_container:

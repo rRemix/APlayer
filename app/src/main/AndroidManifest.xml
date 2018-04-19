@@ -132,6 +132,8 @@
         <activity
             android:name=".ui.activity.EQActivity"
             android:theme="@style/ActivityStyle" />
+        <activity android:name=".ui.activity.SupportDevelopActivity"
+            android:theme="@style/ActivityStyle"/>
         <!-- 设置 -->
         <activity
             android:name=".ui.activity.SettingActivity"
@@ -185,7 +187,6 @@
             <!-- 微博分享 -->
             <intent-filter>
                 <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -217,9 +218,7 @@
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:scheme="tencent1105030910" />
             </intent-filter>
         </activity>

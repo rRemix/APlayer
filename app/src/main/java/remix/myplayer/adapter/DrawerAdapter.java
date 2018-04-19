@@ -27,8 +27,8 @@ public class DrawerAdapter extends BaseAdapter<Integer,DrawerAdapter.DrawerHolde
     //当前选中项
     private int mSelectIndex = 0;
     private int[] IMAGES = new int[]{R.drawable.drawer_icon_musicbox,R.drawable.drawer_icon_recently,
-                                    R.drawable.darwer_icon_night,R.drawable.darwer_icon_set};
-    private int[] TITLES = new int[]{R.string.drawer_song,R.string.drawer_recently,R.string.drawer_night,R.string.drawer_setting};
+                                    R.drawable.darwer_icon_night,R.drawable.darwer_icon_support, R.drawable.darwer_icon_set};
+    private int[] TITLES = new int[]{R.string.drawer_song,R.string.drawer_recently,R.string.drawer_night,R.string.support_develop,R.string.drawer_setting};
     public DrawerAdapter(Context Context,int layoutId) {
         super(Context,layoutId);
     }

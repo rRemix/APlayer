@@ -456,8 +456,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                     case 2:
                         setNightMode(ThemeStore.isDay());
                         break;
-                    //设置
+                    //捐赠
                     case 3:
+                        startActivity(new Intent(mContext,SupportDevelopActivity.class));
+                        break;
+                    //设置
+                    case 4:
                         startActivityForResult(new Intent(mContext,SettingActivity.class), REQUEST_SETTING);
                         break;
                 }

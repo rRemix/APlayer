@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/d4_size"
+        android:background="?attr/background_common"
+        app:contentPadding="@dimen/d16_size">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/item_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textStyle="bold"
+                android:textColor="?attr/text_color_primary"
+                android:textSize="@dimen/s14_size"/>
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:layout_width="@dimen/d32_size"
+                android:layout_height="@dimen/d32_size"
+                android:id="@+id/item_logo"
+                android:layout_marginTop="@dimen/d4_size"
+                android:layout_marginBottom="@dimen/d4_size"
+                fresco:actualImageScaleType="centerCrop"/>
+
+            <TextView
+                android:id="@+id/item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textColor="?attr/text_color"
+                android:textSize="@dimen/s14_size"
+                tools:text="Title" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+</FrameLayout>

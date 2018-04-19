@@ -152,7 +152,7 @@
     <string name="about_info">About</string>
     <string name="check_update">Check for update</string>
     <string name="clear_cache">Clear cache</string>
-    <string name="donate">Support development</string>
+    <string name="support_develop">Support development</string>
     <string name="choose">Choose</string>
     <string name="donate_tip">Your support is to make app better</string>
     <string name="jump_alipay_account">Jump to Alipay</string>
@@ -301,4 +301,5 @@
     <string name="no_playlist_can_import">No playlist can be imported</string>
     <string name="choose_import_playlist">Select playlist to import</string>
     <string name="import_count">Import %s songs</string>
+    <string name="alipay">Alipay</string>
 </resources>

@@ -39,10 +39,15 @@ import remix.myplayer.util.Util;
 public class APlayerApplication extends MultiDexApplication{
     private static Context mContext;
 
+    //是否是googlePlay版本
+    public static boolean IS_GP;
+
     @Override
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
+
+        IS_GP = "google".equalsIgnoreCase(Util.getAppMetaData("UMENG_CHANNEL"));
 
         initUtil();
         initTheme();
@@ -54,10 +59,9 @@ public class APlayerApplication extends MultiDexApplication{
         //友盟
         UMShareAPI.get(this);
         Config.DEBUG = BuildConfig.DEBUG;
-        //bomb
-        Bmob.initialize(this, "0c070110fffa9e88a1362643fb9d4d64");
-        BmobUpdateAgent.setUpdateOnlyWifi(false);
-        BmobUpdateAgent.update(this);
+        //根据渠道加载其他第三方库
+        loadThirdParty();
+
         //禁止默认的页面统计方式
         MobclickAgent.openActivityDurationTrack(false);
         //异常捕获
@@ -114,5 +118,12 @@ public class APlayerApplication extends MultiDexApplication{
 
     static {
         PlatformConfig.setWeixin("wx10775467a6664fbb","8a64ff1614ffe8d8dd4f8cc794f3c4f1");
+    }
+
+    private void loadThirdParty() {
+        //bomb
+        Bmob.initialize(this, "0c070110fffa9e88a1362643fb9d4d64");
+        BmobUpdateAgent.setUpdateOnlyWifi(false);
+        BmobUpdateAgent.update(this);
     }
 }
