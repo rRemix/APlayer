@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -76,16 +75,6 @@ public class BottomActionBarFragment extends BaseFragment{
         mPageName = BottomActionBarFragment.class.getSimpleName();
     }
 
-    private Handler mHandler = new Handler();
-    private float mLastX;
-    private float mLastY;
-    private Runnable mClickRunnable = new Runnable() {
-        @Override
-        public void run() {
-
-        }
-    };
-
     @SuppressLint("ClickableViewAccessibility")
     @Nullable
     @Override
@@ -103,9 +92,7 @@ public class BottomActionBarFragment extends BaseFragment{
 
         //手势检测
         mGestureDetector = new GestureDetector(mContext,new GestureListener(this));
-        mBottomActionBar.setOnTouchListener((v, event) -> {
-            return mGestureDetector.onTouchEvent(event);
-        });
+        mBottomActionBar.setOnTouchListener((v, event) -> mGestureDetector.onTouchEvent(event));
 
         //播放按钮
         CtrlButtonListener listener = new CtrlButtonListener(getContext());
