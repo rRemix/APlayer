@@ -98,10 +98,7 @@ public class Global {
                     deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
                     addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
                 } catch (Exception e){
-                    Util.uploadException("setPlayQueue Error",e);
-                } finally {
-                    if(addRow == 0)
-                        Util.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
+                    LogUtil.d("Global",e.toString());
                 }
 
             }
@@ -144,10 +141,7 @@ public class Global {
                     deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
                     addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
                 } catch (Exception e){
-                    Util.uploadException("setPlayQueue Error",e);
-                } finally {
-                    if(addRow == 0)
-                        Util.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
+                    LogUtil.d("Global",e.toString());
                 }
             }
         }.start();

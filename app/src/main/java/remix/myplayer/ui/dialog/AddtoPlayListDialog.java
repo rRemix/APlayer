@@ -32,9 +32,9 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
-import remix.myplayer.util.Util;
 
 /**
  * Created by taeja on 16-2-1.
@@ -152,7 +152,7 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                                     ToastUtil.show(mContext,R.string.add_song_playlist_success,input.toString(), PlayListUtil.addMultiSongs(mList,input.toString(),newPlayListId));
                                 }
                             }catch (Exception e){
-                                Util.uploadException("新建" + input + "错误:" + newPlayListId,e);
+                                LogUtil.d("AddtoPlayList",e.toString());
                             }
                         }
                     })

@@ -284,7 +284,7 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
         }
     }
 
-    public void onBackPress(){
+    public void onMultiBackPress(){
         mMultiChoice.updateOptionMenu(false);
         if(mTipPopupWindow != null && mTipPopupWindow.isShowing()){
             mTipPopupWindow.dismiss();

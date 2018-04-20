@@ -107,11 +107,9 @@ android {
         exclude 'META-INF/rxjava.properties'
     }
 
-    if(!isGP()){
-        configurations {
-            all*.exclude group: 'com.squareup.okhttp3', module: 'okhttp'
-            all*.exclude group: 'com.google.code.gson', module: 'gson'
-        }
+    configurations {
+        all*.exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+        all*.exclude group: 'com.google.code.gson', module: 'gson'
     }
 
     configurations.all {
@@ -130,8 +128,6 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
-
-
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -162,16 +158,18 @@ dependencies {
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     kapt  'com.jakewharton:butterknife-compiler:8.8.1'
 
-    if (isGP()){
-        implementation 'com.anjlab.android.iab.v3:library:1.0.44'
-        implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-        implementation 'com.google.code.gson:gson:2.8.2'
-    } else{
-        implementation 'cn.bmob.android:bmob-sdk:3.5.0'
-    }
+    implementation 'cn.bmob.android:bmob-sdk:3.5.0'
+
+//    if (isGP()){
+//        implementation 'com.anjlab.android.iab.v3:library:1.0.44'
+//        implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+//        implementation 'com.google.code.gson:gson:2.8.2'
+//    } else{
+//        implementation 'cn.bmob.android:bmob-sdk:3.5.0'
+//    }
 }
 
-static def isGP() {
+static def isGooglePlay() {
     false
 }
 

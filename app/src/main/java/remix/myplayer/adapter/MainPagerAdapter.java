@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import remix.myplayer.R;
 import remix.myplayer.bean.Category;
 import remix.myplayer.ui.fragment.AlbumFragment;
 import remix.myplayer.ui.fragment.ArtistFragment;
@@ -45,17 +44,17 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         Category category = mCateGory.get(position);
-        WeakReference<Fragment> reference = mCacheMap.get(category.getResId());
+        WeakReference<Fragment> reference = mCacheMap.get(category.getTag());
 
         if(reference != null && reference.get() != null){
             LogUtil.d("ConfigViewPager","缓存命中: " + reference.get());
             return reference.get();
         }
-        Fragment fragment = category.getResId() == R.string.tab_song ? new SongFragment() :
-                category.getResId() == R.string.tab_album ? new AlbumFragment() :
-                category.getResId() == R.string.tab_artist ? new ArtistFragment() :
-                category.getResId() == R.string.tab_playlist ? new PlayListFragment() : new FolderFragment();
-        mCacheMap.put(category.getResId(),new WeakReference<>(fragment));
+        Fragment fragment = category.getTag() == Category.TAG_SONG ? new SongFragment() :
+                category.getTag() == Category.TAG_ALBUM ? new AlbumFragment() :
+                category.getTag() == Category.TAG_ARTIST ? new ArtistFragment() :
+                category.getTag() == Category.TAG_PLAYLIST ? new PlayListFragment() : new FolderFragment();
+        mCacheMap.put(category.getTag(),new WeakReference<>(fragment));
         LogUtil.d("ConfigViewPager","重新创建: " + fragment);
         return fragment;
     }

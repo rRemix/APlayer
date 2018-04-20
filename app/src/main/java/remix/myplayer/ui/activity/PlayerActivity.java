@@ -241,7 +241,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                         miuiVersion = Integer.valueOf(miui.substring(1,miui.length()));
                     }
                 }catch (Exception e){
-                    Util.uploadException("miui版本解析错误",e);
+                    LogUtil.d(TAG,e.toString());
                 }
             }
             if(Build.MANUFACTURER.equalsIgnoreCase("Meizu")){

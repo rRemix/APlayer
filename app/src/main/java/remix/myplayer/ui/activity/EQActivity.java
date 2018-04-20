@@ -70,7 +70,7 @@ public class EQActivity extends ToolbarActivity {
                     int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
                     LogUtil.d(TAG,"AudioSessionId:" + AudioSessionId);
                     if(AudioSessionId  == 0) {
-                        Util.uploadException("AudioSessionId","is zero");
+                        LogUtil.d(TAG,"AudioSessionId Error");
                         return;
                     }
                     //是否启用音效设置
@@ -109,7 +109,7 @@ public class EQActivity extends ToolbarActivity {
                     //初始化完成
                     mHasInitial = true;
                 }catch (Exception e){
-                    Util.uploadException("均衡器初始化失败",e);
+                    LogUtil.d(TAG,e.toString());
                 }
             }
 

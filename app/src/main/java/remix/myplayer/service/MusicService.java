@@ -1296,7 +1296,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 //通知栏样式
                 SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O));
             } catch (Exception e){
-                Util.uploadException("初始化失败",e);
+                LogUtil.d(TAG,e.toString());
             }
         }else {
             //播放模式

@@ -16,8 +16,8 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
-import remix.myplayer.util.Util;
 
 import static remix.myplayer.service.MusicService.copy;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
@@ -95,7 +95,7 @@ public class NotifyImpl extends Notify {
                             mRemoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
                         }
                     } catch (Exception e){
-                        Util.uploadException("PushNotify Error",e);
+                        LogUtil.d("Notify",e.toString());
                     } finally {
                         pushNotify(notification);
                     }

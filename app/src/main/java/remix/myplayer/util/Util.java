@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
@@ -40,11 +39,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.SaveListener;
 import remix.myplayer.App;
 import remix.myplayer.R;
-import remix.myplayer.bean.bmob.Error;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.lyric.SearchLrc;
 
@@ -516,64 +512,6 @@ public class Util {
             }
         }
         return false;
-    }
-
-    /**
-     * 手动上传日志信息
-     */
-    public static void uploadException(String title,String description){
-        try {
-            if(!Util.isNetWorkConnected()){
-                return;
-            }
-            PackageManager pm = App.getContext().getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(App.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
-            Error error = new Error(title,description,
-                    pi.versionName,
-                    pi.versionCode + "",
-                    Build.DISPLAY,
-                    Build.CPU_ABI + "," + Build.CPU_ABI2,
-                    Build.MANUFACTURER,
-                    Build.MODEL,
-                    Build.VERSION.RELEASE,
-                    Build.VERSION.SDK_INT + "");
-            error.save(new SaveListener<String>() {
-                @Override
-                public void done(String s, BmobException e) {
-                }
-            });
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 手动上传异常
-     */
-    public static void uploadException(String title,Exception exception){
-        try {
-            if(!Util.isNetWorkConnected()){
-                return;
-            }
-            PackageManager pm = App.getContext().getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(App.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
-            Error error = new Error(title,exception.toString(),
-                    pi.versionName,
-                    pi.versionCode + "",
-                    Build.DISPLAY,
-                    Build.CPU_ABI + "," + Build.CPU_ABI2,
-                    Build.MANUFACTURER,
-                    Build.MODEL,
-                    Build.VERSION.RELEASE,
-                    Build.VERSION.SDK_INT + "");
-            error.save(new SaveListener<String>() {
-                @Override
-                public void done(String s, BmobException e) {
-                }
-            });
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     /**

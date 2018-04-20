@@ -69,7 +69,7 @@ public class SearchLrc {
                 mDisplayName = temp.indexOf('.') > 0 ? temp.substring(0,temp.lastIndexOf('.')) : temp;
             }
         } catch (Exception e){
-            Util.uploadException("SearchLrc Init Error","DisPlayName:" + item.getDisplayname() + " Title:" + item.getTitle());
+            LogUtil.d(TAG,e.toString());
             mDisplayName = mSong.getTitle();
         }
         mLrcParser = new DefaultLrcParser();
@@ -343,7 +343,7 @@ public class SearchLrc {
             }
         }catch (Exception e){
 //            LogUtil.e(TAG,e.toString());
-            Util.uploadException("Search Error",e);
+            LogUtil.d(TAG,e.toString());
         } finally {
             if (br != null)
                 try {

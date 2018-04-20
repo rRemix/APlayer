@@ -27,7 +27,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -74,6 +73,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
@@ -129,11 +129,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
         mIsRunning = true;
-        //更新UI
-//        if(mFromSettingFlag){
-//            mFromSettingFlag = false;
-//            return;
-//        }
         UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
     }
 
@@ -172,35 +167,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         setUpViewColor();
         //handler
         mRefreshHandler = new MsgHandler(this);
-        mRefreshHandler.postDelayed(() -> {
-            final Intent param = getIntent();
-            if(param != null && param.getData() != null){
-                int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
-                if(id < 0)
-                    return;
-                Intent intent = new Intent(MusicService.ACTION_CMD);
-                Bundle arg = new Bundle();
-                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                arg.putInt("Position", 0);
-                intent.putExtras(arg);
-                ArrayList<Integer> list = new ArrayList<>();
-                list.add(id);
-                Global.setPlayQueue(list,mContext,intent);
-            }
-        },1000);
 
-        new MaterialDialog.Builder(this)
-                .title("关于更新")
-                .titleColorAttr(R.attr.text_color_primary)
-                .content("后续版本将不再提供应用内更新的功能\n获取最新版本可前往酷安应用市场")
-                .contentColorAttr(R.attr.text_color_primary)
-                .contentGravity(GravityEnum.START)
-                .positiveText(R.string.confirm)
-                .positiveColorAttr(R.attr.text_color_primary)
-                .backgroundColorAttr(R.attr.background_color_3)
-                .itemsColorAttr(R.attr.text_color_primary)
-                .theme(ThemeStore.getMDDialogTheme())
-                .show();
+        parseIntent();
     }
 
     /**
@@ -315,9 +283,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mPagerAdapter.setList(categories);
-        mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(0).getResId());
+        mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(0).getTag());
         //有且仅有播放列表一个tab
-        if(categories.size() == 1 && categories.get(0).getResId() == R.string.tab_playlist){
+        if(categories.size() == 1 && categories.get(0).getTag() == R.string.tab_playlist){
             showAddPlayListButton(true);
         }
 
@@ -333,7 +301,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             @Override
             public void onPageSelected(int position) {
                 showAddPlayListButton(mPagerAdapter.getList().get(position).getTitle().equals(getString(R.string.tab_playlist)));
-                mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(position).getResId());
+                mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(position).getTag());
                 mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(position);
                 invalidateOptionsMenu();
             }
@@ -345,12 +313,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     }
 
     private int mMenuLayoutId = R.menu.menu_main;
-    public int parseMenuId(int resId) {
-        return resId == R.string.tab_song ? R.menu.menu_main :
-                resId == R.string.tab_album ? R.menu.menu_album :
-                resId == R.string.tab_artist ? R.menu.menu_artist :
-                resId == R.string.tab_playlist ? R.menu.menu_playlist :
-                resId ==  R.string.tab_folder ? R.menu.menu_folder : R.menu.menu_main_simple;
+    public int parseMenuId(int tag) {
+        return tag == Category.TAG_SONG ? R.menu.menu_main :
+                tag == Category.TAG_ALBUM ? R.menu.menu_album :
+                tag == Category.TAG_ARTIST ? R.menu.menu_artist :
+                tag == Category.TAG_PLAYLIST ? R.menu.menu_playlist :
+                tag ==  Category.TAG_FOLDER ? R.menu.menu_folder : R.menu.menu_main_simple;
     }
 
     @Override
@@ -542,7 +510,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                             mViewPager.setOffscreenPageLimit(categories.size() - 1);
                             mPagerAdapter.setList(categories);
                             mPagerAdapter.notifyDataSetChanged();
-                            mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(mViewPager.getCurrentItem()).getResId());
+                            mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(mViewPager.getCurrentItem()).getTag());
                             mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(mViewPager.getCurrentItem());
                             invalidateOptionsMenu();
                         }
@@ -604,7 +572,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                         }.start();
                     }
                     break;
-
             }
         }
     }
@@ -614,9 +581,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
             mDrawerLayout.closeDrawer(mNavigationView);
         } else if(mMultiChoice.isShow()) {
-            onBackPress();
+            onMultiBackPress();
         } else {
-            moveTaskToBack(true);
+            super.onBackPressed();
         }
     }
 
@@ -669,17 +636,40 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-    private static boolean LOAD_COMPLETE = false;
+    private static boolean mLoadComplete = false;
     private class LoadFinishReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent receive) {
-            if(LOAD_COMPLETE)
-                return;
-            LOAD_COMPLETE = true;
-            String action = receive != null ? receive.getAction() : "";
-            if(ACTION_LOAD_FINISH.equals(action)){
+            LogUtil.d("StartAPlayer","receiveBroadcast");
+            if(ACTION_LOAD_FINISH.equals(receive != null ? receive.getAction() : "") && !mLoadComplete){
                 setUpBottomBar();
+                mLoadComplete = true;
             }
+            if(mLoadComplete){
+                parseIntent();
+            }
+
+        }
+    }
+
+    private void parseIntent() {
+        LogUtil.d("StartAPlayer","parseIntent");
+        final Intent param = getIntent();
+        if(param != null && param.getData() != null && mLoadComplete){
+            int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
+            LogUtil.d("StartAPlayer","id: " + id);
+            LogUtil.d("StartAPlayer","path: " + param.getData().getPath());
+            if(id < 0)
+                return;
+            Intent intent = new Intent(MusicService.ACTION_CMD);
+            Bundle arg = new Bundle();
+            arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+            arg.putInt("Position", 0);
+            intent.putExtras(arg);
+            ArrayList<Integer> list = new ArrayList<>();
+            list.add(id);
+            Global.setPlayQueue(list,mContext,intent);
+            setIntent(new Intent());
         }
     }
 }

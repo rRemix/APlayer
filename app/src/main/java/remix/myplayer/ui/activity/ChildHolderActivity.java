@@ -238,7 +238,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     @Override
     public void onBackPressed() {
         if(mMultiChoice.isShow()) {
-            onBackPress();
+            onMultiBackPress();
         } else {
             finish();
         }

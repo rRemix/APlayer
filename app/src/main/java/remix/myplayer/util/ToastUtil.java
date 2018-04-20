@@ -111,4 +111,14 @@ public class ToastUtil {
         }
     }
 
+    /**
+     * 长时间显示Toast
+     *
+     * @param context
+     */
+    public static void showLong(Context context,@StringRes int resId, Object... formatArgs) {
+        if (isShow)
+            Toast.makeText(context, context.getString(resId, formatArgs), Toast.LENGTH_LONG).show();
+    }
+
 }

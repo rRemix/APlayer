@@ -16,7 +16,7 @@ class PurchaseAdapter (context: Context, layoutId: Int) : BaseAdapter<PurchaseBe
     override fun convert(holder: PurchaseHolder?, bean: PurchaseBean?, position: Int) {
         if(holder == null || bean == null)
             return
-        holder.mTitle.text = if (position == 1) mContext.getString(R.string.wechat) else if (position == 2) mContext.getString(R.string.alipay) else bean.title
+        holder.mTitle.text = bean.title
         when(position){
             0,1-> {
                 holder.mLogo.setActualImageResource(if(position == 0) R.drawable.icon_wechat_donate else R.drawable.icon_alipay_donate)
@@ -25,8 +25,10 @@ class PurchaseAdapter (context: Context, layoutId: Int) : BaseAdapter<PurchaseBe
                 holder.mLogo.setImageURI(bean.logo)
             }
         }
-        holder.mLogo.setImageURI(if( position == 0 || position == 1) "asset://" + bean.logo else bean.logo)
-        holder.mPrice.text = if (position == 1 && position == 2) ""  else "$" + bean.price
+        holder.mPrice.text = if (position == 0 || position == 1) ""  else "$" + bean.price
+        holder.mRoot.setOnClickListener {
+            mOnItemClickLitener.onItemClick(it,position)
+        }
     }
 
     class PurchaseHolder(itemView: View) : BaseViewHolder(itemView){

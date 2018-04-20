@@ -1,12 +1,10 @@
 package remix.myplayer.bean.bmob;
 
-import cn.bmob.v3.BmobObject;
-
 /**
  * Created by Remix on 2016/12/1.
  */
 
-public class Feedback extends BmobObject {
+public class Feedback  {
     public String Content;
     public String AppVersion;
     public String AppVersionCode;

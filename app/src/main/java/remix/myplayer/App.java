@@ -71,8 +71,8 @@ public class App extends MultiDexApplication{
             new DynamicShortcutManager(this).setUpShortcut();
 
         //兼容性
-        if(SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"CategoryTemp",true)){
-            SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"CategoryTemp",false);
+        if(SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"CategoryRebuild",true)){
+            SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"CategoryRebuild",false);
             SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,"");
         }
     }
