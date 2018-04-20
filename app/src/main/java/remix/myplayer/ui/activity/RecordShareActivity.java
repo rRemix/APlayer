@@ -17,6 +17,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -42,14 +43,12 @@ import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
-import remix.myplayer.ui.dialog.ShareDialog;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
-import static remix.myplayer.ui.fragment.RecordFragment.REQUEST_SHARE;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
@@ -110,7 +109,7 @@ public class RecordShareActivity extends BaseActivity {
             //处理完成
             case COMPLETE:
                 if(mFile != null)
-                    ToastUtil.show(mContext,R.string.screenshot_save_at,mFile.getAbsoluteFile());
+                    ToastUtil.show(mContext,R.string.screenshot_save_at,mFile.getAbsoluteFile(), Toast.LENGTH_LONG);
                 break;
             //处理错误
             case ERROR:
@@ -226,13 +225,14 @@ public class RecordShareActivity extends BaseActivity {
                 mHandler.sendEmptyMessage(STOP);
 
                 //打开分享的Dialog
-                Intent intent = new Intent(mContext, ShareDialog.class);
-                Bundle arg = new Bundle();
-                arg.putInt("Type", Constants.SHARERECORD);
-                arg.putString("Url",mFile.getAbsolutePath());
-                arg.putParcelable("Song",mInfo);
-                intent.putExtras(arg);
-                startActivityForResult(intent,REQUEST_SHARE);
+//                Intent intent = new Intent(mContext, ShareDialog.class);
+//                Bundle arg = new Bundle();
+//                arg.putInt("Type", Constants.SHARERECORD);
+//                arg.putString("Url",mFile.getAbsolutePath());
+//                arg.putParcelable("Song",mInfo);
+//                intent.putExtras(arg);
+//                startActivityForResult(intent,REQUEST_SHARE);
+                startActivity(Intent.createChooser(Util.createShareImageFileIntent(mFile, mContext), null));
             } catch (Exception e) {
                 Message errMsg = mHandler.obtainMessage(ERROR);
                 errMsg.obj = e.toString();

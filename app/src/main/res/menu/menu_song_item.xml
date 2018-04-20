@@ -9,6 +9,8 @@
             android:id="@+id/menu_add_to_playlist"/>
         <item android:title="@string/set_album_cover"
             android:id="@+id/menu_album_thumb"/>
+        <item android:title="@string/share"
+            android:id="@+id/menu_share"/>
         <item android:title="@string/ring"
             android:id="@+id/menu_ring"/>
         <item android:title="@string/delete"

@@ -17,8 +17,12 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +45,7 @@ import cn.bmob.v3.listener.SaveListener;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.bmob.Error;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.lyric.SearchLrc;
 
 /**
@@ -645,4 +650,42 @@ public class Util {
         return channelNumber;
     }
 
+    @NonNull
+    public static Intent createShareSongFileIntent(@NonNull final Song song, Context context) {
+        try {
+            Parcelable parcelable = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".fileprovider",
+                    new File(song.getUrl()));
+            return new Intent()
+                    .setAction(Intent.ACTION_SEND)
+                    .putExtra(Intent.EXTRA_STREAM,
+                            parcelable)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    .setType("audio/*");
+        } catch (IllegalArgumentException e) {
+            // TODO the path is most likely not like /storage/emulated/0/... but something like /storage/28C7-75B0/...
+            e.printStackTrace();
+            Toast.makeText(context, context.getString(R.string.cant_share_song), Toast.LENGTH_SHORT).show();
+            return new Intent();
+        }
+    }
+
+    @NonNull
+    public static Intent createShareImageFileIntent(@NonNull final File file, Context context) {
+        try {
+            Parcelable parcelable = FileProvider.getUriForFile(context,
+                    context.getApplicationContext().getPackageName() + ".fileprovider",
+                    file);
+            return new Intent()
+                    .setAction(Intent.ACTION_SEND)
+                    .putExtra(Intent.EXTRA_STREAM,
+                            parcelable)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    .setType("image/*");
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            Toast.makeText(context, context.getString(R.string.cant_share_song), Toast.LENGTH_SHORT).show();
+            return new Intent();
+        }
+    }
 }

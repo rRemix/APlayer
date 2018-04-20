@@ -25,6 +25,7 @@ import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
 
@@ -76,6 +77,11 @@ public class SongPopupListener implements PopupMenu.OnMenuItemClickListener {
             case R.id.menu_ring:
                 MobclickAgent.onEvent(mContext,"Ring");
                 MediaStoreUtil.setRing(mContext,mSong.getId());
+                break;
+            case R.id.menu_share:
+                MobclickAgent.onEvent(mContext,"Share");
+                mContext.startActivity(
+                        Intent.createChooser(Util.createShareSongFileIntent(mSong, mContext), null));
                 break;
             case R.id.menu_delete:
                 MobclickAgent.onEvent(mContext,"Delete");
