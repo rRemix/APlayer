@@ -2,7 +2,7 @@ package remix.myplayer.helper
 
 import io.reactivex.Observable
 import org.jetbrains.anko.collections.forEachWithIndex
-import remix.myplayer.APlayerApplication
+import remix.myplayer.App
 import remix.myplayer.R
 import remix.myplayer.request.network.RxUtil
 import remix.myplayer.util.Global
@@ -75,9 +75,9 @@ object M3UHelper {
                 }
                 .compose(RxUtil.applyScheduler())
                 .subscribe({
-                    ToastUtil.show(APlayerApplication.getContext(), APlayerApplication.getContext().getString(R.string.import_playlist_to_count,playlistName,it))
+                    ToastUtil.show(App.getContext(), App.getContext().getString(R.string.import_playlist_to_count,playlistName,it))
                 }, {
-                    ToastUtil.show(APlayerApplication.getContext(),R.string.import_fail,it.toString())
+                    ToastUtil.show(App.getContext(),R.string.import_fail,it.toString())
                 })
     }
 
@@ -108,12 +108,12 @@ object M3UHelper {
                 }
                 .compose(RxUtil.applyScheduler())
                 .doFinally {
-                    ToastUtil.show(APlayerApplication.getContext(),R.string.import_count,count.toString())
+                    ToastUtil.show(App.getContext(),R.string.import_count,count.toString())
                 }
                 .subscribe({
                     count += it
                 }, {
-                    ToastUtil.show(APlayerApplication.getContext(),R.string.import_fail,it.toString())
+                    ToastUtil.show(App.getContext(),R.string.import_fail,it.toString())
                 })
     }
 }

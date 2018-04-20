@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 
 /**
@@ -28,7 +28,7 @@ public class Category implements Serializable{
     }
 
     public String getTitle(){
-        return !TextUtils.isEmpty(mTitle) ? mTitle : APlayerApplication.getContext().getString(mResID);
+        return !TextUtils.isEmpty(mTitle) ? mTitle : App.getContext().getString(mResID);
     }
 
     public int getIndex(){
@@ -51,9 +51,9 @@ public class Category implements Serializable{
     public static final List<Integer> ALL_LIBRARY_RES = Arrays.asList(R.string.tab_song,
             R.string.tab_album,R.string.tab_artist,
             R.string.tab_playlist,R.string.tab_folder);
-    public static final List<String> ALL_LIBRARY_STRING = Arrays.asList(APlayerApplication.getContext().getResources().getString(R.string.tab_song),
-            APlayerApplication.getContext().getResources().getString(R.string.tab_album),APlayerApplication.getContext().getResources().getString(R.string.tab_artist),
-            APlayerApplication.getContext().getResources().getString(R.string.tab_playlist),APlayerApplication.getContext().getResources().getString(R.string.tab_folder));
+    public static final List<String> ALL_LIBRARY_STRING = Arrays.asList(App.getContext().getResources().getString(R.string.tab_song),
+            App.getContext().getResources().getString(R.string.tab_album), App.getContext().getResources().getString(R.string.tab_artist),
+            App.getContext().getResources().getString(R.string.tab_playlist), App.getContext().getResources().getString(R.string.tab_folder));
     public static final List<Category> DEFAULT_LIBRARY = Arrays.asList(
             new Category(R.string.tab_song),
             new Category(R.string.tab_album),

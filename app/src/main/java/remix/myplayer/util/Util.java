@@ -38,7 +38,7 @@ import java.util.Map;
 
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.bmob.Error;
 import remix.myplayer.lyric.SearchLrc;
@@ -178,7 +178,7 @@ public class Util {
     /**
      * 防止修改字体大小
      */
-    public static void setFontSize(APlayerApplication Application) {
+    public static void setFontSize(App Application) {
         Resources resource = Application.getResources();
         Configuration c = resource.getConfiguration();
         c.fontScale = 1.0f;
@@ -521,8 +521,8 @@ public class Util {
             if(!Util.isNetWorkConnected()){
                 return;
             }
-            PackageManager pm = APlayerApplication.getContext().getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
+            PackageManager pm = App.getContext().getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(App.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
             Error error = new Error(title,description,
                     pi.versionName,
                     pi.versionCode + "",
@@ -550,8 +550,8 @@ public class Util {
             if(!Util.isNetWorkConnected()){
                 return;
             }
-            PackageManager pm = APlayerApplication.getContext().getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
+            PackageManager pm = App.getContext().getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(App.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
             Error error = new Error(title,exception.toString(),
                     pi.versionName,
                     pi.versionCode + "",
@@ -630,9 +630,9 @@ public class Util {
         }
         String channelNumber = null;
         try {
-            PackageManager packageManager = APlayerApplication.getContext().getPackageManager();
+            PackageManager packageManager = App.getContext().getPackageManager();
             if (packageManager != null) {
-                ApplicationInfo applicationInfo = packageManager.getApplicationInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_META_DATA);
+                ApplicationInfo applicationInfo = packageManager.getApplicationInfo(App.getContext().getPackageName(), PackageManager.GET_META_DATA);
                 if (applicationInfo != null) {
                     if (applicationInfo.metaData != null) {
                         channelNumber = applicationInfo.metaData.getString(key);

@@ -6,7 +6,7 @@ package remix.myplayer.util;
 
 import com.facebook.common.util.ByteConstants;
 
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 
 /**
@@ -16,11 +16,11 @@ public class Constants {
     //应用包名
     public final static String PACKAGE_NAME = "remix.myplayer";
     //播放队列
-    public final static String PLAY_QUEUE = APlayerApplication.getContext().getString(R.string.play_queue);
+    public final static String PLAY_QUEUE = App.getContext().getString(R.string.play_queue);
     //最近添加
-    public final static String RECENTLY = APlayerApplication.getContext().getString(R.string.recently);
+    public final static String RECENTLY = App.getContext().getString(R.string.recently);
     //我的收藏
-    public final static String MYLOVE = APlayerApplication.getContext().getString(R.string.my_favorite);
+    public final static String MYLOVE = App.getContext().getString(R.string.my_favorite);
 
     //显示模式 1:列表 2:网格
     public final static int LIST_MODEL = 1;

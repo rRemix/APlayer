@@ -26,7 +26,7 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
@@ -56,7 +56,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 public class LockScreenActivity extends BaseActivity implements UpdateHelper.Callback{
     private static final String TAG = "LockScreenActivity";
-    private static final int IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),210);
+    private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(),210);
     //当前播放的歌曲信息
     private Song mInfo;
     //歌曲与艺术家

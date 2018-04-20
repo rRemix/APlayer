@@ -39,7 +39,7 @@ import cn.bmob.v3.update.BmobUpdateAgent;
 import cn.bmob.v3.update.UpdateStatus;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.Category;
 import remix.myplayer.bean.mp3.PlayList;
@@ -65,7 +65,7 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
-import static remix.myplayer.APlayerApplication.IS_GP;
+import static remix.myplayer.App.IS_GP;
 import static remix.myplayer.bean.Category.ALL_LIBRARY_RES;
 import static remix.myplayer.bean.Category.ALL_LIBRARY_STRING;
 
@@ -170,7 +170,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //设置歌词搜索优先级
                             case R.id.setting_lrc_priority_switch:
-                                SPUtil.putValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,isChecked);
+                                SPUtil.putValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,isChecked);
                                 break;
                             //桌面歌词
                             case R.id.setting_lrc_float_switch:

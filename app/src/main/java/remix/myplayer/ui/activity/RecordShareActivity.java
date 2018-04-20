@@ -32,7 +32,7 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.cache.DiskCache;
@@ -60,7 +60,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * 将分享内容与专辑封面进行处理用于分享
  */
 public class RecordShareActivity extends BaseActivity {
-    private static final int IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),268);
+    private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(),268);
 
     @BindView(R.id.recordshare_image)
     SimpleDraweeView mImage;

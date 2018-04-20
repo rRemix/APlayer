@@ -16,7 +16,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.helper.SortOrder;
 import remix.myplayer.theme.Theme;
@@ -125,8 +125,8 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
             //只有主界面显示分割线
             mMultiToolBar.findViewById(R.id.multi_divider).setVisibility(MultiChoiceActivity.this instanceof MainActivity ? View.VISIBLE : View.GONE);
             //第一次长按操作显示提示框
-            if(SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"IsFirstMulti",true)){
-                SPUtil.putValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"IsFirstMulti",false);
+            if(SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"IsFirstMulti",true)){
+                SPUtil.putValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"IsFirstMulti",false);
                 if(mTipPopupWindow == null){
                     mTipPopupWindow = new TipPopupwindow(MultiChoiceActivity.this);
                     mTipPopupWindow.setOnDismissListener(() -> mTipPopupWindow = null);

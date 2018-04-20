@@ -24,7 +24,7 @@ import java.lang.ref.WeakReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.menu.CtrlButtonListener;
@@ -221,7 +221,7 @@ public class BottomActionBarFragment extends BaseFragment{
             LogUtil.e(TAG, "onLongPress");
         }
 
-        private static final int Y_THRESHOLD = DensityUtil.dip2px(APlayerApplication.getContext(),10);
+        private static final int Y_THRESHOLD = DensityUtil.dip2px(App.getContext(),10);
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             LogUtil.e(TAG, "onFling  " + "Y1: " + e1.getY() + " Y2: " + e2.getY());

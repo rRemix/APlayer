@@ -30,7 +30,7 @@ import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.functions.Function;
 import okhttp3.ResponseBody;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.netease.NAlbumSearchResponse;
 import remix.myplayer.bean.netease.NArtistSearchResponse;
@@ -52,13 +52,13 @@ import static remix.myplayer.util.Util.isWifi;
  */
 
 public abstract class ImageUriRequest<T> {
-    public static final int BIG_IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),125);
-    public static final int SMALL_IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),45);
+    public static final int BIG_IMAGE_SIZE = DensityUtil.dip2px(App.getContext(),125);
+    public static final int SMALL_IMAGE_SIZE = DensityUtil.dip2px(App.getContext(),45);
     public static final int URL_PLAYLIST = 1000;
     public static final int URL_ALBUM = 10;
     public static final int URL_ARTIST = 100;
 
-    public static String AUTO_DOWNLOAD_ALBUM = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,APlayerApplication.getContext().getString(R.string.always));
+    public static String AUTO_DOWNLOAD_ALBUM = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, App.getContext().getString(R.string.always));
 
     protected RequestConfig mConfig = DEFAULT_CONFIG;
 
@@ -133,7 +133,7 @@ public abstract class ImageUriRequest<T> {
         return Observable.concat(new Observable<String>() {
             @Override
             protected void subscribeActual(Observer<? super String> observer) {
-                String imageUrl = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getKey(),"");
+                String imageUrl = SPUtil.getValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getKey(),"");
                 if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
                     observer.onNext(imageUrl);
                 }
@@ -164,7 +164,7 @@ public abstract class ImageUriRequest<T> {
             imageUrl = response.getResult().getArtists().get(0).getPicUrl();
         }
         if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
-            SPUtil.putValue(APlayerApplication.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getKey(),imageUrl);
+            SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getKey(),imageUrl);
         }
         return imageUrl;
     }
@@ -188,7 +188,7 @@ public abstract class ImageUriRequest<T> {
                                     protected void onNewResultImpl(Bitmap bitmap) {
                                         Bitmap result = copy(bitmap);
                                         if(result == null) {
-                                            result = BitmapFactory.decodeResource(APlayerApplication.getContext().getResources(), R.drawable.album_empty_bg_day);
+                                            result = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_day);
                                         }
                                         e.onNext(result);
                                         e.onComplete();
@@ -210,7 +210,7 @@ public abstract class ImageUriRequest<T> {
      * @return
      */
     protected boolean isAutoDownloadCover() {
-        Context context = APlayerApplication.getContext();
+        Context context = App.getContext();
         return context.getString(R.string.always).equals(AUTO_DOWNLOAD_ALBUM) || (context.getString(R.string.wifi_only).equals(AUTO_DOWNLOAD_ALBUM) && isWifi(context));
     }
 

@@ -45,7 +45,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.MainPagerAdapter;
@@ -628,7 +628,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      * 更新侧滑菜单
      * @param song
      */
-    private static final int IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),108);
+    private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(),108);
     private void updateHeader(Song song, boolean isPlay) {
         if(song == null)
             return;

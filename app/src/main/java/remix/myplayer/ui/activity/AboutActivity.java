@@ -10,7 +10,7 @@ import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 
 /**
@@ -28,8 +28,8 @@ public class AboutActivity extends ToolbarActivity {
 
         ButterKnife.bind(this);
         try {
-            PackageManager pm = APlayerApplication.getContext().getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
+            PackageManager pm = App.getContext().getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(App.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
             mVersion.setText("v" + pi.versionName);
         }catch (Exception ignored){
 

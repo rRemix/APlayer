@@ -29,7 +29,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.adapter.FloatColorAdapter;
 import remix.myplayer.bean.FloatLrcContent;
@@ -191,7 +191,7 @@ public class FloatLrcView extends RelativeLayout {
     }
 
 
-    private int DEFAULT_COLOR = APlayerApplication.getContext().getResources().getColor(R.color.float_text_color);
+    private int DEFAULT_COLOR = App.getContext().getResources().getColor(R.color.float_text_color);
     public void setText(LrcRow lrc1, LrcRow lrc2) {
         if(lrc1 != null) {
             if(TextUtils.isEmpty(lrc1.getContent()))

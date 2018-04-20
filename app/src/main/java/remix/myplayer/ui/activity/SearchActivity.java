@@ -24,7 +24,7 @@ import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SearchAdapter;
 import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
@@ -175,7 +175,7 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter> {
                         new String[]{"%" + mkey + "%","%" + mkey + "%","%" + mkey + "%"}, null);
 
                 if (cursor != null && cursor.getCount() > 0) {
-                    Set<String> blackList = SPUtil.getStringSet(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.BLACKLIST_SONG);
+                    Set<String> blackList = SPUtil.getStringSet(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.BLACKLIST_SONG);
                     while (cursor.moveToNext()){
                         if(!blackList.contains(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))))
                             songs.add(MediaStoreUtil.getMP3Info(cursor));

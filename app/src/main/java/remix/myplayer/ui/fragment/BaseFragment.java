@@ -8,7 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import com.umeng.analytics.MobclickAgent;
 
 import butterknife.Unbinder;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 
 /**
  * @ClassName
@@ -53,14 +53,14 @@ public abstract class BaseFragment extends Fragment {
         if(isAdded())
             return getString(res);
         else
-            return APlayerApplication.getContext().getString(res);
+            return App.getContext().getString(res);
     }
 
     protected String getStringSafely(@StringRes int res,Object... args){
         if(isAdded())
             return getString(res,args);
         else
-            return APlayerApplication.getContext().getString(res,args);
+            return App.getContext().getString(res,args);
     }
 
 }

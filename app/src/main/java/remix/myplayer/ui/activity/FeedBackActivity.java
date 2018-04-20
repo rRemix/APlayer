@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.bmob.Feedback;
 import remix.myplayer.theme.Theme;
@@ -66,8 +66,8 @@ public class FeedBackActivity extends ToolbarActivity {
             if(TextUtils.isEmpty(content)){
                 return;
             }
-            PackageManager pm = APlayerApplication.getContext().getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
+            PackageManager pm = App.getContext().getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(App.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
             Feedback feedback =  new Feedback(content,
                     contact,
                     pi.versionName,

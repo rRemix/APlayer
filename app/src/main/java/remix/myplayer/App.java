@@ -36,7 +36,7 @@ import remix.myplayer.util.Util;
  * Created by Remix on 16-3-16.
  */
 
-public class APlayerApplication extends MultiDexApplication{
+public class App extends MultiDexApplication{
     private static Context mContext;
 
     //是否是googlePlay版本

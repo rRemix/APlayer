@@ -7,7 +7,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.view.View;
 
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.util.DensityUtil;
 
 /**
@@ -22,7 +22,7 @@ public class BottomBarBehavior extends CoordinatorLayout.Behavior<View> {
 
     public BottomBarBehavior() {
         super();
-        mContext = APlayerApplication.getContext();
+        mContext = App.getContext();
     }
 
     public BottomBarBehavior(Context context, AttributeSet attrs) {

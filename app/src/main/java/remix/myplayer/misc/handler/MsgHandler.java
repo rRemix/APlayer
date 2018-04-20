@@ -6,7 +6,7 @@ import android.os.Message;
 
 import java.lang.reflect.Method;
 
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -41,7 +41,7 @@ public class MsgHandler extends Handler {
         try {
             mMethod.invoke(mFrom, msg);
         } catch (Exception e) {
-            ToastUtil.show(APlayerApplication.getContext(),"调用Method失败:" + e.toString());
+            ToastUtil.show(App.getContext(),"调用Method失败:" + e.toString());
         }
     }
 

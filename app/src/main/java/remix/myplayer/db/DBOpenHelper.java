@@ -5,7 +5,7 @@ import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.util.LogUtil;
 
 /**
@@ -62,7 +62,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     private static DBOpenHelper mInstance;
     public synchronized static DBOpenHelper getInstance(){
         if(mInstance == null)
-            mInstance = new DBOpenHelper(APlayerApplication.getContext());
+            mInstance = new DBOpenHelper(App.getContext());
         return mInstance;
     }
     public DBOpenHelper(Context context){

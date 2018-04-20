@@ -23,7 +23,7 @@ import android.widget.Scroller;
 
 import java.util.List;
 
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.theme.Theme;
@@ -42,9 +42,9 @@ public class LrcView extends View implements ILrcView{
     /**高亮歌词的默认字体大小***/
 //    public static final float DEFAULT_SIZE_FOR_HIGH_LIGHT_LRC = 45;
     /**歌词间默认的行距**/
-    public static final float DEFAULT_PADDING = DensityUtil.dip2px(APlayerApplication.getContext(),10);
+    public static final float DEFAULT_PADDING = DensityUtil.dip2px(App.getContext(),10);
     /** 跨行歌词之间额外的行距*/
-    public static final float DEFAULT_SPACING_PADDING = DensityUtil.dip2px(APlayerApplication.getContext(),5);
+    public static final float DEFAULT_SPACING_PADDING = DensityUtil.dip2px(App.getContext(),5);
     /** 跨行歌词之间行距倍数*/
     public static final float DEFAULT_SPACING_MULTI = 1f;
     /**高亮歌词当前的字体大小***/
@@ -99,7 +99,7 @@ public class LrcView extends View implements ILrcView{
     /** 滑动后TimeLine显示的时间*/
     private static final int DURATION_TIME_LINE = 3000;
     /** 时间线的图标*/
-    private static final Drawable TIMELINE_DRAWABLE = Theme.getDrawable(APlayerApplication.getContext(), R.drawable.icon_lyric_timeline);
+    private static final Drawable TIMELINE_DRAWABLE = Theme.getDrawable(App.getContext(), R.drawable.icon_lyric_timeline);
     /** 初始状态时间线图标所在的位置*/
     private static Rect TIMELINE_DRAWABLE_RECT;
     /**控制文字缩放的因子**/

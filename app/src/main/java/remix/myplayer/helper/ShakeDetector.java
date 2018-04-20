@@ -9,7 +9,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
@@ -48,7 +48,7 @@ public class ShakeDetector extends ContextWrapper implements SensorEventListener
 
     public synchronized static ShakeDetector getInstance(){
         if(mInstance == null){
-            mInstance = new ShakeDetector(APlayerApplication.getContext());
+            mInstance = new ShakeDetector(App.getContext());
         }
         return mInstance;
     }

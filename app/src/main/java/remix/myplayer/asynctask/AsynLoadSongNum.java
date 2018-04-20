@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.widget.TextView;
 
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
@@ -27,7 +27,7 @@ public class AsynLoadSongNum extends AsyncTask<Integer, Integer, Integer> {
 
     @Override
     protected Integer doInBackground(Integer... params) {
-        ContentResolver resolver = APlayerApplication.getContext().getContentResolver();
+        ContentResolver resolver = App.getContext().getContentResolver();
         boolean isAlbum = mType == Constants.ALBUM;
         Cursor cursor = null;
         try {
@@ -54,9 +54,9 @@ public class AsynLoadSongNum extends AsyncTask<Integer, Integer, Integer> {
                 if(mNum.getText() != null) {
                     album = mNum.getText().toString();
                 }
-                mNum.setText(APlayerApplication.getContext().getString(R.string.song_count_2,album,num));
+                mNum.setText(App.getContext().getString(R.string.song_count_2,album,num));
             } else {
-                mNum.setText(APlayerApplication.getContext().getString(R.string.song_count_1,num));
+                mNum.setText(App.getContext().getString(R.string.song_count_1,num));
             }
         }
     }

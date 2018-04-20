@@ -7,7 +7,7 @@ import android.support.annotation.ColorRes;
 import java.util.ArrayList;
 import java.util.List;
 
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.SPUtil;
@@ -45,7 +45,7 @@ public class ThemeStore {
     public static int MATERIAL_COLOR_PRIMARY = R.color.transparent;
     public static int MATERIAL_COLOR_PRIMARY_DARK = R.color.transparent;
 
-    public static boolean IMMERSIVE_MODE = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.IMMERSIVE_MODE,false);
+    public static boolean IMMERSIVE_MODE = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.IMMERSIVE_MODE,false);
 
     /**
      * 当前是否是白天主题
@@ -160,7 +160,7 @@ public class ThemeStore {
      * @param themeColor
      */
     public static void saveThemeColor(int themeColor){
-        SPUtil.putValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"ThemeColor",themeColor);
+        SPUtil.putValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"ThemeColor",themeColor);
     }
 
     /**
@@ -168,7 +168,7 @@ public class ThemeStore {
      * @return
      */
     public static int loadThemeColor(){
-        return SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"ThemeColor",ThemeStore.THEME_BLUE);
+        return SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"ThemeColor",ThemeStore.THEME_BLUE);
     }
 
     /**
@@ -176,7 +176,7 @@ public class ThemeStore {
      * @param mode
      */
     public static void saveThemeMode(int mode){
-        SPUtil.putValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"ThemeMode",mode);
+        SPUtil.putValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"ThemeMode",mode);
     }
 
     /**
@@ -184,7 +184,7 @@ public class ThemeStore {
      * @return
      */
     public static int loadThemeMode(){
-        return SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"ThemeMode",DAY);
+        return SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"ThemeMode",DAY);
     }
 
     @ColorInt

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.reactivex.Observable;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.LrcRequest;
 import remix.myplayer.bean.kugou.KLrcResponse;
@@ -81,12 +81,12 @@ public class SearchLrc {
      * @return 歌词
      */
     public Observable<List<LrcRow>> getLyric(String manualPath,boolean clearCache){
-        int type = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.LYRIC_KEY.LYRIC_NAME,mSong.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE);
+        int type = SPUtil.getValue(App.getContext(),SPUtil.LYRIC_KEY.LYRIC_NAME,mSong.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE);
         Observable<List<LrcRow>> networkObservable = getNetworkObservable(type);
         Observable<List<LrcRow>> localObservable = getLocalObservable();
 
         //根据在线和本地的优先级 确定最后一级
-        boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,false);
+        boolean onlineFirst = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,false);
         Observable<List<LrcRow>> last = Observable.concat(onlineFirst ? networkObservable : localObservable ,onlineFirst ? localObservable : networkObservable).firstOrError().toObservable();
 
         return type == SPUtil.LYRIC_KEY.LYRIC_IGNORE ? Observable.error(new Throwable("Ignore")) :
@@ -265,7 +265,7 @@ public class SearchLrc {
     @Deprecated
     public List<LrcRow> getLrc(String manualPath){
         //判断是否是忽略的歌词
-        Set<String> ignoreLrcId = SPUtil.getStringSet(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"IgnoreLrcID");
+        Set<String> ignoreLrcId = SPUtil.getStringSet(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"IgnoreLrcID");
         if(ignoreLrcId != null && ignoreLrcId.size() > 0){
             for (String id : ignoreLrcId){
                 if((mSong.getId() + "").equals(id)){
@@ -313,7 +313,7 @@ public class SearchLrc {
         //搜索歌词
         try {
             //是否优先搜索在线歌词
-            boolean onlineFirst = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,false);
+            boolean onlineFirst = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,false);
             if(onlineFirst){
                 String onlineLrcContent = getOnlineLrcContent();
                 if(!TextUtils.isEmpty(onlineLrcContent)){
@@ -423,7 +423,7 @@ public class SearchLrc {
      */
     private String getLocalLrcPath() {
         //查找本地目录
-        String searchPath =  SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR,"");
+        String searchPath =  SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR,"");
         if(mSong == null)
             return "";
         if(!TextUtils.isEmpty(searchPath)){
@@ -436,7 +436,7 @@ public class SearchLrc {
             //没有设置歌词路径 搜索所有歌词文件
             Cursor filesCursor = null;
             try {
-                filesCursor = APlayerApplication.getContext().getContentResolver().
+                filesCursor = App.getContext().getContentResolver().
                         query(MediaStore.Files.getContentUri("external"),
                                 null,
                                 MediaStore.Files.FileColumns.DATA + " like ? or " +
@@ -468,7 +468,7 @@ public class SearchLrc {
     private List<String> getAllLocalLrcPath() {
         List<String> results = new ArrayList<>();
         //查找本地目录
-        String searchPath = SPUtil.getValue(APlayerApplication.getContext(), SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "");
+        String searchPath = SPUtil.getValue(App.getContext(), SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCAL_LYRIC_SEARCH_DIR, "");
         if (mSong == null)
             return results;
         if (!TextUtils.isEmpty(searchPath)) {
@@ -482,7 +482,7 @@ public class SearchLrc {
             //没有设置歌词路径 搜索所有歌词文件
             Cursor filesCursor = null;
             try {
-                filesCursor = APlayerApplication.getContext().getContentResolver().
+                filesCursor = App.getContext().getContentResolver().
                         query(MediaStore.Files.getContentUri("external"),
                                 null,
                                 MediaStore.Files.FileColumns.DATA + " like ? or " +
@@ -520,9 +520,9 @@ public class SearchLrc {
     private String getLyricSearchKey(Song song){
         if(song == null)
             return "";
-        boolean isTitleAvailable = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(APlayerApplication.getContext().getString(R.string.unknown_song));
-        boolean isAlbumAvailable = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(APlayerApplication.getContext().getString(R.string.unknown_album));
-        boolean isArtistAvailable = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(APlayerApplication.getContext().getString(R.string.unknown_artist));
+        boolean isTitleAvailable = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(App.getContext().getString(R.string.unknown_song));
+        boolean isAlbumAvailable = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(App.getContext().getString(R.string.unknown_album));
+        boolean isArtistAvailable = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(App.getContext().getString(R.string.unknown_artist));
 
         //歌曲名合法
         if(isTitleAvailable){
