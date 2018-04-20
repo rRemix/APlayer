@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.GravityEnum;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -187,6 +188,19 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 Global.setPlayQueue(list,mContext,intent);
             }
         },1000);
+
+        new MaterialDialog.Builder(this)
+                .title("关于更新")
+                .titleColorAttr(R.attr.text_color_primary)
+                .content("后续版本将不再提供应用内更新的功能\n获取最新版本可前往酷安应用市场")
+                .contentColorAttr(R.attr.text_color_primary)
+                .contentGravity(GravityEnum.START)
+                .positiveText(R.string.confirm)
+                .positiveColorAttr(R.attr.text_color_primary)
+                .backgroundColorAttr(R.attr.background_color_3)
+                .itemsColorAttr(R.attr.text_color_primary)
+                .theme(ThemeStore.getMDDialogTheme())
+                .show();
     }
 
     /**
