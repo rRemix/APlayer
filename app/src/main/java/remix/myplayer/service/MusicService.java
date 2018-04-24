@@ -257,16 +257,15 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mIsServiceStop = false;
 
         if(!mLoadFinished && (mHasPermission = Util.hasPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE}))) {
-            //读取数据
             loadSync();
         }
 
-        String action = commandIntent.getAction();
+        String action = commandIntent != null ? commandIntent.getAction() : "";
         if(TextUtils.isEmpty(action)) {
-            return START_NOT_STICKY;
+            return START_STICKY;
         }
         mPlaybackHandler.postDelayed(() -> handleStartCommandIntent(commandIntent, action),200);
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     private void init() {
