@@ -217,6 +217,7 @@ public class LrcView extends View implements ILrcView{
     private void drawLrcRow(Canvas canvas, TextPaint textPaint, int availableWidth, LrcRow lrcRow) {
         drawText(canvas,textPaint,availableWidth,lrcRow.getContent());
         if(lrcRow.hasTranslate()){
+            mRowY += 20;
             drawText(canvas,textPaint,availableWidth,lrcRow.getTranslate());
         }
         mRowY += mLinePadding;
@@ -230,8 +231,13 @@ public class LrcView extends View implements ILrcView{
      * @param text
      */
     private void drawText(Canvas canvas, TextPaint textPaint, int availableWidth, String text) {
+        //DEFAULT_SPACING_PADDING
         StaticLayout staticLayout = new StaticLayout(text, textPaint, availableWidth,Layout.Alignment.ALIGN_CENTER ,
-                DEFAULT_SPACING_MULTI, -DEFAULT_SPACING_PADDING, true);
+                DEFAULT_SPACING_MULTI, -0, true);
+
+        int height = staticLayout.getHeight();
+        int top = staticLayout.getTopPadding();
+        int bottom = staticLayout.getBottomPadding();
 
         canvas.save();
         canvas.translate(getPaddingLeft(), (mRowY - staticLayout.getHeight() / 2));

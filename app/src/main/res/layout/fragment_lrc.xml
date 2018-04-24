@@ -5,6 +5,7 @@
     android:gravity="center"
     android:paddingBottom="@dimen/d12_size">
     <remix.myplayer.lyric.LrcView
+        android:visibility="gone"
         android:id="@+id/lrc_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,13 +15,13 @@
         android:paddingRight="@dimen/d30_size"
         android:layout_marginTop="@dimen/d8_size"
         android:textColor="@color/day_enable_text_color"/>
-    <!--<android.support.v7.widget.RecyclerView-->
-        <!--android:id="@+id/lrc_recyclerview"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_marginLeft="@dimen/d30_size"-->
-        <!--android:layout_marginRight="@dimen/d30_size"-->
-        <!--android:layout_marginTop="@dimen/d8_size"-->
-        <!--android:overScrollMode="never"-->
-        <!--android:visibility="gone"/>-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/lrc_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/d30_size"
+        android:layout_marginRight="@dimen/d30_size"
+        android:layout_marginTop="@dimen/d8_size"
+        android:overScrollMode="never"
+        android:visibility="visible"/>
 </LinearLayout>

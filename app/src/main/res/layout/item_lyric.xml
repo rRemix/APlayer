@@ -2,15 +2,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/d10_size"
-    android:paddingBottom="@dimen/d10_size">
+    android:paddingTop="@dimen/d8_size"
+    android:paddingBottom="@dimen/d8_size">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/item_content"
         android:textColor="?attr/text_color"
+        android:gravity="center_horizontal"
+        android:layout_centerHorizontal="true" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/item_translation"
+        android:textColor="?attr/text_color"
         android:gravity="center"
-        android:layout_centerInParent="true" />
+        android:layout_below="@id/item_content"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/d1_size"

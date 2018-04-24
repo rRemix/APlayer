@@ -240,7 +240,8 @@ public class SearchLrc {
                                         for(int i = 0 ; i < translate.size();i++){
                                             for(int j = 0 ; j < combine.size();j++){
                                                 if(translate.get(i).getTime() == combine.get(j).getTime()){
-                                                    combine.get(j).setTranslate(translate.get(i).getContent());
+//                                                    combine.get(j).setTranslate(translate.get(i).getContent());
+                                                    combine.get(j).setTranslate(translate.get(i).getContent() + translate.get(i).getContent() + translate.get(i).getContent());
                                                     break;
                                                 }
                                             }
