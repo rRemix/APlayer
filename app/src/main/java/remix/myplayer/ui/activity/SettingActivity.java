@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -212,6 +213,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 break;
                             //断点播放
                             case R.id.setting_breakpoint_switch:
+                                LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(MusicService.ACTION_CMD)
+                                    .putExtra("Control",Constants.PLAY_AT_BREAKPOINT)
+                                    .putExtra(SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT,view.isChecked()));
                                 break;
                         }
                         SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,keyWord[index],isChecked);

@@ -83,7 +83,7 @@ public class SearchLrc {
     public Observable<List<LrcRow>> getLyric(String manualPath,boolean clearCache){
         int type = SPUtil.getValue(App.getContext(),SPUtil.LYRIC_KEY.LYRIC_NAME,mSong.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE);
         Observable<List<LrcRow>> networkObservable = getNetworkObservable(type);
-        Observable<List<LrcRow>> localObservable = getLocalObservable();
+        Observable<List<LrcRow>> localObservable = getLocalObservable(type);
 
         //根据在线和本地的优先级 确定最后一级
         boolean onlineFirst = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,false);
@@ -150,50 +150,53 @@ public class SearchLrc {
     /**
      * 本地歌词
      * @return
+     * @param type
      */
-    private Observable<List<LrcRow>> getLocalObservable() {
-        return Observable.create(e -> {
-            List<String> localPaths = getAllLocalLrcPath();
-            if(localPaths.size() > 0) {
-                if(localPaths.size()==1) {
-                    String localPath = localPaths.get(0);
-                    e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist()));
-                }else{
-                    String localPath = localPaths.get(0);
-                    String translatePath=null;
-                    for (String path : localPaths) {
-                        if(path.contains("translate")&&!path.equals(localPath)){
-                            translatePath=path;
-                            break;
-                        }
-                    }
-                    if(translatePath==null){
-                        e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist()));
-                    }else{
-                        //合并歌词
-                        List<LrcRow> source = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist());
-                        List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(translatePath))),false,mSong.getTitle(),mSong.getArtist() + "/translate");
-                        if(translate != null && translate.size() > 0) {
-                            int j = 0;
-                            for (int i = 0; i < source.size(); ) {
-                                boolean match = Math.abs(translate.get(j).getTime() - source.get(i).getTime()) < 1000;
-                                if (match) {
-                                    source.get(i).setTranslate(translate.get(j).getContent());
-                                    i++;
-                                } else if(translate.get(j).getTime()>source.get(i).getTime()){
-                                    i++;
-                                } else {
-                                    j++;
+    private Observable<List<LrcRow>> getLocalObservable(int type) {
+        return type == SPUtil.LYRIC_KEY.LYRIC_NETEASE || type == SPUtil.LYRIC_KEY.LYRIC_KUGOU ?
+                Observable.empty() :
+                Observable.create(e -> {
+                    List<String> localPaths = getAllLocalLrcPath();
+                    if(localPaths.size() > 0) {
+                        if(localPaths.size() == 1) {
+                            String localPath = localPaths.get(0);
+                            e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist()));
+                        }else{
+                            String localPath = localPaths.get(0);
+                            String translatePath=null;
+                            for (String path : localPaths) {
+                                if(path.contains("translate")&&!path.equals(localPath)){
+                                    translatePath=path;
+                                    break;
                                 }
                             }
-                            mLrcParser.saveLrcRows(source,mKey);
-                            e.onNext(source);
+                            if(translatePath==null){
+                                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist()));
+                            }else{
+                                //合并歌词
+                                List<LrcRow> source = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist());
+                                List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(translatePath))),false,mSong.getTitle(),mSong.getArtist() + "/translate");
+                                if(translate != null && translate.size() > 0) {
+                                    int j = 0;
+                                    for (int i = 0; i < source.size(); ) {
+                                        boolean match = Math.abs(translate.get(j).getTime() - source.get(i).getTime()) < 1000;
+                                        if (match) {
+                                            source.get(i).setTranslate(translate.get(j).getContent());
+                                            i++;
+                                        } else if(translate.get(j).getTime()>source.get(i).getTime()){
+                                            i++;
+                                        } else {
+                                            j++;
+                                        }
+                                    }
+                                    mLrcParser.saveLrcRows(source,mKey);
+                                    e.onNext(source);
+                                }
+                            }
                         }
                     }
-                }
-            }
-            e.onComplete();
-        });
+                    e.onComplete();
+                });
     }
 
 

@@ -53,6 +53,7 @@ public class Constants {
     public final static int CLOSE_NOTIFY = 12;
     public final static int ADD_TO_NEXT_SONG = 13;
     public final static int CHANGE_LYRIC = 14;
+    public final static int PLAY_AT_BREAKPOINT = 15;
     //播放模式
     public final static int PLAY_LOOP = 50;
     public final static int PLAY_SHUFFLE = 51;

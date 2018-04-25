@@ -200,6 +200,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     /** 退出时播放的进度*/
     private int mLastProgress;
 
+    /** 是否开启断点播放*/
+    private boolean mPlayAtBreakPoint;
+
     private MediaStoreObserver mMediaStoreObserver;
     private DBObserver mPlayListObserver;
     private DBObserver mPlayListSongObserver;
@@ -901,10 +904,15 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     }
                     ToastUtil.show(mContext,R.string.already_add_to_next_song);
                     break;
+                //改变歌词源
                 case Constants.CHANGE_LYRIC:
                     if(mShowFloatLrc){
                         updateFloatLrc(true);
                     }
+                    break;
+                //断点播放
+                case Constants.PLAY_AT_BREAKPOINT:
+                    mPlayAtBreakPoint = intent.getBooleanExtra(SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT,false);
                     break;
                 default:break;
             }
@@ -1341,7 +1349,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         }
 
         Song item;
-        mLastProgress = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,0);
+        mPlayAtBreakPoint = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT,false);
+        mLastProgress = mPlayAtBreakPoint ?
+                SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,0) :
+                0;
         //上次退出时保存的正在播放的歌曲未失效
         if(isLastSongExist && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
             setUpDataSource(item,pos);
@@ -1733,7 +1744,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(mAppWidgetBig != null)
                 mAppWidgetBig.updateWidget(mContext,null,false);
             final int progress = getProgress();
-            if(progress > 0)
+            if(progress > 0 && mPlayAtBreakPoint)
                 SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,progress);
         }
     }
