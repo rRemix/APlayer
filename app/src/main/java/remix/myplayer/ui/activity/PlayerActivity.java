@@ -844,7 +844,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             //更新顶部信息
             updateTopStatus(mInfo);
             //更新歌词
-            mHandler.postDelayed(() -> ((LyricFragment) mAdapter.getItem(2)).updateLrc(mInfo),mFistStart ? 100 : 0);
+            if(!mFistStart){
+                ((LyricFragment) mAdapter.getItem(2)).updateLrc(mInfo);
+            }
             //更新进度条
             int temp = MusicService.getProgress();
             mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;

@@ -151,6 +151,8 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     private float mDistance;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if(mView == null)
+            return true;
         int action = event.getAction();
         switch (action){
             case MotionEvent.ACTION_DOWN:
@@ -284,7 +286,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
 
             @Override
             public void load() {
-                getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(mInfo))
+                mDisposable = getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(mInfo))
                         .compose(RxUtil.applySchedulerToIO())
                         .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
                             mRawBitMap = bitmap;
@@ -297,11 +299,12 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                             processBitmap(e);
                         }))
                         .observeOn(AndroidSchedulers.mainThread())
-                        .doOnSubscribe(disposable -> mDisposable = disposable)
                         .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
             }
 
             private void processBitmap(ObservableEmitter<Palette.Swatch> e) {
+                if(isFinishing())
+                    return;
                 StackBlurManager stackBlurManager = new StackBlurManager(mRawBitMap);
                 mNewBitMap = stackBlurManager.processNatively(40);
                 Palette palette = Palette.from(mRawBitMap).generate();

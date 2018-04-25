@@ -51,6 +51,7 @@ public class LyricFragment extends BaseFragment {
             mOnFindListener.onViewInflateFinish(mLrcView);
         mInfo = getArguments().getParcelable("Song");
 
+        updateLrc(mInfo);
         return rootView;
     }
 

@@ -566,6 +566,8 @@ public class MediaStoreUtil {
         ArrayList<Song> list = new ArrayList<>();
         try {
             List<Integer> ids = Global.FolderMap.get(folderName);
+            if(ids == null || ids.size() == 0)
+                return list;
             StringBuilder selection = new StringBuilder(127);
             selection.append(MediaStore.Audio.Media._ID + " in (");
             for(int i = 0 ; i < ids.size();i++){

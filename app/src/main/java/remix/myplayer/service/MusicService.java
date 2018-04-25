@@ -1205,12 +1205,13 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         try {
             mMediaExtractor = new MediaExtractor();
             mMediaExtractor.setDataSource(mCurrentSong.getUrl());
+            return mMediaExtractor.getTrackFormat(0);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        return mMediaExtractor.getTrackFormat(0);
+        return null;
     }
 
     /**
@@ -1246,8 +1247,12 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * @return
      */
     public static int getProgress() {
-        if(getMediaPlayer() != null && mIsInitialized)
-            return getMediaPlayer().getCurrentPosition();
+        try {
+            if(getMediaPlayer() != null && mIsInitialized)
+                return getMediaPlayer().getCurrentPosition();
+        } catch (IllegalStateException e){
+            LogUtil.d(TAG,"getProgress Error: " + e);
+        }
         return 0;
     }
 
