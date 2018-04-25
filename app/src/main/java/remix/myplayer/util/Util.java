@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mozilla.universalchardet.UniversalDetector;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -474,7 +475,7 @@ public class Util {
             String fileName = file.getName().indexOf('.') > 0 ?
                     file.getName().substring(0,file.getName().lastIndexOf('.')) : file.getName();
             //判断歌词文件名与歌曲文件名是否一致
-            if(fileName.toUpperCase().startsWith(displayName.toUpperCase())) {
+            if(fileName.equalsIgnoreCase(displayName.toUpperCase())) {
                 return true;
             }
             //判断是否包含歌手名和歌曲名
@@ -625,5 +626,35 @@ public class Util {
             Toast.makeText(context, context.getString(R.string.cant_share_song), Toast.LENGTH_SHORT).show();
             return new Intent();
         }
+    }
+
+    public static String getCharset(final String filePath){
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(filePath);
+            byte[] buf = new byte[1024];
+            UniversalDetector detector = new UniversalDetector(null);
+            int hasRead;
+            while ((hasRead = fileInputStream.read(buf)) > 0 && !detector.isDone()) {
+                detector.handleData(buf, 0, hasRead);
+            }
+            detector.dataEnd();
+            String encoding = detector.getDetectedCharset();
+            detector.reset();
+            fileInputStream.close();
+            return !TextUtils.isEmpty(encoding) ? encoding : "UTF-8";
+        } catch (IOException e){
+            e.printStackTrace();
+        } finally {
+            if(fileInputStream != null) {
+                try {
+                    fileInputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return "UTF-8";
     }
 }

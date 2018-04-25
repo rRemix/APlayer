@@ -105,6 +105,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     TextView mLockScreenTip;
     @BindView(R.id.setting_immersive_switch)
     SwitchCompat mImmersiveSwitch;
+    @BindView(R.id.setting_breakpoint_switch)
+    SwitchCompat mBreakpointSwitch;
 
     //是否需要重建activity
     private boolean mNeedRecreate = false;
@@ -141,9 +143,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         //导航栏是否变色 是否启用摇一摇切歌
         final String[] keyWord = new String[]{SPUtil.SETTING_KEY.COLOR_NAVIGATION, SPUtil.SETTING_KEY.SHAKE, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,
-                SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, SPUtil.SETTING_KEY.IMMERSIVE_MODE};
+                SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, SPUtil.SETTING_KEY.IMMERSIVE_MODE,
+                SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT};
         ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch,mFloatLrcSwitch,
-                mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch}, new ButterKnife.Action<SwitchCompat>() {
+                mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch,mBreakpointSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
                 view.setChecked(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,keyWord[index],false));
@@ -207,8 +210,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 mNeedRecreate = true;
                                 mHandler.sendEmptyMessage(RECREATE);
                                 break;
+                            //断点播放
+                            case R.id.setting_breakpoint_switch:
+                                break;
                         }
-                        SPUtil.putValue(SettingActivity.this,SPUtil.SETTING_KEY.SETTING_NAME,keyWord[index],isChecked);
+                        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,keyWord[index],isChecked);
                     }
                 });
             }
@@ -345,7 +351,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_feedback_container,R.id.setting_about_container, R.id.setting_update_container,
             R.id.setting_lockscreen_container,R.id.setting_lrc_priority_container,R.id.setting_lrc_float_container,
             R.id.setting_navigation_container,R.id.setting_shake_container, R.id.setting_eq_container,
-            R.id.setting_lrc_path_container,R.id.setting_clear_container,
+            R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_breakpoint_container,
             R.id.setting_screen_container,R.id.setting_scan_container,R.id.setting_classic_notify_container,
             R.id.setting_album_cover_container,R.id.setting_library_category_container,R.id.setting_immersive_container,
             R.id.setting_import_playlist_container})
@@ -668,6 +674,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .itemsColorAttr(R.attr.text_color_primary)
                         .theme(ThemeStore.getMDDialogTheme())
                         .show();
+                break;
+            //断点播放
+            case R.id.setting_breakpoint_container:
+                mBreakpointSwitch.setChecked(!mBreakpointSwitch.isChecked());
                 break;
         }
     }

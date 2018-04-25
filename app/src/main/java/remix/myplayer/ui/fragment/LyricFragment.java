@@ -3,28 +3,18 @@ package remix.myplayer.ui.fragment;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
-import remix.myplayer.adapter.LyricAdapter;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnInflateFinishListener;
 import remix.myplayer.lyric.LrcView;
 import remix.myplayer.lyric.SearchLrc;
-import remix.myplayer.lyric.bean.LrcRow;
-import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2015/12/2.
@@ -38,11 +28,6 @@ public class LyricFragment extends BaseFragment {
     private Song mInfo;
     @BindView(R.id.lrc_view)
     LrcView mLrcView;
-    @BindView(R.id.lrc_recyclerview)
-    RecyclerView mLyricRecyclerView;
-    private LyricAdapter mLyricAdapter;
-    //歌词
-    private List<LrcRow> mLrcList;
 
     private Disposable mDisposable;
 
@@ -66,16 +51,6 @@ public class LyricFragment extends BaseFragment {
             mOnFindListener.onViewInflateFinish(mLrcView);
         mInfo = getArguments().getParcelable("Song");
 
-        mLyricRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mLyricAdapter = new LyricAdapter(mContext,R.layout.item_lyric,mLyricRecyclerView);
-        mLyricRecyclerView.setAdapter(mLyricAdapter);
-
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                LogUtil.d("LyricScroll","ScrollY: " + mLyricRecyclerView.getScrollY());
-            }
-        },3000,1000);
         return rootView;
     }
 
@@ -85,7 +60,6 @@ public class LyricFragment extends BaseFragment {
         if(mDisposable != null && !mDisposable.isDisposed()){
             mDisposable.dispose();
         }
-        mLyricRecyclerView.stopScroll();
     }
 
     public void updateLrc(Song song){
@@ -101,7 +75,6 @@ public class LyricFragment extends BaseFragment {
         getLrc(lrcPath,true);
     }
 
-    final LrcRow BLANK = new LrcRow("00:00",0," ");
     @SuppressLint("CheckResult")
     private void getLrc(String manualPath, boolean clearCache) {
         if (mInfo == null) {
@@ -117,26 +90,15 @@ public class LyricFragment extends BaseFragment {
                 })
                 .subscribe(lrcRows -> {
                     if (id == mInfo.getId()) {
-                        mLrcList = lrcRows;
-                        if (mLrcList == null || mLrcList.size() == 0) {
+                        if (lrcRows == null || lrcRows.size() == 0) {
                             mLrcView.setText(getStringSafely(R.string.no_lrc));
                             return;
                         }
-//                        mLrcView.setLrcRows(mLrcList);
-                        //添加空白
-                        for(int i = 0 ; i < 4;i++){
-                            mLrcList.add(0,BLANK);
-                        }
-                        //末尾
-                        for(int i = 0 ; i < 4;i++){
-                            mLrcList.add(BLANK);
-                        }
-                        mLyricAdapter.setData(mLrcList);
-                        mLyricAdapter.notifyDataSetChanged();
+                        mLrcView.setLrcRows(lrcRows);
                     }
                 }, throwable -> {
                     if (id == mInfo.getId()) {
-                        mLrcList = new ArrayList<>();
+                        mLrcView.setLrcRows(null);
                         mLrcView.setText(getStringSafely(R.string.no_lrc));
                     }
                 });

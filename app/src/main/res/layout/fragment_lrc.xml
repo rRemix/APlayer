@@ -5,7 +5,7 @@
     android:gravity="center"
     android:paddingBottom="@dimen/d12_size">
     <remix.myplayer.lyric.LrcView
-        android:visibility="gone"
+        android:visibility="visible"
         android:id="@+id/lrc_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,5 +23,5 @@
         android:layout_marginRight="@dimen/d30_size"
         android:layout_marginTop="@dimen/d8_size"
         android:overScrollMode="never"
-        android:visibility="visible"/>
+        android:visibility="gone"/>
 </LinearLayout>

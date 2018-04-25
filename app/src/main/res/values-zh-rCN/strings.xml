@@ -304,4 +304,6 @@
     <string name="alipay">支付宝</string>
     <string name="cant_share_song">无法分享歌曲</string>
     <string name="save_wechat_qrcode_success">已保存微信二维码,请打开微信识别该二维码</string>
+    <string name="play_breakpoint">断点播放</string>
+    <string name="play_breakpoint_tip">再次打开软件时将从断点处开始播放</string>
 </resources>

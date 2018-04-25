@@ -28,6 +28,7 @@ import remix.myplayer.R;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2018/1/3.
@@ -36,7 +37,8 @@ import remix.myplayer.util.DensityUtil;
 public class LrcView extends View implements ILrcView{
     /**所有的歌词***/
     private List<LrcRow> mLrcRows;
-
+    /** 所有歌词总计高度*/
+    private int mTotalHeight;
     /**画高亮歌词的画笔***/
     private TextPaint mPaintForHighLightLrc;
     /**高亮歌词的默认字体大小***/
@@ -44,7 +46,7 @@ public class LrcView extends View implements ILrcView{
     /**歌词间默认的行距**/
     public static final float DEFAULT_PADDING = DensityUtil.dip2px(App.getContext(),10);
     /** 跨行歌词之间额外的行距*/
-    public static final float DEFAULT_SPACING_PADDING = DensityUtil.dip2px(App.getContext(),5);
+    public static final float DEFAULT_SPACING_PADDING = 0/** DensityUtil.dip2px(App.getContext(),5)*/;
     /** 跨行歌词之间行距倍数*/
     public static final float DEFAULT_SPACING_MULTI = 1f;
     /**高亮歌词当前的字体大小***/
@@ -182,9 +184,6 @@ public class LrcView extends View implements ILrcView{
             if(i == mCurRow){   //画高亮歌词
                 drawLrcRow(canvas,mPaintForHighLightLrc,availableWidth,mLrcRows.get(i));
             }else{  //普通歌词
-                //计算歌词透明度
-//                int alpha = (int)(0xff /  Math.pow(Math.abs(i - mCurRow),1.2f));
-//                mPaintForOtherLrc.setAlpha(alpha);
                 drawLrcRow(canvas,mPaintForOtherLrc, availableWidth, mLrcRows.get(i));
             }
         }
@@ -196,7 +195,8 @@ public class LrcView extends View implements ILrcView{
 //                    0;
 //            float y = getHeight() / 2 + getScrollY() + timeLineOffsetY ;
             float y = getHeight() / 2 + getScrollY() + DEFAULT_SPACING_PADDING;
-            canvas.drawText(mLrcRows.get(mCurRow).getTimeStr(), TIMELINE_DRAWABLE.getIntrinsicWidth() + 5, y - 10, mPaintForTimeLine);
+
+            canvas.drawText(mLrcRows.get(mCurRow).getTimeStr(), getWidth() - mPaintForTimeLine.measureText(mLrcRows.get(mCurRow).getTimeStr()) - 5, y - 10, mPaintForTimeLine);
             canvas.drawLine(TIMELINE_DRAWABLE.getIntrinsicWidth() + 10, y, getWidth(), y, mPaintForTimeLine);
             TIMELINE_DRAWABLE.setBounds(0,
                     (int)y - TIMELINE_DRAWABLE.getIntrinsicHeight() / 2,
@@ -217,7 +217,7 @@ public class LrcView extends View implements ILrcView{
     private void drawLrcRow(Canvas canvas, TextPaint textPaint, int availableWidth, LrcRow lrcRow) {
         drawText(canvas,textPaint,availableWidth,lrcRow.getContent());
         if(lrcRow.hasTranslate()){
-            mRowY += 20;
+//            mRowY += DEFAULT_SPACING_PADDING;
             drawText(canvas,textPaint,availableWidth,lrcRow.getTranslate());
         }
         mRowY += mLinePadding;
@@ -231,16 +231,11 @@ public class LrcView extends View implements ILrcView{
      * @param text
      */
     private void drawText(Canvas canvas, TextPaint textPaint, int availableWidth, String text) {
-        //DEFAULT_SPACING_PADDING
         StaticLayout staticLayout = new StaticLayout(text, textPaint, availableWidth,Layout.Alignment.ALIGN_CENTER ,
-                DEFAULT_SPACING_MULTI, -0, true);
-
-        int height = staticLayout.getHeight();
-        int top = staticLayout.getTopPadding();
-        int bottom = staticLayout.getBottomPadding();
-
+                DEFAULT_SPACING_MULTI, 0, true);
+        final int extra = staticLayout.getLineCount() > 1 ? DensityUtil.dip2px(getContext(),10) : 0;
         canvas.save();
-        canvas.translate(getPaddingLeft(), (mRowY - staticLayout.getHeight() / 2));
+        canvas.translate(getPaddingLeft(), mRowY - staticLayout.getHeight() / 2 + extra);
         staticLayout.draw(canvas);
         canvas.restore();
         mRowY += staticLayout.getHeight();
@@ -321,13 +316,14 @@ public class LrcView extends View implements ILrcView{
                         mTimeLineWaiting = false;
                         mHandler.removeCallbacks(mLongPressRunnable);
                         float offset = event.getRawY() - mLastY;//偏移量
+                        LogUtil.d("onTouchEvent","scrollY: " + getScrollY() + " offset: " + offset);
                         if(getScrollY() - offset < 0){
                             if(offset > 0){
-                                offset = offset / 3;
+//                                offset = offset / 3;
                             }
-                        }else if(getScrollY() - offset > mLrcRows.size() * (mSizeForOtherLrc + mLinePadding) - mLinePadding){
+                        }else if(getScrollY() - offset > mTotalHeight){
                             if(offset < 0 ){
-                                offset = offset / 3;
+//                                offset = offset / 3;
                             }
                         }
                         scrollBy(getScrollX(), -(int)offset);
@@ -402,6 +398,7 @@ public class LrcView extends View implements ILrcView{
                     lrcRow.setTranslateHeight(getSingleLineHeight(lrcRow.getTranslate()));
                 }
                 lrcRow.setTotalHeight(lrcRow.getTranslateHeight() + lrcRow.getContentHeight());
+                mTotalHeight += lrcRow.getTotalHeight();
             }
         }
         invalidate();

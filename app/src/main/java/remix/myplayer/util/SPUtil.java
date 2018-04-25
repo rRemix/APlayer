@@ -72,6 +72,7 @@ public class SPUtil {
 
     public static class LYRIC_KEY{
         public static final String LYRIC_NAME = "Lyric";
+        public static final int LYRIC_DEFAULT = 0;
         public static final int LYRIC_IGNORE = 1;
         public static final int LYRIC_NETEASE = 2;
         public static final int LYRIC_KUGOU = 3;
@@ -147,6 +148,8 @@ public class SPUtil {
         public static final String PLAY_MODEL = "play_model";
         //经典通知栏背景是否是系统背景色
         public static final String NOTIFY_SYSTEM_COLOR = "notify_system_color";
+        //断点播放
+        public static final String PLAY_AT_BREAKPOINT = "play_at_breakpoint";
     }
 
 }

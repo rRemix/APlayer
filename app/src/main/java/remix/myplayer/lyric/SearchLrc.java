@@ -119,7 +119,10 @@ public class SearchLrc {
         return Observable.create(e -> {
             //手动设置的歌词
             if(!TextUtils.isEmpty(manualPath)){
-                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(manualPath))),true, mSong.getTitle(),mSong.getArtist()));
+                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(manualPath),Util.getCharset(manualPath))),
+                        true,
+                        mSong.getTitle(),
+                        mSong.getArtist()));
             }
             e.onComplete();
         });
@@ -151,7 +154,7 @@ public class SearchLrc {
     private Observable<List<LrcRow>> getLocalObservable() {
         return Observable.create(e -> {
             List<String> localPaths = getAllLocalLrcPath();
-            if(localPaths.size()>0) {
+            if(localPaths.size() > 0) {
                 if(localPaths.size()==1) {
                     String localPath = localPaths.get(0);
                     e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist()));
@@ -240,8 +243,7 @@ public class SearchLrc {
                                         for(int i = 0 ; i < translate.size();i++){
                                             for(int j = 0 ; j < combine.size();j++){
                                                 if(translate.get(i).getTime() == combine.get(j).getTime()){
-//                                                    combine.get(j).setTranslate(translate.get(i).getContent());
-                                                    combine.get(j).setTranslate(translate.get(i).getContent() + translate.get(i).getContent() + translate.get(i).getContent());
+                                                    combine.get(j).setTranslate(translate.get(i).getContent());
                                                     break;
                                                 }
                                             }

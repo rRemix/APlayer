@@ -417,7 +417,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * @param item
      * @param pos
      */
-    public void initDataSource(Song item, int pos){
+    public void setUpDataSource(Song item, int pos){
         if(item == null)
             return;
         //初始化当前播放歌曲
@@ -450,7 +450,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             mNextIndex = mPlayModel != Constants.PLAY_SHUFFLE ?  Global.PlayQueue.indexOf(mNextId) : mRandomList.indexOf(mNextId);
             mNextSong = MediaStoreUtil.getMP3InfoById(mNextId);
             if(mNextSong != null){
-                mLastProgress = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,0);
                 return;
             }
             updateNextSong();
@@ -1021,7 +1020,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(isPlay()){
                 pause(true);
             }
-            LogUtil.d("initDataSource","prepare");
+            LogUtil.d("setUpDataSource","prepare");
             mIsInitialized = false;
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(path);
@@ -1311,7 +1310,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.SHAKE,false)){
             ShakeDetector.getInstance().beginListen();
         }
-        setUpLastSong();
+        restoreLastSong();
         mLoadFinished = true;
         sendBroadcast(new Intent(ACTION_LOAD_FINISH));
     }
@@ -1321,7 +1320,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 初始化上一次退出时时正在播放的歌曲
      * @return
      */
-    private void setUpLastSong() {
+    private void restoreLastSong() {
         if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
             return ;
         //读取上次退出时正在播放的歌曲的id
@@ -1342,10 +1341,13 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         }
 
         Song item;
+        mLastProgress = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,0);
         //上次退出时保存的正在播放的歌曲未失效
         if(isLastSongExist && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
-            initDataSource(item,pos);
+            setUpDataSource(item,pos);
         }else {
+            mLastProgress = 0;
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,0);
             //重新找到一个歌曲id
             int id =  Global.PlayQueue.get(0);
             for(int i = 0; i < Global.PlayQueue.size() ; i++){
@@ -1355,7 +1357,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             }
             item = MediaStoreUtil.getMP3InfoById(id);
             SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_SONG_ID,id);
-            initDataSource(item,0);
+            setUpDataSource(item,0);
         }
     }
 
