@@ -81,7 +81,7 @@ public class SearchLrc {
      * @return 歌词
      */
     public Observable<List<LrcRow>> getLyric(String manualPath,boolean clearCache){
-        int type = SPUtil.getValue(App.getContext(),SPUtil.LYRIC_KEY.LYRIC_NAME,mSong.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE);
+        int type = SPUtil.getValue(App.getContext(),SPUtil.LYRIC_KEY.LYRIC_NAME,mSong.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT);
         Observable<List<LrcRow>> networkObservable = getNetworkObservable(type);
         Observable<List<LrcRow>> localObservable = getLocalObservable(type);
 
@@ -213,6 +213,8 @@ public class SearchLrc {
         if(TextUtils.isEmpty(key)){
             return Observable.error(new Throwable("no available key"));
         }
+        if(type == SPUtil.LYRIC_KEY.LYRIC_DEFAULT)
+            type = SPUtil.LYRIC_KEY.LYRIC_NETEASE;
         if(type == SPUtil.LYRIC_KEY.LYRIC_KUGOU){
             //酷狗歌词
             return HttpClient.getKuGouApiservice().getKuGouSearch(1,"yes","pc",key,mSong.getDuration(),"")

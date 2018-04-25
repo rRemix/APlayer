@@ -104,7 +104,7 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
         MobclickAgent.onEvent(mActivity,item.getItemId() == R.id.menu_edit ? "SongEdit" : "SongDetail" );
         switch (item.getItemId()){
             case R.id.menu_lyric:
-                final boolean alreadyIgnore = SPUtil.getValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
+                final boolean alreadyIgnore = SPUtil.getValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
                 final LyricFragment lyricFragment = mActivity.getLyricFragment();
                 new MaterialDialog.Builder(mActivity)
                         .items(getString(R.string.netease), getString(R.string.kugou), getString(R.string.select_lrc), getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc))
@@ -139,7 +139,7 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                                                         lyricFragment.updateLrc(mInfo);
                                                     }
                                                 } else {//取消忽略
-                                                    SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE);
+                                                    SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_DEFAULT);
                                                     lyricFragment.updateLrc(mInfo);
                                                 }
                                             })

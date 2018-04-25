@@ -225,6 +225,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
             mNewBitMap.recycle();
     }
 
+    private int flag ;
     @Override
     public void UpdateUI(Song Song, boolean isplay) {
         mInfo = Song;
@@ -303,8 +304,10 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
             }
 
             private void processBitmap(ObservableEmitter<Palette.Swatch> e) {
-                if(isFinishing())
+                if(isFinishing()){
+                    e.onComplete();
                     return;
+                }
                 StackBlurManager stackBlurManager = new StackBlurManager(mRawBitMap);
                 mNewBitMap = stackBlurManager.processNatively(40);
                 Palette palette = Palette.from(mRawBitMap).generate();
@@ -315,7 +318,6 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                 e.onComplete();
             }
         }.load();
-
     }
 
 }
