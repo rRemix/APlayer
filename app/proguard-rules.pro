@@ -200,3 +200,5 @@ public static final int *;
 #kotlin
 -dontwarn kotlin.**
 
+#jaudiotagger
+-keep class org.jaudiotagger.** { *; }

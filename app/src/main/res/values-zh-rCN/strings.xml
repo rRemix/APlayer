@@ -306,4 +306,5 @@
     <string name="save_wechat_qrcode_success">已保存微信二维码,请打开微信识别该二维码</string>
     <string name="play_breakpoint">断点播放</string>
     <string name="play_breakpoint_tip">再次打开软件时将从断点处开始播放</string>
+    <string name="please_input_track_number">请输入音轨号</string>
 </resources>

@@ -9,8 +9,6 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.media.AudioManager;
-import android.media.MediaExtractor;
-import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.media.session.PlaybackState;
@@ -31,7 +29,6 @@ import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -123,9 +120,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private static int mNextId = -1;
     /** 下一首播放的mp3 */
     private static Song mNextSong = null;
-
-    /** MediaExtractor 获得码率等信息 */
-    private static MediaExtractor mMediaExtractor;
 
     /** MediaPlayer 负责歌曲的播放等 */
     private MediaPlayer mMediaPlayer;
@@ -342,9 +336,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         setUpMediaPlayer();
         setUpMediaSession();
 
-        //初始化MediaExtractor
-        mMediaExtractor = new MediaExtractor();
-
         //初始化音效设置
         Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mMediaPlayer.getAudioSessionId());
@@ -480,9 +471,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         removeFloatLrc();
         if(mUpdateFloatLrcThread != null)
             mUpdateFloatLrcThread.quitImmediately();
-
-        if(mMediaExtractor != null)
-            mMediaExtractor.release();
 
         mUpdateUIHandler.removeCallbacksAndMessages(null);
         mShowFloatLrc = false;
@@ -1197,49 +1185,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      */
     public static Song getNextMP3(){
         return mNextSong;
-    }
-
-    public static MediaFormat getMediaFormat(){
-        if(mCurrentSong == null)
-            return null;
-        try {
-            mMediaExtractor = new MediaExtractor();
-            mMediaExtractor.setDataSource(mCurrentSong.getUrl());
-            return mMediaExtractor.getTrackFormat(0);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    /**
-     * 获得歌曲码率信息
-     * @return type 0:码率 1:采样率 2:格式
-     */
-    public static String getRateInfo(int type){
-        MediaFormat mf = getMediaFormat();
-        if(mf == null)
-            return "";
-        switch (type){
-            case Constants.BIT_RATE:
-                if(mf.containsKey(MediaFormat.KEY_BIT_RATE)){
-                    return mf.getInteger(MediaFormat.KEY_BIT_RATE) / 1024 + "";
-                } else {
-                    long durationUs = mf.containsKey(MediaFormat.KEY_DURATION) ? mf.getLong(MediaFormat.KEY_DURATION) : mCurrentSong.getDuration();
-                    return mCurrentSong.getSize() * 8 / (durationUs / 1024) + "";
-                }
-            case Constants.SAMPLE_RATE:
-                return mf.containsKey(MediaFormat.KEY_SAMPLE_RATE) ?
-                        mf.getInteger(MediaFormat.KEY_SAMPLE_RATE) + "":
-                        "";
-            case Constants.MIME:
-                return mf.containsKey(MediaFormat.KEY_MIME) ?
-                        mf.getString(MediaFormat.KEY_MIME) + "":
-                        "";
-            default:return "";
-        }
     }
 
     /**

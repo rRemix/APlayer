@@ -37,6 +37,7 @@ import remix.myplayer.bean.netease.NSongSearchResponse;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.cache.DiskLruCache;
+import remix.myplayer.misc.tageditor.TagEditor;
 import remix.myplayer.request.network.HttpClient;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.util.LogUtil;
@@ -52,6 +53,8 @@ import remix.myplayer.util.Util;
  */
 public class SearchLrc {
     private static final String TAG = "SearchLrc";
+
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
     /**
      * 当前播放歌曲的lrc文件路径
      */
@@ -90,7 +93,7 @@ public class SearchLrc {
         Observable<List<LrcRow>> last = Observable.concat(onlineFirst ? networkObservable : localObservable ,onlineFirst ? localObservable : networkObservable).firstOrError().toObservable();
 
         return type == SPUtil.LYRIC_KEY.LYRIC_IGNORE ? Observable.error(new Throwable("Ignore")) :
-                Observable.concat(getCacheObservable(),getManualObservable(manualPath),last).firstOrError().toObservable()
+                Observable.concat(getCacheObservable(),getManualObservable(manualPath),getBuiltInObservable(),last).firstOrError().toObservable()
                 .doOnSubscribe(disposable -> {
                     mKey = Util.hashKeyForDisk(mSong.getTitle() + "/" + mSong.getArtist());
                     CurrentLrcPath = "";
@@ -111,6 +114,23 @@ public class SearchLrc {
         return getLyric("",false);
     }
 
+    /**
+     * 内嵌歌词
+     * @return
+     */
+    private Observable<List<LrcRow>> getBuiltInObservable(){
+        return Observable.create(e -> {
+            TagEditor editor = new TagEditor(mSong.getUrl());
+            final String lyric = editor.getLyric();
+            if(!TextUtils.isEmpty(lyric)){
+                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lyric.getBytes(UTF_8)),UTF_8)),
+                        true,
+                        mSong.getTitle(),
+                        mSong.getArtist()));
+            }
+            e.onComplete();
+        });
+    }
 
     /**
      * 手动设置歌词
@@ -127,7 +147,6 @@ public class SearchLrc {
             e.onComplete();
         });
     }
-
 
     /**
      * 缓存
@@ -237,13 +256,12 @@ public class SearchLrc {
                             .getNeteaseLyric(new Gson().fromJson(body.string(),NSongSearchResponse.class).result.songs.get(0).id)
                             .map(body1 -> {
                                 final NLrcResponse lrcResponse = new Gson().fromJson(body1.string(),NLrcResponse.class);
-                                final Charset utf8 = Charset.forName("utf8");
                                 List<LrcRow> combine = mLrcParser.getLrcRows(new BufferedReader(
                                         new InputStreamReader(
-                                                new ByteArrayInputStream(lrcResponse.lrc.lyric.getBytes(utf8)),utf8)),false,mSong.getTitle(),mSong.getArtist() + "/original");
+                                                new ByteArrayInputStream(lrcResponse.lrc.lyric.getBytes(UTF_8)),UTF_8)),false,mSong.getTitle(),mSong.getArtist() + "/original");
                                 //有翻译 合并
                                 if(lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
-                                    List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(utf8)),utf8)),false,mSong.getTitle(),mSong.getArtist() + "/translate");
+                                    List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(UTF_8)),UTF_8)),false,mSong.getTitle(),mSong.getArtist() + "/translate");
                                     if(translate != null && translate.size() > 0){
                                         for(int i = 0 ; i < translate.size();i++){
                                             for(int j = 0 ; j < combine.size();j++){
@@ -260,8 +278,8 @@ public class SearchLrc {
                                 mLrcParser.saveLrcRows(combine,mKey);
                                 return combine;
                             })).onErrorResumeNext(throwable -> {
-                        return Observable.empty();
-                    });
+                                return Observable.empty();
+                        });
         }
 
     }

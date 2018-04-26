@@ -4,7 +4,9 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.media.MediaScannerConnection;
 import android.media.audiofx.AudioEffect;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.PopupMenu;
@@ -21,10 +23,12 @@ import com.umeng.analytics.MobclickAgent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import remix.myplayer.App;
 import remix.myplayer.R;
-import remix.myplayer.bean.mp3.Genre;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.misc.tageditor.TagEditor;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.EQActivity;
@@ -67,6 +71,9 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
     @BindView(R.id.genre_layout)
     @Nullable
     TextInputLayout mGenreLayout;
+    @BindView(R.id.track_layout)
+    @Nullable
+    TextInputLayout mTrackLayout;
 
     private View mDetailRootView;
     @BindView(R.id.song_detail_path)
@@ -91,12 +98,13 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
     @Nullable
     TextView mDetailSampleRate;
 
-    private Genre mGenreInfo;
+    private final TagEditor mTagEditor;
 
     public AudioPopupListener(PlayerActivity activity,Song info){
         super(activity);
         mActivity = activity;
         mInfo = info;
+        mTagEditor = new TagEditor(mInfo.getUrl());
     }
 
     @Override
@@ -162,47 +170,36 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                         .positiveColorAttr(R.attr.text_color_primary)
                         .backgroundColorAttr(R.attr.background_color_3)
                         .onPositive((dialog, which) -> {
-                            String title = "",artist = "",album = "",genre = "",year = "";
-                            title = mSongLayout.getEditText() != null ? mSongLayout.getEditText().getText().toString() : mInfo.getTitle();
+                            String title = "",artist = "",album = "",genre = "",year = "",track = "";
+                            title = mSongLayout != null ? mSongLayout.getEditText().getText().toString().trim() : "";
                             if(TextUtils.isEmpty(title)){
                                 ToastUtil.show(mActivity,R.string.song_not_empty);
                                 return;
                             }
-                            artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString() : getString(R.string.unknown_artist);
-                            album = mAlbumLayout.getEditText() != null ? mAlbumLayout.getEditText().getText().toString() : getString(R.string.unknown_album);
-                            year = mYearLayout.getEditText() != null ? mYearLayout.getEditText().getText().toString() : " ";
-                            genre = mGenreLayout.getEditText() != null ? mGenreLayout.getEditText().getText().toString() : "";
+                            artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString().trim() : "";
+                            album = mAlbumLayout.getEditText() != null ? mAlbumLayout.getEditText().getText().toString().trim() : "";
+                            year = mYearLayout.getEditText() != null ? mYearLayout.getEditText().getText().toString().trim() : " ";
+                            genre = mGenreLayout.getEditText() != null ? mGenreLayout.getEditText().getText().toString().trim() : "";
+                            track = mTrackLayout.getEditText() != null ? mTrackLayout.getEditText().getText().toString().trim() : "";
 
-                            int updateRow = -1;
-                            int updateGenreRow = -1;
-                            try {
-                                //更新歌曲等信息
-                                updateRow = MediaStoreUtil.updateMP3Info(mInfo.getId(),title,artist,album,year);
-                                //更新流派信息
-                                //先判断是否存在该流派，如果不存在先新建该流派，再建立歌曲与流派的映射
-                                if(mGenreInfo.GenreID > 0){
-                                    updateGenreRow = MediaStoreUtil.updateGenre(mGenreInfo.GenreID,genre);
-                                }
-                                else {
-                                    long genreId = MediaStoreUtil.insertGenre(genre);
-                                    if(genreId != -1){
-                                        updateGenreRow = MediaStoreUtil.insertGenreMap(mInfo.getId(),(int)genreId) ? 1 : -1;
-                                    }
-                                }
-                            }catch (Exception e){
-                                e.printStackTrace();
-                            }
-                            if(updateGenreRow > 0 && updateRow > 0){
-                                ToastUtil.show(mActivity,R.string.save_success);
-                                mInfo.setAlbum(album);
-                                mInfo.setArtist(artist);
-                                mInfo.setTitle(title);
-                                mInfo.setYear(year);
-                                mActivity.updateTopStatus(mInfo);
-                                mActivity.setMP3Item(mInfo);
-                            } else {
-                                ToastUtil.show(mActivity,R.string.save_error);
-                            }
+                            mInfo.setAlbum(album);
+                            mInfo.setArtist(artist);
+                            mInfo.setTitle(title);
+                            mInfo.setYear(year);
+
+                            mTagEditor.save(title,album,artist,year,genre,track,"")
+                                .compose(RxUtil.applyScheduler())
+                                .subscribe(aBoolean -> {
+                                    mActivity.updateTopStatus(mInfo);
+                                    mActivity.setMP3Item(mInfo);
+                                    MediaScannerConnection.scanFile(App.getContext(), new String[]{mInfo.getUrl()}, null, new MediaScannerConnection.OnScanCompletedListener() {
+                                        @Override
+                                        public void onScanCompleted(String path, Uri uri) {
+                                            App.getContext().getContentResolver().notifyChange(uri,null);
+                                        }
+                                    });
+                                    ToastUtil.show(mActivity,R.string.save_success);
+                                }, throwable -> ToastUtil.show(mActivity,R.string.save_error));
                         }).build();
                 editDialog.show();
 
@@ -236,12 +233,19 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                         }
                         mYearLayout.getEditText().setText(mInfo.getYear());
                     }
-                    mGenreInfo = MediaStoreUtil.getGenre(mInfo.getId());
+
                     if(mGenreLayout.getEditText() != null){
                         if(!ThemeStore.isDay()){
                             mGenreLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
                         }
-                        mGenreLayout.getEditText().setText(mGenreInfo.GenreName);
+                        mGenreLayout.getEditText().setText(mTagEditor.getGenreName());
+                    }
+
+                    if(mTrackLayout.getEditText() != null){
+                        if(!ThemeStore.isDay()){
+                            mTrackLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
+                        }
+                        mTrackLayout.getEditText().setText(mTagEditor.getTrakNumber());
                     }
                 }
                 break;
@@ -271,26 +275,17 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                         mDetailSize.setText(getString(R.string.cache_size,1.0f * mInfo.getSize() / ByteConstants.MB));
                     //歌曲格式
                     if(mDetailMime != null){
-                        String path = mInfo.getUrl();
-                        if(!TextUtils.isEmpty(path)){
-                            String extension;
-                            if(path.lastIndexOf('.') > -1 && path.lastIndexOf('.') < path.length() - 1){
-                                extension = mInfo.getUrl().substring(mInfo.getUrl().lastIndexOf('.') + 1 ,mInfo.getUrl().length());
-                            } else {
-                                extension = Util.getType(MusicService.getRateInfo(Constants.MIME));
-                            }
-                            mDetailMime.setText(extension);
-                        }
+                        mDetailMime.setText(mTagEditor.getFormat());
                     }
                     //歌曲时长
                     if(mDetailDuration != null)
                         mDetailDuration.setText(Util.getTime(mInfo.getDuration()));
                     //歌曲码率
                     if(mDetailBitRate != null)
-                        mDetailBitRate.setText(String.format("%s kb/s", MusicService.getRateInfo(Constants.BIT_RATE)));
+                        mDetailBitRate.setText(String.format("%s kb/s", mTagEditor.getBitrate()));
                     //歌曲采样率
                     if(mDetailSampleRate != null)
-                        mDetailSampleRate.setText(String.format("%s Hz", MusicService.getRateInfo(Constants.SAMPLE_RATE)));
+                        mDetailSampleRate.setText(String.format("%s Hz", mTagEditor.getSamlingRate()));
 
                 }
                 break;
