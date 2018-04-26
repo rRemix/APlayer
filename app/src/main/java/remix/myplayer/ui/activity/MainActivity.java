@@ -152,7 +152,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        startService(new Intent(this, MusicService.class));
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //receiver
@@ -653,12 +652,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     }
 
     private void parseIntent() {
-        LogUtil.d("StartAPlayer","parseIntent");
         final Intent param = getIntent();
         if(param != null && param.getData() != null && mLoadComplete){
             int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
-            LogUtil.d("StartAPlayer","id: " + id);
-            LogUtil.d("StartAPlayer","path: " + param.getData().getPath());
             if(id < 0)
                 return;
             Intent intent = new Intent(MusicService.ACTION_CMD);

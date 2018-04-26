@@ -56,6 +56,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 public class LockScreenActivity extends BaseActivity implements UpdateHelper.Callback{
     private static final String TAG = "LockScreenActivity";
+    private static final Bitmap DEFAULT_BITMAP = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_night);
     private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(),210);
     //当前播放的歌曲信息
     private Song mInfo;
@@ -290,21 +291,27 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                 mDisposable = getThumbBitmapObservable(ImageUriUtil.getSearchRequestWithAlbumType(mInfo))
                         .compose(RxUtil.applySchedulerToIO())
                         .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
-                            mRawBitMap = bitmap;
-                            if(mRawBitMap == null)
-                                mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
-                            processBitmap(e);
+                            if(bitmap == null){
+                                processBitmap(e,DEFAULT_BITMAP);
+                            } else {
+                                processBitmap(e,bitmap);
+                            }
+
                         }))
                         .onErrorResumeNext(Observable.create(e -> {
-                            mRawBitMap = BitmapFactory.decodeResource(getResources(), R.drawable.album_empty_bg_night);
-                            processBitmap(e);
+                            processBitmap(e,DEFAULT_BITMAP);
                         }))
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
             }
 
-            private void processBitmap(ObservableEmitter<Palette.Swatch> e) {
+            private void processBitmap(ObservableEmitter<Palette.Swatch> e,Bitmap raw) {
                 if(isFinishing()){
+                    e.onComplete();
+                    return;
+                }
+                mRawBitMap = MusicService.copy(raw);
+                if(mRawBitMap == null || mRawBitMap.isRecycled()){
                     e.onComplete();
                     return;
                 }

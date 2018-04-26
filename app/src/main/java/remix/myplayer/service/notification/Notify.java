@@ -69,7 +69,7 @@ public abstract class Notify {
 
         if (mNotifyMode != newNotifyMode && newNotifyMode == NOTIFY_MODE_BACKGROUND) {
 //            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-//                mService.stopForeground(false);
+                mService.stopForeground(false);
         }
         if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
             mService.startForeground(PLAYING_NOTIFICATION_ID, notification);
