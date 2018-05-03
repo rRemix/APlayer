@@ -269,8 +269,8 @@
     <string name="delete_source">Also delete the source file</string>
     <string name="kugou">Kugou</string>
     <string name="netease">Netease</string>
-    <string name="cancel_timer">Cancel Timing</string>
-    <string name="start_timer">Start Timing</string>
+    <string name="cancel_timer">Sleep timer canceled</string>
+    <string name="start_timer">Start Timer</string>
     <string name="sort_order">Sort</string>
     <string name="album">Album</string>
     <string name="album_desc">Album desc</string>
@@ -307,4 +307,5 @@
     <string name="play_breakpoint">play at breakpoint</string>
     <string name="play_breakpoint_tip">When you open the APlayer again, it will start playing from the breakpoint</string>
     <string name="please_input_track_number">Please input track number</string>
+    <string name="will_stop_at_x">APlayer will be closed in %d minutes</string>
 </resources>

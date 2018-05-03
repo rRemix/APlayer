@@ -168,6 +168,38 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         mRefreshHandler = new MsgHandler(this);
 
         parseIntent();
+
+//        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+//        try {
+//            retriever.setDataSource("/sdcard/Music/欧美/Animals.mp3");
+//            byte[] picture = retriever.getEmbeddedPicture();
+//            if (picture != null) {
+//                Bitmap bitmap = BitmapFactory.decodeByteArray(picture,0,picture.length);
+//                boolean isRecycled = bitmap.isRecycled();
+//            }
+//        } finally {
+//            retriever.release();
+//        }
+//
+//
+//        try {
+//            Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), 12);
+//            ParcelFileDescriptor pfd =  mContext.getContentResolver().openFileDescriptor(uri, "r");
+//            FileDescriptor fd = pfd.getFileDescriptor();
+//            Bitmap bm = BitmapFactory.decodeFileDescriptor(fd);
+//            boolean isRecycled = bm.isRecycled();
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
+//        try {
+//            final String url = MediaStoreUtil.getAlbumUrlByAlbumId(12);
+//            Bitmap bitmap = BitmapFactory.decodeFile(url);
+//            boolean isRecycled = bitmap.isRecycled();
+//        }catch (Exception e){
+//
+//        }
+
     }
 
     /**

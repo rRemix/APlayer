@@ -202,3 +202,4 @@ public static final int *;
 
 #jaudiotagger
 -keep class org.jaudiotagger.** { *; }
+-dontwarn org.jaudiotagger.**

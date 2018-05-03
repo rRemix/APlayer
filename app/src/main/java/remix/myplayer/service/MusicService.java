@@ -3,6 +3,7 @@ package remix.myplayer.service;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -57,6 +58,7 @@ import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.misc.floatpermission.FloatWindowManager;
 import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
+import remix.myplayer.misc.receiver.ExitReceiver;
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.network.RemoteUriRequest;
@@ -367,7 +369,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 
         mMediaPlayer.setOnCompletionListener(mp -> {
             if(mCloseAfter){
-                sendBroadcast(new Intent(Constants.EXIT));
+                sendBroadcast(new Intent(Constants.EXIT)
+                    .setComponent(new ComponentName(mContext, ExitReceiver.class)));
             } else {
                 if(mPlayModel == Constants.PLAY_REPEATONE){
                     prepare(mCurrentSong.getUrl());
@@ -901,6 +904,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 //断点播放
                 case Constants.PLAY_AT_BREAKPOINT:
                     mPlayAtBreakPoint = intent.getBooleanExtra(SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT,false);
+                    if(!mPlayAtBreakPoint)
+                        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,0);
                     break;
                 default:break;
             }
@@ -1376,7 +1381,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             if(mIsplay)
                 mCloseAfter = true;
             else
-                sendBroadcast(new Intent(Constants.EXIT));
+                sendBroadcast(new Intent(Constants.EXIT)
+                        .setComponent(new ComponentName(mContext, ExitReceiver.class)));
         }
     }
 

@@ -180,14 +180,6 @@
             android:name="cn.bmob.v3.update.UpdateDialogActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
-        <!-- 微信 -->
-        <activity
-            android:name=".wxapi.WXEntryActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
         <!-- 线控 -->
         <receiver android:name=".misc.receiver.MediaButtonReceiver">
             <intent-filter android:priority="1000">

@@ -307,4 +307,5 @@
     <string name="play_breakpoint">断点播放</string>
     <string name="play_breakpoint_tip">再次打开软件时将从断点处开始播放</string>
     <string name="please_input_track_number">请输入音轨号</string>
+    <string name="will_stop_at_x">将在%d分钟后关闭</string>
 </resources>
