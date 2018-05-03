@@ -159,7 +159,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
      * 上传到友盟
      */
     private void uploadExceptionToServer(Throwable ex) {
-        //TODO Upload Exception Message To Your Web Server
 //        MobclickAgent.reportError(mContext,ex);
     }
 

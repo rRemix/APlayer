@@ -602,7 +602,7 @@ public class Util {
                     .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     .setType("audio/*");
         } catch (IllegalArgumentException e) {
-            // TODO the path is most likely not like /storage/emulated/0/... but something like /storage/28C7-75B0/...
+            //the path is most likely not like /storage/emulated/0/... but something like /storage/28C7-75B0/...
             e.printStackTrace();
             Toast.makeText(context, context.getString(R.string.cant_share_song), Toast.LENGTH_SHORT).show();
             return new Intent();

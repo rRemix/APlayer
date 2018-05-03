@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.MediaScannerConnection;
 import android.media.audiofx.AudioEffect;
-import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.PopupMenu;
@@ -192,12 +191,7 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                                 .subscribe(aBoolean -> {
                                     mActivity.updateTopStatus(mInfo);
                                     mActivity.setMP3Item(mInfo);
-                                    MediaScannerConnection.scanFile(App.getContext(), new String[]{mInfo.getUrl()}, null, new MediaScannerConnection.OnScanCompletedListener() {
-                                        @Override
-                                        public void onScanCompleted(String path, Uri uri) {
-                                            App.getContext().getContentResolver().notifyChange(uri,null);
-                                        }
-                                    });
+                                    MediaScannerConnection.scanFile(App.getContext(), new String[]{mInfo.getUrl()}, null, (path, uri) -> App.getContext().getContentResolver().notifyChange(uri,null));
                                     ToastUtil.show(mActivity,R.string.save_success);
                                 }, throwable -> ToastUtil.show(mActivity,R.string.save_error));
                         }).build();

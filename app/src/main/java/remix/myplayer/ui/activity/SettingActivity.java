@@ -554,7 +554,6 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             case R.id.setting_update_container:
                 MobclickAgent.onEvent(this,"CheckUpdate");
                 BmobUpdateAgent.setUpdateListener((updateStatus, updateInfo) -> {
-                    // TODO Auto-generated method stub
                     if(updateStatus == UpdateStatus.No){
                         ToastUtil.show(mContext,getString(R.string.no_update));
                     }else if(updateStatus == UpdateStatus.IGNORED){
