@@ -228,9 +228,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
         LogUtil.d("ServiceLifeCycle","onTaskRemoved");
-        unInit();
-        stopSelf();
-        System.exit(0);
+//        unInit();
+//        stopSelf();
+//        System.exit(0);
     }
 
     @Override

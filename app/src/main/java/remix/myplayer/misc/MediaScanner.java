@@ -3,6 +3,7 @@ package remix.myplayer.misc;
 import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
@@ -18,6 +19,7 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.util.ToastUtil;
@@ -78,6 +80,7 @@ public class MediaScanner {
                     }
                 }, throwable -> {
                     mProgressDialog.dismiss();
+                    App.getContext().getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
                     ToastUtil.show(mContext,R.string.scan_failed,throwable.toString());
                 });
 
