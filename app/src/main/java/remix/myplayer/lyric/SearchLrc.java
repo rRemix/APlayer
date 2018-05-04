@@ -93,7 +93,7 @@ public class SearchLrc {
         Observable<List<LrcRow>> last = Observable.concat(onlineFirst ? networkObservable : localObservable ,onlineFirst ? localObservable : networkObservable).firstOrError().toObservable();
 
         return type == SPUtil.LYRIC_KEY.LYRIC_IGNORE ? Observable.error(new Throwable("Ignore")) :
-                Observable.concat(getCacheObservable(),getManualObservable(manualPath),getBuiltInObservable(),last).firstOrError().toObservable()
+                Observable.concat(getCacheObservable(),getManualObservable(manualPath), getEmbeddedObservable(),last).firstOrError().toObservable()
                 .doOnSubscribe(disposable -> {
                     mKey = Util.hashKeyForDisk(mSong.getTitle() + "/" + mSong.getArtist());
                     CurrentLrcPath = "";
@@ -118,7 +118,7 @@ public class SearchLrc {
      * 内嵌歌词
      * @return
      */
-    private Observable<List<LrcRow>> getBuiltInObservable(){
+    private Observable<List<LrcRow>> getEmbeddedObservable(){
         return Observable.create(e -> {
             TagEditor editor = new TagEditor(mSong.getUrl());
             final String lyric = editor.getLyric();

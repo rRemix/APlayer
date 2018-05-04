@@ -37,14 +37,14 @@ public class App extends MultiDexApplication{
     private static Context mContext;
 
     //是否是googlePlay版本
-    public static boolean IS_GP;
+    public static boolean IS_GOOGLEPLAY;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
 
-        IS_GP = "google".equalsIgnoreCase(Util.getAppMetaData("UMENG_CHANNEL"));
+        IS_GOOGLEPLAY = "google".equalsIgnoreCase(Util.getAppMetaData("UMENG_CHANNEL"));
 
         initUtil();
         initTheme();

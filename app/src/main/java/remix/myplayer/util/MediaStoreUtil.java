@@ -639,6 +639,35 @@ public class MediaStoreUtil {
     }
 
     /**
+     * 根据专辑id查询歌曲详细信息
+     * @param albumId  歌曲id
+     * @return 对应歌曲信息
+     */
+    public static Song getMP3InfoByAlbumId(int albumId) {
+        Song song = null;
+        ContentResolver resolver = mContext.getContentResolver();
+        Cursor cursor = null;
+        try {
+            cursor = resolver.query(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
+                    MediaStore.Audio.Media.ALBUM_ID + "=" + albumId + " and " +  MediaStoreUtil.getBaseSelection(), null, null);
+            if(cursor == null || cursor.getCount() == 0)
+                return null;
+            if(cursor.getCount() > 0 && cursor.moveToFirst()){
+                cursor.moveToFirst();
+            }
+            song = getMP3Info(cursor);
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
+        }
+
+        return song;
+    }
+
+    /**
      * 根据歌曲id查询歌曲详细信息
      * @param id  歌曲id
      * @return 对应歌曲信息

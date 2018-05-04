@@ -205,8 +205,8 @@
     <string name="play_failed">unable to play:</string>
     <string name="cant_request_audio_focus">Audio focus denied</string>
     <string name="float_lrc">Desktop lyric</string>
-    <string name="closed_float_lrc">Desktop lyric is closed</string>
-    <string name="opened_float_lrc">Desktop lyric is opened</string>
+    <string name="closed_float_lrc">Desktop lyric is off</string>
+    <string name="opened_float_lrc">Desktop lyric is on</string>
     <string name="confirm_ignore_lrc">Confirm to ignore lyric?</string>
     <string name="confirm_cancel_ignore_lrc">Confirm to cancel ignore?</string>
     <string name="ignore_lrc">Ignore lyric</string>
@@ -308,4 +308,7 @@
     <string name="play_breakpoint_tip">When you open the APlayer again, it will start playing from the breakpoint</string>
     <string name="please_input_track_number">Please input track number</string>
     <string name="will_stop_at_x">APlayer will be closed in %d minutes</string>
+    <string name="saveing">Saving</string>
+    <string name="ignore_mediastore_artwork">Ignore Media Store covers</string>
+    <string name="ignore_mediastore_artwork_tips">Can increase the album cover quality but causes slower image loading times</string>
 </resources>

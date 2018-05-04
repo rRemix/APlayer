@@ -150,6 +150,8 @@ public class SPUtil {
         public static final String NOTIFY_SYSTEM_COLOR = "notify_system_color";
         //断点播放
         public static final String PLAY_AT_BREAKPOINT = "play_at_breakpoint";
+        //是否忽略内嵌封面
+        public static final String IGNORE_MEDIA_STORE = "ignore_media_store";
     }
 
 }

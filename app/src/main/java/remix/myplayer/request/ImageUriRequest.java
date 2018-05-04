@@ -4,6 +4,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -21,7 +22,11 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.google.gson.Gson;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -32,18 +37,23 @@ import io.reactivex.functions.Function;
 import okhttp3.ResponseBody;
 import remix.myplayer.App;
 import remix.myplayer.R;
+import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.bean.netease.NAlbumSearchResponse;
 import remix.myplayer.bean.netease.NArtistSearchResponse;
-import remix.myplayer.bean.netease.NSearchRequest;
+import remix.myplayer.bean.netease.SearchRequest;
 import remix.myplayer.bean.netease.NSongSearchResponse;
+import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.request.network.HttpClient;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ImageUriUtil;
+import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.ToastUtil;
 
-import static remix.myplayer.bean.netease.NSearchRequest.TYPE_NETEASE_ALBUM;
-import static remix.myplayer.bean.netease.NSearchRequest.TYPE_NETEASE_ARTIST;
-import static remix.myplayer.bean.netease.NSearchRequest.TYPE_NETEASE_SONG;
+import static remix.myplayer.bean.netease.SearchRequest.TYPE_NETEASE_ALBUM;
+import static remix.myplayer.bean.netease.SearchRequest.TYPE_NETEASE_ARTIST;
+import static remix.myplayer.bean.netease.SearchRequest.TYPE_NETEASE_SONG;
 import static remix.myplayer.service.MusicService.copy;
 import static remix.myplayer.util.Util.isWifi;
 
@@ -58,7 +68,12 @@ public abstract class ImageUriRequest<T> {
     public static final int URL_ALBUM = 10;
     public static final int URL_ARTIST = 100;
 
-    public static String AUTO_DOWNLOAD_ALBUM = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, App.getContext().getString(R.string.always));
+    //自动下载封面
+    public static String AUTO_DOWNLOAD_ALBUM = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,
+            SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER, App.getContext().getString(R.string.always));
+    //忽略内嵌
+    public static boolean IGNORE_MEDIA_STORE = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,
+            SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE,false);
 
     protected RequestConfig mConfig = DEFAULT_CONFIG;
 
@@ -78,18 +93,18 @@ public abstract class ImageUriRequest<T> {
 
     public abstract void load();
 
-    protected Observable<String> getThumbObservable(NSearchRequest request){
+    protected Observable<String> getThumbObservable(SearchRequest request){
        return Observable.concat(getCustomThumbObservable(request),getContentThumbObservable(request),getNetworkThumbObservable(request))
                .firstOrError()
                .toObservable();
     }
 
-    protected Observable<String> getCustomThumbObservable(NSearchRequest request){
+    protected Observable<String> getCustomThumbObservable(SearchRequest request){
         return new Observable<String>() {
             @Override
             protected void subscribeActual(Observer<? super String> observer) {
                 //是否设置过自定义封面
-                File customImage = ImageUriUtil.getCustomThumbIfExist(request.getID(),request.getLType());
+                File customImage = ImageUriUtil.getCustomThumbIfExist(request.getID(),request.getLocalType());
                 if(customImage != null && customImage.exists()){
                     observer.onNext("file://" + customImage.getAbsolutePath());
                 }
@@ -103,33 +118,66 @@ public abstract class ImageUriRequest<T> {
      * @param request
      * @return
      */
-    private Observable<String> getContentThumbObservable(NSearchRequest request){
-        return new Observable<String>() {
-            @Override
-            protected void subscribeActual(Observer<? super String> observer) {
-                String imageUrl = "";
-                if(request.getLType() == URL_ALBUM){
-                    //专辑封面
+    private Observable<String> getContentThumbObservable(SearchRequest request){
+        return Observable.create(observer -> {
+            String imageUrl = "";
+
+            if(request.getLocalType() == URL_ALBUM){//专辑封面
+                //忽略内嵌封面
+                if(IGNORE_MEDIA_STORE){
+                    Song song = MediaStoreUtil.getMP3InfoByAlbumId(request.getID());
+                    if(song != null){
+                        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                        retriever.setDataSource(song.getUrl());
+
+                        byte[] picture = retriever.getEmbeddedPicture();
+                        retriever.release();
+                        if(picture != null){
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(picture,0,picture.length);
+                            //保存bitmap
+                            File cacheDir = DiskCache.getDiskCacheDir(App.getContext(), "embedded/");
+                            if(bitmap != null && (cacheDir.exists() || cacheDir.mkdirs())){
+                                String child = song.getArtist() + " - " + song.getTitle() + ".jpg";
+                                File original = new File(cacheDir,child.replaceAll("/"," "));
+
+                                if(original.exists()){
+                                    imageUrl = "file://" + original.getAbsolutePath();
+                                } else {
+                                    FileOutputStream fileOutputStream = new FileOutputStream(original);
+                                    bitmap.compress(Bitmap.CompressFormat.JPEG,100,fileOutputStream);
+                                    fileOutputStream.flush();
+                                    fileOutputStream.close();
+                                    imageUrl = "file://" + original.getAbsolutePath();
+                                }
+                            }
+                        } else {
+                            File cover = fallback(song);
+                            if(cover != null && cover.exists())
+                                imageUrl = "file://" + cover.getAbsolutePath();
+                        }
+                    }
+
+                } else {
                     Uri uri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart/"), request.getID());
                     if(ImageUriUtil.isAlbumThumbExistInMediaCache(uri)){
                         imageUrl = uri.toString();
                     }
-                } else {
-                    //艺术家封面
-                    File artistThumb = ImageUriUtil.getArtistThumbInMediaCache(request.getID());
-                    if(artistThumb != null && artistThumb.exists()){
-                        imageUrl = "file://" + artistThumb.getAbsolutePath();
-                    }
                 }
-                if(!TextUtils.isEmpty(imageUrl)) {
-                    observer.onNext(imageUrl);
+
+            } else {//艺术家封面
+                File artistThumb = ImageUriUtil.getArtistThumbInMediaCache(request.getID());
+                if(artistThumb != null && artistThumb.exists()){
+                    imageUrl = "file://" + artistThumb.getAbsolutePath();
                 }
-                observer.onComplete();
             }
-        };
+            if(!TextUtils.isEmpty(imageUrl)) {
+                observer.onNext(imageUrl);
+            }
+            observer.onComplete();
+        });
     }
 
-    private Observable<String> getNetworkThumbObservable(NSearchRequest request){
+    private Observable<String> getNetworkThumbObservable(SearchRequest request){
         return Observable.concat(new Observable<String>() {
             @Override
             protected void subscribeActual(Observer<? super String> observer) {
@@ -141,24 +189,24 @@ public abstract class ImageUriRequest<T> {
             }},Observable.just(isAutoDownloadCover())
                 .filter(aBoolean -> aBoolean)
                 .flatMap(aBoolean -> HttpClient.getNeteaseApiservice()
-                        .getNeteaseSearch(request.getKey(), 0, 1, request.getNType())
+                        .getNeteaseSearch(request.getKey(), 0, 1, request.getNeteaseType())
                         .map(responseBody -> parseNetworkImageUrl(request, responseBody))
         .firstElement().toObservable()));
 
     }
 
     @Nullable
-    private String parseNetworkImageUrl(NSearchRequest request, ResponseBody body) throws IOException {
+    private String parseNetworkImageUrl(SearchRequest request, ResponseBody body) throws IOException {
         String imageUrl = "";
-        if (request.getNType() == TYPE_NETEASE_SONG) {
+        if (request.getNeteaseType() == TYPE_NETEASE_SONG) {
             //搜索的是歌曲
             NSongSearchResponse response = new Gson().fromJson(body.string(), NSongSearchResponse.class);
             imageUrl =  response.result.songs.get(0).album.picUrl;
-        } else if (request.getNType() == TYPE_NETEASE_ALBUM) {
+        } else if (request.getNeteaseType() == TYPE_NETEASE_ALBUM) {
             //搜索的是专辑
             NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);
             imageUrl = response.result.albums.get(0).picUrl;
-        } else if (request.getNType() == TYPE_NETEASE_ARTIST) {
+        } else if (request.getNeteaseType() == TYPE_NETEASE_ARTIST) {
             //搜索的是艺术家
             NArtistSearchResponse response = new Gson().fromJson(body.string(), NArtistSearchResponse.class);
             imageUrl = response.getResult().getArtists().get(0).getPicUrl();
@@ -169,7 +217,7 @@ public abstract class ImageUriRequest<T> {
         return imageUrl;
     }
 
-    protected Observable<Bitmap> getThumbBitmapObservable(NSearchRequest request) {
+    protected Observable<Bitmap> getThumbBitmapObservable(SearchRequest request) {
         return getThumbObservable(request)
                 .flatMap(new Function<String, ObservableSource<Bitmap>>() {
                     @Override
@@ -214,4 +262,21 @@ public abstract class ImageUriRequest<T> {
         return context.getString(R.string.always).equals(AUTO_DOWNLOAD_ALBUM) || (context.getString(R.string.wifi_only).equals(AUTO_DOWNLOAD_ALBUM) && isWifi(context));
     }
 
+
+    private static final String[] FALLBACKS = {"cover.jpg", "album.jpg", "folder.jpg"};
+    private File fallback(Song song) {
+        File parent = new File(song.getUrl()).getParentFile();
+
+        File same = new File(parent,song.getArtist() + " - " + song.getTitle() + ".jpg");
+        if(same.exists())
+            return same;
+
+        for (String fallback : FALLBACKS) {
+            File cover = new File(parent, fallback);
+            if (cover.exists()) {
+                return cover;
+            }
+        }
+        return null;
+    }
 }

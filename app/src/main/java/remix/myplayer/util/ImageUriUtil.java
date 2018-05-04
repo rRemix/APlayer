@@ -14,7 +14,7 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Album;
 import remix.myplayer.bean.mp3.Artist;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.bean.netease.NSearchRequest;
+import remix.myplayer.bean.netease.SearchRequest;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.request.ImageUriRequest;
 
@@ -98,9 +98,9 @@ public class ImageUriUtil {
      * @param song
      * @return
      */
-    public static NSearchRequest getSearchRequest(Song song,int localType){
+    public static SearchRequest getSearchRequest(Song song, int localType){
         if(song == null)
-            return NSearchRequest.DEFAULT_REQUEST;
+            return SearchRequest.DEFAULT_REQUEST;
         boolean isTitleAvailable = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(mContext.getString(R.string.unknown_song));
         boolean isAlbumAvailable = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(mContext.getString(R.string.unknown_album));
         boolean isArtistAvailable = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(mContext.getString(R.string.unknown_artist));
@@ -109,18 +109,18 @@ public class ImageUriUtil {
         if(isTitleAvailable){
             //艺术家合法
             if(isArtistAvailable){
-                return new NSearchRequest(song.getAlbumId(),song.getTitle() + "-" + song.getArtist(),NSearchRequest.TYPE_NETEASE_SONG,localType);
+                return new SearchRequest(song.getAlbumId(),song.getTitle() + "-" + song.getArtist(), SearchRequest.TYPE_NETEASE_SONG,localType);
             }
             //专辑名合法
             if(isAlbumAvailable){
-                return new NSearchRequest(song.getAlbumId(),song.getTitle() + "-" + song.getAlbum(),NSearchRequest.TYPE_NETEASE_SONG,localType);
+                return new SearchRequest(song.getAlbumId(),song.getTitle() + "-" + song.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,localType);
             }
         }
         //根据专辑名字查询
         if(isAlbumAvailable && isArtistAvailable){
-            return new NSearchRequest(song.getAlbumId(),song.getArtist() + "-" + song.getAlbum(),NSearchRequest.TYPE_NETEASE_SONG,localType);
+            return new SearchRequest(song.getAlbumId(),song.getArtist() + "-" + song.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,localType);
         }
-        return NSearchRequest.DEFAULT_REQUEST;
+        return SearchRequest.DEFAULT_REQUEST;
     }
 
     /**
@@ -128,15 +128,15 @@ public class ImageUriUtil {
      * @param album
      * @return
      */
-    public static NSearchRequest getSearchRequest(Album album){
+    public static SearchRequest getSearchRequest(Album album){
         if(album == null)
-            return NSearchRequest.DEFAULT_REQUEST;
+            return SearchRequest.DEFAULT_REQUEST;
         boolean isAlbumAvailable = !TextUtils.isEmpty(album.getAlbum()) && !album.getAlbum().contains(mContext.getString(R.string.unknown_album));
         boolean isArtistAvailable = !TextUtils.isEmpty(album.getArtist()) && !album.getArtist().contains(mContext.getString(R.string.unknown_artist));
         if(isAlbumAvailable && isArtistAvailable){
-            return new NSearchRequest(album.getAlbumID(),album.getArtist() + "-" + album.getAlbum(),NSearchRequest.TYPE_NETEASE_SONG,ImageUriRequest.URL_ALBUM);
+            return new SearchRequest(album.getAlbumID(),album.getArtist() + "-" + album.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,ImageUriRequest.URL_ALBUM);
         }
-        return NSearchRequest.DEFAULT_REQUEST;
+        return SearchRequest.DEFAULT_REQUEST;
     }
 
     /**
@@ -144,17 +144,17 @@ public class ImageUriUtil {
      * @param artist
      * @return
      */
-    public static NSearchRequest getSearchRequest(Artist artist){
+    public static SearchRequest getSearchRequest(Artist artist){
         if(artist == null)
-            return NSearchRequest.DEFAULT_REQUEST;
+            return SearchRequest.DEFAULT_REQUEST;
         boolean isArtistAvailable = !TextUtils.isEmpty(artist.getArtist()) && !artist.getArtist().contains(mContext.getString(R.string.unknown_artist));
         if(isArtistAvailable){
-            return new NSearchRequest(artist.getArtistID(),artist.getArtist(),NSearchRequest.TYPE_NETEASE_ARTIST,ImageUriRequest.URL_ARTIST);
+            return new SearchRequest(artist.getArtistID(),artist.getArtist(), SearchRequest.TYPE_NETEASE_ARTIST,ImageUriRequest.URL_ARTIST);
         }
-        return NSearchRequest.DEFAULT_REQUEST;
+        return SearchRequest.DEFAULT_REQUEST;
     }
 
-    public static NSearchRequest getSearchRequestWithAlbumType(Song song){
+    public static SearchRequest getSearchRequestWithAlbumType(Song song){
         return getSearchRequest(song, ImageUriRequest.URL_ALBUM);
     }
 

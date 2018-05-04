@@ -27,7 +27,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ToastUtil;
 
-import static remix.myplayer.App.IS_GP;
+import static remix.myplayer.App.IS_GOOGLEPLAY;
 
 /**
  * Created by taeja on 16-3-7.
@@ -88,7 +88,7 @@ public class FeedBackActivity extends ToolbarActivity {
 
     private void commitByEmail(){
         Intent data = new Intent(Intent.ACTION_SENDTO);
-        data.setData(Uri.parse(!IS_GP ? "mailto:568920427@qq.com" : "rRemix.me@gmail.com"));
+        data.setData(Uri.parse(!IS_GOOGLEPLAY ? "mailto:568920427@qq.com" : "rRemix.me@gmail.com"));
         data.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback));
         data.putExtra(Intent.EXTRA_TEXT, mContent.getText().toString() + "\n\n\n" + mFeedBack);
         startActivityForResult(data,0);

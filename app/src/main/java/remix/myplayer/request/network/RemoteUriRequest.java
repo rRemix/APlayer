@@ -3,7 +3,7 @@ package remix.myplayer.request.network;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import remix.myplayer.bean.netease.NSearchRequest;
+import remix.myplayer.bean.netease.SearchRequest;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.RequestConfig;
 
@@ -12,9 +12,9 @@ import remix.myplayer.request.RequestConfig;
  */
 
 public abstract class RemoteUriRequest extends ImageUriRequest<Bitmap> {
-    private NSearchRequest mRequest;
+    private SearchRequest mRequest;
 
-    public RemoteUriRequest(@NonNull NSearchRequest request,@NonNull RequestConfig config){
+    public RemoteUriRequest(@NonNull SearchRequest request, @NonNull RequestConfig config){
         super(config);
         mRequest = request;
     }

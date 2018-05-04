@@ -66,7 +66,7 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
-import static remix.myplayer.App.IS_GP;
+import static remix.myplayer.App.IS_GOOGLEPLAY;
 import static remix.myplayer.bean.Category.ALL_LIBRARY_STRING;
 
 /**
@@ -108,6 +108,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     SwitchCompat mImmersiveSwitch;
     @BindView(R.id.setting_breakpoint_switch)
     SwitchCompat mBreakpointSwitch;
+    @BindView(R.id.setting_ignore_mediastore_switch)
+    SwitchCompat mIgnoreMediastoreSwitch;
 
     //是否需要重建activity
     private boolean mNeedRecreate = false;
@@ -145,9 +147,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
         //导航栏是否变色 是否启用摇一摇切歌
         final String[] keyWord = new String[]{SPUtil.SETTING_KEY.COLOR_NAVIGATION, SPUtil.SETTING_KEY.SHAKE, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,
                 SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW, SPUtil.SETTING_KEY.SCREEN_ALWAYS_ON, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC, SPUtil.SETTING_KEY.IMMERSIVE_MODE,
-                SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT};
+                SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT,SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE};
         ButterKnife.apply(new SwitchCompat[]{mNaviSwitch, mShakeSwitch,mLrcPrioritySwitch,mFloatLrcSwitch,
-                mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch,mBreakpointSwitch}, new ButterKnife.Action<SwitchCompat>() {
+                mScreenSwitch, mNotifyStyleSwitch, mImmersiveSwitch,mBreakpointSwitch,mIgnoreMediastoreSwitch}, new ButterKnife.Action<SwitchCompat>() {
             @Override
             public void apply(@NonNull SwitchCompat view, final int index) {
                 view.setChecked(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,keyWord[index],false));
@@ -217,6 +219,11 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     .putExtra("Control",Constants.PLAY_AT_BREAKPOINT)
                                     .putExtra(SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT,view.isChecked()));
                                 break;
+                            //忽略内嵌
+                            case R.id.setting_ignore_mediastore_switch:
+                                ImageUriRequest.IGNORE_MEDIA_STORE = true;
+                                mNeedRefreshAdapter = true;
+                                break;
                         }
                         SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,keyWord[index],isChecked);
                     }
@@ -266,7 +273,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             }
         }.start();
 
-        if(IS_GP){
+        if(IS_GOOGLEPLAY){
             findViewById(R.id.setting_update_container).setVisibility(View.GONE);
         }
     }
@@ -358,7 +365,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_lrc_path_container,R.id.setting_clear_container,R.id.setting_breakpoint_container,
             R.id.setting_screen_container,R.id.setting_scan_container,R.id.setting_classic_notify_container,
             R.id.setting_album_cover_container,R.id.setting_library_category_container,R.id.setting_immersive_container,
-            R.id.setting_import_playlist_container})
+            R.id.setting_import_playlist_container,R.id.setting_ignore_mediastore_container})
     public void onClick(View v){
         switch (v.getId()){
             //文件过滤
@@ -681,6 +688,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             //断点播放
             case R.id.setting_breakpoint_container:
                 mBreakpointSwitch.setChecked(!mBreakpointSwitch.isChecked());
+                break;
+            //忽略内嵌封面
+            case R.id.setting_ignore_mediastore_container:
+                mIgnoreMediastoreSwitch.setChecked(!mIgnoreMediastoreSwitch.isChecked());
                 break;
         }
     }

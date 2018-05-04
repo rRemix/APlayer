@@ -6,12 +6,12 @@ import java.io.Serializable;
  * Created by Remix on 2017/12/4.
  */
 
-public class NSearchRequest implements Serializable {
+public class SearchRequest implements Serializable {
     public static final int TYPE_NETEASE_SONG = 1;
     public static final int TYPE_NETEASE_ALBUM = 10;
     public static final int TYPE_NETEASE_ARTIST = 100;
 
-    public static final NSearchRequest DEFAULT_REQUEST = new NSearchRequest(-1,"",0,0);
+    public static final SearchRequest DEFAULT_REQUEST = new SearchRequest(-1,"",0,0);
     private static final long serialVersionUID = -4168031236748350436L;
 
     private String mKey;
@@ -21,14 +21,14 @@ public class NSearchRequest implements Serializable {
     private int mLocalType;
     private int mID;
 
-    public NSearchRequest(int id,String key, int ntype,int ltype) {
+    public SearchRequest(int id, String key, int ntype, int ltype) {
         this.mID = id;
         this.mKey = key;
         this.mNeteaseType = ntype;
         this.mLocalType = ltype;
     }
 
-    public int getLType(){
+    public int getLocalType(){
         return mLocalType;
     }
 
@@ -40,13 +40,13 @@ public class NSearchRequest implements Serializable {
         return mKey;
     }
 
-    public int getNType() {
+    public int getNeteaseType() {
         return mNeteaseType;
     }
 
     @Override
     public String toString() {
-        return "NSearchRequest{" +
+        return "SearchRequest{" +
                 "mKey='" + mKey + '\'' +
                 ", mNeteaseType=" + mNeteaseType +
                 ", mLocalType=" + mLocalType +
