@@ -951,25 +951,33 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * @param control
      */
     private void updateMediaSession(int control) {
-        boolean isSmartisan = Build.MANUFACTURER.equalsIgnoreCase("smartisan");
-        if((!isSmartisan && SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN ) ||
-                mCurrentSong == null)
+        if(mCurrentSong == null || mCurrentSong.getId() < 0)
             return;
 
         int playState = mIsplay
                 ? PlaybackStateCompat.STATE_PLAYING
                 : PlaybackStateCompat.STATE_PAUSED;
-        if(control == Constants.TOGGLE || control == Constants.PAUSE || control == Constants.START){
-            mMediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
-                    .setState(playState,getProgress(),1.0f)
-                    .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY_PAUSE |
-                            PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).build());
-        } else {
-            mMediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
-                    .setState(playState,getProgress(),1.0f)
-                    .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY_PAUSE |
-                            PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).build());
 
+        mMediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
+                .setState(playState,getProgress(),1.0f)
+                .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY_PAUSE |
+                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).build());
+
+        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder()
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, mCurrentSong.getAlbum())
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mCurrentSong.getArtist())
+                .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, mCurrentSong.getArtist())
+                .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, mCurrentSong.getDisplayname())
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mCurrentSong.getDuration())
+                .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, Global.PlayQueue != null ? Global.PlayQueue.size() : 0 )
+                .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS,mCurrentIndex)
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mCurrentSong.getTitle());
+
+        boolean isSmartisan = Build.MANUFACTURER.equalsIgnoreCase("smartisan");
+        if(!isSmartisan &&
+                SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN ){
+            mMediaSession.setMetadata(builder.build());
+        } else {
             new RemoteUriRequest(getSearchRequestWithAlbumType(mCurrentSong),new RequestConfig.Builder(400,400).build()){
                 @Override
                 public void onError(String errMsg) {
@@ -982,17 +990,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 }
 
                 private void setMediaSessionData(Bitmap result) {
-                    mMediaSession.setMetadata(new MediaMetadataCompat.Builder()
-                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, mCurrentSong.getAlbum())
-                            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mCurrentSong.getArtist())
-                            .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, mCurrentSong.getArtist())
-                            .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, mCurrentSong.getDisplayname())
-                            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mCurrentSong.getDuration())
-                            .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, Global.PlayQueue != null ? Global.PlayQueue.size() : 0 )
-                            .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS,mCurrentIndex)
-                            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART,result)
-                            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mCurrentSong.getTitle())
-                            .build());
+                    builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART,result);
+                    mMediaSession.setMetadata(builder.build());
                 }
             }.load();
         }

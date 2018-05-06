@@ -88,6 +88,7 @@
     <string name="song_not_empty">歌曲名不能为空</string>
     <string name="save_success">保存成功</string>
     <string name="save_error">保存失败</string>
+    <string name="tag_save_error">保存失败: %s</string>
     <string name="arg_illegal">参数不合法: %d</string>
     <string name="send_success">发送成功 感谢您的反馈!</string>
     <string name="send_error">发送失败 请重试!</string>

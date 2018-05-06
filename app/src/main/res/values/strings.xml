@@ -88,6 +88,7 @@
     <string name="song_not_empty">The name of the song cannot be empty</string>
     <string name="save_success">Save Success</string>
     <string name="save_error">Save failed</string>
+    <string name="tag_save_error">Save failed: %s</string>
     <string name="arg_illegal">Parameter illegal: %d</string>
     <string name="send_success">Sent successfully.Thanks to your feedback!</string>
     <string name="send_error">Sent failed.Please try again!</string>

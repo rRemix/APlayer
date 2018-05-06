@@ -476,7 +476,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                     .items(new String[]{getString(R.string.aplayer_lockscreen), getString(R.string.system_lockscreen), getString(R.string.close)})
                     .itemsCallbackSingleChoice(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN) ,
                             (dialog, view, which, text) -> {
-                                SPUtil.putValue(SettingActivity.this,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN,which);
+                                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN,which);
                                 mLockScreenTip.setText(which == 0 ? R.string.aplayer_lockscreen_tip :
                                         which == 1 ? R.string.system_lockscreen_tip : R.string.lockscreen_off_tip);
                                 Intent intent = new Intent(MusicService.ACTION_CMD);
@@ -704,7 +704,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             mCache.setText(getString(R.string.cache_size,mCacheSize / 1024f / 1024));
         }
         if(msg.what == CLEAR_FINISH){
-            ToastUtil.show(SettingActivity.this,getString(R.string.clear_success));
+            ToastUtil.show(mContext,getString(R.string.clear_success));
             mCache.setText(R.string.zero_size);
             mLrcPath.setText(R.string.default_lrc_path);
         }

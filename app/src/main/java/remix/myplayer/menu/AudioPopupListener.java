@@ -193,7 +193,7 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                                     mActivity.setMP3Item(mInfo);
                                     MediaScannerConnection.scanFile(App.getContext(), new String[]{mInfo.getUrl()}, null, (path, uri) -> App.getContext().getContentResolver().notifyChange(uri,null));
                                     ToastUtil.show(mActivity,R.string.save_success);
-                                }, throwable -> ToastUtil.show(mActivity,R.string.save_error));
+                                }, throwable -> ToastUtil.show(mActivity,R.string.tag_save_error,throwable.toString()));
                         }).build();
                 editDialog.show();
 

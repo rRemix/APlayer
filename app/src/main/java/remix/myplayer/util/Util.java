@@ -593,7 +593,7 @@ public class Util {
     public static Intent createShareSongFileIntent(@NonNull final Song song, Context context) {
         try {
             Parcelable parcelable = FileProvider.getUriForFile(context,
-                    context.getApplicationContext().getPackageName() + ".fileprovider",
+                    "cn.bmob.update.fileprovider",
                     new File(song.getUrl()));
             return new Intent()
                     .setAction(Intent.ACTION_SEND)
@@ -613,7 +613,7 @@ public class Util {
     public static Intent createShareImageFileIntent(@NonNull final File file, Context context) {
         try {
             Parcelable parcelable = FileProvider.getUriForFile(context,
-                    context.getApplicationContext().getPackageName() + ".fileprovider",
+                    "cn.bmob.update.fileprovider",
                     file);
             return new Intent()
                     .setAction(Intent.ACTION_SEND)

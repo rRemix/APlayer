@@ -184,12 +184,12 @@ public class TagEditor {
 
             Tag tag = mAudioFile.getTagOrCreateAndSetDefault();
             tag.setField(FieldKey.TITLE,title);
-            tag.setField(FieldKey.ALBUM,album);
-            tag.setField(FieldKey.ARTIST,artist);
-            tag.setField(FieldKey.YEAR,year);
-            tag.setField(FieldKey.GENRE,genre);
-            tag.setField(FieldKey.TRACK,trackNumber);
-//            tag.setField(FieldKey.LYRICS,lyric);
+            tag.setField(FieldKey.ALBUM,album == null ? "" : album);
+            tag.setField(FieldKey.ARTIST,artist == null ? "" : artist);
+            tag.setField(FieldKey.YEAR,year == null ? "" : year);
+            tag.setField(FieldKey.GENRE,genre == null ? "" : genre);
+            tag.setField(FieldKey.TRACK,trackNumber == null ? "" : trackNumber);
+//            tag.setField(FieldKey.LYRICS,lyric == null ? "" : lyric);
 
             mAudioFile.commit();
             e.onNext(true);
