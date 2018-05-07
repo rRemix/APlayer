@@ -15,6 +15,8 @@
             android:title="@string/lyric"/>
         <item android:id="@+id/menu_collect"
             android:title="@string/collect"/>
+        <item android:title="@string/add_to_playlist"
+            android:id="@+id/menu_add_to_playlist"/>
         <!--<item android:title="音量调节"-->
             <!--android:id="@+id/menu_vol"/>-->
         <item android:title="@string/delete"

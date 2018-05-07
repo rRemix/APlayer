@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.MediaScannerConnection;
 import android.media.audiofx.AudioEffect;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.PopupMenu;
@@ -20,6 +21,9 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.common.util.ByteConstants;
 import com.umeng.analytics.MobclickAgent;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.App;
@@ -32,6 +36,7 @@ import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.EQActivity;
 import remix.myplayer.ui.activity.PlayerActivity;
+import remix.myplayer.ui.dialog.AddtoPlayListDialog;
 import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.TimerDialog;
 import remix.myplayer.ui.fragment.LyricFragment;
@@ -169,7 +174,7 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                         .positiveColorAttr(R.attr.text_color_primary)
                         .backgroundColorAttr(R.attr.background_color_3)
                         .onPositive((dialog, which) -> {
-                            String title = "",artist = "",album = "",genre = "",year = "",track = "";
+                            String title,artist,album,genre,year,track;
                             title = mSongLayout != null ? mSongLayout.getEditText().getText().toString().trim() : "";
                             if(TextUtils.isEmpty(title)){
                                 ToastUtil.show(mActivity,R.string.song_not_empty);
@@ -300,6 +305,14 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                 PlayListSong info = new PlayListSong(mInfo.getId(), Global.MyLoveID,Constants.MYLOVE);
                 ToastUtil.show(mActivity,
                         PlayListUtil.addSong(info) > 0 ? getString(R.string.add_song_playlist_success, 1,Constants.MYLOVE) : getString(R.string.add_song_playlist_error));
+                break;
+            case R.id.menu_add_to_playlist:
+                MobclickAgent.onEvent(mActivity,"AddtoPlayList");
+                Intent intentAdd = new Intent(this,AddtoPlayListDialog.class);
+                Bundle ardAdd = new Bundle();
+                ardAdd.putSerializable("list", new ArrayList<>(Collections.singletonList(mInfo.getId())));
+                intentAdd.putExtras(ardAdd);
+                startActivity(intentAdd);
                 break;
             case R.id.menu_delete:
                 new MaterialDialog.Builder(mActivity)

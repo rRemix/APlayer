@@ -111,6 +111,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     @BindView(R.id.setting_ignore_mediastore_switch)
     SwitchCompat mIgnoreMediastoreSwitch;
 
+    private static final int REQUEST_THEME_COLOR = 0x10;
+    private static final int REQUEST_EQ = 0x100;
+
     //是否需要重建activity
     private boolean mNeedRecreate = false;
     //是否需要刷新adapter
@@ -503,7 +506,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 break;
             //选择主色调
             case R.id.setting_color_container:
-                startActivityForResult(new Intent(this, ThemeDialog.class),0);
+                startActivityForResult(new Intent(this, ThemeDialog.class),REQUEST_THEME_COLOR);
                 break;
             //通知栏底色
             case R.id.setting_notify_color_container:
@@ -544,7 +547,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicService.getMediaPlayer().getAudioSessionId());
                 audioEffectIntent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC);
                 if(Util.isIntentAvailable(this,audioEffectIntent)){
-                    startActivityForResult(audioEffectIntent, 0);
+                    startActivityForResult(audioEffectIntent, REQUEST_EQ);
                 } else {
                     startActivity(new Intent(this,EQActivity.class));
                 }
@@ -727,12 +730,16 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 0 && data != null){
-            mNeedRecreate = data.getBooleanExtra("needRecreate",false);
-            mFromColorChoose = data.getBooleanExtra("fromColorChoose",false);
-            if(mNeedRecreate){
-                mHandler.sendEmptyMessage(RECREATE);
+        if(requestCode == REQUEST_THEME_COLOR ){
+            if(data != null){
+                mNeedRecreate = data.getBooleanExtra("needRecreate",false);
+                mFromColorChoose = data.getBooleanExtra("fromColorChoose",false);
+                if(mNeedRecreate){
+                    mHandler.sendEmptyMessage(RECREATE);
+                }
             }
+        } else if(requestCode == REQUEST_EQ){
+
         }
     }
 

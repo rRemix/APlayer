@@ -35,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/d5_szie"
-                android:layout_marginTop="@dimen/d10_size">
+                android:layout_marginTop="@dimen/d4_size">
                 <ImageButton
                     android:id="@+id/notify_close"
                     android:layout_centerVertical="true"
@@ -43,8 +43,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
-                    android:layout_marginRight="@dimen/d12_size"
-                    android:layout_marginLeft="@dimen/d12_size"
+                    android:padding="@dimen/d6_size"
                     android:src="@drawable/notify_btn_close_white" />
                 <TextView
                     style="@style/TextAppearance.AppCompat.Notification.Title"
@@ -52,6 +51,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
                     android:lines="1"
                     android:ellipsize="end"
                     android:textSize="@dimen/s16_size"
@@ -63,7 +63,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/d5_szie"
-                android:layout_marginTop="@dimen/d5_szie"
+                android:layout_marginRight="@dimen/d12_size"
                 android:layout_marginBottom="@dimen/d12_size"
                 android:lines="1"
                 android:ellipsize="end"

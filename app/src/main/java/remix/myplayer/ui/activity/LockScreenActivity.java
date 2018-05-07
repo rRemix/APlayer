@@ -298,9 +298,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                             }
 
                         }))
-                        .onErrorResumeNext(Observable.create(e -> {
-                            processBitmap(e,DEFAULT_BITMAP);
-                        }))
+                        .onErrorResumeNext(Observable.create(e -> processBitmap(e,DEFAULT_BITMAP)))
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
             }

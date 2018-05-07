@@ -18,8 +18,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.EnumMap;
+import java.util.Map;
 
 import io.reactivex.Observable;
+import remix.myplayer.util.FileUtil;
+import remix.myplayer.util.LogUtil;
 
 /**
  * 标签相关
@@ -182,13 +186,28 @@ public class TagEditor {
                 return;
             }
 
+            Map<FieldKey, String> fieldKeyValueMap = new EnumMap<>(FieldKey.class);
+            fieldKeyValueMap.put(FieldKey.ALBUM,album);
+            fieldKeyValueMap.put(FieldKey.TITLE,title);
+            fieldKeyValueMap.put(FieldKey.YEAR,year);
+            fieldKeyValueMap.put(FieldKey.GENRE,genre);
+            fieldKeyValueMap.put(FieldKey.TRACK,trackNumber);
+//            fieldKeyValueMap.put(FieldKey.LYRICS,lyric);
+
             Tag tag = mAudioFile.getTagOrCreateAndSetDefault();
-            tag.setField(FieldKey.TITLE,title);
-            tag.setField(FieldKey.ALBUM,album == null ? "" : album);
-            tag.setField(FieldKey.ARTIST,artist == null ? "" : artist);
-            tag.setField(FieldKey.YEAR,year == null ? "" : year);
-            tag.setField(FieldKey.GENRE,genre == null ? "" : genre);
-            tag.setField(FieldKey.TRACK,trackNumber == null ? "" : trackNumber);
+            for (Map.Entry<FieldKey, String> entry : fieldKeyValueMap.entrySet()) {
+                try {
+                    tag.setField(entry.getKey(), entry.getValue());
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+
+//            tag.setField(FieldKey.ALBUM,album == null ? "" : album);
+//            tag.setField(FieldKey.ARTIST,artist == null ? "" : artist);
+//            tag.setField(FieldKey.YEAR,year == null ? "" : year);
+//            tag.setField(FieldKey.GENRE,genre == null ? "" : genre);
+//            tag.setField(FieldKey.TRACK,trackNumber == null ? "" : trackNumber);
 //            tag.setField(FieldKey.LYRICS,lyric == null ? "" : lyric);
 
             mAudioFile.commit();
