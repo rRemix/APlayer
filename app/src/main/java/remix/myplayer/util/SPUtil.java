@@ -152,6 +152,8 @@ public class SPUtil {
         public static final String PLAY_AT_BREAKPOINT = "play_at_breakpoint";
         //是否忽略内嵌封面
         public static final String IGNORE_MEDIA_STORE = "ignore_media_store";
+        //桌面部件是否透明
+        public static final String APP_WIDGET_TRANSPARENT = "app_widget_transparent";
     }
 
 }

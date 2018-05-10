@@ -98,11 +98,11 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 public class PlayerActivity extends BaseActivity implements UpdateHelper.Callback,FileChooserDialog.FileCallback{
     private static final String TAG = "PlayerActivity";
     //是否正在运行
-    public static boolean mIsRunning;
+    public boolean mIsForeground;
     //上次选中的Fragment
     private int mPrevPosition = 1;
     //是否播放的标志变量
-    public static boolean mIsPlay = false;
+    public boolean mIsPlay = false;
     //第一次启动的标志变量
     private boolean mFistStart = true;
     //是否正在拖动进度条
@@ -330,8 +330,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     public void onResume() {
         super.onResume();
         //更新界面
-        mIsRunning = true;
-//        UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
+        mIsForeground = true;
+//        if(mFistStart)
+//            UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
         if(mNeedUpdateUI){
             UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
             mNeedUpdateUI = false;
@@ -343,7 +344,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     @Override
     protected void onStop() {
         super.onStop();
-        mIsRunning = false;
+        mIsForeground = false;
     }
 
     @Override
@@ -835,12 +836,12 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mIsPlay = isplay;
         //两种情况下更新ui
         //一是activity在前台  二是activity暂停后有更新的动作，当activity重新回到前台后更新ui
-        if(!mIsRunning || mInfo == null){
+        if(!mIsForeground || mInfo == null){
             mNeedUpdateUI = true;
             return;
         }
         //当操作不为播放或者暂停且正在运行时，更新所有控件
-        if((Global.getOperation() != Constants.TOGGLE || mFistStart)) {
+        if((Global.getOperation() != Constants.TOGGLE || mNeedUpdateUI)) {
             //更新顶部信息
             updateTopStatus(mInfo);
             //更新歌词
@@ -857,7 +858,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
             }
             updateBg();
-            requestCover();
+            requestCover(Global.getOperation() != Constants.TOGGLE && !mFistStart);
         }
         //更新按钮状态
         updatePlayButton(isplay);
@@ -867,7 +868,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private class ProgressThread extends Thread {
         @Override
         public void run() {
-            while (mIsRunning) {
+            while (mIsForeground) {
                 if(!MusicService.isPlay())
                     continue;
                 int progress = MusicService.getProgress();
@@ -959,31 +960,31 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     }
 
-    private void updateCover(){
-        ((CoverFragment) mAdapter.getItem(1)).updateCover(mInfo,mUri,!mFistStart);
+    private void updateCover(boolean withAnimation){
+        ((CoverFragment) mAdapter.getItem(1)).updateCover(mInfo,mUri,withAnimation);
         mFistStart = false;
     }
 
     /**
      * 更新封面
      */
-    private void requestCover() {
+    private void requestCover(boolean withAnimation) {
         //更新封面
         if(mInfo == null || (mInfo = MusicService.getCurrentMP3()) == null){
             mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
-            updateCover();
+            updateCover(withAnimation);
         } else {
             new ImageUriRequest<String>(){
                 @Override
                 public void onError(String errMsg) {
                     mUri = Uri.EMPTY;
-                    updateCover();
+                    updateCover(withAnimation);
                 }
 
                 @Override
                 public void onSuccess(String result) {
                     mUri = Uri.parse(result);
-                    updateCover();
+                    updateCover(withAnimation);
                 }
 
                 @Override

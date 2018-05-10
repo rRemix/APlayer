@@ -5,14 +5,21 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.widget.RemoteViews;
 
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.service.MusicService;
+import remix.myplayer.theme.Theme;
+import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.activity.MainActivity;
+import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
 
 /**
@@ -48,18 +55,64 @@ public class AppWidgetMedium extends BaseAppwidget {
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_medium);
         buildAction(context,remoteViews);
 
+//        boolean transParent = SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_TRANSPARENT,true);
+        boolean transParent = true;
+        if(transParent){
+            remoteViews.setImageViewResource(R.id.appwidget_clickable,R.drawable.bg_corner_app_widget_white_0f);
+        } else {
+            remoteViews.setImageViewResource(R.id.appwidget_clickable,R.drawable.bg_corner_app_widget_white_1f);
+        }
+
         remoteViews.setTextViewText(R.id.notify_song, temp.getTitle());
         //播放暂停按钮
-        remoteViews.setImageViewResource(R.id.appwidget_toggle,MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
+        if(transParent){
+            Drawable playPauseDrawable = Theme.TintDrawable(MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal, Color.WHITE);
+            remoteViews.setImageViewBitmap(R.id.appwidget_toggle,drawableToBitmap(playPauseDrawable));
+        } else {
+            remoteViews.setImageViewResource(R.id.appwidget_toggle,MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
+        }
+
         //歌曲名和歌手名
+        if(transParent){
+            remoteViews.setTextColor(R.id.appwidget_title,Color.WHITE);
+//            remoteViews.setTextColor(R.id.appwidget_artist,Color.WHITE);
+            remoteViews.setTextColor(R.id.appwidget_progress,Color.WHITE);
+        } else {
+            remoteViews.setTextColor(R.id.appwidget_title, ColorUtil.getColor(R.color.appwidget_title_color));
+//            remoteViews.setTextColor(R.id.appwidget_artist,ColorUtil.getColor(R.color.appwidget_artist_color));
+            remoteViews.setTextColor(R.id.appwidget_progress,ColorUtil.getColor(R.color.appwidget_progress_color));
+        }
         remoteViews.setTextViewText(R.id.appwidget_title,temp.getTitle());
         remoteViews.setTextViewText(R.id.appwidget_artist,temp.getArtist());
         //播放模式
-        remoteViews.setImageViewResource(R.id.appwidget_model,MusicService.getPlayModel() == Constants.PLAY_LOOP ?
-                R.drawable.widget_btn_loop_normal :  MusicService.getPlayModel() == Constants.PLAY_REPEATONE ? R.drawable.widget_btn_one_normal : R.drawable.widget_btn_shuffle_normal);
+        if(transParent){
+            Drawable modelDrawable = Theme.TintDrawable(MusicService.getPlayModel() == Constants.PLAY_LOOP ?
+                    R.drawable.widget_btn_loop_normal :  MusicService.getPlayModel() == Constants.PLAY_REPEATONE ? R.drawable.widget_btn_one_normal : R.drawable.widget_btn_shuffle_normal,
+                    Color.WHITE);
+            remoteViews.setImageViewBitmap(R.id.appwidget_model,drawableToBitmap(modelDrawable));
+        } else {
+            remoteViews.setImageViewResource(R.id.appwidget_model,MusicService.getPlayModel() == Constants.PLAY_LOOP ?
+                    R.drawable.widget_btn_loop_normal :  MusicService.getPlayModel() == Constants.PLAY_REPEATONE ? R.drawable.widget_btn_one_normal : R.drawable.widget_btn_shuffle_normal);
+        }
+        //上下首歌曲
+        if(transParent){
+            Drawable nextDrawable = Theme.TintDrawable(R.drawable.widget_btn_next_normal,Color.WHITE);
+            remoteViews.setImageViewBitmap(R.id.appwidget_next,drawableToBitmap(nextDrawable));
+            Drawable prevDrawable = Theme.TintDrawable(R.drawable.widget_btn_previous_normal,Color.WHITE);
+            remoteViews.setImageViewBitmap(R.id.appwidget_prev,drawableToBitmap(prevDrawable));
+        }
         //是否收藏
-        remoteViews.setImageViewResource(R.id.appwidget_love,
-                PlayListUtil.isLove(temp.getId()) == PlayListUtil.EXIST ? R.drawable.widget_btn_like_prs : R.drawable.widget_btn_like_nor);
+        if(PlayListUtil.isLove(temp.getId()) == PlayListUtil.EXIST ){
+            if(transParent){
+                Drawable likeDrawable = Theme.TintDrawable(R.drawable.widget_btn_like_nor,Color.WHITE);
+                remoteViews.setImageViewBitmap(R.id.appwidget_love,drawableToBitmap(likeDrawable));
+            } else {
+                remoteViews.setImageViewResource(R.id.appwidget_love,R.drawable.widget_btn_like_nor);
+            }
+        } else {
+            remoteViews.setImageViewResource(R.id.appwidget_love, R.drawable.widget_btn_like_prs);
+        }
+
 
         //设置时间
         long currentTime = MusicService.getProgress();
