@@ -46,7 +46,7 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
 
     @Override
     public void load() {
-        getThumbObservable(mRequest)
+        getCoverObservable(mRequest)
                 .compose(RxUtil.applyScheduler())
                 .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
     }

@@ -33,7 +33,7 @@ public class PlayListUriRequest extends LibraryUriRequest {
         Observable.concat(
                 getCustomThumbObservable(mRequest),
                 Observable.fromIterable(PlayListUtil.getMP3ListByIds(PlayListUtil.getIDList(mRequest.getID()),mRequest.getID()))
-                        .concatMapDelayError(song -> getThumbObservable(getSearchRequestWithAlbumType(song))))
+                        .concatMapDelayError(song -> getCoverObservable(getSearchRequestWithAlbumType(song))))
         .firstOrError()
         .toObservable()
         .compose(RxUtil.applyScheduler())

@@ -989,7 +989,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
                 @Override
                 public void load() {
-                    getThumbObservable(getSearchRequestWithAlbumType(mInfo))
+                    getCoverObservable(getSearchRequestWithAlbumType(mInfo))
                             .compose(RxUtil.applyScheduler())
                             .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
                 }

@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.facebook.common.util.ByteConstants;
@@ -694,6 +695,25 @@ public class MediaStoreUtil {
         }
 
         return song;
+    }
+
+    public static void insertAlbumArt(@NonNull Context context, int albumId, String path) {
+        ContentResolver contentResolver = context.getContentResolver();
+
+        Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
+        contentResolver.delete(ContentUris.withAppendedId(artworkUri, albumId), null, null);
+
+        ContentValues values = new ContentValues();
+        values.put("album_id", albumId);
+        values.put("_data", path);
+
+        contentResolver.insert(artworkUri, values);
+    }
+
+    public static void deleteAlbumArt(@NonNull Context context, int albumId) {
+        ContentResolver contentResolver = context.getContentResolver();
+        Uri localUri = Uri.parse("content://media/external/audio/albumart");
+        contentResolver.delete(ContentUris.withAppendedId(localUri, albumId), null, null);
     }
 
 

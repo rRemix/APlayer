@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
@@ -38,13 +39,31 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.soundcloud.android.crop.Crop;
 
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.CannotWriteException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.images.Artwork;
+import org.jaudiotagger.tag.images.ArtworkFactory;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.functions.Consumer;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
@@ -60,6 +79,7 @@ import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -493,6 +513,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
     }
 
+    @SuppressLint("CheckResult")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -552,27 +573,40 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                             return;
                         }
                         //清除fresco的缓存
-                        new Thread(){
-                            @Override
-                            public void run() {
-                                ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                                if(thumbBean.getType() != Constants.PLAYLIST){
-                                    if(new File(path).exists()){
-                                        Uri fileUri = Uri.parse("file://" + path);
-                                        imagePipeline.evictFromCache(fileUri);
-                                    } else {
-                                        Uri providerUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), id);
-                                        imagePipeline.evictFromCache(providerUri);
-                                    }
-                                    mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-                                }
-
+                        //如果设置的是专辑封面 修改内嵌封面
+                        Observable.create((ObservableOnSubscribe<Uri>) emitter -> {
+                            if(thumbBean.getType() == Constants.ALBUM){
+                                saveArtwork(thumbBean.getId(),new File(path));
                             }
-                        }.start();
+                            if(thumbBean.getType() != Constants.PLAYLIST){
+                                emitter.onNext(new File(path).exists() ? Uri.parse("file://" + path) :
+                                        ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), id));
+                            }
+                            emitter.onComplete();
+                        }).compose(RxUtil.applyScheduler())
+                        .subscribe(uri -> {
+                            if(uri != null){
+                                ImagePipeline imagePipeline = Fresco.getImagePipeline();
+                                imagePipeline.evictFromCache(uri);
+                            }
+                        }, throwable -> ToastUtil.show(mContext,R.string.tag_save_error,throwable.toString()));
                     }
                     break;
             }
         }
+    }
+
+    private void saveArtwork(int albumId, File artFile) throws TagException, ReadOnlyFileException, CannotReadException, InvalidAudioFrameException, IOException, CannotWriteException {
+        Song song = MediaStoreUtil.getMP3InfoByAlbumId(albumId);
+        if(song == null)
+            return;
+        AudioFile audioFile = AudioFileIO.read(new File(song.getUrl()));
+        Tag tag = audioFile.getTagOrCreateAndSetDefault();
+        Artwork artwork = ArtworkFactory.createArtworkFromFile(artFile);
+        tag.deleteArtworkField();
+        tag.setField(artwork);
+        audioFile.commit();
+        MediaStoreUtil.insertAlbumArt(this,albumId,artFile.getAbsolutePath());
     }
 
     @Override
