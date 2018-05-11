@@ -46,29 +46,16 @@ public class AppWidgetBig extends BaseAppwidget {
             return;
         final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_big);
         buildAction(context,remoteViews);
+        //设置封面
+        updateCover(context,remoteViews,appWidgetIds,reloadCover);
         updateRemoteViews(remoteViews,song);
         //设置时间
         long currentTime = MusicService.getProgress();
         if(currentTime > 0){
             remoteViews.setTextViewText(R.id.appwidget_progress, Util.getTime(currentTime));
         }
-        //设置封面
-        updateCover(context,remoteViews,appWidgetIds,reloadCover);
     }
 
-    private void buildAction(Context context, RemoteViews views) {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        ComponentName componentName = new ComponentName(context,MusicService.class);
-        views.setOnClickPendingIntent(R.id.appwidget_toggle,buildPendingIntent(context,componentName,Constants.TOGGLE));
-        views.setOnClickPendingIntent(R.id.appwidget_prev,buildPendingIntent(context,componentName, Constants.PREV));
-        views.setOnClickPendingIntent(R.id.appwidget_next,buildPendingIntent(context,componentName,Constants.NEXT));
-        views.setOnClickPendingIntent(R.id.appwidget_model,buildPendingIntent(context,componentName,Constants.CHANGE_MODEL));
-        views.setOnClickPendingIntent(R.id.appwidget_love,buildPendingIntent(context,componentName,Constants.LOVE));
-        views.setOnClickPendingIntent(R.id.appwidget_skin,buildPendingIntent(context,componentName,Constants.UPDATE_APPWIDGET));
-        Intent action = new Intent(context, MainActivity.class);
-        action.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        views.setOnClickPendingIntent(R.id.appwidget_clickable, PendingIntent.getActivity(context, 0, action, 0));
-    }
+
 
 }
