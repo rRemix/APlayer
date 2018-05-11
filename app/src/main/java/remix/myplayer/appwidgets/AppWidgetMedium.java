@@ -12,6 +12,8 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
+import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.Util;
 
 /**
  * Created by Remix on 2016/12/20.
@@ -40,27 +42,23 @@ public class AppWidgetMedium extends BaseAppwidget {
     }
 
     public void updateWidget(final Context context,final int[] appWidgetIds, boolean reloadCover){
-        Song temp = MusicService.getCurrentMP3();
-        if(temp == null || !hasInstances(context))
+        final Song song = MusicService.getCurrentMP3();
+        if(song == null || !hasInstances(context))
             return;
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_medium);
+        final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_medium);
         buildAction(context,remoteViews);
-//        boolean transParent = SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_TRANSPARENT,true);
-        boolean transParent = true;
-        updateBackground(remoteViews,transParent);
-        updateTitle(remoteViews,temp,transParent);
-        updateArtist(remoteViews,temp,transParent);
-        updatePlayPause(remoteViews,transParent);
-        updateLove(remoteViews,temp,transParent);
-        updateModel(remoteViews,transParent);
-        updateNextAndPrev(remoteViews,transParent);
-        updateProgress(remoteViews,temp,transParent);
+        updateRemoteViews(remoteViews,song);
+        //设置时间
+        long currentTime = MusicService.getProgress();
+        long remainTime = song.getDuration() - MusicService.getProgress();
+        if(currentTime > 0 && remainTime > 0){
+            remoteViews.setTextViewText(R.id.appwidget_progress, Util.getTime(currentTime) + "/" + Util.getTime(remainTime));
+        }
 
-
-//        boolean transParent = SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_TRANSPARENT,true);
+//        boolean transParent = SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,true);
 //        boolean transParent = true;
 //        if(transParent){
-//            remoteViews.setImageViewResource(R.id.appwidget_clickable,R.drawable.bg_corner_app_widget_white_0f);
+//            remoteViews.setImageViewResource(R.id.appwidget_clickable,R.drawable.bg_corner_app_widget_transparent);
 //        } else {
 //            remoteViews.setImageViewResource(R.id.appwidget_clickable,R.drawable.bg_corner_app_widget_white_1f);
 //        }
@@ -135,7 +133,7 @@ public class AppWidgetMedium extends BaseAppwidget {
         views.setOnClickPendingIntent(R.id.appwidget_next,buildPendingIntent(context,componentName,Constants.NEXT));
         views.setOnClickPendingIntent(R.id.appwidget_model,buildPendingIntent(context,componentName,Constants.CHANGE_MODEL));
         views.setOnClickPendingIntent(R.id.appwidget_love,buildPendingIntent(context,componentName,Constants.LOVE));
-
+        views.setOnClickPendingIntent(R.id.appwidget_skin,buildPendingIntent(context,componentName,Constants.UPDATE_APPWIDGET));
         Intent action = new Intent(context, MainActivity.class);
         action.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         views.setOnClickPendingIntent(R.id.appwidget_clickable, PendingIntent.getActivity(context, 0, action, 0));

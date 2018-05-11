@@ -12,7 +12,7 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
-import remix.myplayer.util.PlayListUtil;
+import remix.myplayer.util.SPUtil;
 
 /**
  * @ClassName
@@ -40,20 +40,12 @@ public class AppWidgetSmall extends BaseAppwidget {
     }
 
     public void updateWidget(final Context context,final int[] appWidgetIds, boolean reloadCover){
-        Song temp = MusicService.getCurrentMP3();
-        if(temp == null || !hasInstances(context))
+        final Song song = MusicService.getCurrentMP3();
+        if(song == null || !hasInstances(context))
             return;
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_small);
+        final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_small);
         buildAction(context,remoteViews);
-//        boolean transParent = SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_TRANSPARENT,true);
-        boolean transParent = true;
-        updateBackground(remoteViews,transParent);
-        updatePlayPause(remoteViews,transParent);
-        updateTitle(remoteViews,temp,transParent);
-        updateLove(remoteViews,temp,transParent);
-        updateNextAndPrev(remoteViews,transParent);
-        updateModel(remoteViews,transParent);
-        updateProgress(remoteViews,temp,transParent);
+        updateRemoteViews(remoteViews,song);
 //        remoteViews.setTextViewText(R.id.notify_song, temp.getTitle());
 //        //播放暂停按钮
 //        remoteViews.setImageViewResource(R.id.appwidget_toggle,MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
@@ -82,7 +74,7 @@ public class AppWidgetSmall extends BaseAppwidget {
         views.setOnClickPendingIntent(R.id.appwidget_next,buildPendingIntent(context,componentName,Constants.NEXT));
         views.setOnClickPendingIntent(R.id.appwidget_model,buildPendingIntent(context,componentName,Constants.CHANGE_MODEL));
         views.setOnClickPendingIntent(R.id.appwidget_love,buildPendingIntent(context,componentName,Constants.LOVE));
-
+        views.setOnClickPendingIntent(R.id.appwidget_skin,buildPendingIntent(context,componentName,Constants.UPDATE_APPWIDGET));
         Intent action = new Intent(context, MainActivity.class);
         action.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         views.setOnClickPendingIntent(R.id.appwidget_clickable, PendingIntent.getActivity(context, 0, action, 0));

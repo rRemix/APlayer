@@ -254,7 +254,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 (view, index) -> Theme.TintDrawable(view,view.getBackground(),arrowColor));
 
         //封面
-        mOriginalAlbumChoice = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.wifi_only));
+        mOriginalAlbumChoice = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,mContext.getString(R.string.always));
         mAlbumCoverText.setText(mOriginalAlbumChoice);
 
         //根据系统版本决定是否显示通知栏样式切换

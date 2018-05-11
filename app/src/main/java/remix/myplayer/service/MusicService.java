@@ -78,6 +78,8 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
+import static remix.myplayer.appwidgets.BaseAppwidget.SKIN_TRANSPARENT;
+import static remix.myplayer.appwidgets.BaseAppwidget.SKIN_WHITE_1F;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 
@@ -216,8 +218,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     public static final String ACTION_SHORTCUT_LASTADDED = APLAYER_PACKAGE_NAME + "shortcut.last_added";
     public static final String ACTION_SHORTCUT_CONTINUE_PLAY = APLAYER_PACKAGE_NAME + "shortcut.continue_play";
     public static final String ACTION_LOAD_FINISH = APLAYER_PACKAGE_NAME + "load.finish";
-    public final static String ACTION_CMD = APLAYER_PACKAGE_NAME + ".cmd";
-    public final static String ACTION_WIDGET_UPDATE = APLAYER_PACKAGE_NAME + ".widget_update";
+    public static final String ACTION_CMD = APLAYER_PACKAGE_NAME + ".cmd";
+    public static final String ACTION_WIDGET_UPDATE = APLAYER_PACKAGE_NAME + ".widget_update";
 
     public synchronized static MusicService getInstance(){
         return mInstance;
@@ -350,7 +352,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 初始化mediasession
      */
     private void setUpMediaSession() {
-        //初始化MediaSesson 用于监听线控操作
+        //初始化MediaSession 用于监听线控操作
         mMediaSession = new MediaSessionCompat(getApplicationContext(),"APlayer");
         mMediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
                 | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
@@ -665,8 +667,15 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         switch (action){
             case ACTION_APPWIDGET_OPERATE:
                 Intent appwidgetIntent = new Intent(ACTION_CMD);
-                appwidgetIntent.putExtra("Control",commandIntent.getIntExtra("Control",-1));
-                sendBroadcast(appwidgetIntent);
+                int control = commandIntent.getIntExtra("Control",-1);
+                if(control == Constants.UPDATE_APPWIDGET){
+                    int skin = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
+                    SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
+                    updateAppwidget();
+                } else {
+                    appwidgetIntent.putExtra("Control",control);
+                    sendBroadcast(appwidgetIntent);
+                }
                 break;
             case ACTION_SHORTCUT_CONTINUE_PLAY:
                 Intent continueIntent = new Intent(ACTION_CMD);

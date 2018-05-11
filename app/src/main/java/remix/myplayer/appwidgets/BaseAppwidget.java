@@ -14,6 +14,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.widget.RemoteViews;
 
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.request.RequestConfig;
@@ -24,7 +25,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.Util;
+import remix.myplayer.util.SPUtil;
 
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
@@ -36,6 +37,10 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  */
 
 public class BaseAppwidget extends AppWidgetProvider {
+    public static final int SKIN_WHITE_1F = 1;//白色不带透明
+    public static final int SKIN_TRANSPARENT = 2;//透明
+
+    protected AppWidgetSkin mSkin;
     protected Bitmap mBitmap;
 
     protected PendingIntent buildPendingIntent(Context context,ComponentName componentName,int operation) {
@@ -105,7 +110,6 @@ public class BaseAppwidget extends AppWidgetProvider {
         }
     }
 
-
     protected void pushUpdate(Context context, int[] appWidgetId, RemoteViews remoteViews) {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         if (appWidgetId != null) {
@@ -115,90 +119,78 @@ public class BaseAppwidget extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(new ComponentName(context, getClass()), remoteViews);
     }
 
-    protected void updateProgress(RemoteViews remoteViews, Song song,boolean transParent) {
+    protected void updateRemoteViews(RemoteViews remoteViews,Song song){
+        int skin = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
+        mSkin = skin == SKIN_TRANSPARENT ? AppWidgetSkin.TRANSPARENT : AppWidgetSkin.WHITE_1F;
+        updateBackground(remoteViews);
+        updateTitle(remoteViews,song);
+        updateArtist(remoteViews,song);
+        updateSkin(remoteViews);
+        updatePlayPause(remoteViews);
+        updateLove(remoteViews,song);
+        updateModel(remoteViews);
+        updateNextAndPrev(remoteViews);
+        updateProgress(remoteViews,song);
+    }
+
+    protected void updateSkin(RemoteViews remoteViews){
+        Drawable skinDrawable = Theme.TintDrawable(R.drawable.widget_btn_skin, mSkin.getBtnColor());
+        remoteViews.setImageViewBitmap(R.id.appwidget_skin,drawableToBitmap(skinDrawable));
+    }
+
+    protected void updateProgress(RemoteViews remoteViews, Song song) {
         //设置时间
-        if(transParent){
-            remoteViews.setTextColor(R.id.appwidget_progress,Color.WHITE);
-        } else {
-            remoteViews.setTextColor(R.id.appwidget_progress,ColorUtil.getColor(R.color.appwidget_progress_color));
-        }
+        remoteViews.setTextColor(R.id.appwidget_progress,mSkin.getProgressColor());
         //进度
         remoteViews.setProgressBar(R.id.appwidget_seekbar,(int)song.getDuration(),MusicService.getProgress(),false);
     }
 
-    protected void updateLove(RemoteViews remoteViews, Song song, boolean transParent) {
+    protected void updateLove(RemoteViews remoteViews, Song song) {
         //是否收藏
-        if(PlayListUtil.isLove(song.getId()) == PlayListUtil.EXIST ){
-            if(transParent){
-                Drawable likeDrawable = Theme.TintDrawable(R.drawable.widget_btn_like_nor, Color.WHITE);
-                remoteViews.setImageViewBitmap(R.id.appwidget_love,drawableToBitmap(likeDrawable));
-            } else {
-                remoteViews.setImageViewResource(R.id.appwidget_love,R.drawable.widget_btn_like_nor);
-            }
+        if(PlayListUtil.isLove(song.getId()) == PlayListUtil.EXIST){
+            Drawable likeDrawable = Theme.TintDrawable(R.drawable.widget_btn_like_nor, mSkin.getBtnColor());
+            remoteViews.setImageViewBitmap(R.id.appwidget_love,drawableToBitmap(likeDrawable));
         } else {
             remoteViews.setImageViewResource(R.id.appwidget_love, R.drawable.widget_btn_like_prs);
         }
     }
 
-    protected void updateNextAndPrev(RemoteViews remoteViews, boolean transParent) {
+    protected void updateNextAndPrev(RemoteViews remoteViews) {
         //上下首歌曲
-        if(transParent){
-            Drawable nextDrawable = Theme.TintDrawable(R.drawable.widget_btn_next_normal, Color.WHITE);
-            remoteViews.setImageViewBitmap(R.id.appwidget_next,drawableToBitmap(nextDrawable));
-            Drawable prevDrawable = Theme.TintDrawable(R.drawable.widget_btn_previous_normal,Color.WHITE);
-            remoteViews.setImageViewBitmap(R.id.appwidget_prev,drawableToBitmap(prevDrawable));
-        }
+        Drawable nextDrawable = Theme.TintDrawable(R.drawable.widget_btn_next_normal,mSkin.getBtnColor());
+        remoteViews.setImageViewBitmap(R.id.appwidget_next,drawableToBitmap(nextDrawable));
+        Drawable prevDrawable = Theme.TintDrawable(R.drawable.widget_btn_previous_normal,mSkin.getBtnColor());
+        remoteViews.setImageViewBitmap(R.id.appwidget_prev,drawableToBitmap(prevDrawable));
     }
 
-    protected void updateModel(RemoteViews remoteViews, boolean transParent) {
+    protected void updateModel(RemoteViews remoteViews) {
         //播放模式
-        if(transParent){
-            Drawable modelDrawable = Theme.TintDrawable(MusicService.getPlayModel() == Constants.PLAY_LOOP ?
-                            R.drawable.widget_btn_loop_normal :  MusicService.getPlayModel() == Constants.PLAY_REPEATONE ? R.drawable.widget_btn_one_normal : R.drawable.widget_btn_shuffle_normal,
-                    Color.WHITE);
-            remoteViews.setImageViewBitmap(R.id.appwidget_model,drawableToBitmap(modelDrawable));
-        } else {
-            remoteViews.setImageViewResource(R.id.appwidget_model,MusicService.getPlayModel() == Constants.PLAY_LOOP ?
-                    R.drawable.widget_btn_loop_normal :  MusicService.getPlayModel() == Constants.PLAY_REPEATONE ? R.drawable.widget_btn_one_normal : R.drawable.widget_btn_shuffle_normal);
-        }
+        Drawable modelDrawable = Theme.TintDrawable(MusicService.getPlayModel() == Constants.PLAY_LOOP ?
+                        R.drawable.widget_btn_loop_normal :  MusicService.getPlayModel() == Constants.PLAY_REPEATONE ? R.drawable.widget_btn_one_normal : R.drawable.widget_btn_shuffle_normal,
+                mSkin.getBtnColor());
+        remoteViews.setImageViewBitmap(R.id.appwidget_model,drawableToBitmap(modelDrawable));
     }
 
-    protected void updatePlayPause(RemoteViews remoteViews, boolean transParent) {
+    protected void updatePlayPause(RemoteViews remoteViews) {
         //播放暂停按钮
-        if(transParent){
-            Drawable playPauseDrawable = Theme.TintDrawable(MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal, Color.WHITE);
-            remoteViews.setImageViewBitmap(R.id.appwidget_toggle,drawableToBitmap(playPauseDrawable));
-        } else {
-            remoteViews.setImageViewResource(R.id.appwidget_toggle,MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
-        }
+        Drawable playPauseDrawable = Theme.TintDrawable(MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal,mSkin.getBtnColor());
+        remoteViews.setImageViewBitmap(R.id.appwidget_toggle,drawableToBitmap(playPauseDrawable));
     }
 
-    protected void updateTitle(RemoteViews remoteViews, Song song, boolean transParent) {
+    protected void updateTitle(RemoteViews remoteViews, Song song) {
         //歌曲名
-        if(transParent){
-            remoteViews.setTextColor(R.id.appwidget_title, Color.WHITE);
-        } else {
-            remoteViews.setTextColor(R.id.appwidget_title, ColorUtil.getColor(R.color.appwidget_title_color));
-        }
+        remoteViews.setTextColor(R.id.appwidget_title, mSkin.getTitleColor());
         remoteViews.setTextViewText(R.id.appwidget_title,song.getTitle());
     }
 
-    protected void updateArtist(RemoteViews remoteViews, Song song, boolean transParent){
+    protected void updateArtist(RemoteViews remoteViews, Song song){
         //歌手名
-        if(transParent){
-            remoteViews.setTextColor(R.id.appwidget_artist,ColorUtil.getColor(R.color.day_scan_track_color));
-        } else {
-            remoteViews.setTextColor(R.id.appwidget_artist,ColorUtil.getColor(R.color.appwidget_artist_color));
-        }
+        remoteViews.setTextColor(R.id.appwidget_artist,mSkin.getArtistColor());
         remoteViews.setTextViewText(R.id.appwidget_artist,song.getArtist());
     }
 
-    protected void updateBackground(RemoteViews remoteViews, boolean transParent) {
-        if(transParent){
-            remoteViews.setImageViewResource(R.id.appwidget_clickable,R.drawable.bg_corner_app_widget_white_0f);
-        } else {
-            remoteViews.setImageViewResource(R.id.appwidget_clickable,R.drawable.bg_corner_app_widget_white_1f);
-        }
+    protected void updateBackground(RemoteViews remoteViews) {
+        remoteViews.setImageViewResource(R.id.appwidget_clickable,mSkin.getBackground());
     }
 
     public static Bitmap drawableToBitmap(Drawable drawable) {

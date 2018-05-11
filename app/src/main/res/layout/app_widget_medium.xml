@@ -27,11 +27,12 @@
                 android:layout_centerVertical="true"/>
             <TextView
                 android:id="@+id/appwidget_title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/appwidget_image"
+                android:layout_toLeftOf="@id/appwidget_skin"
                 android:textSize="@dimen/s14_size"
-                android:textColor="@color/appwidget_title_color"
+                android:textColor="@color/appwidget_title_color_white_1f"
                 android:maxLines="1"
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="@dimen/d4_size"/>
@@ -43,7 +44,7 @@
                 android:layout_toRightOf="@id/appwidget_image"
                 android:layout_below="@id/appwidget_title"
                 android:textSize="@dimen/s12_size"
-                android:textColor="@color/appwidget_artist_color"
+                android:textColor="@color/appwidget_artist_color_white_1f"
                 android:maxLines="1"/>
             <TextView
                 android:id="@+id/appwidget_progress"
@@ -54,8 +55,16 @@
                 android:layout_marginBottom="@dimen/d10_size"
                 android:layout_marginRight="@dimen/d8_size"
                 android:textSize="@dimen/s12_size"
-                android:textColor="@color/appwidget_progress_color"
+                android:textColor="@color/appwidget_progress_color_white_1f"
                 android:maxLines="1"/>
+            <ImageButton android:id="@+id/appwidget_skin"
+                android:background="@drawable/bg_common_borderless_ripple"
+                android:src="@drawable/widget_btn_skin"
+                android:layout_width="@dimen/app_widget_medium_button_size"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@id/appwidget_title"
+                android:layout_marginRight="@dimen/d2_size" />
         </RelativeLayout>
 
         <ProgressBar
