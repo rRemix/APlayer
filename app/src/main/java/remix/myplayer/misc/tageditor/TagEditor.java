@@ -191,6 +191,7 @@ public class TagEditor {
             fieldKeyValueMap.put(FieldKey.TITLE,title);
             fieldKeyValueMap.put(FieldKey.YEAR,year);
             fieldKeyValueMap.put(FieldKey.GENRE,genre);
+            fieldKeyValueMap.put(FieldKey.ARTIST,artist);
             fieldKeyValueMap.put(FieldKey.TRACK,trackNumber);
 //            fieldKeyValueMap.put(FieldKey.LYRICS,lyric);
 

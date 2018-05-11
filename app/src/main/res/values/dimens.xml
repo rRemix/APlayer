@@ -76,7 +76,7 @@
 
     <dimen name="app_widget_big_min_height">250dp</dimen>
     <dimen name="app_widget_big_min_width">250dp</dimen>
-    <dimen name="app_widget_big_hieght">340dp</dimen>
+    <dimen name="app_widget_big_height">340dp</dimen>
     <dimen name="app_widget_big_button_size">38dp</dimen>
     <dimen name="app_widget_big_image_size">272dp</dimen>
 

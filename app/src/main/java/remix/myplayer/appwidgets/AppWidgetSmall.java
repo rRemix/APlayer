@@ -45,23 +45,31 @@ public class AppWidgetSmall extends BaseAppwidget {
             return;
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_small);
         buildAction(context,remoteViews);
-
-        remoteViews.setTextViewText(R.id.notify_song, temp.getTitle());
-        //播放暂停按钮
-        remoteViews.setImageViewResource(R.id.appwidget_toggle,MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
-        //歌曲名和歌手名
-        remoteViews.setTextViewText(R.id.appwidget_title,temp.getTitle());
-        //是否收藏
-        remoteViews.setImageViewResource(R.id.appwidget_love,
-                PlayListUtil.isLove(temp.getId()) == PlayListUtil.EXIST ? R.drawable.widget_btn_like_prs : R.drawable.widget_btn_like_nor);
-        //播放模式
-        remoteViews.setImageViewResource(R.id.appwidget_model,MusicService.getPlayModel() == Constants.PLAY_LOOP ?
-                R.drawable.widget_btn_loop_normal :  MusicService.getPlayModel() == Constants.PLAY_REPEATONE ? R.drawable.widget_btn_one_normal : R.drawable.widget_btn_shuffle_normal);
-        //是否收藏
-        remoteViews.setImageViewResource(R.id.appwidget_love,
-                PlayListUtil.isLove(temp.getId()) == PlayListUtil.EXIST ? R.drawable.widget_btn_like_prs : R.drawable.widget_btn_like_nor);
-        //进度
-        remoteViews.setProgressBar(R.id.appwidget_seekbar,(int)temp.getDuration(), MusicService.getProgress(),false);
+//        boolean transParent = SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_TRANSPARENT,true);
+        boolean transParent = true;
+        updateBackground(remoteViews,transParent);
+        updatePlayPause(remoteViews,transParent);
+        updateTitle(remoteViews,temp,transParent);
+        updateLove(remoteViews,temp,transParent);
+        updateNextAndPrev(remoteViews,transParent);
+        updateModel(remoteViews,transParent);
+        updateProgress(remoteViews,temp,transParent);
+//        remoteViews.setTextViewText(R.id.notify_song, temp.getTitle());
+//        //播放暂停按钮
+//        remoteViews.setImageViewResource(R.id.appwidget_toggle,MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
+//        //歌曲名和歌手名
+//        remoteViews.setTextViewText(R.id.appwidget_title,temp.getTitle());
+//        //是否收藏
+//        remoteViews.setImageViewResource(R.id.appwidget_love,
+//                PlayListUtil.isLove(temp.getId()) == PlayListUtil.EXIST ? R.drawable.widget_btn_like_prs : R.drawable.widget_btn_like_nor);
+//        //播放模式
+//        remoteViews.setImageViewResource(R.id.appwidget_model,MusicService.getPlayModel() == Constants.PLAY_LOOP ?
+//                R.drawable.widget_btn_loop_normal :  MusicService.getPlayModel() == Constants.PLAY_REPEATONE ? R.drawable.widget_btn_one_normal : R.drawable.widget_btn_shuffle_normal);
+//        //是否收藏
+//        remoteViews.setImageViewResource(R.id.appwidget_love,
+//                PlayListUtil.isLove(temp.getId()) == PlayListUtil.EXIST ? R.drawable.widget_btn_like_prs : R.drawable.widget_btn_like_nor);
+//        //进度
+//        remoteViews.setProgressBar(R.id.appwidget_seekbar,(int)temp.getDuration(), MusicService.getProgress(),false);
 
         //设置封面
         updateCover(context,remoteViews,appWidgetIds,reloadCover);
