@@ -63,6 +63,7 @@ import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import remix.myplayer.App;
 import remix.myplayer.R;
@@ -79,6 +80,7 @@ import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.SimpleUriRequest;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -578,17 +580,29 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                             if(thumbBean.getType() == Constants.ALBUM){
                                 saveArtwork(thumbBean.getId(),new File(path));
                             }
-                            if(thumbBean.getType() != Constants.PLAYLIST){
-                                emitter.onNext(new File(path).exists() ? Uri.parse("file://" + path) :
-                                        ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), id));
+                            if(thumbBean.getType() == Constants.ALBUM){
+                                new SimpleUriRequest(getSearchRequestWithAlbumType(MediaStoreUtil.getMP3InfoByAlbumId(thumbBean.getId()))){
+                                    @Override
+                                    public void onError(String errMsg) {
+                                        emitter.onError(new Throwable(errMsg));
+                                    }
+
+                                    @Override
+                                    public void onSuccess(Uri result) {
+                                        emitter.onNext(result);
+                                        emitter.onComplete();
+                                    }
+                                }.load();
+                            } else{
+                                emitter.onNext(Uri.parse("file://" + path));
+                                emitter.onComplete();
                             }
-                            emitter.onComplete();
                         }).compose(RxUtil.applyScheduler())
+                        .doFinally(() -> mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER))
                         .subscribe(uri -> {
-                            if(uri != null){
-                                ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                                imagePipeline.evictFromCache(uri);
-                            }
+                            ImagePipeline imagePipeline = Fresco.getImagePipeline();
+                            imagePipeline.evictFromCache(uri);
+                            imagePipeline.evictFromDiskCache(uri);
                         }, throwable -> ToastUtil.show(mContext,R.string.tag_save_error,throwable.toString()));
                     }
                     break;

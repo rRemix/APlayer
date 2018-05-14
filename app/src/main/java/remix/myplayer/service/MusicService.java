@@ -513,6 +513,14 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         sendBroadcast(audioEffectsIntent);
     }
 
+    private void openAudioEffectSession(){
+        final Intent audioEffectsIntent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
+        audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mMediaPlayer.getAudioSessionId());
+        audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
+        audioEffectsIntent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC);
+        sendBroadcast(audioEffectsIntent);
+    }
+
     /**
      * 播放下一首
      */
@@ -540,6 +548,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
         if(!mAudioFocus)
             return;
+        openAudioEffectSession();
         mIsplay = true; //更新所有界面
         update(Global.getOperation());
         mMediaPlayer.start();

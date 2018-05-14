@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +29,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -139,7 +142,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     TextView mRemainPlay;
     //进度条
     @BindView(R.id.seekbar)
-    SeekBar mSeekBar;
+    SeekBar mProgressSeekBar;
     //背景
     @BindView(R.id.audio_holder_container)
     ViewGroup mContainer;
@@ -148,6 +151,14 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     //下一首歌曲
     @BindView(R.id.next_song)
     TextView mNextSong;
+    @BindView(R.id.volume_down)
+    ImageButton mVolumeDown;
+    @BindView(R.id.volume_up)
+    ImageButton mVolumeUp;
+    @BindView(R.id.volume_seekbar)
+    SeekBar mVolumeSeekbar;
+    @BindView(R.id.volume_container)
+    View mVolumeContainer;
     //歌词控件
     private LrcView mLrcView;
     //高亮与非高亮指示器
@@ -216,6 +227,13 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private Bitmap mRawBitMap;
 
     private Palette.Swatch mSwatch;
+    private AudioManager mAudioManager;
+
+    private static final int DELAY_SHOW_NEXT_SONG = 3000;
+    private Runnable mVolumeRunnable = () -> {
+        mNextSong.startAnimation(makeAnimation(mNextSong,true));
+        mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer,false));
+    };
 
     @Override
     protected void setUpTheme() {
@@ -524,6 +542,57 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         }
     }
 
+    @OnClick({R.id.volume_down,R.id.volume_up,R.id.next_song})
+    void onVolumeClick(View view){
+        switch (view.getId()){
+            case R.id.volume_down:
+                mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                        AudioManager.ADJUST_LOWER,
+                        AudioManager.FLAG_PLAY_SOUND);
+                break;
+            case R.id.volume_up:
+                mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                        AudioManager.ADJUST_RAISE,
+                        AudioManager.FLAG_PLAY_SOUND);
+                break;
+            case R.id.next_song:
+//                mNextSong.setVisibility(View.GONE);
+//                mVolumeContainer.setVisibility(View.VISIBLE);
+                mNextSong.startAnimation(makeAnimation(mNextSong,false));
+                mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer,true));
+                mHandler.removeCallbacks(mVolumeRunnable);
+                mHandler.postDelayed(mVolumeRunnable,DELAY_SHOW_NEXT_SONG);
+                break;
+        }
+        if(view.getId() != R.id.next_song){
+            final int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            final int current = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100));
+        }
+    }
+
+    private AlphaAnimation makeAnimation(View view,boolean show){
+        AlphaAnimation alphaAnimation = new AlphaAnimation(show ? 0 : 1,show ? 1 : 0);
+        alphaAnimation.setDuration(300);
+        alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                view.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        return alphaAnimation;
+    }
+
     /**
      * 获得屏幕大小
      */
@@ -558,10 +627,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      */
     private void setUpSeekBar() {
 //        RelativeLayout seekbarContainer = findViewById(R.id.seekbar_container);
-//        mSeekBar = new SeekBar(mContext);
-//        mSeekBar.setProgressDrawable(getResources().getDrawable(R.drawable.bg_progress));
-//        mSeekBar.setPadding(DensityUtil.dip2px(mContext,5),0,DensityUtil.dip2px(mContext,5),0);
-//        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
+//        mProgressSeekBar = new SeekBar(mContext);
+//        mProgressSeekBar.setProgressDrawable(getResources().getDrawable(R.drawable.bg_progress));
+//        mProgressSeekBar.setPadding(DensityUtil.dip2px(mContext,5),0,DensityUtil.dip2px(mContext,5),0);
+//        mProgressSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
 //
 //        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, DensityUtil.dip2px(mContext,2));
 //        lp.setMargins(DensityUtil.dip2px(mContext,10),0,DensityUtil.dip2px(mContext,10),0);
@@ -569,7 +638,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //        lp.addRule(RelativeLayout.LEFT_OF,R.id.text_remain);
 //        lp.addRule(RelativeLayout.RIGHT_OF,R.id.text_hasplay);
 //        lp.addRule(RelativeLayout.CENTER_VERTICAL);
-//        seekbarContainer.addView(mSeekBar,lp);
+//        seekbarContainer.addView(mProgressSeekBar,lp);
         if(mInfo == null)
             return;
         //初始化已播放时间与剩余时间
@@ -584,16 +653,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
         //初始化seekbar
         if(mDuration > 0 && mDuration < Integer.MAX_VALUE)
-            mSeekBar.setMax(mDuration);
+            mProgressSeekBar.setMax(mDuration);
         else
-            mSeekBar.setMax(1000);
+            mProgressSeekBar.setMax(1000);
 
         if(mCurrentTime > 0 && mCurrentTime < mDuration)
-            mSeekBar.setProgress(mCurrentTime);
+            mProgressSeekBar.setProgress(mCurrentTime);
         else
-            mSeekBar.setProgress(0);
+            mProgressSeekBar.setProgress(0);
 
-        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        mProgressSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mHandler.sendEmptyMessage(UPDATE_TIME_ONLY);
@@ -615,6 +684,30 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 mIsDragSeekBarFromUser = false;
             }
         });
+
+        //音量控制
+        mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        final int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        final int current = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100));
+        mVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mHandler.removeCallbacks(mVolumeRunnable);
+                mHandler.postDelayed(mVolumeRunnable,DELAY_SHOW_NEXT_SONG);
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                        (int) (seekBar.getProgress() / 100f * max),
+                        AudioManager.FLAG_PLAY_SOUND);
+            }
+        });
+
+        mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
     }
 
     public void setMP3Item(Song song){
@@ -852,7 +945,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             int temp = MusicService.getProgress();
             mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
             mDuration = (int) mInfo.getDuration();
-            mSeekBar.setMax(mDuration);
+            mProgressSeekBar.setMax(mDuration);
             //更新下一首歌曲
             if(MusicService.getNextMP3() != null){
                 mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
@@ -892,19 +985,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         int accentColor = ThemeStore.getAccentColor();
         int tintColor = ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b);
 
-        LayerDrawable progressDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
-        //修改progress颜色
-        ((GradientDrawable)progressDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_efeeed : R.color.gray_343438));
-        (progressDrawable.getDrawable(1)).setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
-        mSeekBar.setProgressDrawable(progressDrawable);
-
+        setProgressDrawable(mProgressSeekBar,accentColor);
+        setProgressDrawable(mVolumeSeekbar,accentColor);
         //修改thumb
         int inset = DensityUtil.dip2px(mContext,6);
-        mSeekBar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),accentColor),
+        mProgressSeekBar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),accentColor),
                 inset,inset,inset,inset));
-
-//        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
-//        Drawable seekbarBackground = mSeekBar.getBackground();
+        mVolumeSeekbar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),accentColor),
+                inset,inset,inset,inset));
+//        mProgressSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
+//        Drawable seekbarBackground = mProgressSeekBar.getBackground();
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && seekbarBackground instanceof RippleDrawable) {
 //            ((RippleDrawable)seekbarBackground).setColor(ColorStateList.valueOf( ColorUtil.adjustAlpha(ThemeStore.getAccentColor(),0.2f)));
 //        }
@@ -920,19 +1010,31 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         Theme.TintDrawable(mTopHide,R.drawable.icon_player_back,tintColor);
         Theme.TintDrawable(mTopMore,R.drawable.icon_player_more,tintColor);
         //播放模式与播放队列
-        int playmode = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP);
-        Theme.TintDrawable(mPlayModel,playmode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-                playmode == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+        int playMode = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP);
+        Theme.TintDrawable(mPlayModel,playMode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                playMode == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                         R.drawable.play_btn_loop_one,tintColor);
         Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,tintColor);
+
+        //音量控制
+        Theme.TintDrawable(mVolumeDown,R.drawable.ic_volume_down_black_24dp,tintColor);
+        Theme.TintDrawable(mVolumeUp,R.drawable.ic_volume_up_black_24dp,tintColor);
 
         mPlayPauseView.setBackgroundColor(accentColor);
         //下一首背景
         mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.getColor(ThemeStore.isDay() ? R.color.white_fafafa : R.color.gray_343438),
                 DensityUtil.dip2px(this,2),0,0,DensityUtil.dip2px(this,288),DensityUtil.dip2px(this,38),1));
         mNextSong.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_a8a8a8 : R.color.white_e5e5e5));
+
     }
 
+    private void setProgressDrawable(SeekBar seekBar,int accentColor) {
+        LayerDrawable progressDrawable =  (LayerDrawable) seekBar.getProgressDrawable();
+        //修改progress颜色
+        ((GradientDrawable)progressDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_efeeed : R.color.gray_343438));
+        (progressDrawable.getDrawable(1)).setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+        seekBar.setProgressDrawable(progressDrawable);
+    }
 
     //更新背景
     private void updateBg() {
@@ -1041,7 +1143,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     }
 
     private void updateSeekbarByHandler(){
-        mSeekBar.setProgress(mCurrentTime);
+        mProgressSeekBar.setProgress(mCurrentTime);
     }
 
     @OnHandleMessage
@@ -1063,5 +1165,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     public LyricFragment getLyricFragment(){
         return (LyricFragment) mAdapter.getItem(2);
     }
+
 
 }

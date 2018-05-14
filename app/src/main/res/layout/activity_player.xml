@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true"
     android:id="@+id/audio_holder_container"
     android:background="?attr/background_color_main">
@@ -108,26 +108,6 @@
         <!-- 三个播放控制按钮和两个控制播放模式 -->
         <include layout="@layout/layout_player_control"/>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1.5">
-            <TextView
-                android:layout_marginTop="@dimen/d8_size"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/d36_size"
-                android:layout_marginRight="@dimen/d36_size"
-                android:paddingTop="@dimen/d12_size"
-                android:paddingBottom="@dimen/d12_size"
-                android:paddingStart="@dimen/d8_size"
-                android:paddingEnd="@dimen/d8_size"
-                android:gravity="center"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:textSize="@dimen/s14_size"
-                android:textColor="@color/gray_a8a8a8"
-                android:id="@+id/next_song"/>
-        </RelativeLayout>
+        <include layout="@layout/layout_player_volume"/>
     </LinearLayout>
 </FrameLayout>

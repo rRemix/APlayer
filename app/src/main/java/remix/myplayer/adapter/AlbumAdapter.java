@@ -106,12 +106,12 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         holder.mText2.setText(album.getArtist());
 
         //设置封面
-        final int albumid = album.getAlbumID();
+        final int albumId = album.getAlbumID();
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
 
         new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequest(album),new RequestConfig.Builder(imageSize,imageSize).build()).load();
         if(holder instanceof AlbumListHolder){
-            new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);
+            new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumId);
         }
 
         //背景点击效果
@@ -157,7 +157,7 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
             popupMenu.getMenuInflater().inflate(R.menu.menu_album_item, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
-                    albumid,
+                    albumId,
                     Constants.ALBUM,
                     album.getAlbum()));
             popupMenu.show();

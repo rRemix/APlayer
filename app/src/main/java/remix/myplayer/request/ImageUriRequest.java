@@ -149,9 +149,6 @@ public abstract class ImageUriRequest<T> {
         try {
             if(song == null)
                 return "";
-            if(song.getTitle().contains("Believe Me")){
-                int a = 1;
-            }
             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
             retriever.setDataSource(song.getUrl());
 
