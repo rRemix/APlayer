@@ -159,11 +159,11 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         //封面
         new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
 
-        //是否为无损
-        if(!TextUtils.isEmpty(song.getDisplayname())){
-            String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
-            holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
-        }
+//        //是否为无损
+//        if(!TextUtils.isEmpty(song.getDisplayname())){
+//            String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
+//            holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
+//        }
 
         //设置歌曲名
         holder.mName.setText(song.getTitle());

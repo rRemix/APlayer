@@ -223,38 +223,30 @@ public abstract class ImageUriRequest<T> {
 
     protected Observable<Bitmap> getThumbBitmapObservable(SearchRequest request) {
         return getCoverObservable(request)
-                .flatMap(new Function<String, ObservableSource<Bitmap>>() {
-                    @Override
-                    public ObservableSource<Bitmap> apply(String url) {
-                        return Observable.create(new ObservableOnSubscribe<Bitmap>() {
-                            @Override
-                            public void subscribe(ObservableEmitter<Bitmap> e) {
-                                Uri imageUri = !TextUtils.isEmpty(url) ? Uri.parse(url) : Uri.EMPTY;
-                                ImageRequest imageRequest =
-                                        ImageRequestBuilder.newBuilderWithSource(imageUri)
-                                                .setResizeOptions(new ResizeOptions(mConfig.getWidth(),mConfig.getHeight()))
-                                                .build();
-                                DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,this);
-                                dataSource.subscribe(new BaseBitmapDataSubscriber() {
-                                    @Override
-                                    protected void onNewResultImpl(Bitmap bitmap) {
-                                        Bitmap result = copy(bitmap);
-                                        if(result == null) {
-                                            result = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_day);
-                                        }
-                                        e.onNext(result);
-                                        e.onComplete();
-                                    }
-
-                                    @Override
-                                    protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-                                        e.onError(dataSource.getFailureCause());
-                                    }
-                                }, CallerThreadExecutor.getInstance());
+                .flatMap((Function<String, ObservableSource<Bitmap>>) url -> Observable.create(e -> {
+                    Uri imageUri = !TextUtils.isEmpty(url) ? Uri.parse(url) : Uri.EMPTY;
+                    ImageRequest imageRequest =
+                            ImageRequestBuilder.newBuilderWithSource(imageUri)
+                                    .setResizeOptions(new ResizeOptions(mConfig.getWidth(),mConfig.getHeight()))
+                                    .build();
+                    DataSource<CloseableReference<CloseableImage>> dataSource = Fresco.getImagePipeline().fetchDecodedImage(imageRequest,App.getContext());
+                    dataSource.subscribe(new BaseBitmapDataSubscriber() {
+                        @Override
+                        protected void onNewResultImpl(Bitmap bitmap) {
+                            Bitmap result = copy(bitmap);
+                            if(result == null) {
+                                result = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_day);
                             }
-                        });
-                    }
-                });
+                            e.onNext(result);
+                            e.onComplete();
+                        }
+
+                        @Override
+                        protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+                            e.onError(dataSource.getFailureCause());
+                        }
+                    }, CallerThreadExecutor.getInstance());
+                }));
     }
 
     /**

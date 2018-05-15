@@ -89,9 +89,9 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                         .onAny((dialog, which) -> {
                             if(which == POSITIVE){
                                 MobclickAgent.onEvent(mContext,"Delete");
-                                MobclickAgent.onEvent(mContext,"Delete");
                                 if(mId == Global.MyLoveID && mType == Constants.PLAYLIST){
                                     ToastUtil.show(mContext, mContext.getString(R.string.mylove_cant_delete));
+                                    return;
                                 }
                                 if(mType != Constants.PLAYLIST){
                                     ToastUtil.show(mContext,MediaStoreUtil.delete(mId , mType,dialog.isPromptCheckBoxChecked()) > 0 ? R.string.delete_success : R.string.delete_error);
