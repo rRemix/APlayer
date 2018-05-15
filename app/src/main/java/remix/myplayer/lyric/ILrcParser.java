@@ -15,5 +15,5 @@ import remix.myplayer.lyric.bean.LrcRow;
 public interface ILrcParser {
     void saveLrcRows(List<LrcRow> lrcRows, String key);
 
-    List<LrcRow> getLrcRows(BufferedReader bufferedReader, boolean needCache, String songName, String artistName);
+    List<LrcRow> getLrcRows(BufferedReader bufferedReader, boolean needCache, String key);
 }

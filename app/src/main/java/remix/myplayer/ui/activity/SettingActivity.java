@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
@@ -387,8 +388,9 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .itemsColorAttr(R.attr.text_color_primary)
                         .backgroundColorAttr(R.attr.background_color_3)
                         .itemsCallbackSingleChoice(position, (dialog, itemView, which, text) -> {
-                            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, "ScanSize", mScanSize[which]);
+                            SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.SCAN_SIZE, mScanSize[which]);
                             Constants.SCAN_SIZE = mScanSize[which];
+                            getContentResolver().notifyChange(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,null);
                             return true;
                         })
                         .theme(ThemeStore.getMDDialogTheme())

@@ -31,9 +31,7 @@ public class ScanActivity extends ToolbarActivity {
     //几种扫描大小
     static {
         mSizeList.add(0);
-        mSizeList.add(300 * ByteConstants.KB);
         mSizeList.add(500 * ByteConstants.KB);
-        mSizeList.add(800 * ByteConstants.KB);
         mSizeList.add(ByteConstants.MB);
         mSizeList.add(2 * ByteConstants.KB);
     }
@@ -76,7 +74,7 @@ public class ScanActivity extends ToolbarActivity {
                 int size = mSizeList.get(position);
                 if(size >= 0) {
                     //纪录下设置的大小
-                    SPUtil.putValue(ScanActivity.this, SPUtil.SETTING_KEY.SETTING_NAME, "ScanSize", size);
+                    SPUtil.putValue(ScanActivity.this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.SCAN_SIZE, size);
                     Constants.SCAN_SIZE = size;
                 }
             }

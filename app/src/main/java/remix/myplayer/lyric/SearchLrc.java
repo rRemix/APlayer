@@ -23,7 +23,6 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import io.reactivex.Observable;
 import remix.myplayer.App;
@@ -41,6 +40,7 @@ import remix.myplayer.misc.tageditor.TagEditor;
 import remix.myplayer.request.network.HttpClient;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.util.LogUtil;
+import remix.myplayer.util.LyricUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
 
@@ -91,11 +91,10 @@ public class SearchLrc {
         //根据在线和本地的优先级 确定最后一级
         boolean onlineFirst = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,false);
         Observable<List<LrcRow>> last = Observable.concat(onlineFirst ? networkObservable : localObservable ,onlineFirst ? localObservable : networkObservable).firstOrError().toObservable();
-
         return type == SPUtil.LYRIC_KEY.LYRIC_IGNORE ? Observable.error(new Throwable("Ignore")) :
                 Observable.concat(getCacheObservable(),getManualObservable(manualPath), getEmbeddedObservable(),last).firstOrError().toObservable()
                 .doOnSubscribe(disposable -> {
-                    mKey = Util.hashKeyForDisk(mSong.getTitle() + "/" + mSong.getArtist());
+                    mKey = Util.hashKeyForDisk(mSong.getId() + "/" + mSong.getTitle() + "/" + mSong.getArtist());
                     CurrentLrcPath = "";
                     if(clearCache){
                         DiskCache.getLrcDiskCache().remove(mKey);
@@ -125,8 +124,7 @@ public class SearchLrc {
             if(!TextUtils.isEmpty(lyric)){
                 e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lyric.getBytes(UTF_8)),UTF_8)),
                         true,
-                        mSong.getTitle(),
-                        mSong.getArtist()));
+                        mKey));
             }
             e.onComplete();
         });
@@ -139,10 +137,8 @@ public class SearchLrc {
         return Observable.create(e -> {
             //手动设置的歌词
             if(!TextUtils.isEmpty(manualPath)){
-                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(manualPath),Util.getCharset(manualPath))),
-                        true,
-                        mSong.getTitle(),
-                        mSong.getArtist()));
+                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(manualPath), LyricUtil.getCharset(manualPath))),
+                        true,mKey));
             }
             e.onComplete();
         });
@@ -179,7 +175,8 @@ public class SearchLrc {
                     if(localPaths.size() > 0) {
                         if(localPaths.size() == 1) {
                             String localPath = localPaths.get(0);
-                            e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist()));
+                            e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath), LyricUtil.getCharset(localPath))),
+                                    true,mKey));
                         }else{
                             String localPath = localPaths.get(0);
                             String translatePath=null;
@@ -190,11 +187,14 @@ public class SearchLrc {
                                 }
                             }
                             if(translatePath==null){
-                                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist()));
+                                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath), LyricUtil.getCharset(localPath))),
+                                        true,mKey));
                             }else{
                                 //合并歌词
-                                List<LrcRow> source = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath))), true, mSong.getTitle(), mSong.getArtist());
-                                List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(translatePath))),false,mSong.getTitle(),mSong.getArtist() + "/translate");
+                                List<LrcRow> source = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath), LyricUtil.getCharset(localPath))),
+                                        true, mKey);
+                                List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(translatePath), LyricUtil.getCharset(localPath))),
+                                        false,mKey);
                                 if(translate != null && translate.size() > 0) {
                                     int j = 0;
                                     for (int i = 0; i < source.size(); ) {
@@ -244,8 +244,7 @@ public class SearchLrc {
                                 .map(lrcBody -> {
                                     final KLrcResponse lrcResponse = new Gson().fromJson(lrcBody.string(),KLrcResponse.class);
                                     return mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(Base64.decode(lrcResponse.content, Base64.DEFAULT)))),
-                                            true,mSong.getTitle(),
-                                            mSong.getArtist());
+                                            true,mKey);
                                 });
                     });
         }else {
@@ -258,10 +257,12 @@ public class SearchLrc {
                                 final NLrcResponse lrcResponse = new Gson().fromJson(body1.string(),NLrcResponse.class);
                                 List<LrcRow> combine = mLrcParser.getLrcRows(new BufferedReader(
                                         new InputStreamReader(
-                                                new ByteArrayInputStream(lrcResponse.lrc.lyric.getBytes(UTF_8)),UTF_8)),false,mSong.getTitle(),mSong.getArtist() + "/original");
+                                                new ByteArrayInputStream(lrcResponse.lrc.lyric.getBytes(UTF_8)),UTF_8)),
+                                        false,mKey);
                                 //有翻译 合并
                                 if(lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
-                                    List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(UTF_8)),UTF_8)),false,mSong.getTitle(),mSong.getArtist() + "/translate");
+                                    List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(UTF_8)),UTF_8)),
+                                            false,mKey);
                                     if(translate != null && translate.size() > 0){
                                         for(int i = 0 ; i < translate.size();i++){
                                             for(int j = 0 ; j < combine.size();j++){
@@ -281,106 +282,7 @@ public class SearchLrc {
                                 return Observable.empty();
                         });
         }
-
     }
-
-    /**
-     * 根据歌词id,发送请求并解析歌词
-     * @return 歌词信息list
-     */
-    @Deprecated
-    public List<LrcRow> getLrc(String manualPath){
-        //判断是否是忽略的歌词
-        Set<String> ignoreLrcId = SPUtil.getStringSet(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"IgnoreLrcID");
-        if(ignoreLrcId != null && ignoreLrcId.size() > 0){
-            for (String id : ignoreLrcId){
-                if((mSong.getId() + "").equals(id)){
-                    return null;
-                }
-            }
-        }
-        BufferedReader br = null;
-        //manualPath不为空说明为手动设置歌词
-        try {
-            if(!TextUtils.isEmpty(manualPath)){
-                br = new BufferedReader(new InputStreamReader(new FileInputStream(manualPath)));
-                return mLrcParser.getLrcRows(br,true,mSong.getTitle(),mSong.getArtist());
-            }
-        } catch (Exception e){
-            LogUtil.e(TAG,e.toString());
-        } finally {
-            if (br != null)
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-        }
-
-        //搜索时判断该歌曲是否有缓存
-        try {
-            DiskLruCache.Snapshot snapShot = DiskCache.getLrcDiskCache().get(Util.hashKeyForDisk(mKey));
-             if(snapShot != null && (br = new BufferedReader(new InputStreamReader(snapShot.getInputStream(0)))) != null ){
-                 List<LrcRow> lrcRows = mLrcParser.getLrcRows(br,false, mSong.getTitle(),mSong.getArtist());
-                 snapShot.close();
-                 return lrcRows;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if(br != null)
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-        }
-
-        //搜索歌词
-        try {
-            //是否优先搜索在线歌词
-            boolean onlineFirst = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.ONLINE_LYRIC_FIRST,false);
-            if(onlineFirst){
-                String onlineLrcContent = getOnlineLrcContent();
-                if(!TextUtils.isEmpty(onlineLrcContent)){
-                    br = new BufferedReader(
-                            new InputStreamReader(new ByteArrayInputStream(Base64.decode(onlineLrcContent, Base64.DEFAULT))));
-                    return mLrcParser.getLrcRows(br,true, mSong.getTitle(),mSong.getArtist());
-                } else {
-                    String localLrcPath = getLocalLrcPath();
-                    if(!localLrcPath.equals("")){
-                        br = new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath)));
-                        return mLrcParser.getLrcRows(br,true, mSong.getTitle(),mSong.getArtist());
-                    }
-                }
-            } else {
-                String localLrcPath = getLocalLrcPath();
-                if(!localLrcPath.equals("")){
-                    br = new BufferedReader(new InputStreamReader(new FileInputStream(localLrcPath)));
-                    return mLrcParser.getLrcRows(br,true, mSong.getTitle(),mSong.getArtist());
-                } else {
-                    String onlineLrcContent = getOnlineLrcContent();
-                    if(!TextUtils.isEmpty(onlineLrcContent)){
-                        br = new BufferedReader(
-                                new InputStreamReader(new ByteArrayInputStream(Base64.decode(onlineLrcContent, Base64.DEFAULT))));
-                        return mLrcParser.getLrcRows(br,true, mSong.getTitle(),mSong.getArtist());
-                    }
-                }
-            }
-        }catch (Exception e){
-//            LogUtil.e(TAG,e.toString());
-            LogUtil.d(TAG,e.toString());
-        } finally {
-            if (br != null)
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-        }
-        return null;
-    }
-
 
     /**
      * 获取酷狗歌词接口的参数
@@ -454,7 +356,7 @@ public class SearchLrc {
             return "";
         if(!TextUtils.isEmpty(searchPath)){
             //已设置歌词路径
-            Util.searchFile(mDisplayName,mSong.getTitle(),mSong.getArtist(), new File(searchPath));
+            LyricUtil.searchFile(mDisplayName,mSong.getTitle(),mSong.getArtist(), new File(searchPath));
             if(!TextUtils.isEmpty(CurrentLrcPath)){
                 return CurrentLrcPath;
             }
@@ -475,7 +377,7 @@ public class SearchLrc {
                 while (filesCursor.moveToNext()){
                     File file = new File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
                     if (file.exists() && file.isFile() && file.canRead()) {
-                        if(Util.isRightLrc(file, mDisplayName,mSong.getTitle(),mSong.getArtist())){
+                        if(LyricUtil.isRightLrc(file, mDisplayName,mSong.getTitle(),mSong.getArtist())){
                             return file.getAbsolutePath();
                         }
                     }
@@ -499,7 +401,7 @@ public class SearchLrc {
             return results;
         if (!TextUtils.isEmpty(searchPath)) {
             //已设置歌词路径
-            Util.searchFile(mDisplayName, mSong.getTitle(), mSong.getArtist(), new File(searchPath));
+            LyricUtil.searchFile(mDisplayName, mSong.getTitle(), mSong.getArtist(), new File(searchPath));
             if (!TextUtils.isEmpty(CurrentLrcPath)) {
                 results.add(CurrentLrcPath);
                 return results;
@@ -514,14 +416,14 @@ public class SearchLrc {
                                 MediaStore.Files.FileColumns.DATA + " like ? or " +
                                         MediaStore.Files.FileColumns.DATA + " like ? or " +
                                         MediaStore.Files.FileColumns.DATA + " like ? ",
-                                new String[]{"%lyric%", "%Lyric%", "%.lrc%"},
+                                new String[]{"%lyric%", "%Lyric%", "%.lrc"},
                                 null);
                 if (filesCursor == null || !(filesCursor.getCount() > 0))
                     return results;
                 while (filesCursor.moveToNext()) {
                     File file = new File(filesCursor.getString(filesCursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
                     if (file.exists() && file.isFile() && file.canRead()) {
-                        if (Util.isRightLrc(file, mDisplayName, mSong.getTitle(), mSong.getArtist())) {
+                        if (LyricUtil.isRightLrc(file, mDisplayName, mSong.getTitle(), mSong.getArtist())) {
                             results.add(file.getAbsolutePath());
                         }
                     }

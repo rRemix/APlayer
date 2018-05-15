@@ -15,7 +15,6 @@ import java.util.List;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.cache.DiskLruCache;
-import remix.myplayer.util.Util;
 
 /**
  * @ClassName
@@ -58,7 +57,7 @@ public class DefaultLrcParser implements ILrcParser {
     }
 
     @Override
-    public List<LrcRow> getLrcRows(BufferedReader bufferedReader, boolean needCache,String songName,String artistName) {
+    public List<LrcRow> getLrcRows(BufferedReader bufferedReader, boolean needCache, String key) {
         if(bufferedReader == null)
             return null;
         //解析歌词
@@ -110,7 +109,7 @@ public class DefaultLrcParser implements ILrcParser {
         lrcRows.get(lrcRows.size() - 1).setTotalTime(5000);
 
         if (needCache) {
-            saveLrcRows(lrcRows,Util.hashKeyForDisk(songName + "/" + artistName));
+            saveLrcRows(lrcRows,key);
 //            editor = DiskCache.getLrcDiskCache().edit(Util.hashKeyForDisk(songName + "/" + artistName));
 //            if(editor != null)
 //                lrcCacheStream = editor.newOutputStream(0);

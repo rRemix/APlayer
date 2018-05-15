@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Album;
 import remix.myplayer.bean.mp3.Artist;
@@ -56,9 +57,13 @@ public class MediaStoreUtil {
     private static Context mContext;
     private MediaStoreUtil(){}
 //    public static String BASE_SELECTION = " and is_music = 1 ";
-    public static String BASE_SELECTION = " ";
+    private static String BASE_SELECTION = " ";
     public static void setContext(Context context){
         mContext = context;
+    }
+
+    static {
+        Constants.SCAN_SIZE = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SCAN_SIZE,ByteConstants.KB * 500);
     }
 
     public static List<Artist> getAllArtist(){
@@ -83,7 +88,7 @@ public class MediaStoreUtil {
         return artists;
     }
 
-    public static List<Album> getALlAlbum(){
+    public static List<Album> getAllAlbum(){
         ArrayList<Album> albums = new ArrayList<>();
         Cursor cursor = null;
 
@@ -115,8 +120,6 @@ public class MediaStoreUtil {
         ArrayList<Song> songs = new ArrayList<>();
         Cursor cursor = null;
 
-        //默认过滤文件大小1MB
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SCAN_SIZE,ByteConstants.MB);
         try {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     null,
@@ -169,8 +172,6 @@ public class MediaStoreUtil {
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
 
-        //默认过滤文件大小500K
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",ByteConstants.MB);
         try{
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -202,9 +203,6 @@ public class MediaStoreUtil {
         Cursor cursor = null;
         Map<String,List<Integer>> folder = new TreeMap<>(String::compareToIgnoreCase);
 
-
-        //默认过滤文件大小500K
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",ByteConstants.MB);
         try{
             cursor = resolver.query(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -238,9 +236,6 @@ public class MediaStoreUtil {
         ArrayList<Integer> allSongList = new ArrayList<>();
         ContentResolver resolver = mContext.getContentResolver();
         Cursor cursor = null;
-
-        //默认过滤文件大小500K
-        Constants.SCAN_SIZE = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ScanSize",ByteConstants.MB);
 
         try{
             cursor = resolver.query(
