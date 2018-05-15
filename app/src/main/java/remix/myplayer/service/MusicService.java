@@ -61,7 +61,7 @@ import remix.myplayer.misc.observer.MediaStoreObserver;
 import remix.myplayer.misc.receiver.ExitReceiver;
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver;
 import remix.myplayer.request.RequestConfig;
-import remix.myplayer.request.network.RemoteUriRequest;
+import remix.myplayer.request.RemoteUriRequest;
 import remix.myplayer.service.notification.Notify;
 import remix.myplayer.service.notification.NotifyImpl;
 import remix.myplayer.service.notification.NotifyImpl24;
@@ -288,7 +288,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mWakeLock = ((PowerManager)getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,getClass().getSimpleName());
         mWakeLock.setReferenceCounted(false);
         //通知栏
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1 & !SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,false)){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N & !SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,false)){
             mNotify = new NotifyImpl24(this);
         } else {
             mNotify = new NotifyImpl(this);
@@ -1272,7 +1272,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ThemeMode", ThemeStore.DAY);
                 SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ThemeColor",ThemeStore.THEME_BLUE);
                 //通知栏样式
-                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O));
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,Build.VERSION.SDK_INT < Build.VERSION_CODES.N);
             } catch (Exception e){
                 LogUtil.d(TAG,e.toString());
             }

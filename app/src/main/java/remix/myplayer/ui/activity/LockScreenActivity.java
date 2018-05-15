@@ -1,5 +1,7 @@
 package remix.myplayer.ui.activity;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -19,16 +21,22 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.umeng.analytics.MobclickAgent;
 
+import java.lang.ref.WeakReference;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.bean.netease.SearchRequest;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.menu.CtrlButtonListener;
 import remix.myplayer.request.ImageUriRequest;
@@ -58,6 +66,8 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
     private static final String TAG = "LockScreenActivity";
     private static final Bitmap DEFAULT_BITMAP = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.album_empty_bg_night);
     private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(),210);
+    private static final int BLUR_SIZE = DensityUtil.dip2px(App.getContext(),100);
+    private static final RequestConfig CONFIG = new RequestConfig.Builder(BLUR_SIZE,BLUR_SIZE).build();
     //当前播放的歌曲信息
     private Song mInfo;
     //歌曲与艺术家
@@ -264,9 +274,8 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
 
         if(mInfo == null)
             return;
-
-        final int size = DensityUtil.dip2px(mContext,100);
-        new ImageUriRequest<Palette.Swatch>(new RequestConfig.Builder(size,size).build()){
+//        new ImageUriRequestImpl(this,mInfo).load();
+        new ImageUriRequest<Palette.Swatch>(CONFIG){
             @Override
             public void onError(String errMsg) {
 //                ToastUtil.show(mContext,errMsg);
@@ -274,16 +283,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
 
             @Override
             public void onSuccess(Palette.Swatch result) {
-                if(result == null)
-                    return;
-                mSongColor = result.getBodyTextColor();
-                mArtistColor = result.getTitleTextColor();
-
-                mImageBackground.setImageBitmap(mNewBitMap);
-                mSong.setTextColor(mSongColor);
-                mArtist.setTextColor(mArtistColor);
-                mNextSong.setTextColor(mSongColor);
-                mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT,0,2,mSongColor,0,0,1));
+                setResult(result);
             }
 
             @Override
@@ -296,33 +296,85 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                             } else {
                                 processBitmap(e,bitmap);
                             }
-
                         }))
                         .onErrorResumeNext(Observable.create(e -> processBitmap(e,DEFAULT_BITMAP)))
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
             }
-
-            private void processBitmap(ObservableEmitter<Palette.Swatch> e,Bitmap raw) {
-                if(isFinishing()){
-                    e.onComplete();
-                    return;
-                }
-                mRawBitMap = MusicService.copy(raw);
-                if(mRawBitMap == null || mRawBitMap.isRecycled()){
-                    e.onComplete();
-                    return;
-                }
-                StackBlurManager stackBlurManager = new StackBlurManager(mRawBitMap);
-                mNewBitMap = stackBlurManager.processNatively(40);
-                Palette palette = Palette.from(mRawBitMap).generate();
-                Palette.Swatch swatch = palette.getMutedSwatch();//柔和 暗色
-                if(swatch == null)
-                    swatch = new Palette.Swatch(Color.GRAY,100);
-                e.onNext(swatch);
-                e.onComplete();
-            }
         }.load();
     }
 
+    private void setResult(Palette.Swatch result) {
+        if(result == null)
+            return;
+        mSongColor = result.getBodyTextColor();
+        mArtistColor = result.getTitleTextColor();
+
+        mImageBackground.setImageBitmap(mNewBitMap);
+        mSong.setTextColor(mSongColor);
+        mArtist.setTextColor(mArtistColor);
+        mNextSong.setTextColor(mSongColor);
+        mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE, Color.TRANSPARENT,0,2,mSongColor,0,0,1));
+    }
+
+    private void processBitmap(ObservableEmitter<Palette.Swatch> e,Bitmap raw) {
+        if(isFinishing()){
+            e.onComplete();
+            return;
+        }
+        mRawBitMap = MusicService.copy(raw);
+        if(mRawBitMap == null || mRawBitMap.isRecycled()){
+            e.onComplete();
+            return;
+        }
+        StackBlurManager stackBlurManager = new StackBlurManager(mRawBitMap);
+        mNewBitMap = stackBlurManager.processNatively(40);
+        Palette palette = Palette.from(mRawBitMap).generate();
+        Palette.Swatch swatch = palette.getMutedSwatch();//柔和 暗色
+        if(swatch == null)
+            swatch = new Palette.Swatch(Color.GRAY,100);
+        e.onNext(swatch);
+        e.onComplete();
+    }
+
+    private static class ImageUriRequestImpl extends ImageUriRequest<Palette.Swatch> {
+        private final WeakReference<LockScreenActivity> mRef;
+        private final Song mSong;
+        ImageUriRequestImpl(LockScreenActivity activity,Song song){
+            mRef = new WeakReference<>(activity);
+            mSong = song;
+        }
+
+        @Override
+        public void onError(String errMsg) {
+
+        }
+
+        @Override
+        public void onSuccess(Palette.Swatch result) {
+            if(mRef.get() != null && !mRef.get().isFinishing())
+                mRef.get().setResult(result);
+        }
+
+        @SuppressLint("CheckResult")
+        @Override
+        public void load() {
+            final LockScreenActivity activity = mRef.get();
+            if(activity == null || activity.isFinishing())
+                return;
+            SearchRequest request = ImageUriUtil.getSearchRequestWithAlbumType(mSong);
+            getThumbBitmapObservable(request)
+                    .compose(RxUtil.applySchedulerToIO())
+                    .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {
+                        if(bitmap == null){
+                            activity.processBitmap(e,DEFAULT_BITMAP);
+                        } else {
+                            activity.processBitmap(e,bitmap);
+                        }
+                    }))
+                    .onErrorResumeNext(Observable.create(e -> activity.processBitmap(e,DEFAULT_BITMAP)))
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
+        }
+    }
 }

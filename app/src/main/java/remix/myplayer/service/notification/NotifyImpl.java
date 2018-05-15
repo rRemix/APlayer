@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -12,7 +11,7 @@ import android.widget.RemoteViews;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.request.RequestConfig;
-import remix.myplayer.request.network.RemoteUriRequest;
+import remix.myplayer.request.RemoteUriRequest;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
@@ -45,7 +44,7 @@ public class NotifyImpl extends Notify {
         Notification notification = buildNotification(mService);
 
         if((MusicService.getCurrentMP3() != null)) {
-            boolean isSystemColor = SPUtil.getValue(mService,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR,Build.VERSION.SDK_INT < Build.VERSION_CODES.N);
+            boolean isSystemColor = SPUtil.getValue(mService,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR,true);
 
             Song song = MusicService.getCurrentMP3();
             //设置歌手，歌曲名

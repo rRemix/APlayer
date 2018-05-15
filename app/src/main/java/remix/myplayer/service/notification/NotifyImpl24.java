@@ -11,7 +11,7 @@ import android.support.v4.app.NotificationCompat;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.request.RequestConfig;
-import remix.myplayer.request.network.RemoteUriRequest;
+import remix.myplayer.request.RemoteUriRequest;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
