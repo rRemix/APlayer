@@ -1,17 +1,22 @@
 package remix.myplayer.lyric;
 
+import android.os.Environment;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import remix.myplayer.App;
 import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.cache.DiskLruCache;
@@ -25,19 +30,16 @@ import remix.myplayer.misc.cache.DiskLruCache;
 
 public class DefaultLrcParser implements ILrcParser {
     @Override
-    public void saveLrcRows(List<LrcRow> lrcRows, String key){
+    public void saveLrcRows(List<LrcRow> lrcRows, String cacheKey,String searchKey){
         if(lrcRows == null || lrcRows.size() == 0)
             return;
         DiskLruCache.Editor editor;
         OutputStream lrcCacheStream = null;
         try {
-            editor = DiskCache.getLrcDiskCache().edit(key);
+            editor = DiskCache.getLrcDiskCache().edit(cacheKey);
             if(editor == null)
                 return;
             lrcCacheStream = editor.newOutputStream(0);
-//            for(LrcRow lrcRow : lrcRows){
-//                lrcCacheStream.write((lrcRow + "\n").getBytes());
-//            }
             lrcCacheStream.write(new Gson().toJson(lrcRows,new TypeToken<List<LrcRow>>(){}.getType()).getBytes());
             lrcCacheStream.flush();
             editor.commit();
@@ -54,10 +56,41 @@ public class DefaultLrcParser implements ILrcParser {
             }
         }
 
+//        //保存歌词原始文件
+//        if(TextUtils.isEmpty(searchKey) || !Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
+//            return;
+//        File lyricDir = new File(Environment.getExternalStorageDirectory(),"Android/data/"
+//                + App.getContext().getPackageName() + "/lyric");
+//        if(!lyricDir.exists() && !lyricDir.mkdirs())
+//            return;
+//
+//        File lyricFile = new File(lyricDir,searchKey.replaceAll("/","") + ".lrc");
+//        if(lyricFile.exists())
+//            return;
+//        FileOutputStream outputStream = null;
+//        try {
+//            outputStream = new FileOutputStream(lyricFile);
+//            for(int i = 0 ; i < lrcRows.size();i++){
+//                LrcRow lrcRow = lrcRows.get(i);
+//                outputStream.write(("[" + lrcRow.getTimeStr() + "]" + lrcRow.getContent()
+//                        + (!TextUtils.isEmpty(lrcRow.getTranslate()) ? "\r\n" + lrcRow.getTranslate() + "\r\n" : "\r\n")).getBytes());
+//            }
+//            outputStream.flush();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            if(outputStream != null) {
+//                try {
+//                    outputStream.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
     }
 
     @Override
-    public List<LrcRow> getLrcRows(BufferedReader bufferedReader, boolean needCache, String key) {
+    public List<LrcRow> getLrcRows(BufferedReader bufferedReader, boolean needCache, String cacheKey,String searchKey) {
         if(bufferedReader == null)
             return null;
         //解析歌词
@@ -109,20 +142,8 @@ public class DefaultLrcParser implements ILrcParser {
         lrcRows.get(lrcRows.size() - 1).setTotalTime(5000);
 
         if (needCache) {
-            saveLrcRows(lrcRows,key);
-//            editor = DiskCache.getLrcDiskCache().edit(Util.hashKeyForDisk(songName + "/" + artistName));
-//            if(editor != null)
-//                lrcCacheStream = editor.newOutputStream(0);
-//            if(lrcCacheStream != null){
-//                lrcCacheStream.write(new Gson().toJson(lrcRows,new TypeToken<List<LrcRow>>(){}.getType()).getBytes());
-//                lrcCacheStream.flush();
-//            }
-//            if (editor != null) {
-//                editor.commit();
-//            }
-//            DiskCache.getLrcDiskCache().flush();
+            saveLrcRows(lrcRows,cacheKey,searchKey);
         }
-
 
         return lrcRows;
     }

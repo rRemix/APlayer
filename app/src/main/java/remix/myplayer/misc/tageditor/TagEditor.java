@@ -58,15 +58,15 @@ public class TagEditor {
     }
 
     public String getFormat(){
-        return mAudioHeader.getFormat();
+        return mAudioHeader != null ? mAudioHeader.getFormat() : "";
     }
 
     public String getBitrate(){
-        return mAudioHeader.getBitRate();
+        return mAudioHeader != null ? mAudioHeader.getBitRate() : "";
     }
 
     public String getSamlingRate(){
-        return mAudioHeader.getSampleRate();
+        return mAudioHeader != null ? mAudioHeader.getSampleRate() : "";
     }
 
     @Nullable
@@ -150,8 +150,7 @@ public class TagEditor {
     public Observable<Boolean> save(String title, String album, String artist, String year, String genre, String trackNumber, String lyric) {
         return Observable.create(e -> {
             if(mAudioFile == null){
-                e.onError(new Throwable("AudioFile null"));
-                return;
+                throw new IllegalArgumentException("AudioFile is null");
             }
 
             Map<FieldKey, String> fieldKeyValueMap = new EnumMap<>(FieldKey.class);

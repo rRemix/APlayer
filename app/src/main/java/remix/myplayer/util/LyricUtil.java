@@ -23,23 +23,23 @@ public class LyricUtil {
      * @param songName
      * @param searchPath
      */
-    public static void searchFile(String displayName,String songName,String artistName,File searchPath) {
+    public static String searchFile(String displayName,String songName,String artistName,File searchPath) {
         //判断SD卡是否存在
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File[] files = searchPath.listFiles();
             if(files == null || files.length == 0)
-                return;
+                return "";
             for(File file : files){
                 if (file.isDirectory() && file.canRead()){
                     searchFile(displayName,songName,artistName,file);
                 } else {
                     if(isRightLrc(file,displayName,songName,artistName)){
-                        SearchLrc.CurrentLrcPath = file.getAbsolutePath();
-                        return;
+                        return file.getAbsolutePath();
                     }
                 }
             }
         }
+        return "";
     }
 
     /**

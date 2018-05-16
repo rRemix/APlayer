@@ -205,7 +205,7 @@ public abstract class ImageUriRequest<T> {
         if (request.getNeteaseType() == TYPE_NETEASE_SONG) {
             //搜索的是歌曲
             NSongSearchResponse response = new Gson().fromJson(body.string(), NSongSearchResponse.class);
-            imageUrl =  response.result.songs.get(0).album.picUrl;
+            imageUrl = response.result.songs.get(0).album.picUrl;
         } else if (request.getNeteaseType() == TYPE_NETEASE_ALBUM) {
             //搜索的是专辑
             NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);

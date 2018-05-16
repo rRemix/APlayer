@@ -370,60 +370,6 @@ public class Util {
     }
 
     /**
-     * 根据歌曲名和歌手请求歌曲信息
-     * @param songname
-     * @param artistname
-     * @return
-     */
-    public static JSONObject getSongJsonObject(String songname, String artistname,long duration){
-        URL lrcIdUrl = null;
-        try {
-            //歌词迷
-//            lrcIdUrl = new URL("http://gecimi.com/api/lyric/" + songname + "/" + artistname);
-            //酷狗
-            lrcIdUrl = new URL("http://lyrics.kugou.com/search?ver=1&man=yes&client=pc&keyword="
-                            + artistname + "-" + songname + "&duration=" + duration + "&hash=");
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
-        BufferedReader br = null;
-        String s;
-        StringBuilder strBuffer = new StringBuilder();
-        try {
-            if(lrcIdUrl == null)
-                return new JSONObject("");
-            HttpURLConnection httpConn = (HttpURLConnection) lrcIdUrl.openConnection();
-            httpConn.setConnectTimeout(10000);
-            httpConn.connect();
-            InputStreamReader inReader = new InputStreamReader(httpConn.getInputStream());
-            br = new BufferedReader(inReader);
-            if(br == null)
-                return null;
-            while((s = br.readLine()) != null){
-                strBuffer.append(s);
-            }
-            return new JSONObject(strBuffer.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if(br != null) {
-                    br.close();
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return null;
-    }
-
-
-    /**
      * 根据字符串形式的时间，得到毫秒值
      * @param strTime 时间字符串
      * @return
