@@ -548,7 +548,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
         if(!mAudioFocus)
             return;
-        openAudioEffectSession();
         mIsplay = true; //更新所有界面
         update(Global.getOperation());
         mMediaPlayer.start();
@@ -1040,6 +1039,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             }
             LogUtil.d("setUpDataSource","prepare");
             mIsInitialized = false;
+//            openAudioEffectSession();
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(path);
             mMediaPlayer.prepareAsync();

@@ -66,7 +66,7 @@ public class LyricUtil {
             String fileName = file.getName().indexOf('.') > 0 ?
                     file.getName().substring(0,file.getName().lastIndexOf('.')) : file.getName();
             //判断歌词文件名与歌曲文件名是否一致
-            if(fileName.equalsIgnoreCase(displayName.toUpperCase())) {
+            if(fileName.equalsIgnoreCase(displayName)) {
                 return true;
             }
             //判断是否包含歌手名和歌曲名
@@ -74,18 +74,18 @@ public class LyricUtil {
                 return true;
             }
             //读取前五行歌词内容进行判断
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(file),getCharset(file.getAbsolutePath())));
             boolean hasArtist = false;
             boolean hasTitle = false;
             for(int i = 0 ; i < 5;i++){
-                String lrcLine = "";
+                String lrcLine;
                 if((lrcLine = br.readLine()) == null)
                     break;
-                if(lrcLine.contains("ar") && lrcLine.toUpperCase().contains(artist.toUpperCase())) {
+                if(lrcLine.contains("ar") && lrcLine. equalsIgnoreCase(artist)) {
                     hasArtist = true;
                     continue;
                 }
-                if(lrcLine.contains("ti") && lrcLine.toUpperCase().contains(title.toUpperCase())) {
+                if(lrcLine.contains("ti") && lrcLine.equalsIgnoreCase(title)) {
                     hasTitle = true;
                 }
             }

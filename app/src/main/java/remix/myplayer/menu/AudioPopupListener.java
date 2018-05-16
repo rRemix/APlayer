@@ -206,46 +206,37 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                 if(mEditRootView != null){
                     ButterKnife.bind(AudioPopupListener.this, mEditRootView);
 
-                    if(mSongLayout.getEditText() != null){
-                        if(!ThemeStore.isDay()){
-                            mSongLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
-                            mSongLayout.getEditText().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-                        }
-                        mSongLayout.getEditText().addTextChangedListener(new TextInputEditWatcher(mSongLayout,getString(R.string.song_not_empty)));
-                        mSongLayout.getEditText().setText(mInfo.getTitle());
+                    if(!ThemeStore.isDay()){
+                        mSongLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
+                        mSongLayout.getEditText().getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
                     }
-                    if(mAlbumLayout.getEditText() != null) {
-                        if(!ThemeStore.isDay()){
-                            mAlbumLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
-                        }
-                        mAlbumLayout.getEditText().setText(mInfo.getAlbum());
-                    }
-                    if(mArtistLayout.getEditText() != null) {
-                        if(!ThemeStore.isDay()){
-                            mArtistLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
-                        }
-                        mArtistLayout.getEditText().setText(mInfo.getArtist());
-                    }
-                    if(mYearLayout.getEditText() != null){
-                        if(!ThemeStore.isDay()){
-                            mYearLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
-                        }
-                        mYearLayout.getEditText().setText(mInfo.getYear());
-                    }
+                    mSongLayout.getEditText().addTextChangedListener(new TextInputEditWatcher(mSongLayout,getString(R.string.song_not_empty)));
+                    mSongLayout.getEditText().setText(mInfo.getTitle());
 
-                    if(mGenreLayout.getEditText() != null){
-                        if(!ThemeStore.isDay()){
-                            mGenreLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
-                        }
-                        mGenreLayout.getEditText().setText(mTagEditor.getGenreName());
+                    if(!ThemeStore.isDay()){
+                        mAlbumLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
                     }
+                    mAlbumLayout.getEditText().setText(mInfo.getAlbum());
 
-                    if(mTrackLayout.getEditText() != null){
-                        if(!ThemeStore.isDay()){
-                            mTrackLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
-                        }
-                        mTrackLayout.getEditText().setText(mTagEditor.getTrakNumber());
+                    if(!ThemeStore.isDay()){
+                        mArtistLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
                     }
+                    mArtistLayout.getEditText().setText(mInfo.getArtist());
+
+                    if(!ThemeStore.isDay()){
+                        mYearLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
+                    }
+                    mYearLayout.getEditText().setText(mInfo.getYear());
+
+                    if(!ThemeStore.isDay()){
+                        mGenreLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
+                    }
+                    mGenreLayout.getEditText().setText(mTagEditor.getGenreName());
+
+                    if(!ThemeStore.isDay()){
+                        mTrackLayout.getEditText().setTextColor(ThemeStore.getTextColorPrimary());
+                    }
+                    mTrackLayout.getEditText().setText(mTagEditor.getTrackNumber());
                 }
                 break;
 

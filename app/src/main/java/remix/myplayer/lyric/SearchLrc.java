@@ -15,8 +15,10 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -122,9 +124,7 @@ public class SearchLrc {
             TagEditor editor = new TagEditor(mSong.getUrl());
             final String lyric = editor.getLyric();
             if(!TextUtils.isEmpty(lyric)){
-                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lyric.getBytes(UTF_8)),UTF_8)),
-                        true,
-                        mKey));
+                e.onNext(mLrcParser.getLrcRows(getBufferReader(lyric.getBytes(UTF_8)), true, mKey));
             }
             e.onComplete();
         });
@@ -137,8 +137,7 @@ public class SearchLrc {
         return Observable.create(e -> {
             //手动设置的歌词
             if(!TextUtils.isEmpty(manualPath)){
-                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(manualPath), LyricUtil.getCharset(manualPath))),
-                        true,mKey));
+                e.onNext(mLrcParser.getLrcRows(getBufferReader(manualPath), true,mKey));
             }
             e.onComplete();
         });
@@ -175,8 +174,7 @@ public class SearchLrc {
                     if(localPaths.size() > 0) {
                         if(localPaths.size() == 1) {
                             String localPath = localPaths.get(0);
-                            e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath), LyricUtil.getCharset(localPath))),
-                                    true,mKey));
+                            e.onNext(mLrcParser.getLrcRows(getBufferReader(localPath), true,mKey));
                         }else{
                             String localPath = localPaths.get(0);
                             String translatePath=null;
@@ -187,14 +185,11 @@ public class SearchLrc {
                                 }
                             }
                             if(translatePath==null){
-                                e.onNext(mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath), LyricUtil.getCharset(localPath))),
-                                        true,mKey));
+                                e.onNext(mLrcParser.getLrcRows(getBufferReader(localPath), true,mKey));
                             }else{
                                 //合并歌词
-                                List<LrcRow> source = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(localPath), LyricUtil.getCharset(localPath))),
-                                        true, mKey);
-                                List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new FileInputStream(translatePath), LyricUtil.getCharset(localPath))),
-                                        false,mKey);
+                                List<LrcRow> source = mLrcParser.getLrcRows(getBufferReader(localPath), true, mKey);
+                                List<LrcRow> translate = mLrcParser.getLrcRows(getBufferReader(localPath), false,mKey);
                                 if(translate != null && translate.size() > 0) {
                                     int j = 0;
                                     for (int i = 0; i < source.size(); ) {
@@ -243,8 +238,7 @@ public class SearchLrc {
                                 searchResponse.candidates.get(0).accesskey)
                                 .map(lrcBody -> {
                                     final KLrcResponse lrcResponse = new Gson().fromJson(lrcBody.string(),KLrcResponse.class);
-                                    return mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(Base64.decode(lrcResponse.content, Base64.DEFAULT)))),
-                                            true,mKey);
+                                    return mLrcParser.getLrcRows(getBufferReader(Base64.decode(lrcResponse.content, Base64.DEFAULT)), true,mKey);
                                 });
                     });
         }else {
@@ -255,14 +249,11 @@ public class SearchLrc {
                             .getNeteaseLyric(new Gson().fromJson(body.string(),NSongSearchResponse.class).result.songs.get(0).id)
                             .map(body1 -> {
                                 final NLrcResponse lrcResponse = new Gson().fromJson(body1.string(),NLrcResponse.class);
-                                List<LrcRow> combine = mLrcParser.getLrcRows(new BufferedReader(
-                                        new InputStreamReader(
-                                                new ByteArrayInputStream(lrcResponse.lrc.lyric.getBytes(UTF_8)),UTF_8)),
-                                        false,mKey);
+
+                                List<LrcRow> combine = mLrcParser.getLrcRows(getBufferReader(lrcResponse.lrc.lyric.getBytes(UTF_8)), false,mKey);
                                 //有翻译 合并
                                 if(lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
-                                    List<LrcRow> translate = mLrcParser.getLrcRows(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(lrcResponse.tlyric.lyric.getBytes(UTF_8)),UTF_8)),
-                                            false,mKey);
+                                    List<LrcRow> translate = mLrcParser.getLrcRows(getBufferReader(lrcResponse.tlyric.lyric.getBytes(UTF_8)), false,mKey);
                                     if(translate != null && translate.size() > 0){
                                         for(int i = 0 ; i < translate.size();i++){
                                             for(int j = 0 ; j < combine.size();j++){
@@ -282,67 +273,6 @@ public class SearchLrc {
                                 return Observable.empty();
                         });
         }
-    }
-
-    /**
-     * 获取酷狗歌词接口的参数
-     * @return
-     */
-    public LrcRequest getLrcParam(){
-        //酷狗
-        try {
-            JSONObject response = Util.getSongJsonObject(URLEncoder.encode(mSong.getTitle(), "utf-8"),
-                    URLEncoder.encode(mSong.getArtist(), "utf-8"), mSong.getDuration());
-            if(response != null && response.length() > 0){
-                if(response.getJSONArray("candidates").length() > 0){
-                    JSONObject jsonObject = response.getJSONArray("candidates").getJSONObject(0);
-                    if(jsonObject.getInt("score") >= 60)
-                        return new LrcRequest(jsonObject.getInt("id"),jsonObject.getString("accesskey"));
-                }
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return new LrcRequest();
-    }
-
-    /**
-     * 获得在线歌词
-     * @return
-     */
-    private String getOnlineLrcContent(){
-        LrcRequest lrcParam = getLrcParam();
-        BufferedReader br = null;
-        if(lrcParam != null && !TextUtils.isEmpty(lrcParam.AccessKey)){
-            try {
-                URL url = new URL("http://lyrics.kugou.com/download?ver=1&client=pc&id=" + lrcParam.ID + "&accesskey=" + lrcParam.AccessKey + "&fmt=lrc&charset=utf8");
-                HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-                httpConn.setConnectTimeout(10000);
-                httpConn.connect();
-                br = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
-                StringBuffer stringBuffer = new StringBuffer(128);
-                String s;
-                while ((s = br.readLine()) != null){
-                    stringBuffer.append(s);
-                }
-                if(TextUtils.isEmpty(stringBuffer)){
-                    return null;
-                }
-                return new JSONObject(stringBuffer.toString()).getString("content");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }  finally {
-                if(br != null)
-                    try {
-                        br.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-            }
-        }
-        return null;
     }
 
     /**
@@ -465,5 +395,13 @@ public class SearchLrc {
             }
         }
         return "";
+    }
+
+    private BufferedReader getBufferReader(String path) throws FileNotFoundException, UnsupportedEncodingException {
+        return new BufferedReader(new InputStreamReader(new FileInputStream(path), LyricUtil.getCharset(path)));
+    }
+
+    private BufferedReader getBufferReader(byte[] bytes){
+        return new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytes),UTF_8));
     }
 }

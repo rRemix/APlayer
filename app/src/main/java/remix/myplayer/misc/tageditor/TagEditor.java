@@ -76,7 +76,7 @@ public class TagEditor {
         try {
             return mAudioFile.getTagOrCreateAndSetDefault().getFirst(field);
         }catch (Exception e){
-            return null;
+            return "";
         }
     }
 
@@ -87,80 +87,48 @@ public class TagEditor {
         try {
             return mAudioFile.getTagOrCreateAndSetDefault().getFirst(field);
         }catch (Exception e){
-            return null;
+            return "";
         }
     }
 
     @Nullable
     public String getSongTitle(){
-        try {
-            return getFiledValue(FieldKey.TITLE);
-        }catch (Exception e){
-            return null;
-        }
+        return getFiledValue(FieldKey.TITLE);
     }
 
     @Nullable
     public String getAlbumTitle(){
-        try {
-            return getFiledValue(FieldKey.ALBUM);
-        }catch (Exception e){
-            return null;
-        }
+        return getFiledValue(FieldKey.ALBUM);
     }
 
     @Nullable
     public String getArtistName(){
-        try {
-            return getFiledValue(FieldKey.ARTIST);
-        }catch (Exception e){
-            return null;
-        }
+        return getFiledValue(FieldKey.ARTIST);
     }
 
     @Nullable
     public String getAlbumArtistName(){
-        try {
-            return getFiledValue(FieldKey.ALBUM_ARTIST);
-        }catch (Exception e){
-            return null;
-        }
+        return getFiledValue(FieldKey.ALBUM_ARTIST);
     }
 
     @Nullable
     public String getGenreName(){
-        try {
-            return getFiledValue(FieldKey.GENRE);
-        }catch (Exception e){
-            return null;
-        }
+        return getFiledValue(FieldKey.GENRE);
     }
 
     @Nullable
     public String getSongYear(){
-        try {
-            return getFiledValue(FieldKey.YEAR);
-        }catch (Exception e){
-            return null;
-        }
+        return getFiledValue(FieldKey.YEAR);
     }
 
     @Nullable
-    public String getTrakNumber(){
-        try {
-            return getFiledValue(FieldKey.TRACK);
-        }catch (Exception e){
-            return null;
-        }
+    public String getTrackNumber(){
+        return getFiledValue(FieldKey.TRACK);
     }
 
     @Nullable
     public String getLyric(){
-        try {
-            return getFiledValue(FieldKey.LYRICS);
-        }catch (Exception e){
-            return null;
-        }
+        return getFiledValue(FieldKey.LYRICS);
     }
 
     @Nullable
@@ -198,7 +166,7 @@ public class TagEditor {
             Tag tag = mAudioFile.getTagOrCreateAndSetDefault();
             for (Map.Entry<FieldKey, String> entry : fieldKeyValueMap.entrySet()) {
                 try {
-                    tag.setField(entry.getKey(), entry.getValue());
+                    tag.setField(entry.getKey(), entry.getValue() == null ? "" : entry.getValue());
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
