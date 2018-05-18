@@ -159,7 +159,7 @@ public class BaseAppwidget extends AppWidgetProvider {
 
     protected void updateLove(RemoteViews remoteViews, Song song) {
         //是否收藏
-        if(PlayListUtil.isLove(song.getId()) == PlayListUtil.EXIST){
+        if(PlayListUtil.isLove(song.getId()) != PlayListUtil.EXIST){
             Drawable likeDrawable = Theme.TintDrawable(R.drawable.widget_btn_like_nor, mSkin.getBtnColor());
             remoteViews.setImageViewBitmap(R.id.appwidget_love,drawableToBitmap(likeDrawable));
         } else {

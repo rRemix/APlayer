@@ -275,7 +275,7 @@ public class AudioPopupListener extends ContextWrapper implements PopupMenu.OnMe
                         mDetailBitRate.setText(String.format("%s kb/s", mTagEditor.getBitrate()));
                     //歌曲采样率
                     if(mDetailSampleRate != null)
-                        mDetailSampleRate.setText(String.format("%s Hz", mTagEditor.getSamlingRate()));
+                        mDetailSampleRate.setText(String.format("%s Hz", mTagEditor.getSamplingRate()));
 
                 }
                 break;

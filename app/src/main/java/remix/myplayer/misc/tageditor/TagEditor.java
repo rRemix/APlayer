@@ -22,8 +22,6 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import remix.myplayer.util.FileUtil;
-import remix.myplayer.util.LogUtil;
 
 /**
  * 标签相关
@@ -65,7 +63,7 @@ public class TagEditor {
         return mAudioHeader != null ? mAudioHeader.getBitRate() : "";
     }
 
-    public String getSamlingRate(){
+    public String getSamplingRate(){
         return mAudioHeader != null ? mAudioHeader.getSampleRate() : "";
     }
 

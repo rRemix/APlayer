@@ -611,7 +611,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         //如果是随机播放 需要调整下RandomList
         //保证正常播放队列和随机播放队列中当前歌曲的索引一致
         int index = mRandomList.indexOf(mCurrentId);
-        if(mPlayModel == Constants.PLAY_SHUFFLE && index != mCurrentIndex){
+        if(mPlayModel == Constants.PLAY_SHUFFLE && index != mCurrentIndex && index < mRandomList.size()){
             Collections.swap(mRandomList,mCurrentIndex,index);
         }
 
