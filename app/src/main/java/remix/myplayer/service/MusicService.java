@@ -1413,7 +1413,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      */
     private void acquireWakeLock(){
         if(mWakeLock != null)
-            mWakeLock.acquire(30000L);
+            mWakeLock.acquire(mCurrentSong != null ? mCurrentSong.getDuration() : 30000L);
     }
 
     /**
