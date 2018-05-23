@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -131,12 +132,12 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
 //            }
 
             //是否无损
-            if(!TextUtils.isEmpty(song.getDisplayname())){
-                String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
-                holder.mSQ.setVisibility(!TextUtils.isEmpty(prefix) && (prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")) ? View.VISIBLE : View.GONE);
-            } else {
-                holder.mSQ.setVisibility(View.GONE);
-            }
+//            if(!TextUtils.isEmpty(song.getDisplayname())){
+//                String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
+//                holder.mSQ.setVisibility(!TextUtils.isEmpty(prefix) && (prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")) ? View.VISIBLE : View.GONE);
+//            } else {
+//                holder.mSQ.setVisibility(View.GONE);
+//            }
 
             //设置标题
             holder.mTitle.setText(song.getTitle());
@@ -159,7 +160,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
                     Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                     final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton, Gravity.END);
                     popupMenu.getMenuInflater().inflate(R.menu.menu_song_item, popupMenu.getMenu());
-                    popupMenu.setOnMenuItemClickListener(new SongPopupListener(mContext,song,mType == Constants.PLAYLIST,mArg));
+                    popupMenu.setOnMenuItemClickListener(new SongPopupListener((AppCompatActivity) mContext,song,mType == Constants.PLAYLIST,mArg));
                     popupMenu.show();
 //                    Intent intent = new Intent(mContext, OptionDialog.class);
 //                    intent.putExtra("Song", song);

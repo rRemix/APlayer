@@ -2,6 +2,7 @@ package remix.myplayer.misc.tageditor;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
 import android.support.annotation.Nullable;
 
 import org.jaudiotagger.audio.AudioFile;
@@ -22,6 +23,9 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import remix.myplayer.App;
+import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.util.MediaStoreUtil;
 
 /**
  * 标签相关
@@ -145,7 +149,7 @@ public class TagEditor {
         return null;
     }
 
-    public Observable<Boolean> save(String title, String album, String artist, String year, String genre, String trackNumber, String lyric) {
+    public Observable<Song> save(Song song, String title, String album, String artist, String year, String genre, String trackNumber, String lyric) {
         return Observable.create(e -> {
             if(mAudioFile == null){
                 throw new IllegalArgumentException("AudioFile is null");
@@ -177,8 +181,16 @@ public class TagEditor {
 //            tag.setField(FieldKey.LYRICS,lyric == null ? "" : lyric);
 
             mAudioFile.commit();
-            e.onNext(true);
-            e.onComplete();
+
+            MediaScannerConnection.scanFile(App.getContext(),
+                    new String[]{song.getUrl()},
+                    null,
+                    (path, uri) -> {
+                        App.getContext().getContentResolver().notifyChange(uri,null);
+                        e.onNext(MediaStoreUtil.getMP3InfoById(song.getId()));
+                        e.onComplete();
+                    });
+
         });
     }
 }

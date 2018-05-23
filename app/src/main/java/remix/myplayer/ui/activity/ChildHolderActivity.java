@@ -26,6 +26,7 @@ import remix.myplayer.helper.SortOrder;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.service.MusicService;
@@ -46,12 +47,13 @@ import remix.myplayer.util.SPUtil;
 /**
  * 专辑、艺术家、文件夹、播放列表详情
  */
-public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdapter> implements UpdateHelper.Callback{
+public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdapter>
+        implements UpdateHelper.Callback,OnTagEditListener{
     public final static String TAG = ChildHolderActivity.class.getSimpleName();
     public final static String TAG_PLAYLIST_SONG = ChildHolderActivity.class.getSimpleName() + "Song";
     private boolean mIsRunning = false;
     //获得歌曲信息列表的参数
-    public static int mId;
+    public static int ID;
     private int mType;
     private String mArg;
     private List<Song> mInfoList;
@@ -84,7 +86,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
         mRefreshHandler = new MsgHandler(this);
         //参数id，类型，标题
-        mId = getIntent().getIntExtra("Id", -1);
+        ID = getIntent().getIntExtra("Id", -1);
         mType = getIntent().getIntExtra("Type", -1);
         mArg = getIntent().getStringExtra("Title");
 
@@ -114,7 +116,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 //                    startActivity(new Intent(mContext,CustomSortActivity.class)
 //                            .putExtra("list",new ArrayList<>(mInfoList))
 //                            .putExtra("name",mArg)
-//                            .putExtra("id",mId);
+//                            .putExtra("id",ID);
                 }
             }
 
@@ -131,7 +133,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
                 ? ColorUtil.getColor(R.color.white)
                 : ThemeStore.getTextColorPrimary());
 
-        //歌曲数目与标题
+        //标题
         if(mType != Constants.FOLDER) {
             if(mArg.contains("unknown")){
                 if(mType == Constants.ARTIST)
@@ -184,7 +186,6 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         return true;
     }
 
-
     @Override
     protected void saveSortOrder(String sortOrder) {
         boolean update = false;
@@ -196,7 +197,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
                 if(sortOrder.equalsIgnoreCase(SortOrder.PlayListSongSortOrder.PLAYLIST_SONG_CUSTOM)){
                     startActivity(new Intent(mContext,CustomSortActivity.class)
                             .putExtra("list",new ArrayList<>(mInfoList))
-                            .putExtra("id",mId)
+                            .putExtra("id", ID)
                             .putExtra("name",mArg));
                 } else {
                     update = true;
@@ -254,51 +255,31 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         updateList(true);
     }
 
-    private class GetSongThread extends Thread{
-        //是否需要重新查询歌曲列表
-        private boolean mNeedReset = true;
-        GetSongThread(boolean needReset) {
-            this.mNeedReset = needReset;
-        }
+    @Override
+    public void onTagEdit(Song newSong) {
+        if(newSong == null)
+            return;
+        mRefreshHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(mType == Constants.ARTIST || mType == Constants.ALBUM){
+                    ID = mType == Constants.ARTIST ? newSong.getArtistId() : newSong.getAlbumId();
+                    Title = mType == Constants.ARTIST ? newSong.getArtist() : newSong.getAlbum();
+                    mToolBar.setTitle(Title);
+                    updateList(true);
 
-        @Override
-        public void run() {
-            mRefreshHandler.sendEmptyMessage(START);
-            if(mNeedReset)
-                mInfoList = getMP3List();
-            mRefreshHandler.sendEmptyMessage(END);
-            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-        }
-    }
+//                    if(mAdapter.getDatas() == null)
+//                        return;
+//                    for(int i = 0 ; i < mAdapter.getDatas().size();i++){
+//                        if(mAdapter.getDatas().get(i).getId() == newSong.getId()){
+//                            mAdapter.getDatas().set(i,newSong);
+//                            mAdapter.notifyItemChanged(i + 1);
+//                        }
+//                    }
+                }
+            }
+        },200);
 
-    /**
-     * 根据条件排序
-     */
-    private void sortList(){
-//        Collections.sort(mInfoList, (o1, o2) -> {
-//            boolean isAsc = ChildHolderAdapter.ASC_DESC == ChildHolderAdapter.ASC;
-//            if(o1 == null && o2 == null)
-//                return 0;
-//            if(o1 == null)
-//                return isAsc ? -1 : 1;
-//            if(o2 == null)
-//                return isAsc? 1 : -1;
-//            //当前是按名字排序
-//            if(ChildHolderAdapter.SORT == ChildHolderAdapter.NAME){
-//                if(TextUtils.isEmpty(o1.getTitleKey()) && TextUtils.isEmpty(o2.getTitleKey()))
-//                    return 0;
-//                if(TextUtils.isEmpty(o1.getTitleKey()))
-//                    return isAsc ? -1 : 1;
-//                if(TextUtils.isEmpty(o2.getTitleKey()))
-//                    return isAsc ? 1 : -1;
-//                return isAsc ? o1.getTitleKey().compareTo(o2.getTitleKey()) : o2.getTitleKey().compareTo(o1.getTitleKey());
-//            } else if(ChildHolderAdapter.SORT == ChildHolderAdapter.ADDTIME){
-//                //当前是按添加时间排序
-//                return isAsc ? Long.valueOf(o1.getAddTime()).compareTo(o2.getAddTime()) : Long.valueOf(o2.getAddTime()).compareTo(o1.getAddTime());
-//            } else {
-//                return 0;
-//            }
-//        });
     }
 
     /**
@@ -306,16 +287,16 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
      * @return 对应歌曲信息列表
      */
     private List<Song> getMP3List(){
-        if(mId < 0)
-            return  null;
+        if(ID < 0)
+            return null;
         switch (mType) {
             //专辑id
             case Constants.ALBUM:
-                mInfoList = MediaStoreUtil.getMP3InfoByArg(mId, Constants.ALBUM);
+                mInfoList = MediaStoreUtil.getMP3InfoByArg(ID, Constants.ALBUM);
                 break;
             //歌手id
             case Constants.ARTIST:
-                mInfoList = MediaStoreUtil.getMP3InfoByArg(mId, Constants.ARTIST);
+                mInfoList = MediaStoreUtil.getMP3InfoByArg(ID, Constants.ARTIST);
                 break;
             //文件夹名
             case Constants.FOLDER:
@@ -324,10 +305,10 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
             //播放列表名
             case Constants.PLAYLIST:
                 /* 播放列表歌曲id列表 */
-                List<Integer> playListSongIDList = PlayListUtil.getIDList(mId);
+                List<Integer> playListSongIDList = PlayListUtil.getIDList(ID);
                 if(playListSongIDList == null)
                     return mInfoList;
-                mInfoList = PlayListUtil.getMP3ListByIds(playListSongIDList,mId);
+                mInfoList = PlayListUtil.getMP3ListByIds(playListSongIDList, ID);
                 break;
         }
         return mInfoList;
@@ -406,4 +387,20 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         }
     }
 
+    private class GetSongThread extends Thread{
+        //是否需要重新查询歌曲列表
+        private boolean mNeedReset = true;
+        GetSongThread(boolean needReset) {
+            this.mNeedReset = needReset;
+        }
+
+        @Override
+        public void run() {
+            mRefreshHandler.sendEmptyMessage(START);
+            if(mNeedReset)
+                mInfoList = getMP3List();
+            mRefreshHandler.sendEmptyMessage(END);
+            mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
+        }
+    }
 }

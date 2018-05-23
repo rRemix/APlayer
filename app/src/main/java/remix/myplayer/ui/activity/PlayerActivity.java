@@ -60,6 +60,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
+import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.lyric.LrcView;
 import remix.myplayer.menu.AudioPopupListener;
 import remix.myplayer.misc.handler.MsgHandler;
@@ -98,7 +99,8 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 /**
  * 播放界面
  */
-public class PlayerActivity extends BaseActivity implements UpdateHelper.Callback,FileChooserDialog.FileCallback{
+public class PlayerActivity extends BaseActivity implements UpdateHelper.Callback,
+        FileChooserDialog.FileCallback, OnTagEditListener {
     private static final String TAG = "PlayerActivity";
     //是否正在运行
     public boolean mIsForeground;
@@ -695,24 +697,18 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mHandler.removeCallbacks(mVolumeRunnable);
                 mHandler.postDelayed(mVolumeRunnable,DELAY_SHOW_NEXT_SONG);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                        (int) (seekBar.getProgress() / 100f * max),
+                        AudioManager.FLAG_PLAY_SOUND);
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
-                        (int) (seekBar.getProgress() / 100f * max),
-                        AudioManager.FLAG_PLAY_SOUND);
             }
         });
-
         mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
-    }
-
-    public void setMP3Item(Song song){
-        if(song != null)
-            mInfo = song;
     }
 
     /**
@@ -1130,6 +1126,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     @Override
     public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
+    }
+
+    @Override
+    public void onTagEdit(Song newSong) {
+        if(newSong != null){
+            mInfo = newSong;
+            updateTopStatus(newSong);
+            ((LyricFragment) mAdapter.getItem(2)).updateLrc(newSong,true);
+            sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
+        }
     }
 
     private void updateProgressByHandler() {

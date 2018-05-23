@@ -7,6 +7,10 @@
             android:id="@+id/menu_add_to_play_queue"/>
         <item android:title="@string/add_to_playlist"
             android:id="@+id/menu_add_to_playlist"/>
+        <item android:title="@string/song_detail"
+            android:id="@+id/menu_detail"/>
+        <item android:title="@string/song_edit"
+            android:id="@+id/menu_edit"/>
         <item android:title="@string/set_album_cover"
             android:id="@+id/menu_album_thumb"/>
         <item android:title="@string/share"

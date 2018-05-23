@@ -207,7 +207,7 @@ public class MultiChoice implements OnMultiItemClickListener {
                     if (arg instanceof Integer)
                         idList.add((Integer) arg);
                 }
-                num = PlayListUtil.deleteMultiSongs(idList,ChildHolderActivity.mId);
+                num = PlayListUtil.deleteMultiSongs(idList,ChildHolderActivity.ID);
                 break;
             case Constants.SONG:
             case Constants.ALBUM:

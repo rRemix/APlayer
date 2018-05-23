@@ -4,7 +4,6 @@ package remix.myplayer.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -51,8 +50,6 @@ import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,10 +58,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
@@ -75,6 +69,7 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.SortOrder;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
@@ -110,7 +105,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 /**
  *
  */
-public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Callback {
+public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Callback,OnTagEditListener {
     @BindView(R.id.tabs)
     TabLayout mTablayout;
     @BindView(R.id.ViewPager)
@@ -681,6 +676,10 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 }
             }
         }
+    }
+
+    @Override
+    public void onTagEdit(Song newSong) {
     }
 
     private static boolean mLoadComplete = false;
