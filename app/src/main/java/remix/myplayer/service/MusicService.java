@@ -1032,17 +1032,15 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     return;
                 }
             }
-
             if(isPlay()){
                 pause(true);
             }
-            LogUtil.d("setUpDataSource","prepare");
             mIsInitialized = false;
-//            openAudioEffectSession();
+            openAudioEffectSession();
             mMediaPlayer.reset();
             if(mMediaPlayer instanceof IjkMediaPlayer)
-//                ((IjkMediaPlayer)mMediaPlayer).setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
-            mMediaPlayer.setDataSource("/sdcard/Music/华语/轨迹.ape");
+                ((IjkMediaPlayer)mMediaPlayer).setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
+            mMediaPlayer.setDataSource(path);
             mMediaPlayer.prepareAsync();
 //            mIsplay = true;
             mIsInitialized = true;
@@ -1294,7 +1292,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         restoreLastSong();
         mLoadFinished = true;
         sendBroadcast(new Intent(ACTION_LOAD_FINISH));
-        openAudioEffectSession();
+//        openAudioEffectSession();
     }
 
 
