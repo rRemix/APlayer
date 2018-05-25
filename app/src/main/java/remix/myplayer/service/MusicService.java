@@ -10,7 +10,6 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.media.session.PlaybackState;
 import android.os.Build;
@@ -77,6 +76,8 @@ import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
+import tv.danmaku.ijk.media.player.IMediaPlayer;
+import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 import static remix.myplayer.appwidgets.BaseAppwidget.SKIN_TRANSPARENT;
 import static remix.myplayer.appwidgets.BaseAppwidget.SKIN_WHITE_1F;
@@ -126,7 +127,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private static Song mNextSong = null;
 
     /** MediaPlayer 负责歌曲的播放等 */
-    private MediaPlayer mMediaPlayer;
+    private IMediaPlayer mMediaPlayer;
 
     /** 桌面部件 */
     private AppWidgetMedium mAppWidgetMedium;
@@ -365,7 +366,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 初始化Mediaplayer
      */
     private void setUpMediaPlayer() {
-        mMediaPlayer = new MediaPlayer();
+        mMediaPlayer = new IjkMediaPlayer();
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayer.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
 
@@ -386,6 +387,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mMediaPlayer.setOnPreparedListener(mp -> {
             LogUtil.d(TAG,"准备完成:" + mFirstPrepared);
             if(mFirstPrepared){
+                pause(false);
                 mFirstPrepared = false;
                 if(mLastProgress > 0){
                     mMediaPlayer.seekTo(mLastProgress);
@@ -515,6 +517,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 
     private void openAudioEffectSession(){
         final Intent audioEffectsIntent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
+        LogUtil.d(TAG,"AudioSessionId: " + mMediaPlayer.getAudioSessionId());
         audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mMediaPlayer.getAudioSessionId());
         audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
         sendBroadcast(audioEffectsIntent);
@@ -1037,7 +1040,9 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             mIsInitialized = false;
 //            openAudioEffectSession();
             mMediaPlayer.reset();
-            mMediaPlayer.setDataSource(path);
+            if(mMediaPlayer instanceof IjkMediaPlayer)
+//                ((IjkMediaPlayer)mMediaPlayer).setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
+            mMediaPlayer.setDataSource("/sdcard/Music/华语/轨迹.ape");
             mMediaPlayer.prepareAsync();
 //            mIsplay = true;
             mIsInitialized = true;
@@ -1121,7 +1126,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 获得MediaPlayer
      * @return
      */
-    public static MediaPlayer getMediaPlayer(){
+    public static IMediaPlayer getMediaPlayer(){
         return mInstance.mMediaPlayer;
     }
 
@@ -1212,7 +1217,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     public static int getProgress() {
         try {
             if(getMediaPlayer() != null && mIsInitialized)
-                return getMediaPlayer().getCurrentPosition();
+                return (int) getMediaPlayer().getCurrentPosition();
         } catch (IllegalStateException e){
             LogUtil.d(TAG,"getProgress Error: " + e);
         }

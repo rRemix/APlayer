@@ -168,6 +168,10 @@ dependencies {
 //    implementation 'com.anjlab.android.iab.v3:library:1.0.44'
 //    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 //    implementation 'com.google.code.gson:gson:2.8.2'
+
+//    implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
+//    implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
+//    implementation 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.8'
 }
 
 kapt {

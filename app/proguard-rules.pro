@@ -203,3 +203,6 @@ public static final int *;
 #jaudiotagger
 -keep class org.jaudiotagger.** { *; }
 -dontwarn org.jaudiotagger.**
+
+#ijkplayer
+-keep class tv.danmaku.ijk.media.player.** { *; }
