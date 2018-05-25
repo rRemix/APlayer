@@ -82,7 +82,8 @@ public class LyricFragment extends BaseFragment {
             mLrcView.setText(getStringSafely(R.string.no_lrc));
             return;
         }
-
+        if(mLrcView == null)
+            return;
         final int id = mInfo.getId();
         new SearchLrc(mInfo).getLyric(manualPath,clearCache)
                 .doOnSubscribe(disposable -> {

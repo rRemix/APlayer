@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,37 +55,37 @@ public class DefaultLrcParser implements ILrcParser {
             }
         }
 
-//        //保存歌词原始文件
-//        if(TextUtils.isEmpty(searchKey) || !Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
-//            return;
-//        File lyricDir = new File(Environment.getExternalStorageDirectory(),"Android/data/"
-//                + App.getContext().getPackageName() + "/lyric");
-//        if(!lyricDir.exists() && !lyricDir.mkdirs())
-//            return;
-//
-//        File lyricFile = new File(lyricDir,searchKey.replaceAll("/","") + ".lrc");
-//        if(lyricFile.exists())
-//            return;
-//        FileOutputStream outputStream = null;
-//        try {
-//            outputStream = new FileOutputStream(lyricFile);
-//            for(int i = 0 ; i < lrcRows.size();i++){
-//                LrcRow lrcRow = lrcRows.get(i);
-//                outputStream.write(("[" + lrcRow.getTimeStr() + "]" + lrcRow.getContent()
-//                        + (!TextUtils.isEmpty(lrcRow.getTranslate()) ? "\r\n" + lrcRow.getTranslate() + "\r\n" : "\r\n")).getBytes());
-//            }
-//            outputStream.flush();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            if(outputStream != null) {
-//                try {
-//                    outputStream.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
+        //保存歌词原始文件
+        if(TextUtils.isEmpty(searchKey) || !Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
+            return;
+        File lyricDir = new File(Environment.getExternalStorageDirectory(),"Android/data/"
+                + App.getContext().getPackageName() + "/lyric");
+        if(!lyricDir.exists() && !lyricDir.mkdirs())
+            return;
+
+        File lyricFile = new File(lyricDir,searchKey.replaceAll("/","") + ".lrc");
+        if(lyricFile.exists())
+            return;
+        FileOutputStream outputStream = null;
+        try {
+            outputStream = new FileOutputStream(lyricFile);
+            for(int i = 0 ; i < lrcRows.size();i++){
+                LrcRow lrcRow = lrcRows.get(i);
+                outputStream.write(("[" + lrcRow.getTimeStr() + "]" + lrcRow.getContent()
+                        + (!TextUtils.isEmpty(lrcRow.getTranslate()) ? "\r\n" + lrcRow.getTranslate() + "\r\n" : "\r\n")).getBytes());
+            }
+            outputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -191,7 +192,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
             Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton, Gravity.END);
             popupMenu.getMenuInflater().inflate(R.menu.menu_song_item, popupMenu.getMenu());
-            popupMenu.setOnMenuItemClickListener(new SongPopupListener(mContext,song,false,""));
+            popupMenu.setOnMenuItemClickListener(new SongPopupListener((AppCompatActivity) mContext,song,false,""));
             popupMenu.show();
         });
 

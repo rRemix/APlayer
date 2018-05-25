@@ -31,6 +31,7 @@ import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.customview.SearchToolBar;
 import remix.myplayer.util.Constants;
@@ -46,7 +47,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 搜索界面，根据关键字，搜索歌曲名，艺术家，专辑中的记录
  */
-public class SearchActivity extends PermissionActivity<Song,SearchAdapter> {
+public class SearchActivity extends PermissionActivity<Song,SearchAdapter> implements OnTagEditListener{
     //搜索的关键字
     private String mkey;
     //搜索结果的listview
@@ -151,6 +152,10 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter> {
     private void search(String key) {
         mkey = key;
         getLoaderManager().restartLoader(LoaderIds.SEARCH_ACTIVITY, null, this);
+    }
+
+    @Override
+    public void onTagEdit(Song newSong) {
     }
 
     private static class AsyncSearchLoader extends AppWrappedAsyncTaskLoader<List<Song>> {

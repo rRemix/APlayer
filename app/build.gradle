@@ -3,6 +3,10 @@ apply plugin: "kotlin-android"
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
+static def releaseTime() {
+    return new Date().format("yyyy-MM-dd HH-mm")
+}
+
 repositories {
     maven {
         url 'https://maven.google.com'
@@ -22,8 +26,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 66
-        versionName "1.3.2"
+        versionCode 67
+        versionName "1.3.2.1"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
@@ -63,7 +67,7 @@ android {
 
             android.applicationVariants.all { variant ->
                 variant.outputs.all {
-                    outputFileName = "APlayer_v${defaultConfig.versionName}_${variant.productFlavors[0].name}.apk"
+                    outputFileName = "APlayer_v${defaultConfig.versionName}_${variant.productFlavors[0].name}_${releaseTime()}.apk"
                 }
             }
         }
@@ -85,7 +89,7 @@ android {
 
 //        qihu360{}
 //        chuizi{}
-//        xiaomi{}
+        xiaomi{}
         kuan {}
         google{}
         productFlavors.all { flavor ->

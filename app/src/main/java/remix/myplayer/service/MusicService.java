@@ -60,8 +60,8 @@ import remix.myplayer.misc.observer.DBObserver;
 import remix.myplayer.misc.observer.MediaStoreObserver;
 import remix.myplayer.misc.receiver.ExitReceiver;
 import remix.myplayer.misc.receiver.HeadsetPlugReceiver;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.RemoteUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.notification.Notify;
 import remix.myplayer.service.notification.NotifyImpl;
 import remix.myplayer.service.notification.NotifyImpl24;
@@ -249,7 +249,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         LogUtil.d("ServiceLifeCycle","onCreate");
         mContext = this;
         mInstance = this;
-        init();
+        setUp();
     }
 
     @Override
@@ -269,7 +269,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         return START_STICKY;
     }
 
-    private void init() {
+    private void setUp() {
         MusicEventHelper.addCallback(this);
 
         mShortcutManager = new DynamicShortcutManager(mContext);
@@ -517,7 +517,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         final Intent audioEffectsIntent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
         audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mMediaPlayer.getAudioSessionId());
         audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
-        audioEffectsIntent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC);
         sendBroadcast(audioEffectsIntent);
     }
 
@@ -588,7 +587,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             update(Global.Operation);
             mVolumeController.fadeOut();
         }
-
     }
 
     /**
@@ -968,17 +966,17 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * @param control
      */
     private void updateMediaSession(int control) {
-        if(mCurrentSong == null || mCurrentSong.getId() < 0)
-            return;
-
-        int playState = mIsplay
-                ? PlaybackStateCompat.STATE_PLAYING
-                : PlaybackStateCompat.STATE_PAUSED;
-
         mMediaSession.setPlaybackState(new PlaybackStateCompat.Builder()
-                .setState(playState,getProgress(),1.0f)
+                .setState(mIsplay ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED,
+                        getProgress(),1.0f)
                 .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY_PAUSE |
                         PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).build());
+
+        if(mCurrentSong == null)
+            return;
+        boolean isSmartisan = Build.MANUFACTURER.equalsIgnoreCase("smartisan");
+        if((!isSmartisan && SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN ))
+            return;
 
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, mCurrentSong.getAlbum())
@@ -990,9 +988,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS,mCurrentIndex)
                 .putString(MediaMetadataCompat.METADATA_KEY_TITLE, mCurrentSong.getTitle());
 
-        boolean isSmartisan = Build.MANUFACTURER.equalsIgnoreCase("smartisan");
-        if(!isSmartisan &&
-                SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LOCKSCREEN,Constants.APLAYER_LOCKSCREEN) == Constants.CLOSE_LOCKSCREEN ){
+        if(control == Constants.TOGGLE || control == Constants.PAUSE || control == Constants.START){
             mMediaSession.setMetadata(builder.build());
         } else {
             new RemoteUriRequest(getSearchRequestWithAlbumType(mCurrentSong),new RequestConfig.Builder(400,400).build()){
@@ -1293,6 +1289,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         restoreLastSong();
         mLoadFinished = true;
         sendBroadcast(new Intent(ACTION_LOAD_FINISH));
+        openAudioEffectSession();
     }
 
 
@@ -1416,7 +1413,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      */
     private void acquireWakeLock(){
         if(mWakeLock != null)
-            mWakeLock.acquire(30000L);
+            mWakeLock.acquire(mCurrentSong != null ? mCurrentSong.getDuration() : 30000L);
     }
 
     /**
@@ -1731,7 +1728,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 case AudioManager.AUDIOFOCUS_GAIN://获得AudioFocus
                     mAudioFocus = true;
                     if(mMediaPlayer == null)
-                        init();
+                        setUp();
                     else if(mNeedContinue){
                         play(true);
                         mNeedContinue = false;
