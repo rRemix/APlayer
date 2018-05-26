@@ -2,6 +2,9 @@ package remix.myplayer.bean.mp3;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.MediaStore;
+
+import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -178,6 +181,20 @@ public class Song implements Cloneable, Parcelable {
     }
 
     public long getDuration() {
+        if (Duration <= 0){
+            IjkMediaPlayer ijkMediaPlayer = new IjkMediaPlayer();
+            try {
+                ijkMediaPlayer.setDataSource(Url);
+                ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
+                ijkMediaPlayer.prepareAsync();
+                Duration = ijkMediaPlayer.getDuration();
+                if(Duration > 0){
+                    //todo update mediastore
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return Duration;
     }
 

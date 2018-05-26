@@ -17,9 +17,10 @@
 
 package tv.danmaku.ijk.media.player.pragma;
 
-import android.util.Log;
-
 import java.util.Locale;
+
+
+import android.util.Log;
 
 @SuppressWarnings({"SameParameterValue", "WeakerAccess"})
 public class DebugLog {

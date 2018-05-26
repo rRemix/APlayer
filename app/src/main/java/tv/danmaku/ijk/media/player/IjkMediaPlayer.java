@@ -23,8 +23,8 @@ import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
+import android.graphics.Rect;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.RingtoneManager;
@@ -131,12 +131,15 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public static final int FFP_PROP_INT64_ASYNC_STATISTIC_BUF_CAPACITY     = 20203;
     public static final int FFP_PROP_INT64_TRAFFIC_STATISTIC_BYTE_COUNT     = 20204;
     public static final int FFP_PROP_INT64_CACHE_STATISTIC_PHYSICAL_POS     = 20205;
-    public static final int FFP_PROP_INT64_CACHE_STATISTIC_BUF_FORWARDS     = 20206;
+    public static final int FFP_PROP_INT64_CACHE_STATISTIC_FILE_FORWARDS    = 20206;
     public static final int FFP_PROP_INT64_CACHE_STATISTIC_FILE_POS         = 20207;
     public static final int FFP_PROP_INT64_CACHE_STATISTIC_COUNT_BYTES      = 20208;
+    public static final int FFP_PROP_INT64_LOGICAL_FILE_SIZE                = 20209;
+    public static final int FFP_PROP_INT64_SHARE_CACHE_DATA                 = 20210;
     public static final int FFP_PROP_INT64_BIT_RATE                         = 20100;
     public static final int FFP_PROP_INT64_TCP_SPEED                        = 20200;
     public static final int FFP_PROP_INT64_LATEST_SEEK_LOAD_DURATION        = 20300;
+    public static final int FFP_PROP_INT64_IMMEDIATE_RECONNECT              = 20211;
     //----------------------------------------
 
     @AccessedByNative
@@ -243,6 +246,9 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
          */
         native_setup(new WeakReference<IjkMediaPlayer>(this));
     }
+
+    private native void _setFrameAtTime(String imgCachePath, long startTime, long endTime, int num, int imgDefinition)
+            throws IllegalArgumentException, IllegalStateException;
 
     /*
      * Update the IjkMediaPlayer SurfaceTexture. Call after setting a new
@@ -498,12 +504,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     private native void _setAndroidIOCallback(IAndroidIO androidIO)
             throws IllegalArgumentException, SecurityException, IllegalStateException;
-
-    private native void _injectCacheNode(int index, long fileLogicalPos, long physicalPos, long cacheSize, long fileSize);
-
-    public void injectCacheNode(int index, long fileLogicalPos, long physicalPos, long cacheSize, long fileSize) {
-        _injectCacheNode(index, fileLogicalPos, physicalPos, cacheSize, fileSize);
-     }
 
     @Override
     public String getDataSource() {
@@ -810,8 +810,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         return _getPropertyLong(FFP_PROP_INT64_CACHE_STATISTIC_PHYSICAL_POS, 0);
     }
 
-    public long getCacheStatisticBufForwards() {
-        return _getPropertyLong(FFP_PROP_INT64_CACHE_STATISTIC_BUF_FORWARDS, 0);
+    public long getCacheStatisticFileForwards() {
+        return _getPropertyLong(FFP_PROP_INT64_CACHE_STATISTIC_FILE_FORWARDS, 0);
     }
 
     public long getCacheStatisticFilePos() {
@@ -820,6 +820,10 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     public long getCacheStatisticCountBytes() {
         return _getPropertyLong(FFP_PROP_INT64_CACHE_STATISTIC_COUNT_BYTES, 0);
+    }
+
+    public long getFileSize() {
+        return _getPropertyLong(FFP_PROP_INT64_LOGICAL_FILE_SIZE, 0);
     }
 
     public long getBitRate() {
@@ -944,6 +948,14 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     protected void finalize() throws Throwable {
         super.finalize();
         native_finalize();
+    }
+
+    public void httphookReconnect() {
+        _setPropertyLong(FFP_PROP_INT64_IMMEDIATE_RECONNECT, 1);
+    }
+
+    public void setCacheShare(int share) {
+        _setPropertyLong(FFP_PROP_INT64_SHARE_CACHE_DATA, (long)share);
     }
 
     private static class EventHandler extends Handler {
@@ -1108,7 +1120,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         int EVENT_WILL_HTTP_OPEN = 0x1;                 // ARG_URL
         int EVENT_DID_HTTP_OPEN = 0x2;                  // ARG_URL, ARG_ERROR, ARG_HTTP_CODE
         int EVENT_WILL_HTTP_SEEK = 0x3;                 // ARG_URL, ARG_OFFSET
-        int EVENT_DID_HTTP_SEEK = 0x4;                  // ARG_URL, ARG_OFFSET, ARG_ERROR, ARG_HTTP_CODE
+        int EVENT_DID_HTTP_SEEK = 0x4;                  // ARG_URL, ARG_OFFSET, ARG_ERROR, ARG_HTTP_CODE, ARG_FILE_SIZE
 
         String ARG_URL = "url";
         String ARG_SEGMENT_INDEX = "segment_index";
@@ -1122,6 +1134,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
         String ARG_OFFSET = "offset";
         String ARG_HTTP_CODE = "http_code";
+        String ARG_FILE_SIZE = "file_size";
 
         /*
          * @return true if invoke is handled

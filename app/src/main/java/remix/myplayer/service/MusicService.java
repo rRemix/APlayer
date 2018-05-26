@@ -82,6 +82,7 @@ import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import static remix.myplayer.appwidgets.BaseAppwidget.SKIN_TRANSPARENT;
 import static remix.myplayer.appwidgets.BaseAppwidget.SKIN_WHITE_1F;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
+import static tv.danmaku.ijk.media.player.IjkMediaMeta.IJKM_KEY_DURATION_US;
 
 
 /**
