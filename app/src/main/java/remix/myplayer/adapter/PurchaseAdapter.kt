@@ -2,6 +2,7 @@ package remix.myplayer.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
 import butterknife.BindView
@@ -18,14 +19,28 @@ class PurchaseAdapter (context: Context, layoutId: Int) : BaseAdapter<PurchaseBe
             return
         holder.mTitle.text = bean.title
         when(position){
-            0,1-> {
-                holder.mLogo.setActualImageResource(if(position == 0) R.drawable.icon_wechat_donate else R.drawable.icon_alipay_donate)
+            0,1,2-> {
+                holder.mLogo.setActualImageResource(when(position){
+                    0 -> R.drawable.icon_wechat_donate
+                    1 -> R.drawable.icon_alipay_donate
+                    else -> {
+                        R.drawable.icon_paypal_donate
+                    }
+                })
+                holder.mPrice.visibility = View.GONE
+                holder.mPrice.text = ""
             }
             else ->{
-                holder.mLogo.setImageURI(bean.logo)
+                if(TextUtils.isEmpty(bean.logo)){
+                    holder.mLogo.visibility = View.GONE
+                }else{
+                    holder.mLogo.visibility = View.VISIBLE
+                    holder.mLogo.setImageURI(bean.logo)
+                }
+                holder.mPrice.visibility = View.VISIBLE
+                holder.mPrice.text = bean.price
             }
         }
-        holder.mPrice.text = if (position == 0 || position == 1) ""  else "$" + bean.price
         holder.mRoot.setOnClickListener {
             mOnItemClickLitener.onItemClick(it,position)
         }

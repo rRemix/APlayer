@@ -165,7 +165,8 @@ dependencies {
 
     implementation 'cn.bmob.android:bmob-sdk:3.6.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-//    implementation 'com.anjlab.android.iab.v3:library:1.0.44'
+//    implementation 'com.android.billingclient:billing:1.1'
+    implementation 'com.anjlab.android.iab.v3:library:1.0.44'
 //    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 //    implementation 'com.google.code.gson:gson:2.8.2'
 }

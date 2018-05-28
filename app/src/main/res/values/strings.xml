@@ -312,4 +312,9 @@
     <string name="saveing">Saving</string>
     <string name="ignore_mediastore_artwork">Ignore Media Store covers</string>
     <string name="ignore_mediastore_artwork_tips">Can increase the album cover quality but causes slower image loading times</string>
+    <string name="error_setup_inapp_billing">Problem setting up in-app billing: %s</string>
+    <string name="error_occur">Error occurred: %s</string>
+    <string name="thank_you">Thank you!</string>
+    <string name="restored_previous_purchases">Restored previous purchases.</string>
+    <string name="paypal">Paypal</string>
 </resources>

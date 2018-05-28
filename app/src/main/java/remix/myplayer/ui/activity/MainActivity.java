@@ -185,6 +185,19 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         mRefreshHandler = new MsgHandler(this);
 
         parseIntent();
+
+//        new MaterialDialog.Builder(this)
+//                .title("暂停应用内更新")
+//                .titleColorAttr(R.attr.text_color_primary)
+//                .content("后续版本将不再提供应用内更新的功能,获取最新版本可前往360、小米、酷安等应用市场")
+//                .contentColorAttr(R.attr.text_color_primary)
+//                .positiveText(R.string.choose)
+//                .positiveColorAttr(R.attr.text_color_primary)
+//                .buttonRippleColorAttr(R.attr.ripple_color)
+//                .backgroundColorAttr(R.attr.background_color_3)
+//                .itemsColorAttr(R.attr.text_color_primary)
+//                .theme(ThemeStore.getMDDialogTheme())
+//                .show();
     }
 
     /**
