@@ -25,6 +25,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
+import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import remix.myplayer.R
 import remix.myplayer.adapter.PurchaseAdapter
@@ -46,13 +47,16 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
 
     lateinit var mAdapter: PurchaseAdapter
 
-    val SKU_IDS = arrayListOf("1","2","3")
+    val SKU_IDS = arrayListOf("price_3","price_8","price_15","price_25", "price_40")
 
     private var mBillingProcessor: BillingProcessor? = null
     private var mDisposable: Disposable? = null
 
-    private val BASE64EncodedPublicKey = "LIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApgWTndDltDV7vmbT2QfoZ2rMi6r+ORTCBBhq7OQato/gkpAfhThrWRLqt/rkQuwquQzhbXNJdTBvxUJgbY8aI0+q06xh+qx/03vJ8tdKk3XXnY0WNAiy2TRUvs50daliSSaC9Ef433M4SVm7A9ft0qpXeDjrrKa8QeApB8ba6YK/+rl1LzjiSMmrZHqMrzuspdGPvp+2Dgrulkh8XJLwC7T3tMlrPy35/VRf1xt+mjSokjW7MnJN+/uYutHoOdVtBYjMIAWBPDaZp754rlDH/47+IUh6mYYX9XtHL3irbPnu3sKgBEC+e5mMrhgTmg+1jrr6SR3m9MfNTrcWoMaU0wIDAQAB"
+    private val BASE64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApgWTndDltDV7vmbT2QfoZ2rMi6r+ORTCBBhq7OQato/gkpAfhThrWRLqt/rkQuwquQzhbXNJdTBvxUJgbY8aI0+q06xh+qx/03vJ8tdKk3XXnY0WNAiy2TRUvs50daliSSaC9Ef433M4SVm7A9ft0qpXeDjrrKa8QeApB8ba6YK/+rl1LzjiSMmrZHqMrzuspdGPvp+2Dgrulkh8XJLwC7T3tMlrPy35/VRf1xt+mjSokjW7MnJN+/uYutHoOdVtBYjMIAWBPDaZp754rlDH/47+IUh6mYYX9XtHL3irbPnu3sKgBEC+e5mMrhgTmg+1jrr6SR3m9MfNTrcWoMaU0wIDAQAB"
     private val TAG = "SupportDevelopActivity"
+
+
+    private lateinit var mLoading:MaterialDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,8 +162,8 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
                         intent.data = Uri.parse("https://www.paypal.me/XIAOBORUI")
                         startActivity(intent)
                     }
-                    else ->{
-                        mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position - 2])
+                    3,4,5,6,7 ->{
+                        mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position - 3])
                     }
                 }
             }
@@ -168,26 +172,43 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
         mRecyclerView.layoutManager = GridLayoutManager(mContext,2)
         mRecyclerView.adapter = mAdapter
 
+        mLoading = MaterialDialog.Builder(this)
+                .title(R.string.loading)
+                .titleColorAttr(R.attr.text_color_primary)
+                .content(R.string.please_wait)
+                .contentColorAttr(R.attr.text_color_primary)
+                .canceledOnTouchOutside(false)
+                .progress(true, 0)
+                .backgroundColorAttr(R.attr.background_color_3)
+                .progressIndeterminateStyle(false).build()
+
         mBillingProcessor = BillingProcessor(this,BASE64EncodedPublicKey,this)
     }
 
-
     private fun loadSkuDetails() {
-        mDisposable = Single.fromCallable { mBillingProcessor?.getPurchaseListingDetails(SKU_IDS) }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
+        Single.fromCallable({ mBillingProcessor!!.getPurchaseListingDetails(SKU_IDS) })
+                .map({
                     val beans = ArrayList<PurchaseBean>()
-                    it?.forEach {
+                    it.sortedWith(kotlin.Comparator{ o1, o2 ->
+                        o1.priceValue.compareTo(o2.priceValue)
+                    }).forEach {
                         beans.add(PurchaseBean(it.productId,"",it.title,it.priceText))
                     }
-
-                    mAdapter.datas.addAll(beans)
-                    mAdapter.notifyDataSetChanged()
-                },{
-                    ToastUtil.show(mContext,R.string.error_occur,it)
+                    beans
                 })
+                .doFinally { mLoading.dismiss() }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : DisposableSingleObserver<List<PurchaseBean>>() {
+                    override fun onSuccess(datas: List<PurchaseBean>) {
+                        mAdapter.datas.addAll(datas)
+                        mAdapter.notifyDataSetChanged()
+                    }
 
+                    override fun onError(e: Throwable) { ToastUtil.show(mContext,R.string.error_occur,e) }
+
+                    override fun onStart() { mLoading.show() }
+                })
     }
 
     override fun onBillingInitialized() {

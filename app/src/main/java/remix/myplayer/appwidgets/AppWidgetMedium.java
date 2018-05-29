@@ -1,8 +1,6 @@
 package remix.myplayer.appwidgets;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
@@ -10,9 +8,6 @@ import android.widget.RemoteViews;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.activity.MainActivity;
-import remix.myplayer.util.Constants;
-import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
 
 /**
@@ -47,8 +42,6 @@ public class AppWidgetMedium extends BaseAppwidget {
             return;
         final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_medium);
         buildAction(context,remoteViews);
-        //设置封面
-        updateCover(context,remoteViews,appWidgetIds,reloadCover);
         updateRemoteViews(remoteViews,song);
         //设置时间
         long currentTime = MusicService.getProgress();
@@ -56,6 +49,7 @@ public class AppWidgetMedium extends BaseAppwidget {
         if(currentTime > 0 && remainTime > 0){
             remoteViews.setTextViewText(R.id.appwidget_progress, Util.getTime(currentTime) + "/" + Util.getTime(remainTime));
         }
-
+        //设置封面
+        updateCover(context,remoteViews,appWidgetIds,reloadCover);
     }
 }

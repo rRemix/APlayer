@@ -1013,8 +1013,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,tintColor);
 
         //音量控制
-        Theme.TintDrawable(mVolumeDown,R.drawable.ic_volume_down_black_24dp,tintColor);
-        Theme.TintDrawable(mVolumeUp,R.drawable.ic_volume_up_black_24dp,tintColor);
+        mVolumeDown.getDrawable().setColorFilter(tintColor, PorterDuff.Mode.SRC_ATOP);
+        mVolumeUp.getDrawable().setColorFilter(tintColor, PorterDuff.Mode.SRC_ATOP);
+//        Theme.TintDrawable(mVolumeDown,R.drawable.ic_volume_down_black_24dp,tintColor);
+//        Theme.TintDrawable(mVolumeUp,R.drawable.ic_volume_up_black_24dp,tintColor);
 
         mPlayPauseView.setBackgroundColor(accentColor);
         //下一首背景

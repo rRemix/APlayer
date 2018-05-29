@@ -96,7 +96,7 @@
     <string name="not_install_weibo">You haven\'t installed Weibo </string>
     <string name="create_dir_error">Create folder failed</string>
     <string name="need_permission">App needs necessary permissions</string>
-    <string name="play_now">Now playing: %s</string>
+    <string name="play_now">Playing: %s</string>
     <string name="default_lrc_path">Default behavior is to scan all lyric files</string>
     <string name="lrc_tip">%s</string>
     <string name="cache_size">%1$2.2f MB</string>
@@ -133,7 +133,7 @@
     <string name="common">Common</string>
     <string name="lrc">Lyric</string>
     <string name="music_filter">Filter</string>
-    <string name="lrc_scan">The scanning path</string>
+    <string name="lrc_scan">Scanning-path</string>
     <string name="lockscreen_show">LockScreen</string>
     <string name="manual_scan">Manual scan</string>
     <string name="lrc_priority">Lyric search</string>
@@ -317,4 +317,5 @@
     <string name="thank_you">Thank you!</string>
     <string name="restored_previous_purchases">Restored previous purchases.</string>
     <string name="paypal">Paypal</string>
+    <string name="exit">Exit</string>
 </resources>

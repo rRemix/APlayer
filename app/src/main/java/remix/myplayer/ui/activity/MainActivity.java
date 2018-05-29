@@ -4,6 +4,7 @@ package remix.myplayer.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -73,6 +74,7 @@ import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.receiver.ExitReceiver;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.SimpleUriRequest;
@@ -474,6 +476,11 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                     //设置
                     case 4:
                         startActivityForResult(new Intent(mContext,SettingActivity.class), REQUEST_SETTING);
+                        break;
+                    //退出
+                    case 5:
+                        sendBroadcast(new Intent(Constants.EXIT)
+                                .setComponent(new ComponentName(mContext, ExitReceiver.class)));
                         break;
                 }
                 mDrawerAdapter.setSelectIndex(position);

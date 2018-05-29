@@ -1,8 +1,6 @@
 package remix.myplayer.appwidgets;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
@@ -10,9 +8,6 @@ import android.widget.RemoteViews;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.ui.activity.MainActivity;
-import remix.myplayer.util.Constants;
-import remix.myplayer.util.SPUtil;
 
 /**
  * @ClassName
@@ -45,8 +40,8 @@ public class AppWidgetSmall extends BaseAppwidget {
             return;
         final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_widget_small);
         buildAction(context,remoteViews);
+        updateRemoteViews(remoteViews,song);
         //设置封面
         updateCover(context,remoteViews,appWidgetIds,reloadCover);
-        updateRemoteViews(remoteViews,song);
     }
 }

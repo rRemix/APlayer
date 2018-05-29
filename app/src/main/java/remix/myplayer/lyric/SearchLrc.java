@@ -39,6 +39,8 @@ import remix.myplayer.util.LyricUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
 
+import static remix.myplayer.App.IS_GOOGLEPLAY;
+
 /**
  * Created by Remix on 2015/12/7.
  */
@@ -164,10 +166,7 @@ public class SearchLrc {
                 Observable.create(e -> {
                     List<String> localPaths = getAllLocalLrcPath();
                     if(localPaths.size() > 0) {
-                        if(localPaths.size() == 1) {
-                            String localPath = localPaths.get(0);
-                            e.onNext(mLrcParser.getLrcRows(getBufferReader(localPath), true, mCacheKey,mSearchKey));
-                        }else{
+                        if(localPaths.size() > 1 && !IS_GOOGLEPLAY) {
                             String localPath = localPaths.get(0);
                             String translatePath=null;
                             for (String path : localPaths) {
@@ -199,6 +198,9 @@ public class SearchLrc {
                                     e.onNext(source);
                                 }
                             }
+                        }else{
+                            String localPath = localPaths.get(0);
+                            e.onNext(mLrcParser.getLrcRows(getBufferReader(localPath), true, mCacheKey,mSearchKey));
                         }
                     }
                     e.onComplete();
@@ -242,7 +244,7 @@ public class SearchLrc {
                                 final NLrcResponse lrcResponse = new Gson().fromJson(body1.string(),NLrcResponse.class);
                                 List<LrcRow> combine = mLrcParser.getLrcRows(getBufferReader(lrcResponse.lrc.lyric.getBytes(UTF_8)), false, mCacheKey,mSearchKey);
                                 //有翻译 合并
-                                if(lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
+                                if(!IS_GOOGLEPLAY && lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
                                     List<LrcRow> translate = mLrcParser.getLrcRows(getBufferReader(lrcResponse.tlyric.lyric.getBytes(UTF_8)), false, mCacheKey,mSearchKey);
                                     if(translate != null && translate.size() > 0){
                                         for(int i = 0 ; i < translate.size();i++){

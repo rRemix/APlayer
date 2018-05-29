@@ -21,8 +21,6 @@ public class ExitReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
-            //关闭数据库
-            DBManager.getInstance().closeDataBase();
             //停止所有service
             ServiceManager.StopAll();
 //            //关闭通知
@@ -30,6 +28,8 @@ public class ExitReceiver extends BroadcastReceiver {
             //停止摇一摇
 //            ShakeDetector.getInstance().stopListen();
             MobclickAgent.onKillProcess(context);
+            //关闭数据库
+            DBManager.getInstance().closeIfNeed();
             //关闭所有activity
             ActivityManager.FinishAll();
             System.exit(0);

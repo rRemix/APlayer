@@ -11,15 +11,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @Date 2016/10/18 14:53
  */
 public class DBManager {
-    private AtomicInteger mOpenCounter = new AtomicInteger();
+    private AtomicInteger mOpenCounter = new AtomicInteger(0);
     private static DBManager mInstance;
     private static DBOpenHelper mOpenHelper;
     private SQLiteDatabase mDateBase;
 
-    public static synchronized void initialInstance(DBOpenHelper helper){
+    public static void initialInstance(DBOpenHelper helper){
         if(mInstance == null){
-            mInstance = new DBManager();
-            mOpenHelper = helper;
+            synchronized (DBManager.class){
+                if(mInstance == null){
+                    mInstance = new DBManager();
+                    mOpenHelper = helper;
+                }
+            }
         }
     }
 
@@ -32,14 +36,21 @@ public class DBManager {
     }
 
     public synchronized SQLiteDatabase openDataBase(){
-        if(mOpenCounter.incrementAndGet() == 1){
+//        int ret = mOpenCounter.incrementAndGet();
+//        if(ret == 1)
+        if(mDateBase == null)
             mDateBase = mOpenHelper.getWritableDatabase();
-        }
         return mDateBase;
     }
 
     public synchronized void closeDataBase(){
-        if(mOpenCounter.decrementAndGet() == 0 && mDateBase != null){
+//        if(mOpenCounter.decrementAndGet() == 0 && mDateBase != null && mDateBase.isOpen()){
+//            mDateBase.close();
+//        }
+    }
+
+    public synchronized void closeIfNeed(){
+        if(mDateBase != null && mDateBase.isOpen()){
             mDateBase.close();
         }
     }

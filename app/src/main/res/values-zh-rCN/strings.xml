@@ -317,4 +317,5 @@
     <string name="thank_you">感谢您的支持!</string>
     <string name="restored_previous_purchases">恢复过往的内购</string>
     <string name="paypal">Paypal</string>
+    <string name="exit">退出</string>
 </resources>

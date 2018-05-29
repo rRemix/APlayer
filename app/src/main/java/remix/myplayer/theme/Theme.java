@@ -58,6 +58,7 @@ public class Theme {
      * @return
      */
     public static Drawable TintDrawable(Drawable oriDrawable, @ColorInt int color,@FloatRange(from=0.0D, to=1.0D) float alpha){
+
         final Drawable wrappedDrawable = DrawableCompat.wrap(oriDrawable.mutate());
         DrawableCompat.setTintList(wrappedDrawable,ColorStateList.valueOf(ColorUtil.adjustAlpha(color,alpha)));
         return wrappedDrawable;

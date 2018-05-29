@@ -2,7 +2,6 @@ package remix.myplayer.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.text.TextUtils
 import android.view.View
 import android.widget.TextView
 import butterknife.BindView
@@ -12,32 +11,21 @@ import remix.myplayer.adapter.holder.BaseViewHolder
 import remix.myplayer.bean.PurchaseBean
 
 class PurchaseAdapter (context: Context, layoutId: Int) : BaseAdapter<PurchaseBean,PurchaseAdapter.PurchaseHolder>(context,layoutId) {
-
+    private val LOGOS_OTHERS = listOf(R.drawable.icon_cookie,R.drawable.icon_cake,R.drawable.icon_drink,
+                    R.drawable.icon_movie,R.drawable.icon_gift)
+    private val LOGOS_DONATE = listOf(R.drawable.icon_wechat_donate,R.drawable.icon_alipay_donate,R.drawable.icon_paypal_donate)
     @SuppressLint("SetTextI18n")
     override fun convert(holder: PurchaseHolder?, bean: PurchaseBean?, position: Int) {
         if(holder == null || bean == null)
             return
-        holder.mTitle.text = bean.title
+        holder.mTitle.text = bean.title.replace("(APlayer)","")
         when(position){
             0,1,2-> {
-                holder.mLogo.setActualImageResource(when(position){
-                    0 -> R.drawable.icon_wechat_donate
-                    1 -> R.drawable.icon_alipay_donate
-                    else -> {
-                        R.drawable.icon_paypal_donate
-                    }
-                })
-                holder.mPrice.visibility = View.GONE
+                holder.mLogo.setActualImageResource(LOGOS_DONATE[position])
                 holder.mPrice.text = ""
             }
-            else ->{
-                if(TextUtils.isEmpty(bean.logo)){
-                    holder.mLogo.visibility = View.GONE
-                }else{
-                    holder.mLogo.visibility = View.VISIBLE
-                    holder.mLogo.setImageURI(bean.logo)
-                }
-                holder.mPrice.visibility = View.VISIBLE
+            3,4,5,6,7 ->{
+                holder.mLogo.setActualImageResource(LOGOS_OTHERS[position - 3])
                 holder.mPrice.text = bean.price
             }
         }

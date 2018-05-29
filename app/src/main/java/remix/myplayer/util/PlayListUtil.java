@@ -309,6 +309,7 @@ public class PlayListUtil {
         } finally {
             if(cursor != null && !cursor.isClosed())
                 cursor.close();
+            DBManager.getInstance().closeDataBase();
         }
         LogUtil.d("QueryPlayList",playList + "");
         return playList;

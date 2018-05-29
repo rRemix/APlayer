@@ -372,7 +372,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mMediaPlayer.setOnCompletionListener(mp -> {
             if(mCloseAfter){
                 sendBroadcast(new Intent(Constants.EXIT)
-                    .setComponent(new ComponentName(mContext, ExitReceiver.class)));
+                        .setComponent(new ComponentName(mContext, ExitReceiver.class)));
             } else {
                 if(mPlayModel == Constants.PLAY_REPEATONE){
                     prepare(mCurrentSong.getUrl());
@@ -489,6 +489,19 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mAudioManager.abandonAudioFocus(mAudioFocusListener);
         mMediaSession.setActive(false);
         mMediaSession.release();
+
+        if(mTimerUpdater != null){
+            mTimerUpdater.cancel();
+            mTimerUpdater = null;
+        }
+        if(mWidgetTimer != null){
+            mWidgetTimer.cancel();
+            mWidgetTimer = null;
+        }
+        if(mWidgetTask != null){
+            mWidgetTask.cancel();
+            mWidgetTask = null;
+        }
 
         Util.unregisterReceiver(this,mControlRecevier);
         Util.unregisterReceiver(this,mHeadSetReceiver);
