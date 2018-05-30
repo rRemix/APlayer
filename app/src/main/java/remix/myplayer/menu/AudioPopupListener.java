@@ -21,7 +21,6 @@ import java.util.Collections;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.Tag;
 import remix.myplayer.ui.activity.EQActivity;
@@ -46,7 +45,7 @@ import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
  * @Author Xiaoborui
  * @Date 2016/8/29 15:33
  */
-public class AudioPopupListener<ActivityCallback extends AppCompatActivity & OnTagEditListener & FileChooserDialog.FileCallback> extends ContextWrapper implements PopupMenu.OnMenuItemClickListener{
+public class AudioPopupListener<ActivityCallback extends AppCompatActivity & FileChooserDialog.FileCallback> extends ContextWrapper implements PopupMenu.OnMenuItemClickListener{
     private ActivityCallback mActivity;
     private Song mInfo;
     private Tag mTag;

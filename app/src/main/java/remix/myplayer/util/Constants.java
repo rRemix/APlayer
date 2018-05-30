@@ -36,6 +36,7 @@ public class Constants {
 
     public final static String EXIT = "remix.music.EXIT";
     public final static String SOUNDEFFECT_ACTION = "remix.music.SOUNDEFFECT_ACTION";
+    public final static String TAG_EDIT = "remix.music.TAG_EDIT";
 
     //控制命令
     public final static int PLAYSELECTEDSONG = 0;

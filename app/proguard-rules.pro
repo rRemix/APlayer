@@ -43,6 +43,7 @@
     <fields>;
     <methods>;
 }
+-keep class **.bean.**{*;}
 # 保留Parcelable序列化类不被混淆
 -keep class * implements android.os.Parcelable {
     public static final android.os.Parcelable$Creator *;

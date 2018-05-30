@@ -3,6 +3,7 @@ package remix.myplayer.ui.activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -65,6 +66,7 @@ import remix.myplayer.lyric.LrcView;
 import remix.myplayer.menu.AudioPopupListener;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.tageditor.TagReceiver;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -83,6 +85,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -100,7 +103,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * 播放界面
  */
 public class PlayerActivity extends BaseActivity implements UpdateHelper.Callback,
-        FileChooserDialog.FileCallback, OnTagEditListener {
+        FileChooserDialog.FileCallback,OnTagEditListener {
     private static final String TAG = "PlayerActivity";
     //是否正在运行
     public boolean mIsForeground;
@@ -237,6 +240,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer,false));
     };
 
+    private TagReceiver mTagReceiver;
+
     @Override
     protected void setUpTheme() {
         if(ThemeStore.isDay())
@@ -292,6 +297,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         ButterKnife.bind(this);
 
         mHandler = new MsgHandler(this);
+        mTagReceiver = new TagReceiver(this);
+        registerReceiver(mTagReceiver,new IntentFilter(Constants.TAG_EDIT));
+//        mHandler.postDelayed(() -> sendBroadcast(new Intent(Constants.TAG_EDIT)
+//                .putExtra("newSong",new Song())),2000);
 
         //获是否正在播放和正在播放的歌曲
         mInfo = MusicService.getCurrentMP3();
@@ -1070,7 +1079,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      */
     private void requestCover(boolean withAnimation) {
         //更新封面
-        if(mInfo == null || (mInfo = MusicService.getCurrentMP3()) == null){
+        if(mInfo == null){
             mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
             updateCover(withAnimation);
         } else {
@@ -1102,6 +1111,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         super.onDestroy();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mHandler.remove();
+        Util.unregisterReceiver(this,mTagReceiver);
     }
 
     /**
@@ -1115,8 +1125,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //        Set<String> ignoreLrcId = new HashSet<>(SPUtil.getStringSet(this,SPUtil.SETTING_KEY.SETTING_NAME,"IgnoreLrcID"));
 //        if(ignoreLrcId.size() > 0){
 //            for (String id : ignoreLrcId){
-//                if((mInfo.getId() + "").equals(id)){
-//                    ignoreLrcId.remove(mInfo.getId() + "");
+//                if((mInfo.getID() + "").equals(id)){
+//                    ignoreLrcId.remove(mInfo.getID() + "");
 //                    SPUtil.putStringSet(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"IgnoreLrcID",ignoreLrcId);
 //                }
 //            }
@@ -1128,16 +1138,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     @Override
     public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
-    }
-
-    @Override
-    public void onTagEdit(Song newSong) {
-        if(newSong != null){
-            mInfo = newSong;
-            updateTopStatus(newSong);
-            ((LyricFragment) mAdapter.getItem(2)).updateLrc(newSong,true);
-            sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
-        }
     }
 
     private void updateProgressByHandler() {
@@ -1174,5 +1174,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         return (LyricFragment) mAdapter.getItem(2);
     }
 
+    @Override
+    public void onTagEdit(Song newSong) {
+        if(newSong != null){
+            updateTopStatus(newSong);
+            ((LyricFragment) mAdapter.getItem(2)).updateLrc(newSong,true);
+            Fresco.getImagePipeline().clearCaches();
+            SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.COVER_NAME,ImageUriUtil.getSearchRequestWithAlbumType(mInfo).getLastFMKey());
+            mInfo = newSong;
+            requestCover(false);
+        }
+    }
 
 }

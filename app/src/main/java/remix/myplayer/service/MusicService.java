@@ -1210,6 +1210,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         return mCurrentSong;
     }
 
+    public static void setCurrentMP3(Song song){
+        if(song != null)
+            mCurrentSong = song;
+    }
+
     /**
      * 返回下一首播放歌曲
      * @return

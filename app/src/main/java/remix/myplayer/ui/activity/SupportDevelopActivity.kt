@@ -27,6 +27,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Function
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
+import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.adapter.PurchaseAdapter
 import remix.myplayer.bean.PurchaseBean
@@ -52,7 +53,6 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
     private var mBillingProcessor: BillingProcessor? = null
     private var mDisposable: Disposable? = null
 
-    private val BASE64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApgWTndDltDV7vmbT2QfoZ2rMi6r+ORTCBBhq7OQato/gkpAfhThrWRLqt/rkQuwquQzhbXNJdTBvxUJgbY8aI0+q06xh+qx/03vJ8tdKk3XXnY0WNAiy2TRUvs50daliSSaC9Ef433M4SVm7A9ft0qpXeDjrrKa8QeApB8ba6YK/+rl1LzjiSMmrZHqMrzuspdGPvp+2Dgrulkh8XJLwC7T3tMlrPy35/VRf1xt+mjSokjW7MnJN+/uYutHoOdVtBYjMIAWBPDaZp754rlDH/47+IUh6mYYX9XtHL3irbPnu3sKgBEC+e5mMrhgTmg+1jrr6SR3m9MfNTrcWoMaU0wIDAQAB"
     private val TAG = "SupportDevelopActivity"
 
 
@@ -182,7 +182,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
                 .backgroundColorAttr(R.attr.background_color_3)
                 .progressIndeterminateStyle(false).build()
 
-        mBillingProcessor = BillingProcessor(this,BASE64EncodedPublicKey,this)
+        mBillingProcessor = BillingProcessor(this,BuildConfig.GOOGLE_PLAY_LICENSE_KEY,this)
     }
 
     private fun loadSkuDetails() {

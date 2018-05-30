@@ -5,7 +5,6 @@ import android.net.Uri;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import io.reactivex.Observable;
-import remix.myplayer.bean.netease.SearchRequest;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -17,7 +16,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  */
 
 public class PlayListUriRequest extends LibraryUriRequest {
-    public PlayListUriRequest(SimpleDraweeView image, SearchRequest request, RequestConfig config) {
+    public PlayListUriRequest(SimpleDraweeView image, NewUriRequest request, RequestConfig config) {
         super(image,request,config);
     }
 

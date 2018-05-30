@@ -114,7 +114,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
 //            //如果是,高亮该歌曲，并显示动画
 //            if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ShowHighLight",false))
 //            if(currentMP3 != null){
-//                boolean highlight = song.getId() == currentMP3.getId();
+//                boolean highlight = song.getID() == currentMP3.getID();
 //                if(highlight)
 //                    mLastIndex = position;
 //                holder.mTitle.setTextColor(highlight ?

@@ -44,7 +44,8 @@ public class App extends MultiDexApplication{
         super.onCreate();
         mContext = getApplicationContext();
 
-        IS_GOOGLEPLAY = "google".equalsIgnoreCase(Util.getAppMetaData("UMENG_CHANNEL"));
+//        IS_GOOGLEPLAY = "google".equalsIgnoreCase(Util.getAppMetaData("UMENG_CHANNEL"));
+        IS_GOOGLEPLAY = true;
 
         initUtil();
         initTheme();

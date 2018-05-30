@@ -1,11 +1,12 @@
 package remix.myplayer.ui;
 
+import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -19,16 +20,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.misc.tageditor.TagEditor;
 import remix.myplayer.request.network.RxUtil;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.Constants;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
 
-public class Tag<ActivityCallback extends AppCompatActivity & OnTagEditListener> extends ContextWrapper{
+public class Tag extends ContextWrapper{
     @BindView(R.id.song_layout)
     @Nullable
     TextInputLayout mSongLayout;
@@ -71,19 +72,17 @@ public class Tag<ActivityCallback extends AppCompatActivity & OnTagEditListener>
     @Nullable
     TextView mDetailSampleRate;
 
-    private final ActivityCallback mActivity;
     private final Song mInfo;
     private final TagEditor mTagEditor;
 
-    public Tag(ActivityCallback activityCallback,Song song){
-        super(activityCallback);
-        mActivity = activityCallback;
+    public Tag(Context context, Song song){
+        super(context);
         mInfo = song;
         mTagEditor = new TagEditor(mInfo.getUrl());
     }
 
     public void detail(){
-        MaterialDialog detailDialog = new MaterialDialog.Builder(mActivity)
+        MaterialDialog detailDialog = new MaterialDialog.Builder(this)
                 .title(R.string.song_detail)
                 .titleColorAttr(R.attr.text_color_primary)
                 .customView(R.layout.dialog_song_detail,true)
@@ -122,7 +121,7 @@ public class Tag<ActivityCallback extends AppCompatActivity & OnTagEditListener>
     }
 
     public void edit(){
-        MaterialDialog editDialog = new MaterialDialog.Builder(mActivity)
+        MaterialDialog editDialog = new MaterialDialog.Builder(this)
                 .title(R.string.song_edit)
                 .titleColorAttr(R.attr.text_color_primary)
                 .customView(R.layout.dialog_song_edit,true)
@@ -135,7 +134,7 @@ public class Tag<ActivityCallback extends AppCompatActivity & OnTagEditListener>
                     String title,artist,album,genre,year,track;
                     title = mSongLayout != null ? mSongLayout.getEditText().getText().toString().trim() : "";
                     if(TextUtils.isEmpty(title)){
-                        ToastUtil.show(mActivity,R.string.song_not_empty);
+                        ToastUtil.show(this,R.string.song_not_empty);
                         return;
                     }
                     artist = mArtistLayout.getEditText() != null ? mArtistLayout.getEditText().getText().toString().trim() : "";
@@ -147,9 +146,12 @@ public class Tag<ActivityCallback extends AppCompatActivity & OnTagEditListener>
                     mTagEditor.save(mInfo,title,album,artist,year,genre,track,"")
                             .compose(RxUtil.applyScheduler())
                             .subscribe(song -> {
-                                mActivity.onTagEdit(MediaStoreUtil.getMP3InfoById(mInfo.getId()));
-                                ToastUtil.show(mActivity,R.string.save_success);
-                            }, throwable -> ToastUtil.show(mActivity,R.string.tag_save_error,throwable.toString()));
+                                sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
+                                sendBroadcast(new Intent(Constants.TAG_EDIT)
+                                        .putExtra("newSong",song));
+                                MusicService.setCurrentMP3(song);
+                                ToastUtil.show(this,R.string.save_success);
+                            }, throwable -> ToastUtil.show(this,R.string.tag_save_error,throwable.toString()));
                 }).build();
         editDialog.show();
 

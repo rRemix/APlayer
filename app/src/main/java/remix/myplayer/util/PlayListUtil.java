@@ -511,7 +511,7 @@ public class PlayListUtil {
 
 //        for(Integer id : idList){
 //            Song temp = MediaStoreUtil.getMP3InfoById(id);
-//            if(temp != null && temp.getId() == id){
+//            if(temp != null && temp.getID() == id){
 //                songList.add(temp);
 //            } else {
 //                //如果外部删除了某些歌曲 手动添加歌曲信息，保证点击播放列表前后歌曲数目一致

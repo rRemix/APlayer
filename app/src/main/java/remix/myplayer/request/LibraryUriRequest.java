@@ -1,5 +1,6 @@
 package remix.myplayer.request;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
@@ -9,7 +10,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
-import remix.myplayer.bean.netease.SearchRequest;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.util.LogUtil;
 
@@ -19,16 +19,16 @@ import remix.myplayer.util.LogUtil;
 
 public class LibraryUriRequest extends ImageUriRequest<String> {
     protected SimpleDraweeView mImage;
-    SearchRequest mRequest;
-    public LibraryUriRequest(@NonNull SimpleDraweeView image, @NonNull SearchRequest request, RequestConfig config) {
+    NewUriRequest mRequest;
+    public LibraryUriRequest(@NonNull SimpleDraweeView image, @NonNull NewUriRequest request, RequestConfig config) {
         super(config);
         mImage = image;
         mRequest = request;
     }
 
     public void onError(String errMsg){
-        mImage.setImageURI(Uri.EMPTY);
-        LogUtil.d("UriRequest","Error: " + errMsg);
+//        mImage.setImageURI(Uri.EMPTY);
+        LogUtil.e("UriRequest","Error: " + errMsg);
     }
 
     public void onSuccess(String result) {
@@ -44,6 +44,7 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
         mImage.setController(controller);
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void load() {
         getCoverObservable(mRequest)

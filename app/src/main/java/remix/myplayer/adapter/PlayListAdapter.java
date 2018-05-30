@@ -24,9 +24,9 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.PlayList;
-import remix.myplayer.bean.netease.SearchRequest;
 import remix.myplayer.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.request.ImageUriRequest;
+import remix.myplayer.request.NewUriRequest;
 import remix.myplayer.request.PlayListUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
@@ -107,7 +107,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         //设置专辑封面
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
         new PlayListUriRequest(holder.mImage,
-                new SearchRequest(info.getId(), info.getName(), 1, ImageUriRequest.URL_PLAYLIST),
+                new NewUriRequest(info.getId(),  ImageUriRequest.URL_PLAYLIST),
                 new RequestConfig.Builder(imageSize,imageSize).build()).load();
 
         holder.mContainer.setOnClickListener(v -> {

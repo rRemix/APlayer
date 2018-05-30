@@ -1,7 +1,10 @@
 package remix.myplayer.request.network;
 
+import android.support.annotation.Nullable;
+
 import io.reactivex.Observable;
 import okhttp3.ResponseBody;
+import remix.myplayer.BuildConfig;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -26,4 +29,11 @@ public interface ApiService {
     @GET("download")
     Observable<ResponseBody> getKuGouLyric(@Query("ver") int ver,@Query("client") String client,@Query("fmt") String fmt,@Query("charset") String charSet,
                                             @Query("id") int id,@Query("accesskey") String accessKey);
+
+    String BASE_QUERY_PARAMETERS = "?format=json&autocorrect=1&api_key=" + BuildConfig.LASTFM_API_KEY;
+    @GET(BASE_QUERY_PARAMETERS + "&method=album.getinfo")
+    Observable<ResponseBody> getAlbumInfo(@Query("album") String albumName, @Query("artist") String artistName, @Nullable @Query("lang") String language);
+
+    @GET(BASE_QUERY_PARAMETERS + "&method=artist.getinfo")
+    Observable<ResponseBody> getArtistInfo(@Query("artist") String artistName, @Nullable @Query("lang") String language);
 }

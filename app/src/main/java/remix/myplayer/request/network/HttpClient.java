@@ -23,10 +23,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class HttpClient implements HttpHelper {
     private static final String NETEASE_BASE_URL = "http://music.163.com/api/";
     private static final String KUGOU_BASE_URL = "http://lyrics.kugou.com/";
-    private static final long TIMEOUT = 1000;
+    private static final String LASTFM_BASE_URL = "http://ws.audioscrobbler.com/2.0/";
+    private static final long TIMEOUT = 5000;
 
     private ApiService mNeteaseApi;
     private ApiService mKuGouApi;
+    private ApiService mLastfmApi;
 
     public static HttpClient getInstance(){
         return SingletonHolder.mInstance;
@@ -38,6 +40,10 @@ public class HttpClient implements HttpHelper {
 
     public static ApiService getKuGouApiservice(){
         return getInstance().mKuGouApi;
+    }
+
+    public static ApiService getLastFMApiservice(){
+        return getInstance().mLastfmApi;
     }
 
     private HttpClient(){
@@ -56,6 +62,17 @@ public class HttpClient implements HttpHelper {
 
         mKuGouApi = retrofitBuilder
                 .baseUrl(KUGOU_BASE_URL)
+                .client(new OkHttpClient.Builder()
+                        .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                        .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                        .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                        .build())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build().create(ApiService.class);
+
+        mLastfmApi = retrofitBuilder
+                .baseUrl(LASTFM_BASE_URL)
                 .client(new OkHttpClient.Builder()
                         .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
                         .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)

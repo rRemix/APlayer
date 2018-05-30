@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -29,6 +30,7 @@ import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.tageditor.TagReceiver;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
@@ -39,6 +41,9 @@ import remix.myplayer.util.Global;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
+import remix.myplayer.util.Util;
+
+import static remix.myplayer.util.Constants.TAG_EDIT;
 
 /**
  * Created by Remix on 2015/12/4.
@@ -57,6 +62,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     private int mType;
     private String mArg;
     private List<Song> mInfoList;
+    private TagReceiver mTagEditReceiver;
 
     //歌曲数目与标题
     @BindView(R.id.childholder_item_num)
@@ -85,6 +91,9 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         ButterKnife.bind(this);
 
         mRefreshHandler = new MsgHandler(this);
+        mTagEditReceiver = new TagReceiver(this);
+        registerReceiver(mTagEditReceiver,new IntentFilter(TAG_EDIT));
+
         //参数id，类型，标题
         ID = getIntent().getIntExtra("Id", -1);
         mType = getIntent().getIntExtra("Type", -1);
@@ -255,31 +264,16 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         updateList(true);
     }
 
-    @Override
     public void onTagEdit(Song newSong) {
         if(newSong == null)
             return;
-        mRefreshHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(mType == Constants.ARTIST || mType == Constants.ALBUM){
-                    ID = mType == Constants.ARTIST ? newSong.getArtistId() : newSong.getAlbumId();
-                    Title = mType == Constants.ARTIST ? newSong.getArtist() : newSong.getAlbum();
-                    mToolBar.setTitle(Title);
-                    updateList(true);
-
-//                    if(mAdapter.getDatas() == null)
-//                        return;
-//                    for(int i = 0 ; i < mAdapter.getDatas().size();i++){
-//                        if(mAdapter.getDatas().get(i).getId() == newSong.getId()){
-//                            mAdapter.getDatas().set(i,newSong);
-//                            mAdapter.notifyItemChanged(i + 1);
-//                        }
-//                    }
-                }
-            }
-        },200);
-
+        if(mType == Constants.ARTIST || mType == Constants.ALBUM) {
+            ID = mType == Constants.ARTIST ? newSong.getArtistId() : newSong.getAlbumId();
+            Title = mType == Constants.ARTIST ? newSong.getArtist() : newSong.getAlbum();
+            mToolBar.setTitle(Title);
+            if(mIsRunning)
+                updateList(true);
+        }
     }
 
     /**
@@ -362,6 +356,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     protected void onDestroy() {
         super.onDestroy();
         mRefreshHandler.remove();
+        Util.unregisterReceiver(this,mTagEditReceiver);
     }
 
     @OnHandleMessage
@@ -403,4 +398,5 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
     }
+
 }

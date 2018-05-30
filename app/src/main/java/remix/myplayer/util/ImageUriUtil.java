@@ -4,19 +4,25 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import remix.myplayer.R;
+import remix.myplayer.bean.lastfm.LastFmAlbum;
+import remix.myplayer.bean.lastfm.LastFmArtist;
 import remix.myplayer.bean.mp3.Album;
 import remix.myplayer.bean.mp3.Artist;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.bean.netease.SearchRequest;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.request.ImageUriRequest;
+import remix.myplayer.request.NewUriRequest;
 
 /**
  * Created by Remix on 2017/11/30.
@@ -93,50 +99,53 @@ public class ImageUriUtil {
         return null;
     }
 
-    /**
-     * 根据歌曲信息构建请求参数
-     * @param song
-     * @return
-     */
-    public static SearchRequest getSearchRequest(Song song, int localType){
-        if(song == null)
-            return SearchRequest.DEFAULT_REQUEST;
-        boolean isTitleAvailable = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(mContext.getString(R.string.unknown_song));
-        boolean isAlbumAvailable = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(mContext.getString(R.string.unknown_album));
-        boolean isArtistAvailable = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(mContext.getString(R.string.unknown_artist));
-
-        //歌曲名合法
-        if(isTitleAvailable){
-            //艺术家合法
-            if(isArtistAvailable){
-                return new SearchRequest(song.getAlbumId(),song.getTitle() + "-" + song.getArtist(), SearchRequest.TYPE_NETEASE_SONG,localType);
-            }
-            //专辑名合法
-            if(isAlbumAvailable){
-                return new SearchRequest(song.getAlbumId(),song.getTitle() + "-" + song.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,localType);
-            }
-        }
-        //根据专辑名字查询
-        if(isAlbumAvailable && isArtistAvailable){
-            return new SearchRequest(song.getAlbumId(),song.getArtist() + "-" + song.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,localType);
-        }
-        return SearchRequest.DEFAULT_REQUEST;
-    }
+//    /**
+//     * 根据歌曲信息构建请求参数
+//     * @param song
+//     * @return
+//     */
+//    public static SearchRequest getSearchRequest(Song song, int localType){
+//        if(song == null)
+//            return SearchRequest.DEFAULT_REQUEST;
+//        boolean isTitleAvailable = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(mContext.getString(R.string.unknown_song));
+//        boolean isAlbumAvailable = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(mContext.getString(R.string.unknown_album));
+//        boolean isArtistAvailable = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(mContext.getString(R.string.unknown_artist));
+//
+//        //歌曲名合法
+//        if(isTitleAvailable){
+//            //艺术家合法
+//            if(isArtistAvailable){
+//                return new SearchRequest(song.getAlbumId(),song.getTitle() + "-" + song.getArtist(), SearchRequest.TYPE_NETEASE_SONG,localType);
+//            }
+//            //专辑名合法
+//            if(isAlbumAvailable){
+//                return new SearchRequest(song.getAlbumId(),song.getTitle() + "-" + song.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,localType);
+//            }
+//        }
+//        //根据专辑名字查询
+//        if(isAlbumAvailable && isArtistAvailable){
+//            return new SearchRequest(song.getAlbumId(),song.getArtist() + "-" + song.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,localType);
+//        }
+//        return SearchRequest.DEFAULT_REQUEST;
+//    }
 
     /**
      * 根据专辑信息构建请求参数
      * @param album
      * @return
      */
-    public static SearchRequest getSearchRequest(Album album){
+    public static NewUriRequest getSearchRequest(Album album){
+//        if(album == null)
+//            return SearchRequest.DEFAULT_REQUEST;
+//        boolean isAlbumAvailable = !TextUtils.isEmpty(album.getAlbum()) && !album.getAlbum().contains(mContext.getString(R.string.unknown_album));
+//        boolean isArtistAvailable = !TextUtils.isEmpty(album.getArtist()) && !album.getArtist().contains(mContext.getString(R.string.unknown_artist));
+//        if(isAlbumAvailable && isArtistAvailable){
+//            return new SearchRequest(album.getAlbumID(),album.getArtist() + "-" + album.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,ImageUriRequest.URL_ALBUM);
+//        }
+//        return SearchRequest.DEFAULT_REQUEST;
         if(album == null)
-            return SearchRequest.DEFAULT_REQUEST;
-        boolean isAlbumAvailable = !TextUtils.isEmpty(album.getAlbum()) && !album.getAlbum().contains(mContext.getString(R.string.unknown_album));
-        boolean isArtistAvailable = !TextUtils.isEmpty(album.getArtist()) && !album.getArtist().contains(mContext.getString(R.string.unknown_artist));
-        if(isAlbumAvailable && isArtistAvailable){
-            return new SearchRequest(album.getAlbumID(),album.getArtist() + "-" + album.getAlbum(), SearchRequest.TYPE_NETEASE_SONG,ImageUriRequest.URL_ALBUM);
-        }
-        return SearchRequest.DEFAULT_REQUEST;
+            return NewUriRequest.DEFAULT_REQUEST;
+        return new NewUriRequest(album.getAlbumID(),ImageUriRequest.URL_ALBUM,album.getAlbum(),album.getArtist());
     }
 
     /**
@@ -144,18 +153,100 @@ public class ImageUriUtil {
      * @param artist
      * @return
      */
-    public static SearchRequest getSearchRequest(Artist artist){
+    public static NewUriRequest getSearchRequest(Artist artist){
+//        if(artist == null)
+//            return SearchRequest.DEFAULT_REQUEST;
+//        boolean isArtistAvailable = !TextUtils.isEmpty(artist.getArtist()) && !artist.getArtist().contains(mContext.getString(R.string.unknown_artist));
+//        if(isArtistAvailable){
+//            return new SearchRequest(artist.getArtistID(),artist.getArtist(), SearchRequest.TYPE_NETEASE_ARTIST,ImageUriRequest.URL_ARTIST);
+//        }
+//        return SearchRequest.DEFAULT_REQUEST;
         if(artist == null)
-            return SearchRequest.DEFAULT_REQUEST;
-        boolean isArtistAvailable = !TextUtils.isEmpty(artist.getArtist()) && !artist.getArtist().contains(mContext.getString(R.string.unknown_artist));
-        if(isArtistAvailable){
-            return new SearchRequest(artist.getArtistID(),artist.getArtist(), SearchRequest.TYPE_NETEASE_ARTIST,ImageUriRequest.URL_ARTIST);
+            return NewUriRequest.DEFAULT_REQUEST;
+        return new NewUriRequest(artist.getArtistID(),ImageUriRequest.URL_ARTIST,artist.getArtist());
+    }
+
+    public static NewUriRequest getSearchRequestWithAlbumType(Song song){
+        return new NewUriRequest(song.getAlbumId(),ImageUriRequest.URL_ALBUM,
+                song.getTitle(),song.getAlbum(),song.getArtist());
+    }
+
+    public static boolean isArtistNameUnknown(@Nullable String artistName) {
+        if (TextUtils.isEmpty(artistName)) return false;
+        artistName = artistName.trim().toLowerCase();
+        return artistName.equals("unknown") || artistName.equals("<unknown>") || artistName.equals("未知艺术家");
+    }
+
+    public static boolean isAlbumNameUnknown(@Nullable String albumName){
+        if (TextUtils.isEmpty(albumName)) return false;
+        albumName = albumName.trim().toLowerCase();
+        return albumName.equals("unknown") || albumName.equals("<unknown>") || albumName.equals("未知专辑");
+    }
+
+    public enum ImageSize {
+        SMALL, MEDIUM, LARGE, EXTRALARGE, MEGA, UNKNOWN
+    }
+    public static String getLargestAlbumImageUrl(List<LastFmAlbum.Album.Image> images) {
+        HashMap imageUrls = new HashMap();
+        for (LastFmAlbum.Album.Image image : images) {
+            ImageSize size = null;
+            final String attribute = image.getSize();
+            if (attribute == null) {
+                size = ImageSize.UNKNOWN;
+            } else {
+                try {
+                    size = ImageSize.valueOf(attribute.toUpperCase(Locale.ENGLISH));
+                } catch (final IllegalArgumentException e) {
+                    // if they suddenly again introduce a new image size
+                }
+            }
+            if (size != null) {
+                imageUrls.put(size, image.getText());
+            }
         }
-        return SearchRequest.DEFAULT_REQUEST;
+        return getLargestImageUrl(imageUrls);
     }
 
-    public static SearchRequest getSearchRequestWithAlbumType(Song song){
-        return getSearchRequest(song, ImageUriRequest.URL_ALBUM);
+    public static String getLargestArtistImageUrl(List<LastFmArtist.Artist.Image> images) {
+        Map<ImageSize, String> imageUrls = new HashMap<>();
+        for (LastFmArtist.Artist.Image image : images) {
+            ImageSize size = null;
+            final String attribute = image.getSize();
+            if (attribute == null) {
+                size = ImageSize.UNKNOWN;
+            } else {
+                try {
+                    size = ImageSize.valueOf(attribute.toUpperCase(Locale.ENGLISH));
+                } catch (final IllegalArgumentException e) {
+                    // if they suddenly again introduce a new image size
+                }
+            }
+            if (size != null) {
+                imageUrls.put(size, image.getText());
+            }
+        }
+        return getLargestImageUrl(imageUrls);
     }
 
+    private static String getLargestImageUrl(Map<ImageSize, String> imageUrls) {
+        if (imageUrls.containsKey(ImageSize.MEGA)) {
+            return imageUrls.get(ImageSize.MEGA);
+        }
+        if (imageUrls.containsKey(ImageSize.EXTRALARGE)) {
+            return imageUrls.get(ImageSize.EXTRALARGE);
+        }
+        if (imageUrls.containsKey(ImageSize.LARGE)) {
+            return imageUrls.get(ImageSize.LARGE);
+        }
+        if (imageUrls.containsKey(ImageSize.MEDIUM)) {
+            return imageUrls.get(ImageSize.MEDIUM);
+        }
+        if (imageUrls.containsKey(ImageSize.SMALL)) {
+            return imageUrls.get(ImageSize.SMALL);
+        }
+        if (imageUrls.containsKey(ImageSize.UNKNOWN)) {
+            return imageUrls.get(ImageSize.UNKNOWN);
+        }
+        return null;
+    }
 }

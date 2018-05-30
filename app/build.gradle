@@ -3,10 +3,6 @@ apply plugin: "kotlin-android"
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-static def releaseTime() {
-    return new Date().format("yyyy-MM-dd HH-mm")
-}
-
 repositories {
     maven {
         url 'https://maven.google.com'
@@ -40,6 +36,9 @@ android {
             }
         }
         multiDexEnabled true
+
+        buildConfigField("String", "LASTFM_API_KEY", "\"${getProperty(getProperties('../local.properties'), 'LASTFM_API_KEY')}\"")
+        buildConfigField("String", "GOOGLE_PLAY_LICENSE_KEY", "\"${getProperty(getProperties('../local.properties'), 'GOOGLE_PLAY_LICENSE_KEY')}\"")
     }
 
     signingConfigs {
@@ -177,6 +176,23 @@ dependencies {
     implementation 'com.anjlab.android.iab.v3:library:1.0.44'
 //    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 //    implementation 'com.google.code.gson:gson:2.8.2'
+}
+
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd HH-mm")
+}
+
+def getProperties(String fileName) {
+    final def Properties properties = new Properties()
+    def file = file(fileName)
+    if (file.exists()) {
+        file.withInputStream { stream -> properties.load(stream) }
+    }
+    return properties
+}
+
+def getProperty(Properties properties, String name) {
+    return properties.getProperty(name) ?: "$name missing"
 }
 
 kapt {

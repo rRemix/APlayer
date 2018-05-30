@@ -70,7 +70,6 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.SortOrder;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
@@ -107,7 +106,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 /**
  *
  */
-public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Callback,OnTagEditListener {
+public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Callback {
     @BindView(R.id.tabs)
     TabLayout mTablayout;
     @BindView(R.id.ViewPager)
@@ -696,10 +695,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 }
             }
         }
-    }
-
-    @Override
-    public void onTagEdit(Song newSong) {
     }
 
     private static boolean mLoadComplete = false;
