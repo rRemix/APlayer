@@ -1,6 +1,8 @@
 package remix.myplayer.util;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.StringRes;
 import android.widget.Toast;
 
@@ -99,9 +101,20 @@ public class ToastUtil {
 
     public static void show(Context context, CharSequence message) {
         if (isShow) {
-            Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
-            toast.getView().setAlpha(0.8f);
-            toast.show();
+            if(Looper.myLooper() == Looper.getMainLooper()){
+                Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+                toast.getView().setAlpha(0.8f);
+                toast.show();
+            }else{
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+                        toast.getView().setAlpha(0.8f);
+                        toast.show();
+                    }
+                });
+            }
         }
     }
 

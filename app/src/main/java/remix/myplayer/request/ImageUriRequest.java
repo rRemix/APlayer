@@ -220,12 +220,10 @@ public abstract class ImageUriRequest<T> {
         String bodyString = body.string();
         if(request.getSearchType() == ImageUriRequest.URL_ALBUM){
             LastFmAlbum lastFmAlbum = new Gson().fromJson(bodyString, LastFmAlbum.class);
-            if(lastFmAlbum != null && lastFmAlbum.getAlbum() != null)
-                imageUrl = ImageUriUtil.getLargestAlbumImageUrl(lastFmAlbum.getAlbum().getImage());
+            imageUrl = ImageUriUtil.getLargestAlbumImageUrl(lastFmAlbum.getAlbum().getImage());
         }else if(request.getSearchType() == ImageUriRequest.URL_ARTIST){
             LastFmArtist lastFmArtist = new Gson().fromJson(bodyString, LastFmArtist.class);
-            if(lastFmArtist != null && lastFmArtist.getArtist() != null)
-                imageUrl = ImageUriUtil.getLargestArtistImageUrl(lastFmArtist.getArtist().getImage());
+            imageUrl = ImageUriUtil.getLargestArtistImageUrl(lastFmArtist.getArtist().getImage());
         }
         if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
             SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getLastFMKey(),imageUrl);

@@ -24,6 +24,7 @@ import io.reactivex.ObservableSource
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 import io.reactivex.functions.Function
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
@@ -186,6 +187,8 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
     }
 
     private fun loadSkuDetails() {
+        if(mAdapter.datas.size >  3)
+            return
         Single.fromCallable({ mBillingProcessor!!.getPurchaseListingDetails(SKU_IDS) })
                 .map({
                     val beans = ArrayList<PurchaseBean>()
@@ -220,7 +223,14 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
     }
 
     override fun onProductPurchased(productId: String, details: TransactionDetails?) {
-        ToastUtil.show(mContext,R.string.thank_you)
+        Single.fromCallable {
+            mBillingProcessor?.consumePurchase(productId)
+        }.subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(Consumer {
+            Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show()
+        })
+
     }
 
     override fun onBillingError(errorCode: Int, error: Throwable?) {
