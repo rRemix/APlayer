@@ -21,6 +21,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
 
 import butterknife.BindView;
+import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.PlayList;
@@ -73,6 +74,11 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
     public void onViewRecycled(BaseViewHolder holder) {
         super.onViewRecycled(holder);
         if(holder instanceof PlayListHolder){
+            if(((PlayListHolder) holder).mImage.getTag() != null){
+                Disposable disposable = (Disposable) ((PlayListHolder) holder).mImage.getTag();
+                if(!disposable.isDisposed())
+                    disposable.dispose();
+            }
             ((PlayListHolder) holder).mImage.setImageURI(Uri.EMPTY);
         }
     }
@@ -106,9 +112,9 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         holder.mOther.setText(mContext.getString(R.string.song_count,info.Count));
         //设置专辑封面
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
-        new PlayListUriRequest(holder.mImage,
+        Disposable disposable = new PlayListUriRequest(holder.mImage,
                 new NewUriRequest(info.getId(),  ImageUriRequest.URL_PLAYLIST),
-                new RequestConfig.Builder(imageSize,imageSize).build()).load();
+                new RequestConfig.Builder(imageSize,imageSize).build()).loadImage();
 
         holder.mContainer.setOnClickListener(v -> {
             if(holder.getAdapterPosition() - 1 < 0){

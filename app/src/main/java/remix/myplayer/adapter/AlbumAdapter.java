@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -24,9 +23,9 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
 
 import butterknife.BindView;
+import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.bean.mp3.Album;
 import remix.myplayer.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.request.LibraryUriRequest;
@@ -75,6 +74,11 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
     public void onViewRecycled(BaseViewHolder holder) {
         super.onViewRecycled(holder);
         if(holder instanceof AlbumHolder){
+            if(((AlbumHolder) holder).mImage.getTag() != null){
+                Disposable disposable = (Disposable) ((AlbumHolder) holder).mImage.getTag();
+                if(!disposable.isDisposed())
+                    disposable.dispose();
+            }
             ((AlbumHolder) holder).mImage.setImageURI(Uri.EMPTY);
         }
     }
@@ -101,17 +105,16 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
             return;
         }
         final AlbumHolder holder = (AlbumHolder) baseHolder;
-        //获得并设置专辑与艺术家
         holder.mText1.setText(album.getAlbum());
-        holder.mText2.setText(album.getArtist());
 
         //设置封面
         final int albumId = album.getAlbumID();
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
 
-        new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequest(album),new RequestConfig.Builder(imageSize,imageSize).build()).load();
+        Disposable disposable = new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequest(album),new RequestConfig.Builder(imageSize,imageSize).build()).loadImage();
+        holder.mImage.setTag(disposable);
         if(holder instanceof AlbumListHolder){
-            new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumId);
+            holder.mText2.setText(mContext.getString(R.string.song_count_2,album.getArtist(),album.getCount()));
         }
 
         //背景点击效果

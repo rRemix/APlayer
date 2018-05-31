@@ -1,10 +1,13 @@
 package remix.myplayer.request;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -26,9 +29,40 @@ public class PlayListUriRequest extends LibraryUriRequest {
         LogUtil.d("Cover","Err: " + errMsg);
     }
 
+    public Disposable loadImage(){
+        return Observable.concat(
+                getCustomThumbObservable(mRequest),
+                Observable.fromIterable(PlayListUtil.getMP3ListByIds(PlayListUtil.getIDList(mRequest.getID()),mRequest.getID()))
+                        .concatMapDelayError(song -> getCoverObservable(getSearchRequestWithAlbumType(song))))
+                .firstOrError()
+                .toObservable()
+                .compose(RxUtil.applyScheduler())
+                .subscribeWith(new DisposableObserver<String>() {
+                    @Override
+                    protected void onStart() {
+
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+                        onSuccess(s);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        PlayListUriRequest.this.onError(e.toString());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    @SuppressLint("CheckResult")
     @Override
     public void load() {
-        LogUtil.d("Cover","Request: " + mRequest);
         Observable.concat(
                 getCustomThumbObservable(mRequest),
                 Observable.fromIterable(PlayListUtil.getMP3ListByIds(PlayListUtil.getIDList(mRequest.getID()),mRequest.getID()))

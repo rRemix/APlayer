@@ -25,6 +25,7 @@ import com.github.promeg.pinyinhelper.Pinyin;
 import java.util.ArrayList;
 
 import butterknife.BindView;
+import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Song;
@@ -88,6 +89,11 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
     public void onViewRecycled(BaseViewHolder holder) {
         super.onViewRecycled(holder);
         if(holder instanceof SongViewHolder){
+            if(((SongViewHolder) holder).mImage.getTag() != null){
+                Disposable disposable = (Disposable) ((SongViewHolder) holder).mImage.getTag();
+                if(!disposable.isDisposed())
+                    disposable.dispose();
+            }
             ((SongViewHolder) holder).mImage.setImageURI(Uri.EMPTY);
         }
     }
@@ -158,9 +164,9 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 //        }
 
         //封面
-        new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
-//        holder.mImage.setImageURI(ContentUris.withAppendedId(Uri
-//                .parse("content://media/external/audio/albumart"), song.getAlbumId()));
+//        new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
+        Disposable disposable = new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).loadImage();
+        holder.mImage.setTag(disposable);
 //        //是否为无损
 //        if(!TextUtils.isEmpty(song.getDisplayname())){
 //            String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);

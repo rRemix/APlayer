@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
+import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Song;
@@ -49,15 +51,27 @@ public class SearchAdapter extends BaseAdapter<Song,SearchAdapter.SearchResHolde
         mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getSelectColor(),size,size);
     }
 
+    @Override
+    public void onViewRecycled(SearchAdapter.SearchResHolder holder) {
+        super.onViewRecycled(holder);
+        if((holder).mImage.getTag() != null){
+            Disposable disposable = (Disposable) (holder).mImage.getTag();
+            if(!disposable.isDisposed())
+                disposable.dispose();
+        }
+        holder.mImage.setImageURI(Uri.EMPTY);
+    }
+
     @SuppressLint("RestrictedApi")
     @Override
     protected void convert(final SearchResHolder holder, Song song, int position) {
         holder.mName.setText(song.getTitle());
         holder.mOther.setText(String.format("%s-%s", song.getArtist(), song.getAlbum()));
         //封面
-        new LibraryUriRequest(holder.mImage,
+        Disposable disposable = new LibraryUriRequest(holder.mImage,
                 getSearchRequestWithAlbumType(song),
-                new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
+                new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).loadImage();
+        holder.mImage.setTag(disposable);
 
         //设置按钮着色
         int tintColor = ThemeStore.THEME_MODE == ThemeStore.DAY ? ColorUtil.getColor(R.color.gray_6c6a6c) : Color.WHITE;

@@ -77,7 +77,8 @@ public class MediaStoreUtil {
                     SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,SortOrder.ArtistSortOrder.ARTIST_A_Z));
             if(cursor != null){
                 while (cursor.moveToNext()){
-                    artists.add(new Artist(cursor.getInt(0),cursor.getString(1)));
+                    artists.add(new Artist(cursor.getInt(0),cursor.getString(1),
+                            getSongCount(Constants.ARTIST,cursor.getInt(0))));
                 }
             }
         }finally {
@@ -106,7 +107,7 @@ public class MediaStoreUtil {
                     albums.add(new Album(cursor.getInt(0),
                             Util.processInfo(cursor.getString(1), Util.ALBUMTYPE),
                             cursor.getInt(2),
-                            Util.processInfo(cursor.getString(3), Util.ARTISTTYPE)));
+                            Util.processInfo(cursor.getString(3), Util.ARTISTTYPE),getSongCount(Constants.ALBUM,cursor.getInt(0))));
                 }
             }
         }finally {
@@ -114,6 +115,26 @@ public class MediaStoreUtil {
                 cursor.close();
         }
         return albums;
+    }
+
+    public static int getSongCount(int type,int id){
+        ContentResolver resolver = App.getContext().getContentResolver();
+        boolean isAlbum = type == Constants.ALBUM;
+        Cursor cursor = null;
+        try {
+            cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    new String[]{MediaStore.Audio.Media._ID},
+                    MediaStoreUtil.getBaseSelection()
+                            + " and " + (isAlbum ? MediaStore.Audio.Media.ALBUM_ID  : MediaStore.Audio.Media.ARTIST_ID)+ "=" + id,
+                    null,null);
+            return cursor != null ? cursor.getCount() : 0;
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
+        }
+        return 0;
     }
 
     public static List<Song> getAllSong(){

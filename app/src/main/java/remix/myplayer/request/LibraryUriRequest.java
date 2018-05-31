@@ -10,6 +10,8 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.observers.DisposableObserver;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.util.LogUtil;
 
@@ -44,11 +46,58 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
         mImage.setController(controller);
     }
 
+    public Disposable loadImage(){
+        return getCoverObservable(mRequest)
+                .compose(RxUtil.applyScheduler())
+                .subscribeWith(new DisposableObserver<String>() {
+                    @Override
+                    protected void onStart() {
+
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+
+                        onSuccess(s);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        LibraryUriRequest.this.onError(e.toString());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
     @SuppressLint("CheckResult")
     @Override
     public void load() {
         getCoverObservable(mRequest)
                 .compose(RxUtil.applyScheduler())
-                .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
+                .subscribeWith(new DisposableObserver<String>() {
+                    @Override
+                    protected void onStart() {
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+                        onSuccess(s);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        LibraryUriRequest.this.onError(e.toString());
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
+//                .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
     }
 }
