@@ -1,7 +1,6 @@
 package remix.myplayer.adapter;
 
 import android.annotation.SuppressLint;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -31,6 +30,8 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.menu.SongPopupListener;
+import remix.myplayer.request.LibraryUriRequest;
+import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -44,6 +45,9 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.ToastUtil;
+
+import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
+import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 /**
  * 全部歌曲和最近添加页面所用adapter
@@ -154,9 +158,9 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 //        }
 
         //封面
-//        new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
-        holder.mImage.setImageURI(ContentUris.withAppendedId(Uri
-                .parse("content://media/external/audio/albumart"), song.getAlbumId()));
+        new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
+//        holder.mImage.setImageURI(ContentUris.withAppendedId(Uri
+//                .parse("content://media/external/audio/albumart"), song.getAlbumId()));
 //        //是否为无损
 //        if(!TextUtils.isEmpty(song.getDisplayname())){
 //            String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
