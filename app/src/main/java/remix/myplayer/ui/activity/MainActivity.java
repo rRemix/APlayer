@@ -78,6 +78,7 @@ import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.SimpleUriRequest;
 import remix.myplayer.request.network.RxUtil;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -721,7 +722,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 return;
             Intent intent = new Intent(MusicService.ACTION_CMD);
             Bundle arg = new Bundle();
-            arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+            arg.putInt("Control", Command.PLAYSELECTEDSONG);
             arg.putInt("Position", 0);
             intent.putExtras(arg);
             ArrayList<Integer> list = new ArrayList<>();

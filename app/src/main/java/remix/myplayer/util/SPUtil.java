@@ -154,6 +154,10 @@ public class SPUtil {
         public static final String IGNORE_MEDIA_STORE = "ignore_media_store";
         //桌面部件样式
         public static final String APP_WIDGET_SKIN = "app_widget_transparent";
+        //是否默认开启定时器
+        public static final String TIMER_DEFAULT = "timer_default";
+        //定时器时长
+        public static final String TIMER_DURATION = "timer_duration";
     }
 
 }

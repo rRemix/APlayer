@@ -10,11 +10,11 @@ import android.widget.RemoteViews;
 
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.RemoteUriRequest;
+import remix.myplayer.request.RequestConfig;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.ColorUtil;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
@@ -124,19 +124,19 @@ public class NotifyImpl extends Notify {
     private void buildAction(Context context) {
         //添加Action
         //切换
-        PendingIntent playIntent = buildPendingIntent(context, Constants.TOGGLE);
+        PendingIntent playIntent = buildPendingIntent(context, Command.TOGGLE);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_play,playIntent);
         mRemoteView.setOnClickPendingIntent(R.id.notify_play,playIntent);
         //下一首
-        PendingIntent nextIntent = buildPendingIntent(context, Constants.NEXT);
+        PendingIntent nextIntent = buildPendingIntent(context, Command.NEXT);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_next, nextIntent);
         mRemoteView.setOnClickPendingIntent(R.id.notify_next, nextIntent);
         //上一首
-        PendingIntent prevIntent = buildPendingIntent(context, Constants.PREV);
+        PendingIntent prevIntent = buildPendingIntent(context, Command.PREV);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_prev,prevIntent);
 
         //关闭通知栏
-        PendingIntent closeIntent = buildPendingIntent(context,Constants.CLOSE_NOTIFY);
+        PendingIntent closeIntent = buildPendingIntent(context, Command.CLOSE_NOTIFY);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_close, closeIntent);
         mRemoteView.setOnClickPendingIntent(R.id.notify_close,closeIntent);
     }

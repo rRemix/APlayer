@@ -15,6 +15,7 @@ import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 
 /**
  * Created by Remix on 2017/11/22.
@@ -72,6 +73,7 @@ public abstract class Notify {
                 mService.stopForeground(false);
         }
         if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
+            LogUtil.d("ServiceLifeCycle","启动前台服务");
             mService.startForeground(PLAYING_NOTIFICATION_ID, notification);
         } else  {
             mNotificationManager.notify(PLAYING_NOTIFICATION_ID, notification);

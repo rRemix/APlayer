@@ -21,6 +21,7 @@ import java.util.Collections;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.Tag;
 import remix.myplayer.ui.activity.EQActivity;
@@ -74,7 +75,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                 case 1:
                                     SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
                                     lyricFragment.updateLrc(mInfo,true);
-                                    sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
+                                    sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                     break;
                                 case 2: //手动选择歌词
                                     new FileChooserDialog.Builder(mActivity)
@@ -102,7 +103,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                                 }
                                             })
                                             .show();
-                                    sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
+                                    sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                     break;
                             }
 
@@ -157,7 +158,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & Fil
                                             return;
                                         if(mInfo.getId() == MusicService.getCurrentMP3().getId() && Global.PlayQueue.size() >= 2){
                                             Intent intent = new Intent(MusicService.ACTION_CMD);
-                                            intent.putExtra("Control", Constants.NEXT);
+                                            intent.putExtra("Control", Command.NEXT);
                                             mActivity.sendBroadcast(intent);
                                         }
                                     }

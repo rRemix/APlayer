@@ -57,14 +57,21 @@
                 android:textSize="@dimen/s12_size"
                 android:textColor="@color/appwidget_progress_color_white_1f"
                 android:maxLines="1"/>
-            <ImageButton android:id="@+id/appwidget_skin"
+            <ImageButton android:id="@+id/appwidget_timer"
                 android:background="@drawable/bg_common_borderless_ripple"
-                android:src="@drawable/widget_btn_skin"
+                android:src="@drawable/widget_btn_timer"
                 android:layout_width="@dimen/app_widget_medium_button_size"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignTop="@id/appwidget_title"
                 android:layout_marginRight="@dimen/d2_size" />
+            <ImageButton android:id="@+id/appwidget_skin"
+                android:background="@drawable/bg_common_borderless_ripple"
+                android:src="@drawable/widget_btn_skin"
+                android:layout_width="@dimen/app_widget_medium_button_size"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/appwidget_timer"
+                android:layout_alignTop="@id/appwidget_title"/>
         </RelativeLayout>
 
         <ProgressBar

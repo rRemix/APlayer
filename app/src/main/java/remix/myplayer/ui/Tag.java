@@ -22,6 +22,7 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.tageditor.TagEditor;
 import remix.myplayer.request.network.RxUtil;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
@@ -146,7 +147,7 @@ public class Tag extends ContextWrapper{
                     mTagEditor.save(mInfo,title,album,artist,year,genre,track,"")
                             .compose(RxUtil.applyScheduler())
                             .subscribe(song -> {
-                                sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
+                                sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                 sendBroadcast(new Intent(Constants.TAG_EDIT)
                                         .putExtra("newSong",song));
                                 MusicService.setCurrentMP3(song);

@@ -31,6 +31,7 @@ import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.misc.tageditor.TagReceiver;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
@@ -117,7 +118,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
                     //设置正在播放列表
                     Intent intent = new Intent(MusicService.ACTION_CMD);
                     Bundle arg = new Bundle();
-                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                    arg.putInt("Control", Command.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
                     Global.setPlayQueue(idList,mContext,intent);

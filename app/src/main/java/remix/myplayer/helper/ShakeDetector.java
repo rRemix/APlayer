@@ -10,8 +10,8 @@ import android.hardware.SensorManager;
 import android.os.Handler;
 
 import remix.myplayer.App;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
 
 /**
@@ -39,7 +39,7 @@ public class ShakeDetector extends ContextWrapper implements SensorEventListener
     private boolean mDetect = false;
     private Handler mHandler = new Handler();
     private Runnable mRunnable = () -> sendBroadcast(new Intent(MusicService.ACTION_CMD)
-            .putExtra("Control", Constants.NEXT));
+            .putExtra("Control", Command.NEXT));
 
     private static ShakeDetector mInstance;
     private ShakeDetector(Context context){

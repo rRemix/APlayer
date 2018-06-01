@@ -27,8 +27,8 @@ import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnFirstLoadFinishListener;
 import remix.myplayer.interfaces.OnInflateFinishListener;
+import remix.myplayer.service.Command;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
 
 /**
@@ -112,7 +112,7 @@ public class CoverFragment extends BaseFragment {
 
             int offsetX = (mWidth +  mImage.getWidth()) >> 1;
             final double startValue = 0;
-            final double endValue = operation == Constants.PREV ? offsetX : -offsetX;
+            final double endValue = operation == Command.PREV ? offsetX : -offsetX;
 
             //封面移动动画
             final Spring outAnim = SpringSystem.create().createSpring();

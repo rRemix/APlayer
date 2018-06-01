@@ -10,10 +10,10 @@ import android.support.v4.app.NotificationCompat;
 
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.RemoteUriRequest;
+import remix.myplayer.request.RequestConfig;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 
 import static remix.myplayer.service.MusicService.copy;
@@ -59,18 +59,18 @@ public class NotifyImpl24 extends Notify{
         int playPauseIcon = MusicService.isPlay() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp;
 
         Intent deleteIntent = new Intent(MusicService.ACTION_CMD);
-        deleteIntent.putExtra("Control", Constants.CLOSE_NOTIFY);
+        deleteIntent.putExtra("Control", Command.CLOSE_NOTIFY);
         deleteIntent.putExtra("FromImpl24",true);
 
         Notification notification = new NotificationCompat.Builder(mService, PLAYING_NOTIFICATION_CHANNEL_ID)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.notifbar_icon)
                 .addAction(R.drawable.ic_skip_previous_black_24dp, mService.getString(R.string.previous),
-                        buildPendingIntent(mService,Constants.PREV))
+                        buildPendingIntent(mService, Command.PREV))
                 .addAction(playPauseIcon, mService.getString(R.string.play_pause),
-                        buildPendingIntent(mService,Constants.TOGGLE))
+                        buildPendingIntent(mService, Command.TOGGLE))
                 .addAction(R.drawable.ic_skip_next_black_24dp, mService.getString(R.string.next),
-                        buildPendingIntent(mService,Constants.NEXT))
+                        buildPendingIntent(mService, Command.NEXT))
 //                .setDeleteIntent(PendingIntent.getBroadcast(mService,3,deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContentIntent(getContentIntent())
                 .setContentTitle(song.getTitle())

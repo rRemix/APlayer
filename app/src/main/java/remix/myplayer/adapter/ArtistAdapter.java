@@ -105,7 +105,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         //设置歌手名
         holder.mText1.setText(artist.getArtist());
         final int artistId = artist.getArtistID();
-        if(holder instanceof ArtistListHolder){
+        if(holder instanceof ArtistListHolder && holder.mText2 != null){
             holder.mText2.setText(mContext.getString(R.string.song_count_1,artist.getCount()));
         }
         //设置封面
@@ -214,6 +214,7 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         @BindView(R.id.item_text1)
         TextView mText1;
         @BindView(R.id.item_text2)
+        @Nullable
         TextView mText2;
         @BindView(R.id.item_simpleiview)
         SimpleDraweeView mImage;

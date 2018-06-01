@@ -16,6 +16,7 @@ import java.util.List;
 
 import remix.myplayer.R;
 import remix.myplayer.bean.CustomThumb;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.dialog.AddtoPlayListDialog;
@@ -57,7 +58,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 }
                 Intent intent = new Intent(MusicService.ACTION_CMD);
                 Bundle arg = new Bundle();
-                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                arg.putInt("Control", Command.PLAYSELECTEDSONG);
                 arg.putInt("Position", 0);
                 intent.putExtras(arg);
                 Global.setPlayQueue(idList,mContext,intent);

@@ -34,6 +34,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.customview.CircleSeekBar;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
@@ -118,8 +119,10 @@ public class TimerDialog extends BaseDialogActivity {
                     int minute = (int) (progress / 60);
                     mMinute.setText(minute < 10 ? "0" + minute : "" + minute);
                     mSecond.setText("00");
-                    mTime = (int) progress;
-                    mSaveTime = (int) progress;
+                    //取整数分钟
+                    mTime = minute * 60;
+                    mSaveTime = minute * 60;
+                    LogUtil.e("TimerDialog","设置时间: " + mSaveTime + "s");
                 }
             }
             @Override
@@ -135,8 +138,8 @@ public class TimerDialog extends BaseDialogActivity {
         ((LinearLayout)findView(R.id.popup_timer_container)).addView(mSwitch);
 
         //读取保存的配置
-        boolean hasDefault = SPUtil.getValue(this, SPUtil.SETTING_KEY.SETTING_NAME, "TimerDefault", false);
-        final int time = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"TimerNum",-1);
+        boolean hasDefault = SPUtil.getValue(this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
+        final int time = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.TIMER_DURATION,-1);
 
         //默认选项
         if(hasDefault && time > 0){
@@ -152,16 +155,16 @@ public class TimerDialog extends BaseDialogActivity {
             if (isChecked) {
                 if (mSaveTime > 0) {
                     ToastUtil.show(TimerDialog.this,R.string.set_success);
-                    SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, "TimerDefault", true);
-                    SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, "TimerNum", mSaveTime);
+                    SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, true);
+                    SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.TIMER_DURATION, mSaveTime);
                 } else {
                     ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
                     mSwitch.setChecked(false);
                 }
             } else {
                 ToastUtil.show(TimerDialog.this,R.string.cancel_success);
-                SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, "TimerDefault", false);
-                SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, "TimerNum", -1);
+                SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.TIMER_DEFAULT, false);
+                SPUtil.putValue(TimerDialog.this, SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.TIMER_DURATION, -1);
                 mSaveTime = -1;
             }
         });
@@ -191,14 +194,12 @@ public class TimerDialog extends BaseDialogActivity {
             ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
             return;
         }
-        String msg = mIsTiming ? getString(R.string.cancel_timer) : getString(R.string.will_stop_at_x,mTime / 60);
-        ToastUtil.show(this,msg);
-        mIsTiming = !mIsTiming;
+
         //如果开始计时，保存设置的时间
-        if(mIsTiming){
-            mSaveTime = mTime / 60;
-        }
-        MusicService.getInstance().toggleTimer(mIsTiming,mTime / 60 * 60 * 1000);
+//        if(mIsTiming){
+//            mSaveTime = mTime / 60;
+//        }
+        MusicService.getInstance().toggleTimer(!mIsTiming,mTime * 1000);
         finish();
     }
 
@@ -231,7 +232,6 @@ public class TimerDialog extends BaseDialogActivity {
             }
             mSeekbar.setProgress(msg.arg1);
         }
-
     }
 
     @Override
@@ -252,6 +252,7 @@ public class TimerDialog extends BaseDialogActivity {
                     Bundle data = new Bundle();
                     data.putString("Minute",min < 10 ? "0" + min : "" + min);
                     data.putString("Second",sec < 10 ? "0" + sec : "" + sec);
+                    LogUtil.e("TimerDialog","Minute: " + min + " Second: " + sec);
                     msg.setData(data);
                     mHandler.sendMessage(msg);
                 }

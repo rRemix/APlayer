@@ -33,6 +33,7 @@ import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.menu.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -113,7 +114,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 
             headerHolder.mShuffle.setOnClickListener(v -> {
                 Intent intent = new Intent(MusicService.ACTION_CMD);
-                intent.putExtra("Control", Constants.NEXT);
+                intent.putExtra("Control", Command.NEXT);
                 intent.putExtra("shuffle",true);
                 if(mType == ALLSONG){
                     if(Global.AllSongList == null || Global.AllSongList.size() == 0){

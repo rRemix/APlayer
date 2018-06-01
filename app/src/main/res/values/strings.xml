@@ -270,8 +270,8 @@
     <string name="delete_source">Also delete the source file</string>
     <string name="kugou">Kugou</string>
     <string name="netease">Netease</string>
-    <string name="cancel_timer">Sleep timer canceled</string>
-    <string name="start_timer">Start Timer</string>
+    <string name="cancel_timer">Cancel sleep timer</string>
+    <string name="start_timer">Start sleep timer</string>
     <string name="sort_order">Sort</string>
     <string name="album">Album</string>
     <string name="album_desc">Album desc</string>
@@ -318,4 +318,5 @@
     <string name="restored_previous_purchases">Restored previous purchases.</string>
     <string name="paypal">Paypal</string>
     <string name="exit">Exit</string>
+    <string name="plz_set_default_time">Please set the default time first</string>
 </resources>

@@ -16,6 +16,7 @@ import java.util.Collections;
 import remix.myplayer.R;
 import remix.myplayer.bean.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.Tag;
@@ -55,7 +56,7 @@ public class SongPopupListener
             case R.id.menu_next:
                 MobclickAgent.onEvent(mActivity,"Share");
                 Intent intent = new Intent(MusicService.ACTION_CMD);
-                intent.putExtra("Control", Constants.ADD_TO_NEXT_SONG);
+                intent.putExtra("Control", Command.ADD_TO_NEXT_SONG);
                 intent.putExtra("song",mSong);
                 mActivity.sendBroadcast(intent);
                 break;

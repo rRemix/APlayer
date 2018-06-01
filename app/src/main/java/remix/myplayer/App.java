@@ -23,6 +23,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.CrashHandler;
 import remix.myplayer.util.ImageUriUtil;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PermissionUtil;
 import remix.myplayer.util.PlayListUtil;
@@ -42,6 +43,7 @@ public class App extends MultiDexApplication{
     @Override
     public void onCreate() {
         super.onCreate();
+        LogUtil.d("ServiceLifeCycle","启动App");
         mContext = getApplicationContext();
 
 //        IS_GOOGLEPLAY = "google".equalsIgnoreCase(Util.getAppMetaData("UMENG_CHANNEL"));

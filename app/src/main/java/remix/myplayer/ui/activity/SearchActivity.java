@@ -31,9 +31,9 @@ import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.customview.SearchToolBar;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -95,7 +95,7 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter>{
             public void onItemClick(View view, int position) {
                 if(mAdapter != null && mAdapter.getDatas() != null){
                     Intent intent = new Intent(MusicService.ACTION_CMD);
-                    intent.putExtra("Control",Constants.PLAY_TEMP);
+                    intent.putExtra("Control", Command.PLAY_TEMP);
                     intent.putExtra("Song",  mAdapter.getDatas().get(position));
                     sendBroadcast(intent);
                 }else {

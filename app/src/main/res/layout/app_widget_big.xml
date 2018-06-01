@@ -11,6 +11,12 @@
         android:textSize="@dimen/s12_size"
         android:textColor="@color/appwidget_artist_color_white_1f"
         android:maxLines="1"/>
+    <ImageButton android:id="@+id/appwidget_timer"
+        android:visibility="gone"
+        android:background="@drawable/bg_common_borderless_ripple"
+        android:src="@drawable/widget_btn_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <ImageView
         android:layout_width="match_parent"

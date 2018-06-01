@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.view.View;
 
 import remix.myplayer.R;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.util.Constants;
 
 /**
  * Created by Remix on 2015/12/3.
@@ -26,15 +26,15 @@ public class CtrlButtonListener implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.lockscreen_prev:
             case R.id.playbar_prev:
-                intent.putExtra("Control", Constants.PREV);
+                intent.putExtra("Control", Command.PREV);
                 break;
             case R.id.lockscreen_next:
             case R.id.playbar_next:
-                intent.putExtra("Control", Constants.NEXT);
+                intent.putExtra("Control", Command.NEXT);
                 break;
             case R.id.lockscreen_play:
             case R.id.playbar_play:
-                intent.putExtra("Control", Constants.TOGGLE);
+                intent.putExtra("Control", Command.TOGGLE);
                 break;
         }
         context.sendBroadcast(intent);
