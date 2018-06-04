@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
 import remix.myplayer.lyric.bean.LrcRow;
-import remix.myplayer.util.LogUtil;
 
 /**
  * @ClassName
@@ -91,7 +90,6 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
         super.onDraw(canvas);
         if(mCurLrcRow == null)
             return;
-        LogUtil.d("FloatTextView","Color: " + getPaint().getColor());
         canvas.drawText(mCurLrcRow.getContent(), mCurTextXForHighLightLrc,(getHeight() + mTextRect.height()) / 2,getPaint());
     }
 
