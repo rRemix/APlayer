@@ -22,7 +22,6 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import remix.myplayer.App;
-import remix.myplayer.R;
 import remix.myplayer.bean.kugou.KLrcResponse;
 import remix.myplayer.bean.kugou.KSearchResponse;
 import remix.myplayer.bean.mp3.Song;
@@ -34,6 +33,7 @@ import remix.myplayer.misc.cache.DiskLruCache;
 import remix.myplayer.misc.tageditor.TagEditor;
 import remix.myplayer.request.network.HttpClient;
 import remix.myplayer.request.network.RxUtil;
+import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.LyricUtil;
 import remix.myplayer.util.SPUtil;
@@ -241,7 +241,8 @@ public class SearchLrc {
                     .flatMap(body -> HttpClient.getInstance()
                             .getNeteaseLyric(new Gson().fromJson(body.string(),NSongSearchResponse.class).result.songs.get(0).id)
                             .map(body1 -> {
-                                final NLrcResponse lrcResponse = new Gson().fromJson(body1.string(),NLrcResponse.class);
+                                final String bodyStr = body1.string();
+                                final NLrcResponse lrcResponse = new Gson().fromJson(bodyStr,NLrcResponse.class);
                                 List<LrcRow> combine = mLrcParser.getLrcRows(getBufferReader(lrcResponse.lrc.lyric.getBytes(UTF_8)), false, mCacheKey,mSearchKey);
                                 //有翻译 合并
                                 if(!IS_GOOGLEPLAY && lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
@@ -366,18 +367,18 @@ public class SearchLrc {
     private String getLyricSearchKey(Song song){
         if(song == null)
             return "";
-        boolean isTitleAvailable = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(App.getContext().getString(R.string.unknown_song));
-        boolean isAlbumAvailable = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(App.getContext().getString(R.string.unknown_album));
-        boolean isArtistAvailable = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(App.getContext().getString(R.string.unknown_artist));
+        boolean isTitleAvailable = !ImageUriUtil.isSongNameUnknownOrEmpty(song.getTitle());
+        boolean isAlbumAvailable = !ImageUriUtil.isAlbumNameUnknownOrEmpty(song.getAlbum());
+        boolean isArtistAvailable = !ImageUriUtil.isArtistNameUnknownOrEmpty(song.getArtist());
 
         //歌曲名合法
         if(isTitleAvailable){
             //艺术家合法
             if(isArtistAvailable){
-                return song.getArtist() + " - " + song.getTitle();
+                return song.getArtist() + "-" + song.getTitle();
             } else if(isAlbumAvailable){
                 //专辑名合法
-                return song.getAlbum() + " - " + song.getTitle();
+                return song.getAlbum() + "-" + song.getTitle();
             } else {
                 return song.getTitle();
             }

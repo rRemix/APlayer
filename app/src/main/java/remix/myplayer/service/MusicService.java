@@ -995,8 +995,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
             //更新通知栏
             mNotify.updateForPlaying();
             //更新桌面歌词播放按钮
-            if(mFloatLrcView != null)
+            if(mFloatLrcView != null){
                 mFloatLrcView.setPlayIcon(MusicService.isPlay());
+                mFloatLrcView.stopAnimation();
+            }
             updateMediaSession(control);
             mShortcutManager.updateContinueShortcut();
         }

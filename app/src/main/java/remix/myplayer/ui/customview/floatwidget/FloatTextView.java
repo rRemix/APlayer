@@ -2,14 +2,15 @@ package remix.myplayer.ui.customview.floatwidget;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Color;
+import android.content.res.ColorStateList;
+import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
 import remix.myplayer.lyric.bean.LrcRow;
-import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.LogUtil;
 
 /**
  * @ClassName
@@ -19,9 +20,8 @@ import remix.myplayer.util.DensityUtil;
  */
 
 public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
-    private Context mContext;
-    /** 画笔*/
-    private Paint mPaint;
+    private static final int DELAY_MAX = 100;
+
     /** 当前x坐标*/
     private float mCurTextXForHighLightLrc;
     /** 当前的歌词*/
@@ -42,24 +42,22 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
 
     public FloatTextView(Context context) {
         super(context);
-        init(context);
+        init();
     }
     public FloatTextView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init();
     }
 
-    private void init(Context context) {
-        mContext = context;
-        mPaint = getPaint();
-        mPaint.setShadowLayer(DensityUtil.dip2px(mContext,1.0f),0,1, Color.argb(51,0,0,0));
+    private void init() {
+//        mPaint = getPaint();
+//        mPaint.setShadowLayer(DensityUtil.dip2px(getContext(),1.0f),0,1, Color.argb(51,0,0,0));
     }
 
     public FloatTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init();
     }
-
 
     /**控制歌词水平滚动的属性动画***/
     private ValueAnimator mAnimator;
@@ -78,41 +76,52 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
             mAnimator.setFloatValues(0,endX);
         }
         mAnimator.setDuration(duration);
-        mAnimator.setStartDelay((long) (duration * 0.1)); //延迟执行属性动画
+        long delay = (long) (duration * 0.1);
+        mAnimator.setStartDelay(delay > DELAY_MAX ? DELAY_MAX : delay); //延迟执行属性动画
         mAnimator.start();
     }
 
-//    @Override
-//    protected void onDraw(Canvas canvas) {
-//        super.onDraw(canvas);
-//        if(mCurLrcRow == null)
-//            return;
-//        canvas.drawText(mCurLrcRow.getContent(), mCurTextXForHighLightLrc,(getHeight() + mTextRect.height()) / 2, getPaint());
-//    }
+    @Override
+    public void setTextColor(ColorStateList colors) {
+        super.setTextColor(colors);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        if(mCurLrcRow == null)
+            return;
+        LogUtil.d("FloatTextView","Color: " + getPaint().getColor());
+        canvas.drawText(mCurLrcRow.getContent(), mCurTextXForHighLightLrc,(getHeight() + mTextRect.height()) / 2,getPaint());
+    }
 
     public void setLrcRow(LrcRow lrcRow){
+        if(mCurLrcRow != null && mCurLrcRow == lrcRow)
+            return;
         mCurLrcRow = lrcRow;
-        setText(mCurLrcRow.getContent());
+//        setText(mCurLrcRow.getContent());
 
-//        if(mCurLrcRow != null){
-//            Paint paint = getPaint();
-//            if(paint == null)
-//                return;
-//            if(mAnimator != null && mAnimator.isRunning())
-//                mAnimator.cancel();
-//            String text = mCurLrcRow.getContent();
-//            paint.getTextBounds(text,0,text.length(),mTextRect);
-//            float textWidth = mTextRect.width();
-//            if(textWidth > getWidth()){
-//                //如果歌词宽度大于view的宽，则需要动态设置歌词的起始x坐标，以实现水平滚动
-//                startScrollLrc(getWidth() - textWidth, (long) (mCurLrcRow.getTotalTime() * 0.6));
-//            }else{
-//                //如果歌词宽度小于view的宽，则让歌词居中显示
-//                mCurTextXForHighLightLrc = (getWidth() - textWidth) / 2;
-//            }
-//            invalidate();
-//        }
+        if(mCurLrcRow != null){
+            Paint paint = getPaint();
+            if(paint == null)
+                return;
+            String text = mCurLrcRow.getContent();
+            paint.getTextBounds(text,0,text.length(),mTextRect);
+            float textWidth = mTextRect.width();
+            if(textWidth > getWidth()){
+                //如果歌词宽度大于view的宽，则需要动态设置歌词的起始x坐标，以实现水平滚动
+                startScrollLrc(getWidth() - textWidth, (long) (mCurLrcRow.getTotalTime() * 0.85));
+            }else{
+                //如果歌词宽度小于view的宽，则让歌词居中显示
+                mCurTextXForHighLightLrc = (getWidth() - textWidth) / 2;
+                invalidate();
+            }
+        }
 
     }
 
+    public void stopAnimation() {
+        if(mAnimator != null && mAnimator.isRunning())
+            mAnimator.cancel();
+    }
 }
