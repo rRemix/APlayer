@@ -49,8 +49,7 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     }
 
     private void init() {
-//        mPaint = getPaint();
-//        mPaint.setShadowLayer(DensityUtil.dip2px(getContext(),1.0f),0,1, Color.argb(51,0,0,0));
+
     }
 
     public FloatTextView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {

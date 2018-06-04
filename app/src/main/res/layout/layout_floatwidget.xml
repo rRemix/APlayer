@@ -151,6 +151,10 @@
             android:id="@+id/widget_line1"
             android:gravity="center"
             android:ellipsize="end"
+            android:shadowColor="@color/black"
+            android:shadowRadius="2"
+            android:shadowDx="1"
+            android:shadowDy="1"
             tools:text="哈哈哈哈哈哈哈哈"/>
 
         <TextView
@@ -164,9 +168,9 @@
             android:gravity="center"
             android:ellipsize="end"
             android:shadowColor="@color/black"
-            android:shadowRadius="4"
-            android:shadowDx="2"
-            android:shadowDy="2"
+            android:shadowRadius="2"
+            android:shadowDx="1"
+            android:shadowDy="1"
             tools:text="哈哈哈哈哈哈哈哈"/>
     </LinearLayout>
 
