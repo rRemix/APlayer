@@ -319,4 +319,9 @@
     <string name="paypal">Paypal</string>
     <string name="exit">退出</string>
     <string name="plz_set_default_time">请先设置默认时间</string>
+    <string name="app_widget_big_name">APlayer-大尺寸</string>
+    <string name="app_widget_medium_name">APlayer-中尺寸</string>
+    <string name="app_widget_small_name">APlayer-小尺寸</string>
+    <string name="app_widget_medium_transparent_name">APlayer-中尺寸-透明</string>
+    <string name="app_widget_small_transparent_name">APlayer-小尺寸-透明</string>
 </resources>

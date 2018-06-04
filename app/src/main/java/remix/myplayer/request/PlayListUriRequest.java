@@ -19,7 +19,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  */
 
 public class PlayListUriRequest extends LibraryUriRequest {
-    public PlayListUriRequest(SimpleDraweeView image, NewUriRequest request, RequestConfig config) {
+    public PlayListUriRequest(SimpleDraweeView image, UriRequest request, RequestConfig config) {
         super(image,request,config);
     }
 

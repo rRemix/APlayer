@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/app_widget_big_height">
+    android:layout_height="@dimen/app_widget_big_height"
+    android:background="@drawable/bg_corner_app_widget_white_1f">
     <TextView
         android:visibility="gone"
         android:id="@+id/appwidget_artist"

@@ -10,9 +10,9 @@ import remix.myplayer.request.network.RxUtil;
  */
 
 public abstract class RemoteUriRequest extends ImageUriRequest<Bitmap> {
-    private NewUriRequest mRequest;
+    private UriRequest mRequest;
 
-    public RemoteUriRequest(@NonNull NewUriRequest request, @NonNull RequestConfig config){
+    public RemoteUriRequest(@NonNull UriRequest request, @NonNull RequestConfig config){
         super(config);
         mRequest = request;
     }

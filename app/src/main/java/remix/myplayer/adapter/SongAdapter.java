@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -95,7 +94,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
                 if(!disposable.isDisposed())
                     disposable.dispose();
             }
-            ((SongViewHolder) holder).mImage.setImageURI(Uri.EMPTY);
+//            ((SongViewHolder) holder).mImage.setImageURI(Uri.EMPTY);
         }
     }
 

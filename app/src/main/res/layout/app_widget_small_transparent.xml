@@ -3,7 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/app_widget_small_height"
-    android:background="@drawable/bg_corner_app_widget_white_1f">
+    android:background="@drawable/bg_corner_app_widget_transparent">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/appwidget_clickable"/>
+
     <TextView
         android:visibility="gone"
         android:id="@+id/appwidget_artist"
@@ -21,11 +26,6 @@
         android:textSize="@dimen/s12_size"
         android:textColor="@color/appwidget_progress_color_white_1f"
         android:maxLines="1"/>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/appwidget_clickable"/>
 
     <LinearLayout
         android:layout_width="match_parent"

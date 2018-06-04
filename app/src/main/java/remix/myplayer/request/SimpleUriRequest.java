@@ -7,8 +7,8 @@ import android.support.annotation.NonNull;
 import remix.myplayer.request.network.RxUtil;
 
 public abstract class SimpleUriRequest extends ImageUriRequest<Uri> {
-    private NewUriRequest mRequest;
-    public SimpleUriRequest(@NonNull NewUriRequest request) {
+    private UriRequest mRequest;
+    public SimpleUriRequest(@NonNull UriRequest request) {
         super();
         mRequest = request;
     }

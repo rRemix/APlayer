@@ -21,8 +21,8 @@ import remix.myplayer.util.LogUtil;
 
 public class LibraryUriRequest extends ImageUriRequest<String> {
     protected SimpleDraweeView mImage;
-    NewUriRequest mRequest;
-    public LibraryUriRequest(@NonNull SimpleDraweeView image, @NonNull NewUriRequest request, RequestConfig config) {
+    UriRequest mRequest;
+    public LibraryUriRequest(@NonNull SimpleDraweeView image, @NonNull UriRequest request, RequestConfig config) {
         super(config);
         mImage = image;
         mRequest = request;
@@ -52,18 +52,16 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
                 .subscribeWith(new DisposableObserver<String>() {
                     @Override
                     protected void onStart() {
-
+                        mImage.setImageURI(Uri.EMPTY);
                     }
 
                     @Override
                     public void onNext(String s) {
-
                         onSuccess(s);
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
                         LibraryUriRequest.this.onError(e.toString());
                     }
 

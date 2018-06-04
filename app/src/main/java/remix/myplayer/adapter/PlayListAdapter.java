@@ -27,9 +27,9 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.request.ImageUriRequest;
-import remix.myplayer.request.NewUriRequest;
 import remix.myplayer.request.PlayListUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.UriRequest;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -113,9 +113,9 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         //设置专辑封面
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
         Disposable disposable = new PlayListUriRequest(holder.mImage,
-                new NewUriRequest(info.getId(),  ImageUriRequest.URL_PLAYLIST),
+                new UriRequest(info.getId(),UriRequest.TYPE_NETEASE_SONG,  ImageUriRequest.URL_PLAYLIST),
                 new RequestConfig.Builder(imageSize,imageSize).build()).loadImage();
-
+        holder.mImage.setTag(disposable);
         holder.mContainer.setOnClickListener(v -> {
             if(holder.getAdapterPosition() - 1 < 0){
                 ToastUtil.show(mContext,R.string.illegal_arg);

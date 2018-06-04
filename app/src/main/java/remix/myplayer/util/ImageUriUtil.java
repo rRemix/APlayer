@@ -22,7 +22,7 @@ import remix.myplayer.bean.mp3.Artist;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.request.ImageUriRequest;
-import remix.myplayer.request.NewUriRequest;
+import remix.myplayer.request.UriRequest;
 
 /**
  * Created by Remix on 2017/11/30.
@@ -134,7 +134,7 @@ public class ImageUriUtil {
      * @param album
      * @return
      */
-    public static NewUriRequest getSearchRequest(Album album){
+    public static UriRequest getSearchRequest(Album album){
 //        if(album == null)
 //            return SearchRequest.DEFAULT_REQUEST;
 //        boolean isAlbumAvailable = !TextUtils.isEmpty(album.getAlbum()) && !album.getAlbum().contains(mContext.getString(R.string.unknown_album));
@@ -144,8 +144,8 @@ public class ImageUriUtil {
 //        }
 //        return SearchRequest.DEFAULT_REQUEST;
         if(album == null)
-            return NewUriRequest.DEFAULT_REQUEST;
-        return new NewUriRequest(album.getAlbumID(),ImageUriRequest.URL_ALBUM,album.getAlbum(),album.getArtist());
+            return UriRequest.DEFAULT_REQUEST;
+        return new UriRequest(album.getAlbumID(),ImageUriRequest.URL_ALBUM,UriRequest.TYPE_NETEASE_ALBUM,album.getAlbum(),album.getArtist());
     }
 
     /**
@@ -153,7 +153,7 @@ public class ImageUriUtil {
      * @param artist
      * @return
      */
-    public static NewUriRequest getSearchRequest(Artist artist){
+    public static UriRequest getSearchRequest(Artist artist){
 //        if(artist == null)
 //            return SearchRequest.DEFAULT_REQUEST;
 //        boolean isArtistAvailable = !TextUtils.isEmpty(artist.getArtist()) && !artist.getArtist().contains(mContext.getString(R.string.unknown_artist));
@@ -162,25 +162,31 @@ public class ImageUriUtil {
 //        }
 //        return SearchRequest.DEFAULT_REQUEST;
         if(artist == null)
-            return NewUriRequest.DEFAULT_REQUEST;
-        return new NewUriRequest(artist.getArtistID(),ImageUriRequest.URL_ARTIST,artist.getArtist());
+            return UriRequest.DEFAULT_REQUEST;
+        return new UriRequest(artist.getArtistID(),ImageUriRequest.URL_ARTIST,UriRequest.TYPE_NETEASE_ARTIST,artist.getArtist());
     }
 
-    public static NewUriRequest getSearchRequestWithAlbumType(Song song){
-        return new NewUriRequest(song.getAlbumId(),ImageUriRequest.URL_ALBUM,
+    public static UriRequest getSearchRequestWithAlbumType(Song song){
+        return new UriRequest(song.getAlbumId(),ImageUriRequest.URL_ALBUM,UriRequest.TYPE_NETEASE_SONG,
                 song.getTitle(),song.getAlbum(),song.getArtist());
     }
 
-    public static boolean isArtistNameUnknown(@Nullable String artistName) {
-        if (TextUtils.isEmpty(artistName)) return false;
+    public static boolean isArtistNameUnknownOrEmpty(@Nullable String artistName) {
+        if (TextUtils.isEmpty(artistName)) return true;
         artistName = artistName.trim().toLowerCase();
         return artistName.equals("unknown") || artistName.equals("<unknown>") || artistName.equals("未知艺术家");
     }
 
-    public static boolean isAlbumNameUnknown(@Nullable String albumName){
-        if (TextUtils.isEmpty(albumName)) return false;
+    public static boolean isAlbumNameUnknownOrEmpty(@Nullable String albumName){
+        if (TextUtils.isEmpty(albumName)) return true;
         albumName = albumName.trim().toLowerCase();
         return albumName.equals("unknown") || albumName.equals("<unknown>") || albumName.equals("未知专辑");
+    }
+
+    public static boolean isSongNameUnknownOrEmpty(@Nullable String songName){
+        if (TextUtils.isEmpty(songName)) return true;
+        songName = songName.trim().toLowerCase();
+        return songName.equals("unknown") || songName.equals("<unknown>") || songName.equals("未知歌曲");
     }
 
     public enum ImageSize {

@@ -319,4 +319,9 @@
     <string name="paypal">Paypal</string>
     <string name="exit">Exit</string>
     <string name="plz_set_default_time">Please set the default time first</string>
+    <string name="app_widget_big_name">APlayer-Big</string>
+    <string name="app_widget_medium_name">APlayer-Medium</string>
+    <string name="app_widget_small_name">APlayer-Small</string>
+    <string name="app_widget_medium_transparent_name">APlayer-Medium-Transparent</string>
+    <string name="app_widget_small_transparent_name">APlayer-Small-Transparent</string>
 </resources>

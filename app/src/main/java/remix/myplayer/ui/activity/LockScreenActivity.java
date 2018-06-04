@@ -36,8 +36,8 @@ import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.menu.CtrlButtonListener;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
-import remix.myplayer.request.NewUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.UriRequest;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -357,7 +357,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
             final LockScreenActivity activity = mRef.get();
             if(activity == null || activity.isFinishing())
                 return;
-            NewUriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(mSong);
+            UriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(mSong);
             getThumbBitmapObservable(request)
                     .compose(RxUtil.applySchedulerToIO())
                     .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {

@@ -19,7 +19,7 @@
             android:layout_alignParentTop="true"
             fresco:fadeDuration="@integer/FadeDuration"
             fresco:actualImageScaleType="centerCrop"
-            fresco:placeholderImage="?attr/default_album"
+            fresco:placeholderImage="?attr/default_artist"
             fresco:placeholderImageScaleType="centerCrop"
             fresco:failureImage="?attr/default_artist"
             fresco:failureImageScaleType="centerCrop"

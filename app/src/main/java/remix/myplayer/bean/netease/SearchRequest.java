@@ -37,7 +37,7 @@
 //        return mID;
 //    }
 //
-//    public String getNeteaseKey() {
+//    public String getNeteaseSearchKey() {
 //        return mNeteaseKey;
 //    }
 //

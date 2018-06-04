@@ -13,8 +13,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.widget.RemoteViews;
 
-import remix.myplayer.App;
 import remix.myplayer.R;
+import remix.myplayer.appwidgets.medium.AppWidgetMedium;
+import remix.myplayer.appwidgets.small.AppWidgetSmall;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.request.RemoteUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -25,7 +26,6 @@ import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.SPUtil;
 
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
@@ -36,7 +36,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * @Date 2016/12/28 15:50
  */
 
-public class BaseAppwidget extends AppWidgetProvider {
+public abstract class BaseAppwidget extends AppWidgetProvider {
     public static final int SKIN_WHITE_1F = 1;//白色不带透明
     public static final int SKIN_TRANSPARENT = 2;//透明
 
@@ -154,9 +154,9 @@ public class BaseAppwidget extends AppWidgetProvider {
     }
 
     protected void updateRemoteViews(RemoteViews remoteViews,Song song){
-        int skin = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
-        mSkin = skin == SKIN_TRANSPARENT ? AppWidgetSkin.TRANSPARENT : AppWidgetSkin.WHITE_1F;
-        updateBackground(remoteViews);
+//        int skin = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
+//        mSkin = skin == SKIN_TRANSPARENT ? AppWidgetSkin.TRANSPARENT : AppWidgetSkin.WHITE_1F;
+//        updateBackground(remoteViews);
         updateTitle(remoteViews,song);
         updateArtist(remoteViews,song);
         updateSkin(remoteViews);
@@ -250,4 +250,6 @@ public class BaseAppwidget extends AppWidgetProvider {
         drawable.draw(canvas);
         return bitmap;
     }
+
+    public abstract void updateWidget(final Context context,final int[] appWidgetIds, boolean reloadCover);
 }

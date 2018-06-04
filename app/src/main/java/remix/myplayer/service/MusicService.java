@@ -33,7 +33,9 @@ import android.view.WindowManager;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -42,9 +44,12 @@ import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 import remix.myplayer.R;
 import remix.myplayer.appshortcuts.DynamicShortcutManager;
-import remix.myplayer.appwidgets.AppWidgetBig;
-import remix.myplayer.appwidgets.AppWidgetMedium;
-import remix.myplayer.appwidgets.AppWidgetSmall;
+import remix.myplayer.appwidgets.BaseAppwidget;
+import remix.myplayer.appwidgets.big.AppWidgetBig;
+import remix.myplayer.appwidgets.medium.AppWidgetMedium;
+import remix.myplayer.appwidgets.medium.AppWidgetMediumTransparent;
+import remix.myplayer.appwidgets.small.AppWidgetSmall;
+import remix.myplayer.appwidgets.small.AppWidgetSmallTransparent;
 import remix.myplayer.bean.FloatLrcContent;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
@@ -79,8 +84,6 @@ import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 import remix.myplayer.util.Util;
 
-import static remix.myplayer.appwidgets.BaseAppwidget.SKIN_TRANSPARENT;
-import static remix.myplayer.appwidgets.BaseAppwidget.SKIN_WHITE_1F;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
 
@@ -130,9 +133,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private MediaPlayer mMediaPlayer;
 
     /** 桌面部件 */
-    private AppWidgetMedium mAppWidgetMedium;
-    private AppWidgetSmall mAppWidgetSmall;
-    private AppWidgetBig mAppWidgetBig;
+//    private AppWidgetMedium mAppWidgetMedium;
+//    private AppWidgetSmall mAppWidgetSmall;
+//    private AppWidgetBig mAppWidgetBig;
+    private Map<String,BaseAppwidget> mAppWidgets = new HashMap<>();
+//    private List<BaseAppwidget> mAppWidgets = new ArrayList<>();
 
     /** AudiaoManager */
     private AudioManager mAudioManager;
@@ -315,9 +320,12 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mAudioFocusListener = new AudioFocusChangeListener();
 
         //桌面部件
-        mAppWidgetBig = new AppWidgetBig();
-        mAppWidgetMedium = new AppWidgetMedium();
-        mAppWidgetSmall = new AppWidgetSmall();
+        mAppWidgets.put("BigWidget",new AppWidgetBig());
+        mAppWidgets.put("MediumWidget",new AppWidgetMedium());
+        mAppWidgets.put("MediumWidgetTransparent",new AppWidgetMediumTransparent());
+        mAppWidgets.put("SmallWidget",new AppWidgetSmall());
+        mAppWidgets.put("SmallWidgetTransparent",new AppWidgetSmallTransparent());
+
         mWindowManager = (WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE);
 
         //初始化Receiver
@@ -659,23 +667,31 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     public class WidgetReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            final int skin = SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
-            SPUtil.putValue(context,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
+//            final int skin = SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
+//            SPUtil.putValue(context,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
 
             String str = intent.getStringExtra("WidgetName");
             int[] appIds = intent.getIntArrayExtra("WidgetIds");
             switch (str){
                 case "BigWidget":
-                    if(mAppWidgetBig != null)
-                        mAppWidgetBig.updateWidget(context,appIds,true);
+                    if(mAppWidgets.get("BigWidget") != null)
+                        mAppWidgets.get("BigWidget").updateWidget(context,appIds,true);
                     break;
                 case "MediumWidget":
-                    if(mAppWidgetMedium != null)
-                        mAppWidgetMedium.updateWidget(context,appIds,true);
+                    if(mAppWidgets.get("MediumWidget") != null)
+                        mAppWidgets.get("MediumWidget").updateWidget(context,appIds,true);
                     break;
                 case "SmallWidget":
-                    if(mAppWidgetSmall != null)
-                        mAppWidgetSmall.updateWidget(context,appIds,true);
+                    if(mAppWidgets.get("SmallWidget") != null)
+                        mAppWidgets.get("SmallWidget").updateWidget(context,appIds,true);
+                    break;
+                case "MediumWidgetTransparent":
+                    if(mAppWidgets.get("MediumWidgetTransparent") != null)
+                        mAppWidgets.get("MediumWidgetTransparent").updateWidget(context,appIds,true);
+                    break;
+                case "SmallWidgetTransparent":
+                    if(mAppWidgets.get("SmallWidgetTransparent") != null)
+                        mAppWidgets.get("SmallWidgetTransparent").updateWidget(context,appIds,true);
                     break;
             }
         }
@@ -695,8 +711,8 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                 Intent appwidgetIntent = new Intent(ACTION_CMD);
                 int control = commandIntent.getIntExtra("Control",-1);
                 if(control == Constants.UPDATE_APPWIDGET){
-                    int skin = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
-                    SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
+//                    int skin = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
+//                    SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.APP_WIDGET_SKIN,skin == SKIN_WHITE_1F ? SKIN_TRANSPARENT : SKIN_WHITE_1F);
                     updateAppwidget();
                 } else {
                     appwidgetIntent.putExtra("Control",control);
@@ -1514,12 +1530,11 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
      * 更新桌面部件
      */
     private void updateAppwidget() {
-        if(mAppWidgetMedium != null)
-            mAppWidgetMedium.updateWidget(mContext,null,true);
-        if(mAppWidgetSmall != null)
-            mAppWidgetSmall.updateWidget(mContext,null,true);
-        if(mAppWidgetBig != null)
-            mAppWidgetBig.updateWidget(mContext,null,true);
+        for(Map.Entry<String,BaseAppwidget> entry : mAppWidgets.entrySet()){
+            if(entry.getValue() != null)
+                entry.getValue().updateWidget(mContext,null,true);
+        }
+
         //暂停停止更新进度条和时间
         if(!isPlay()){
             if(mWidgetTimer != null){
@@ -1745,12 +1760,10 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private class WidgetTask extends TimerTask{
         @Override
         public void run() {
-            if(mAppWidgetSmall != null)
-                mAppWidgetSmall.updateWidget(mContext,null,false);
-            if(mAppWidgetMedium != null)
-                mAppWidgetMedium.updateWidget(mContext,null,false);
-            if(mAppWidgetBig != null)
-                mAppWidgetBig.updateWidget(mContext,null,false);
+            for(Map.Entry<String,BaseAppwidget> entry : mAppWidgets.entrySet()){
+                if(entry.getValue() != null)
+                    entry.getValue().updateWidget(mContext,null,true);
+            }
             final int progress = getProgress();
             if(progress > 0 && mPlayAtBreakPoint)
                 SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_PLAY_PROGRESS,progress);

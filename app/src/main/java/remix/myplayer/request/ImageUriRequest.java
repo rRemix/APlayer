@@ -46,9 +46,9 @@ import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 
 import static remix.myplayer.App.IS_GOOGLEPLAY;
-import static remix.myplayer.request.NewUriRequest.TYPE_NETEASE_ALBUM;
-import static remix.myplayer.request.NewUriRequest.TYPE_NETEASE_ARTIST;
-import static remix.myplayer.request.NewUriRequest.TYPE_NETEASE_SONG;
+import static remix.myplayer.request.UriRequest.TYPE_NETEASE_ALBUM;
+import static remix.myplayer.request.UriRequest.TYPE_NETEASE_ARTIST;
+import static remix.myplayer.request.UriRequest.TYPE_NETEASE_SONG;
 import static remix.myplayer.service.MusicService.copy;
 import static remix.myplayer.util.Util.isWifi;
 
@@ -88,13 +88,13 @@ public abstract class ImageUriRequest<T> {
 
     public abstract void load();
 
-    protected Observable<String> getCoverObservable(NewUriRequest request){
+    protected Observable<String> getCoverObservable(UriRequest request){
        return Observable.concat(getCustomThumbObservable(request),getContentThumbObservable(request),getNetworkThumbObservable(request))
                .firstOrError()
                .toObservable();
     }
 
-    Observable<String> getCustomThumbObservable(NewUriRequest request){
+    Observable<String> getCustomThumbObservable(UriRequest request){
         return new Observable<String>() {
             @Override
             protected void subscribeActual(Observer<? super String> observer) {
@@ -115,7 +115,7 @@ public abstract class ImageUriRequest<T> {
      * @param request
      * @return
      */
-    private Observable<String> getContentThumbObservable(NewUriRequest request){
+    private Observable<String> getContentThumbObservable(UriRequest request){
         return Observable.create(observer -> {
             String imageUrl = "";
             if(request.getSearchType() == URL_ALBUM){//专辑封面
@@ -185,12 +185,12 @@ public abstract class ImageUriRequest<T> {
         return imageUrl;
     }
 
-    private Observable<String> getNetworkThumbObservable(NewUriRequest request){
+    private Observable<String> getNetworkThumbObservable(UriRequest request){
         return IS_GOOGLEPLAY ? getLastFMNetworkThumbObservable(request) : getNeteaseNetworkThumbObservable(request);
     }
 
     //lastFM
-    private Observable<String> getLastFMNetworkThumbObservable(NewUriRequest request){
+    private Observable<String> getLastFMNetworkThumbObservable(UriRequest request){
         return Observable.concat(new Observable<String>() {
             @Override
             protected void subscribeActual(Observer<? super String> observer) {
@@ -202,7 +202,7 @@ public abstract class ImageUriRequest<T> {
             }},Observable.just(isAutoDownloadCover() && !TextUtils.isEmpty(request.getLastFMKey()))
                 .filter(aBoolean -> aBoolean)
                 .flatMap(new Function<Boolean, ObservableSource<String>>() {
-                    private Observable<ResponseBody> getObservable(NewUriRequest request){
+                    private Observable<ResponseBody> getObservable(UriRequest request){
                         return request.getSearchType() == ImageUriRequest.URL_ALBUM ?
                                 HttpClient.getLastFMApiservice().getAlbumInfo(request.getAlbumName(),request.getArtistName(),null) :
                                 HttpClient.getLastFMApiservice().getArtistInfo(request.getArtistName(),null);
@@ -215,7 +215,7 @@ public abstract class ImageUriRequest<T> {
                 }).firstElement().toObservable());
     }
 
-    private String parseLastFMNetworkImageUrl(NewUriRequest request, ResponseBody body) throws IOException{
+    private String parseLastFMNetworkImageUrl(UriRequest request, ResponseBody body) throws IOException{
         String imageUrl = "";
         String bodyString = body.string();
         if(request.getSearchType() == ImageUriRequest.URL_ALBUM){
@@ -234,46 +234,49 @@ public abstract class ImageUriRequest<T> {
     }
 
     //网易
-    private Observable<String> getNeteaseNetworkThumbObservable(NewUriRequest request){
+    private Observable<String> getNeteaseNetworkThumbObservable(UriRequest request){
         return Observable.concat(new Observable<String>() {
             @Override
             protected void subscribeActual(Observer<? super String> observer) {
-                String imageUrl = SPUtil.getValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseKey(),"");
+                String imageUrl = SPUtil.getValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseSearchKey(),"");
                 if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
                     observer.onNext(imageUrl);
                 }
                 observer.onComplete();
-            }},Observable.just(isAutoDownloadCover() && !TextUtils.isEmpty(request.getNeteaseKey()))
+            }},Observable.just(isAutoDownloadCover() && !TextUtils.isEmpty(request.getNeteaseSearchKey()))
                 .filter(aBoolean -> aBoolean)
                 .flatMap(aBoolean -> HttpClient.getNeteaseApiservice()
-                        .getNeteaseSearch(request.getNeteaseKey(), 0, 1, request.getSearchType())
+                        .getNeteaseSearch(request.getNeteaseSearchKey(), 0, 1, request.getNeteaseType())
                         .map(responseBody -> parseNeteaseNetworkImageUrl(request, responseBody))
                         .firstElement().toObservable()));
     }
 
     @Nullable
-    private String parseNeteaseNetworkImageUrl(NewUriRequest request, ResponseBody body) throws IOException {
+    private String parseNeteaseNetworkImageUrl(UriRequest request, ResponseBody body) throws IOException {
         String imageUrl = "";
-        if (request.getSearchType() == TYPE_NETEASE_SONG) {
+        if(request.getNeteaseType() == UriRequest.TYPE_NETEASE_ALBUM && request.getAlbumName().contains("One More Light")){
+            int a = 1;
+        }
+        if (request.getNeteaseType() == TYPE_NETEASE_SONG) {
             //搜索的是歌曲
             NSongSearchResponse response = new Gson().fromJson(body.string(), NSongSearchResponse.class);
             imageUrl = response.result.songs.get(0).album.picUrl;
-        } else if (request.getSearchType() == TYPE_NETEASE_ALBUM) {
+        } else if (request.getNeteaseType() == TYPE_NETEASE_ALBUM) {
             //搜索的是专辑
             NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);
             imageUrl = response.result.albums.get(0).picUrl;
-        } else if (request.getSearchType() == TYPE_NETEASE_ARTIST) {
+        } else if (request.getNeteaseType() == TYPE_NETEASE_ARTIST) {
             //搜索的是艺术家
             NArtistSearchResponse response = new Gson().fromJson(body.string(), NArtistSearchResponse.class);
             imageUrl = response.getResult().getArtists().get(0).getPicUrl();
         }
         if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
-            SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseKey(),imageUrl);
+            SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseSearchKey(),imageUrl);
         }
         return imageUrl;
     }
 
-    protected Observable<Bitmap> getThumbBitmapObservable(NewUriRequest request) {
+    protected Observable<Bitmap> getThumbBitmapObservable(UriRequest request) {
         return getCoverObservable(request)
                 .flatMap((Function<String, ObservableSource<Bitmap>>) url -> Observable.create(e -> {
                     Uri imageUri = !TextUtils.isEmpty(url) ? Uri.parse(url) : Uri.EMPTY;
