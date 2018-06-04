@@ -54,9 +54,6 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
     private var mBillingProcessor: BillingProcessor? = null
     private var mDisposable: Disposable? = null
 
-    private val TAG = "SupportDevelopActivity"
-
-
     private lateinit var mLoading:MaterialDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -160,7 +157,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
                     }
                     2 -> {
                         val intent = Intent("android.intent.action.VIEW")
-                        intent.data = Uri.parse("https://www.paypal.me/XIAOBORUI")
+                        intent.data = Uri.parse("https://www.paypal.me/rRemix")
                         startActivity(intent)
                     }
                     3,4,5,6,7 ->{
