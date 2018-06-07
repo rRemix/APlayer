@@ -1764,7 +1764,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         public void run() {
             for(Map.Entry<String,BaseAppwidget> entry : mAppWidgets.entrySet()){
                 if(entry.getValue() != null)
-                    entry.getValue().updateWidget(mContext,null,true);
+                    entry.getValue().updateWidget(mContext,null,false);
             }
             final int progress = getProgress();
             if(progress > 0 && mPlayAtBreakPoint)

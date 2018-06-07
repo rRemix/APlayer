@@ -238,7 +238,7 @@ public abstract class ImageUriRequest<T> {
         return Observable.concat(new Observable<String>() {
             @Override
             protected void subscribeActual(Observer<? super String> observer) {
-                String imageUrl = SPUtil.getValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseSearchKey(),"");
+                String imageUrl = SPUtil.getValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseCacheKey(),"");
                 if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
                     observer.onNext(imageUrl);
                 }
@@ -254,13 +254,14 @@ public abstract class ImageUriRequest<T> {
     @Nullable
     private String parseNeteaseNetworkImageUrl(UriRequest request, ResponseBody body) throws IOException {
         String imageUrl = "";
-        if(request.getNeteaseType() == UriRequest.TYPE_NETEASE_ALBUM && request.getAlbumName().contains("One More Light")){
+        if("AMERIKA".equalsIgnoreCase(request.getTitle())){
             int a = 1;
         }
         if (request.getNeteaseType() == TYPE_NETEASE_SONG) {
             //搜索的是歌曲
             NSongSearchResponse response = new Gson().fromJson(body.string(), NSongSearchResponse.class);
-            imageUrl = response.result.songs.get(0).album.picUrl;
+            if(response.result.songs.get(0).score >= 60)
+                imageUrl = response.result.songs.get(0).album.picUrl;
         } else if (request.getNeteaseType() == TYPE_NETEASE_ALBUM) {
             //搜索的是专辑
             NAlbumSearchResponse response = new Gson().fromJson(body.string(), NAlbumSearchResponse.class);
@@ -271,7 +272,7 @@ public abstract class ImageUriRequest<T> {
             imageUrl = response.getResult().getArtists().get(0).getPicUrl();
         }
         if(!TextUtils.isEmpty(imageUrl) && UriUtil.isNetworkUri(Uri.parse(imageUrl))){
-            SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseSearchKey(),imageUrl);
+            SPUtil.putValue(App.getContext(),SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseCacheKey(),imageUrl);
         }
         return imageUrl;
     }

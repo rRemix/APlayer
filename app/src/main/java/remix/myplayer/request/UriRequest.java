@@ -52,10 +52,11 @@ public class UriRequest implements Serializable {
         this.mArtistName = artistName;
     }
 
+    public String getNeteaseCacheKey(){
+        return mSearchType + "-" + mId;
+    }
+
     public String getNeteaseSearchKey(){
-        if(mNeteaseType == UriRequest.TYPE_NETEASE_ALBUM && mAlbumName.contains("One More Light")){
-            int a = 1;
-        }
         boolean isTitleAvailable = !ImageUriUtil.isSongNameUnknownOrEmpty(mTitle);
         boolean isAlbumAvailable = !ImageUriUtil.isAlbumNameUnknownOrEmpty(mAlbumName);
         boolean isArtistAvailable = !ImageUriUtil.isArtistNameUnknownOrEmpty(mArtistName);
@@ -72,9 +73,11 @@ public class UriRequest implements Serializable {
                 }
             }
             //根据专辑名字查询
-            if(isAlbumAvailable && isArtistAvailable){
-                return mArtistName + "-" + mAlbumName;
-            }
+//            if(isAlbumAvailable && isArtistAvailable){
+//                return mArtistName + "-" + mAlbumName;
+//            }
+            if(isAlbumAvailable)
+                return mAlbumName;
         }else if(mSearchType == ImageUriRequest.URL_ARTIST){
             if(isArtistAvailable)
                 return mArtistName;
