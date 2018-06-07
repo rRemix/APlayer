@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
 import remix.myplayer.lyric.bean.LrcRow;
+import remix.myplayer.util.LogUtil;
 
 /**
  * @ClassName
@@ -93,9 +94,10 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     }
 
     public void setLrcRow(LrcRow lrcRow){
-        if(mCurLrcRow != null && mCurLrcRow == lrcRow)
+        if(lrcRow.getTime() != 0 && mCurLrcRow != null && mCurLrcRow.getTime() == lrcRow.getTime())
             return;
         mCurLrcRow = lrcRow;
+        LogUtil.d("FloatTextView","SetLrcRow: " + lrcRow);
 //        setText(mCurLrcRow.getContent());
 
         if(mCurLrcRow != null){

@@ -51,6 +51,8 @@ import static remix.myplayer.App.IS_GOOGLEPLAY;
 public class SearchLrc {
     private static final String TAG = "SearchLrc";
 
+    public static String LOCAL_LYRIC_PATH;
+
     private static final Charset UTF_8 = Charset.forName("UTF-8");
     private ILrcParser mLrcParser;
     private Song mSong;
@@ -89,6 +91,7 @@ public class SearchLrc {
         return type == SPUtil.LYRIC_KEY.LYRIC_IGNORE ? Observable.error(new Throwable("Ignore")) :
                 Observable.concat(getCacheObservable(),getManualObservable(manualPath), getEmbeddedObservable(),last).firstOrError().toObservable()
                 .doOnSubscribe(disposable -> {
+                    LOCAL_LYRIC_PATH = "";
                     mCacheKey = Util.hashKeyForDisk(String.valueOf(mSong.getId()) + "-" +
                             (!TextUtils.isEmpty(mSong.getArtist()) ? mSong.getArtist() : "") + "-" +
                             (!TextUtils.isEmpty(mSong.getTitle()) ? mSong.getTitle() : ""));
@@ -278,9 +281,9 @@ public class SearchLrc {
             return "";
         if(!TextUtils.isEmpty(searchPath)){
             //已设置歌词路径
-            String lyricPath = LyricUtil.searchFile(mDisplayName,mSong.getTitle(),mSong.getArtist(), new File(searchPath));
-            if(!TextUtils.isEmpty(lyricPath)){
-                return lyricPath;
+            LyricUtil.searchFile(mDisplayName,mSong.getTitle(),mSong.getArtist(), new File(searchPath));
+            if(!TextUtils.isEmpty(SearchLrc.LOCAL_LYRIC_PATH)){
+                return SearchLrc.LOCAL_LYRIC_PATH;
             }
         } else{
             //没有设置歌词路径 搜索所有歌词文件
@@ -321,9 +324,10 @@ public class SearchLrc {
         if (mSong == null)
             return results;
         if (!TextUtils.isEmpty(searchPath)) {
-            //已设置歌词路径
-            String lyricPath = LyricUtil.searchFile(mDisplayName, mSong.getTitle(), mSong.getArtist(), new File(searchPath));
-            results.add(lyricPath);
+            //已设置歌词搜索路径
+            LyricUtil.searchFile(mDisplayName, mSong.getTitle(), mSong.getArtist(), new File(searchPath));
+            if(!TextUtils.isEmpty(LOCAL_LYRIC_PATH))
+                results.add(SearchLrc.LOCAL_LYRIC_PATH);
             return results;
         } else {
             //没有设置歌词路径 搜索所有歌词文件
