@@ -705,6 +705,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             LogUtil.d("StartAPlayer","receiveBroadcast");
             if(ACTION_LOAD_FINISH.equals(receive != null ? receive.getAction() : "") && !mLoadComplete){
                 setUpBottomBar();
+                UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
                 mLoadComplete = true;
             }
             if(mLoadComplete){

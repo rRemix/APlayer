@@ -578,7 +578,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         if(fadeIn)
             mVolumeController.fadeIn();
         else
-            mVolumeController.to(1);
+            mVolumeController.directTo(1);
 
         mPlaybackHandler.post(() -> {
             //保存当前播放和下一首播放的歌曲的id
@@ -1787,7 +1787,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                         mNeedContinue = false;
                         Global.setOperation(Command.TOGGLE);
                     }
-                    mVolumeController.to(1);
+                    mVolumeController.directTo(1);
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT://短暂暂停
                     mNeedContinue = mIsplay;
@@ -1797,7 +1797,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     }
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK://减小音量
-                    mVolumeController.to(.1f);
+                    mVolumeController.directTo(.1f);
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS://暂停
                     mAudioFocus = false;
