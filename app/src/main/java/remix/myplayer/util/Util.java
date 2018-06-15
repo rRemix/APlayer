@@ -438,7 +438,6 @@ public class Util {
     @NonNull
     public static Intent createShareSongFileIntent(@NonNull final Song song, Context context) {
         try {
-            LogUtil.d("ShareSong","Context: " + context);
             Parcelable parcelable = FileProvider.getUriForFile(context,
                     context.getPackageName() + "fileprovider",
                     new File(song.getUrl()));

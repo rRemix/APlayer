@@ -36,11 +36,11 @@ public class AlipayUtil {
      * 这个方法最好，但在 2016 年 8 月发现新用户可能无法使用
      *
      * @param activity Parent Activity
-     * @param urlCode 手动解析二维码获得地址中的参数，例如 https://qr.alipay.com/aehvyvf4taua18zo6e 最后那段
      * @return 是否成功调用
      */
-    public static boolean startAlipayClient(Activity activity, String urlCode) {
-        return startIntentUrl(activity, INTENT_URL_FORMAT.replace("{urlCode}", urlCode));
+    //568920427@qq.com FKX01752E4HENBODS0YAA6 lin_kin_p@163.com FKX01908X8ECOECIQZIL43
+    public static boolean startAlipayClient(Activity activity) {
+        return startIntentUrl(activity, INTENT_URL_FORMAT.replace("{urlCode}", "FKX01752E4HENBODS0YAA6"));
     }
 
     /**
