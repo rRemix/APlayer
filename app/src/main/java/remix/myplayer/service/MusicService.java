@@ -575,7 +575,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mIsplay = true; //更新所有界面
         update(Global.getOperation());
         mMediaPlayer.start();
-        LogUtil.e("VolumeController","fadeIn: " + fadeIn);
         if(fadeIn)
             mVolumeController.fadeIn();
         else
