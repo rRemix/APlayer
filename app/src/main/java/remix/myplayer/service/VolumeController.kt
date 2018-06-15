@@ -15,7 +15,7 @@ class VolumeController {
         val mediaPlayer = MusicService.getMediaPlayer()
         object : CountDownTimer(DURATION_IN_MS, DURATION_IN_MS / 10) {
             override fun onFinish() {
-                directTo(0f)
+                directTo(1f)
             }
 
             override fun onTick(millisUntilFinished: Long) {
