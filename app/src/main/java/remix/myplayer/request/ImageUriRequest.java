@@ -254,9 +254,6 @@ public abstract class ImageUriRequest<T> {
     @Nullable
     private String parseNeteaseNetworkImageUrl(UriRequest request, ResponseBody body) throws IOException {
         String imageUrl = "";
-        if("AMERIKA".equalsIgnoreCase(request.getTitle())){
-            int a = 1;
-        }
         if (request.getNeteaseType() == TYPE_NETEASE_SONG) {
             //搜索的是歌曲
             NSongSearchResponse response = new Gson().fromJson(body.string(), NSongSearchResponse.class);

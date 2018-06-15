@@ -80,6 +80,7 @@ public class LibraryUriRequest extends ImageUriRequest<String> {
                 .subscribeWith(new DisposableObserver<String>() {
                     @Override
                     protected void onStart() {
+                        mImage.setImageURI(Uri.EMPTY);
                     }
 
                     @Override
