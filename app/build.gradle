@@ -95,8 +95,8 @@ android {
 //        anzhuomarket{}
 
 //        chuizi{}
-        qihu360{}
-        xiaomi{}
+//        qihu360{}
+//        xiaomi{}
         kuan {}
 //        google{}
         productFlavors.all { flavor ->
