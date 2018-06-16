@@ -72,10 +72,15 @@ public class SPUtil {
 
     public static class LYRIC_KEY{
         public static final String LYRIC_NAME = "Lyric";
+        public static final int LYRIC_DEFAULT = 0;
         public static final int LYRIC_IGNORE = 1;
         public static final int LYRIC_NETEASE = 2;
         public static final int LYRIC_KUGOU = 3;
         public static final int LYRIC_MANUAL = 4;
+    }
+
+    public static class COVER_KEY{
+        public static final String COVER_NAME = "Cover";
     }
 
 
@@ -102,19 +107,53 @@ public class SPUtil {
         //锁屏设置
         public static final String LOCKSCREEN = "lockScreen";
         //导航浪变色
-        public static final String COLOR_NAVIGATION = "ColorNavigation";
+        public static final String COLOR_NAVIGATION = "color_Navigation";
         //摇一摇
         public static final String SHAKE = "shake";
         //优先搜索在线歌词
         public static final String ONLINE_LYRIC_FIRST = "online_lyric_first";
         //是否开启桌面歌词
-        public static final String FLOAT_LYRIC = "float_lyric";
+        public static final String FLOAT_LYRIC_SHOW = "float_lyric_show";
         //沉浸式状态栏
         public static final String IMMERSIVE_MODE = "immersive_mode";
-        //退出时的歌曲id
+        //过滤大小
+        public static final String SCAN_SIZE = "scan_size";
+        //歌曲排序顺序
+        public static final String SONG_SORT_ORDER = "song_sort_order";
+        //专辑排序顺序
+        public static final String ALBUM_SORT_ORDER = "album_sort_order";
+        //艺术家排序顺序
+        public static final String ARTIST_SORT_ORDER = "artist_sort_order";
+        //播放列表排序顺序
+        public static final String PLAYLIST_SORT_ORDER = "playlist_sort_order";
+        //文件夹内歌曲排序顺序
+        public static final String CHILD_FOLDER_SONG_SORT_ORDER = "child_folder_song_sort_order";
+        //艺术家内歌曲排序顺序
+        public static final String CHILD_ARTIST_SONG_SORT_ORDER = "child_artist_sort_order";
+        //专辑内歌曲排序顺序
+        public static final String CHILD_ALBUM_SONG_SORT_ORDER = "child_album_song_sort_order";
+        //播放列表内歌曲排序顺序
+        public static final String CHILD_PLAYLIST_SONG_SORT_ORDER = "child_playlist_song_sort_order";
+        //移除歌曲
+        public static final String BLACKLIST_SONG = "black_list_song";
+        //本地歌词搜索路径
+        public static final String LOCAL_LYRIC_SEARCH_DIR = "local_lyric_search_dir";
+        //退出时播放时间
+        public static final String LAST_PLAY_PROGRESS = "last_play_progress";
+        //退出时播放的歌曲
         public static final String LAST_SONG_ID = "last_song_id";
-        //下一首歌曲id
+        //退出时下一首歌曲
         public static final String NEXT_SONG_ID = "next_song_id";
+        //播放模式
+        public static final String PLAY_MODEL = "play_model";
+        //经典通知栏背景是否是系统背景色
+        public static final String NOTIFY_SYSTEM_COLOR = "notify_system_color";
+        //断点播放
+        public static final String PLAY_AT_BREAKPOINT = "play_at_breakpoint";
+        //是否忽略内嵌封面
+        public static final String IGNORE_MEDIA_STORE = "ignore_media_store";
+        //桌面部件样式
+        public static final String APP_WIDGET_SKIN = "app_widget_transparent";
     }
 
 }

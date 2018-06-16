@@ -1,6 +1,7 @@
 package remix.myplayer.ui.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import com.umeng.analytics.MobclickAgent;
 import remix.myplayer.BuildConfig;
 import remix.myplayer.R;
 import remix.myplayer.misc.manager.ActivityManager;
+import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -138,6 +140,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        startService(new Intent(this,MusicService.class));
         MobclickAgent.onResume(this);
     }
     @Override

@@ -106,6 +106,11 @@ public class LrcRow implements Comparable<LrcRow>{
 		super();
 		mTimeStr = timeStr;
 		mTime = time;
+		if(TextUtils.isEmpty(content)){
+            mContent = "";
+            mTranslate = "";
+		    return;
+        }
 		String[] mulitiContent = content.split("\t");
         mContent = mulitiContent[0];
         if(mulitiContent.length > 1){

@@ -1,12 +1,14 @@
 package remix.myplayer.ui.fragment;
 
 import android.content.Context;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 
 import com.umeng.analytics.MobclickAgent;
 
 import butterknife.Unbinder;
+import remix.myplayer.App;
 
 /**
  * @ClassName
@@ -14,7 +16,7 @@ import butterknife.Unbinder;
  * @Author Xiaoborui
  * @Date 2016/7/27 15:18
  */
-public class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment {
     protected Unbinder mUnBinder;
     protected Context mContext;
     protected String mPageName = BaseFragment.class.getSimpleName();
@@ -46,5 +48,19 @@ public class BaseFragment extends Fragment {
         MobclickAgent.onPageEnd(mPageName);
     }
 
+
+    protected String getStringSafely(@StringRes int res){
+        if(isAdded())
+            return getString(res);
+        else
+            return App.getContext().getString(res);
+    }
+
+    protected String getStringSafely(@StringRes int res,Object... args){
+        if(isAdded())
+            return getString(res,args);
+        else
+            return App.getContext().getString(res,args);
+    }
 
 }

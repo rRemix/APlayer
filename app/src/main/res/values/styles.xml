@@ -85,12 +85,12 @@
     </style>
 
     <style name="CustomTabTextAppearance.Light" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">@dimen/s16_size</item>
+        <item name="android:textSize">@dimen/tab_text_size</item>
         <item name="android:textColor">@color/light_normal_tab_text_color</item>
         <item name="textAllCaps">true</item>
     </style>
     <style name="CustomTabTextAppearance.Dark" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">@dimen/s16_size</item>
+        <item name="android:textSize">@dimen/tab_text_size</item>
         <item name="android:textColor">@color/dark_normal_tab_text_color</item>
         <item name="textAllCaps">true</item>
     </style>

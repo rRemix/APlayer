@@ -57,12 +57,7 @@ public class AddtoPlayListAdapter extends RecyclerView.Adapter<AddtoPlayListAdap
             holder.mText.setText(info.Name);
             holder.mText.setTag(info._Id);
             if(mOnItemClickLitener != null){
-                holder.mContainer.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mOnItemClickLitener.onItemClick(v,position);
-                    }
-                });
+                holder.mContainer.setOnClickListener(v -> mOnItemClickLitener.onItemClick(v,position));
             }
 
         }

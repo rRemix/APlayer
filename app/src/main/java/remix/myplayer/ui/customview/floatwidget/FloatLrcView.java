@@ -29,7 +29,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.adapter.FloatColorAdapter;
 import remix.myplayer.bean.FloatLrcContent;
@@ -191,13 +191,19 @@ public class FloatLrcView extends RelativeLayout {
     }
 
 
-    private int DEFAULT_COLOR = APlayerApplication.getContext().getResources().getColor(R.color.float_text_color);
+    private int DEFAULT_COLOR = App.getContext().getResources().getColor(R.color.float_text_color);
     public void setText(LrcRow lrc1, LrcRow lrc2) {
         if(lrc1 != null) {
             if(TextUtils.isEmpty(lrc1.getContent()))
                 lrc1.setContent("......");
             mText1.setLrcRow(lrc1);
-            mText2.setTextColor(lrc1.hasTranslate() ? ThemeStore.getThemeColorInt(ThemeStore.getThemeColor()) : DEFAULT_COLOR);
+//            if(lrc1.hasTranslate()){
+//                mText2.setTextColor(ThemeStore.getThemeColorInt(ThemeStore.getThemeColor()));
+//                mText2.setShadowLayer(0,0,0, Color.TRANSPARENT);
+//            } else {
+//                mText2.setTextColor(DEFAULT_COLOR);
+//                mText2.setShadowLayer(4,2,2,Color.BLACK);
+//            }
         }
         if(lrc2 != null) {
             if(TextUtils.isEmpty(lrc2.getContent()))
@@ -274,7 +280,7 @@ public class FloatLrcView extends RelativeLayout {
         switch (view.getId()) {
             //关闭桌面歌词
             case R.id.widget_close:
-                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC,false);
+                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW,false);
                 Intent closeIntent = new Intent(MusicService.ACTION_CMD);
                 closeIntent.putExtra("FloatLrc",false);
                 closeIntent.putExtra("Control",Constants.TOGGLE_FLOAT_LRC);

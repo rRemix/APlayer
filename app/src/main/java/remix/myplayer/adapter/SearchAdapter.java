@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.view.Gravity;
@@ -18,7 +19,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.listener.SongPopupListener;
+import remix.myplayer.menu.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
@@ -72,8 +73,8 @@ public class SearchAdapter extends BaseAdapter<Song,SearchAdapter.SearchResHolde
         holder.mButton.setOnClickListener(v -> {
             Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton, Gravity.END);
-            popupMenu.getMenuInflater().inflate(R.menu.song_menu, popupMenu.getMenu());
-            popupMenu.setOnMenuItemClickListener(new SongPopupListener(mContext,song,false,""));
+            popupMenu.getMenuInflater().inflate(R.menu.menu_song_item, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new SongPopupListener((AppCompatActivity) mContext,song,false,""));
             popupMenu.show();
         });
 

@@ -24,8 +24,8 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.PlayList;
-import remix.myplayer.bean.netease.NSearchRequest;
-import remix.myplayer.listener.AlbArtFolderPlaylistListener;
+import remix.myplayer.bean.netease.SearchRequest;
+import remix.myplayer.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.PlayListUriRequest;
 import remix.myplayer.request.RequestConfig;
@@ -107,7 +107,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
         //设置专辑封面
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
         new PlayListUriRequest(holder.mImage,
-                new NSearchRequest(info.getId(), info.getName(), 1, ImageUriRequest.URL_PLAYLIST),
+                new SearchRequest(info.getId(), info.getName(), 1, ImageUriRequest.URL_PLAYLIST),
                 new RequestConfig.Builder(imageSize,imageSize).build()).load();
 
         holder.mContainer.setOnClickListener(v -> {
@@ -136,7 +136,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
                 return;
             Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-            popupMenu.getMenuInflater().inflate(R.menu.playlist_menu, popupMenu.getMenu());
+            popupMenu.getMenuInflater().inflate(R.menu.menu_playlist_item, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext, info._Id, Constants.PLAYLIST, info.Name));
             popupMenu.show();
         });
@@ -257,7 +257,7 @@ public class PlayListAdapter extends HeaderAdapter<PlayList, BaseViewHolder> imp
 //        }
 //        @Override
 //        protected void onPostExecute(String url) {
-//            Uri uri = Uri.parse("file:///" + url);
+//            Uri uri = Uri.importM3UFile("file:///" + url);
 //            if(mImage != null)
 //                mImage.setImageURI(uri);
 //        }

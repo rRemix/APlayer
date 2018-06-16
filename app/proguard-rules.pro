@@ -47,12 +47,14 @@
 -keep class * implements android.os.Parcelable {
     public static final android.os.Parcelable$Creator *;
 }
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
 -keepclasseswithmembers class * implements android.os.Parcelable{
     <fields>;
     <methods>;
 }
-
-
 #baseAdapter
 -keepclassmembers class remix.myplayer.adapter.holder.BaseViewHolder
 -keepclasseswithmembers class remix.myplayer.adapter.holder.BaseViewHolder {
@@ -65,6 +67,9 @@
 }
 
 -keep class **.R$* {*;}
+-keep public class remix.myplayer.R$*{
+public static final int *;
+}
 -keepclasseswithmembers class * extends android.app.Activity{
     <methods>;
 }
@@ -78,22 +83,6 @@
 -keep public class com.android.vending.licensing.ILicensingService
 -keep public class * extends java.lang.annotation.Annotation
 -keep public class * extends android.os.Handler
-
-#友盟推送
--dontwarn com.taobao.**
--dontwarn anet.channel.**
--dontwarn anetwork.channel.**
--dontwarn org.android.**
--dontwarn org.apache.thrift.**
--dontwarn com.xiaomi.**
--dontwarn com.huawei.**
--keep class com.taobao.** {*;}
--keep class org.android.** {*;}
--keep class anet.channel.** {*;}
--keep class com.umeng.** {*;}
--keep class com.xiaomi.** {*;}
--keep class com.huawei.** {*;}
--keep class org.apache.thrift.** {*;}
 
 -keep public class **.R$*{
    public static final int *;
@@ -113,16 +102,6 @@
 -keepclassmembers class * {
     public <init> (org.json.JSONObject);
 }
-
-
-#友盟分享
--keep public interface com.facebook.**
--keep public interface com.tencent.**
--keep public interface com.umeng.socialize.**
--keep public interface com.umeng.socialize.sensor.**
--keep public interface com.umeng.scrshot.**
--keep public class com.umeng.socialize.* {*;}
--dontwarn com.umeng.**
 
 # fresco
 -keep class android.support.v4.** { *; }
@@ -153,39 +132,6 @@
 -keep class com.facebook.imagepipeline.animated.factory.AnimatedFactoryImpl {
     public AnimatedFactoryImpl(com.facebook.imagepipeline.bitmaps.PlatformBitmapFactory,com.facebook.imagepipeline.core.ExecutorSupplier);
 }
-# 腾讯
--keep class com.tencent.open.TDialog$*
--keep class com.tencent.open.TDialog$* {*;}
--keep class com.tencent.open.PKDialog
--keep class com.tencent.open.PKDialog {*;}
--keep class com.tencent.open.PKDialog$*
--keep class com.tencent.open.PKDialog$* {*;}
--keep class com.tencent.mm.sdk.** {
-    *;
-}
-# 新浪微博
--keep class com.sina.weibo.sdk.** {*;}
--dontwarn com.weibo.sdk.android.WeiboDialog
--dontwarn android.net.http.SslError
--dontwarn android.webkit.WebViewClient
--keep public class android.net.http.SslError{
-     *;
-}
--keep public class android.webkit.WebViewClient{
-    *;
-}
--keep public class android.webkit.WebChromeClient{
-    *;
-}
--keep public interface android.webkit.WebChromeClient$CustomViewCallback {
-    *;
-}
--keep public interface android.webkit.ValueCallback {
-    *;
-}
--keep class * implements android.webkit.WebChromeClient {
-    *;
-}
 
 # bomb
 -dontwarn cn.bmob.v3.**
@@ -203,10 +149,6 @@
 -keep class com.example.bmobexample.file.Song{*;}
 -keep class com.example.bmobexample.relation.Post{*;}
 -keep class com.example.bmobexample.relation.Comment{*;}
-
-# keep BmobPush
--dontwarn  cn.bmob.push.**
--keep class cn.bmob.push.** {*;}
 
 # keep okhttp3、okio
 -dontwarn javax.annotation.**
@@ -258,6 +200,9 @@
 #kotlin
 -dontwarn kotlin.**
 
-#ijkplayer
--keep class tv.danmaku.ijk.media.**{*;}
+#jaudiotagger
+-keep class org.jaudiotagger.** { *; }
+-dontwarn org.jaudiotagger.**
 
+#ijkplayer
+-keep class tv.danmaku.ijk.media.player.** { *; }

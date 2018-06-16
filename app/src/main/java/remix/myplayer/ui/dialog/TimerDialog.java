@@ -170,7 +170,7 @@ public class TimerDialog extends BaseDialogActivity {
 
         //分钟 秒 背景框
         ButterKnife.apply(new View[]{findView(R.id.timer_minute_container), findView(R.id.timer_second_container)},
-                (ButterKnife.Action<View>) (view, index) -> {
+                (view, index) -> {
                     final Drawable drawable = Theme.getShape(
                             GradientDrawable.RECTANGLE,
                             Color.TRANSPARENT,
@@ -191,7 +191,7 @@ public class TimerDialog extends BaseDialogActivity {
             ToastUtil.show(TimerDialog.this,R.string.plz_set_correct_time);
             return;
         }
-        String msg = mIsTiming ? "取消定时关闭" : "将在" + mTime / 60 + "分钟后关闭";
+        String msg = mIsTiming ? getString(R.string.cancel_timer) : getString(R.string.will_stop_at_x,mTime / 60);
         ToastUtil.show(this,msg);
         mIsTiming = !mIsTiming;
         //如果开始计时，保存设置的时间

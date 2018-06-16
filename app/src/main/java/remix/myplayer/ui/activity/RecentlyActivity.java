@@ -106,7 +106,7 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
     @Override
     public void onBackPressed() {
         if(mMultiChoice.isShow()) {
-            onBackPress();
+            onMultiBackPress();
         } else {
             finish();
         }

@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,13 +29,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.drawable.ScalingUtils;
@@ -58,8 +60,9 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
-import remix.myplayer.listener.AudioPopupListener;
+import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.lyric.LrcView;
+import remix.myplayer.menu.AudioPopupListener;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.request.ImageUriRequest;
@@ -74,12 +77,13 @@ import remix.myplayer.ui.customview.playpause.PlayPauseView;
 import remix.myplayer.ui.dialog.FileChooserDialog;
 import remix.myplayer.ui.dialog.PlayQueueDialog;
 import remix.myplayer.ui.fragment.CoverFragment;
-import remix.myplayer.ui.fragment.LrcFragment;
+import remix.myplayer.ui.fragment.LyricFragment;
 import remix.myplayer.ui.fragment.RecordFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
 import remix.myplayer.util.ToastUtil;
@@ -95,14 +99,15 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 /**
  * 播放界面
  */
-public class PlayerActivity extends BaseActivity implements UpdateHelper.Callback,FileChooserDialog.FileCallback{
+public class PlayerActivity extends BaseActivity implements UpdateHelper.Callback,
+        FileChooserDialog.FileCallback, OnTagEditListener {
     private static final String TAG = "PlayerActivity";
     //是否正在运行
-    public static boolean mIsRunning;
+    public boolean mIsForeground;
     //上次选中的Fragment
     private int mPrevPosition = 1;
     //是否播放的标志变量
-    public static boolean mIsPlay = false;
+    public boolean mIsPlay = false;
     //第一次启动的标志变量
     private boolean mFistStart = true;
     //是否正在拖动进度条
@@ -139,7 +144,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     TextView mRemainPlay;
     //进度条
     @BindView(R.id.seekbar)
-    SeekBar mSeekBar;
+    SeekBar mProgressSeekBar;
     //背景
     @BindView(R.id.audio_holder_container)
     ViewGroup mContainer;
@@ -148,6 +153,14 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     //下一首歌曲
     @BindView(R.id.next_song)
     TextView mNextSong;
+    @BindView(R.id.volume_down)
+    ImageButton mVolumeDown;
+    @BindView(R.id.volume_up)
+    ImageButton mVolumeUp;
+    @BindView(R.id.volume_seekbar)
+    SeekBar mVolumeSeekbar;
+    @BindView(R.id.volume_container)
+    View mVolumeContainer;
     //歌词控件
     private LrcView mLrcView;
     //高亮与非高亮指示器
@@ -202,6 +215,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private boolean mIsBacking = false;
     private float mEventY1;
     private float mEventY2;
+    private float mEventX1;
+    private float mEventX2;
 
     /** 更新Handler */
     private MsgHandler mHandler;
@@ -214,6 +229,13 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private Bitmap mRawBitMap;
 
     private Palette.Swatch mSwatch;
+    private AudioManager mAudioManager;
+
+    private static final int DELAY_SHOW_NEXT_SONG = 3000;
+    private Runnable mVolumeRunnable = () -> {
+        mNextSong.startAnimation(makeAnimation(mNextSong,true));
+        mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer,false));
+    };
 
     @Override
     protected void setUpTheme() {
@@ -239,7 +261,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                         miuiVersion = Integer.valueOf(miui.substring(1,miui.length()));
                     }
                 }catch (Exception e){
-                    Util.uploadException("miui版本解析错误",e);
+                    LogUtil.d(TAG,e.toString());
                 }
             }
             if(Build.MANUFACTURER.equalsIgnoreCase("Meizu")){
@@ -298,29 +320,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         if(savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null){
             mOriginRect = savedInstanceState.getParcelable("Rect");
         }
-
-        getWindow().getDecorView().setOnTouchListener((v,event) -> {
-            if(event.getAction() == MotionEvent.ACTION_DOWN){
-                mEventY1 = event.getY();
-            }
-            if(event.getAction() == MotionEvent.ACTION_UP){
-                mEventY2 = event.getY();
-                if(mEventY2 - mEventY1 > 100){
-                    onBackPressed();
-                }
-            }
-            return false;
-        });
-
-        if(SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"LrcHint",true)){
-            SPUtil.putValue(this,SPUtil.SETTING_KEY.SETTING_NAME,"LrcHint",false);
-            new MaterialDialog.Builder(mContext)
-                    .content(getString(R.string.lc_operation_hint))
-                    .contentColorAttr(R.attr.text_color_primary)
-                    .positiveColorAttr(R.attr.text_color_primary)
-                    .backgroundColorAttr(R.attr.background_color_3)
-                    .show();
-        }
     }
 
     /**
@@ -351,8 +350,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     public void onResume() {
         super.onResume();
         //更新界面
-        mIsRunning = true;
-//        UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
+        mIsForeground = true;
+//        if(mFistStart)
+//            UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
         if(mNeedUpdateUI){
             UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
             mNeedUpdateUI = false;
@@ -364,7 +364,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     @Override
     protected void onStop() {
         super.onStop();
-        mIsRunning = false;
+        mIsForeground = false;
     }
 
     @Override
@@ -507,17 +507,17 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             //设置播放模式
             case R.id.playbar_model:
                 MobclickAgent.onEvent(this,"PlayModel");
-                int currentmodel = MusicService.getPlayModel();
-                currentmodel = (currentmodel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentmodel);
-                MusicService.getInstance().setPlayModel(currentmodel);
-                Theme.TintDrawable(mPlayModel,currentmodel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-                        currentmodel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+                int currentModel = MusicService.getPlayModel();
+                currentModel = (currentModel == Constants.PLAY_REPEATONE ? Constants.PLAY_LOOP : ++currentModel);
+                MusicService.getInstance().setPlayModel(currentModel);
+                Theme.TintDrawable(mPlayModel,currentModel == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                        currentModel == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                                 R.drawable.play_btn_loop_one,ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b));
 
-                String msg = currentmodel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
-                        currentmodel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
+                String msg = currentModel == Constants.PLAY_LOOP ? getString(R.string.model_normal) :
+                        currentModel == Constants.PLAY_SHUFFLE ? getString(R.string.model_random) : getString(R.string.model_repeat);
                 //刷新下一首
-                if(currentmodel != Constants.PLAY_SHUFFLE && MusicService.getNextMP3() != null){
+                if(currentModel != Constants.PLAY_SHUFFLE && MusicService.getNextMP3() != null){
                     mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
                 }
                 ToastUtil.show(this,msg);
@@ -537,11 +537,62 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 @SuppressLint("RestrictedApi")
                 Context wrapper = new ContextThemeWrapper(this,Theme.getPopupMenuStyle());
                 final PopupMenu popupMenu = new PopupMenu(wrapper,v, Gravity.TOP);
-                popupMenu.getMenuInflater().inflate(R.menu.audio_menu, popupMenu.getMenu());
+                popupMenu.getMenuInflater().inflate(R.menu.menu_audio_item, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new AudioPopupListener(this,mInfo));
                 popupMenu.show();
                 break;
         }
+    }
+
+    @OnClick({R.id.volume_down,R.id.volume_up,R.id.next_song})
+    void onVolumeClick(View view){
+        switch (view.getId()){
+            case R.id.volume_down:
+                mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                        AudioManager.ADJUST_LOWER,
+                        AudioManager.FLAG_PLAY_SOUND);
+                break;
+            case R.id.volume_up:
+                mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC,
+                        AudioManager.ADJUST_RAISE,
+                        AudioManager.FLAG_PLAY_SOUND);
+                break;
+            case R.id.next_song:
+//                mNextSong.setVisibility(View.GONE);
+//                mVolumeContainer.setVisibility(View.VISIBLE);
+                mNextSong.startAnimation(makeAnimation(mNextSong,false));
+                mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer,true));
+                mHandler.removeCallbacks(mVolumeRunnable);
+                mHandler.postDelayed(mVolumeRunnable,DELAY_SHOW_NEXT_SONG);
+                break;
+        }
+        if(view.getId() != R.id.next_song){
+            final int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            final int current = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100));
+        }
+    }
+
+    private AlphaAnimation makeAnimation(View view,boolean show){
+        AlphaAnimation alphaAnimation = new AlphaAnimation(show ? 0 : 1,show ? 1 : 0);
+        alphaAnimation.setDuration(300);
+        alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                view.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        return alphaAnimation;
     }
 
     /**
@@ -578,10 +629,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      */
     private void setUpSeekBar() {
 //        RelativeLayout seekbarContainer = findViewById(R.id.seekbar_container);
-//        mSeekBar = new SeekBar(mContext);
-//        mSeekBar.setProgressDrawable(getResources().getDrawable(R.drawable.bg_progress));
-//        mSeekBar.setPadding(DensityUtil.dip2px(mContext,5),0,DensityUtil.dip2px(mContext,5),0);
-//        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
+//        mProgressSeekBar = new SeekBar(mContext);
+//        mProgressSeekBar.setProgressDrawable(getResources().getDrawable(R.drawable.bg_progress));
+//        mProgressSeekBar.setPadding(DensityUtil.dip2px(mContext,5),0,DensityUtil.dip2px(mContext,5),0);
+//        mProgressSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
 //
 //        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, DensityUtil.dip2px(mContext,2));
 //        lp.setMargins(DensityUtil.dip2px(mContext,10),0,DensityUtil.dip2px(mContext,10),0);
@@ -589,7 +640,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //        lp.addRule(RelativeLayout.LEFT_OF,R.id.text_remain);
 //        lp.addRule(RelativeLayout.RIGHT_OF,R.id.text_hasplay);
 //        lp.addRule(RelativeLayout.CENTER_VERTICAL);
-//        seekbarContainer.addView(mSeekBar,lp);
+//        seekbarContainer.addView(mProgressSeekBar,lp);
         if(mInfo == null)
             return;
         //初始化已播放时间与剩余时间
@@ -597,23 +648,23 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         final int temp = MusicService.getProgress();
         mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
 
-        if(mDuration > 0 && mCurrentTime >= 0 && (mDuration - mCurrentTime) > 0){
+        if(mDuration > 0 && mDuration - mCurrentTime > 0){
             mHasPlay.setText(Util.getTime(mCurrentTime));
             mRemainPlay.setText(Util.getTime(mDuration - mCurrentTime));
         }
 
         //初始化seekbar
         if(mDuration > 0 && mDuration < Integer.MAX_VALUE)
-            mSeekBar.setMax(mDuration);
+            mProgressSeekBar.setMax(mDuration);
         else
-            mSeekBar.setMax(1000);
+            mProgressSeekBar.setMax(1000);
 
         if(mCurrentTime > 0 && mCurrentTime < mDuration)
-            mSeekBar.setProgress(mCurrentTime);
+            mProgressSeekBar.setProgress(mCurrentTime);
         else
-            mSeekBar.setProgress(0);
+            mProgressSeekBar.setProgress(0);
 
-        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        mProgressSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mHandler.sendEmptyMessage(UPDATE_TIME_ONLY);
@@ -635,11 +686,29 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 mIsDragSeekBarFromUser = false;
             }
         });
-    }
 
-    public void setMP3Item(Song song){
-        if(song != null)
-            mInfo = song;
+        //音量控制
+        mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        final int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        final int current = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        mVolumeSeekbar.setProgress((int) (current * 1.0 / max * 100));
+        mVolumeSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mHandler.removeCallbacks(mVolumeRunnable);
+                mHandler.postDelayed(mVolumeRunnable,DELAY_SHOW_NEXT_SONG);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,
+                        (int) (seekBar.getProgress() / 100f * max),
+                        AudioManager.FLAG_PLAY_SOUND);
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+        mHandler.postDelayed(mVolumeRunnable, DELAY_SHOW_NEXT_SONG);
     }
 
     /**
@@ -683,6 +752,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     /**
      * 初始化viewpager
      */
+    @SuppressLint("ClickableViewAccessibility")
     private void setUpViewPager(){
         mAdapter = new PagerAdapter(getSupportFragmentManager());
         Bundle bundle = new Bundle();
@@ -773,8 +843,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         coverFragment.setArguments(bundle);
 
         mAdapter.addFragment(coverFragment);
-        final LrcFragment lrcFragment = new LrcFragment();
-        lrcFragment.setOnInflateFinishListener(view -> {
+        final LyricFragment lyricFragment = new LyricFragment();
+        lyricFragment.setOnInflateFinishListener(view -> {
             mLrcView = (LrcView) view;
             mLrcView.setOnLrcClickListener(new LrcView.OnLrcClickListener() {
                 @Override
@@ -782,50 +852,6 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 }
                 @Override
                 public void onLongClick() {
-                    //是否已经忽略
-                    final boolean alreadyIgnore = SPUtil.getValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE) == SPUtil.LYRIC_KEY.LYRIC_IGNORE;
-                    new MaterialDialog.Builder(mContext)
-                            .items(getString(R.string.netease),getString(R.string.kugou),getString(R.string.select_lrc),getString(!alreadyIgnore ? R.string.ignore_lrc : R.string.cancel_ignore_lrc))
-                            .itemsColorAttr(R.attr.text_color_primary)
-                            .backgroundColorAttr(R.attr.background_color_3)
-                            .itemsCallback((dialog, itemView, position, text) -> {
-                                switch (position){
-                                    case 0: //网易 酷狗
-                                    case 1:
-                                        SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
-                                        lrcFragment.updateLrc(mInfo,true);
-                                        break;
-                                    case 2: //手动选择歌词
-                                        new FileChooserDialog.Builder(PlayerActivity.this)
-                                                .extensionsFilter(".lrc")
-                                                .show();
-                                        break;
-                                    case 3: //忽略或者取消忽略
-                                        new MaterialDialog.Builder(mContext)
-                                                .negativeText(R.string.cancel)
-                                                .negativeColorAttr(R.attr.text_color_primary)
-                                                .positiveText(R.string.confirm)
-                                                .positiveColorAttr(R.attr.text_color_primary)
-                                                .title(!alreadyIgnore ? R.string.confirm_ignore_lrc : R.string.confirm_cancel_ignore_lrc)
-                                                .titleColorAttr(R.attr.text_color_primary)
-                                                .backgroundColorAttr(R.attr.background_color_3)
-                                                .onPositive((dialog1, which) -> {
-                                                    if(!alreadyIgnore){//忽略
-                                                        if (mInfo != null) {
-                                                            SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_IGNORE);
-                                                            lrcFragment.updateLrc(mInfo);
-                                                        }
-                                                    } else {//取消忽略
-                                                        SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_NETEASE);
-                                                        lrcFragment.updateLrc(mInfo);
-                                                    }
-
-                                                })
-                                                .show();
-                                        break;
-                                }
-                            })
-                            .show();
                 }
             });
             mLrcView.setOnSeekToListener(progress -> {
@@ -839,20 +865,28 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mLrcView.setOtherColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
             mLrcView.setTimeLineColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
         });
-        lrcFragment.setArguments(bundle);
-        mAdapter.addFragment(lrcFragment);
+        lyricFragment.setArguments(bundle);
+        mAdapter.addFragment(lyricFragment);
 
         mPager.setAdapter(mAdapter);
         mPager.setOffscreenPageLimit(mAdapter.getCount() - 1);
+
+        final int THRESHOLD_Y = DensityUtil.dip2px(mContext,40);
+        final int THRESHOLD_X = DensityUtil.dip2px(mContext,60);
         //下滑关闭
         mPager.setOnTouchListener((v, event) -> {
             if(event.getAction() == MotionEvent.ACTION_DOWN){
+                mEventX1 = event.getX();
                 mEventY1 = event.getY();
             }
             if(event.getAction() == MotionEvent.ACTION_UP){
+                mEventX2 = event.getX();
                 mEventY2 = event.getY();
-                if(mEventY2 - mEventY1 > 200)
+                LogUtil.d("PlayerAction","ThresHoldX: " + THRESHOLD_X + " DistanceX: " + Math.abs(mEventX1 - mEventX2));
+                LogUtil.d("PlayerAction","ThresHoldY: " + THRESHOLD_Y + " DistanceY: " + (mEventY2 - mEventY1));
+                if(mEventY2 - mEventY1 > THRESHOLD_Y && Math.abs(mEventX1 - mEventX2) < THRESHOLD_X){
                     onBackPressed();
+                }
             }
             return false;
         });
@@ -891,27 +925,29 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mIsPlay = isplay;
         //两种情况下更新ui
         //一是activity在前台  二是activity暂停后有更新的动作，当activity重新回到前台后更新ui
-        if(!mIsRunning || mInfo == null){
+        if(!mIsForeground || mInfo == null){
             mNeedUpdateUI = true;
             return;
         }
         //当操作不为播放或者暂停且正在运行时，更新所有控件
-        if((Global.getOperation() != Constants.TOGGLE || mFistStart)) {
+        if((Global.getOperation() != Constants.TOGGLE || mNeedUpdateUI)) {
             //更新顶部信息
             updateTopStatus(mInfo);
             //更新歌词
-            mHandler.postDelayed(() -> ((LrcFragment) mAdapter.getItem(2)).updateLrc(mInfo),mFistStart ? 50 : 0);
+            if(!mFistStart){
+                ((LyricFragment) mAdapter.getItem(2)).updateLrc(mInfo);
+            }
             //更新进度条
             int temp = MusicService.getProgress();
             mCurrentTime = temp > 0 && temp < mDuration ? temp : 0;
             mDuration = (int) mInfo.getDuration();
-            mSeekBar.setMax(mDuration);
+            mProgressSeekBar.setMax(mDuration);
             //更新下一首歌曲
             if(MusicService.getNextMP3() != null){
                 mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
             }
             updateBg();
-            requestCover();
+            requestCover(Global.getOperation() != Constants.TOGGLE && !mFistStart);
         }
         //更新按钮状态
         updatePlayButton(isplay);
@@ -921,7 +957,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     private class ProgressThread extends Thread {
         @Override
         public void run() {
-            while (mIsRunning) {
+            while (mIsForeground) {
                 if(!MusicService.isPlay())
                     continue;
                 int progress = MusicService.getProgress();
@@ -945,19 +981,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         int accentColor = ThemeStore.getAccentColor();
         int tintColor = ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_6c6a6c : R.color.gray_6b6b6b);
 
-        LayerDrawable progressDrawable =  (LayerDrawable) mSeekBar.getProgressDrawable();
-        //修改progress颜色
-        ((GradientDrawable)progressDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_efeeed : R.color.gray_343438));
-        (progressDrawable.getDrawable(1)).setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
-        mSeekBar.setProgressDrawable(progressDrawable);
-
+        setProgressDrawable(mProgressSeekBar,accentColor);
+        setProgressDrawable(mVolumeSeekbar,accentColor);
         //修改thumb
         int inset = DensityUtil.dip2px(mContext,6);
-        mSeekBar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),accentColor),
+        mProgressSeekBar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),accentColor),
                 inset,inset,inset,inset));
-
-//        mSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
-//        Drawable seekbarBackground = mSeekBar.getBackground();
+        mVolumeSeekbar.setThumb(new InsetDrawable(Theme.TintDrawable(Theme.getShape(GradientDrawable.RECTANGLE,accentColor, DensityUtil.dip2px(this,2),DensityUtil.dip2px(this,6)),accentColor),
+                inset,inset,inset,inset));
+//        mProgressSeekBar.setThumb(Theme.getShape(GradientDrawable.OVAL,ThemeStore.getAccentColor(),DensityUtil.dip2px(mContext,10),DensityUtil.dip2px(mContext,10)));
+//        Drawable seekbarBackground = mProgressSeekBar.getBackground();
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && seekbarBackground instanceof RippleDrawable) {
 //            ((RippleDrawable)seekbarBackground).setColor(ColorStateList.valueOf( ColorUtil.adjustAlpha(ThemeStore.getAccentColor(),0.2f)));
 //        }
@@ -973,19 +1006,31 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         Theme.TintDrawable(mTopHide,R.drawable.icon_player_back,tintColor);
         Theme.TintDrawable(mTopMore,R.drawable.icon_player_more,tintColor);
         //播放模式与播放队列
-        int playmode = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME, "PlayModel",Constants.PLAY_LOOP);
-        Theme.TintDrawable(mPlayModel,playmode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
-                playmode == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
+        int playMode = SPUtil.getValue(this,SPUtil.SETTING_KEY.SETTING_NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP);
+        Theme.TintDrawable(mPlayModel,playMode == Constants.PLAY_LOOP ? R.drawable.play_btn_loop :
+                playMode == Constants.PLAY_SHUFFLE ? R.drawable.play_btn_shuffle :
                         R.drawable.play_btn_loop_one,tintColor);
         Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,tintColor);
+
+        //音量控制
+        Theme.TintDrawable(mVolumeDown,R.drawable.ic_volume_down_black_24dp,tintColor);
+        Theme.TintDrawable(mVolumeUp,R.drawable.ic_volume_up_black_24dp,tintColor);
 
         mPlayPauseView.setBackgroundColor(accentColor);
         //下一首背景
         mNextSong.setBackground(Theme.getShape(GradientDrawable.RECTANGLE,ColorUtil.getColor(ThemeStore.isDay() ? R.color.white_fafafa : R.color.gray_343438),
                 DensityUtil.dip2px(this,2),0,0,DensityUtil.dip2px(this,288),DensityUtil.dip2px(this,38),1));
         mNextSong.setTextColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_a8a8a8 : R.color.white_e5e5e5));
+
     }
 
+    private void setProgressDrawable(SeekBar seekBar,int accentColor) {
+        LayerDrawable progressDrawable =  (LayerDrawable) seekBar.getProgressDrawable();
+        //修改progress颜色
+        ((GradientDrawable)progressDrawable.getDrawable(0)).setColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.gray_efeeed : R.color.gray_343438));
+        (progressDrawable.getDrawable(1)).setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+        seekBar.setProgressDrawable(progressDrawable);
+    }
 
     //更新背景
     private void updateBg() {
@@ -1013,36 +1058,36 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 
     }
 
-    private void updateCover(){
-        ((CoverFragment) mAdapter.getItem(1)).updateCover(mInfo,mUri,!mFistStart);
+    private void updateCover(boolean withAnimation){
+        ((CoverFragment) mAdapter.getItem(1)).updateCover(mInfo,mUri,withAnimation);
         mFistStart = false;
     }
 
     /**
      * 更新封面
      */
-    private void requestCover() {
+    private void requestCover(boolean withAnimation) {
         //更新封面
         if(mInfo == null || (mInfo = MusicService.getCurrentMP3()) == null){
             mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
-            updateCover();
+            updateCover(withAnimation);
         } else {
             new ImageUriRequest<String>(){
                 @Override
                 public void onError(String errMsg) {
                     mUri = Uri.EMPTY;
-                    updateCover();
+                    updateCover(withAnimation);
                 }
 
                 @Override
                 public void onSuccess(String result) {
                     mUri = Uri.parse(result);
-                    updateCover();
+                    updateCover(withAnimation);
                 }
 
                 @Override
                 public void load() {
-                    getThumbObservable(getSearchRequestWithAlbumType(mInfo))
+                    getCoverObservable(getSearchRequestWithAlbumType(mInfo))
                             .compose(RxUtil.applyScheduler())
                             .subscribe(this::onSuccess, throwable -> onError(throwable.toString()));
                 }
@@ -1075,11 +1120,22 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //            }
 //        }
         SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_MANUAL);
-        ((LrcFragment) mAdapter.getItem(2)).updateLrc(file.getAbsolutePath());
+        ((LyricFragment) mAdapter.getItem(2)).updateLrc(file.getAbsolutePath());
+        sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
     }
 
     @Override
     public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
+    }
+
+    @Override
+    public void onTagEdit(Song newSong) {
+        if(newSong != null){
+            mInfo = newSong;
+            updateTopStatus(newSong);
+            ((LyricFragment) mAdapter.getItem(2)).updateLrc(newSong,true);
+            sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
+        }
     }
 
     private void updateProgressByHandler() {
@@ -1093,7 +1149,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     }
 
     private void updateSeekbarByHandler(){
-        mSeekBar.setProgress(mCurrentTime);
+        mProgressSeekBar.setProgress(mCurrentTime);
     }
 
     @OnHandleMessage
@@ -1111,5 +1167,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             updateSeekbarByHandler();
         }
     }
+
+    public LyricFragment getLyricFragment(){
+        return (LyricFragment) mAdapter.getItem(2);
+    }
+
 
 }

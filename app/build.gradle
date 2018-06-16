@@ -3,6 +3,10 @@ apply plugin: "kotlin-android"
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
+static def releaseTime() {
+    return new Date().format("yyyy-MM-dd HH-mm")
+}
+
 repositories {
     maven {
         url 'https://maven.google.com'
@@ -15,19 +19,20 @@ ext {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.3"
+    buildToolsVersion '27.0.3'
 
 
     defaultConfig {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 56
-        versionName "1.2.9-beta"
+        versionCode 67
+        versionName "1.3.2.1"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
-            abiFilters 'armeabi-v7a', 'x86'
+            abiFilters 'armeabi-v7a'
+//            abiFilters 'armeabi-v7a', 'x86'
         }
         externalNativeBuild {
             cmake {
@@ -39,7 +44,7 @@ android {
 
     signingConfigs {
         debug {
-            storeFile file("/../Debug.jks")
+            storeFile file("./Debug.jks")
             storePassword "123456"
             keyAlias "Debug"
             keyPassword "123456"
@@ -62,7 +67,7 @@ android {
 
             android.applicationVariants.all { variant ->
                 variant.outputs.all {
-                    outputFileName = "APlayer_v${defaultConfig.versionName}_${variant.productFlavors[0].name}.apk"
+                    outputFileName = "APlayer_v${defaultConfig.versionName}_${variant.productFlavors[0].name}_${releaseTime()}.apk"
                 }
             }
         }
@@ -78,14 +83,15 @@ android {
 //        tencent{}
 //        alibaba{}
 //        meizu{}
-
 //        assistant91{}
 //        baidu{}
 //        anzhuomarket{}
+
 //        qihu360{}
 //        chuizi{}
-//        xiaomi{}
+        xiaomi{}
         kuan {}
+        google{}
         productFlavors.all { flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
         }
@@ -107,8 +113,8 @@ android {
     }
 
     configurations {
-        all*.exclude group: 'com.squareup.okhttp3', module: 'okhttp'
-        all*.exclude group: 'com.google.code.gson', module: 'gson'
+        implementation.exclude module: 'okio'
+        implementation.exclude module: 'gson'
     }
 
     configurations.all {
@@ -130,37 +136,42 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
+//    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
     implementation "com.android.support:design:$supportLibVersion"
     implementation "com.android.support:palette-v7:$supportLibVersion"
     implementation "com.android.support:cardview-v7:$supportLibVersion"
-    implementation 'com.android.support:multidex:1.0.2'
-    implementation 'com.facebook.fresco:fresco:1.5.0'
+    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.facebook.fresco:fresco:1.9.0'
     implementation 'com.facebook.rebound:rebound:0.3.8'
-    implementation 'com.umeng.analytics:analytics:6.1.2'
+    implementation 'com.umeng.sdk:common:1.4.4'
+    implementation 'com.umeng.sdk:analytics:7.4.4'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
-    implementation 'cn.bmob.android:bmob-sdk:3.5.0'
     implementation 'com.jakewharton:butterknife:8.8.1'
     implementation 'com.github.promeg:tinypinyin:2.0.1'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.7'
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.13'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
-    implementation 'androidx.core:core-ktx:0.2'
+    implementation 'androidx.core:core-ktx:0.3'
     implementation 'org.jetbrains.anko:anko-common:0.10.4'
-    implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
-    implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
-//    debugImplementation 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.8'
-//    debugImplementation 'tv.danmaku.ijk.media:ijkplayer-x86_64:0.8.8'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
     kapt  'com.jakewharton:butterknife-compiler:8.8.1'
 
+    implementation 'cn.bmob.android:bmob-sdk:3.6.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+//    implementation 'com.anjlab.android.iab.v3:library:1.0.44'
+//    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+//    implementation 'com.google.code.gson:gson:2.8.2'
+
+//    implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
+//    implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
+//    implementation 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.8'
 }
 
 kapt {

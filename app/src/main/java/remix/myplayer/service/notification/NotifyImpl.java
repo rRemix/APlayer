@@ -3,7 +3,6 @@ package remix.myplayer.service.notification;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v4.app.NotificationCompat;
 import android.view.View;
@@ -12,13 +11,13 @@ import android.widget.RemoteViews;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.request.RequestConfig;
-import remix.myplayer.request.network.RemoteUriRequest;
+import remix.myplayer.request.RemoteUriRequest;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
-import remix.myplayer.util.Util;
 
 import static remix.myplayer.service.MusicService.copy;
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
@@ -45,7 +44,7 @@ public class NotifyImpl extends Notify {
         Notification notification = buildNotification(mService);
 
         if((MusicService.getCurrentMP3() != null)) {
-            boolean isSystemColor = SPUtil.getValue(mService,SPUtil.SETTING_KEY.SETTING_NAME,"IsSystemColor",true);
+            boolean isSystemColor = SPUtil.getValue(mService,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR,true);
 
             Song song = MusicService.getCurrentMP3();
             //设置歌手，歌曲名
@@ -96,7 +95,7 @@ public class NotifyImpl extends Notify {
                             mRemoteView.setImageViewResource(R.id.notify_image, R.drawable.album_empty_bg_day);
                         }
                     } catch (Exception e){
-                        Util.uploadException("PushNotify Error",e);
+                        LogUtil.d("Notify",e.toString());
                     } finally {
                         pushNotify(notification);
                     }
@@ -124,26 +123,20 @@ public class NotifyImpl extends Notify {
 
     private void buildAction(Context context) {
         //添加Action
-        Intent actionIntent = new Intent(MusicService.ACTION_CMD);
-        actionIntent.putExtra("FromNotify", true);
-        //播放或者暂停
-        actionIntent.putExtra("Control", Constants.TOGGLE);
-        PendingIntent playIntent = PendingIntent.getBroadcast(context, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mRemoteBigView.setOnClickPendingIntent(R.id.notify_play, playIntent);
+        //切换
+        PendingIntent playIntent = buildPendingIntent(context, Constants.TOGGLE);
+        mRemoteBigView.setOnClickPendingIntent(R.id.notify_play,playIntent);
         mRemoteView.setOnClickPendingIntent(R.id.notify_play,playIntent);
         //下一首
-        actionIntent.putExtra("Control", Constants.NEXT);
-        PendingIntent nextIntent = PendingIntent.getBroadcast(context,1,actionIntent,PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent nextIntent = buildPendingIntent(context, Constants.NEXT);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_next, nextIntent);
         mRemoteView.setOnClickPendingIntent(R.id.notify_next, nextIntent);
         //上一首
-        actionIntent.putExtra("Control", Constants.PREV);
-        PendingIntent prevIntent = PendingIntent.getBroadcast(context, 2, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent prevIntent = buildPendingIntent(context, Constants.PREV);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_prev,prevIntent);
 
         //关闭通知栏
-        actionIntent.putExtra("Control", Constants.CLOSE_NOTIFY);
-        PendingIntent closeIntent = PendingIntent.getBroadcast(context, 3, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent closeIntent = buildPendingIntent(context,Constants.CLOSE_NOTIFY);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_close, closeIntent);
         mRemoteView.setOnClickPendingIntent(R.id.notify_close,closeIntent);
     }

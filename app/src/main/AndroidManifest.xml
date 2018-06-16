@@ -13,9 +13,10 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.hardware.sensor.accelerometer"/>
 
     <application
-        android:name=".APlayerApplication"
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -45,11 +46,7 @@
                 <category android:name="android.intent.category.APP_MUSIC" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -131,6 +128,8 @@
         <activity
             android:name=".ui.activity.EQActivity"
             android:theme="@style/ActivityStyle" />
+        <activity android:name=".ui.activity.SupportDevelopActivity"
+            android:theme="@style/ActivityStyle"/>
         <!-- 设置 -->
         <activity
             android:name=".ui.activity.SettingActivity"
@@ -148,7 +147,7 @@
             android:theme="@style/LockScreenActivity" />
         <!-- shortcut过渡 -->
         <activity
-            android:name=".ui.activity.AppShortcutActivity"
+            android:name=".appshortcuts.AppShortcutActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
             android:theme="@style/AppShortcut" />
@@ -175,57 +174,10 @@
 
         <!-- 图片裁剪 -->
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
-        <activity
-            android:name=".ui.dialog.ShareDialog"
-            android:configChanges="keyboardHidden|orientation"
-            android:screenOrientation="portrait"
-            android:theme="@style/BaseDialogTheme">
-
-            <!-- 微博分享 -->
-            <intent-filter>
-                <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
 
         <!-- bombupdate -->
         <activity
             android:name="cn.bmob.v3.update.UpdateDialogActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-        <!-- 微信 -->
-        <activity
-            android:name=".wxapi.WXEntryActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-        <!-- 必须注册在微博授权，分享微博时候用到 -->
-        <activity
-            android:name="com.sina.weibo.sdk.component.WeiboSdkBrowser"
-            android:configChanges="keyboardHidden|orientation"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- 腾讯相关activity -->
-        <activity
-            android:name="com.tencent.tauth.AuthActivity"
-            android:launchMode="singleTask"
-            android:noHistory="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="tencent1105030910" />
-            </intent-filter>
-        </activity>
-        <!-- 腾讯 -->
-        <activity
-            android:name="com.tencent.connect.common.AssistActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <!-- 线控 -->

@@ -53,7 +53,6 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
     @Override
     protected void initAdapter() {
         mAdapter = new SongAdapter(mContext,R.layout.item_song_recycle,mMultiChoice, SongAdapter.ALLSONG,mRecyclerView);
-        mAdapter.setChangeCallback(() -> getLoaderManager().restartLoader(getLoaderId(),null,SongFragment.this));
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {

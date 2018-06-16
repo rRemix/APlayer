@@ -98,14 +98,20 @@
     <color name="lrc_normal_night">@color/night_textcolor</color>
     <color name="lrc_highlight_night">@color/night_textcolor_primary</color>
 
-    <color name="appwidget_title_color">#252525</color>
-    <color name="appwidget_artist_color">#a9a9a9</color>
-    <color name="appwidget_progress_color">#a8a8a8</color>
+    <color name="appwidget_title_color_white_1f">#252525</color>
+    <color name="appwidget_title_color_transparent">#ffffff</color>
+    <color name="appwidget_artist_color_white_1f">#a9a9a9</color>
+    <color name="appwidget_artist_color_transparent">#edeceb</color>
+    <color name="appwidget_progress_color_white_1f">#a8a8a8</color>
+    <color name="appwidget_progress_color_transparent">#ffffff</color>
+    <color name="appwidget_btn_color_white_1f">#b4b4b4</color>
+    <color name="appwidget_btn_color_transparent">#ffffff</color>
     <color name="appwidget_background_color">#f9f9f9</color>
     <color name="appwidget_track_color">#e3e3e3</color>
     <color name="appwidget_track_start_color">#96b9ff</color>
     <color name="appwidget_track_end_color">#5179f5</color>
     <color name="appwidget_big_bar_color">#4f000000</color>
+
 
     <color name="day_textcolor_primary">@color/black_1c1b19</color>
     <color name="day_textcolor">@color/gray_6d6c69</color>

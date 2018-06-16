@@ -2,7 +2,6 @@ package remix.myplayer.service.notification;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,7 +11,7 @@ import android.support.v4.app.NotificationCompat;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.request.RequestConfig;
-import remix.myplayer.request.network.RemoteUriRequest;
+import remix.myplayer.request.RemoteUriRequest;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
@@ -60,19 +59,19 @@ public class NotifyImpl24 extends Notify{
         int playPauseIcon = MusicService.isPlay() ? R.drawable.ic_pause_black_24dp : R.drawable.ic_play_arrow_black_24dp;
 
         Intent deleteIntent = new Intent(MusicService.ACTION_CMD);
-        deleteIntent.putExtra("Close", true);
+        deleteIntent.putExtra("Control", Constants.CLOSE_NOTIFY);
         deleteIntent.putExtra("FromImpl24",true);
 
         Notification notification = new NotificationCompat.Builder(mService, PLAYING_NOTIFICATION_CHANNEL_ID)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.notifbar_icon)
                 .addAction(R.drawable.ic_skip_previous_black_24dp, mService.getString(R.string.previous),
-                        PendingIntent.getBroadcast(mService,0, getControlIntent(Constants.PREV), PendingIntent.FLAG_UPDATE_CURRENT))
+                        buildPendingIntent(mService,Constants.PREV))
                 .addAction(playPauseIcon, mService.getString(R.string.play_pause),
-                        PendingIntent.getBroadcast(mService,1, getControlIntent(Constants.TOGGLE), PendingIntent.FLAG_UPDATE_CURRENT))
+                        buildPendingIntent(mService,Constants.TOGGLE))
                 .addAction(R.drawable.ic_skip_next_black_24dp, mService.getString(R.string.next),
-                        PendingIntent.getBroadcast(mService,2, getControlIntent(Constants.NEXT), PendingIntent.FLAG_UPDATE_CURRENT))
-                .setDeleteIntent(PendingIntent.getBroadcast(mService,3,deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                        buildPendingIntent(mService,Constants.NEXT))
+//                .setDeleteIntent(PendingIntent.getBroadcast(mService,3,deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContentIntent(getContentIntent())
                 .setContentTitle(song.getTitle())
                 .setLargeIcon(bitmap)
@@ -86,11 +85,6 @@ public class NotifyImpl24 extends Notify{
         if(mIsStop)
             return;
         pushNotify(notification);
-    }
-
-    private Intent getControlIntent(int control){
-        return new Intent(MusicService.ACTION_CMD).putExtra("FromNotify", true)
-                .putExtra("Control",control);
     }
 
 }

@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -67,7 +68,7 @@ public abstract class Notify {
         }
 
         if (mNotifyMode != newNotifyMode && newNotifyMode == NOTIFY_MODE_BACKGROUND) {
-            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+//            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
                 mService.stopForeground(false);
         }
         if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
@@ -86,7 +87,7 @@ public abstract class Notify {
     public void cancelPlayingNotify(){
         mService.stopForeground(true);
         mNotificationManager.cancel(PLAYING_NOTIFICATION_ID);
-        mIsStop = true;
+//        mIsStop = true;
 //        mNotifyMode = NOTIFY_MODE_NONE;
     }
 
@@ -104,5 +105,17 @@ public abstract class Notify {
                 0,
                 PendingIntent.FLAG_UPDATE_CURRENT
         );
+    }
+
+    protected PendingIntent buildPendingIntent(Context context, int operation) {
+        Intent intent = new Intent(MusicService.ACTION_CMD);
+        intent.putExtra("Control",operation);
+        intent.setComponent(new ComponentName(context,MusicService.class));
+        intent.putExtra("FromNotify",true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return PendingIntent.getForegroundService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        } else {
+            return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
     }
 }

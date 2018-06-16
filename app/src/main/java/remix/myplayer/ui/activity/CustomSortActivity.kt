@@ -25,8 +25,7 @@ import java.util.*
 class CustomSortActivity : ToolbarActivity() {
     @BindView(R.id.custom_sort_recyclerView)
     lateinit var mRecyclerView: FastScrollRecyclerView
-    @BindView(R.id.custom_sort_save)
-    lateinit var mSave: FloatingActionButton
+
     lateinit var mAdapter: CustomSortAdapter
     lateinit var mMDDialog: MaterialDialog
 
@@ -90,7 +89,7 @@ class CustomSortActivity : ToolbarActivity() {
             ThemeStore.getTextColorPrimary())
 
         mMDDialog = MaterialDialog.Builder(this)
-                .title("保存中")
+                .title(R.string.saveing)
                 .titleColorAttr(R.attr.text_color_primary)
                 .content(R.string.please_wait)
                 .contentColorAttr(R.attr.text_color_primary)
@@ -111,6 +110,7 @@ class CustomSortActivity : ToolbarActivity() {
             uiThread {
                 ToastUtil.show(mContext,if(result > 0) R.string.save_success else R.string.save_error)
                 mMDDialog.dismiss()
+                finish()
             }
         }
     }

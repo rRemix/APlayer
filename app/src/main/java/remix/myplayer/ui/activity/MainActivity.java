@@ -1,9 +1,9 @@
 package remix.myplayer.ui.activity;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -21,6 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -37,36 +38,59 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.soundcloud.android.crop.Crop;
 
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.CannotWriteException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.tag.images.Artwork;
+import org.jaudiotagger.tag.images.ArtworkFactory;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import remix.myplayer.APlayerApplication;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.adapter.DrawerAdapter;
 import remix.myplayer.adapter.MainPagerAdapter;
 import remix.myplayer.bean.Category;
 import remix.myplayer.bean.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
+import remix.myplayer.helper.SortOrder;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.SimpleUriRequest;
+import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
+import remix.myplayer.ui.fragment.AlbumFragment;
+import remix.myplayer.ui.fragment.ArtistFragment;
 import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.ui.fragment.LibraryFragment;
+import remix.myplayer.ui.fragment.PlayListFragment;
+import remix.myplayer.ui.fragment.SongFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
@@ -81,7 +105,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 /**
  *
  */
-public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Callback {
+public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Callback,OnTagEditListener {
     @BindView(R.id.tabs)
     TabLayout mTablayout;
     @BindView(R.id.ViewPager)
@@ -113,6 +137,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
     private final int REQUEST_SETTING = 1;
     private BroadcastReceiver mLoadReceiver;
 
+    //当前选中的fragment
+    private LibraryFragment mCurrentFragment;
     @Override
     protected void onResume() {
         super.onResume();
@@ -120,11 +146,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
         }
         mIsRunning = true;
-        //更新UI
-//        if(mFromSettingFlag){
-//            mFromSettingFlag = false;
-//            return;
-//        }
         UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
     }
 
@@ -148,7 +169,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        startService(new Intent(this, MusicService.class));
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         //receiver
@@ -163,34 +183,20 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         setUpViewColor();
         //handler
         mRefreshHandler = new MsgHandler(this);
-        mRefreshHandler.postDelayed(() -> {
-            final Intent param = getIntent();
-            if(param != null && param.getData() != null){
-                int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
-                if(id < 0)
-                    return;
-                Intent intent = new Intent(MusicService.ACTION_CMD);
-                Bundle arg = new Bundle();
-                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
-                arg.putInt("Position", 0);
-                intent.putExtras(arg);
-                ArrayList<Integer> list = new ArrayList<>();
-                list.add(id);
-                Global.setPlayQueue(list,mContext,intent);
-            }
-        },1000);
+
+        parseIntent();
     }
 
     /**
      * 初始化底部显示控件
      */
-    private void setUpBottomBar(Song song) {
+    private void setUpBottomBar() {
         //初始化底部状态栏
         mBottomBar = (BottomActionBarFragment) getSupportFragmentManager().findFragmentById(R.id.bottom_actionbar_new);
         int lastId = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.LAST_SONG_ID,-1);
-
-        if(song != null) {
-            mBottomBar.updateBottomStatus(song,  MusicService.isPlay());
+        Song item;
+        if(lastId > 0 && (item = MediaStoreUtil.getMP3InfoById(lastId)) != null) {
+            mBottomBar.updateBottomStatus(item,  MusicService.isPlay());
         } else {
             if(Global.PlayQueue == null || Global.PlayQueue.size() == 0)
                 return ;
@@ -200,7 +206,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 if (id != lastId)
                     break;
             }
-            Song item = MediaStoreUtil.getMP3InfoById(id);
+            item = MediaStoreUtil.getMP3InfoById(id);
             if(item != null){
                 mBottomBar.updateBottomStatus(item,  MusicService.isPlay());
             }
@@ -283,7 +289,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-
     //初始化ViewPager
     private void setUpPager() {
         String categoryJson = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.LIBRARY_CATEGORY,"");
@@ -294,8 +299,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
         mPagerAdapter = new MainPagerAdapter(getSupportFragmentManager());
         mPagerAdapter.setList(categories);
+        mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(0).getTag());
         //有且仅有播放列表一个tab
-        if(categories.size() == 1 && categories.get(0).getTitle().equals(getString(R.string.tab_playlist))){
+        if(categories.size() == 1 && categories.get(0).getTag() == R.string.tab_playlist){
             showAddPlayListButton(true);
         }
 
@@ -311,11 +317,66 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             @Override
             public void onPageSelected(int position) {
                 showAddPlayListButton(mPagerAdapter.getList().get(position).getTitle().equals(getString(R.string.tab_playlist)));
+                mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(position).getTag());
+                mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(position);
+                invalidateOptionsMenu();
             }
             @Override
             public void onPageScrollStateChanged(int state) {
             }
         });
+        mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(0);
+    }
+
+    private int mMenuLayoutId = R.menu.menu_main;
+    public int parseMenuId(int tag) {
+        return tag == Category.TAG_SONG ? R.menu.menu_main :
+                tag == Category.TAG_ALBUM ? R.menu.menu_album :
+                tag == Category.TAG_ARTIST ? R.menu.menu_artist :
+                tag == Category.TAG_PLAYLIST ? R.menu.menu_playlist :
+                tag ==  Category.TAG_FOLDER ? R.menu.menu_folder : R.menu.menu_main_simple;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        String sortOrder = null;
+
+        if(mCurrentFragment instanceof SongFragment){
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SONG_SORT_ORDER, SortOrder.SongSortOrder.SONG_A_Z);
+        } else if(mCurrentFragment instanceof AlbumFragment){
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,SortOrder.AlbumSortOrder.ALBUM_A_Z);
+        } else if(mCurrentFragment instanceof ArtistFragment){
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,SortOrder.ArtistSortOrder.ARTIST_A_Z);
+        } else if(mCurrentFragment instanceof PlayListFragment){
+            sortOrder = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,SortOrder.PlayListSortOrder.PLAYLIST_DATE);
+        }
+
+        if(TextUtils.isEmpty(sortOrder)){
+            return true;
+        }
+        setUpMenuItem(menu, sortOrder);
+        return true;
+    }
+
+
+    @Override
+    protected int getMenuLayoutId() {
+        return mMenuLayoutId;
+    }
+
+    @Override
+    protected void saveSortOrder(String sortOrder) {
+        if(mCurrentFragment instanceof SongFragment){
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SONG_SORT_ORDER,sortOrder);
+        } else if(mCurrentFragment instanceof AlbumFragment){
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ALBUM_SORT_ORDER,sortOrder);
+        } else if(mCurrentFragment instanceof ArtistFragment){
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,sortOrder);
+        } else if(mCurrentFragment instanceof PlayListFragment ){
+            SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.PLAYLIST_SORT_ORDER,sortOrder);
+        }
+        mCurrentFragment.onMediaStoreChanged();
     }
 
     private void showAddPlayListButton(boolean show) {
@@ -393,8 +454,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                     case 2:
                         setNightMode(ThemeStore.isDay());
                         break;
-                    //设置
+                    //捐赠
                     case 3:
+                        startActivity(new Intent(mContext,SupportDevelopActivity.class));
+                        break;
+                    //设置
+                    case 4:
                         startActivityForResult(new Intent(mContext,SettingActivity.class), REQUEST_SETTING);
                         break;
                 }
@@ -445,6 +510,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
 
     }
 
+    @SuppressLint("CheckResult")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -461,6 +527,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                             mViewPager.setOffscreenPageLimit(categories.size() - 1);
                             mPagerAdapter.setList(categories);
                             mPagerAdapter.notifyDataSetChanged();
+                            mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(mViewPager.getCurrentItem()).getTag());
+                            mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(mViewPager.getCurrentItem());
+                            invalidateOptionsMenu();
                         }
                     }
                     break;
@@ -501,28 +570,52 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                             return;
                         }
                         //清除fresco的缓存
-                        new Thread(){
-                            @Override
-                            public void run() {
-                                ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                                if(thumbBean.getType() != Constants.PLAYLIST){
-                                    if(new File(path).exists()){
-                                        Uri fileUri = Uri.parse("file://" + path);
-                                        imagePipeline.evictFromCache(fileUri);
-                                    } else {
-                                        Uri providerUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), id);
-                                        imagePipeline.evictFromCache(providerUri);
-                                    }
-                                    mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER);
-                                }
-
+                        //如果设置的是专辑封面 修改内嵌封面
+                        Observable.create((ObservableOnSubscribe<Uri>) emitter -> {
+                            if(thumbBean.getType() == Constants.ALBUM){
+                                saveArtwork(thumbBean.getId(),new File(path));
                             }
-                        }.start();
+                            if(thumbBean.getType() == Constants.ALBUM){
+                                new SimpleUriRequest(getSearchRequestWithAlbumType(MediaStoreUtil.getMP3InfoByAlbumId(thumbBean.getId()))){
+                                    @Override
+                                    public void onError(String errMsg) {
+                                        emitter.onError(new Throwable(errMsg));
+                                    }
+
+                                    @Override
+                                    public void onSuccess(Uri result) {
+                                        emitter.onNext(result);
+                                        emitter.onComplete();
+                                    }
+                                }.load();
+                            } else{
+                                emitter.onNext(Uri.parse("file://" + path));
+                                emitter.onComplete();
+                            }
+                        }).compose(RxUtil.applyScheduler())
+                        .doFinally(() -> mRefreshHandler.sendEmptyMessage(Constants.UPDATE_ADAPTER))
+                        .subscribe(uri -> {
+                            ImagePipeline imagePipeline = Fresco.getImagePipeline();
+                            imagePipeline.evictFromCache(uri);
+                            imagePipeline.evictFromDiskCache(uri);
+                        }, throwable -> ToastUtil.show(mContext,R.string.tag_save_error,throwable.toString()));
                     }
                     break;
-
             }
         }
+    }
+
+    private void saveArtwork(int albumId, File artFile) throws TagException, ReadOnlyFileException, CannotReadException, InvalidAudioFrameException, IOException, CannotWriteException {
+        Song song = MediaStoreUtil.getMP3InfoByAlbumId(albumId);
+        if(song == null)
+            return;
+        AudioFile audioFile = AudioFileIO.read(new File(song.getUrl()));
+        Tag tag = audioFile.getTagOrCreateAndSetDefault();
+        Artwork artwork = ArtworkFactory.createArtworkFromFile(artFile);
+        tag.deleteArtworkField();
+        tag.setField(artwork);
+        audioFile.commit();
+        MediaStoreUtil.insertAlbumArt(this,albumId,artFile.getAbsolutePath());
     }
 
     @Override
@@ -530,9 +623,9 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if (mDrawerLayout.isDrawerOpen(mNavigationView)) {
             mDrawerLayout.closeDrawer(mNavigationView);
         } else if(mMultiChoice.isShow()) {
-            onBackPress();
+            onMultiBackPress();
         } else {
-            moveTaskToBack(true);
+            super.onBackPressed();
         }
     }
 
@@ -558,7 +651,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
      * 更新侧滑菜单
      * @param song
      */
-    private static final int IMAGE_SIZE = DensityUtil.dip2px(APlayerApplication.getContext(),108);
+    private static final int IMAGE_SIZE = DensityUtil.dip2px(App.getContext(),108);
     private void updateHeader(Song song, boolean isPlay) {
         if(song == null)
             return;
@@ -585,17 +678,41 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-    private static boolean LOAD_COMPLETE = false;
+    @Override
+    public void onTagEdit(Song newSong) {
+    }
+
+    private static boolean mLoadComplete = false;
     private class LoadFinishReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent receive) {
-            if(LOAD_COMPLETE)
-                return;
-            LOAD_COMPLETE = true;
-            String action = receive != null ? receive.getAction() : "";
-            if(ACTION_LOAD_FINISH.equals(action)){
-                setUpBottomBar(receive != null ? receive.getParcelableExtra("song") : null);
+            LogUtil.d("StartAPlayer","receiveBroadcast");
+            if(ACTION_LOAD_FINISH.equals(receive != null ? receive.getAction() : "") && !mLoadComplete){
+                setUpBottomBar();
+                mLoadComplete = true;
             }
+            if(mLoadComplete){
+                parseIntent();
+            }
+
+        }
+    }
+
+    private void parseIntent() {
+        final Intent param = getIntent();
+        if(param != null && param.getData() != null && mLoadComplete){
+            int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
+            if(id < 0)
+                return;
+            Intent intent = new Intent(MusicService.ACTION_CMD);
+            Bundle arg = new Bundle();
+            arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+            arg.putInt("Position", 0);
+            intent.putExtras(arg);
+            ArrayList<Integer> list = new ArrayList<>();
+            list.add(id);
+            Global.setPlayQueue(list,mContext,intent);
+            setIntent(new Intent());
         }
     }
 }

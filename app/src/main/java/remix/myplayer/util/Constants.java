@@ -4,7 +4,9 @@ package remix.myplayer.util;
  * Created by taeja on 16-2-17.
  */
 
-import remix.myplayer.APlayerApplication;
+import com.facebook.common.util.ByteConstants;
+
+import remix.myplayer.App;
 import remix.myplayer.R;
 
 /**
@@ -14,11 +16,11 @@ public class Constants {
     //应用包名
     public final static String PACKAGE_NAME = "remix.myplayer";
     //播放队列
-    public final static String PLAY_QUEUE = APlayerApplication.getContext().getString(R.string.play_queue);
+    public final static String PLAY_QUEUE = App.getContext().getString(R.string.play_queue);
     //最近添加
-    public final static String RECENTLY = APlayerApplication.getContext().getString(R.string.recently);
+    public final static String RECENTLY = App.getContext().getString(R.string.recently);
     //我的收藏
-    public final static String MYLOVE = APlayerApplication.getContext().getString(R.string.my_favorite);
+    public final static String MYLOVE = App.getContext().getString(R.string.my_favorite);
 
     //显示模式 1:列表 2:网格
     public final static int LIST_MODEL = 1;
@@ -50,7 +52,8 @@ public class Constants {
     public final static int UNLOCK_DESTOP_LYRIC = 11;
     public final static int CLOSE_NOTIFY = 12;
     public final static int ADD_TO_NEXT_SONG = 13;
-    public final static int SEEK_TO = 14;
+    public final static int CHANGE_LYRIC = 14;
+    public final static int PLAY_AT_BREAKPOINT = 15;
     //播放模式
     public final static int PLAY_LOOP = 50;
     public final static int PLAY_SHUFFLE = 51;
@@ -95,7 +98,7 @@ public class Constants {
     public static final int TOGGLE_FLOAT_LRC = 503;
 
     //扫描文件默认大小设置
-    public static int SCAN_SIZE = 0;
+    public static int SCAN_SIZE = ByteConstants.MB;
 
     //分享心情还是歌曲
     public final static int SHARESONG = 1;

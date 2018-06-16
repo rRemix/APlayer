@@ -17,7 +17,7 @@ import butterknife.BindView;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Folder;
-import remix.myplayer.listener.AlbArtFolderPlaylistListener;
+import remix.myplayer.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.MultiChoice;
@@ -76,7 +76,7 @@ public class FolderAdapter extends BaseAdapter<Folder,FolderAdapter.FolderHolder
             holder.mButton.setOnClickListener(v -> {
                 Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                 final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton);
-                popupMenu.getMenuInflater().inflate(R.menu.folder_menu, popupMenu.getMenu());
+                popupMenu.getMenuInflater().inflate(R.menu.menu_folder_item, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
                         holder.getAdapterPosition(),
                         Constants.FOLDER,

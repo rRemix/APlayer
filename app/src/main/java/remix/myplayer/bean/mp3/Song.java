@@ -2,8 +2,9 @@ package remix.myplayer.bean.mp3;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.MediaStore;
 
-import remix.myplayer.service.MusicService;
+import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -46,6 +47,10 @@ public class Song implements Cloneable, Parcelable {
         Year = year;
         TitleKey = titleKey;
         AddTime = addTime;
+    }
+
+    public Song(int id){
+        Id = id;
     }
 
     public Song(Song info) {
@@ -96,7 +101,7 @@ public class Song implements Cloneable, Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Song && ((Song)o).getId() == this.getId();
+        return o instanceof Song  && ((Song)o).getId() == this.getId();
     }
 
     public long getAddTime() {
@@ -176,7 +181,21 @@ public class Song implements Cloneable, Parcelable {
     }
 
     public long getDuration() {
-        return Duration > 0 ? Duration : MusicService.getDuration();
+        if (Duration <= 0){
+            IjkMediaPlayer ijkMediaPlayer = new IjkMediaPlayer();
+            try {
+                ijkMediaPlayer.setDataSource(Url);
+                ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
+                ijkMediaPlayer.prepareAsync();
+                Duration = ijkMediaPlayer.getDuration();
+                if(Duration > 0){
+                    //todo update mediastore
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return Duration;
     }
 
     public void setDuration(long duration) {

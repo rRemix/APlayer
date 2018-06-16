@@ -1,9 +1,7 @@
 package remix.myplayer.ui.dialog;
 
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -22,20 +20,21 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.AddtoPlayListAdapter;
-import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.db.PlayLists;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
-import remix.myplayer.util.Util;
 
 /**
  * Created by taeja on 16-2-1.
@@ -55,11 +54,10 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
     public static int mPlayListNameIndex;
     public static int mPlayListIdIndex;
 
-    private int mAudioID;
-
     private boolean mAddAfterCreate = true;
     private static int LOADER_ID = 0;
 
+    private List<Integer> mList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,16 +65,18 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
         setContentView(R.layout.dialog_addto_playlist);
         ButterKnife.bind(this);
 
-        mAudioID = getIntent().getExtras().getInt("Id");
+        mList = (List<Integer>) getIntent().getExtras().getSerializable("list");
+        if(mList == null){
+            ToastUtil.show(mContext,R.string.add_song_playlist_error);
+            finish();
+        }
 
         mAdapter = new AddtoPlayListAdapter(this);
         mAdapter.setOnItemClickLitener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 if(view != null ) {
-                    PlayListSong info = new PlayListSong(mAudioID,getPlayListId(position),getPlayListName(position));
-                    ToastUtil.show(AddtoPlayListDialog.this,
-                            PlayListUtil.addSong(info) > 0 ? getString(R.string.add_song_playlist_success, 1,getPlayListName(position)) : getString(R.string.add_song_playlist_error));
+                    ToastUtil.show(mContext,R.string.add_song_playlist_success,PlayListUtil.addMultiSongs(mList,getPlayListName(position)),getPlayListName(position));
                 } else {
                     ToastUtil.show(AddtoPlayListDialog.this,R.string.add_song_playlist_error,Toast.LENGTH_SHORT);
                 }
@@ -136,37 +136,27 @@ public class AddtoPlayListDialog extends BaseDialogActivity implements LoaderMan
                     .backgroundColorAttr(R.attr.background_color_3)
                     .contentColorAttr(R.attr.text_color_primary)
                     .inputRange(1,15)
-                    .input("", "本地歌单" + Global.PlayList.size(), new MaterialDialog.InputCallback() {
-                        @Override
-                        public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                            if(!TextUtils.isEmpty(input)){
-                                int newPlayListId = -1;
-                                try {
-                                    newPlayListId = PlayListUtil.addPlayList(input.toString());
-                                    ToastUtil.show(AddtoPlayListDialog.this, newPlayListId > 0 ?
-                                                    R.string.add_playlist_success :
-                                                    newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_already_exist,
-                                            Toast.LENGTH_SHORT);
-                                    if(newPlayListId < 0){
-                                        return;
-                                    }
-                                    if(mAddAfterCreate){
-                                        ToastUtil.show(AddtoPlayListDialog.this,
-                                                PlayListUtil.addSong(new PlayListSong(mAudioID,newPlayListId,input.toString())) > 0 ? getString(R.string.add_song_playlist_success, 1,input.toString()) : getString(R.string.add_song_playlist_error),
-                                                Toast.LENGTH_SHORT);
-                                    }
-                                }catch (Exception e){
-                                    Util.uploadException("新建" + input + "错误:" + newPlayListId,e);
+                    .input("", "本地歌单" + Global.PlayList.size(), (dialog, input) -> {
+                        if(!TextUtils.isEmpty(input)){
+                            int newPlayListId = -1;
+                            try {
+                                newPlayListId = PlayListUtil.addPlayList(input.toString());
+                                ToastUtil.show(mContext, newPlayListId > 0 ?
+                                                R.string.add_playlist_success :
+                                                newPlayListId == -1 ? R.string.add_playlist_error : R.string.playlist_already_exist,
+                                        Toast.LENGTH_SHORT);
+                                if(newPlayListId < 0){
+                                    return;
                                 }
+                                if(mAddAfterCreate){
+                                    ToastUtil.show(mContext,R.string.add_song_playlist_success,input.toString(), PlayListUtil.addMultiSongs(mList,input.toString(),newPlayListId));
+                                }
+                            }catch (Exception e){
+                                LogUtil.d("AddtoPlayList",e.toString());
                             }
                         }
                     })
-                    .dismissListener(new DialogInterface.OnDismissListener() {
-                        @Override
-                        public void onDismiss(DialogInterface dialog) {
-                            finish();
-                        }
-                    })
+                    .dismissListener(dialog -> finish())
                     .show();
 
         }

@@ -30,6 +30,7 @@ import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
@@ -60,7 +61,7 @@ public class OptionDialog extends BaseDialogActivity {
     SimpleDraweeView mDraweeView;
 
     //当前正在播放的歌曲
-    private Song mInfo = null;
+    private Song mSong = null;
     //是否是删除播放列表中歌曲
     private boolean mIsDeletePlayList = false;
     //播放列表名字
@@ -72,16 +73,16 @@ public class OptionDialog extends BaseDialogActivity {
         setContentView(R.layout.dialog_option);
         ButterKnife.bind(this);
 
-        mInfo = getIntent().getExtras().getParcelable("Song");
-        if(mInfo == null)
+        mSong = getIntent().getExtras().getParcelable("Song");
+        if(mSong == null)
             return;
         if(mIsDeletePlayList = getIntent().getExtras().getBoolean("IsDeletePlayList", false)){
             mPlayListName = getIntent().getExtras().getString("PlayListName");
         }
 
         //设置歌曲名与封面
-        mTitle.setText(String.format("%s-%s", mInfo.getTitle(), mInfo.getArtist()));
-        new LibraryUriRequest(mDraweeView, ImageUriUtil.getSearchRequestWithAlbumType(mInfo),new RequestConfig.Builder(SMALL_IMAGE_SIZE,SMALL_IMAGE_SIZE).build()).load();
+        mTitle.setText(String.format("%s-%s", mSong.getTitle(), mSong.getArtist()));
+        new LibraryUriRequest(mDraweeView, ImageUriUtil.getSearchRequestWithAlbumType(mSong),new RequestConfig.Builder(SMALL_IMAGE_SIZE,SMALL_IMAGE_SIZE).build()).load();
         //置于底部
         Window w = getWindow();
 //        w.setWindowAnimations(R.style.AnimBottom);
@@ -116,7 +117,7 @@ public class OptionDialog extends BaseDialogActivity {
                 MobclickAgent.onEvent(this,"AddtoPlayList");
                 Intent intentAdd = new Intent(OptionDialog.this,AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
-                ardAdd.putInt("Id",mInfo.getId());
+                ardAdd.putInt("Id", mSong.getId());
                 intentAdd.putExtras(ardAdd);
                 startActivity(intentAdd);
                 finish();
@@ -124,23 +125,19 @@ public class OptionDialog extends BaseDialogActivity {
             //设置铃声
             case R.id.popup_ring:
                 MobclickAgent.onEvent(this,"Ring");
-                MediaStoreUtil.setRing(this,mInfo.getId());
+                MediaStoreUtil.setRing(this, mSong.getId());
                 finish();
                 break;
             //分享
             case R.id.popup_share:
 //                Intent intent = new Intent(MusicService.ACTION_CMD);
 //                intent.putExtra("Control",Constants.ADD_TO_NEXT_SONG);
-//                intent.putExtra("song",mInfo);
+//                intent.putExtra("song",mSong);
 //                sendBroadcast(intent);
 //                finish();
                 MobclickAgent.onEvent(this,"Share");
-                Intent intentShare = new Intent(mContext,ShareDialog.class);
-                Bundle argShare = new Bundle();
-                argShare.putParcelable("Song",mInfo);
-                argShare.putInt("Type",Constants.SHARESONG);
-                intentShare.putExtras(argShare);
-                startActivity(intentShare);
+                startActivity(
+                        Intent.createChooser(Util.createShareSongFileIntent(mSong, mContext), null));
                 finish();
                 break;
             //删除
@@ -158,8 +155,8 @@ public class OptionDialog extends BaseDialogActivity {
                                 if(which == POSITIVE){
                                     MobclickAgent.onEvent(mContext,"Delete");
                                     boolean deleteSuccess = !mIsDeletePlayList ?
-                                            MediaStoreUtil.delete(mInfo.getId() , Constants.SONG,dialog.isPromptCheckBoxChecked()) > 0 :
-                                            PlayListUtil.deleteSong(mInfo.getId(),mPlayListName);
+                                            MediaStoreUtil.delete(mSong.getId() , Constants.SONG,dialog.isPromptCheckBoxChecked()) > 0 :
+                                            PlayListUtil.deleteSong(mSong.getId(),mPlayListName);
 
                                     ToastUtil.show(mContext,deleteSuccess ? R.string.delete_success : R.string.delete_error);
                                     finish();

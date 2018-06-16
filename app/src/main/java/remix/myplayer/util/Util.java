@@ -5,7 +5,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
@@ -15,16 +15,18 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
+import android.os.Parcelable;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -35,11 +37,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.SaveListener;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
-import remix.myplayer.bean.bmob.Error;
+import remix.myplayer.bean.mp3.Song;
 
 /**
  * Created by Remix on 2015/11/30.
@@ -140,6 +140,8 @@ public class Util {
      * @param directory
      */
     public static void deleteFilesByDirectory(File directory) {
+        if(directory == null)
+            return;
         if(directory.isFile()){
             deleteFileSafely(directory);
             return;
@@ -174,7 +176,7 @@ public class Util {
     /**
      * 防止修改字体大小
      */
-    public static void setFontSize(APlayerApplication Application) {
+    public static void setFontSize(App Application) {
         Resources resource = Application.getResources();
         Configuration c = resource.getConfiguration();
         c.fontScale = 1.0f;
@@ -368,206 +370,6 @@ public class Util {
     }
 
     /**
-     * 根据歌曲名和歌手请求歌曲信息
-     * @param songname
-     * @param artistname
-     * @return
-     */
-    public static JSONObject getSongJsonObject(String songname, String artistname,long duration){
-        URL lrcIdUrl = null;
-        try {
-            //歌词迷
-//            lrcIdUrl = new URL("http://gecimi.com/api/lyric/" + songname + "/" + artistname);
-            //酷狗
-            lrcIdUrl = new URL("http://lyrics.kugou.com/search?ver=1&man=yes&client=pc&keyword="
-                            + artistname + "-" + songname + "&duration=" + duration + "&hash=");
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
-        BufferedReader br = null;
-        String s;
-        StringBuilder strBuffer = new StringBuilder();
-        try {
-            if(lrcIdUrl == null)
-                return new JSONObject("");
-            HttpURLConnection httpConn = (HttpURLConnection) lrcIdUrl.openConnection();
-            httpConn.setConnectTimeout(10000);
-            httpConn.connect();
-            InputStreamReader inReader = new InputStreamReader(httpConn.getInputStream());
-            br = new BufferedReader(inReader);
-            if(br == null)
-                return null;
-            while((s = br.readLine()) != null){
-                strBuffer.append(s);
-            }
-            return new JSONObject(strBuffer.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if(br != null) {
-                    br.close();
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return null;
-    }
-
-
-    /**
-     * 查找歌曲的lrc文件
-     * @param songName
-     * @param searchPath
-     */
-    public static void searchFile(String displayName,String songName,String artistName,File searchPath) {
-        //判断SD卡是否存在
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File[] files = searchPath.listFiles();
-            if(files == null || files.length == 0)
-                return;
-            for(File file : files){
-                if (file.isDirectory() && file.canRead()){
-                    searchFile(displayName,songName,artistName,file);
-                } else {
-                    if(isRightLrc(file,displayName,songName,artistName)){
-                        Global.CurrentLrcPath = file.getAbsolutePath();
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 判断是否是相匹配的歌词
-     * @param file
-     * @param title
-     * @param artist
-     * @return
-     */
-    public static boolean isRightLrc(File file,String displayName,String title,String artist){
-        BufferedReader br = null;
-        try {
-            if(file == null || !file.canRead() || !file.isFile())
-                return false;
-            if(TextUtils.isEmpty(file.getAbsolutePath()) || TextUtils.isEmpty(displayName) ||
-                    TextUtils.isEmpty(title) || TextUtils.isEmpty(artist))
-                return false;
-            //仅判断.lrc文件
-            if(!file.getName().endsWith("lrc"))
-                return false;
-            //暂时忽略网易云的歌词
-            if(file.getAbsolutePath().contains("netease/cloudmusic/"))
-                return false;
-            String fileName = file.getName().indexOf('.') > 0 ?
-                    file.getName().substring(0,file.getName().lastIndexOf('.')) : file.getName();
-            //判断歌词文件名与歌曲文件名是否一致
-            if(fileName.toUpperCase().startsWith(displayName.toUpperCase())) {
-                return true;
-            }
-            //判断是否包含歌手名和歌曲名
-            if(fileName.toUpperCase().contains(title.toUpperCase()) && fileName.toUpperCase().contains(artist.toUpperCase())){
-                return true;
-            }
-            //读取前五行歌词内容进行判断
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            boolean hasArtist = false;
-            boolean hasTitle = false;
-            for(int i = 0 ; i < 5;i++){
-                String lrcLine = "";
-                if((lrcLine = br.readLine()) == null)
-                    break;
-                if(lrcLine.contains("ar") && lrcLine.toUpperCase().contains(artist.toUpperCase())) {
-                    hasArtist = true;
-                    continue;
-                }
-                if(lrcLine.contains("ti") && lrcLine.toUpperCase().contains(title.toUpperCase())) {
-                    hasTitle = true;
-                }
-            }
-            if(hasArtist && hasTitle){
-                return true;
-            }
-        } catch (Exception e) {
-
-        } finally {
-            try {
-                if(br != null){
-                    br.close();
-                }
-            } catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 手动上传日志信息
-     */
-    public static void uploadException(String title,String description){
-        try {
-            if(!Util.isNetWorkConnected()){
-                return;
-            }
-            PackageManager pm = APlayerApplication.getContext().getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
-            Error error = new Error(title,description,
-                    pi.versionName,
-                    pi.versionCode + "",
-                    Build.DISPLAY,
-                    Build.CPU_ABI + "," + Build.CPU_ABI2,
-                    Build.MANUFACTURER,
-                    Build.MODEL,
-                    Build.VERSION.RELEASE,
-                    Build.VERSION.SDK_INT + "");
-            error.save(new SaveListener<String>() {
-                @Override
-                public void done(String s, BmobException e) {
-                }
-            });
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 手动上传异常
-     */
-    public static void uploadException(String title,Exception exception){
-        try {
-            if(!Util.isNetWorkConnected()){
-                return;
-            }
-            PackageManager pm = APlayerApplication.getContext().getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
-            Error error = new Error(title,exception.toString(),
-                    pi.versionName,
-                    pi.versionCode + "",
-                    Build.DISPLAY,
-                    Build.CPU_ABI + "," + Build.CPU_ABI2,
-                    Build.MANUFACTURER,
-                    Build.MODEL,
-                    Build.VERSION.RELEASE,
-                    Build.VERSION.SDK_INT + "");
-            error.save(new SaveListener<String>() {
-                @Override
-                public void done(String s, BmobException e) {
-                }
-            });
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * 根据字符串形式的时间，得到毫秒值
      * @param strTime 时间字符串
      * @return
@@ -613,6 +415,71 @@ public class Util {
     public static boolean isWifi(Context context) {
         NetworkInfo activeNetInfo = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         return activeNetInfo != null && activeNetInfo.getType() == ConnectivityManager.TYPE_WIFI;
+    }
+
+    /**
+     * 获取app当前的渠道号或application中指定的meta-data
+     *
+     * @return 如果没有获取成功(没有对应值，或者异常)，则返回值为空
+     */
+    public static String getAppMetaData(String key) {
+        if (TextUtils.isEmpty(key)) {
+            return null;
+        }
+        String channelNumber = null;
+        try {
+            PackageManager packageManager = App.getContext().getPackageManager();
+            if (packageManager != null) {
+                ApplicationInfo applicationInfo = packageManager.getApplicationInfo(App.getContext().getPackageName(), PackageManager.GET_META_DATA);
+                if (applicationInfo != null) {
+                    if (applicationInfo.metaData != null) {
+                        channelNumber = applicationInfo.metaData.getString(key);
+                    }
+                }
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return channelNumber;
+    }
+
+    @NonNull
+    public static Intent createShareSongFileIntent(@NonNull final Song song, Context context) {
+        try {
+            Parcelable parcelable = FileProvider.getUriForFile(context,
+                    "cn.bmob.update.fileprovider",
+                    new File(song.getUrl()));
+            return new Intent()
+                    .setAction(Intent.ACTION_SEND)
+                    .putExtra(Intent.EXTRA_STREAM,
+                            parcelable)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    .setType("audio/*");
+        } catch (IllegalArgumentException e) {
+            //the path is most likely not like /storage/emulated/0/... but something like /storage/28C7-75B0/...
+            e.printStackTrace();
+            Toast.makeText(context, context.getString(R.string.cant_share_song), Toast.LENGTH_SHORT).show();
+            return new Intent();
+        }
+    }
+
+    @NonNull
+    public static Intent createShareImageFileIntent(@NonNull final File file, Context context) {
+        try {
+            Parcelable parcelable = FileProvider.getUriForFile(context,
+                    "cn.bmob.update.fileprovider",
+                    file);
+            return new Intent()
+                    .setAction(Intent.ACTION_SEND)
+                    .putExtra(Intent.EXTRA_STREAM,
+                            parcelable)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    .setType("image/*");
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            Toast.makeText(context, context.getString(R.string.cant_share_song), Toast.LENGTH_SHORT).show();
+            return new Intent();
+        }
     }
 
 }

@@ -10,10 +10,16 @@ public class PlayList {
     public int _Id;
     public String Name;
     public int Count;
+    public int Date;
     public PlayList(){}
     public PlayList(String name, int count) {
         Name = name;
         Count = count;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 
     public int getId() {
@@ -38,5 +44,23 @@ public class PlayList {
 
     public void setCount(int count) {
         Count = count;
+    }
+
+    public int getDate() {
+        return Date;
+    }
+
+    public void setDate(int date) {
+        Date = date;
+    }
+
+    @Override
+    public String toString() {
+        return "PlayList{" +
+                "_Id=" + _Id +
+                ", Name='" + Name + '\'' +
+                ", Count=" + Count +
+                ", Date=" + Date +
+                '}';
     }
 }

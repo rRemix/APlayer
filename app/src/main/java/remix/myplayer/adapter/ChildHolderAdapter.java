@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -22,13 +23,11 @@ import com.github.promeg.pinyinhelper.Pinyin;
 import java.util.ArrayList;
 
 import butterknife.BindView;
-import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
-import remix.myplayer.interfaces.SortChangeCallback;
-import remix.myplayer.listener.SongPopupListener;
+import remix.myplayer.menu.SongPopupListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -41,7 +40,6 @@ import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.LogUtil;
-import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -49,24 +47,11 @@ import remix.myplayer.util.ToastUtil;
  */
 @SuppressLint("RestrictedApi")
 public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> implements FastScroller.SectionIndexer,OnUpdateHighLightListener{
-    //升序
-    public static final int ASC = 0;
-    //降序
-    public static final int DESC = 1;
-    //按字母排序
-    public static final int NAME = 0;
-    //按添加时间排序
-    public static final int ADDTIME = 1;
     private int mType;
     private String mArg;
     private MultiChoice mMultiChoice;
     private Drawable mDefaultDrawable;
     private Drawable mSelectDrawable;
-    private SortChangeCallback mCallback;
-    //当前是升序还是降序 0:升序 1:降序
-    public static int ASC_DESC = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"SubDirAscDesc", ASC);
-    //当前是按字母排序还是添加时间 0:字母 1:时间
-    public static int SORT = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"SubDirSort", NAME);
     private RecyclerView mRecyclerView;
     private int mLastIndex;
 
@@ -80,10 +65,6 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
         int size = DensityUtil.dip2px(mContext,60);
         mDefaultDrawable = Theme.getShape(GradientDrawable.RECTANGLE,Color.TRANSPARENT,size,size);
         mSelectDrawable = Theme.getShape(GradientDrawable.RECTANGLE,ThemeStore.getSelectColor(),size,size);
-    }
-
-    public void setCallback(SortChangeCallback callback){
-        mCallback = callback;
     }
 
     @Override
@@ -103,12 +84,20 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
                 return;
             }
             //显示当前排序方式
-            headerHolder.mAscDesc.setText(ASC_DESC != ASC ? R.string.sort_as_desc : R.string.sort_as_asc);
-            headerHolder.mSort.setText(SORT != NAME ?  R.string.sort_as_add_time : R.string.sort_as_letter);
-            View.OnClickListener listener = v -> OnClick(headerHolder,v);
-            headerHolder.mSort.setOnClickListener(listener);
-            headerHolder.mAscDesc.setOnClickListener(listener);
-            headerHolder.mShuffle.setOnClickListener(listener);
+            headerHolder.mShuffle.setOnClickListener(v -> {
+                Intent intent = new Intent(MusicService.ACTION_CMD);
+                intent.putExtra("Control", Constants.NEXT);
+                intent.putExtra("shuffle",true);
+                //设置正在播放列表
+                ArrayList<Integer> IDList = new ArrayList<>();
+                for (Song info : mDatas)
+                    IDList.add(info.getId());
+                if(IDList.size() == 0){
+                    ToastUtil.show(mContext,R.string.no_song);
+                    return;
+                }
+                Global.setPlayQueue(IDList,mContext,intent);
+            });
             return;
         }
 
@@ -143,12 +132,12 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
 //            }
 
             //是否无损
-            if(!TextUtils.isEmpty(song.getDisplayname())){
-                String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
-                holder.mSQ.setVisibility(!TextUtils.isEmpty(prefix) && (prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")) ? View.VISIBLE : View.GONE);
-            } else {
-                holder.mSQ.setVisibility(View.GONE);
-            }
+//            if(!TextUtils.isEmpty(song.getDisplayname())){
+//                String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
+//                holder.mSQ.setVisibility(!TextUtils.isEmpty(prefix) && (prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")) ? View.VISIBLE : View.GONE);
+//            } else {
+//                holder.mSQ.setVisibility(View.GONE);
+//            }
 
             //设置标题
             holder.mTitle.setText(song.getTitle());
@@ -170,8 +159,8 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
                         return;
                     Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
                     final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton, Gravity.END);
-                    popupMenu.getMenuInflater().inflate(R.menu.song_menu, popupMenu.getMenu());
-                    popupMenu.setOnMenuItemClickListener(new SongPopupListener(mContext,song,mType == Constants.PLAYLIST,mArg));
+                    popupMenu.getMenuInflater().inflate(R.menu.menu_song_item, popupMenu.getMenu());
+                    popupMenu.setOnMenuItemClickListener(new SongPopupListener((AppCompatActivity) mContext,song,mType == Constants.PLAYLIST,mArg));
                     popupMenu.show();
 //                    Intent intent = new Intent(mContext, OptionDialog.class);
 //                    intent.putExtra("Song", song);
@@ -193,7 +182,8 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
                     ToastUtil.show(mContext,R.string.illegal_arg);
                     return;
                 }
-                mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition() - 1);
+                if(song != null && song.getId() > 0)
+                    mOnItemClickLitener.onItemClick(v,holder.getAdapterPosition() - 1);
             });
             holder.mContainer.setOnLongClickListener(v -> {
                 if(holder.getAdapterPosition() - 1 < 0){
@@ -211,45 +201,6 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
             mMultiChoice.addView(holder.mContainer);
         } else {
             holder.mContainer.setSelected(false);
-        }
-    }
-
-    public void OnClick(SongAdapter.HeaderHolder headerHolder, View v){
-        switch (v.getId()){
-            case R.id.play_shuffle:
-                Intent intent = new Intent(MusicService.ACTION_CMD);
-                intent.putExtra("Control", Constants.NEXT);
-                intent.putExtra("shuffle",true);
-                //设置正在播放列表
-                ArrayList<Integer> IDList = new ArrayList<>();
-                for (Song info : mDatas)
-                    IDList.add(info.getId());
-                if(IDList.size() == 0){
-                    ToastUtil.show(mContext,R.string.no_song);
-                    return;
-                }
-                Global.setPlayQueue(IDList,mContext,intent);
-                break;
-            case R.id.sort:
-                if(SORT == NAME){
-                    SORT = ADDTIME;
-                } else if(SORT == ADDTIME){
-                    SORT = NAME;
-                }
-                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"SubDirSort",SORT);
-                headerHolder.mSort.setText(SORT != NAME ?  R.string.sort_as_add_time : R.string.sort_as_letter);
-                mCallback.SortChange();
-                break;
-            case R.id.asc_desc:
-                if(ASC_DESC == ASC){
-                    ASC_DESC = DESC;
-                } else if(ASC_DESC == DESC){
-                    ASC_DESC = ASC;
-                }
-                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"SubDirAscDesc",ASC_DESC);
-                headerHolder.mAscDesc.setText(ASC_DESC != ASC ? R.string.sort_as_desc : R.string.sort_as_asc);
-                mCallback.SortChange();
-                break;
         }
     }
 

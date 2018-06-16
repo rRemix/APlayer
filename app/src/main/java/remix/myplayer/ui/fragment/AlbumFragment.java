@@ -124,7 +124,7 @@ public class AlbumFragment extends LibraryFragment<Album,AlbumAdapter>{
 
         @Override
         public List<Album> loadInBackground() {
-            return MediaStoreUtil.getALlAlbum();
+            return MediaStoreUtil.getAllAlbum();
         }
     }
 }

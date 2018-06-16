@@ -5,7 +5,7 @@ import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.util.LogUtil;
 
 /**
@@ -16,12 +16,13 @@ import remix.myplayer.util.LogUtil;
  */
 public class DBOpenHelper extends SQLiteOpenHelper {
     public static final String DBNAME = "playlist.db";
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     public static final String CREATE_TABLE_PLAY_LIST =
             "create table if not exists play_list(" +
                     "_id integer primary key ," +
                     "name text unique," +
-                    "count integer)";
+                    "count integer," +
+                    "date integer)";
     public static final String CREATE_TABLE_PLAY_LIST_SONG =
             "create table if not exists play_list_song(" +
                     "_id integer primary key," +
@@ -61,16 +62,11 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     private static DBOpenHelper mInstance;
     public synchronized static DBOpenHelper getInstance(){
         if(mInstance == null)
-            mInstance = new DBOpenHelper(APlayerApplication.getContext());
+            mInstance = new DBOpenHelper(App.getContext());
         return mInstance;
     }
     public DBOpenHelper(Context context){
-        this(context, DBNAME, null, VERSION, new DatabaseErrorHandler() {
-            @Override
-            public void onCorruption(SQLiteDatabase dbObj) {
-                LogUtil.d("DBError","error occur");
-            }
-        });
+        this(context, DBNAME, null, VERSION, dbObj -> LogUtil.d("DBError","error occur"));
     }
 
     private DBOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
@@ -88,6 +84,8 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        if(newVersion == 2){
+            db.execSQL("alter table play_list add date integer");
+        }
     }
 }

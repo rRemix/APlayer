@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -19,19 +20,23 @@ import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.adapter.SearchAdapter;
 import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.customview.SearchToolBar;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
+import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
 /**
@@ -42,7 +47,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 搜索界面，根据关键字，搜索歌曲名，艺术家，专辑中的记录
  */
-public class SearchActivity extends PermissionActivity<Song,SearchAdapter> {
+public class SearchActivity extends PermissionActivity<Song,SearchAdapter> implements OnTagEditListener{
     //搜索的关键字
     private String mkey;
     //搜索结果的listview
@@ -149,6 +154,10 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter> {
         getLoaderManager().restartLoader(LoaderIds.SEARCH_ACTIVITY, null, this);
     }
 
+    @Override
+    public void onTagEdit(Song newSong) {
+    }
+
     private static class AsyncSearchLoader extends AppWrappedAsyncTaskLoader<List<Song>> {
         private String mkey;
         private AsyncSearchLoader(Context context,String key) {
@@ -158,19 +167,23 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter> {
 
         @Override
         public List<Song> loadInBackground() {
+            if(TextUtils.isEmpty(mkey))
+                return new ArrayList<>();
             Cursor cursor = null;
             List<Song> songs = new ArrayList<>();
             try {
                 String selection = MediaStore.Audio.Media.TITLE + " like ? " + "or " + MediaStore.Audio.Media.ARTIST + " like ? "
-                        + "or " + MediaStore.Audio.Media.ALBUM + " like ? and " + MediaStore.Audio.Media.SIZE + ">" + Constants.SCAN_SIZE + MediaStoreUtil.getBaseSelection();
+                        + "or " + MediaStore.Audio.Media.ALBUM + " like ? and " +  MediaStoreUtil.getBaseSelection();
                 cursor = getContext().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                         null,
                         selection,
                         new String[]{"%" + mkey + "%","%" + mkey + "%","%" + mkey + "%"}, null);
 
                 if (cursor != null && cursor.getCount() > 0) {
+                    Set<String> blackList = SPUtil.getStringSet(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.BLACKLIST_SONG);
                     while (cursor.moveToNext()){
-                        songs.add(MediaStoreUtil.getMP3Info(cursor));
+                        if(!blackList.contains(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID))))
+                            songs.add(MediaStoreUtil.getMP3Info(cursor));
                     }
                 }
             }finally {

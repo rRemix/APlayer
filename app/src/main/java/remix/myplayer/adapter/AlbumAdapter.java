@@ -28,8 +28,7 @@ import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.bean.mp3.Album;
-import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.listener.AlbArtFolderPlaylistListener;
+import remix.myplayer.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.theme.Theme;
@@ -107,16 +106,12 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
         holder.mText2.setText(album.getArtist());
 
         //设置封面
-        final int albumid = album.getAlbumID();
-
+        final int albumId = album.getAlbumID();
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
-        Song song = new Song();
-        song.setArtist(album.getArtist());
-        song.setAlbum(album.getAlbum());
-        song.setAlbumId(albumid);
-        new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequestWithAlbumType(song),new RequestConfig.Builder(imageSize,imageSize).build()).load();
+
+        new LibraryUriRequest(holder.mImage, ImageUriUtil.getSearchRequest(album),new RequestConfig.Builder(imageSize,imageSize).build()).load();
         if(holder instanceof AlbumListHolder){
-            new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumid);
+            new AsynLoadSongNum(holder.mText2,Constants.ALBUM).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,albumId);
         }
 
         //背景点击效果
@@ -160,9 +155,9 @@ public class AlbumAdapter extends HeaderAdapter<Album, BaseViewHolder> implement
                 return;
             Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton,Gravity.END);
-            popupMenu.getMenuInflater().inflate(R.menu.album_menu, popupMenu.getMenu());
+            popupMenu.getMenuInflater().inflate(R.menu.menu_album_item, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new AlbArtFolderPlaylistListener(mContext,
-                    albumid,
+                    albumId,
                     Constants.ALBUM,
                     album.getAlbum()));
             popupMenu.show();

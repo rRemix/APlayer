@@ -1,7 +1,6 @@
 package remix.myplayer.ui.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -20,9 +19,6 @@ import com.umeng.analytics.MobclickAgent;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import cn.bmob.v3.exception.BmobException;
-import cn.bmob.v3.listener.SaveListener;
-import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.bean.bmob.Feedback;
 import remix.myplayer.theme.Theme;
@@ -30,6 +26,8 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ToastUtil;
+
+import static remix.myplayer.App.IS_GOOGLEPLAY;
 
 /**
  * Created by taeja on 16-3-7.
@@ -48,6 +46,7 @@ public class FeedBackActivity extends ToolbarActivity {
     EditText mContact;
     @BindView(R.id.feedback_submit)
     Button mSubmit;
+
     Feedback mFeedBack = new Feedback();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,35 +58,6 @@ public class FeedBackActivity extends ToolbarActivity {
         mSubmit.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0,ThemeStore.getAccentColor()));
         mContent.setBackground(Theme.getCorner(1.0f,DensityUtil.dip2px(this,2),0, ColorUtil.getColor(R.color.gray_e2e2e2)));
         Theme.setTint(mContact,ThemeStore.getMaterialPrimaryColor(),false);
-    }
-
-    public static void commitByBomb(Context context, String content, String contact){
-        try {
-            if(TextUtils.isEmpty(content)){
-                return;
-            }
-            PackageManager pm = APlayerApplication.getContext().getPackageManager();
-            PackageInfo pi = pm.getPackageInfo(APlayerApplication.getContext().getPackageName(), PackageManager.GET_ACTIVITIES);
-            Feedback feedback =  new Feedback(content,
-                    contact,
-                    pi.versionName,
-                    pi.versionCode + "",
-                    Build.DISPLAY,
-                    Build.CPU_ABI + "," + Build.CPU_ABI2,
-                    Build.MANUFACTURER,
-                    Build.MODEL,
-                    Build.VERSION.RELEASE,
-                    Build.VERSION.SDK_INT + ""
-            );
-
-            feedback.save(new SaveListener<String>() {
-                @Override
-                public void done(String s, BmobException e) {
-                }
-            });
-        } catch (PackageManager.NameNotFoundException e) {
-
-        }
     }
 
     @OnClick(R.id.feedback_submit)
@@ -111,17 +81,6 @@ public class FeedBackActivity extends ToolbarActivity {
                     Build.VERSION.SDK_INT + ""
             );
             commitByEmail();
-//            mFeedBack.save(new SaveListener<String>() {
-//                @Override
-//                public void done(String s, BmobException e) {
-//                    if(e == null){
-//                        ToastUtil.show(FeedBackActivity.this,R.string.send_success);
-//                        finish();
-//                    } else {
-//                        commitByEmail();
-//                    }
-//                }
-//            });
         } catch (PackageManager.NameNotFoundException e) {
             ToastUtil.show(FeedBackActivity.this,R.string.send_error);
         }
@@ -129,7 +88,7 @@ public class FeedBackActivity extends ToolbarActivity {
 
     private void commitByEmail(){
         Intent data = new Intent(Intent.ACTION_SENDTO);
-        data.setData(Uri.parse("mailto:568920427@qq.com"));
+        data.setData(Uri.parse(!IS_GOOGLEPLAY ? "mailto:568920427@qq.com" : "rRemix.me@gmail.com"));
         data.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback));
         data.putExtra(Intent.EXTRA_TEXT, mContent.getText().toString() + "\n\n\n" + mFeedBack);
         startActivityForResult(data,0);

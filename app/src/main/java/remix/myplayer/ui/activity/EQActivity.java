@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import remix.myplayer.APlayerApplication;
+import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -70,11 +70,11 @@ public class EQActivity extends ToolbarActivity {
                     int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
                     LogUtil.d(TAG,"AudioSessionId:" + AudioSessionId);
                     if(AudioSessionId  == 0) {
-                        Util.uploadException("AudioSessionId","is zero");
+                        LogUtil.d(TAG,"AudioSessionId Error");
                         return;
                     }
                     //是否启用音效设置
-                    mEnable = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"EnableEQ",false) & Global.getHeadsetOn();
+                    mEnable = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"EnableEQ",false) & Global.getHeadsetOn();
 
                     //EQ
                     mEqualizer = new Equalizer(0, AudioSessionId);
@@ -85,7 +85,7 @@ public class EQActivity extends ToolbarActivity {
 
                     //得到之前存储的每个频率的db值
                     for(short i = 0 ; i < mBandNumber; i++){
-                        short temp = (short)(SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"Band" + i,0));
+                        short temp = (short)(SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"Band" + i,0));
                         mBandFrequencys.add(temp);
                         if (mEnable){
                             mEqualizer.setBandLevel(i,temp);
@@ -109,7 +109,7 @@ public class EQActivity extends ToolbarActivity {
                     //初始化完成
                     mHasInitial = true;
                 }catch (Exception e){
-                    Util.uploadException("均衡器初始化失败",e);
+                    LogUtil.d(TAG,e.toString());
                 }
             }
 

@@ -7,7 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.provider.MediaStore;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -25,13 +25,11 @@ import com.github.promeg.pinyinhelper.Pinyin;
 import java.util.ArrayList;
 
 import butterknife.BindView;
-import remix.myplayer.APlayerApplication;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
-import remix.myplayer.interfaces.SortChangeCallback;
-import remix.myplayer.listener.SongPopupListener;
+import remix.myplayer.menu.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.service.MusicService;
@@ -46,7 +44,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
 
 import static remix.myplayer.request.ImageUriRequest.SMALL_IMAGE_SIZE;
@@ -60,21 +57,15 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * Created by Remix on 2016/4/11.
  */
 public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements FastScroller.SectionIndexer,OnUpdateHighLightListener {
-    //升序还是降序
-    public static String ASCDESC = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"AscDesc"," asc");
-    //按字母排序还是按添加时间排序
-    public static String SORT = SPUtil.getValue(APlayerApplication.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-
     protected MultiChoice mMultiChoice;
     private int mType;
     public static final int ALLSONG = 0;
     public static final int RECENTLY = 1;
     private final Drawable mDefaultDrawable;
     private final Drawable mSelectDrawable;
-    private SortChangeCallback mCallback;
 
     private final RecyclerView mRecyclerView;
-    private int mLastIndex;
+    private int mLastIndex = 1;
 
     public SongAdapter(Context context,int layoutId, MultiChoice multiChoice, int type,RecyclerView recyclerView) {
         super(context,layoutId,multiChoice);
@@ -84,10 +75,6 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         int size = DensityUtil.dip2px(mContext,60);
         mDefaultDrawable = Theme.getShape(GradientDrawable.OVAL,Color.TRANSPARENT,size,size);
         mSelectDrawable = Theme.getShape(GradientDrawable.OVAL,ThemeStore.getSelectColor(),size,size);
-    }
-
-    public void setChangeCallback(SortChangeCallback callback){
-        mCallback = callback;
     }
 
     @Override
@@ -118,17 +105,28 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
                 headerHolder.mRoot.setVisibility(View.VISIBLE);
             }
 
-            if(mType == RECENTLY){
-                //最近添加 隐藏排序方式
-                headerHolder.mSortContainer.setVisibility(View.GONE);
-            }
-            //显示当前排序方式
-            headerHolder.mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? R.string.sort_as_add_time : R.string.sort_as_letter);
-            headerHolder.mAscDesc.setText(!ASCDESC.equals(" asc") ? R.string.sort_as_desc : R.string.sort_as_asc);
-            View.OnClickListener listener = v -> OnClick(headerHolder,v);
-            headerHolder.mSort.setOnClickListener(listener);
-            headerHolder.mAscDesc.setOnClickListener(listener);
-            headerHolder.mShuffle.setOnClickListener(listener);
+            headerHolder.mShuffle.setOnClickListener(v -> {
+                Intent intent = new Intent(MusicService.ACTION_CMD);
+                intent.putExtra("Control", Constants.NEXT);
+                intent.putExtra("shuffle",true);
+                if(mType == ALLSONG){
+                    if(Global.AllSongList == null || Global.AllSongList.size() == 0){
+                        ToastUtil.show(mContext,R.string.no_song);
+                        return;
+                    }
+                    Global.setPlayQueue(Global.AllSongList,mContext,intent);
+                } else {
+                    ArrayList<Integer> IdList = new ArrayList<>();
+                    for(int i = 0 ; i < mDatas.size();i++){
+                        IdList.add(mDatas.get(i).getId());
+                    }
+                    if(IdList.size() == 0){
+                        ToastUtil.show(mContext,R.string.no_song);
+                        return;
+                    }
+                    Global.setPlayQueue(IdList,mContext,intent);
+                }
+            });
             return;
         }
 
@@ -162,11 +160,11 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         //封面
         new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
 
-        //是否为无损
-        if(!TextUtils.isEmpty(song.getDisplayname())){
-            String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
-            holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
-        }
+//        //是否为无损
+//        if(!TextUtils.isEmpty(song.getDisplayname())){
+//            String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
+//            holder.mSQ.setVisibility(prefix.equals("flac") || prefix.equals("ape") || prefix.equals("wav")? View.VISIBLE : View.GONE);
+//        }
 
         //设置歌曲名
         holder.mName.setText(song.getTitle());
@@ -193,8 +191,8 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
                 return;
             Context wrapper = new ContextThemeWrapper(mContext,Theme.getPopupMenuStyle());
             final PopupMenu popupMenu = new PopupMenu(wrapper,holder.mButton, Gravity.END);
-            popupMenu.getMenuInflater().inflate(R.menu.song_menu, popupMenu.getMenu());
-            popupMenu.setOnMenuItemClickListener(new SongPopupListener(mContext,song,false,""));
+            popupMenu.getMenuInflater().inflate(R.menu.menu_song_item, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new SongPopupListener((AppCompatActivity) mContext,song,false,""));
             popupMenu.show();
         });
 
@@ -230,57 +228,6 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
             }
         }
     }
-
-    protected void OnClick(HeaderHolder headerHolder, View v){
-        switch (v.getId()){
-            case R.id.play_shuffle:
-                Intent intent = new Intent(MusicService.ACTION_CMD);
-                intent.putExtra("Control", Constants.NEXT);
-                intent.putExtra("shuffle",true);
-                if(mType == ALLSONG){
-                    if(Global.AllSongList == null || Global.AllSongList.size() == 0){
-                        ToastUtil.show(mContext,R.string.no_song);
-                        return;
-                    }
-                    Global.setPlayQueue(Global.AllSongList,mContext,intent);
-                } else {
-                    ArrayList<Integer> IdList = new ArrayList<>();
-                    for(int i = 0 ; i < mDatas.size();i++){
-                        IdList.add(mDatas.get(i).getId());
-                    }
-                    if(IdList.size() == 0){
-                        ToastUtil.show(mContext,R.string.no_song);
-                        return;
-                    }
-                    Global.setPlayQueue(IdList,mContext,intent);
-                }
-
-                break;
-            case R.id.asc_desc:
-                if(ASCDESC.equals(" asc")){
-                    ASCDESC = " desc";
-                } else {
-                    ASCDESC = " asc";
-                }
-                headerHolder.mAscDesc.setText(!ASCDESC.equals(" asc") ? R.string.sort_as_desc : R.string.sort_as_asc);
-                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"AscDesc", ASCDESC);
-                mCallback.SortChange();
-                break;
-            case R.id.sort:
-//                ASCDESC = SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,"AscDesc"," asc");
-//                SORT = SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,"Sort",MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-                if(SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER)){
-                    SORT = MediaStore.Audio.Media.DATE_ADDED;
-                } else {
-                    SORT = MediaStore.Audio.Media.DEFAULT_SORT_ORDER;
-                }
-                headerHolder.mSort.setText(!SORT.equals(MediaStore.Audio.Media.DEFAULT_SORT_ORDER) ? R.string.sort_as_add_time : R.string.sort_as_letter);
-                SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"Sort",SORT);
-                mCallback.SortChange();
-                break;
-        }
-    }
-
     @Override
     public String getSectionText(int position) {
         if(position == 0)
@@ -360,12 +307,6 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
         View mDivider;
         @BindView(R.id.play_shuffle)
         View mShuffle;
-        @BindView(R.id.asc_desc)
-        TextView mAscDesc;
-        @BindView(R.id.sort)
-        TextView mSort;
-        @BindView(R.id.sort_container)
-        View mSortContainer;
 
         HeaderHolder(View itemView) {
             super(itemView);

@@ -98,10 +98,7 @@ public class Global {
                     deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
                     addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
                 } catch (Exception e){
-                    Util.uploadException("setPlayQueue Error",e);
-                } finally {
-                    if(addRow == 0)
-                        Util.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
+                    LogUtil.d("Global",e.toString());
                 }
 
             }
@@ -118,7 +115,7 @@ public class Global {
             @Override
             public void run() {
                 //当前模式是随机播放 或者即将设置为随机播放 都要更新mRandomList
-                boolean shuffle = intent.getBooleanExtra("shuffle",false) | SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME, "PlayModel",Constants.PLAY_LOOP) == Constants.PLAY_SHUFFLE;
+                boolean shuffle = intent.getBooleanExtra("shuffle",false) | SPUtil.getValue(context,SPUtil.SETTING_KEY.SETTING_NAME,  SPUtil.SETTING_KEY.PLAY_MODEL,Constants.PLAY_LOOP) == Constants.PLAY_SHUFFLE;
                 if(newQueueIdList == null || newQueueIdList.size() == 0){
                     return;
                 }
@@ -144,10 +141,7 @@ public class Global {
                     deleteRow = PlayListUtil.clearTable(Constants.PLAY_QUEUE);
                     addRow = PlayListUtil.addMultiSongs(PlayQueue,Constants.PLAY_QUEUE, PlayQueueID);
                 } catch (Exception e){
-                    Util.uploadException("setPlayQueue Error",e);
-                } finally {
-                    if(addRow == 0)
-                        Util.uploadException("updateDB","deleteRow:" + deleteRow + " addRow:" + addRow);
+                    LogUtil.d("Global",e.toString());
                 }
             }
         }.start();
@@ -169,11 +163,6 @@ public class Global {
         }
         return PlayListUtil.addMultiSongs(infos);
     }
-
-    /**
-     * 当前播放歌曲的lrc文件路径
-     */
-    public static String CurrentLrcPath = "";
 
     /**
      * 所有可能的歌词目录
