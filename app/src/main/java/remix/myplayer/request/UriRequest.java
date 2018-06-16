@@ -65,19 +65,19 @@ public class UriRequest implements Serializable {
             if(isTitleAvailable){
                 //艺术家合法
                 if(isArtistAvailable){
-                    return mArtistName + "-" + mTitle;
+                    return mTitle + "-" + mArtistName;
                 }
                 //专辑名合法
                 if(isAlbumAvailable){
-                    return mAlbumName + "-" + mTitle;
+                    return mTitle + "-" + mAlbumName;
                 }
             }
             //根据专辑名字查询
-//            if(isAlbumAvailable && isArtistAvailable){
-//                return mArtistName + "-" + mAlbumName;
-//            }
-            if(isAlbumAvailable)
-                return mAlbumName;
+            if(isAlbumAvailable && isArtistAvailable){
+                return mArtistName + "-" + mAlbumName;
+            }
+//            if(isAlbumAvailable)
+//                return mAlbumName;
         }else if(mSearchType == ImageUriRequest.URL_ARTIST){
             if(isArtistAvailable)
                 return mArtistName;
