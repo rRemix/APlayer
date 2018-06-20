@@ -231,7 +231,6 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
             mNewBitMap.recycle();
     }
 
-    private int flag ;
     @Override
     public void UpdateUI(Song Song, boolean isplay) {
         mInfo = Song;
