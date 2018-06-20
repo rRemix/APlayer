@@ -4,13 +4,13 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 
 import remix.myplayer.lyric.bean.LrcRow;
-import remix.myplayer.util.LogUtil;
 
 /**
  * @ClassName
@@ -28,6 +28,8 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
     private LrcRow mCurLrcRow;
     /** 当前歌词的字符串所占的控件*/
     private Rect mTextRect = new Rect();
+    /** 垂直便宜*/
+    private int mOffsetY;
     /***
      * 监听属性动画的数值值的改变
      */
@@ -90,31 +92,32 @@ public class FloatTextView extends android.support.v7.widget.AppCompatTextView {
         super.onDraw(canvas);
         if(mCurLrcRow == null)
             return;
-        canvas.drawText(mCurLrcRow.getContent(), mCurTextXForHighLightLrc,(getHeight() + mTextRect.height()) / 2,getPaint());
+        canvas.drawText(mCurLrcRow.getContent(),
+                mCurTextXForHighLightLrc,
+                (getHeight() - getPaint().getFontMetrics().top - getPaint().getFontMetrics().bottom) / 2,
+                getPaint());
     }
 
-    public void setLrcRow(LrcRow lrcRow){
+    public void setLrcRow(@NonNull LrcRow lrcRow){
         if(lrcRow.getTime() != 0 && mCurLrcRow != null && mCurLrcRow.getTime() == lrcRow.getTime())
             return;
         mCurLrcRow = lrcRow;
-        LogUtil.d("FloatTextView","SetLrcRow: " + lrcRow);
 //        setText(mCurLrcRow.getContent());
 
-        if(mCurLrcRow != null){
-            Paint paint = getPaint();
-            if(paint == null)
-                return;
-            String text = mCurLrcRow.getContent();
-            paint.getTextBounds(text,0,text.length(),mTextRect);
-            float textWidth = mTextRect.width();
-            if(textWidth > getWidth()){
-                //如果歌词宽度大于view的宽，则需要动态设置歌词的起始x坐标，以实现水平滚动
-                startScrollLrc(getWidth() - textWidth, (long) (mCurLrcRow.getTotalTime() * 0.85));
-            }else{
-                //如果歌词宽度小于view的宽，则让歌词居中显示
-                mCurTextXForHighLightLrc = (getWidth() - textWidth) / 2;
-                invalidate();
-            }
+        TextPaint paint = getPaint();
+        if(paint == null)
+            return;
+        String text = mCurLrcRow.getContent();
+        paint.getTextBounds(text,0,text.length(),mTextRect);
+        float textWidth = mTextRect.width();
+        mOffsetY = (int) ((mTextRect.bottom + mTextRect.top - paint.getFontMetrics().bottom - paint.getFontMetrics().top) / 2);
+        if(textWidth > getWidth()){
+            //如果歌词宽度大于view的宽，则需要动态设置歌词的起始x坐标，以实现水平滚动
+            startScrollLrc(getWidth() - textWidth, (long) (mCurLrcRow.getTotalTime() * 0.85));
+        }else{
+            //如果歌词宽度小于view的宽，则让歌词居中显示
+            mCurTextXForHighLightLrc = (getWidth() - textWidth) / 2;
+            invalidate();
         }
 
     }
