@@ -182,7 +182,7 @@ public class CircleSeekBar extends AbsSeekBar {
                 mRad += 0.5 * Math.PI;
             else
                 mRad = 2.5 * Math.PI + mRad;
-            setThumbPostion(mRad);
+            setThumbPosition(mRad);
             //设置当前进度
             mProgress = (int)(Math.toDegrees(mRad) / 360.0 * mProgressMax);
             //设置thumb状态
@@ -198,7 +198,7 @@ public class CircleSeekBar extends AbsSeekBar {
      * 根据弧度计算偏移量
      * @param radian 滑过的弧度
      */
-    private void setThumbPostion(double radian) {
+    private void setThumbPosition(double radian) {
         mOffsetX = (float) Math.sin(radian) * mRadius;
         mOffsetY = -(float) Math.cos(radian) * mRadius;
     }
@@ -300,7 +300,7 @@ public class CircleSeekBar extends AbsSeekBar {
             progress = 0;
         mProgress = progress;
         mRad = Math.toRadians(progress * 360.0 / mProgressMax );
-        setThumbPostion(mRad);
+        setThumbPosition(mRad);
         invalidate();
     }
 

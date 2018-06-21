@@ -3,6 +3,7 @@ package remix.myplayer.ui.activity;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -65,10 +66,12 @@ import remix.myplayer.lyric.LrcView;
 import remix.myplayer.menu.AudioPopupListener;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.tageditor.TagReceiver;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.network.RxUtil;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -83,6 +86,7 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.StatusBarUtil;
@@ -100,7 +104,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * 播放界面
  */
 public class PlayerActivity extends BaseActivity implements UpdateHelper.Callback,
-        FileChooserDialog.FileCallback, OnTagEditListener {
+        FileChooserDialog.FileCallback,OnTagEditListener {
     private static final String TAG = "PlayerActivity";
     //是否正在运行
     public boolean mIsForeground;
@@ -237,6 +241,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mVolumeContainer.startAnimation(makeAnimation(mVolumeContainer,false));
     };
 
+    private TagReceiver mTagReceiver;
+
     @Override
     protected void setUpTheme() {
         if(ThemeStore.isDay())
@@ -292,6 +298,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         ButterKnife.bind(this);
 
         mHandler = new MsgHandler(this);
+        mTagReceiver = new TagReceiver(this);
+        registerReceiver(mTagReceiver,new IntentFilter(Constants.TAG_EDIT));
+//        mHandler.postDelayed(() -> sendBroadcast(new Intent(Constants.TAG_EDIT)
+//                .putExtra("newSong",new Song())),2000);
 
         //获是否正在播放和正在播放的歌曲
         mInfo = MusicService.getCurrentMP3();
@@ -484,13 +494,13 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         Intent intent = new Intent(MusicService.ACTION_CMD);
         switch (v.getId()) {
             case R.id.playbar_prev:
-                intent.putExtra("Control", Constants.PREV);
+                intent.putExtra("Control", Command.PREV);
                 break;
             case R.id.playbar_next:
-                intent.putExtra("Control", Constants.NEXT);
+                intent.putExtra("Control", Command.NEXT);
                 break;
             case R.id.playbar_play_container:
-                intent.putExtra("Control", Constants.TOGGLE);
+                intent.putExtra("Control", Command.TOGGLE);
                 break;
         }
         MobclickAgent.onEvent(this,v.getId() == R.id.playbar_play_container ? "Prev" : v.getId() == R.id.playbar_next ? "Next" : "Play");
@@ -930,7 +940,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             return;
         }
         //当操作不为播放或者暂停且正在运行时，更新所有控件
-        if((Global.getOperation() != Constants.TOGGLE || mNeedUpdateUI)) {
+        if((Global.getOperation() != Command.TOGGLE || mNeedUpdateUI)) {
             //更新顶部信息
             updateTopStatus(mInfo);
             //更新歌词
@@ -947,7 +957,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 mNextSong.setText(getString(R.string.next_song,MusicService.getNextMP3().getTitle()));
             }
             updateBg();
-            requestCover(Global.getOperation() != Constants.TOGGLE && !mFistStart);
+            requestCover(Global.getOperation() != Command.TOGGLE && !mFistStart);
         }
         //更新按钮状态
         updatePlayButton(isplay);
@@ -1013,8 +1023,10 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         Theme.TintDrawable(mPlayQueue,R.drawable.play_btn_normal_list,tintColor);
 
         //音量控制
-        Theme.TintDrawable(mVolumeDown,R.drawable.ic_volume_down_black_24dp,tintColor);
-        Theme.TintDrawable(mVolumeUp,R.drawable.ic_volume_up_black_24dp,tintColor);
+        mVolumeDown.getDrawable().setColorFilter(tintColor, PorterDuff.Mode.SRC_ATOP);
+        mVolumeUp.getDrawable().setColorFilter(tintColor, PorterDuff.Mode.SRC_ATOP);
+//        Theme.TintDrawable(mVolumeDown,R.drawable.ic_volume_down_black_24dp,tintColor);
+//        Theme.TintDrawable(mVolumeUp,R.drawable.ic_volume_up_black_24dp,tintColor);
 
         mPlayPauseView.setBackgroundColor(accentColor);
         //下一首背景
@@ -1068,7 +1080,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      */
     private void requestCover(boolean withAnimation) {
         //更新封面
-        if(mInfo == null || (mInfo = MusicService.getCurrentMP3()) == null){
+        if(mInfo == null){
             mUri = Uri.parse("res://" + mContext.getPackageName() + "/" + (ThemeStore.isDay() ? R.drawable.album_empty_bg_day : R.drawable.album_empty_bg_night));
             updateCover(withAnimation);
         } else {
@@ -1100,6 +1112,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         super.onDestroy();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mHandler.remove();
+        Util.unregisterReceiver(this,mTagReceiver);
     }
 
     /**
@@ -1113,29 +1126,19 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //        Set<String> ignoreLrcId = new HashSet<>(SPUtil.getStringSet(this,SPUtil.SETTING_KEY.SETTING_NAME,"IgnoreLrcID"));
 //        if(ignoreLrcId.size() > 0){
 //            for (String id : ignoreLrcId){
-//                if((mInfo.getId() + "").equals(id)){
-//                    ignoreLrcId.remove(mInfo.getId() + "");
+//                if((mInfo.getID() + "").equals(id)){
+//                    ignoreLrcId.remove(mInfo.getID() + "");
 //                    SPUtil.putStringSet(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"IgnoreLrcID",ignoreLrcId);
 //                }
 //            }
 //        }
         SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_MANUAL);
         ((LyricFragment) mAdapter.getItem(2)).updateLrc(file.getAbsolutePath());
-        sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
+        sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
     }
 
     @Override
     public void onFileChooserDismissed(@NonNull FileChooserDialog dialog) {
-    }
-
-    @Override
-    public void onTagEdit(Song newSong) {
-        if(newSong != null){
-            mInfo = newSong;
-            updateTopStatus(newSong);
-            ((LyricFragment) mAdapter.getItem(2)).updateLrc(newSong,true);
-            sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
-        }
     }
 
     private void updateProgressByHandler() {
@@ -1172,5 +1175,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         return (LyricFragment) mAdapter.getItem(2);
     }
 
+    @Override
+    public void onTagEdit(Song newSong) {
+        if(newSong != null){
+            updateTopStatus(newSong);
+            ((LyricFragment) mAdapter.getItem(2)).updateLrc(newSong,true);
+            Fresco.getImagePipeline().clearCaches();
+            SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.COVER_NAME,ImageUriUtil.getSearchRequestWithAlbumType(mInfo).getLastFMKey());
+            mInfo = newSong;
+            requestCover(false);
+        }
+    }
 
 }

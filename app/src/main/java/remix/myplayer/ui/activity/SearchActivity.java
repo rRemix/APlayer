@@ -31,10 +31,9 @@ import remix.myplayer.asynctask.AppWrappedAsyncTaskLoader;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.interfaces.OnTagEditListener;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.customview.SearchToolBar;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -47,7 +46,7 @@ import remix.myplayer.util.ToastUtil;
 /**
  * 搜索界面，根据关键字，搜索歌曲名，艺术家，专辑中的记录
  */
-public class SearchActivity extends PermissionActivity<Song,SearchAdapter> implements OnTagEditListener{
+public class SearchActivity extends PermissionActivity<Song,SearchAdapter>{
     //搜索的关键字
     private String mkey;
     //搜索结果的listview
@@ -96,7 +95,7 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter> imple
             public void onItemClick(View view, int position) {
                 if(mAdapter != null && mAdapter.getDatas() != null){
                     Intent intent = new Intent(MusicService.ACTION_CMD);
-                    intent.putExtra("Control",Constants.PLAY_TEMP);
+                    intent.putExtra("Control", Command.PLAY_TEMP);
                     intent.putExtra("Song",  mAdapter.getDatas().get(position));
                     sendBroadcast(intent);
                 }else {
@@ -154,9 +153,6 @@ public class SearchActivity extends PermissionActivity<Song,SearchAdapter> imple
         getLoaderManager().restartLoader(LoaderIds.SEARCH_ACTIVITY, null, this);
     }
 
-    @Override
-    public void onTagEdit(Song newSong) {
-    }
 
     private static class AsyncSearchLoader extends AppWrappedAsyncTaskLoader<List<Song>> {
         private String mkey;

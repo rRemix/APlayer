@@ -1,10 +1,12 @@
 package remix.myplayer.adapter
 
 import android.content.Context
+import android.net.Uri
 import android.view.View
 import android.widget.TextView
 import butterknife.BindView
 import com.facebook.drawee.view.SimpleDraweeView
+import io.reactivex.disposables.Disposable
 import remix.myplayer.R
 import remix.myplayer.adapter.holder.BaseViewHolder
 import remix.myplayer.bean.mp3.Song
@@ -24,7 +26,22 @@ class CustomSortAdapter (context: Context,layoutId: Int) : BaseAdapter<Song, Cus
         holder.mTitle.text = song.Title
         holder.mAlbum.text = song.album
         //封面
-        LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song), RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load()
+
+        val disposable = LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song), RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).loadImage()
+        holder.mImage.tag = disposable
+    }
+
+    override fun onViewRecycled(holder: CustomSortHolder?) {
+        super.onViewRecycled(holder)
+        holder?.let {
+            if (it.mImage.tag != null) {
+                val disposable = it.mImage.tag as Disposable
+                if (!disposable.isDisposed)
+                    disposable.dispose()
+            }
+            holder.mImage.setImageURI(Uri.EMPTY)
+        }
+
     }
 
     class CustomSortHolder(itemView: View) : BaseViewHolder(itemView) {

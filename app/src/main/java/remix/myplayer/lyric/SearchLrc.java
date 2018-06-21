@@ -22,7 +22,6 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import remix.myplayer.App;
-import remix.myplayer.R;
 import remix.myplayer.bean.kugou.KLrcResponse;
 import remix.myplayer.bean.kugou.KSearchResponse;
 import remix.myplayer.bean.mp3.Song;
@@ -34,10 +33,13 @@ import remix.myplayer.misc.cache.DiskLruCache;
 import remix.myplayer.misc.tageditor.TagEditor;
 import remix.myplayer.request.network.HttpClient;
 import remix.myplayer.request.network.RxUtil;
+import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.LyricUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
+
+import static remix.myplayer.App.IS_GOOGLEPLAY;
 
 /**
  * Created by Remix on 2015/12/7.
@@ -48,6 +50,8 @@ import remix.myplayer.util.Util;
  */
 public class SearchLrc {
     private static final String TAG = "SearchLrc";
+
+    public static String LOCAL_LYRIC_PATH;
 
     private static final Charset UTF_8 = Charset.forName("UTF-8");
     private ILrcParser mLrcParser;
@@ -87,6 +91,7 @@ public class SearchLrc {
         return type == SPUtil.LYRIC_KEY.LYRIC_IGNORE ? Observable.error(new Throwable("Ignore")) :
                 Observable.concat(getCacheObservable(),getManualObservable(manualPath), getEmbeddedObservable(),last).firstOrError().toObservable()
                 .doOnSubscribe(disposable -> {
+                    LOCAL_LYRIC_PATH = "";
                     mCacheKey = Util.hashKeyForDisk(String.valueOf(mSong.getId()) + "-" +
                             (!TextUtils.isEmpty(mSong.getArtist()) ? mSong.getArtist() : "") + "-" +
                             (!TextUtils.isEmpty(mSong.getTitle()) ? mSong.getTitle() : ""));
@@ -164,10 +169,7 @@ public class SearchLrc {
                 Observable.create(e -> {
                     List<String> localPaths = getAllLocalLrcPath();
                     if(localPaths.size() > 0) {
-                        if(localPaths.size() == 1) {
-                            String localPath = localPaths.get(0);
-                            e.onNext(mLrcParser.getLrcRows(getBufferReader(localPath), true, mCacheKey,mSearchKey));
-                        }else{
+                        if(localPaths.size() > 1 && !IS_GOOGLEPLAY) {
                             String localPath = localPaths.get(0);
                             String translatePath=null;
                             for (String path : localPaths) {
@@ -199,6 +201,9 @@ public class SearchLrc {
                                     e.onNext(source);
                                 }
                             }
+                        }else{
+                            String localPath = localPaths.get(0);
+                            e.onNext(mLrcParser.getLrcRows(getBufferReader(localPath), true, mCacheKey,mSearchKey));
                         }
                     }
                     e.onComplete();
@@ -239,10 +244,11 @@ public class SearchLrc {
                     .flatMap(body -> HttpClient.getInstance()
                             .getNeteaseLyric(new Gson().fromJson(body.string(),NSongSearchResponse.class).result.songs.get(0).id)
                             .map(body1 -> {
-                                final NLrcResponse lrcResponse = new Gson().fromJson(body1.string(),NLrcResponse.class);
+                                final String bodyStr = body1.string();
+                                final NLrcResponse lrcResponse = new Gson().fromJson(bodyStr,NLrcResponse.class);
                                 List<LrcRow> combine = mLrcParser.getLrcRows(getBufferReader(lrcResponse.lrc.lyric.getBytes(UTF_8)), false, mCacheKey,mSearchKey);
                                 //有翻译 合并
-                                if(lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
+                                if(!IS_GOOGLEPLAY && lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
                                     List<LrcRow> translate = mLrcParser.getLrcRows(getBufferReader(lrcResponse.tlyric.lyric.getBytes(UTF_8)), false, mCacheKey,mSearchKey);
                                     if(translate != null && translate.size() > 0){
                                         for(int i = 0 ; i < translate.size();i++){
@@ -275,9 +281,9 @@ public class SearchLrc {
             return "";
         if(!TextUtils.isEmpty(searchPath)){
             //已设置歌词路径
-            String lyricPath = LyricUtil.searchFile(mDisplayName,mSong.getTitle(),mSong.getArtist(), new File(searchPath));
-            if(!TextUtils.isEmpty(lyricPath)){
-                return lyricPath;
+            LyricUtil.searchFile(mDisplayName,mSong.getTitle(),mSong.getArtist(), new File(searchPath));
+            if(!TextUtils.isEmpty(SearchLrc.LOCAL_LYRIC_PATH)){
+                return SearchLrc.LOCAL_LYRIC_PATH;
             }
         } else{
             //没有设置歌词路径 搜索所有歌词文件
@@ -318,9 +324,10 @@ public class SearchLrc {
         if (mSong == null)
             return results;
         if (!TextUtils.isEmpty(searchPath)) {
-            //已设置歌词路径
-            String lyricPath = LyricUtil.searchFile(mDisplayName, mSong.getTitle(), mSong.getArtist(), new File(searchPath));
-            results.add(lyricPath);
+            //已设置歌词搜索路径
+            LyricUtil.searchFile(mDisplayName, mSong.getTitle(), mSong.getArtist(), new File(searchPath));
+            if(!TextUtils.isEmpty(LOCAL_LYRIC_PATH))
+                results.add(SearchLrc.LOCAL_LYRIC_PATH);
             return results;
         } else {
             //没有设置歌词路径 搜索所有歌词文件
@@ -364,18 +371,18 @@ public class SearchLrc {
     private String getLyricSearchKey(Song song){
         if(song == null)
             return "";
-        boolean isTitleAvailable = !TextUtils.isEmpty(song.getTitle()) && !song.getTitle().contains(App.getContext().getString(R.string.unknown_song));
-        boolean isAlbumAvailable = !TextUtils.isEmpty(song.getAlbum()) && !song.getAlbum().contains(App.getContext().getString(R.string.unknown_album));
-        boolean isArtistAvailable = !TextUtils.isEmpty(song.getArtist()) && !song.getArtist().contains(App.getContext().getString(R.string.unknown_artist));
+        boolean isTitleAvailable = !ImageUriUtil.isSongNameUnknownOrEmpty(song.getTitle());
+        boolean isAlbumAvailable = !ImageUriUtil.isAlbumNameUnknownOrEmpty(song.getAlbum());
+        boolean isArtistAvailable = !ImageUriUtil.isArtistNameUnknownOrEmpty(song.getArtist());
 
         //歌曲名合法
         if(isTitleAvailable){
             //艺术家合法
             if(isArtistAvailable){
-                return song.getArtist() + " - " + song.getTitle();
+                return song.getArtist() + "-" + song.getTitle();
             } else if(isAlbumAvailable){
                 //专辑名合法
-                return song.getAlbum() + " - " + song.getTitle();
+                return song.getAlbum() + "-" + song.getTitle();
             } else {
                 return song.getTitle();
             }

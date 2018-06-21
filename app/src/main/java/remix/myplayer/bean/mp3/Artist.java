@@ -7,10 +7,16 @@ package remix.myplayer.bean.mp3;
 public class Artist {
     private int ArtistID;
     private String Artist;
+    private int Count;
 
-    public Artist(int artistID, String artist) {
+    public Artist(int artistID, String artist,int count) {
         ArtistID = artistID;
         Artist = artist;
+        Count = count;
+    }
+
+    public int getCount() {
+        return Count;
     }
 
     public int getArtistID() {

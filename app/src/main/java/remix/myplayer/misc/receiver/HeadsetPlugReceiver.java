@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
@@ -38,7 +39,7 @@ public class HeadsetPlugReceiver extends BroadcastReceiver {
 
         if(!headsetOn && MusicService.isPlay()){
             Intent ctlIntent = new Intent(MusicService.ACTION_CMD);
-            ctlIntent.putExtra("Control",Constants.PAUSE);
+            ctlIntent.putExtra("Control", Command.PAUSE);
             context.sendBroadcast(ctlIntent);
         }
         try {

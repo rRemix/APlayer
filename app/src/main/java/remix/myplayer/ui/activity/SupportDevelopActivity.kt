@@ -2,21 +2,33 @@ package remix.myplayer.ui.activity
 
 import android.app.Activity
 import android.content.ContentValues
+import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
+import android.widget.Toast
 import butterknife.BindView
 import butterknife.ButterKnife
 import com.afollestad.materialdialogs.MaterialDialog
+import com.anjlab.android.iab.v3.BillingProcessor
+import com.anjlab.android.iab.v3.TransactionDetails
 import io.reactivex.Observable
 import io.reactivex.ObservableSource
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 import io.reactivex.functions.Function
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
+import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.adapter.PurchaseAdapter
 import remix.myplayer.bean.PurchaseBean
@@ -29,7 +41,7 @@ import java.io.File
 import java.io.OutputStream
 import java.util.*
 
-class SupportDevelopActivity : ToolbarActivity() {
+class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandler {
     @BindView(R.id.toolbar)
     lateinit var mToolBar: Toolbar
     @BindView(R.id.activity_support_recyclerView)
@@ -37,24 +49,26 @@ class SupportDevelopActivity : ToolbarActivity() {
 
     lateinit var mAdapter: PurchaseAdapter
 
+    val SKU_IDS = arrayListOf("price_3","price_8","price_15","price_25", "price_40")
+
+    private var mBillingProcessor: BillingProcessor? = null
+    private var mDisposable: Disposable? = null
+
+    private lateinit var mLoading:MaterialDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_support_develop)
-
         ButterKnife.bind(this)
-
         setUpToolbar(mToolBar,getString(R.string.support_develop))
 
-        val beans = ArrayList<PurchaseBean>()
-        for (i in 0..1) {
-            when (i) {
-                0 -> beans.add(PurchaseBean(i.toString(),"icon_wechat_donate",getString(R.string.wechat),""))
-                1 -> beans.add(PurchaseBean(i.toString(),"icon_alipay_donate",getString(R.string.alipay),""))
-            }
-        }
-
         mAdapter = PurchaseAdapter(mContext,R.layout.item_support)
+
+        val beans = ArrayList<PurchaseBean>()
+        beans.add(PurchaseBean("wechat","icon_wechat_donate",getString(R.string.wechat),""))
+        beans.add(PurchaseBean("alipay","icon_alipay_donate",getString(R.string.alipay),""))
+        beans.add(PurchaseBean("paypal","icon_paypal_donate",getString(R.string.paypal),""))
+
         mAdapter.setData(beans)
         mAdapter.setOnItemClickListener(object : OnItemClickListener{
             override fun onItemLongClick(view: View?, position: Int) {
@@ -141,16 +155,100 @@ class SupportDevelopActivity : ToolbarActivity() {
                                 .contentColorAttr(R.attr.text_color_primary)
                                 .show()
                     }
-                    else ->{
-
+                    2 -> {
+                        val intent = Intent("android.intent.action.VIEW")
+                        intent.data = Uri.parse("https://www.paypal.me/rRemix")
+                        startActivity(intent)
+                    }
+                    3,4,5,6,7 ->{
+                        mBillingProcessor?.purchase(this@SupportDevelopActivity, SKU_IDS[position - 3])
                     }
                 }
             }
-
         })
 
         mRecyclerView.layoutManager = GridLayoutManager(mContext,2)
         mRecyclerView.adapter = mAdapter
+
+        mLoading = MaterialDialog.Builder(this)
+                .title(R.string.loading)
+                .titleColorAttr(R.attr.text_color_primary)
+                .content(R.string.please_wait)
+                .contentColorAttr(R.attr.text_color_primary)
+                .canceledOnTouchOutside(false)
+                .progress(true, 0)
+                .backgroundColorAttr(R.attr.background_color_3)
+                .progressIndeterminateStyle(false).build()
+
+        mBillingProcessor = BillingProcessor(this,BuildConfig.GOOGLE_PLAY_LICENSE_KEY,this)
     }
+
+    private fun loadSkuDetails() {
+        if(mAdapter.datas.size >  3)
+            return
+        Single.fromCallable({ mBillingProcessor!!.getPurchaseListingDetails(SKU_IDS) })
+                .map({
+                    val beans = ArrayList<PurchaseBean>()
+                    it.sortedWith(kotlin.Comparator{ o1, o2 ->
+                        o1.priceValue.compareTo(o2.priceValue)
+                    }).forEach {
+                        beans.add(PurchaseBean(it.productId,"",it.title,it.priceText))
+                    }
+                    beans
+                })
+                .doFinally { mLoading.dismiss() }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : DisposableSingleObserver<List<PurchaseBean>>() {
+                    override fun onSuccess(datas: List<PurchaseBean>) {
+                        mAdapter.datas.addAll(datas)
+                        mAdapter.notifyDataSetChanged()
+                    }
+
+                    override fun onError(e: Throwable) { ToastUtil.show(mContext,R.string.error_occur,e) }
+
+                    override fun onStart() { mLoading.show() }
+                })
+    }
+
+    override fun onBillingInitialized() {
+        loadSkuDetails()
+    }
+
+    override fun onPurchaseHistoryRestored() {
+        Toast.makeText(this, R.string.restored_previous_purchases, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onProductPurchased(productId: String, details: TransactionDetails?) {
+        Single.fromCallable {
+            mBillingProcessor?.consumePurchase(productId)
+        }.subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(Consumer {
+            Toast.makeText(this, R.string.thank_you, Toast.LENGTH_SHORT).show()
+        })
+
+    }
+
+    override fun onBillingError(errorCode: Int, error: Throwable?) {
+        ToastUtil.show(mContext,R.string.error_occur,"code = $errorCode err =  $error")
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        mBillingProcessor?.let {
+            if(!it.handleActivityResult(requestCode,resultCode, data))
+                super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    override fun onDestroy() {
+        mBillingProcessor?.release()
+        mDisposable?.let {
+            if(!it.isDisposed)
+                it.dispose()
+        }
+        super.onDestroy()
+    }
+
 
 }

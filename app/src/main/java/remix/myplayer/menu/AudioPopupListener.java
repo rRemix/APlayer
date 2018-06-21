@@ -21,7 +21,7 @@ import java.util.Collections;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.PlayListSong;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.interfaces.OnTagEditListener;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.Tag;
 import remix.myplayer.ui.activity.EQActivity;
@@ -46,7 +46,7 @@ import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
  * @Author Xiaoborui
  * @Date 2016/8/29 15:33
  */
-public class AudioPopupListener<ActivityCallback extends AppCompatActivity & OnTagEditListener & FileChooserDialog.FileCallback> extends ContextWrapper implements PopupMenu.OnMenuItemClickListener{
+public class AudioPopupListener<ActivityCallback extends AppCompatActivity & FileChooserDialog.FileCallback> extends ContextWrapper implements PopupMenu.OnMenuItemClickListener{
     private ActivityCallback mActivity;
     private Song mInfo;
     private Tag mTag;
@@ -75,7 +75,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & OnT
                                 case 1:
                                     SPUtil.putValue(mActivity,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",position == 0 ? SPUtil.LYRIC_KEY.LYRIC_NETEASE : SPUtil.LYRIC_KEY.LYRIC_KUGOU);
                                     lyricFragment.updateLrc(mInfo,true);
-                                    sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
+                                    sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                     break;
                                 case 2: //手动选择歌词
                                     new FileChooserDialog.Builder(mActivity)
@@ -103,7 +103,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & OnT
                                                 }
                                             })
                                             .show();
-                                    sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.CHANGE_LYRIC));
+                                    sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
                                     break;
                             }
 
@@ -158,7 +158,7 @@ public class AudioPopupListener<ActivityCallback extends AppCompatActivity & OnT
                                             return;
                                         if(mInfo.getId() == MusicService.getCurrentMP3().getId() && Global.PlayQueue.size() >= 2){
                                             Intent intent = new Intent(MusicService.ACTION_CMD);
-                                            intent.putExtra("Control", Constants.NEXT);
+                                            intent.putExtra("Control", Command.NEXT);
                                             mActivity.sendBroadcast(intent);
                                         }
                                     }

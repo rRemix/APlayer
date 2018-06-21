@@ -36,24 +36,8 @@ public class Constants {
 
     public final static String EXIT = "remix.music.EXIT";
     public final static String SOUNDEFFECT_ACTION = "remix.music.SOUNDEFFECT_ACTION";
+    public final static String TAG_EDIT = "remix.music.TAG_EDIT";
 
-    //控制命令
-    public final static int PLAYSELECTEDSONG = 0;
-    public final static int PREV = 1;
-    public final static int TOGGLE = 2;
-    public final static int NEXT = 3;
-    public final static int PAUSE = 4;
-    public final static int START = 5;
-    public final static int CHANGE_MODEL = 6;
-    public final static int LOVE = 7;
-    public final static int TOGGLE_MEDIASESSION = 8;
-    public final static int PLAY_TEMP = 9;
-    public final static int TOGGLE_NOTIFY = 10;
-    public final static int UNLOCK_DESTOP_LYRIC = 11;
-    public final static int CLOSE_NOTIFY = 12;
-    public final static int ADD_TO_NEXT_SONG = 13;
-    public final static int CHANGE_LYRIC = 14;
-    public final static int PLAY_AT_BREAKPOINT = 15;
     //播放模式
     public final static int PLAY_LOOP = 50;
     public final static int PLAY_SHUFFLE = 51;

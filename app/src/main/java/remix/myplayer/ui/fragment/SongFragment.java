@@ -20,6 +20,7 @@ import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
@@ -61,7 +62,7 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
                 if(id > 0 && !mMultiChoice.itemAddorRemoveWithClick(view,position,id,TAG)){
                     Intent intent = new Intent(MusicService.ACTION_CMD);
                     Bundle arg = new Bundle();
-                    arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                    arg.putInt("Control", Command.PLAYSELECTEDSONG);
                     arg.putInt("Position", position);
                     intent.putExtras(arg);
                     Global.setPlayQueue(Global.AllSongList,mContext,intent);

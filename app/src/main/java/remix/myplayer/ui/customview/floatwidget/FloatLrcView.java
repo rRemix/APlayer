@@ -35,6 +35,7 @@ import remix.myplayer.adapter.FloatColorAdapter;
 import remix.myplayer.bean.FloatLrcContent;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.lyric.bean.LrcRow;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.Constants;
@@ -274,6 +275,10 @@ public class FloatLrcView extends RelativeLayout {
         mPlay.setImageResource(play ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal);
     }
 
+    public void stopAnimation(){
+        mText1.stopAnimation();
+    }
+
     @OnClick({R.id.widget_close, R.id.widget_lock,R.id.widget_next,R.id.widget_play,R.id.widget_prev,
                 R.id.widget_lrc_bigger,R.id.widget_lrc_smaller,R.id.widget_setting,R.id.widget_unlock})
     public void onViewClicked(View view) {
@@ -309,7 +314,7 @@ public class FloatLrcView extends RelativeLayout {
             case R.id.widget_play:
             case R.id.widget_prev:
                 Intent ctlIntent = new Intent(MusicService.ACTION_CMD);
-                ctlIntent.putExtra("Control",view.getId() == R.id.widget_next ? Constants.NEXT : view.getId() == R.id.widget_prev ? Constants.PREV : Constants.TOGGLE);
+                ctlIntent.putExtra("Control",view.getId() == R.id.widget_next ? Command.NEXT : view.getId() == R.id.widget_prev ? Command.PREV : Command.TOGGLE);
                 mContext.sendBroadcast(ctlIntent);
                 mUIHandler.postDelayed(() -> mPlay.setImageResource(MusicService.isPlay() ? R.drawable.widget_btn_stop_normal : R.drawable.widget_btn_play_normal),100);
                 //操作后重置消息的时间
@@ -388,12 +393,13 @@ public class FloatLrcView extends RelativeLayout {
         mUIHandler.removeCallbacksAndMessages(null);
     }
 
-    private class UnLockNotify {
+    private static class UnLockNotify {
         private static final String UNLOCK_NOTIFICATION_CHANNEL_ID = "unlock_notification";
         private static final int UNLOCK_NOTIFICATION_ID = 2;
-
+        private Context mContext;
         private NotificationManager mNotificationManager;
         UnLockNotify(){
+            mContext = App.getContext();
             mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 initNotificationChanel();
@@ -420,7 +426,7 @@ public class FloatLrcView extends RelativeLayout {
                     .setTicker(mContext.getString(R.string.float_lock_ticker))
                     .setContentIntent(PendingIntent.getBroadcast(mContext,
                             10,
-                            new Intent(MusicService.ACTION_CMD).putExtra("Control",Constants.UNLOCK_DESTOP_LYRIC),
+                            new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.UNLOCK_DESKTOP_LYRIC),
                             PendingIntent.FLAG_UPDATE_CURRENT))
                     .setSmallIcon(R.drawable.notifbar_icon)
                     .build();

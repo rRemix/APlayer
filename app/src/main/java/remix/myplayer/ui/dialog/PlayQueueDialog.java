@@ -31,8 +31,8 @@ import remix.myplayer.helper.MusicEventHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
 import remix.myplayer.util.PlayListUtil;
@@ -67,7 +67,7 @@ public class PlayQueueDialog extends BaseDialogActivity implements LoaderManager
             public void onItemClick(View view, int position) {
                 Intent intent = new Intent(MusicService.ACTION_CMD);
                 Bundle arg = new Bundle();
-                arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+                arg.putInt("Control", Command.PLAYSELECTEDSONG);
                 arg.putInt("Position", position);
                 intent.putExtras(arg);
                 sendBroadcast(intent);

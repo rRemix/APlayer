@@ -22,15 +22,7 @@ import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
@@ -446,8 +438,9 @@ public class Util {
     @NonNull
     public static Intent createShareSongFileIntent(@NonNull final Song song, Context context) {
         try {
+            LogUtil.d("ShareSong","Context: " + context);
             Parcelable parcelable = FileProvider.getUriForFile(context,
-                    "cn.bmob.update.fileprovider",
+                    context.getPackageName() + "fileprovider",
                     new File(song.getUrl()));
             return new Intent()
                     .setAction(Intent.ACTION_SEND)
@@ -467,7 +460,7 @@ public class Util {
     public static Intent createShareImageFileIntent(@NonNull final File file, Context context) {
         try {
             Parcelable parcelable = FileProvider.getUriForFile(context,
-                    "cn.bmob.update.fileprovider",
+                    context.getPackageName() + "fileprovider",
                     file);
             return new Intent()
                     .setAction(Intent.ACTION_SEND)

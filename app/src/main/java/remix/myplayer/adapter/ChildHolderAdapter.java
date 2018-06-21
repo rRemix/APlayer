@@ -28,6 +28,7 @@ import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.menu.SongPopupListener;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -86,7 +87,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
             //显示当前排序方式
             headerHolder.mShuffle.setOnClickListener(v -> {
                 Intent intent = new Intent(MusicService.ACTION_CMD);
-                intent.putExtra("Control", Constants.NEXT);
+                intent.putExtra("Control", Command.NEXT);
                 intent.putExtra("shuffle",true);
                 //设置正在播放列表
                 ArrayList<Integer> IDList = new ArrayList<>();
@@ -114,7 +115,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
 //            //如果是,高亮该歌曲，并显示动画
 //            if(SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,"ShowHighLight",false))
 //            if(currentMP3 != null){
-//                boolean highlight = song.getId() == currentMP3.getId();
+//                boolean highlight = song.getID() == currentMP3.getID();
 //                if(highlight)
 //                    mLastIndex = position;
 //                holder.mTitle.setTextColor(highlight ?

@@ -1,7 +1,6 @@
 package remix.myplayer.ui.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -28,20 +27,17 @@ import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import remix.myplayer.App;
 import remix.myplayer.R;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.bean.netease.SearchRequest;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.menu.CtrlButtonListener;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.UriRequest;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
@@ -176,7 +172,6 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
                 //如果往右或者是往左没有超过最左边,移动View
                 if(mDistance > 0 || ((mView.getScrollX() + (-mDistance)) < 0)) {
                     mView.scrollBy((int) -mDistance, 0);
-                    finish();
                 }
                 LogUtil.d(TAG,"distance:" + mDistance + "\r\n");
                 break;
@@ -362,7 +357,7 @@ public class LockScreenActivity extends BaseActivity implements UpdateHelper.Cal
             final LockScreenActivity activity = mRef.get();
             if(activity == null || activity.isFinishing())
                 return;
-            SearchRequest request = ImageUriUtil.getSearchRequestWithAlbumType(mSong);
+            UriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(mSong);
             getThumbBitmapObservable(request)
                     .compose(RxUtil.applySchedulerToIO())
                     .flatMap(bitmap -> Observable.create((ObservableOnSubscribe<Palette.Swatch>) e -> {

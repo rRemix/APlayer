@@ -5,7 +5,6 @@ import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import remix.myplayer.App;
 import remix.myplayer.util.LogUtil;
 
 /**
@@ -59,12 +58,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
                     "update play_list set count = (select count(*) from play_list_song where play_list_id = new.play_list_id ) where _id = new.play_list_id; " +
                     "end";
 
-    private static DBOpenHelper mInstance;
-    public synchronized static DBOpenHelper getInstance(){
-        if(mInstance == null)
-            mInstance = new DBOpenHelper(App.getContext());
-        return mInstance;
-    }
+
     public DBOpenHelper(Context context){
         this(context, DBNAME, null, VERSION, dbObj -> LogUtil.d("DBError","error occur"));
     }

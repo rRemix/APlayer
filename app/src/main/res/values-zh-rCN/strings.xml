@@ -312,4 +312,16 @@
     <string name="saveing">保存中</string>
     <string name="ignore_mediastore_artwork">忽略内嵌封面</string>
     <string name="ignore_mediastore_artwork_tips">可提高专辑封面质量，但会使图片加载速度变慢</string>
+    <string name="error_setup_inapp_billing">初始化内购失败: %s</string>
+    <string name="error_occur">发生错误: %s</string>
+    <string name="thank_you">感谢您的支持!</string>
+    <string name="restored_previous_purchases">恢复过往的内购</string>
+    <string name="paypal">Paypal</string>
+    <string name="exit">退出</string>
+    <string name="plz_set_default_time">请先设置默认时间</string>
+    <string name="app_widget_big_name">APlayer-大尺寸</string>
+    <string name="app_widget_medium_name">APlayer-中尺寸</string>
+    <string name="app_widget_small_name">APlayer-小尺寸</string>
+    <string name="app_widget_medium_transparent_name">APlayer-中尺寸-透明</string>
+    <string name="app_widget_small_transparent_name">APlayer-小尺寸-透明</string>
 </resources>

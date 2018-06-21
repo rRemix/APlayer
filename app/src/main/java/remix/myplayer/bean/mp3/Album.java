@@ -9,12 +9,18 @@ public class Album {
     private String Album;
     private int ArtistID;
     private String Artist;
+    private int Count;
 
-    public Album(int albumID, String album, int artistId,String artist) {
+    public Album(int albumID, String album, int artistId,String artist,int count) {
         AlbumID = albumID;
         Album = album;
         ArtistID = artistId;
         Artist = artist;
+        Count = count;
+    }
+
+    public int getCount() {
+        return Count;
     }
 
     public int getAlbumID() {

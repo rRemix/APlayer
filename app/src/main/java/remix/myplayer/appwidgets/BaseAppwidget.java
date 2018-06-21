@@ -13,18 +13,19 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.widget.RemoteViews;
 
-import remix.myplayer.App;
 import remix.myplayer.R;
+import remix.myplayer.appwidgets.medium.AppWidgetMedium;
+import remix.myplayer.appwidgets.small.AppWidgetSmall;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.RemoteUriRequest;
+import remix.myplayer.request.RequestConfig;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.ui.activity.MainActivity;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.PlayListUtil;
-import remix.myplayer.util.SPUtil;
 
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 
@@ -35,7 +36,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
  * @Date 2016/12/28 15:50
  */
 
-public class BaseAppwidget extends AppWidgetProvider {
+public abstract class BaseAppwidget extends AppWidgetProvider {
     public static final int SKIN_WHITE_1F = 1;//白色不带透明
     public static final int SKIN_TRANSPARENT = 2;//透明
 
@@ -51,7 +52,19 @@ public class BaseAppwidget extends AppWidgetProvider {
         } else {
             return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
-//        return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    protected PendingIntent buildSkinPendingIntent(Context context, String widgetName){
+        Intent intent = new Intent(MusicService.ACTION_WIDGET_UPDATE);
+        intent.putExtra("WidgetName",widgetName);
+        intent.setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+        return PendingIntent.getBroadcast(context,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    protected PendingIntent buildTimerPendingIntent(Context context){
+        Intent intent = new Intent(MusicService.ACTION_CMD);
+        intent.putExtra("Control",Command.TOGGLE_TIMER);
+        return PendingIntent.getBroadcast(context,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     protected boolean hasInstances(Context context) {
@@ -111,12 +124,21 @@ public class BaseAppwidget extends AppWidgetProvider {
 
     protected void buildAction(Context context, RemoteViews views) {
         ComponentName componentName = new ComponentName(context,MusicService.class);
-        views.setOnClickPendingIntent(R.id.appwidget_toggle,buildPendingIntent(context,componentName,Constants.TOGGLE));
-        views.setOnClickPendingIntent(R.id.appwidget_prev,buildPendingIntent(context,componentName, Constants.PREV));
-        views.setOnClickPendingIntent(R.id.appwidget_next,buildPendingIntent(context,componentName,Constants.NEXT));
-        views.setOnClickPendingIntent(R.id.appwidget_model,buildPendingIntent(context,componentName,Constants.CHANGE_MODEL));
-        views.setOnClickPendingIntent(R.id.appwidget_love,buildPendingIntent(context,componentName,Constants.LOVE));
-        views.setOnClickPendingIntent(R.id.appwidget_skin,buildPendingIntent(context,componentName,Constants.UPDATE_APPWIDGET));
+        views.setOnClickPendingIntent(R.id.appwidget_toggle,buildPendingIntent(context,componentName, Command.TOGGLE));
+        views.setOnClickPendingIntent(R.id.appwidget_prev,buildPendingIntent(context,componentName, Command.PREV));
+        views.setOnClickPendingIntent(R.id.appwidget_next,buildPendingIntent(context,componentName, Command.NEXT));
+        views.setOnClickPendingIntent(R.id.appwidget_model,buildPendingIntent(context,componentName, Command.CHANGE_MODEL));
+        views.setOnClickPendingIntent(R.id.appwidget_love,buildPendingIntent(context,componentName, Command.LOVE));
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            final String widgetName = this instanceof AppWidgetSmall ? "SmallWidget" : this instanceof AppWidgetMedium ? "MediumWidget" : "BigWidget";
+            views.setOnClickPendingIntent(R.id.appwidget_skin, buildSkinPendingIntent(context,widgetName));
+            views.setOnClickPendingIntent(R.id.appwidget_timer,buildTimerPendingIntent(context));
+        }else{
+            views.setOnClickPendingIntent(R.id.appwidget_skin,buildPendingIntent(context,componentName,Constants.UPDATE_APPWIDGET));
+            views.setOnClickPendingIntent(R.id.appwidget_timer,buildPendingIntent(context,componentName, Command.TOGGLE_TIMER));
+        }
+
         Intent action = new Intent(context, MainActivity.class);
         action.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         views.setOnClickPendingIntent(R.id.appwidget_clickable, PendingIntent.getActivity(context, 0, action, 0));
@@ -132,9 +154,9 @@ public class BaseAppwidget extends AppWidgetProvider {
     }
 
     protected void updateRemoteViews(RemoteViews remoteViews,Song song){
-        int skin = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
-        mSkin = skin == SKIN_TRANSPARENT ? AppWidgetSkin.TRANSPARENT : AppWidgetSkin.WHITE_1F;
-        updateBackground(remoteViews);
+//        int skin = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.APP_WIDGET_SKIN,SKIN_WHITE_1F);
+//        mSkin = skin == SKIN_TRANSPARENT ? AppWidgetSkin.TRANSPARENT : AppWidgetSkin.WHITE_1F;
+//        updateBackground(remoteViews);
         updateTitle(remoteViews,song);
         updateArtist(remoteViews,song);
         updateSkin(remoteViews);
@@ -143,6 +165,12 @@ public class BaseAppwidget extends AppWidgetProvider {
         updateModel(remoteViews);
         updateNextAndPrev(remoteViews);
         updateProgress(remoteViews,song);
+        updateTimer(remoteViews);
+    }
+
+    private void updateTimer(RemoteViews remoteViews) {
+        Drawable timerDrawable = Theme.TintDrawable(R.drawable.widget_btn_timer, mSkin.getBtnColor());
+        remoteViews.setImageViewBitmap(R.id.appwidget_timer,drawableToBitmap(timerDrawable));
     }
 
     protected void updateSkin(RemoteViews remoteViews){
@@ -222,4 +250,6 @@ public class BaseAppwidget extends AppWidgetProvider {
         drawable.draw(canvas);
         return bitmap;
     }
+
+    public abstract void updateWidget(final Context context,final int[] appWidgetIds, boolean reloadCover);
 }

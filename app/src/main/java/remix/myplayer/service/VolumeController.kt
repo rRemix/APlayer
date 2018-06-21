@@ -15,7 +15,7 @@ class VolumeController {
         val mediaPlayer = MusicService.getMediaPlayer()
         object : CountDownTimer(DURATION_IN_MS, DURATION_IN_MS / 10) {
             override fun onFinish() {
-                to(1)
+                directTo(1f)
             }
 
             override fun onTick(millisUntilFinished: Long) {
@@ -41,18 +41,18 @@ class VolumeController {
             }
 
             override fun onFinish() {
-                to(0)
+                directTo(0f)
                 mediaPlayer?.pause()
             }
 
         }.start()
     }
 
-    fun to(@FloatRange(from = 0.0, to = 1.0) toVolume: Float){
-        to(toVolume,toVolume)
+    fun directTo(@FloatRange(from = 0.0, to = 1.0) toVolume: Float){
+        directTo(toVolume,toVolume)
     }
 
-    fun to(@FloatRange(from = 0.0, to = 1.0) leftVolume: Float, @FloatRange(from = 0.0, to = 1.0) rightVolume: Float){
+    private fun directTo(@FloatRange(from = 0.0, to = 1.0) leftVolume: Float, @FloatRange(from = 0.0, to = 1.0) rightVolume: Float){
         val mediaPlayer = MusicService.getMediaPlayer()
         try {
             mediaPlayer.setVolume(leftVolume, rightVolume)

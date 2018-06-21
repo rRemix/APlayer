@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.KeyEvent;
 
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
 
 /**
@@ -39,8 +39,8 @@ public class MediaButtonReceiver extends BroadcastReceiver {
                 keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY || keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
             intent.putExtra("Control",
                     keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE  || keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY ?
-                            Constants.TOGGLE :
-                            keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Constants.NEXT : Constants.PREV);
+                            Command.TOGGLE :
+                            keyCode == KeyEvent.KEYCODE_MEDIA_NEXT ? Command.NEXT : Command.PREV);
             context.sendBroadcast(intent);
             return;
         }
@@ -53,7 +53,7 @@ public class MediaButtonReceiver extends BroadcastReceiver {
                 public void run() {
                     try {
                         sleep(800);
-                        int arg = mCount == 1 ? Constants.TOGGLE : mCount == 2 ? Constants.NEXT : Constants.PREV;
+                        int arg = mCount == 1 ? Command.TOGGLE : mCount == 2 ? Command.NEXT : Command.PREV;
                         mCount = 0;
                         Intent intent = new Intent(MusicService.ACTION_CMD);
                         intent.putExtra("Control", arg);

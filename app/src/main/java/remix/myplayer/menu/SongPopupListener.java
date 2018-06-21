@@ -1,8 +1,8 @@
 package remix.myplayer.menu;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.MenuItem;
 
@@ -16,7 +16,7 @@ import java.util.Collections;
 import remix.myplayer.R;
 import remix.myplayer.bean.CustomThumb;
 import remix.myplayer.bean.mp3.Song;
-import remix.myplayer.interfaces.OnTagEditListener;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.ui.Tag;
@@ -34,42 +34,42 @@ import static com.afollestad.materialdialogs.DialogAction.POSITIVE;
  * Created by Remix on 2018/3/5.
  */
 
-public class SongPopupListener<ActivityCallback extends AppCompatActivity & OnTagEditListener>
+public class SongPopupListener
         implements PopupMenu.OnMenuItemClickListener {
     private String mPlayListName;
     private boolean mIsDeletePlayList;
     private Song mSong;
-    private ActivityCallback mActivityCallback;
+    private Activity mActivity;
     private Tag mTag;
 
-    public SongPopupListener(ActivityCallback activityCallback, Song song,boolean isDeletePlayList,String playListName) {
+    public SongPopupListener(Activity activity, Song song, boolean isDeletePlayList, String playListName) {
         mIsDeletePlayList = isDeletePlayList;
         mPlayListName = playListName;
         mSong = song;
-        mActivityCallback = activityCallback;
-        mTag = new Tag(activityCallback,mSong);
+        mActivity = activity;
+        mTag = new Tag(activity,mSong);
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_next:
-                MobclickAgent.onEvent(mActivityCallback,"Share");
+                MobclickAgent.onEvent(mActivity,"Share");
                 Intent intent = new Intent(MusicService.ACTION_CMD);
-                intent.putExtra("Control", Constants.ADD_TO_NEXT_SONG);
+                intent.putExtra("Control", Command.ADD_TO_NEXT_SONG);
                 intent.putExtra("song",mSong);
-                mActivityCallback.sendBroadcast(intent);
+                mActivity.sendBroadcast(intent);
                 break;
             case R.id.menu_add_to_playlist:
-                MobclickAgent.onEvent(mActivityCallback,"AddtoPlayList");
-                Intent intentAdd = new Intent(mActivityCallback,AddtoPlayListDialog.class);
+                MobclickAgent.onEvent(mActivity,"AddtoPlayList");
+                Intent intentAdd = new Intent(mActivity,AddtoPlayListDialog.class);
                 Bundle ardAdd = new Bundle();
                 ardAdd.putSerializable("list", new ArrayList<>(Collections.singletonList(mSong.getId())));
                 intentAdd.putExtras(ardAdd);
-                mActivityCallback.startActivity(intentAdd);
+                mActivity.startActivity(intentAdd);
                 break;
             case R.id.menu_add_to_play_queue:
-                ToastUtil.show(mActivityCallback,mActivityCallback.getString(R.string.add_song_playqueue_success, Global.AddSongToPlayQueue(Collections.singletonList(mSong.getId()))));
+                ToastUtil.show(mActivity, mActivity.getString(R.string.add_song_playqueue_success, Global.AddSongToPlayQueue(Collections.singletonList(mSong.getId()))));
                 break;
             case R.id.menu_detail:
                 mTag.detail();
@@ -79,25 +79,25 @@ public class SongPopupListener<ActivityCallback extends AppCompatActivity & OnTa
                 break;
             case R.id.menu_album_thumb:
                 CustomThumb thumbBean = new CustomThumb(mSong.getAlbumId(),Constants.ALBUM,mSong.getAlbum());
-                Intent thumbIntent = mActivityCallback.getIntent();
+                Intent thumbIntent = mActivity.getIntent();
                 thumbIntent.putExtra("thumb",thumbBean);
-                mActivityCallback.setIntent(thumbIntent);
-                Crop.pickImage( mActivityCallback, Crop.REQUEST_PICK);
+                mActivity.setIntent(thumbIntent);
+                Crop.pickImage(mActivity, Crop.REQUEST_PICK);
                 break;
             case R.id.menu_ring:
-                MobclickAgent.onEvent(mActivityCallback,"Ring");
-                MediaStoreUtil.setRing(mActivityCallback,mSong.getId());
+                MobclickAgent.onEvent(mActivity,"Ring");
+                MediaStoreUtil.setRing(mActivity,mSong.getId());
                 break;
             case R.id.menu_share:
-                MobclickAgent.onEvent(mActivityCallback,"Share");
-                mActivityCallback.startActivity(
-                        Intent.createChooser(Util.createShareSongFileIntent(mSong, mActivityCallback), null));
+                MobclickAgent.onEvent(mActivity,"Share");
+                mActivity.startActivity(
+                        Intent.createChooser(Util.createShareSongFileIntent(mSong, mActivity), null));
                 break;
             case R.id.menu_delete:
-                MobclickAgent.onEvent(mActivityCallback,"Delete");
+                MobclickAgent.onEvent(mActivity,"Delete");
                 try {
-                    String title = mActivityCallback.getString(R.string.confirm_delete_from_playlist_or_library,mIsDeletePlayList ? mPlayListName : "曲库");
-                    new MaterialDialog.Builder(mActivityCallback)
+                    String title = mActivity.getString(R.string.confirm_delete_from_playlist_or_library,mIsDeletePlayList ? mPlayListName : "曲库");
+                    new MaterialDialog.Builder(mActivity)
                             .content(title)
                             .buttonRippleColor(ThemeStore.getRippleColor())
                             .positiveText(R.string.confirm)
@@ -105,12 +105,12 @@ public class SongPopupListener<ActivityCallback extends AppCompatActivity & OnTa
                             .checkBoxPromptRes(R.string.delete_source, false, null)
                             .onAny((dialog, which) -> {
                                 if(which == POSITIVE){
-                                    MobclickAgent.onEvent(mActivityCallback,"Delete");
+                                    MobclickAgent.onEvent(mActivity,"Delete");
                                     boolean deleteSuccess = !mIsDeletePlayList ?
                                             MediaStoreUtil.delete(mSong.getId() , Constants.SONG,dialog.isPromptCheckBoxChecked()) > 0 :
                                             PlayListUtil.deleteSong(mSong.getId(),mPlayListName);
 
-                                    ToastUtil.show(mActivityCallback,deleteSuccess ? R.string.delete_success : R.string.delete_error);
+                                    ToastUtil.show(mActivity,deleteSuccess ? R.string.delete_success : R.string.delete_error);
                                 }
                             })
                             .backgroundColorAttr(R.attr.background_color_3)

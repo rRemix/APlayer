@@ -4,15 +4,11 @@ import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import com.facebook.drawee.view.SimpleDraweeView;
-
-import io.reactivex.functions.Consumer;
-import remix.myplayer.bean.netease.SearchRequest;
 import remix.myplayer.request.network.RxUtil;
 
 public abstract class SimpleUriRequest extends ImageUriRequest<Uri> {
-    private SearchRequest mRequest;
-    public SimpleUriRequest(@NonNull SearchRequest request) {
+    private UriRequest mRequest;
+    public SimpleUriRequest(@NonNull UriRequest request) {
         super();
         mRequest = request;
     }

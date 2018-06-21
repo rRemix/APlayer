@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -23,9 +22,9 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.promeg.pinyinhelper.Pinyin;
 
 import butterknife.BindView;
+import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
-import remix.myplayer.asynctask.AsynLoadSongNum;
 import remix.myplayer.bean.mp3.Artist;
 import remix.myplayer.menu.AlbArtFolderPlaylistListener;
 import remix.myplayer.request.LibraryUriRequest;
@@ -72,6 +71,11 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
     public void onViewRecycled(BaseViewHolder holder) {
         super.onViewRecycled(holder);
         if(holder instanceof ArtistHolder){
+            if(((ArtistHolder) holder).mImage.getTag() != null){
+                Disposable disposable = (Disposable) ((ArtistHolder) holder).mImage.getTag();
+                if(!disposable.isDisposed())
+                    disposable.dispose();
+            }
             ((ArtistHolder) holder).mImage.setImageURI(Uri.EMPTY);
         }
     }
@@ -101,12 +105,13 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
         //设置歌手名
         holder.mText1.setText(artist.getArtist());
         final int artistId = artist.getArtistID();
-        if(holder instanceof ArtistListHolder){
-            new AsynLoadSongNum(holder.mText2,Constants.ARTIST).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,artistId);
+        if(holder instanceof ArtistListHolder && holder.mText2 != null){
+            holder.mText2.setText(mContext.getString(R.string.song_count_1,artist.getCount()));
         }
         //设置封面
         final int imageSize = ListModel == 1 ? SMALL_IMAGE_SIZE : BIG_IMAGE_SIZE;
-        new LibraryUriRequest(holder.mImage,ImageUriUtil.getSearchRequest(artist),new RequestConfig.Builder(imageSize,imageSize).build()).load();
+        Disposable disposable = new LibraryUriRequest(holder.mImage,ImageUriUtil.getSearchRequest(artist),new RequestConfig.Builder(imageSize,imageSize).build()).loadImage();
+        holder.mImage.setTag(disposable);
 
         //item点击效果
         holder.mContainer.setBackground(

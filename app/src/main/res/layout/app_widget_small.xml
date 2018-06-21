@@ -2,7 +2,8 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/app_widget_small_height">
+    android:layout_height="@dimen/app_widget_small_height"
+    android:background="@drawable/bg_corner_app_widget_white_1f">
     <TextView
         android:visibility="gone"
         android:id="@+id/appwidget_artist"
@@ -49,15 +50,25 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/d8_size"
                 android:layout_marginTop="@dimen/d2_size">
-                <ImageButton android:id="@+id/appwidget_skin"
+                <ImageButton android:id="@+id/appwidget_timer"
                     android:background="@drawable/bg_common_borderless_ripple"
-                    android:src="@drawable/widget_btn_skin"
+                    android:src="@drawable/widget_btn_timer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:paddingLeft="@dimen/d4_size"
                     android:paddingRight="@dimen/d4_size"
                     android:layout_centerVertical="true"/>
+                <ImageButton android:id="@+id/appwidget_skin"
+                    android:background="@drawable/bg_common_borderless_ripple"
+                    android:src="@drawable/widget_btn_skin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/d4_size"
+                    android:paddingRight="@dimen/d4_size"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/appwidget_timer"
+                    android:visibility="gone"/>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

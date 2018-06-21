@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/app_widget_big_height">
+    android:layout_height="@dimen/app_widget_big_height"
+    android:background="@drawable/bg_corner_app_widget_white_1f">
     <TextView
         android:visibility="gone"
         android:id="@+id/appwidget_artist"
@@ -11,6 +12,12 @@
         android:textSize="@dimen/s12_size"
         android:textColor="@color/appwidget_artist_color_white_1f"
         android:maxLines="1"/>
+    <ImageButton android:id="@+id/appwidget_timer"
+        android:visibility="gone"
+        android:background="@drawable/bg_common_borderless_ripple"
+        android:src="@drawable/widget_btn_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <ImageView
         android:layout_width="match_parent"

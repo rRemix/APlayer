@@ -53,6 +53,7 @@ import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.network.RxUtil;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -208,7 +209,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             //通知栏样式
                             case R.id.setting_notify_switch:
                                 sendBroadcast(new Intent(MusicService.ACTION_CMD)
-                                        .putExtra("Control",Constants.TOGGLE_NOTIFY)
+                                        .putExtra("Control", Command.TOGGLE_NOTIFY)
                                         .putExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,isChecked));
                                 break;
                             //沉浸式状态栏
@@ -220,7 +221,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                             //断点播放
                             case R.id.setting_breakpoint_switch:
                                 LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(MusicService.ACTION_CMD)
-                                    .putExtra("Control",Constants.PLAY_AT_BREAKPOINT)
+                                    .putExtra("Control", Command.PLAY_AT_BREAKPOINT)
                                     .putExtra(SPUtil.SETTING_KEY.PLAY_AT_BREAKPOINT,view.isChecked()));
                                 break;
                             //忽略内嵌
@@ -484,7 +485,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 mLockScreenTip.setText(which == 0 ? R.string.aplayer_lockscreen_tip :
                                         which == 1 ? R.string.system_lockscreen_tip : R.string.lockscreen_off_tip);
                                 Intent intent = new Intent(MusicService.ACTION_CMD);
-                                intent.putExtra("Control",Constants.TOGGLE_MEDIASESSION);
+                                intent.putExtra("Control", Command.TOGGLE_MEDIASESSION);
                                 sendBroadcast(intent);
                                 return true;
                             })
@@ -527,7 +528,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 (dialog, view, which, text) -> {
                                     SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.NOTIFY_SYSTEM_COLOR,which == 0);
                                     sendBroadcast(new Intent(MusicService.ACTION_CMD)
-                                            .putExtra("Control",Constants.TOGGLE_NOTIFY)
+                                            .putExtra("Control", Command.TOGGLE_NOTIFY)
                                             .putExtra(SPUtil.SETTING_KEY.NOTIFY_STYLE_CLASSIC,mNotifyStyleSwitch.isChecked()));
                                     return true;
                                 })

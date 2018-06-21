@@ -20,32 +20,6 @@ object M3UHelper {
     private val DURATION_SEPARATOR = ","
 
     /**
-     * #EXTM3U
-    #EXTINF:202580,5 Seconds of Summer - She Looks So Perfect
-    /storage/emulated/0/Music/欧美/She Looks So Perfect.mp3
-    #EXTINF:215406,복면가왕 - 07. 매일 매일 기다려 (티삼스)
-    /storage/emulated/0/Music/日韩/ (河铉雨) -    (每天每天等待着) (Live).mp3
-    #EXTINF:312242,薛之谦 - 暧昧
-    /storage/emulated/0/Music/测试/薛之谦 - 暧昧.mp3
-    #EXTINF:272692,MISIA - Angel
-    /storage/emulated/0/Music/日韩/Angel.mp3
-    #EXTINF:283115,<unknown> - Angel-live
-    /storage/emulated/0/Music/日韩/Angel-live.mp3
-    #EXTINF:266632,아이유 - 斑马，斑马
-    /storage/emulated/0/Music/日韩/ (IU) - 斑马，斑马 (Live).mp3
-    #EXTINF:326165,华语群星 - 半缘修道》ft. 若菲飞
-    /storage/emulated/0/Music/测试/兔裹煎蛋卷若菲飞 - 半缘修道.mp3
-    #EXTINF:199445,Jessie J/Ariana Grande/Nicki Minaj - Bang Bang
-    /storage/emulated/0/Music/欧美/Bang Bang.mp3
-    #EXTINF:216294,Linkin Park - Battle Symphony
-    /storage/emulated/0/Music/One More Night/Battle Symphony.mp3
-    #EXTINF:222067,Kelly Clarkson - Because Of You
-    /storage/emulated/0/Music/欧美/Because Of You.mp3
-    #EXTINF:226821,Rammstein - AMERIKA
-    /storage/emulated/0/Music/Rammstein/Amerika.mp3
-     */
-
-    /**
      * 导入歌单
      */
     fun importM3UFile(file: File, playlistName: String, newCreate: Boolean){

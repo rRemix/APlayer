@@ -4,6 +4,7 @@ package remix.myplayer.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -69,14 +70,15 @@ import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.SortOrder;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.misc.cache.DiskCache;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
+import remix.myplayer.misc.receiver.ExitReceiver;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
 import remix.myplayer.request.SimpleUriRequest;
 import remix.myplayer.request.network.RxUtil;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -105,7 +107,7 @@ import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
 /**
  *
  */
-public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Callback,OnTagEditListener {
+public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Callback {
     @BindView(R.id.tabs)
     TabLayout mTablayout;
     @BindView(R.id.ViewPager)
@@ -185,6 +187,19 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         mRefreshHandler = new MsgHandler(this);
 
         parseIntent();
+
+//        new MaterialDialog.Builder(this)
+//                .title("暂停应用内更新")
+//                .titleColorAttr(R.attr.text_color_primary)
+//                .content("后续版本将不再提供应用内更新的功能,获取最新版本可前往360、小米、酷安等应用市场")
+//                .contentColorAttr(R.attr.text_color_primary)
+//                .positiveText(R.string.choose)
+//                .positiveColorAttr(R.attr.text_color_primary)
+//                .buttonRippleColorAttr(R.attr.ripple_color)
+//                .backgroundColorAttr(R.attr.background_color_3)
+//                .itemsColorAttr(R.attr.text_color_primary)
+//                .theme(ThemeStore.getMDDialogTheme())
+//                .show();
     }
 
     /**
@@ -462,6 +477,11 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                     case 4:
                         startActivityForResult(new Intent(mContext,SettingActivity.class), REQUEST_SETTING);
                         break;
+                    //退出
+                    case 5:
+                        sendBroadcast(new Intent(Constants.EXIT)
+                                .setComponent(new ComponentName(mContext, ExitReceiver.class)));
+                        break;
                 }
                 mDrawerAdapter.setSelectIndex(position);
             }
@@ -678,10 +698,6 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-    @Override
-    public void onTagEdit(Song newSong) {
-    }
-
     private static boolean mLoadComplete = false;
     private class LoadFinishReceiver extends BroadcastReceiver {
         @Override
@@ -689,6 +705,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             LogUtil.d("StartAPlayer","receiveBroadcast");
             if(ACTION_LOAD_FINISH.equals(receive != null ? receive.getAction() : "") && !mLoadComplete){
                 setUpBottomBar();
+                UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
                 mLoadComplete = true;
             }
             if(mLoadComplete){
@@ -706,7 +723,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 return;
             Intent intent = new Intent(MusicService.ACTION_CMD);
             Bundle arg = new Bundle();
-            arg.putInt("Control", Constants.PLAYSELECTEDSONG);
+            arg.putInt("Control", Command.PLAYSELECTEDSONG);
             arg.putInt("Position", 0);
             intent.putExtras(arg);
             ArrayList<Integer> list = new ArrayList<>();

@@ -99,6 +99,8 @@
             android:lines="1"
             android:textColor="?attr/text_color"
             android:textSize="@dimen/s12_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline"
             tools:text="周杰伦" />
     </android.support.constraint.ConstraintLayout>

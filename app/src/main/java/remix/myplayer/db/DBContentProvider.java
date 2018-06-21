@@ -55,10 +55,11 @@ public class DBContentProvider extends ContentProvider {
             cursor.setNotificationUri(App.getContext().getContentResolver(), Uri.parse(CONTENT_AUTHORITY_SLASH));
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            DBManager.getInstance().closeDataBase();
         }
         return cursor;
     }
-
 
     /**
      *  插入多条歌曲信息
@@ -83,6 +84,7 @@ public class DBContentProvider extends ContentProvider {
             App.getContext().getContentResolver().notifyChange(uri,null);
         } finally {
             db.endTransaction(); //结束事务
+            DBManager.getInstance().closeDataBase();
         }
         return lines;
     }
@@ -104,6 +106,8 @@ public class DBContentProvider extends ContentProvider {
             }
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            DBManager.getInstance().closeDataBase();
         }
         return newUri;
     }
@@ -116,8 +120,10 @@ public class DBContentProvider extends ContentProvider {
         try {
             deleteRow = db.delete(match == PLAY_LIST_MULTIPLE ? PlayLists.TABLE_NAME : PlayListSongs.TABLE_NAME, selection, selectionArgs);
             App.getContext().getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            DBManager.getInstance().closeDataBase();
         }
 
         return deleteRow;
@@ -134,6 +140,8 @@ public class DBContentProvider extends ContentProvider {
             App.getContext().getContentResolver().notifyChange(uri,null/**match == PLAY_LIST_MULTIPLE ? mPlayListObserver : mPlayListSongObserver*/);
         } catch (Exception e){
             e.printStackTrace();
+        } finally {
+            DBManager.getInstance().closeDataBase();
         }
 
         return updateRow;

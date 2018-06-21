@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.PopupMenu;
@@ -25,6 +24,7 @@ import com.github.promeg.pinyinhelper.Pinyin;
 import java.util.ArrayList;
 
 import butterknife.BindView;
+import io.reactivex.disposables.Disposable;
 import remix.myplayer.R;
 import remix.myplayer.adapter.holder.BaseViewHolder;
 import remix.myplayer.bean.mp3.Song;
@@ -32,6 +32,7 @@ import remix.myplayer.interfaces.OnUpdateHighLightListener;
 import remix.myplayer.menu.SongPopupListener;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.Theme;
 import remix.myplayer.theme.ThemeStore;
@@ -88,7 +89,12 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
     public void onViewRecycled(BaseViewHolder holder) {
         super.onViewRecycled(holder);
         if(holder instanceof SongViewHolder){
-            ((SongViewHolder) holder).mImage.setImageURI(Uri.EMPTY);
+            if(((SongViewHolder) holder).mImage.getTag() != null){
+                Disposable disposable = (Disposable) ((SongViewHolder) holder).mImage.getTag();
+                if(!disposable.isDisposed())
+                    disposable.dispose();
+            }
+//            ((SongViewHolder) holder).mImage.setImageURI(Uri.EMPTY);
         }
     }
 
@@ -107,7 +113,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 
             headerHolder.mShuffle.setOnClickListener(v -> {
                 Intent intent = new Intent(MusicService.ACTION_CMD);
-                intent.putExtra("Control", Constants.NEXT);
+                intent.putExtra("Control", Command.NEXT);
                 intent.putExtra("shuffle",true);
                 if(mType == ALLSONG){
                     if(Global.AllSongList == null || Global.AllSongList.size() == 0){
@@ -140,7 +146,7 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 //            //判断该歌曲是否是正在播放的歌曲
 //            //如果是,高亮该歌曲，并显示动画
 //            if(currentMP3 != null){
-//                boolean highlight = song.getId() == MusicService.getCurrentMP3().getId();
+//                boolean highlight = song.getID() == MusicService.getCurrentMP3().getID();
 //                if(highlight)
 //                    mLastIndex = position;
 //                holder.mName.setTextColor(highlight ?
@@ -158,8 +164,9 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 //        }
 
         //封面
-        new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
-
+//        new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
+        Disposable disposable = new LibraryUriRequest(holder.mImage, getSearchRequestWithAlbumType(song),new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).loadImage();
+        holder.mImage.setTag(disposable);
 //        //是否为无损
 //        if(!TextUtils.isEmpty(song.getDisplayname())){
 //            String prefix = song.getDisplayname().substring(song.getDisplayname().lastIndexOf(".") + 1);
