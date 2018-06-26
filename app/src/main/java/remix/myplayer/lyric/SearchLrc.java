@@ -18,7 +18,9 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.Observable;
 import remix.myplayer.App;
@@ -38,8 +40,6 @@ import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.LyricUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.Util;
-
-import static remix.myplayer.App.IS_GOOGLEPLAY;
 
 /**
  * Created by Remix on 2015/12/7.
@@ -169,32 +169,42 @@ public class SearchLrc {
                 Observable.create(e -> {
                     List<String> localPaths = getAllLocalLrcPath();
                     if(localPaths.size() > 0) {
-                        if(localPaths.size() > 1 && !IS_GOOGLEPLAY) {
+                        if(localPaths.size() > 1 && isCN()) {
+                            Collections.sort(localPaths, (o1, o2) -> o2.compareTo(o1));
                             String localPath = localPaths.get(0);
-                            String translatePath=null;
+                            String translatePath = null;
                             for (String path : localPaths) {
-                                if(path.contains("translate")&&!path.equals(localPath)){
-                                    translatePath=path;
+                                if(path.contains("translate") && !path.equals(localPath)){
+                                    translatePath = path;
                                     break;
                                 }
                             }
-                            if(translatePath==null){
+                            if(translatePath == null){
                                 e.onNext(mLrcParser.getLrcRows(getBufferReader(localPath), true, mCacheKey,mSearchKey));
                             }else{
                                 //合并歌词
                                 List<LrcRow> source = mLrcParser.getLrcRows(getBufferReader(localPath), false, mCacheKey,mSearchKey);
-                                List<LrcRow> translate = mLrcParser.getLrcRows(getBufferReader(localPath), false, mCacheKey,mSearchKey);
+                                List<LrcRow> translate = mLrcParser.getLrcRows(getBufferReader(translatePath), false, mCacheKey,mSearchKey);
                                 if(translate != null && translate.size() > 0) {
-                                    int j = 0;
-                                    for (int i = 0; i < source.size(); ) {
-                                        boolean match = Math.abs(translate.get(j).getTime() - source.get(i).getTime()) < 1000;
-                                        if (match) {
-                                            source.get(i).setTranslate(translate.get(j).getContent());
-                                            i++;
-                                        } else if(translate.get(j).getTime()>source.get(i).getTime()){
-                                            i++;
-                                        } else {
-                                            j++;
+//                                    int j = 0;
+//                                    for (int i = 0; i < source.size(); ) {
+//                                        boolean match = Math.abs(translate.get(j).getTime() - source.get(i).getTime()) < 1000;
+//                                        if (match) {
+//                                            source.get(i).setTranslate(translate.get(j).getContent());
+//                                            i++;
+//                                        } else if(translate.get(j).getTime() > source.get(i).getTime()){
+//                                            i++;
+//                                        } else {
+//                                            j++;
+//                                        }
+//                                    }
+                                    for(int i = 0 ; i < translate.size();i++){
+                                        for(int j = 0 ; j < source.size();j++){
+                                            if(isTranslateCanUse(translate.get(i).getContent()) &&
+                                                    translate.get(i).getTime() == source.get(j).getTime()){
+                                                source.get(j).setTranslate(translate.get(i).getContent());
+                                                break;
+                                            }
                                         }
                                     }
                                     mLrcParser.saveLrcRows(source, mCacheKey,mSearchKey);
@@ -248,7 +258,7 @@ public class SearchLrc {
                                 final NLrcResponse lrcResponse = new Gson().fromJson(bodyStr,NLrcResponse.class);
                                 List<LrcRow> combine = mLrcParser.getLrcRows(getBufferReader(lrcResponse.lrc.lyric.getBytes(UTF_8)), false, mCacheKey,mSearchKey);
                                 //有翻译 合并
-                                if(!IS_GOOGLEPLAY && lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
+                                if(isCN() && lrcResponse.tlyric != null && !TextUtils.isEmpty(lrcResponse.tlyric.lyric)){
                                     List<LrcRow> translate = mLrcParser.getLrcRows(getBufferReader(lrcResponse.tlyric.lyric.getBytes(UTF_8)), false, mCacheKey,mSearchKey);
                                     if(translate != null && translate.size() > 0){
                                         for(int i = 0 ; i < translate.size();i++){
@@ -268,6 +278,14 @@ public class SearchLrc {
                                 return Observable.empty();
                         });
         }
+    }
+
+    private boolean isCN(){
+        return "zh".equalsIgnoreCase(Locale.getDefault().getLanguage());
+    }
+
+    private boolean isTranslateCanUse(String translate){
+        return !TextUtils.isEmpty(translate) && !translate.startsWith("词") && !translate.startsWith("曲");
     }
 
     /**

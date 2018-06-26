@@ -324,4 +324,5 @@
     <string name="app_widget_small_name">APlayer-小尺寸</string>
     <string name="app_widget_medium_transparent_name">APlayer-中尺寸-透明</string>
     <string name="app_widget_small_transparent_name">APlayer-小尺寸-透明</string>
+    <string name="create_playlist_fail">创建播放列表失败: </string>
 </resources>
