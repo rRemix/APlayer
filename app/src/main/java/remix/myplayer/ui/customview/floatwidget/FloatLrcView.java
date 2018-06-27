@@ -16,7 +16,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -126,15 +125,12 @@ public class FloatLrcView extends RelativeLayout {
         init(context);
     }
 
-
     private void init(Context context) {
         mContext = context;
         mNotify = new UnLockNotify();
         mWindowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 
-        View root = LayoutInflater.from(mContext).inflate(R.layout.layout_floatwidget, null);
-        ButterKnife.bind(this, root);
-        addView(root);
+        ButterKnife.bind(this, inflate(context,R.layout.layout_floatwidget,this));
         setUpView();
     }
 

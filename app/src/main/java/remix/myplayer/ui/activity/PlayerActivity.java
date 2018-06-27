@@ -70,6 +70,7 @@ import remix.myplayer.misc.tageditor.TagReceiver;
 import remix.myplayer.request.ImageUriRequest;
 import remix.myplayer.request.LibraryUriRequest;
 import remix.myplayer.request.RequestConfig;
+import remix.myplayer.request.UriRequest;
 import remix.myplayer.request.network.RxUtil;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
@@ -1181,7 +1182,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             updateTopStatus(newSong);
             ((LyricFragment) mAdapter.getItem(2)).updateLrc(newSong,true);
             Fresco.getImagePipeline().clearCaches();
-            SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.COVER_NAME,ImageUriUtil.getSearchRequestWithAlbumType(mInfo).getLastFMKey());
+            final UriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(mInfo);
+            SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.COVER_NAME,request.getLastFMKey());
+            SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseCacheKey());
             mInfo = newSong;
             requestCover(false);
         }

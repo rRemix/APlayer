@@ -148,7 +148,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
                                 .positiveText(R.string.jump_alipay_account)
                                 .negativeText(R.string.cancel)
                                 .content(R.string.donate_tip)
-                                .onPositive { _, _ -> AlipayUtil.startAlipayClient(mContext as Activity, "FKX01908X8ECOECIQZIL43") }
+                                .onPositive { _, _ -> AlipayUtil.startAlipayClient(mContext as Activity) }
                                 .backgroundColorAttr(R.attr.background_color_3)
                                 .positiveColorAttr(R.attr.text_color_primary)
                                 .negativeColorAttr(R.attr.text_color_primary)

@@ -891,6 +891,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     Song tempSong = intent.getParcelableExtra("Song");
                     if(tempSong != null){
                         mCurrentSong = tempSong;
+                        Global.Operation = Command.PLAY_TEMP;
                         prepare(mCurrentSong.getUrl());
                     }
                     break;
@@ -993,7 +994,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
     private void update(int control){
         if(control == Command.PLAYSELECTEDSONG || control == Command.PREV || control == Command.NEXT
                 || control == Command.TOGGLE || control == Command.PAUSE || control == Command.START
-                || control == Command.PLAY_TEMP) {
+                || control == Command.PLAY_TEMP ) {
             //更新ui
             mUpdateUIHandler.sendEmptyMessage(Constants.UPDATE_UI);
             //更新通知栏

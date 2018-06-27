@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import remix.myplayer.interfaces.OnTagEditListener;
 import remix.myplayer.misc.handler.MsgHandler;
 import remix.myplayer.misc.handler.OnHandleMessage;
 import remix.myplayer.misc.tageditor.TagReceiver;
+import remix.myplayer.request.UriRequest;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
@@ -39,6 +41,7 @@ import remix.myplayer.ui.fragment.BottomActionBarFragment;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.Global;
+import remix.myplayer.util.ImageUriUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
@@ -268,6 +271,10 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     public void onTagEdit(Song newSong) {
         if(newSong == null)
             return;
+        Fresco.getImagePipeline().clearCaches();
+        final UriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(newSong);
+        SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.COVER_NAME,request.getLastFMKey());
+        SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.COVER_NAME,request.getNeteaseCacheKey());
         if(mType == Constants.ARTIST || mType == Constants.ALBUM) {
             ID = mType == Constants.ARTIST ? newSong.getArtistId() : newSong.getAlbumId();
             Title = mType == Constants.ARTIST ? newSong.getArtist() : newSong.getAlbum();

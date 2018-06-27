@@ -117,7 +117,9 @@ public class App extends MultiDexApplication{
     private void loadThirdParty() {
         //bomb
         Bmob.initialize(this, "0c070110fffa9e88a1362643fb9d4d64");
-        BmobUpdateAgent.setUpdateOnlyWifi(false);
-        BmobUpdateAgent.update(this);
+        if(!IS_GOOGLEPLAY){
+            BmobUpdateAgent.setUpdateOnlyWifi(false);
+            BmobUpdateAgent.update(this);
+        }
     }
 }
