@@ -26,6 +26,7 @@ import remix.myplayer.theme.ThemeStore;
 import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.ToastUtil;
+import remix.myplayer.util.Util;
 
 import static remix.myplayer.App.IS_GOOGLEPLAY;
 
@@ -82,16 +83,21 @@ public class FeedBackActivity extends ToolbarActivity {
             );
             commitByEmail();
         } catch (PackageManager.NameNotFoundException e) {
-            ToastUtil.show(FeedBackActivity.this,R.string.send_error);
+            ToastUtil.show(this,R.string.send_error);
         }
     }
 
     private void commitByEmail(){
         Intent data = new Intent(Intent.ACTION_SENDTO);
-        data.setData(Uri.parse(!IS_GOOGLEPLAY ? "mailto:568920427@qq.com" : "rRemix.me@gmail.com"));
+        data.setData(Uri.parse(!IS_GOOGLEPLAY ? "mailto:568920427@qq.com" : "mailto:rRemix.me@gmail.com"));
         data.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback));
         data.putExtra(Intent.EXTRA_TEXT, mContent.getText().toString() + "\n\n\n" + mFeedBack);
-        startActivityForResult(data,0);
+        if(Util.isIntentAvailable(this,data)){
+            startActivityForResult(data,0);
+        }else{
+            ToastUtil.show(this,R.string.send_error);
+        }
+
     }
 
     @Override

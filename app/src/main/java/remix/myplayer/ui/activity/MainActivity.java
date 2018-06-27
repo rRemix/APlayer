@@ -288,7 +288,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                                     }
                                 }
                             } catch (Exception e){
-                                ToastUtil.show(mContext,"创建播放列表错误:" + e.toString());
+                                ToastUtil.show(mContext,R.string.create_playlist_fail,e.toString());
                             }
                         })
                         .show();
