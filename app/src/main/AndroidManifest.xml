@@ -102,6 +102,9 @@
         <activity
             android:name=".ui.activity.ChildHolderActivity"
             android:theme="@style/ActivityStyle" />
+        <!--艺术家详情-->
+        <activity android:name=".ui.activity.artist.ArtistDetailActivity"
+            android:theme="@style/ActivityStyle"/>
         <!--手动排序-->
         <activity android:name=".ui.activity.CustomSortActivity"
             android:theme="@style/ActivityStyle"/>

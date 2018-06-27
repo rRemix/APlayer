@@ -11,6 +11,7 @@ repositories {
 
 ext {
     supportLibVersion = '26.1.0'
+    lifecycleVersion = '1.1.1'
 }
 
 android {
@@ -80,6 +81,10 @@ android {
         }
     }
 
+    dataBinding {
+        enabled true
+    }
+
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
@@ -97,8 +102,8 @@ android {
 //        chuizi{}
 //        qihu360{}
 //        xiaomi{}
-        kuan {}
-//        google{}
+//        kuan {}
+        google{}
         productFlavors.all { flavor ->
             flavor.manifestPlaceholders = [CHANNEL_VALUE: name]
         }
@@ -172,10 +177,9 @@ dependencies {
 
     implementation 'cn.bmob.android:bmob-sdk:3.6.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-//    implementation 'com.android.billingclient:billing:1.1'
     implementation 'com.anjlab.android.iab.v3:library:1.0.44'
-//    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-//    implementation 'com.google.code.gson:gson:2.8.2'
+
+    implementation "android.arch.lifecycle:extensions:$lifecycleVersion"
 }
 
 def releaseTime() {

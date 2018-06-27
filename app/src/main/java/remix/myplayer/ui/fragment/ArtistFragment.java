@@ -19,7 +19,7 @@ import remix.myplayer.asynctask.WrappedAsyncTaskLoader;
 import remix.myplayer.bean.mp3.Artist;
 import remix.myplayer.interfaces.LoaderIds;
 import remix.myplayer.interfaces.OnItemClickListener;
-import remix.myplayer.ui.activity.ChildHolderActivity;
+import remix.myplayer.ui.activity.artist.ArtistDetailActivity;
 import remix.myplayer.ui.customview.fastcroll_recyclerview.FastScrollRecyclerView;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.MediaStoreUtil;
@@ -66,7 +66,8 @@ public class ArtistFragment extends LibraryFragment<Artist,ArtistAdapter>{
                         Artist artist =  mAdapter.getDatas().get(position);
                         int artistid = artist.getArtistID();
                         String title = artist.getArtist();
-                        Intent intent = new Intent(mContext, ChildHolderActivity.class);
+//                        Intent intent = new Intent(mContext, ChildHolderActivity.class);
+                        Intent intent = new Intent(mContext, ArtistDetailActivity.class);
                         intent.putExtra("Id", artistid);
                         intent.putExtra("Title", title);
                         intent.putExtra("Type", Constants.ARTIST);

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/d8_size">
+    <android.support.v7.widget.CardView
+        android:layout_width="@dimen/item_album_for_artist_img_size"
+        android:layout_height="@dimen/item_album_for_artist_img_size"
+        android:foreground="?attr/background_common"
+        app:cardElevation="@dimen/d4_size">
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/item_img"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            fresco:fadeDuration="@integer/FadeDuration"
+            fresco:actualImageScaleType="centerCrop"
+            fresco:placeholderImage="?attr/default_album"
+            fresco:placeholderImageScaleType="centerCrop"
+            fresco:failureImage="?attr/default_album"
+            fresco:failureImageScaleType="centerCrop"/>
+    </android.support.v7.widget.CardView>
+    <TextView
+        android:id="@+id/item_album"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="@dimen/item_album_for_artist_img_size"
+        android:maxLines="1"
+        android:textColor="?attr/text_color_primary"
+        android:textSize="@dimen/s14_size"
+        android:layout_marginTop="@dimen/d10_size"
+        android:layout_gravity="left"
+        android:ellipsize="end"
+        tools:text="Trespassing TrespassingTrespassing"/>
+</LinearLayout>

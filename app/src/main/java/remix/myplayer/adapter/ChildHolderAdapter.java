@@ -255,7 +255,7 @@ public class ChildHolderAdapter extends HeaderAdapter<Song,BaseViewHolder> imple
         }
     }
 
-    static class ChildHolderViewHolder extends BaseViewHolder {
+    public static class ChildHolderViewHolder extends BaseViewHolder {
         @BindView(R.id.sq)
         View mSQ;
         @BindView(R.id.album_holder_item_title)

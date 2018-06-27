@@ -66,6 +66,32 @@ public class MediaStoreUtil {
         Constants.SCAN_SIZE = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.SCAN_SIZE,ByteConstants.KB * 500);
     }
 
+    /**
+     *
+     * @param artistId
+     * @return
+     */
+    public static Artist getArtist(int artistId){
+        Cursor cursor = null;
+        try {
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    new String[]{MediaStore.Audio.Media.ARTIST_ID,MediaStore.Audio.Media.ARTIST},
+                    MediaStore.Audio.Media.ARTIST_ID + "=" + artistId + " and " + MediaStoreUtil.getBaseSelection(),
+                    null,
+                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,SortOrder.ArtistSortOrder.ARTIST_A_Z));
+            if(cursor != null){
+                while (cursor.moveToNext()){
+                    return new Artist(cursor.getInt(0),cursor.getString(1),
+                            getSongCount(Constants.ARTIST,cursor.getInt(0)));
+                }
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
+        }
+        return null;
+    }
+
     public static List<Artist> getAllArtist(){
         ArrayList<Artist> artists = new ArrayList<>();
         Cursor cursor = null;
@@ -87,6 +113,33 @@ public class MediaStoreUtil {
         }
 
         return artists;
+    }
+
+    public static List<Album> getAlbum(int artistId){
+        List<Album> albums = new ArrayList<>();
+        Cursor cursor = null;
+        try {
+            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    new String[]{"distinct " + MediaStore.Audio.Media.ALBUM_ID,
+                            MediaStore.Audio.Media.ALBUM,
+                            MediaStore.Audio.Media.ARTIST_ID,
+                            MediaStore.Audio.Media.ARTIST},
+                    MediaStore.Audio.Media.ARTIST_ID + "=" + artistId + " and " + MediaStoreUtil.getBaseSelection(),
+                    null,
+                    SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ARTIST_SORT_ORDER,SortOrder.ArtistSortOrder.ARTIST_A_Z));
+            if(cursor != null){
+                while (cursor.moveToNext()){
+                    albums.add(new Album(cursor.getInt(0),
+                            Util.processInfo(cursor.getString(1), Util.ALBUMTYPE),
+                            cursor.getInt(2),
+                            Util.processInfo(cursor.getString(3), Util.ARTISTTYPE),getSongCount(Constants.ALBUM,cursor.getInt(0))));
+                }
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed())
+                cursor.close();
+        }
+        return albums;
     }
 
     public static List<Album> getAllAlbum(){

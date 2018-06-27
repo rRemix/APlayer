@@ -46,8 +46,7 @@ public class App extends MultiDexApplication{
         LogUtil.d("ServiceLifeCycle","启动App");
         mContext = getApplicationContext();
 
-        if(!BuildConfig.DEBUG)
-            IS_GOOGLEPLAY = "google".equalsIgnoreCase(Util.getAppMetaData("UMENG_CHANNEL"));
+        IS_GOOGLEPLAY = "google".equalsIgnoreCase(Util.getAppMetaData("UMENG_CHANNEL"));
         initUtil();
         initTheme();
 

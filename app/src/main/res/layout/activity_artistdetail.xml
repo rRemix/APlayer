@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v4.widget.NestedScrollView
+        android:overScrollMode="never"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/background_color_main">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/artist_detail_top_img_height"
+                    android:id="@+id/activity_img"
+                    fresco:fadeDuration="@integer/FadeDuration"
+                    fresco:actualImageScaleType="centerCrop"
+                    fresco:placeholderImage="?attr/default_artist"
+                    fresco:placeholderImageScaleType="centerCrop"
+                    fresco:failureImage="?attr/default_artist"
+                    fresco:failureImageScaleType="centerCrop"
+                    tools:ignore="ContentDescription" />
+                <android.support.design.widget.AppBarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    app:elevation="0dp">
+                    <include layout="@layout/toolbar"/>
+                </android.support.design.widget.AppBarLayout>
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/activity_artist_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/text_color_primary"
+                android:textSize="@dimen/s20_size"
+                android:maxLines="1"
+                android:layout_marginTop="@dimen/d8_size"
+                android:layout_marginLeft="@dimen/d16_size"
+                android:layout_marginRight="@dimen/d16_size"
+                tools:text="Adam Lambert" />
+
+            <TextView
+                android:id="@+id/activity_albums_and_songs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/text_color"
+                android:textSize="@dimen/s18_size"
+                android:maxLines="1"
+                android:layout_marginTop="@dimen/d4_size"
+                android:layout_marginLeft="@dimen/d16_size"
+                android:layout_marginRight="@dimen/d16_size"
+                tools:text="3专辑 4音乐"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/activity_artist_intro"
+                android:textColor="?attr/text_color_primary"
+                android:textSize="@dimen/s16_size"
+                android:layout_marginTop="@dimen/d10_size"
+                android:layout_marginLeft="@dimen/d16_size"
+                android:layout_marginRight="@dimen/d16_size"
+                android:maxLines="4"
+                android:ellipsize="end"
+                tools:text="亚当.兰伯特 亚当.兰伯特 亚当.兰伯特 亚当.兰伯特 亚当.兰伯特 亚当.兰伯特 亚当.兰伯特 亚当.兰伯特"/>
+
+            <TextView
+                android:id="@+id/activity_albums"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_album"
+                android:textColor="?attr/text_color_primary"
+                android:textSize="@dimen/s18_size"
+                android:layout_marginLeft="@dimen/d16_size"
+                android:layout_marginRight="@dimen/d16_size"
+                android:layout_marginTop="@dimen/d32_size"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:overScrollMode="never"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/activity_albums_recyclerView"
+                android:layout_marginTop="@dimen/d16_size"
+                android:layout_marginLeft="@dimen/d16_size"
+                android:layout_marginRight="@dimen/d16_size"
+                tools:listitem="@layout/item_album_for_artist"/>
+
+            <TextView
+                android:id="@+id/activity_songs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_song"
+                android:textColor="?attr/text_color_primary"
+                android:textSize="@dimen/s18_size"
+                android:layout_marginLeft="@dimen/d16_size"
+                android:layout_marginRight="@dimen/d16_size"
+                android:layout_marginTop="@dimen/d32_size"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:overScrollMode="never"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/activity_songs_recyclerView"
+                android:layout_marginTop="@dimen/d16_size"
+                android:layout_marginLeft="@dimen/d16_size"
+                android:layout_marginRight="@dimen/d16_size"
+                tools:listitem="@layout/item_song_for_artist"/>
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+
+</layout>

@@ -120,4 +120,7 @@
     <dimen name="cover_margin">9dp</dimen>
     <dimen name="record_margin">34dp</dimen>
 
+    <dimen name="artist_detail_top_img_height">260dp</dimen>
+    <dimen name="item_album_for_artist_img_size">90dp</dimen>
+
 </resources>
