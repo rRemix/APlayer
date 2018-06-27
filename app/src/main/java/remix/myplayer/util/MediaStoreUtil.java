@@ -557,8 +557,29 @@ public class MediaStoreUtil {
             return null;
 
         long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
+        final String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+        final int id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+//        if (duration > 0){
+//            IjkMediaPlayer ijkMediaPlayer = new IjkMediaPlayer();
+//            try {
+//                ijkMediaPlayer.setDataSource(data);
+//                ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
+//                ijkMediaPlayer.prepareAsync();
+//                Thread.sleep(20);
+//                duration = ijkMediaPlayer.getDuration();
+//                if(duration > 0){
+//                    ContentValues contentValues = new ContentValues();
+//                    contentValues.put(MediaStore.Audio.Media.DURATION,duration);
+//                    int updateCount = mContext.getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+//                            contentValues, MediaStore.Audio.Media._ID + "=?",new String[]{id + ""});
+//                    LogUtil.d("UpdateDuration","UpdateCount: " + updateCount);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
         return new Song(
-                cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID)),
+                id,
                 cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
                 Util.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)), Util.SONGTYPE),
                 Util.processInfo(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)), Util.ALBUMTYPE),
@@ -567,7 +588,7 @@ public class MediaStoreUtil {
                 cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST_ID)),
                 duration,
                 Util.getTime(duration),
-                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)),
+                data,
                 cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE)),
                 cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.YEAR)),
                 cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE_KEY)),

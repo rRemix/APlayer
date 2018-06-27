@@ -1,9 +1,12 @@
 package remix.myplayer.bean.mp3;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 
+import remix.myplayer.App;
+import remix.myplayer.util.LogUtil;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 /**
@@ -187,9 +190,15 @@ public class Song implements Cloneable, Parcelable {
                 ijkMediaPlayer.setDataSource(Url);
                 ijkMediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 0);
                 ijkMediaPlayer.prepareAsync();
+                Thread.sleep(20);
                 Duration = ijkMediaPlayer.getDuration();
+                LogUtil.d("UpdateDuration","Duration: " + Duration);
                 if(Duration > 0){
-                    //todo update mediastore
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(MediaStore.Audio.Media.DURATION,Duration);
+                    int updateCount = App.getContext().getContentResolver().update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                            contentValues, MediaStore.Audio.Media._ID + "=?",new String[]{Id + ""});
+                    LogUtil.d("UpdateDuration","UpdateCount: " + updateCount);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
