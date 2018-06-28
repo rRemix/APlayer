@@ -22,8 +22,8 @@ android {
         applicationId "remix.myplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 75
-        versionName "1.3.4"
+        versionCode 76
+        versionName "1.3.5-beta"
         flavorDimensions "default"
         vectorDrawables.useSupportLibrary = true
         ndk {
@@ -43,7 +43,7 @@ android {
 
     signingConfigs {
         debug {
-            storeFile file("/../Debug.jks")
+            storeFile file("./Debug.jks")
             storePassword "123456"
             keyAlias "Debug"
             keyPassword "123456"
@@ -95,8 +95,8 @@ android {
 //        anzhuomarket{}
 
 //        chuizi{}
-//        qihu360{}
-//        xiaomi{}
+        qihu360{}
+        xiaomi{}
         kuan {}
 //        google{}
         productFlavors.all { flavor ->
@@ -176,6 +176,10 @@ dependencies {
     implementation 'com.anjlab.android.iab.v3:library:1.0.44'
 //    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 //    implementation 'com.google.code.gson:gson:2.8.2'
+
+//    implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
+//    implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
+//    implementation 'tv.danmaku.ijk.media:ijkplayer-x86:0.8.8'
 }
 
 def releaseTime() {

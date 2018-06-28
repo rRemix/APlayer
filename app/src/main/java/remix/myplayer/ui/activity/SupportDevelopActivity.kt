@@ -186,8 +186,8 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
     private fun loadSkuDetails() {
         if(mAdapter.datas.size >  3)
             return
-        Single.fromCallable({ mBillingProcessor!!.getPurchaseListingDetails(SKU_IDS) })
-                .map({
+        mDisposable = Single.fromCallable({ mBillingProcessor!!.getPurchaseListingDetails(SKU_IDS) })
+                .map {
                     val beans = ArrayList<PurchaseBean>()
                     it.sortedWith(kotlin.Comparator{ o1, o2 ->
                         o1.priceValue.compareTo(o2.priceValue)
@@ -195,7 +195,7 @@ class SupportDevelopActivity : ToolbarActivity(), BillingProcessor.IBillingHandl
                         beans.add(PurchaseBean(it.productId,"",it.title,it.priceText))
                     }
                     beans
-                })
+                }
                 .doFinally { mLoading.dismiss() }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
