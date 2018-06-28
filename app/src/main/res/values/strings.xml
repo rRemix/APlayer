@@ -297,7 +297,7 @@
     <string name="import_fail">Import failed: %s</string>
     <string name="new_create">New</string>
     <string name="choose_import_way">Select import mode</string>
-    <string name="import_from_external_storage">Import from external storage.</string>
+    <string name="import_from_external_storage">Import from external storage(m3u)</string>
     <string name="import_from_others">Import from the existing playlist</string>
     <string name="no_playlist_can_import">No playlist can be imported</string>
     <string name="choose_import_playlist">Select playlist to import</string>
@@ -325,4 +325,9 @@
     <string name="app_widget_medium_transparent_name">APlayer-Medium-Transparent</string>
     <string name="app_widget_small_transparent_name">APlayer-Small-Transparent</string>
     <string name="create_playlist_fail">Create playlist failed: </string>
+    <string name="export_playlist">Export Playlist</string>
+    <string name="export_play_list_tip">Export playlist to external storage</string>
+    <string name="choose_playlist_to_export">Select playlist to export</string>
+    <string name="export_fail">Export failed:%s</string>
+    <string name="export_success">Export success</string>
 </resources>

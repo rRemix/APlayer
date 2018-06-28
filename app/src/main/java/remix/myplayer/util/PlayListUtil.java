@@ -407,42 +407,6 @@ public class PlayListUtil {
     }
 
     /**
-     * 根据id列表查询歌曲
-     * @param idList
-     * @return
-     */
-    public static List<Song> getMP3ListByIds(List<Integer> idList){
-        if(idList == null || idList.size() == 0)
-            return new ArrayList<>();
-
-        StringBuilder selection = new StringBuilder(128);
-        for(int i = 0; i < idList.size(); i++){
-            selection.append(idList.get(i)).append( i == idList.size() - 1 ? ") " : ",");
-        }
-        List<Song> songList = new ArrayList<>();
-        Cursor cursor = null;
-        try {
-            cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                    null,
-                    selection.toString(),
-                    null,
-                    null);
-            if(cursor != null && cursor.getCount() > 0){
-                while (cursor.moveToNext()){
-                    songList.add(getMP3Info(cursor));
-                }
-            }
-        } catch (Exception e){
-            e.printStackTrace();
-        } finally {
-            if(cursor != null && !cursor.isClosed()){
-                cursor.close();
-            }
-        }
-        return songList;
-    }
-
-    /**
      * 根据多个歌曲id返回多个歌曲详细信息
      * @param idList 歌曲id列表
      * @param playlistId 播放列表id
@@ -472,6 +436,7 @@ public class PlayListUtil {
         }
         Cursor cursor = null;
         List<Song> songList = new ArrayList<>(idList.size());
+        //处理自定义排序
         Song[] tempArray = new Song[idList.size()];
         try {
             cursor = mContext.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -484,6 +449,8 @@ public class PlayListUtil {
                     Song temp = getMP3Info(cursor);
                     tempArray[isCustom ? idList.indexOf(temp.getId()) : cursor.getPosition()] = temp;
                 }
+
+                //找到不存在的歌曲
                 for(Song temp : tempArray){
                     if(temp != null)
                         songList.add(temp);
@@ -498,6 +465,7 @@ public class PlayListUtil {
                             deleteId.add(id);
                         }
                     }
+                    //从播放列表移除
                     PlayListUtil.deleteMultiSongs(deleteId,playlistId);
                 }
             }
