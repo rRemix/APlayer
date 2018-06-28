@@ -55,7 +55,7 @@ class VolumeController {
     private fun directTo(@FloatRange(from = 0.0, to = 1.0) leftVolume: Float, @FloatRange(from = 0.0, to = 1.0) rightVolume: Float){
         val mediaPlayer = MusicService.getMediaPlayer()
         try {
-            mediaPlayer.setVolume(leftVolume, rightVolume)
+            mediaPlayer?.setVolume(leftVolume, rightVolume)
         }catch (e: IllegalStateException){
             LogUtil.d("VolumeController",e.toString())
         }
