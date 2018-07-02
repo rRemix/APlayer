@@ -221,15 +221,15 @@ public class SongAdapter extends HeaderAdapter<Song,BaseViewHolder> implements F
 
         if(mType == ALLSONG){
             if(MultiChoice.TAG.equals(SongFragment.TAG) &&
-                    mMultiChoice.mSelectedPosition.contains(position - 1)){
-                mMultiChoice.addView(holder.mContainer);
+                    mMultiChoice.getSelectPos().contains(position - 1)){
+                holder.mContainer.setSelected(true);
             } else {
                 holder.mContainer.setSelected(false);
             }
         } else {
             if(MultiChoice.TAG.equals(RecentlyActivity.TAG) &&
-                    mMultiChoice.mSelectedPosition.contains(position - 1)){
-                mMultiChoice.addView(holder.mContainer);
+                    mMultiChoice.getSelectPos().contains(position - 1)){
+                holder.mContainer.setSelected(true);
             } else {
                 holder.mContainer.setSelected(false);
             }

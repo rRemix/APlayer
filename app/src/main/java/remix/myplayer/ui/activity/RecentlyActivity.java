@@ -62,11 +62,12 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
         mHandler = new MsgHandler(this);
 
         mAdapter = new SongAdapter(this, R.layout.item_song_recycle,mMultiChoice,SongAdapter.RECENTLY,mRecyclerView);
+        mMultiChoice.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 int id = getSongId(position);
-                if(id > 0 && !mMultiChoice.itemAddorRemoveWithClick(view,position,id,TAG)){
+                if(id > 0 && !mMultiChoice.itemClick(mAdapter,position,id,TAG)){
                     Intent intent = new Intent(MusicService.ACTION_CMD);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Command.PLAYSELECTEDSONG);
@@ -80,7 +81,7 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
             public void onItemLongClick(View view, int position) {
                 int id = getSongId(position);
                 if(id > 0)
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG,Constants.SONG);
+                    mMultiChoice.itemLongClick(mAdapter,position,id,TAG,Constants.SONG);
             }
         });
 
@@ -157,7 +158,8 @@ public class RecentlyActivity extends PermissionActivity<Song,SongAdapter> imple
     public void handleMessage(Message msg){
         switch (msg.what){
             case Constants.CLEAR_MULTI:
-                mMultiChoice.clearSelectedViews();
+                if(mAdapter != null)
+                    mAdapter.notifyDataSetChanged();
                 break;
             case Constants.UPDATE_ADAPTER:
                 if(mAdapter != null)

@@ -58,8 +58,7 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
             @Override
             public void onItemClick(View view, int position) {
                 int id = getSongID(position);
-
-                if(id > 0 && !mMultiChoice.itemAddorRemoveWithClick(view,position,id,TAG)){
+                if(id > 0 && !mMultiChoice.itemClick(mAdapter,position,id,TAG)){
                     Intent intent = new Intent(MusicService.ACTION_CMD);
                     Bundle arg = new Bundle();
                     arg.putInt("Control", Command.PLAYSELECTEDSONG);
@@ -72,7 +71,7 @@ public class SongFragment extends LibraryFragment<Song,SongAdapter> {
             public void onItemLongClick(View view, int position) {
                 int id = getSongID(position);
                 if(getUserVisibleHint() && id > 0)
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,id,TAG,Constants.SONG);
+                    mMultiChoice.itemLongClick(mAdapter,position,id,TAG,Constants.SONG);
             }
         });
 

@@ -1,6 +1,7 @@
 package remix.myplayer.ui;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
@@ -8,9 +9,16 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import remix.myplayer.R;
+import remix.myplayer.adapter.AlbumAdapter;
+import remix.myplayer.adapter.ArtistAdapter;
+import remix.myplayer.adapter.FolderAdapter;
+import remix.myplayer.adapter.PlayListAdapter;
+import remix.myplayer.adapter.SongAdapter;
 import remix.myplayer.bean.mp3.PlayList;
 import remix.myplayer.interfaces.OnMultiItemClickListener;
 import remix.myplayer.interfaces.OnUpdateOptionMenuListener;
@@ -46,28 +54,25 @@ public class MultiChoice implements OnMultiItemClickListener {
     /** 多选菜单是否正在显示 */
     private boolean mIsShow = false;
 
-    /** 所有选中状态的view */
-    public ArrayList<View> mSelectedViews = new ArrayList<>();
+    private RecyclerView.Adapter mAdapter;
+
+//    /** 所有选中状态的view */
+//    public ArrayList<View> mSelectedViews = new ArrayList<>();
 
     /** 所有选中view的position */
-    public ArrayList<Integer> mSelectedPosition = new ArrayList<>();
+    private Set<Integer> mSelectedPosition = new HashSet<>();
 
     /** 所有选中view对应的参数 包括歌曲id 专辑id 艺术家id 文件夹名 播放列表名 */
-    public ArrayList<Object> mSelectedArg = new ArrayList<>();
+    private ArrayList<Object> mSelectedArg = new ArrayList<>();
 
     /** 更新optionmenu */
     private OnUpdateOptionMenuListener mUpdateOptionMenuListener;
 
-    /** 构造函数 */
     public MultiChoice(Context context){
         mContext = context;
     }
 
     public MultiChoice(){}
-    public void setContext(Context context){
-        mContext = context;
-    }
-
 
     public boolean isShow(){
         return mIsShow;
@@ -75,6 +80,14 @@ public class MultiChoice implements OnMultiItemClickListener {
 
     public void setShowing(boolean showing){
         mIsShow = showing;
+    }
+
+    public void setAdapter(RecyclerView.Adapter adapter){
+        mAdapter = adapter;
+    }
+
+    public Set<Integer> getSelectPos(){
+        return mSelectedPosition;
     }
 
     @Override
@@ -231,18 +244,21 @@ public class MultiChoice implements OnMultiItemClickListener {
     }
 
     /**
-     * @param view
+     * @param adapter
      * @param position
      * @param arg
      * @param tag
      * @return
      */
-    public boolean itemAddorRemoveWithClick(View view,int position,Object arg,String tag){
+    public boolean itemClick(RecyclerView.Adapter adapter, int position, Object arg, String tag){
         if(mIsShow && TAG.equals(tag)){
             mIsShow = true;
-            removeOrAddView(view);
+//            removeOrAddView(view);
             removeOrAddPosition(position);
             removeOrAddArg(arg);
+            if(isLibraryAdapter())
+                position += 1;
+            mAdapter.notifyItemChanged(position);
             return true;
         }
         return false;
@@ -250,12 +266,12 @@ public class MultiChoice implements OnMultiItemClickListener {
 
     /**
      *
-     * @param view
+     * @param adapter
      * @param position
      * @param arg
      * @param newTag
      */
-    public void itemAddorRemoveWithLongClick(View view,int position,Object arg,String newTag,int type){
+    public void itemLongClick(RecyclerView.Adapter adapter, int position, Object arg, String newTag, int type){
         //当前没有处于多选状态
         if(!mIsShow && TAG.equals("")){
             Util.vibrate(mContext,150);
@@ -265,36 +281,44 @@ public class MultiChoice implements OnMultiItemClickListener {
             if(mUpdateOptionMenuListener != null)
                 mUpdateOptionMenuListener.onUpdate(true);
         }
-        removeOrAddView(view);
+//        removeOrAddView(view);
         removeOrAddPosition(position);
         removeOrAddArg(arg);
+        if(isLibraryAdapter())
+            position += 1;
+        mAdapter.notifyItemChanged(position);
+    }
 
+    private boolean isLibraryAdapter(){
+        return mAdapter instanceof SongAdapter || mAdapter instanceof AlbumAdapter || mAdapter instanceof ArtistAdapter
+                || mAdapter instanceof PlayListAdapter || mAdapter instanceof FolderAdapter;
     }
 
     public void updateOptionMenu(boolean multishow){
         if(mUpdateOptionMenuListener != null)
             mUpdateOptionMenuListener.onUpdate(multishow);
+        mAdapter.notifyDataSetChanged();
     }
 
-    public void addView(View view){
-        mSelectedViews.add(view);
-        setViewSelected(view, true);
-    }
+//    public void addView(View view){
+//        mSelectedViews.add(view);
+//        setViewSelected(view, true);
+//    }
 
-    /**
-     * 添加或者删除选中的view
-     * @param view
-     */
-    public void removeOrAddView(View view){
-        if(mSelectedViews.contains(view)){
-            mSelectedViews.remove(view);
-
-            setViewSelected(view,false);
-        } else {
-            mSelectedViews.add(view);
-            setViewSelected(view,true);
-        }
-    }
+//    /**
+//     * 添加或者删除选中的view
+//     * @param view
+//     */
+//    public void removeOrAddView(View view){
+//        if(mSelectedViews.contains(view)){
+//            mSelectedViews.remove(view);
+//
+//            setViewSelected(view,false);
+//        } else {
+//            mSelectedViews.add(view);
+//            setViewSelected(view,true);
+//        }
+//    }
 
     /**
      * 添加或者删除选中view在adapter中的position
@@ -324,24 +348,24 @@ public class MultiChoice implements OnMultiItemClickListener {
      * 重置
      */
     public void clear(){
-        clearSelectedViews();
-        mSelectedViews.clear();
+//        clearSelectedViews();
+//        mSelectedViews.clear();
         mSelectedPosition.clear();
         mSelectedArg.clear();
         TAG = "";
         TYPE = -1;
     }
 
-    /**
-     * 清除所有view的选中状态
-     */
-    public void clearSelectedViews(){
-        for(View view : mSelectedViews){
-            if(view != null)
-                setViewSelected(view,false);
-        }
-        mSelectedViews.clear();
-    }
+//    /**
+//     * 清除所有view的选中状态
+//     */
+//    public void clearSelectedViews(){
+//        for(View view : mSelectedViews){
+//            if(view != null)
+//                setViewSelected(view,false);
+//        }
+//        mSelectedViews.clear();
+//    }
 
     /**
      * 设置view的选中状态

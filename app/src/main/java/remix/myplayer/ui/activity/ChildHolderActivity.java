@@ -104,13 +104,14 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
         mArg = getIntent().getStringExtra("Title");
 
         mAdapter = new ChildHolderAdapter(this,R.layout.item_child_holder,mType,mArg,mMultiChoice,mRecyclerView);
+        mMultiChoice.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 if(position < 0 || mInfoList == null || position >= mInfoList.size())
                     return;
                 int songId = mInfoList.get(position).getId();
-                if(!mMultiChoice.itemAddorRemoveWithClick(view,position,songId,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
+                if(!mMultiChoice.itemClick(mAdapter,position,songId,mType == Constants.PLAYLISTSONG ? TAG_PLAYLIST_SONG : TAG)){
                     if (mInfoList != null && mInfoList.size() == 0)
                         return;
                     ArrayList<Integer> idList = new ArrayList<>();
@@ -135,7 +136,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
             @Override
             public void onItemLongClick(View view, int position) {
-                mMultiChoice.itemAddorRemoveWithLongClick(view,position,mInfoList.get(position).getId(), TAG,mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
+                mMultiChoice.itemLongClick(mAdapter,position,mInfoList.get(position).getId(), TAG,mType == Constants.PLAYLIST ? Constants.PLAYLISTSONG : Constants.SONG);
             }
         });
 
@@ -371,7 +372,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
     public void handleInternal(Message msg){
         switch (msg.what){
             case Constants.CLEAR_MULTI:
-                mMultiChoice.clearSelectedViews();
+                mAdapter.notifyDataSetChanged();
                 break;
             case Constants.UPDATE_ADAPTER:
                 mAdapter.setData(mInfoList);
@@ -392,7 +393,7 @@ public class ChildHolderActivity extends PermissionActivity<Song,ChildHolderAdap
 
     private class GetSongThread extends Thread{
         //是否需要重新查询歌曲列表
-        private boolean mNeedReset = true;
+        private boolean mNeedReset;
         GetSongThread(boolean needReset) {
             this.mNeedReset = needReset;
         }

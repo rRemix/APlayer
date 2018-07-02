@@ -52,7 +52,7 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
             @Override
             public void onItemClick(View view, int position) {
                 String name = getPlayListName(position);
-                if(!TextUtils.isEmpty(name) && !mMultiChoice.itemAddorRemoveWithClick(view,position,getPlayListId(position),TAG)){
+                if(!TextUtils.isEmpty(name) && !mMultiChoice.itemClick(mAdapter,position,getPlayListId(position),TAG)){
                     if(getPlayListSongCount(position) == 0) {
                         ToastUtil.show(mContext,getStringSafely(R.string.list_is_empty));
                         return;
@@ -70,7 +70,7 @@ public class PlayListFragment extends LibraryFragment<PlayList,PlayListAdapter>{
             public void onItemLongClick(View view, int position) {
                 String name = getPlayListName(position);
                 if(!TextUtils.isEmpty(name))
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,getPlayListId(position),TAG,Constants.PLAYLIST);
+                    mMultiChoice.itemLongClick(mAdapter,position,getPlayListId(position),TAG,Constants.PLAYLIST);
             }
         });
     }

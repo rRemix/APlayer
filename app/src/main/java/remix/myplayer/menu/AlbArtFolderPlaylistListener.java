@@ -127,7 +127,7 @@ public class AlbArtFolderPlaylistListener implements PopupMenu.OnMenuItemClickLi
                 Crop.pickImage((Activity) mContext, Crop.REQUEST_PICK);
                 break;
             default:
-                ToastUtil.show(mContext,"click " + item.getTitle());
+                ToastUtil.show(mContext,"itemClick " + item.getTitle());
         }
         return true;
     }

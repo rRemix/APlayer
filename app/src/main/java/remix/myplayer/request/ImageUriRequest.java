@@ -150,14 +150,13 @@ public abstract class ImageUriRequest<T> {
      */
     private String resolveEmbeddedPicture(Song song){
         String imageUrl = null;
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         try {
             if(song == null)
                 return "";
-            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
             retriever.setDataSource(song.getUrl());
 
             byte[] picture = retriever.getEmbeddedPicture();
-            retriever.release();
             if(picture != null){
                 Bitmap bitmap = BitmapFactory.decodeByteArray(picture,0,picture.length);
                 //保存bitmap
@@ -181,6 +180,8 @@ public abstract class ImageUriRequest<T> {
             }
         }catch (Exception e){
             e.printStackTrace();
+        }finally {
+            retriever.release();
         }
         return imageUrl;
     }
@@ -312,13 +313,17 @@ public abstract class ImageUriRequest<T> {
     }
 
 
-    private static final String[] FALLBACKS = {"cover.jpg", "album.jpg", "folder.jpg"};
+    private static final String[] FALLBACKS = {"cover.jpg", "album.jpg", "folder.jpg", "cover.png", "album.png", "folder.png"};
     private File fallback(Song song) {
         File parent = new File(song.getUrl()).getParentFile();
 
-        File same = new File(parent,song.getArtist() + " - " + song.getTitle() + ".jpg");
-        if(same.exists())
-            return same;
+        File sameJPG = new File(parent,song.getArtist() + " - " + song.getTitle() + ".jpg");
+        if(sameJPG.exists())
+            return sameJPG;
+
+        File samePNG = new File(parent,song.getArtist() + " - " + song.getTitle() + ".png");
+        if(samePNG.exists())
+            return samePNG;
 
         for (String fallback : FALLBACKS) {
             File cover = new File(parent, fallback);

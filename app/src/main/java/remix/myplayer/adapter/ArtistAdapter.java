@@ -165,8 +165,8 @@ public class ArtistAdapter extends HeaderAdapter<Artist, BaseViewHolder> impleme
 
         //是否处于选中状态
         if(MultiChoice.TAG.equals(ArtistFragment.TAG) &&
-                mMultiChoice.mSelectedPosition.contains(position - 1)){
-            mMultiChoice.addView(holder.mContainer);
+                mMultiChoice.getSelectPos().contains(position - 1)){
+            holder.mContainer.setSelected(true);
         } else {
             holder.mContainer.setSelected(false);
         }

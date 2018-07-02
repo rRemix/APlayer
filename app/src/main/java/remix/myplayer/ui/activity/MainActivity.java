@@ -339,6 +339,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
                 showAddPlayListButton(mPagerAdapter.getList().get(position).getTitle().equals(getString(R.string.tab_playlist)));
                 mMenuLayoutId = parseMenuId(mPagerAdapter.getList().get(position).getTag());
                 mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(position);
+                mMultiChoice.setAdapter(mCurrentFragment.getAdapter());
                 invalidateOptionsMenu();
             }
             @Override
@@ -346,6 +347,8 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
             }
         });
         mCurrentFragment = (LibraryFragment) mPagerAdapter.getItem(0);
+        mCurrentFragment.setAdapterLifeCycle(adapter -> mMultiChoice.setAdapter(adapter));
+
     }
 
     private int mMenuLayoutId = R.menu.menu_main;
@@ -692,7 +695,12 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         if(msg.what == Constants.RECREATE_ACTIVITY) {
             recreate();
         } else if(msg.what == Constants.CLEAR_MULTI){
-            mMultiChoice.clearSelectedViews();
+//            mMultiChoice.clearSelectedViews();
+            for(Fragment temp : getSupportFragmentManager().getFragments()){
+                if(temp instanceof LibraryFragment){
+                    ((LibraryFragment) temp).getAdapter().notifyDataSetChanged();
+                }
+            }
         } else if (msg.what == Constants.UPDATE_ADAPTER){
             //刷新适配器
             for(Fragment temp : getSupportFragmentManager().getFragments()){

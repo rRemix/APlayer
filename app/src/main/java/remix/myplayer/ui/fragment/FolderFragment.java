@@ -53,7 +53,7 @@ public class FolderFragment extends LibraryFragment<Folder,FolderAdapter>  {
             public void onItemClick(View view, int position) {
                 String path = mAdapter.getDatas().get(position).getPath();
                 if(getUserVisibleHint() && !TextUtils.isEmpty(path) &&
-                        !mMultiChoice.itemAddorRemoveWithClick(view,position,position,TAG)){
+                        !mMultiChoice.itemClick(mAdapter,position,position,TAG)){
                     Intent intent = new Intent(mContext, ChildHolderActivity.class);
                     intent.putExtra("Id", position);
                     intent.putExtra("Type", Constants.FOLDER);
@@ -66,7 +66,7 @@ public class FolderFragment extends LibraryFragment<Folder,FolderAdapter>  {
             public void onItemLongClick(View view, int position) {
                 String path = mAdapter.getDatas().get(position).getPath();
                 if(getUserVisibleHint() && !TextUtils.isEmpty(path))
-                    mMultiChoice.itemAddorRemoveWithLongClick(view,position,position,TAG,Constants.FOLDER);
+                    mMultiChoice.itemLongClick(mAdapter,position,position,TAG,Constants.FOLDER);
             }
         });
     }

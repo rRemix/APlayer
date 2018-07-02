@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseFragm
     protected boolean mHasPermission = false;
     protected MultiChoice mMultiChoice;
     private final String[] mPermissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private AdapterLifeCycle mLifeCycle;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -56,9 +58,15 @@ public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseFragm
             mMultiChoice = ((MultiChoiceActivity)mContext).getMultiChoice();
         }
         initAdapter();
+        if(mLifeCycle != null)
+            mLifeCycle.onAdded(mAdapter);
         initView();
 
         return rootView;
+    }
+
+    public void setAdapterLifeCycle(AdapterLifeCycle lifeCycle){
+        mLifeCycle = lifeCycle;
     }
 
     protected abstract int getLayoutID();
@@ -129,4 +137,8 @@ public abstract class LibraryFragment<D,A extends BaseAdapter> extends BaseFragm
 
     protected abstract Loader<List<D>> getLoader();
     protected abstract int getLoaderId();
+
+    public interface AdapterLifeCycle{
+        void onAdded(RecyclerView.Adapter adapter);
+    }
 }

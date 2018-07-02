@@ -128,11 +128,11 @@ public abstract class MultiChoiceActivity extends ToolbarActivity{
             if(SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"IsFirstMulti",true)){
                 SPUtil.putValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,"IsFirstMulti",false);
                 if(mTipPopupWindow == null){
-                    mTipPopupWindow = new TipPopupwindow(MultiChoiceActivity.this);
+                    mTipPopupWindow = new TipPopupwindow(this);
                     mTipPopupWindow.setOnDismissListener(() -> mTipPopupWindow = null);
                 }
                 if(!mTipPopupWindow.isShowing() && multiShow){
-                    mTipPopupWindow.show(new View(MultiChoiceActivity.this));
+                    mTipPopupWindow.show(new View(this));
                 }
             }
         });
