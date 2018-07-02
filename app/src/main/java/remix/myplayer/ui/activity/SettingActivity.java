@@ -353,14 +353,14 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 List<String> allPlayListsName = new ArrayList<>();
                 String newPlaylistName = file.getName().substring(0, file.getName().lastIndexOf("."));
                 //判断是否存在
-                boolean[] alreadyExist = new boolean[1];
+                boolean alreadyExist = false;
                 for (PlayList temp : Global.PlayList) {
                     allPlayListsName.add(temp.getName());
                     if (temp.getName().equalsIgnoreCase(newPlaylistName))
-                        alreadyExist[0] = true;
+                        alreadyExist = true;
                 }
                 //已经存在不新建
-                if (!alreadyExist[0]) {
+                if (!alreadyExist) {
                     allPlayListsName.add(0, newPlaylistName + "(" + getString(R.string.new_create) + ")");
                 }
                 new MaterialDialog.Builder(this)
@@ -369,8 +369,10 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                         .items(allPlayListsName)
                         .itemsColorAttr(R.attr.text_color_primary)
                         .backgroundColorAttr(R.attr.background_color_3)
-                        .itemsCallback((dialog1, itemView, position, text) ->
-                                mDisposables.add(importM3UFile(file, !alreadyExist[0] ? newPlaylistName : text.toString(), !alreadyExist[0])))
+                        .itemsCallback((dialog1, itemView, position, text) -> {
+                            final boolean chooseNew = position == 0 && text.toString().startsWith(newPlaylistName);
+                            mDisposables.add(importM3UFile(file, chooseNew ? newPlaylistName : text.toString(), chooseNew));
+                        })
                         .theme(ThemeStore.getMDDialogTheme())
                         .positiveText(R.string.confirm)
                         .positiveColorAttr(R.attr.text_color_primary)
