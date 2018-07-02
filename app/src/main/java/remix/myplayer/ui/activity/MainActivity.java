@@ -92,7 +92,6 @@ import remix.myplayer.util.ColorUtil;
 import remix.myplayer.util.Constants;
 import remix.myplayer.util.DensityUtil;
 import remix.myplayer.util.Global;
-import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.MediaStoreUtil;
 import remix.myplayer.util.PlayListUtil;
 import remix.myplayer.util.SPUtil;
@@ -186,7 +185,13 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         //handler
         mRefreshHandler = new MsgHandler(this);
 
-        parseIntent();
+        mRefreshHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                parseIntent();
+            }
+        },600);
+//        parseIntent();
 
 //        new MaterialDialog.Builder(this)
 //                .title("暂停应用内更新")
@@ -698,26 +703,19 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         }
     }
 
-    private static boolean mLoadComplete = false;
-    private class LoadFinishReceiver extends BroadcastReceiver {
+    public class LoadFinishReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent receive) {
-            LogUtil.d("StartAPlayer","receiveBroadcast");
-            if(ACTION_LOAD_FINISH.equals(receive != null ? receive.getAction() : "") && !mLoadComplete){
+            if(ACTION_LOAD_FINISH.equals(receive != null ? receive.getAction() : "")){
                 setUpBottomBar();
                 UpdateUI(MusicService.getCurrentMP3(), MusicService.isPlay());
-                mLoadComplete = true;
             }
-            if(mLoadComplete){
-                parseIntent();
-            }
-
         }
     }
 
     private void parseIntent() {
         final Intent param = getIntent();
-        if(param != null && param.getData() != null && mLoadComplete){
+        if(param != null && param.getData() != null){
             int id = MediaStoreUtil.getSongIdByUrl(Uri.decode(param.getData().getPath()));
             if(id < 0)
                 return;

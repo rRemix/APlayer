@@ -86,7 +86,6 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 import static remix.myplayer.util.ImageUriUtil.getSearchRequestWithAlbumType;
-import static tv.danmaku.ijk.media.player.IjkMediaMeta.IJKM_KEY_DURATION_US;
 
 
 /**
@@ -290,7 +289,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
 //            return START_STICKY;
 //        }
 //        mPlaybackHandler.postDelayed(() -> handleStartCommandIntent(commandIntent, action),200);
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     private void setUp() {

@@ -38,7 +38,7 @@ import remix.myplayer.util.Util;
  * Created by taeja on 16-4-13.
  */
 public class EQActivity extends ToolbarActivity {
-    private final static String TAG = "EQActivity";
+    private final static String TAG = "SetUpEQ";
     private static Equalizer mEqualizer;
     private static short mBandNumber = -1;
     private static short mMaxEQLevel = -1;
@@ -67,6 +67,7 @@ public class EQActivity extends ToolbarActivity {
             @Override
             public void run() {
                 try {
+                    Thread.sleep(600);
                     int AudioSessionId = MusicService.getMediaPlayer().getAudioSessionId();
                     LogUtil.d(TAG,"AudioSessionId:" + AudioSessionId);
                     if(AudioSessionId  == 0) {
