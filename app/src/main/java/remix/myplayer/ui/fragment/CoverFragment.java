@@ -8,8 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.ControllerListener;
@@ -42,8 +40,8 @@ import remix.myplayer.util.Global;
 public class CoverFragment extends BaseFragment {
     @BindView(R.id.cover_image)
     SimpleDraweeView mImage;
-    @BindView(R.id.cover_shadow)
-    ImageView mShadow;
+//    @BindView(R.id.cover_shadow)
+//    ImageView mShadow;
     @BindView(R.id.cover_container)
     View mCoverContainer;
 
@@ -71,14 +69,14 @@ public class CoverFragment extends BaseFragment {
             public boolean onPreDraw() {
                 mImage.getViewTreeObserver().removeOnPreDrawListener(this);
 
-                int imageWidth = mImage.getWidth();
-                int imageHeight = mImage.getHeight();
-                //如果封面宽度大于高度 需要处理下
-                if(imageWidth > imageHeight){
-                    RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) mImage.getLayoutParams();
-                    lp.width = lp.height = imageHeight;
-                    mImage.setLayoutParams(lp);
-                }
+//                int imageWidth = mCoverContainer.getWidth();
+//                int imageHeight = mCoverContainer.getHeight();
+//                //如果封面宽度大于高度 需要处理下
+//                if(imageWidth > imageHeight){
+//                    ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mCoverContainer.getLayoutParams();
+//                    lp.width = lp.height = imageHeight;
+//                    mCoverContainer.setLayoutParams(lp);
+//                }
 
                 if(mInflateFinishListener != null)
                     mInflateFinishListener.onViewInflateFinish(mImage);
@@ -104,9 +102,7 @@ public class CoverFragment extends BaseFragment {
             return;
         if (mImage == null || info == null)
             return;
-
         mUri = uri;
-
         if(withAnim){
             int operation = Global.getOperation();
 
@@ -158,12 +154,12 @@ public class CoverFragment extends BaseFragment {
             outAnim.setEndValue(endValue);
         } else {
             setImageUriInternal();
-            mShadow.setVisibility(View.VISIBLE);
+//            mShadow.setVisibility(View.VISIBLE);
         }
     }
 
     public void setImageUriInternal(){
-        mShadow.setVisibility(View.INVISIBLE);
+//        mShadow.setVisibility(View.INVISIBLE);
         ImageRequestBuilder imageRequestBuilder = ImageRequestBuilder.newBuilderWithSource(mUri);
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(imageRequestBuilder.build())
@@ -180,7 +176,7 @@ public class CoverFragment extends BaseFragment {
                             mFirstLoadFinishListener.onFirstLoadFinish();
                             mFirstLoadFinishListener = null;
                         }
-                        mShadow.setVisibility(View.VISIBLE);
+//                        mShadow.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -199,7 +195,7 @@ public class CoverFragment extends BaseFragment {
                             mFirstLoadFinishListener.onFirstLoadFinish();
                             mFirstLoadFinishListener = null;
                         }
-                        mShadow.setVisibility(View.VISIBLE);
+//                        mShadow.setVisibility(View.VISIBLE);
                     }
 
                     @Override

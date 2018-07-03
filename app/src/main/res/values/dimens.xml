@@ -119,5 +119,6 @@
     <dimen name="player_seekbar_margin">8dp</dimen>
     <dimen name="cover_margin">9dp</dimen>
     <dimen name="record_margin">34dp</dimen>
+    <dimen name="layout_player_topbar_height">56dp</dimen>
 
 </resources>

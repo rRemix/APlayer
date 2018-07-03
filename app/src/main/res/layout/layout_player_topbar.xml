@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/d56_size"
+    android:layout_height="@dimen/layout_player_topbar_height"
     android:id="@+id/top_actionbar">
     <ImageButton
         android:layout_width="@dimen/d40_size"

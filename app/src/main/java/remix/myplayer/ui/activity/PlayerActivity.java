@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
@@ -39,11 +38,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
@@ -59,6 +56,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import remix.myplayer.R;
 import remix.myplayer.adapter.PagerAdapter;
+import remix.myplayer.bean.AnimationUrl;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.helper.UpdateHelper;
 import remix.myplayer.interfaces.OnTagEditListener;
@@ -192,6 +190,14 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     //是否需要更新
     private boolean mNeedUpdateUI = true;
 
+    //动画图片信息
+    private AnimationUrl mAnimUrl;
+
+    //Fragment
+    private LyricFragment mLyricFragment;
+    private CoverFragment mCoverFragment;
+    private RecordFragment mRecordFragment;
+
     private static final String SCALE_WIDTH = "SCALE_WIDTH";
     private static final String SCALE_HEIGHT = "SCALE_HEIGHT";
     private static final String TRANSITION_X = "TRANSITION_X";
@@ -307,6 +313,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         //获是否正在播放和正在播放的歌曲
         mInfo = MusicService.getCurrentMP3();
         mIsPlay = MusicService.isPlay();
+        mAnimUrl = getIntent().getParcelableExtra("AnimUrl");
 
         setUpSize();
         setUpTop();
@@ -322,10 +329,15 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mContainer.addView(mAnimCover);
 
         //设置封面
-        if(mInfo != null)
-            new LibraryUriRequest(mAnimCover,
-                    getSearchRequestWithAlbumType(mInfo),
-                    new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
+        if(mInfo != null){
+            if(mAnimUrl != null && !TextUtils.isEmpty(mAnimUrl.getUrl()) && mAnimUrl.getAlbumId() == mInfo.getAlbumId()){
+                mAnimCover.setImageURI(mAnimUrl.getUrl());
+            }else{
+                new LibraryUriRequest(mAnimCover,
+                        getSearchRequestWithAlbumType(mInfo),
+                        new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
+            }
+        }
 
         //恢复位置信息
         if(savedInstanceState != null && savedInstanceState.getParcelable("Rect") != null){
@@ -350,7 +362,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     @Override
     protected void onStart() {
         super.onStart();
-        //只有从Mactivity启动，才使用动画
+        //只有从Activity启动，才使用动画
         if(!mFromNotify && mFromActivity) {
             overridePendingTransition(0,0);
             mFromActivity = false;
@@ -409,40 +421,41 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             DraweeController controller = Fresco.newDraweeControllerBuilder()
                     .setImageRequest(imageRequestBuilder.build())
                     .setOldController(mAnimCover.getController())
-                    .setControllerListener(new ControllerListener<ImageInfo>() {
-                        @Override
-                        public void onSubmit(String id, Object callerContext) {
-
-                        }
-
-                        @Override
-                        public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
-                            playBackAnimation();
-                        }
-
-                        @Override
-                        public void onIntermediateImageSet(String id, ImageInfo imageInfo) {
-
-                        }
-
-                        @Override
-                        public void onIntermediateImageFailed(String id, Throwable throwable) {
-
-                        }
-
-                        @Override
-                        public void onFailure(String id, Throwable throwable) {
-                            playBackAnimation();
-                        }
-
-                        @Override
-                        public void onRelease(String id) {
-
-                        }
-                    })
+//                    .setControllerListener(new ControllerListener<ImageInfo>() {
+//                        @Override
+//                        public void onSubmit(String id, Object callerContext) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
+//                            playBackAnimation();
+//                        }
+//
+//                        @Override
+//                        public void onIntermediateImageSet(String id, ImageInfo imageInfo) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onIntermediateImageFailed(String id, Throwable throwable) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onFailure(String id, Throwable throwable) {
+//                            playBackAnimation();
+//                        }
+//
+//                        @Override
+//                        public void onRelease(String id) {
+//
+//                        }
+//                    })
                     .build();
             mAnimCover.setController(controller);
             mAnimCover.setVisibility(View.VISIBLE);
+            playBackAnimation();
         } else {
             finish();
             overridePendingTransition(0,R.anim.audio_out);
@@ -470,10 +483,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             @Override
             public void onSpringActivate(Spring spring) {
                 //隐藏fragment中的image
-                if(mAdapter.getItem(1) instanceof CoverFragment){
-                    ((CoverFragment) mAdapter.getItem(1)).hideImage();
-                }
-
+                mCoverFragment.hideImage();
             }
             @Override
             public void onSpringAtRest(Spring spring) {
@@ -771,17 +781,16 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         bundle.putParcelable("Song", mInfo);
 
         //初始化所有fragment
-        final RecordFragment recordFragment = new RecordFragment();
-        mAdapter.addFragment(recordFragment);
-        CoverFragment coverFragment = new CoverFragment();
-        coverFragment.setOnFirstLoadFinishListener(() -> mAnimCover.setVisibility(View.INVISIBLE));
+        mRecordFragment = new RecordFragment();
+        mAdapter.addFragment(mRecordFragment);
+        mCoverFragment = new CoverFragment();
+        mCoverFragment.setOnFirstLoadFinishListener(() -> mAnimCover.setVisibility(View.INVISIBLE));
 
-        coverFragment.setInflateFinishListener(view -> {
+        mCoverFragment.setInflateFinishListener(view -> {
             //从通知栏启动只设置位置信息并隐藏
             //不用启动动画
             if (mFromNotify) {
-                if (mAdapter.getItem(1) instanceof CoverFragment)
-                    ((CoverFragment) mAdapter.getItem(1)).showImage();
+                mCoverFragment.showImage();
                 //隐藏动画用的封面并设置位置信息
                 mAnimCover.setVisibility(View.GONE);
                 return;
@@ -832,9 +841,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
                 @Override
                 public void onSpringAtRest(Spring spring) {
                     //入场动画结束时显示fragment中的封面
-                    if (mAdapter.getItem(1) instanceof CoverFragment) {
-                        ((CoverFragment) mAdapter.getItem(1)).showImage();
-                    }
+                    mCoverFragment.showImage();
 //                    mHandler.postDelayed(() -> {
 //                        //隐藏动画用的封面
 //                        mAnimCover.setVisibility(View.INVISIBLE);
@@ -851,11 +858,11 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             spring.setEndValue(1);
 
         });
-        coverFragment.setArguments(bundle);
+        mCoverFragment.setArguments(bundle);
 
-        mAdapter.addFragment(coverFragment);
-        final LyricFragment lyricFragment = new LyricFragment();
-        lyricFragment.setOnInflateFinishListener(view -> {
+        mAdapter.addFragment(mCoverFragment);
+        mLyricFragment = new LyricFragment();
+        mLyricFragment.setOnInflateFinishListener(view -> {
             mLrcView = (LrcView) view;
             mLrcView.setOnLrcClickListener(new LrcView.OnLrcClickListener() {
                 @Override
@@ -876,9 +883,8 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             mLrcView.setOtherColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
             mLrcView.setTimeLineColor(ColorUtil.getColor(ThemeStore.isDay() ? R.color.lrc_normal_day : R.color.lrc_normal_night));
         });
-        lyricFragment.setArguments(bundle);
-        mAdapter.addFragment(lyricFragment);
-
+        mLyricFragment.setArguments(bundle);
+        mAdapter.addFragment(mLyricFragment);
         mPager.setAdapter(mAdapter);
         mPager.setOffscreenPageLimit(mAdapter.getCount() - 1);
 
@@ -946,7 +952,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             updateTopStatus(mInfo);
             //更新歌词
             if(!mFistStart){
-                ((LyricFragment) mAdapter.getItem(2)).updateLrc(mInfo);
+                mLyricFragment.updateLrc(mInfo);
             }
             //更新进度条
             int temp = MusicService.getProgress();
@@ -1072,7 +1078,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     }
 
     private void updateCover(boolean withAnimation){
-        ((CoverFragment) mAdapter.getItem(1)).updateCover(mInfo,mUri,withAnimation);
+        mCoverFragment.updateCover(mInfo,mUri,withAnimation);
         mFistStart = false;
     }
 
@@ -1134,7 +1140,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
 //            }
 //        }
         SPUtil.putValue(mContext,SPUtil.LYRIC_KEY.LYRIC_NAME,mInfo.getId() + "",SPUtil.LYRIC_KEY.LYRIC_MANUAL);
-        ((LyricFragment) mAdapter.getItem(2)).updateLrc(file.getAbsolutePath());
+        mLyricFragment.updateLrc(file.getAbsolutePath());
         sendBroadcast(new Intent(MusicService.ACTION_CMD).putExtra("Control", Command.CHANGE_LYRIC));
     }
 
@@ -1173,14 +1179,14 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     }
 
     public LyricFragment getLyricFragment(){
-        return (LyricFragment) mAdapter.getItem(2);
+        return mLyricFragment;
     }
 
     @Override
     public void onTagEdit(Song newSong) {
         if(newSong != null){
             updateTopStatus(newSong);
-            ((LyricFragment) mAdapter.getItem(2)).updateLrc(newSong,true);
+            mLyricFragment.updateLrc(newSong,true);
             Fresco.getImagePipeline().clearCaches();
             final UriRequest request = ImageUriUtil.getSearchRequestWithAlbumType(mInfo);
             SPUtil.deleteValue(mContext,SPUtil.COVER_KEY.COVER_NAME,request.getLastFMKey());

@@ -26,6 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import remix.myplayer.App;
 import remix.myplayer.R;
+import remix.myplayer.bean.AnimationUrl;
 import remix.myplayer.bean.mp3.Song;
 import remix.myplayer.menu.CtrlButtonListener;
 import remix.myplayer.request.LibraryUriRequest;
@@ -68,6 +69,8 @@ public class BottomActionBarFragment extends BaseFragment{
 
     //保存封面位置信息
     private Rect mCoverRect;
+    //图片路径
+    private AnimationUrl mAnimUrl = new AnimationUrl();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -112,6 +115,7 @@ public class BottomActionBarFragment extends BaseFragment{
                 return true;
             }
         });
+
         return rootView;
     }
 
@@ -128,7 +132,21 @@ public class BottomActionBarFragment extends BaseFragment{
         if(mCover != null)
             new LibraryUriRequest(mCover,
                     getSearchRequestWithAlbumType(song),
-                    new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()).load();
+                    new RequestConfig.Builder(SMALL_IMAGE_SIZE, SMALL_IMAGE_SIZE).build()){
+                @Override
+                public void onSuccess(String result) {
+                    super.onSuccess(result);
+                    mAnimUrl.setAlbumId(song.getAlbumId());
+                    mAnimUrl.setUrl(result);
+                }
+
+                @Override
+                public void onError(String errMsg) {
+                    super.onError(errMsg);
+                    mAnimUrl.setAlbumId(-1);
+                    mAnimUrl.setUrl("");
+                }
+            }.load();
         //设置按钮着色
         if(mPlayButton == null)
             return;
@@ -148,11 +166,10 @@ public class BottomActionBarFragment extends BaseFragment{
             return;
         Intent intent = new Intent(mContext, PlayerActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putParcelable("Song",MusicService.getCurrentMP3());
         intent.putExtras(bundle);
-        intent.putExtra("isPlay",MusicService.isPlay());
         intent.putExtra("FromActivity",true);
         intent.putExtra("Rect",mCoverRect);
+        intent.putExtra("AnimUrl",mAnimUrl);
 
         ActivityOptionsCompat options = ActivityOptionsCompat
                 .makeSceneTransitionAnimation(getActivity(), mCover, "image");
