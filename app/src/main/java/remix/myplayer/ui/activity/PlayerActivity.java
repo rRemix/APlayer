@@ -17,6 +17,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.graphics.Palette;
 import android.support.v7.view.ContextThemeWrapper;
@@ -44,6 +46,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringConfig;
 import com.facebook.rebound.SpringSystem;
 import com.umeng.analytics.MobclickAgent;
 
@@ -220,6 +223,12 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
      * 终点View的位置信息
      */
     private static Rect mDestRect = new Rect();
+    /**
+     * 动画参数
+     */
+    private static final SpringConfig COVER_IN_SPRING_CONFIG = SpringConfig.fromOrigamiTensionAndFriction(30, 7);
+    private static final SpringConfig COVER_OUT_SPRING_CONFIG = SpringConfig.fromOrigamiTensionAndFriction(35, 7);
+
     /**
      * 下拉关闭
      */
@@ -469,6 +478,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         final float scaleX = mScaleBundle.getFloat(SCALE_WIDTH) - 1;
         final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
         Spring coverSpring = SpringSystem.create().createSpring();
+        coverSpring.setSpringConfig(COVER_OUT_SPRING_CONFIG);
         coverSpring.addListener(new SimpleSpringListener(){
             @Override
             public void onSpringUpdate(Spring spring) {
@@ -776,14 +786,28 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
     @SuppressLint("ClickableViewAccessibility")
     private void setUpViewPager(){
         mAdapter = new PagerAdapter(getSupportFragmentManager());
+        //activity重启后复用以前的fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if(fragmentManager.getFragments() != null && fragmentManager.getFragments().size() > 0){
+            for(Fragment fragment : fragmentManager.getFragments()){
+                if(fragment instanceof RecordFragment){
+                    mRecordFragment = (RecordFragment) fragment;
+                }else if(fragment instanceof CoverFragment){
+                    mCoverFragment = (CoverFragment) fragment;
+                }else if(fragment instanceof LyricFragment)
+                    mLyricFragment = (LyricFragment) fragment;
+            }
+        }
         Bundle bundle = new Bundle();
         bundle.putInt("Width", mWidth);
         bundle.putParcelable("Song", mInfo);
 
         //初始化所有fragment
-        mRecordFragment = new RecordFragment();
+        if(mRecordFragment == null)
+            mRecordFragment = new RecordFragment();
         mAdapter.addFragment(mRecordFragment);
-        mCoverFragment = new CoverFragment();
+        if(mCoverFragment == null)
+            mCoverFragment = new CoverFragment();
         mCoverFragment.setOnFirstLoadFinishListener(() -> mAnimCover.setVisibility(View.INVISIBLE));
 
         mCoverFragment.setInflateFinishListener(view -> {
@@ -827,6 +851,7 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
             final float scaleY = mScaleBundle.getFloat(SCALE_HEIGHT) - 1;
 
             final Spring spring = SpringSystem.create().createSpring();
+            spring.setSpringConfig(COVER_IN_SPRING_CONFIG);
             spring.addListener(new SimpleSpringListener(){
                 @Override
                 public void onSpringUpdate(Spring spring) {
@@ -861,7 +886,9 @@ public class PlayerActivity extends BaseActivity implements UpdateHelper.Callbac
         mCoverFragment.setArguments(bundle);
 
         mAdapter.addFragment(mCoverFragment);
-        mLyricFragment = new LyricFragment();
+
+        if(mLyricFragment == null)
+            mLyricFragment = new LyricFragment();
         mLyricFragment.setOnInflateFinishListener(view -> {
             mLrcView = (LrcView) view;
             mLrcView.setOnLrcClickListener(new LrcView.OnLrcClickListener() {
