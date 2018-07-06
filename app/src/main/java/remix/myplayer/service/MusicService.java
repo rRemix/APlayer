@@ -412,7 +412,6 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
         mMediaPlayer.setOnPreparedListener(mp -> {
             LogUtil.d(TAG,"准备完成:" + mFirstPrepared);
             if(mFirstPrepared){
-                pause(false);
                 mFirstPrepared = false;
                 if(mLastProgress > 0){
                     mMediaPlayer.seekTo(mLastProgress);

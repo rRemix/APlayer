@@ -185,12 +185,7 @@ public class MainActivity extends MultiChoiceActivity implements UpdateHelper.Ca
         //handler
         mRefreshHandler = new MsgHandler(this);
 
-        mRefreshHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                parseIntent();
-            }
-        },600);
+        mRefreshHandler.postDelayed(this::parseIntent,600);
 //        parseIntent();
 
 //        new MaterialDialog.Builder(this)
