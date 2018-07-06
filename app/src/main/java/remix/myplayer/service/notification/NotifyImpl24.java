@@ -71,6 +71,8 @@ public class NotifyImpl24 extends Notify{
                         buildPendingIntent(mService, Command.TOGGLE))
                 .addAction(R.drawable.ic_skip_next_black_24dp, mService.getString(R.string.next),
                         buildPendingIntent(mService, Command.NEXT))
+                .addAction(R.drawable.ic_desktop_lyric_black_24dp,mService.getString(R.string.float_lrc),
+                        buildPendingIntent(mService, Command.TOGGLE_FLOAT_LRC))
 //                .setDeleteIntent(PendingIntent.getBroadcast(mService,3,deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .setContentIntent(getContentIntent())
                 .setContentTitle(song.getTitle())

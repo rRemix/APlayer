@@ -12,6 +12,7 @@ import android.graphics.PixelFormat;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.media.session.PlaybackState;
+import android.net.Uri;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -20,6 +21,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -862,8 +864,26 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     updateAppwidget();
                     break;
                 //桌面歌词
-                case Constants.TOGGLE_FLOAT_LRC:
-                    boolean open = intent.getBooleanExtra("FloatLrc",false);
+                case Command.TOGGLE_FLOAT_LRC:
+                    boolean open;
+                    if(intent.hasExtra("FloatLrc")){
+                        open = intent.getBooleanExtra("FloatLrc",false);
+                    }else{
+                        open = !SPUtil.getValue(mContext,
+                                SPUtil.SETTING_KEY.SETTING_NAME,
+                                SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW,false);
+                        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW,open);
+                    }
+                    if (open && !FloatWindowManager.getInstance().checkPermission(mContext)) {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                            Intent permissionIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                            permissionIntent.setData(Uri.parse("package:" + getPackageName()));
+                            permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(permissionIntent);
+                        }
+                        ToastUtil.show(mContext, R.string.plz_give_float_permission);
+                        break;
+                    }
                     if(mShowFloatLrc != open){
                         mShowFloatLrc = open;
                         if(mShowFloatLrc){

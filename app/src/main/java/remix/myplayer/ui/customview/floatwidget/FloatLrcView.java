@@ -37,7 +37,6 @@ import remix.myplayer.lyric.bean.LrcRow;
 import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.theme.ThemeStore;
-import remix.myplayer.util.Constants;
 import remix.myplayer.util.LogUtil;
 import remix.myplayer.util.SPUtil;
 import remix.myplayer.util.ToastUtil;
@@ -284,7 +283,7 @@ public class FloatLrcView extends RelativeLayout {
                 SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME, SPUtil.SETTING_KEY.FLOAT_LYRIC_SHOW,false);
                 Intent closeIntent = new Intent(MusicService.ACTION_CMD);
                 closeIntent.putExtra("FloatLrc",false);
-                closeIntent.putExtra("Control",Constants.TOGGLE_FLOAT_LRC);
+                closeIntent.putExtra("Control", Command.TOGGLE_FLOAT_LRC);
                 mContext.sendBroadcast(closeIntent);
                 break;
             //锁定

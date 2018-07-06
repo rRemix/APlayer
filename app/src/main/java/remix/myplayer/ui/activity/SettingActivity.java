@@ -171,6 +171,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, keyWord[index], isChecked);
                         switch (buttonView.getId()) {
                             //变色导航栏
                             case R.id.setting_navaigation_switch:
@@ -206,7 +207,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 mFloatLrcTip.setText(isChecked ? R.string.opened_float_lrc : R.string.closed_float_lrc);
                                 Intent intent = new Intent(MusicService.ACTION_CMD);
                                 intent.putExtra("FloatLrc", mFloatLrcSwitch.isChecked());
-                                intent.putExtra("Control", Constants.TOGGLE_FLOAT_LRC);
+                                intent.putExtra("Control", Command.TOGGLE_FLOAT_LRC);
                                 sendBroadcast(intent);
                                 break;
                             //屏幕常亮
@@ -236,7 +237,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 mNeedRefreshAdapter = true;
                                 break;
                         }
-                        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, keyWord[index], isChecked);
+
                     }
                 });
             }
