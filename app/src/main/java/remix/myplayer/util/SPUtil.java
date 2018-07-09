@@ -158,6 +158,8 @@ public class SPUtil {
         public static final String TIMER_DEFAULT = "timer_default";
         //定时器时长
         public static final String TIMER_DURATION = "timer_duration";
+        //封面下载源
+        public static final String ALBUM_COVER_DOWNLOAD_SOURCE = "album_cover_download_source";
     }
 
 }

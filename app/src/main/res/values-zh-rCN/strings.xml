@@ -270,6 +270,7 @@
     <string name="delete_source">同时删除源文件</string>
     <string name="kugou">酷狗</string>
     <string name="netease">网易</string>
+    <string name="lastfm">LastFM</string>
     <string name="cancel_timer">取消计时</string>
     <string name="start_timer">开始计时</string>
     <string name="sort_order">排序</string>
@@ -330,4 +331,6 @@
     <string name="choose_playlist_to_export">选择要导出的歌单</string>
     <string name="export_fail">导出失败:%s</string>
     <string name="export_success">导出成功</string>
+    <string name="cover_download_source">封面下载源</string>
+    <string name="cover_download_source_tip">默认从LastFM下载</string>
 </resources>

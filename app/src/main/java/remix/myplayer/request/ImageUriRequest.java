@@ -70,6 +70,12 @@ public abstract class ImageUriRequest<T> {
     public static boolean IGNORE_MEDIA_STORE = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,
             SPUtil.SETTING_KEY.IGNORE_MEDIA_STORE,false);
 
+    //封面下载源
+    public static final int DOWNLOAD_NETEASE = 1;
+    public static final int DOWNLOAD_LASTFM = 0;
+    public static int DOWNLOAD_SOURCE = SPUtil.getValue(App.getContext(),SPUtil.SETTING_KEY.SETTING_NAME,
+            SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,DOWNLOAD_LASTFM);
+
     protected RequestConfig mConfig = DEFAULT_CONFIG;
 
     private static final RequestConfig DEFAULT_CONFIG = new RequestConfig.Builder()
@@ -187,7 +193,7 @@ public abstract class ImageUriRequest<T> {
     }
 
     private Observable<String> getNetworkThumbObservable(UriRequest request){
-        return IS_GOOGLEPLAY ? getLastFMNetworkThumbObservable(request) : getNeteaseNetworkThumbObservable(request);
+        return IS_GOOGLEPLAY || DOWNLOAD_SOURCE == DOWNLOAD_LASTFM ? getLastFMNetworkThumbObservable(request) : getNeteaseNetworkThumbObservable(request);
     }
 
     //lastFM
