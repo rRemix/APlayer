@@ -12,6 +12,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.TaskStackBuilder;
 
 import remix.myplayer.R;
+import remix.myplayer.service.Command;
 import remix.myplayer.service.MusicService;
 import remix.myplayer.ui.activity.PlayerActivity;
 import remix.myplayer.util.Global;
@@ -114,10 +115,17 @@ public abstract class Notify {
         intent.putExtra("Control",operation);
         intent.setComponent(new ComponentName(context,MusicService.class));
         intent.putExtra("FromNotify",true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            return PendingIntent.getForegroundService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        } else {
+
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
             return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }else{
+            if(operation != Command.TOGGLE_FLOAT_LRC){
+                return PendingIntent.getForegroundService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            }else{
+                PendingIntent.getBroadcast(context,operation,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+            }
         }
+
+        return PendingIntent.getService(context, operation, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }

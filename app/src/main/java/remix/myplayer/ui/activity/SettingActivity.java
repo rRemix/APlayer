@@ -74,6 +74,7 @@ import static remix.myplayer.bean.Category.ALL_LIBRARY_STRING;
 import static remix.myplayer.helper.M3UHelperKt.exportPlayListToFile;
 import static remix.myplayer.helper.M3UHelperKt.importLocalPlayList;
 import static remix.myplayer.helper.M3UHelperKt.importM3UFile;
+import static remix.myplayer.request.ImageUriRequest.DOWNLOAD_LASTFM;
 
 /**
  * @ClassName SettingActivity
@@ -171,6 +172,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                 view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, keyWord[index], isChecked);
                         switch (buttonView.getId()) {
                             //变色导航栏
                             case R.id.setting_navaigation_switch:
@@ -206,7 +208,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 mFloatLrcTip.setText(isChecked ? R.string.opened_float_lrc : R.string.closed_float_lrc);
                                 Intent intent = new Intent(MusicService.ACTION_CMD);
                                 intent.putExtra("FloatLrc", mFloatLrcSwitch.isChecked());
-                                intent.putExtra("Control", Constants.TOGGLE_FLOAT_LRC);
+                                intent.putExtra("Control", Command.TOGGLE_FLOAT_LRC);
                                 sendBroadcast(intent);
                                 break;
                             //屏幕常亮
@@ -236,7 +238,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                 mNeedRefreshAdapter = true;
                                 break;
                         }
-                        SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME, keyWord[index], isChecked);
+
                     }
                 });
             }
@@ -285,6 +287,7 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
 
         if (IS_GOOGLEPLAY) {
             findViewById(R.id.setting_update_container).setVisibility(View.GONE);
+            findViewById(R.id.setting_cover_source_container).setVisibility(View.GONE);
         }
     }
 
@@ -395,7 +398,8 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
             R.id.setting_lrc_path_container, R.id.setting_clear_container, R.id.setting_breakpoint_container,
             R.id.setting_screen_container, R.id.setting_scan_container, R.id.setting_classic_notify_container,
             R.id.setting_album_cover_container, R.id.setting_library_category_container, R.id.setting_immersive_container,
-            R.id.setting_import_playlist_container, R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container})
+            R.id.setting_import_playlist_container, R.id.setting_export_playlist_container, R.id.setting_ignore_mediastore_container,
+            R.id.setting_cover_source_container})
     public void onClick(View v) {
         switch (v.getId()) {
             //文件过滤
@@ -655,6 +659,30 @@ public class SettingActivity extends ToolbarActivity implements FolderChooserDia
                                     SPUtil.putValue(mContext, SPUtil.SETTING_KEY.SETTING_NAME,
                                             SPUtil.SETTING_KEY.AUTO_DOWNLOAD_ALBUM_COVER,
                                             text.toString());
+                                    return true;
+                                })
+                        .backgroundColorAttr(R.attr.background_color_3)
+                        .itemsColorAttr(R.attr.text_color_primary)
+                        .theme(ThemeStore.getMDDialogTheme())
+                        .show();
+                break;
+            //封面下载源
+            case R.id.setting_cover_source_container:
+                final int oldChoice = SPUtil.getValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,DOWNLOAD_LASTFM);
+                new MaterialDialog.Builder(this)
+                        .title(R.string.cover_download_source)
+                        .titleColorAttr(R.attr.text_color_primary)
+                        .positiveText(R.string.choose)
+                        .positiveColorAttr(R.attr.text_color_primary)
+                        .buttonRippleColorAttr(R.attr.ripple_color)
+                        .items(new String[]{getString(R.string.lastfm), getString(R.string.netease)})
+                        .itemsCallbackSingleChoice(oldChoice,
+                                (dialog, view, which, text) -> {
+                                    if(oldChoice != which){
+                                        mNeedRefreshAdapter = true;
+                                        ImageUriRequest.DOWNLOAD_SOURCE = which;
+                                        SPUtil.putValue(mContext,SPUtil.SETTING_KEY.SETTING_NAME,SPUtil.SETTING_KEY.ALBUM_COVER_DOWNLOAD_SOURCE,which);
+                                    }
                                     return true;
                                 })
                         .backgroundColorAttr(R.attr.background_color_3)

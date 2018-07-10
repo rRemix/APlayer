@@ -270,6 +270,7 @@
     <string name="delete_source">Also delete the source file</string>
     <string name="kugou">Kugou</string>
     <string name="netease">Netease</string>
+    <string name="lastfm">LastFM</string>
     <string name="cancel_timer">Cancel sleep timer</string>
     <string name="start_timer">Start sleep timer</string>
     <string name="sort_order">Sort</string>
@@ -330,4 +331,6 @@
     <string name="choose_playlist_to_export">Select playlist to export</string>
     <string name="export_fail">Export failed:%s</string>
     <string name="export_success">Export success</string>
+    <string name="cover_download_source">Cover download source</string>
+    <string name="cover_download_source_tip">Default behavior is download from LastFM</string>
 </resources>

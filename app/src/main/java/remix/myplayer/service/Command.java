@@ -19,5 +19,5 @@ public interface Command {
     int CHANGE_LYRIC = 14;
     int PLAY_AT_BREAKPOINT = 15;
     int TOGGLE_TIMER = 16;
-
+    int TOGGLE_FLOAT_LRC = 17;
 }
