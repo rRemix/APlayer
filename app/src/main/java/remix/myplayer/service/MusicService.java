@@ -886,6 +886,7 @@ public class MusicService extends BaseService implements Playback,MusicEventHelp
                     }
                     if(mShowFloatLrc != open){
                         mShowFloatLrc = open;
+                        ToastUtil.show(mContext,mShowFloatLrc ? R.string.opened_float_lrc : R.string.closed_float_lrc);
                         if(mShowFloatLrc){
                             updateFloatLrc(false);
                         } else {

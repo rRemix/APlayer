@@ -110,7 +110,7 @@ public abstract class Notify {
         );
     }
 
-    protected PendingIntent buildPendingIntent(Context context, int operation) {
+    PendingIntent buildPendingIntent(Context context, int operation) {
         Intent intent = new Intent(MusicService.ACTION_CMD);
         intent.putExtra("Control",operation);
         intent.setComponent(new ComponentName(context,MusicService.class));

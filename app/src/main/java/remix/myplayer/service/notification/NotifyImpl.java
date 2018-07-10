@@ -139,6 +139,11 @@ public class NotifyImpl extends Notify {
         PendingIntent closeIntent = buildPendingIntent(context, Command.CLOSE_NOTIFY);
         mRemoteBigView.setOnClickPendingIntent(R.id.notify_close, closeIntent);
         mRemoteView.setOnClickPendingIntent(R.id.notify_close,closeIntent);
+
+        //桌面歌词
+        PendingIntent lyricIntent = buildPendingIntent(context,Command.TOGGLE_FLOAT_LRC);
+        mRemoteBigView.setOnClickPendingIntent(R.id.notify_lyric,lyricIntent);
+        mRemoteView.setOnClickPendingIntent(R.id.notify_lyric,lyricIntent);
     }
 
 }
